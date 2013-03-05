@@ -91,7 +91,7 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Key in XWikiContext for access to current hibernate database name.
      */
-    private static String currentDatabaseKey = "hibcurrentdatabase";
+    private static String CURRENT_DATABASE_KEY = "hibcurrentdatabase";
 
     private DatabaseProduct databaseProduct = DatabaseProduct.UNKNOWN;
 
@@ -681,6 +681,7 @@ public class XWikiHibernateBaseStore implements Initializable
     private void executeSQL(final String sql, Session session)
     {
         session.doWork(new Work() {
+            @Override
             public void execute(Connection connection) throws SQLException
             {
                 Statement stmt = null;
@@ -1349,7 +1350,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     private String getCurrentDatabase(XWikiContext context)
     {
-        return (String) context.get(currentDatabaseKey);
+        return (String) context.get(CURRENT_DATABASE_KEY);
     }
 
     /**
@@ -1358,7 +1359,16 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     private void setCurrentDatabase(XWikiContext context, String database)
     {
-        context.put(currentDatabaseKey, database);
+        context.put(CURRENT_DATABASE_KEY, database);
+    }
+
+    /**
+     * @return true if the user has configured Hibernate to use XWiki in schema mode (vs database mode)
+     * @since 4.5M1
+     */
+    protected boolean isInSchemaMode()
+    {
+        return StringUtils.equals(getConfiguration().getProperty("xwiki.virtual_mode"), "schema");
     }
 
     /**

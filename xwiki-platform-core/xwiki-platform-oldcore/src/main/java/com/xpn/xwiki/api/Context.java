@@ -176,10 +176,10 @@ public class Context extends Api
 
     /**
      * Returns the URL factory matching both the protocol used to make the current request and the container or
-     * environment in which XWiki is running. The most used concrete implementations of the <code>XWikiURLFactory</code>
-     * are <code>XWikiServletURLFactory</code> and <code>XWikiPortletURLFactory</code>. <code>XWikiURLFactory</code>
-     * offers a generic way of creating XWiki specific URLs that should be chosen instead of the basic string
-     * concatenation. Hard-coding the protocol used, like HTTP, inside wiki pages should be avoided.
+     * environment in which XWiki is running. The most used concrete implementation of the <code>XWikiURLFactory</code>
+     * is <code>XWikiServletURLFactory</code>. <code>XWikiURLFactory</code> offers a generic way of creating XWiki
+     * specific URLs that should be chosen instead of the basic string concatenation. Hard-coding the protocol used,
+     * like HTTP, inside wiki pages should be avoided.
      * 
      * @return The URL factory.
      */
@@ -369,7 +369,7 @@ public class Context extends Api
      * @param key The key to look for in the context.
      * @return The value associated with the given key in the XWiki context, if you have programming rights, or
      *         <code>null</code> otherwise.
-     * @see #put(String, Object)
+     * @see #put(String, java.lang.Object)
      */
     @Programming
     public java.lang.Object get(String key)

@@ -23,6 +23,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>Contains technical pages for the FAQ application.
-  </content>
+  <content>{{translation key='platform.faq.technical'/}}
+
+= {{translation key='platform.faq.list'/}} =
+
+{{spaceindex/}}
+
+</content>
 </xwikidoc>

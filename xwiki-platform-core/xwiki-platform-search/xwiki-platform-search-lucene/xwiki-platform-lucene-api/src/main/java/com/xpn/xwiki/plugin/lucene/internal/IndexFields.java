@@ -24,8 +24,6 @@ import java.util.Date;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 
-import com.xpn.xwiki.plugin.lucene.SearchResult;
-
 
 /**
  * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of

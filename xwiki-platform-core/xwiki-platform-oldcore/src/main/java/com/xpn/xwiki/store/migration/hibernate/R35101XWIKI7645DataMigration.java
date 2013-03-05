@@ -126,7 +126,8 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
                     // This exception is thrown when this migrator isn't really needed. This happens when migrating from
                     // a version between 3.2 and 3.5, which do use the proper table structure, but we can't easily
                     // distinguish between a pre-3.2 database and a post-3.2 database.
-                    if (ex.getMessage().contains("ORA-22859")) {
+                    // ORA-22859 on Oracle 11g, but ORA-22858 on Oracle 10g should be ignored.
+                    if (ex.getMessage().contains("ORA-22859") || ex.getMessage().contains("ORA-22858")) {
                         return;
                     } else {
                         throw ex;

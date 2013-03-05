@@ -26,6 +26,7 @@ import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.internal.message.TranslationMessageElement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.stability.Unstable;
 
 /**
  * Generate the final translation based or variables informations (parameters, etc.).
@@ -33,6 +34,7 @@ import org.xwiki.rendering.block.CompositeBlock;
  * @version $Id$
  * @since 4.3M2
  */
+@Unstable
 public interface TranslationMessage extends TranslationMessageElement
 {
     /**

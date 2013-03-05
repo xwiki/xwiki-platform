@@ -3756,7 +3756,6 @@ document.observe('xwiki:dom:loaded', function() {
 #if($xcontext.action == 'view')
   $response.sendRedirect($xwiki.getURL($doc.getFullName(), 'admin', $request.getQueryString()))##
 #else
-  $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
   $xwiki.jsx.use('XWiki.AdminSheet')##
   #if ($themeDoc)
     $xwiki.ssx.use('XWiki.AdminSheet', {'colorTheme' : $themeDocFullName})##

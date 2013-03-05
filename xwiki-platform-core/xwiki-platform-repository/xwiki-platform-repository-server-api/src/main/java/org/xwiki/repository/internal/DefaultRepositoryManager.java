@@ -528,7 +528,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
             if (attachment != null) {
                 resourceReference =
-                    new AttachmentResourceReference(this.entityReferenceSerializer.serialize(attachment.getReference()));
+                    new AttachmentResourceReference(
+                        this.entityReferenceSerializer.serialize(attachment.getReference()));
             }
         }
 
@@ -683,6 +684,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         BaseObject extensionProxyObject = document.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
         if (extensionProxyObject == null) {
             extensionProxyObject = document.newXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE, xcontext);
+            extensionProxyObject.setIntValue(XWikiRepositoryModel.PROP_PROXY_AUTOUPDATE, 1);
             needSave = true;
         }
 
@@ -839,7 +841,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
                 if (dependencyObject != null) {
                     String extensionVersion =
-                        getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, (String) null);
+                        getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION,
+                            (String) null);
 
                     if (StringUtils.isNotEmpty(extensionVersion)
                         && extension.getId().getVersion().equals(new DefaultVersion(extensionVersion))) {

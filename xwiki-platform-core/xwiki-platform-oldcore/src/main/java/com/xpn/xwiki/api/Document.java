@@ -1271,7 +1271,7 @@ public class Document extends Api
      * Displays the pretty name of the given field of the given object.
      * 
      * @param fieldname fieldname to display the pretty name of
-     * @param object Object to find the class to display the pretty name of
+     * @param obj Object to find the class to display the pretty name of
      * @return the pretty name display of the field.
      */
     public String displayPrettyName(String fieldname, Object obj)
@@ -1307,7 +1307,7 @@ public class Document extends Api
      * with the optional addition of a mandatory field.
      *
      * @param fieldname fieldname to display the pretty name of
-     * @param object Object to find the class to display the pretty name of
+     * @param obj Object to find the class to display the pretty name of
      * @param showMandatory true to display a mandatory sign
      * @return the pretty name display of the field.
      */
@@ -2718,13 +2718,19 @@ public class Document extends Api
     /**
      * Allow to easily access any revision of a document
      * 
-     * @param revision version to access
-     * @return Document object
-     * @throws XWikiException
+     * @param revision the version to access
+     * @return the document coresponding to the requested revision or {@code null} if the revision does not exist.
      */
-    public Document getDocumentRevision(String revision) throws XWikiException
+    public Document getDocumentRevision(String revision)
     {
-        return new Document(this.context.getWiki().getDocument(this.doc, revision, this.context), this.context);
+        try {
+            XWikiDocument documentRevision = this.context.getWiki().getDocument(this.doc, revision, this.context);
+            Document result = new Document(documentRevision, this.context);
+
+            return result;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

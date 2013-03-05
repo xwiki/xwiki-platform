@@ -34,7 +34,10 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 
 /**
  * Wizard step responsible for importing the content of an office document into the wysiwyg editor.
@@ -53,6 +56,12 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
      * Checkbox allowing the user to select whether he wants to filter out office styles or not.
      */
     private CheckBox filterStylesCheckBox;
+
+    /**
+     * Allows the user to choose between including the entire content of the office file in the edited content and
+     * including only the office viewer macro.
+     */
+    private CheckBox officeViewerCheckBox;
 
     /**
      * The component used to import office documents.
@@ -93,11 +102,8 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
 
         if (isOpenOfficeServerConnected) {
             setFileHelpLabel(Strings.INSTANCE.importOfficeFileHelpLabel());
-            // Add filter styles check box.
-            this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
-            // The filter styles check box should be checked by default.
-            this.filterStylesCheckBox.setValue(true);
-            display().add(filterStylesCheckBox);
+            initFilterStylesCheckBox();
+            initUseOfficeViewerCheckBox();
         } else {
             Label errorMessageLabel = new Label(Strings.INSTANCE.importOfficeFileFeatureNotAvailable());
             errorMessageLabel.addStyleName("xErrorMsg");
@@ -105,6 +111,44 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
             display().clear();
             display().add(errorMessageLabel);
         }
+    }
+
+    /**
+     * Initializes the filter styles check box.
+     */
+    private void initFilterStylesCheckBox()
+    {
+        this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
+        // The filter styles check box should be checked by default.
+        this.filterStylesCheckBox.setValue(true);
+
+        Panel label = new FlowPanel();
+        label.setStyleName(FIELD_LABEL_STYLE);
+        label.add(filterStylesCheckBox);
+        display().add(label);
+
+        Panel hint = new FlowPanel();
+        hint.setStyleName(FIELD_HINT_STYLE);
+        hint.add(new InlineLabel(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxHint()));
+        display().add(hint);
+    }
+
+    /**
+     * Initializes the office viewer check box.
+     */
+    private void initUseOfficeViewerCheckBox()
+    {
+        this.officeViewerCheckBox = new CheckBox(Strings.INSTANCE.importOfficeFileUseOfficeViewerCheckBoxLabel());
+
+        Panel label = new FlowPanel();
+        label.setStyleName(FIELD_LABEL_STYLE);
+        label.add(officeViewerCheckBox);
+        display().add(label);
+
+        Panel hint = new FlowPanel();
+        hint.setStyleName(FIELD_HINT_STYLE);
+        hint.add(new InlineLabel(Strings.INSTANCE.importOfficeFileUseOfficeViewerCheckBoxHint()));
+        display().add(hint);
     }
 
     /**
@@ -148,6 +192,9 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
         Map<String, String> params = new HashMap<String, String>();
         if (filterStylesCheckBox.getValue()) {
             params.put("filterStyles", "strict");
+        }
+        if (officeViewerCheckBox.getValue()) {
+            params.put("useOfficeViewer", "true");
         }
         // For Office2007: Office2007 generates an xhtml document (when copied) which has attributes and tags of
         // several namespaces. But the document itself doesn't contain the namespace definitions, which causes

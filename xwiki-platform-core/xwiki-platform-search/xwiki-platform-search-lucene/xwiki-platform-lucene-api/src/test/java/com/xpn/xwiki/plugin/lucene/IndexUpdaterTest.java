@@ -159,6 +159,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
             .will(returnValue(this.loremIpsum));
         this.mockXWiki.stubs().method("Param").with(ANYTHING, ANYTHING).will(new CustomStub("Implements XWiki.Param")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 return invocation.parameterValues.get(1);
@@ -304,6 +305,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         Thread indexCleaner = new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 indexUpdater.cleanIndex();

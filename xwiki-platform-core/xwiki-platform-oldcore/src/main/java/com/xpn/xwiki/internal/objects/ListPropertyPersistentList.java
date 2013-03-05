@@ -37,7 +37,7 @@ public class ListPropertyPersistentList extends PersistentList
 {
 
     /**
-     * @param session The session implementor. {@see PersistentList}.
+     * @param session The session implementor. {@link PersistentList}.
      * @param list The notify list to wrap with this list holder.
      */
     public ListPropertyPersistentList(SessionImplementor session, NotifyList list)
@@ -46,7 +46,7 @@ public class ListPropertyPersistentList extends PersistentList
     }
 
     /**
-     * @param session The session implementor. {@see PersistentList}.
+     * @param session The session implementor. {@link PersistentList}.
      */
     public ListPropertyPersistentList(SessionImplementor session)
     {

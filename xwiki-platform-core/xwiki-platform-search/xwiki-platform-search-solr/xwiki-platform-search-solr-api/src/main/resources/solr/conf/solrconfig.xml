@@ -429,7 +429,8 @@
          be based on the last SolrCore to be initialized.
          
       -->
-    <maxBooleanClauses>1024</maxBooleanClauses>
+    <!-- The value was doubled for XWiki's requirements. -->
+    <maxBooleanClauses>2048</maxBooleanClauses>
 
 
     <!-- Solr Internal Query Caches
@@ -767,8 +768,8 @@
 
        <!-- Default qeury fields with default attached boost values. -->
        <str name="qf">
-          name^1.0 title^1.5 fullname^1.0 doccontent^1.25 objcontent^0.75 comment^0.85 attcontent^0.75 filename^1.25 propertyvalue^1.25
-          space^0.5 wiki^0.5 type^1.0 class^0.5 author^1.0 creator^1.0 date^1.0 creationdate^1.0 mimetype^1.0
+          name^0.3 title^0.4 fullname^0.25 doccontent^0.5 objcontent^0.45 comment^0.40 attcontent^0.65 filename^0.75 propertyvalue^0.55
+          space^0.25 wiki^0.2 type^0.1 class^0.4 author_display^0.2 creator_display^0.2 date^1.0 creationdate^1.0 mimetype^0.4
        </str>
 
 
@@ -821,12 +822,20 @@
        <str name="facet.field">creator</str>
 
        <!-- Highlighting defaults -->
-       <str name="hl">on</str>
-       <!-- Note: It seems that in Solr 3.6.1 we can not highlight dates because of the wrong way they are handled internally. -->
-       <str name="hl.fl">doccontent objcontent comment attcontent propertyvalue</str>
+       <str name="hl">true</str>
+       <!-- Highlight all possible fields, on which we get a hit. -->
+       <str name="hl.fl">*</str>
+       <str name="hl.requireFieldMatch">true</str>
+       <!-- Surround the highlight result with a HTML span. -->
        <str name="hl.simple.pre"><![CDATA[<span class="search-text-highlight">]]></str>
        <str name="hl.simple.post"><![CDATA[<span class="search-text-highlight-stop"></span></span>]]></str>
-       
+       <!-- Enable highlighting for range/wildcard/fuzzy/prefix queries. -->
+       <str name="hl.hl.usePhraseHighlighter">true</str>
+       <str name="hl.highlightMultiTerm">true</str>
+       <!-- Return up to 3 highlighted snippets. -->
+       <int name="hl.snippets">3</int>
+       <!-- If the snippets are contiguous, merge them into a single snippet instead of handling them separately. -->
+       <str name="hl.mergeContiguous">true</str>
 
      </lst>
     <!-- In addition to defaults, "appends" params can be specified

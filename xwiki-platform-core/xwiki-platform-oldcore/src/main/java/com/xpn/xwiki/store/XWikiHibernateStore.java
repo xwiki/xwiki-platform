@@ -137,12 +137,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private ObservationManager observationManager;
 
     /**
-     * Used to convert a string into a proper Document Reference.
-     */
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "current");
-
-    /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
@@ -413,6 +407,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @param context
      * @throws XWikiException
      */
+    @Override
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         boolean bTransaction = true;
@@ -1707,16 +1702,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         {
             private final Event ev = new ActionExecutingEvent();
 
+            @Override
             public String getName()
             {
                 return "deleteLocksOnLogoutListener";
             }
 
+            @Override
             public List<Event> getEvents()
             {
                 return Collections.<Event> singletonList(this.ev);
             }
 
+            @Override
             public void onEvent(Event event, Object source, Object data)
             {
                 if ("logout".equals(((ActionExecutingEvent) event).getActionName())) {

@@ -34,9 +34,9 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.5.0-rc1</gwt.version>
-    <gwt.maven.plugin.version>2.5.0-rc1</gwt.maven.plugin.version>
-    <smartgwt.version>3.0</smartgwt.version>
+    <gwt.version>2.5.0</gwt.version>
+    <gwt.maven.plugin.version>2.5.0</gwt.maven.plugin.version>
+    <smartgwt.version>3.1</smartgwt.version>
     <!-- JS/CSS minification is on by default -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
   </properties>
@@ -55,24 +55,24 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.3</version>
+        <version>2.5.4-rc1</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.2.5.Final</version>
+        <version>3.2.7.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.2</version>
+        <version>1.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.2</version>
+        <version>1.3</version>
         <exclusions>
           <exclusion>
             <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
@@ -302,23 +302,65 @@
         <configuration>
           <!-- List of specific CLIRR excludes. Example:
 
-               <difference>
-                 <className>org/xwiki/ircbot/IRCBot</className>
-                 <method>void initialize(java.lang.String)</method>
-                 <differenceType>7012</differenceType>
-                 <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
-                 IRC Bot application in a subwiki</justification>
-               </difference>
+            <difference>
+              <className>org/xwiki/ircbot/IRCBot</className>
+              <method>void initialize(java.lang.String)</method>
+              <differenceType>7012</differenceType>
+              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
+                IRC Bot application in a subwiki</justification>
+            </difference>
 
                See http://mojo.codehaus.org/clirr-maven-plugin/examples/ignored-differences.html
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>com.xpn.xwiki.XWikiContext ajc$privMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$getXWikiContext()</method>
+              <differenceType>7002</differenceType>
+              <justification>
+                * The XWikiCompatibilityAspect aspect class had a method (flushCache()) calling the private getXWikiContext() method from XWiki.java
+                * This private method has been removed from XWiki.java
+                * AspectJ needs to add a public proxy method in XWiki.java (it names it: public XWikiContext ajc$privMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$getXWikiContext())
+                  so that it can call it from XWikiCompatiblityAspect.class with:
+
+                  public static void ajc$interMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$flushCache(XWiki ajc$this_)
+                  {
+                    ajc$this_.flushCache(ajc$this_.ajc$privMethod$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$getXWikiContext());
+                  }
+                * Thus we need to exclude it now that we've removed this getXWikiContext() ;)
+              </justification>
+            </difference>
+             <difference>
+               <differenceType>7006</differenceType>
+               <className>org/xwiki/localization/Translation</className>
+               <method>java.lang.String getRawSource()</method>
+               <to>java.lang.Object</to>
+               <justification>YOUNG API. There is no reason to limit it to String</justification>
+             </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Remove dependency on Portlet API from old core -->
+            <exclude>com/xpn/xwiki/web/XWikiForm</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiPortlet</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiPortletContext</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiPortletRequest</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiPortletResponse</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiPortletURLFactory</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiRequest</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiResponse</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiServletRequest</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiServletRequestStub</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiServletResponse</exclude>
+            <exclude>com/xpn/xwiki/web/XWikiServletResponseStub</exclude>
+            <exclude>com/xpn/xwiki/gwt/api/server/XWikiRequestWrapper</exclude>
+            <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</exclude>
+            <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</exclude>
+            <!-- Added new translation keys. This interface is not meant to be implemented. -->
+            <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -382,6 +424,7 @@
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-refactoring</module>
+    <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-repository</module>
     <module>xwiki-platform-rest</module>

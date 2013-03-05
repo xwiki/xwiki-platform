@@ -140,11 +140,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         // Note that this is a bridge between the old core and the component architecture.
         // In the new component architecture we use ThreadLocal to transport the request,
         // response and session to components which require them.
-        ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
+        ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+            containerInitializer.initializeResponse(context.getResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize request/response or session", e);
@@ -153,8 +152,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
     private void cleanupContainerComponent()
     {
-        Container container = (Container) Utils.getComponent(Container.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        Container container = Utils.getComponent(Container.class);
+        Execution execution = Utils.getComponent(Execution.class);
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.
@@ -196,16 +195,19 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return new XWikiGWTException(exp.getMessage(), exp.getFullMessage(), exp.getCode(), exp.getModule());
     }
 
+    @Override
     public Document getDocument(String fullName) throws XWikiGWTException
     {
         return getDocument(fullName, false, false, false, false);
     }
 
+    @Override
     public Document getDocument(String fullName, boolean full, boolean withRenderedContent) throws XWikiGWTException
     {
         return getDocument(fullName, full, false, false, withRenderedContent);
     }
 
+    @Override
     public String getUniquePageName(String space) throws XWikiGWTException
     {
         try {
@@ -216,6 +218,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public String getUniquePageName(String space, String pageName) throws XWikiGWTException
     {
         try {
@@ -226,6 +229,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Document getUniqueDocument(String space, String pageName) throws XWikiGWTException
     {
         try {
@@ -237,6 +241,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Document getUniqueDocument(String space) throws XWikiGWTException
     {
         try {
@@ -248,12 +253,14 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers)
         throws XWikiGWTException
     {
         return getDocument(fullName, full, viewDisplayers, editDisplayers, false);
     }
 
+    @Override
     public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers,
         boolean withRenderedContent) throws XWikiGWTException
     {
@@ -272,6 +279,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Boolean deleteDocument(String docName) throws XWikiGWTException
     {
         try {
@@ -288,15 +296,17 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public int deleteDocuments(String sql) throws XWikiGWTException
     {
         int nb = 0;
-        List newlist = new ArrayList();
         try {
             XWikiContext context = getXWikiContext();
             List list = context.getWiki().getStore().searchDocumentsNames(sql, context);
-            if ((list == null) && (list.size() == 0))
+            if (list == null || list.isEmpty()) {
                 return nb;
+            }
+
             for (int i = 0; i < list.size(); i++) {
                 if (context.getWiki().getRightService()
                     .hasAccessLevel("delete", context.getUser(), (String) list.get(i), context) == true) {
@@ -311,6 +321,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public User getUser() throws XWikiGWTException
     {
         try {
@@ -320,6 +331,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public User getUser(String fullName) throws XWikiGWTException
     {
         try {
@@ -335,6 +347,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public User[] getUserList(int nb, int start) throws XWikiGWTException
     {
         User[] users = new User[nb];
@@ -358,6 +371,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public List searchDocuments(String sql, int nb, int start) throws XWikiGWTException
     {
         try {
@@ -368,16 +382,19 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public List getDocuments(String sql, int nb, int start) throws XWikiGWTException
     {
         return getDocuments(sql, nb, start, false);
     }
 
+    @Override
     public List getDocuments(String sql, int nb, int start, boolean full) throws XWikiGWTException
     {
         return getDocuments(sql, nb, start, full, false, false);
     }
 
+    @Override
     public List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers)
         throws XWikiGWTException
     {
@@ -389,6 +406,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public boolean updateProperty(String docname, String className, String propertyname, String value)
         throws XWikiGWTException
     {
@@ -417,6 +435,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public boolean updateProperty(String docname, String className, String propertyname, int value)
         throws XWikiGWTException
     {
@@ -437,6 +456,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public boolean updateProperty(String docname, String className, String propertyname, List value)
         throws XWikiGWTException
     {
@@ -461,19 +481,15 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
     private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers,
-        boolean editDisplayers, XWikiContext context) throws XWikiGWTException
-    {
-        return getDocuments(sql, nb, start, full, viewDisplayers, editDisplayers, false, context);
-    }
-
-    private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers,
         boolean editDisplayers, boolean withRenderedContent, XWikiContext context) throws XWikiGWTException
     {
         List newlist = new ArrayList();
         try {
             List list = context.getWiki().getStore().searchDocumentsNames(sql, nb, start, context);
-            if ((list == null) && (list.size() == 0))
+            if (list == null || list.isEmpty()) {
                 return newlist;
+            }
+
             for (int i = 0; i < list.size(); i++) {
                 if (context.getWiki().getRightService()
                     .hasAccessLevel("view", context.getUser(), (String) list.get(i), context) == true) {
@@ -496,8 +512,9 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         List newlist = new ArrayList();
         try {
             List list = context.getWiki().getStore().searchDocumentsNames(sql, nb, start, context);
-            if ((list == null) && (list.size() == 0))
+            if (list == null || list.isEmpty()) {
                 return newlist;
+            }
 
             for (int i = 0; i < list.size(); i++) {
                 if (context.getWiki().getRightService()
@@ -511,6 +528,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public List getObjects(String sql, String className, int nb, int start) throws XWikiGWTException
     {
         List docs = getDocuments(sql, nb, start, true);
@@ -525,6 +543,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return objects;
     }
 
+    @Override
     public XObject getFirstObject(String sql, String className) throws XWikiGWTException
     {
         List objs = getObjects(sql, className, 1, 0);
@@ -544,6 +563,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public XObject addObject(String fullName, String className) throws XWikiGWTException
     {
         try {
@@ -563,6 +583,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public List addObject(String fullName, List classesName) throws XWikiGWTException
     {
         try {
@@ -581,6 +602,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public boolean addObject(String docname, XObject xobject) throws XWikiGWTException
     {
         XWikiContext context = null;
@@ -607,6 +629,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
      * @param content
      * @return
      */
+    @Override
     public Boolean saveDocumentContent(String fullName, String content) throws XWikiGWTException
     {
         return saveDocumentContent(fullName, content, null);
@@ -640,6 +663,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Boolean saveObject(XObject object) throws XWikiGWTException
     {
         try {
@@ -663,11 +687,13 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Boolean deleteObject(XObject object) throws XWikiGWTException
     {
         return deleteObject(object.getName(), object.getClassName(), object.getNumber());
     }
 
+    @Override
     public Boolean deleteObject(String docName, String className, int number) throws XWikiGWTException
     {
         try {
@@ -693,6 +719,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Boolean saveObjects(List objects) throws XWikiGWTException
     {
         Iterator it = objects.iterator();
@@ -710,6 +737,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
      * @param force
      * @return
      */
+    @Override
     public Boolean lockDocument(String fullName, boolean force) throws XWikiGWTException
     {
         try {
@@ -733,6 +761,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public void unlockDocument(String fullName) throws XWikiGWTException
     {
         try {
@@ -747,6 +776,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Boolean isLastDocumentVersion(String fullName, String version) throws XWikiGWTException
     {
         try {
@@ -757,6 +787,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public String getLoginURL() throws XWikiGWTException
     {
         try {
@@ -767,6 +798,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public String login(String username, String password, boolean rememberme) throws XWikiGWTException
     {
         try {
@@ -782,6 +814,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public boolean addComment(String docname, String message) throws XWikiGWTException
     {
         XWikiContext context = null;
@@ -803,21 +836,25 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public List customQuery(String queryPage) throws XWikiGWTException
     {
         return customQuery(queryPage, null, 0, 0);
     }
 
+    @Override
     public List customQuery(String queryPage, Map params) throws XWikiGWTException
     {
         return customQuery(queryPage, params, 0, 0);
     }
 
+    @Override
     public List customQuery(String queryPage, int nb, int start) throws XWikiGWTException
     {
         return customQuery(queryPage, null, nb, start);
     }
 
+    @Override
     public List customQuery(String queryPage, Map params, int nb, int start) throws XWikiGWTException
     {
         List newlist = new ArrayList();
@@ -831,7 +868,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                     while (it.hasNext()) {
                         String key = (String) it.next();
                         Object value = params.get(key);
-                        if (key instanceof String) {
+                        if (value instanceof String) {
                             // we clean params so that they cannot close a string
                             params.put(key, ((String) value).replaceAll("'", ""));
                         } else {
@@ -1079,6 +1116,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public String getDocumentContent(String fullName) throws XWikiGWTException
     {
         return getDocumentContent(fullName, false, null);
@@ -1104,11 +1142,13 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return baseObject;
     }
 
+    @Override
     public String getDocumentContent(String fullName, boolean rendered) throws XWikiGWTException
     {
         return getDocumentContent(fullName, rendered, null);
     }
 
+    @Override
     public String getDocumentContent(String fullName, boolean rendered, Map params) throws XWikiGWTException
     {
         try {
@@ -1133,6 +1173,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
     // get version history of a document
+    @Override
     public List getDocumentVersions(String fullName, int nb, int start) throws XWikiGWTException
     {
         try {
@@ -1175,12 +1216,14 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public void logJSError(Map infos)
     {
         LOGGER.warn("[GWT-JS] useragent:" + infos.get("useragent") + "\n" + "module:" + infos.get("module") + "\n");
         // + "stacktrace" + infos.get("stacktrace"));
     }
 
+    @Override
     public Dictionary getTranslation(String translationPage, String locale) throws XWikiGWTException
     {
         try {
@@ -1202,15 +1245,13 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 }
             }
 
-            if (properties == null)
-                return new Dictionary();
-            else
-                return new Dictionary(properties);
+            return new Dictionary(properties);
         } catch (Exception e) {
             throw getXWikiGWTException(e);
         }
     }
 
+    @Override
     public Boolean hasAccessLevel(String level, String docName) throws XWikiGWTException
     {
         XWikiContext context = getXWikiContext();
@@ -1222,6 +1263,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    @Override
     public Boolean hasAccessLevel(String level, String username, String docName) throws XWikiGWTException
     {
         try {

@@ -88,7 +88,8 @@ var XWiki = (function (XWiki) {
    * list of accepted suggestions.
    */
   initializeSelection: function() {
-    this.input.readonly = true;
+    this.input.readOnly = true;
+    this.input.addClassName('loading');
     this.loadSelectedValue(this.input.value.split(this.options.separator), 0);
   },
 
@@ -97,8 +98,11 @@ var XWiki = (function (XWiki) {
    */
   loadSelectedValue: function(values, index) {
     if (index >= values.length) {
-      this.input.clear();
-      this.input.readonly = false;
+      this.input.readOnly = false;
+      this.input.clear().removeClassName('loading');
+      return;
+    } else if (values[index].trim() == '') {
+      this.loadSelectedValue(values, index + 1);
       return;
     }
     // Look for the selected value in all the sources.
@@ -139,7 +143,7 @@ var XWiki = (function (XWiki) {
    * @return default suggestion data for when a selected value is not found in any of the configured sources
    */
   getDefaultSuggestion: function(value) {
-    return {id: value, value: value};
+    return {id: value, value: value, info: value};
   },
 
   /**

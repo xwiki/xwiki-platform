@@ -26,10 +26,10 @@
   <content>{{velocity}}
 #set($columns = [ 'link', 'page', 'code', 'date'])
 #set($columnsProperties = {
-    'link' : { 'type' : 'text' },
-    'page' : { 'type' : 'text' },
-    'code' : { 'type' : 'text' },
-    'date' : { 'type' : 'text' }
+    'link' : { 'type' : 'text', 'sortable' : false },
+    'page' : { 'type' : 'text', 'sortable' : false },
+    'code' : { 'type' : 'text', 'sortable' : false },
+    'date' : { 'type' : 'text', 'sortable' : false }
 })
 #set($options = { 
     'resultPage': 'XWiki.ExternalLinksJSON',

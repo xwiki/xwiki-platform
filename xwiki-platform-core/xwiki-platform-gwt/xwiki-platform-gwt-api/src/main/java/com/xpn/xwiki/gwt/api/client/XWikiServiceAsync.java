@@ -20,8 +20,6 @@
 package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
-
 import java.util.List;
 import java.util.Map;               
 

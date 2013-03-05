@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.XMLUtils;
 
@@ -44,6 +46,7 @@ import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
@@ -430,7 +433,11 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public void XWiki.flushCache()
     {
-        flushCache(getXWikiContext());
+        Execution execution = Utils.getComponent(Execution.class);
+
+        ExecutionContext ec = execution.getContext();
+
+        flushCache(ec != null ? (XWikiContext) ec.getProperty("xwikicontext") : null);
     }
 
     /**

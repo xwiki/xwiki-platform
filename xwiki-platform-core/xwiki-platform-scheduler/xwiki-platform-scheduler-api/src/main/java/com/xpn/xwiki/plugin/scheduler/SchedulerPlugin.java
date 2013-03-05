@@ -262,7 +262,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         scontext.setURLFactory(xurf);
 
         try {
-            XWikiDocument cDoc = context.getWiki().getDocument(job.getName(), context);
+            XWikiDocument cDoc = context.getWiki().getDocument(job.getDocumentReference(), context);
             scontext.setDoc(cDoc);
         } catch (Exception e) {
             throw new SchedulerPluginException(
@@ -285,10 +285,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     {
         String hql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.SchedulerJobClass'";
         try {
-            List<String> jobsDocsNames = context.getWiki().getStore().searchDocumentsNames(hql, context);
-            for (String docName : jobsDocsNames) {
+            List<DocumentReference> jobDocReferences =
+                context.getWiki().getStore().searchDocumentReferences(hql, context);
+            for (DocumentReference docReference : jobDocReferences) {
                 try {
-                    XWikiDocument jobDoc = context.getWiki().getDocument(docName, context);
+                    XWikiDocument jobDoc = context.getWiki().getDocument(docReference, context);
                     BaseObject jobObj = jobDoc.getXObject(XWIKI_JOB_CLASSREFERENCE);
 
                     String status = jobObj.getStringValue("status");
@@ -299,8 +300,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                         this.pauseJob(jobObj, context);
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Failed to restore job with in document [{}] and wiki [{}]", new Object[] {docName,
-                    context.getDatabase()}, e);
+                    LOGGER.error("Failed to restore job with in document [{}] and wiki [{}]", docReference,
+                        context.getDatabase(), e);
                 }
             }
         } catch (Exception e) {
@@ -591,7 +592,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     private void saveStatus(String status, BaseObject object, XWikiContext context) throws XWikiException
     {
-        XWikiDocument jobHolder = context.getWiki().getDocument(object.getName(), context);
+        XWikiDocument jobHolder = context.getWiki().getDocument(object.getDocumentReference(), context);
         // We need to retrieve the object BaseObject the document again. Otherwise, modifications made to the
         // BaseObject passed as argument will not be saved (XWikiDocument#getObject clones the document
         // and returns the BaseObject from the clone)

@@ -43,6 +43,17 @@
 #if($xwiki.getDocument($xcontext.user).getValue('displayHiddenDocuments') == 1)
   #set($hiddenClause = '')
 #end
+## ----------------------------------------------------------------------
+## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
+## Also exclude WebPreferences.
+## ----------------------------------------------------------------------
+#set($blacklistClause = '')
+#foreach ($blacklistedSpace in $blacklistedSpaces)
+  #set ($blacklistClause = " -exactspace:${blacklistedSpace}${blacklistClause}")
+#end
+#if(!$hasAdmin &amp;&amp; !$isAdvancedUser)
+  #set ($blacklistClause = " -name:WebPreferences${blacklistClause}")
+#end
 ## -----------------------------------
 ## Query execution, results formatting
 ## -----------------------------------
@@ -54,7 +65,7 @@
   #set($query = $query.replaceAll('__INPUT__', $input))
   #set($discard = $response.setContentType("text/xml"))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-  #set($rawresults = $xwiki.lucene.getSearchResults("(${query})${hiddenClause}", '', $xcontext.database, $NULL))
+  #set($rawresults = $xwiki.lucene.getSearchResults("(${query})${hiddenClause}${blacklistClause}", '', $xcontext.database, $NULL))
   #set($results = $rawresults.getResults("1", "$nb"))
   &lt;results&gt;
     #foreach($item in $results)

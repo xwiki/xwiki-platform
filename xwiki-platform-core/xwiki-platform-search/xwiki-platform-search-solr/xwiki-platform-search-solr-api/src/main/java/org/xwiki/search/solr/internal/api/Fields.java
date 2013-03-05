@@ -57,6 +57,11 @@ public interface Fields
     String SPACE = "space";
 
     /**
+     * Unanalyzed and not stored version of the document's space.
+     */
+    String SPACE_EXACT = "space_exact";
+
+    /**
      * Name of the document.
      */
     String NAME = "name";
@@ -72,6 +77,11 @@ public interface Fields
      * Note: Multilingual and virtual field.
      */
     String TITLE = "title";
+
+    /**
+     * Lowercased, unanalyzed and not stored version of the document's title, used for sorting.
+     */
+    String TITLE_SORT = "title_sort";
 
     /**
      * Version of the document.
@@ -103,9 +113,24 @@ public interface Fields
     String AUTHOR = "author";
 
     /**
+     * Last modifier, in its display version (i.e., "first_name last_name").
+     */
+    String AUTHOR_DISPLAY = "author_display";
+
+    /**
+     * Lowercased, unanalyzed and not stored version of the document's last author display version, used for sorting.
+     */
+    String AUTHOR_DISPLAY_SORT = "author_display_sort";
+
+    /**
      * Creator of the document.
      */
     String CREATOR = "creator";
+
+    /**
+     * Creator of the document, in its display version (i.e., "first_name last_name").
+     */
+    String CREATOR_DISPLAY = "creator_display";
 
     /**
      * Date of last modification.

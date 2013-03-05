@@ -1,0 +1,108 @@
+#template('colorThemeInit.vm')
+
+.button-group {
+  /* Required in order to display the drop-down list below the button. */
+  position: relative;
+}
+
+a.dropdown-toggle > span {
+  /* Draw the down arrow/triangle using the border. */
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid $theme.buttonPrimaryTextColor;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+a.dropdown-toggle.secondary > span {
+  border-top: 4px solid $theme.buttonSecondaryTextColor;
+}
+
+.button-group > a.dropdown-toggle {
+  /* Left border shadow to separate the toggle from the button. */
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.125) inset;
+  margin-left: -1px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+/* Overwrite the left border radius. */
+.buttonwrapper > a.dropdown-toggle {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Overwrite the right border radius. */
+.button-group > input.button,
+.buttonwrapper.button-group > button,
+.buttonwrapper.button-group > a:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  /* Overwrite the padding because we fix the button padding issue in Firefox. */
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+/* Firefox button padding fix. This is required in order for the button to have the same height as the drop-down toggle in Firefox. */
+.button-group button::-moz-focus-inner,
+.button-group input::-moz-focus-inner {
+  border: 0 none !important;
+  padding: 0 !important;
+}
+
+.button-group > .dropdown-menu {
+  background-color: $theme.pageContentBackgroundColor;
+  border: 1px solid $theme.borderColor;
+  /* Same border radius as the button. */
+  border-radius: 3px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  /* Hidden by default. */
+  display: none;
+  left: 0;
+  margin: 2px 0 0;
+  min-width: 160px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 200;
+}
+
+/* IE discards the :target selector and thus we have to duplicate the rule.. */
+.button-group > .dropdown-menu:target {
+  display: block;
+}
+.button-group > .dropdown-menu.open {
+  display: block;
+}
+
+/* Overwrite the button styles inside the drop-down list. */
+.button-group > .dropdown-menu > input.button,
+.button-group > .dropdown-menu > button,
+.button-group > .dropdown-menu > a {
+  background-color: transparent;
+  background-image: none;
+  border: 0 none transparent;
+  border-radius: 0;
+  color: $theme.textColor;
+  display: block;
+  /* Reset the IE filter. */
+  filter: none;
+  padding: 3px 6px;
+  text-align: left;
+  text-shadow: none;
+}
+
+/* Force 100% width on the buttons. The anchors behave nicely. */
+.button-group > .dropdown-menu > input.button,
+.button-group > .dropdown-menu > button {
+  width: 100%;
+}
+
+.button-group > .dropdown-menu > input.button:hover,
+.button-group > .dropdown-menu > button:hover,
+.button-group > .dropdown-menu > a:hover,
+.button-group > .dropdown-menu > input.button:focus,
+.button-group > .dropdown-menu > button:focus,
+.button-group > .dropdown-menu > a:focus {
+  background-color: $theme.highlightColor;
+  box-shadow: none;
+}

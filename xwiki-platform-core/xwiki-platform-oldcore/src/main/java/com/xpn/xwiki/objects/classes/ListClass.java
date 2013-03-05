@@ -531,6 +531,7 @@ public abstract class ListClass extends PropertyClass
             this.map = map;
         }
 
+        @Override
         public int compare(String o1, String o2)
         {
             ListItem s1 = this.map.get(o1);

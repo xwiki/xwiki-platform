@@ -39,6 +39,7 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Request;
+import org.xwiki.job.internal.DefaultJobStatus;
 
 /**
  * Make sure the provided XAR extension properly is registered in the installed extensions index.
@@ -48,7 +49,7 @@ import org.xwiki.job.Request;
  */
 @Component
 @Named(RepairXarJob.JOBTYPE)
-public class RepairXarJob extends AbstractExtensionJob<InstallRequest>
+public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJobStatus<InstallRequest>>
 {
     /**
      * The id of the job.

@@ -32,6 +32,10 @@
   <artifactId>xwiki-platform-rendering-macro-ruby</artifactId>
   <name>XWiki Platform - Rendering - Macro - Ruby</name>
   <description>XWiki Platform - Rendering - Macro - Ruby</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-core-rendering-macro-ruby</xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -30,7 +30,6 @@ import org.suigeneris.jrcs.diff.delta.AddDelta;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.suigeneris.jrcs.diff.delta.DeleteDelta;
 import org.suigeneris.jrcs.rcs.InvalidFileFormatException;
-import org.suigeneris.jrcs.rcs.impl.Node;
 import org.suigeneris.jrcs.util.ToString;
 
 /**

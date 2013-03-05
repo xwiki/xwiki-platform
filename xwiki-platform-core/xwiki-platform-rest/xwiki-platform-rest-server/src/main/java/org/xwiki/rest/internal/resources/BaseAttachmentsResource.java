@@ -254,7 +254,6 @@ public class BaseAttachmentsResource extends XWikiResource
     }
 
     protected Attachments getAttachmentsForDocument(Document doc, int start, int number, Boolean withPrettyNames)
-            throws XWikiException
     {
         Attachments attachments = objectFactory.createAttachments();
 

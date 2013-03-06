@@ -34,7 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 5.0M1
  */
 @Component
-@Named("user")
+@Named(SpaceComponentManager.ID)
 @Singleton
 public class SpaceComponentManagerFactory implements ComponentManagerFactory
 {

@@ -38,7 +38,7 @@ import org.xwiki.model.EntityType;
  * @since 5.0M1
  */
 @Component
-@Named("space")
+@Named(SpaceComponentManager.ID)
 @Singleton
 public class SpaceComponentManager extends AbstractEntityComponentManager implements Initializable
 {

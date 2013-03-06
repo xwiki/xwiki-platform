@@ -34,7 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 5.0M1
  */
 @Component
-@Named("document")
+@Named(DocumentComponentManager.ID)
 @Singleton
 public class DocumentComponentManagerFactory implements ComponentManagerFactory
 {

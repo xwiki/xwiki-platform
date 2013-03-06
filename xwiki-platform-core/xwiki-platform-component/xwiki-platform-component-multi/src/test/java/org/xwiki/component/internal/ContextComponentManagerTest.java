@@ -28,6 +28,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
@@ -45,6 +47,8 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
      */
     private DocumentAccessBridge mockDocumentAccessBridge;
 
+    private EntityReferenceValueProvider mockCurrentValueProvider;
+
     public static interface Role
     {
     }
@@ -60,6 +64,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Document Access Bridge Mock
         this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
+        this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
     }
 
     @Test
@@ -67,12 +72,14 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     {
         final States state = getMockery().states("test");
 
-        //@formatter:off
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otheruser"));
-                will(returnValue("user1")); 
-        }});
-        //@formatter:on
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).getCurrentUser();
+                when(state.isNot("otheruser"));
+                will(returnValue("user1"));
+            }
+        });
 
         ComponentManager userCM = getComponentManager().getInstance(ComponentManager.class, "user");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
@@ -88,12 +95,19 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Now verify that we cannot look it up anymore if there's another user in the context
         state.become("otheruser");
-        //@formatter:off
-        getMockery().checking(new Expectations() {{
-            oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user2")); 
-            oneOf(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
-        }});
-        //@formatter:on
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).getCurrentUser();
+                will(returnValue("user2"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                will(returnValue("wiki"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document"));
+            }
+        });
 
         try {
             contextCM.getInstance(Role.class);
@@ -108,14 +122,23 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     {
         final States state = getMockery().states("test");
 
-        //@formatter:off
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                when(state.isNot("otherwiki"));
                 will(returnValue("wiki1"));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));
-                will(returnValue("user")); 
-        }});
-        //@formatter:on
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                when(state.isNot("otherwiki"));
+                will(returnValue("space1"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                when(state.isNot("otherwiki"));
+                will(returnValue("document1"));
+                allowing(mockDocumentAccessBridge).getCurrentUser();
+                when(state.isNot("otherwiki"));
+                will(returnValue("user"));
+            }
+        });
 
         // Register in the current wiki.
         ComponentManager wikiCM = getComponentManager().getInstance(ComponentManager.class, "wiki");
@@ -131,12 +154,19 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         // Now verify that we cannot look it up anymore if there's another wiki in the context
         state.become("otherwiki");
 
-        //@formatter:off
-        getMockery().checking(new Expectations() {{
-            oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user")); 
-            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki2"));
-        }});
-        //@formatter:on
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockDocumentAccessBridge).getCurrentUser();
+                will(returnValue("user"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                will(returnValue("wiki2"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space2"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document2"));
+            }
+        });
 
         try {
             contextCM.getInstance(Role.class);
@@ -151,14 +181,23 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     {
         final States state = getMockery().states("test");
 
-        //@formatter:off
-        getMockery().checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                when(state.isNot("otherwiki"));
                 will(returnValue("wiki"));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));
-                will(returnValue("user")); 
-        }});
-        //@formatter:on
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                when(state.isNot("otherwiki"));
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                when(state.isNot("otherwiki"));
+                will(returnValue("document"));
+                allowing(mockDocumentAccessBridge).getCurrentUser();
+                when(state.isNot("otherwiki"));
+                will(returnValue("user"));
+            }
+        });
 
         // Register in the current wiki.
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();

@@ -34,7 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 3.3M2
  */
 @Component
-@Named("user")
+@Named(UserComponentManager.ID)
 @Singleton
 public class UserComponentManagerFactory implements ComponentManagerFactory
 {

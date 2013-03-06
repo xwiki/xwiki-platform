@@ -29,6 +29,7 @@ import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current user in the
@@ -39,10 +40,15 @@ import org.xwiki.component.phase.InitializationException;
  * @since 2.1RC1
  */
 @Component
-@Named("user")
+@Named(UserComponentManager.ID)
 @Singleton
 public class UserComponentManager extends AbstractGenericComponentManager implements Initializable
 {
+    /**
+     * The identifier of this {@link ComponentManager}.
+     */
+    public static final String ID = "user";
+
     /**
      * Used to access the current user in the Execution Context.
      */
@@ -50,11 +56,17 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * Used to serialize the user reference.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> referenceSerializer;
+
+    /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named("wiki")
-    private ComponentManager wikiComponentManager;
+    @Named(DocumentComponentManager.ID)
+    private ComponentManager documentComponentManager;
 
     @Override
     public void initialize() throws InitializationException
@@ -62,12 +74,12 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
         // Set the parent to the Wiki Component Manager since if a component isn't found for a particular user
         // we want to check if it's available in the current wiki and if not then in the Wiki Component Manager's
         // parent.
-        setInternalParent(this.wikiComponentManager);
+        setInternalParent(this.documentComponentManager);
     }
 
     @Override
     protected String getKey()
     {
-        return "user:" + this.documentAccessBridge.getCurrentUser();
+        return ID + ':' + this.referenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
     }
 }

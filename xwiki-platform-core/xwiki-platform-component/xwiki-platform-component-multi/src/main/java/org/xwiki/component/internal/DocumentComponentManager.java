@@ -24,36 +24,49 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.EntityType;
 
 /**
- * Implementation of {@link ComponentManagerFactory} which force parent to be {@link DocumentComponentManager}.
+ * Proxy Component Manager that creates and queries individual Component Managers specific to the current document in
+ * the Execution Context. These Component Managers are created on the fly the first time a component is registered for
+ * the current document.
  * 
  * @version $Id$
- * @since 3.3M2
+ * @since 5.0M2
  */
 @Component
-@Named(UserComponentManager.ID)
+@Named(DocumentComponentManager.ID)
 @Singleton
-public class UserComponentManagerFactory implements ComponentManagerFactory
+public class DocumentComponentManager extends AbstractEntityComponentManager implements Initializable
 {
     /**
-     * The default {@link ComponentManagerFactory} used to actually create the {@link ComponentManager} instance.
+     * The identifier of this {@link ComponentManager}.
      */
-    @Inject
-    private ComponentManagerFactory factory;
+    public static final String ID = "document";
 
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named(DocumentComponentManager.ID)
-    private ComponentManager documentComponentManager;
+    @Named(SpaceComponentManager.ID)
+    private ComponentManager spaceComponentManager;
+
+    /**
+     * Default constructor.
+     */
+    public DocumentComponentManager()
+    {
+        super(EntityType.DOCUMENT);
+    }
 
     @Override
-    public ComponentManager createComponentManager(ComponentManager parentComponentManager)
+    public void initialize() throws InitializationException
     {
-        return this.factory.createComponentManager(this.documentComponentManager);
+        // Set the parent to the Root Component Manager since if a component isn't found for a particular wiki
+        // we want to check if it's available in the Root Component Manager.
+        setInternalParent(this.spaceComponentManager);
     }
 }

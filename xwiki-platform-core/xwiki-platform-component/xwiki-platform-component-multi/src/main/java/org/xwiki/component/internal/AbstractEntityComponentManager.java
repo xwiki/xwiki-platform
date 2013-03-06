@@ -21,51 +21,48 @@ package org.xwiki.component.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Proxy Component Manager that creates and queries individual Component Managers specific to the current wiki in the
+ * Proxy Component Manager that creates and queries individual Component Managers specific to the current entity in the
  * Execution Context. These Component Managers are created on the fly the first time a component is registered for the
- * current wiki.
+ * current entity.
  * 
  * @version $Id$
- * @since 2.1RC1
+ * @since 5.0M2
  */
-@Component
-@Named(WikiComponentManager.ID)
-@Singleton
-public class WikiComponentManager extends AbstractEntityComponentManager implements Initializable
+public abstract class AbstractEntityComponentManager extends AbstractGenericComponentManager implements Initializable
 {
     /**
-     * The identifier of this {@link ComponentManager}.
-     */
-    public static final String ID = "wiki";
-
-    /**
-     * The Component Manager to be used as parent when a component is not found in the current Component Manager.
+     * Used to access the current space in the Execution Context.
      */
     @Inject
-    private ComponentManager rootComponentManager;
+    @Named("current")
+    private EntityReferenceValueProvider currentProvider;
 
     /**
-     * Default constructor.
+     * The type of entity associated to this {@link org.xwiki.component.manager.ComponentManager}.
      */
-    public WikiComponentManager()
+    private EntityType type;
+
+    /**
+     * @param type the type of entity associated to this {@link org.xwiki.component.manager.ComponentManager}
+     */
+    public AbstractEntityComponentManager(EntityType type)
     {
-        super(EntityType.WIKI);
+        this.type = type;
     }
 
     @Override
-    public void initialize() throws InitializationException
+    protected String getKey()
     {
-        // Set the parent to the Root Component Manager since if a component isn't found for a particular wiki
-        // we want to check if it's available in the Root Component Manager.
-        setInternalParent(this.rootComponentManager);
+        String entity = this.currentProvider.getDefaultValue(this.type);
+
+        return entity != null ? this.type.name().toLowerCase() + ":" + this.currentProvider.getDefaultValue(this.type)
+            : null;
     }
 }

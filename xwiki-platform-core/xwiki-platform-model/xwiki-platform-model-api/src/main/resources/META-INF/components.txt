@@ -19,3 +19,5 @@ org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver
 org.xwiki.model.internal.DefaultModelConfiguration
 org.xwiki.model.internal.DefaultModelContext
 org.xwiki.model.internal.scripting.ModelScriptService
+org.xwiki.model.internal.EntityManagerProvider
+org.xwiki.model.internal.DefaultEntityManager

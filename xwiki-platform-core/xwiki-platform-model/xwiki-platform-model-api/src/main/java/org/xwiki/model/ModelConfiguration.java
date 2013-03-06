@@ -20,6 +20,7 @@
 package org.xwiki.model;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides configuration options for the Model module.
@@ -35,4 +36,11 @@ public interface ModelConfiguration
      * @return the default value to use when a reference doesn't have the passed type specified
      */
     String getDefaultReferenceValue(EntityType type);
+
+    /**
+     * @return the hint corresponding to the Model implementation to use (e.g. "bridge")
+     * @since 5.0M2
+     */
+    @Unstable
+    String getImplementationHint();
 }

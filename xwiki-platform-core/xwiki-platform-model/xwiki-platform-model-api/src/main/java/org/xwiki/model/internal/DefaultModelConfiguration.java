@@ -71,6 +71,11 @@ public class DefaultModelConfiguration implements ModelConfiguration
     };
 
     /**
+     * Default Model implementation to use.
+     */
+    private static final String DEFAULT_MODEL_HINT = "bridge";
+
+    /**
      * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available
      * in the system. This is why we lazy load the ConfigurationSource component.
      */
@@ -87,21 +92,46 @@ public class DefaultModelConfiguration implements ModelConfiguration
     public String getDefaultReferenceValue(EntityType type)
     {
         String name;
-        try {
-            // TODO: For the moment we only look in the XWiki properties file since otherwise looking into
-            // Wiki, Space and User preferences cause some cyclic dependencies (we'll be able to do that when all
-            // code has been migrated to use References instead of Strings).
-            ConfigurationSource configuration =
-                this.componentManager.getInstance(ConfigurationSource.class, "xwikiproperties");
-            name = configuration.getProperty(PREFIX + "reference.default." + type.toString().toLowerCase(),
+        ConfigurationSource configurationSource = getConfigurationSource();
+        if (configurationSource != null) {
+            name = configurationSource.getProperty(PREFIX + "reference.default." + type.toString().toLowerCase(),
                 DEFAULT_VALUES.get(type));
-        } catch (ComponentLookupException e) {
-            // Failed to load the component, use default values
-            this.logger.debug("Failed to load [" + ConfigurationSource.class.getName()
-                + "]. Using default Model values", e);
+        } else {
             name = DEFAULT_VALUES.get(type);
         }
 
         return name;
+    }
+
+    @Override
+    public String getImplementationHint()
+    {
+        String hint;
+        ConfigurationSource configurationSource = getConfigurationSource();
+        if (configurationSource != null) {
+            hint = configurationSource.getProperty(PREFIX + "implementation", DEFAULT_MODEL_HINT);
+        } else {
+            hint = DEFAULT_MODEL_HINT;
+        }
+        return hint;
+    }
+
+    /**
+     * @return the configuration source to use to get configuration data. For the moment we only look in the XWiki
+     *         properties file since otherwise looking into Wiki, Space and User preferences cause some cyclic
+     *         dependencies (we'll be able to do that when all code has been migrated to use References instead of
+     *         Strings).
+     */
+    private ConfigurationSource getConfigurationSource()
+    {
+        ConfigurationSource configurationSource;
+        try {
+            configurationSource = this.componentManager.getInstance(ConfigurationSource.class, "xwikiproperties");
+        } catch (ComponentLookupException e) {
+            this.logger.debug("Failed to load [%]. Using default Model values", ConfigurationSource.class.getName(), e);
+            configurationSource = null;
+        }
+
+        return configurationSource;
     }
 }

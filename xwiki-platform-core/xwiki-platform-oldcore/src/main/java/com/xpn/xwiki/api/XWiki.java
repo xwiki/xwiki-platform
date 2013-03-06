@@ -1237,7 +1237,7 @@ public class XWiki extends Api
      * @return true if at least 1 subwiki exists; false otherwise
      * @see #getWikiNames()
      */
-    public boolean hasVirtualWikis()
+    public boolean hasSubWikis()
     {
         return getWikiNames().size() > 1;
     }

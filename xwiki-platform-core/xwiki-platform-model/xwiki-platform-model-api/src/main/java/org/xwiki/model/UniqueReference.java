@@ -27,13 +27,15 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * TODO: Decide if this should be part of the current EntityReference implementation.
  *
- * @since 5.0M1
+ * @since 5.0M2
  */
+@Unstable
 public class UniqueReference
 {
     private EntityReference reference;

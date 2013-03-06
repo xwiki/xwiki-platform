@@ -20,6 +20,7 @@
 package org.xwiki.model;
 
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents some content along with the syntax in which it's written.
@@ -27,8 +28,9 @@ import org.xwiki.rendering.syntax.Syntax;
  * Note that this class is immutable (text and syntax cannot be changed once set).
  *
  * @version $Id$
- * @since 5.0M1
+ * @since 5.0M2
  */
+@Unstable
 public class Content
 {
     private final String text;

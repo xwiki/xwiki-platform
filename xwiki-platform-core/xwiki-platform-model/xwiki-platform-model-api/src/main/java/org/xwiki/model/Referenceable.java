@@ -20,10 +20,12 @@
 package org.xwiki.model;
 
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
- * @since 5.0M1
+ * @since 5.0M2
  */
+@Unstable
 public interface Referenceable
 {
     EntityReference getReference();

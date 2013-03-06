@@ -19,12 +19,15 @@
  */
 package org.xwiki.model;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * An XWiki Server is made of one or several {@link WikiEntity}s. This is the top most
  * concept of the XWiki Model.
  *
- * @since 5.0M1
+ * @since 5.0M2
  */
+@Unstable
 public interface Server extends Persistable
 {
     /**

@@ -21,9 +21,12 @@ package org.xwiki.model;
 
 import java.util.Locale;
 
+import org.xwiki.stability.Unstable;
+
 /**
- * @since 5.0M1
+ * @since 5.0M2
  */
+@Unstable
 public interface Entity extends Persistable, Linkable, Referenceable
 {
     /**

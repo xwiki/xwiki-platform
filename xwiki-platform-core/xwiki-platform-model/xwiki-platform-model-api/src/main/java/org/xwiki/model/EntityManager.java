@@ -20,14 +20,16 @@
 package org.xwiki.model;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides direct access to any Entity through an{@link org.xwiki.model.reference.EntityReference} without having
  * to navigate through the Entity hierarchy.
  *
- * @since 5.0M1
+ * @since 5.0M2
  */
 @Role
+@Unstable
 public interface EntityManager
 {
     /**

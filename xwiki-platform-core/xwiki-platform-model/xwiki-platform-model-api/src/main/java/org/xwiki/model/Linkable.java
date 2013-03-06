@@ -20,6 +20,7 @@
 package org.xwiki.model;
 
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Indicates that an {@link Entity} can be a link to another Entity. This is useful for example for two
@@ -29,8 +30,9 @@ import org.xwiki.model.reference.EntityReference;
  *   <li>aliases an entity</li>
  * </ul>
  *
- * @since 5.0M1
+ * @since 5.0M2
  */
+@Unstable
 public interface Linkable
 {
     /**

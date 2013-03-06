@@ -77,6 +77,7 @@ public class CustomDialog extends Dialog {
         add(main);
     }
 
+    @Override
     protected void endDialog() {
         setCurrentResult("");
         super.endDialog();

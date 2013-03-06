@@ -46,7 +46,6 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         factoryMap = new HashMap();
         register(xwiki, XWikiContext.MODE_XMLRPC, XWikiXmlRpcURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
         register(xwiki, XWikiContext.MODE_SERVLET, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
-        register(xwiki, XWikiContext.MODE_PORTLET, XWikiPortletURLFactory.class, "xwiki.urlfactory.portletclass");
         register(xwiki, XWikiContext.MODE_PDF, PdfURLFactory.class, "xwiki.urlfactory.pdfclass");
         register(xwiki, XWikiContext.MODE_GWT, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
         register(xwiki, XWikiContext.MODE_GWT_DEBUG, XWikiDebugGWTURLFactory.class, "xwiki.urlfactory.servletclass");

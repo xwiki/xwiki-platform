@@ -32,7 +32,6 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**

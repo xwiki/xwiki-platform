@@ -60,11 +60,15 @@
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 
     <!-- Setting dbcp.ps.maxActive configuration tells DBCP whether to cache Prepared Statement or not.
-         Note that when using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
+
+         Note 1: When using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
          Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
          schema if the same PS is reused it'll execute on the wrong schema! Since HSQLDB does internally cache
          prepared statement there's no performance loss. see http://jira.xwiki.org/browse/XWIKI-1740.
-         Thus we recommend not turning on this configuration for HSQLDB unless you know what you're doing :) -->
+         Thus we recommend not turning on this configuration for HSQLDB unless you know what you're doing :)
+
+         Note 2: The same applies to PostGreSQL.
+    -->
 
     <!-- BoneCP Connection Pooling configuration.
     <property name="bonecp.idleMaxAgeInMinutes">240</property>
@@ -149,6 +153,8 @@
          Notes:
            - "jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
+           - "xwiki.virtual_mode" can be set to either "schema" or "database". Note that currently the database mode
+             doesn't support database creation (see http://jira.xwiki.org/browse/XWIKI-8753)
 
     <property name="connection.url">jdbc:postgresql:xwiki</property>
     <property name="connection.username">xwiki</property>
@@ -156,7 +162,7 @@
     <property name="connection.driver_class">org.postgresql.Driver</property>
     <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
     <property name="jdbc.use_streams_for_binary">false</property>
-    <property name="dbcp.ps.maxActive">20</property>
+    <property name="xwiki.virtual_mode">schema</property>
     <mapping resource="xwiki.postgresql.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated

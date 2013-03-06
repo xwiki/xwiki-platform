@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model</artifactId>
   <name>XWiki Platform - Model</name>
   <packaging>jar</packaging>
   <description>XWiki Model (Wiki, Space, Document, etc)</description>
   <properties>
-    <xwiki.clover.targetPercentage>79.3%</xwiki.clover.targetPercentage>
+    <xwiki.jacoco.instructionRatio>79.49</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

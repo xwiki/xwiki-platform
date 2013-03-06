@@ -27,13 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-syntaxes</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-syntax-messagetool</artifactId>
   <name>XWiki Platform - Localization - Syntax - MessageTool</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Localization - Syntax - MessageTool</description>
-  
+  <properties>
+    <xwiki.jacoco.instructionRatio>82.79</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

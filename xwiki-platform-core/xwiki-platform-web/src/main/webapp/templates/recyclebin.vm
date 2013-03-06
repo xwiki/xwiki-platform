@@ -1,11 +1,16 @@
 ## Preview deleted document in recycle bin
 #set ($deletedDocument = $xwiki.getDeletedDocument($tdoc.getFullName(), $tdoc.getLanguage(), $request.get('id')))
 #if ($deletedDocument)
-  #set ($doc = $deletedDocument.getDocument())
-  #set ($tdoc = $doc)
-  #set ($cdoc = $doc)
-  #template('contentview.vm')
-  #template('docextra.vm')
+  #if (!$deletedDocument.getDocument())
+    #xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+    #xwikimessageboxend()
+  #else
+    #set ($doc = $deletedDocument.getDocument())
+    #set ($tdoc = $doc)
+    #set ($cdoc = $doc)
+    #template('contentview.vm')
+    #template('docextra.vm')
+  #end
 #else
   #xwikimessageboxstart($msg.get('error') $msg.get('core.recyclebin.invalidEntry'))
   #template('recyclebinlist.vm')

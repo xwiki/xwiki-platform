@@ -58,13 +58,13 @@ import com.xpn.xwiki.plugin.lucene.SearchResults;
 public class BaseSearchResult extends XWikiResource
 {
     protected static final String SEARCH_TEMPLATE_INFO =
-            "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&orderfield={fieldname}(&order={asc|desc}))(&prettynames={false|true})";
+            "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&prettyNames={false|true})";
 
     protected static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
-            "q={lucenequery}(&number={number})(&start={start})(&orderfield={fieldname}(&order={asc|desc}))(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
+            "q={lucenequery}(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
     protected static final String QUERY_TEMPLATE_INFO =
-            "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&orderfield={fieldname}(&order={asc|desc}))(&distinct=1)(&prettynames={false|true})(&wikis={wikis})(&classname={classname})";
+            "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
     protected static enum SearchScope
     {
@@ -759,7 +759,7 @@ public class BaseSearchResult extends XWikiResource
     protected List<SearchResult> searchLucene(String query, String defaultWikiName, String wikis,
             boolean hasProgrammingRights, String orderField, String order, int number, int start,
             Boolean withPrettyNames)
-            throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
+            throws IllegalArgumentException, UriBuilderException, XWikiException
     {
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 

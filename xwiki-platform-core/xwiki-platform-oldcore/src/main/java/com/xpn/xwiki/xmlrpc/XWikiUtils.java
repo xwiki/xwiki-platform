@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import org.apache.xmlrpc.XmlRpcException;
 import org.xwiki.xmlrpc.model.XWikiExtendedId;
 
 import com.xpn.xwiki.XWikiContext;

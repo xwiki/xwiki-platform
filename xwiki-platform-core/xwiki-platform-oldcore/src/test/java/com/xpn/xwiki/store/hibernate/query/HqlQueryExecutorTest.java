@@ -35,7 +35,7 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  */
 @MockingRequirement(HqlQueryExecutor.class)
-public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase
+public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQueryExecutor>
 {
     private HqlQueryExecutor executor;
 

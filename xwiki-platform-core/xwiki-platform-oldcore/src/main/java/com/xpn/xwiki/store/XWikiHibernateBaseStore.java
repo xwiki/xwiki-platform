@@ -91,7 +91,7 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Key in XWikiContext for access to current hibernate database name.
      */
-    private static String currentDatabaseKey = "hibcurrentdatabase";
+    private static String CURRENT_DATABASE_KEY = "hibcurrentdatabase";
 
     private DatabaseProduct databaseProduct = DatabaseProduct.UNKNOWN;
 
@@ -384,6 +384,8 @@ public class XWikiHibernateBaseStore implements Initializable
                     schema = "APP";
                 } else if (databaseProduct == DatabaseProduct.HSQLDB) {
                     schema = "PUBLIC";
+                } else if (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()) {
+                    schema = "public";
                 } else {
                     schema = wikiName.replace('-', '_');
                 }
@@ -472,8 +474,12 @@ public class XWikiHibernateBaseStore implements Initializable
             String contextSchema = getSchemaFromWikiName(context);
 
             DatabaseProduct databaseProduct = getDatabaseProductName();
-            if (databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.HSQLDB
-                || databaseProduct == DatabaseProduct.DERBY || databaseProduct == DatabaseProduct.DB2) {
+            if (databaseProduct == DatabaseProduct.ORACLE
+                || databaseProduct == DatabaseProduct.HSQLDB
+                || databaseProduct == DatabaseProduct.DERBY
+                || databaseProduct == DatabaseProduct.DB2
+                || databaseProduct == DatabaseProduct.POSTGRESQL)
+            {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
                 Iterator iter = config.getTableMappings();
@@ -629,20 +635,22 @@ public class XWikiHibernateBaseStore implements Initializable
         try {
             if (isVirtual(context)) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Switch database to: [" + context.getDatabase() + "]");
+                    LOGGER.debug("Switch database to [{}]", context.getDatabase());
                 }
 
                 if (context.getDatabase() != null) {
                     String schemaName = getSchemaFromWikiName(context);
                     String escapedSchemaName = escapeSchema(schemaName, context);
 
-                    DatabaseProduct databaseProduct = getDatabaseProductName(context);
+                    DatabaseProduct databaseProduct = getDatabaseProductName();
                     if (DatabaseProduct.ORACLE == databaseProduct) {
                         executeSQL("alter session set current_schema = " + escapedSchemaName, session);
                     } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
                         || DatabaseProduct.DB2 == databaseProduct)
                     {
                         executeSQL("SET SCHEMA " + escapedSchemaName, session);
+                    } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
+                        executeSQL("SET search_path TO " + escapedSchemaName, session);
                     } else {
                         String catalog = session.connection().getCatalog();
                         catalog = (catalog == null) ? null : catalog.replace('_', '-');
@@ -673,6 +681,7 @@ public class XWikiHibernateBaseStore implements Initializable
     private void executeSQL(final String sql, Session session)
     {
         session.doWork(new Work() {
+            @Override
             public void execute(Connection connection) throws SQLException
             {
                 Statement stmt = null;
@@ -1341,7 +1350,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     private String getCurrentDatabase(XWikiContext context)
     {
-        return (String) context.get(currentDatabaseKey);
+        return (String) context.get(CURRENT_DATABASE_KEY);
     }
 
     /**
@@ -1350,6 +1359,15 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     private void setCurrentDatabase(XWikiContext context, String database)
     {
-        context.put(currentDatabaseKey, database);
+        context.put(CURRENT_DATABASE_KEY, database);
+    }
+
+    /**
+     * @return true if the user has configured Hibernate to use XWiki in schema mode (vs database mode)
+     * @since 4.5M1
+     */
+    protected boolean isInSchemaMode()
+    {
+        return StringUtils.equals(getConfiguration().getProperty("xwiki.virtual_mode"), "schema");
     }
 }

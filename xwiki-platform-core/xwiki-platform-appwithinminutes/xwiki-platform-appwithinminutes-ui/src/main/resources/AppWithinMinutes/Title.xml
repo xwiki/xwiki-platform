@@ -138,8 +138,18 @@
   </object>
   <content>{{velocity}}
 #if ($type == 'edit')
+  #set ($className = $object.getxWikiClass().name)
+  #if ($doc.fullName == $className)
+    ## We are editing the class so the title must be read from / written to the template document.
+    #set ($name = 'templateTitle')
+    #set ($value = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template").title)
+  #else
+    ## We are editing an application entry so the title must be read from / written to the current document.
+    #set ($name = 'title')
+    #set ($value = $tdoc.title)
+  #end
   {{html clean="false"}}
-  &lt;input type="text" name="title" value="$!escapetool.xml($tdoc.title)"
+  &lt;input type="text" name="$name" value="$!escapetool.xml($value)"
     #if ($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)class="required"#end/&gt;
   {{/html}}
 #elseif ("$!type" != '')

@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -32,6 +33,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
@@ -56,6 +58,12 @@ public class ApplicationManagerScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * The plugin.
@@ -87,7 +95,7 @@ public class ApplicationManagerScriptService implements ScriptService
         ApplicationManagerPluginApi api = (ApplicationManagerPluginApi) econtext.getProperty(PLUGINAPI_KEY);
 
         if (api == null) {
-            XWikiContext xcontext = (XWikiContext) econtext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+            XWikiContext xcontext = this.xcontextProvider.get();
 
             api = (ApplicationManagerPluginApi) getPlugin(xcontext).getPluginApi(this.plugin, xcontext);
             econtext.setProperty(PLUGINAPI_KEY, api);
@@ -104,9 +112,10 @@ public class ApplicationManagerScriptService implements ScriptService
         return getAPI().getDefaultException();
     }
 
+    @Deprecated
     public XWikiMessageTool getMessageTool()
     {
-        return getAPI().getMessageTool();
+        return ApplicationManagerMessageTool.getDefault(this.xcontextProvider.get());
     }
 
     public XWikiApplication createApplicationDocument() throws XWikiException

@@ -171,9 +171,9 @@ public class PackageMojo extends AbstractMojo
     private ArtifactMetadataSource metadataSource;
 
     /**
-     * The user under which the import should be done. If not user is specified then we import with backup pack.
-     * For example {@code superadmin}.
-     *
+     * The user under which the import should be done. If not user is specified then we import with backup pack. For
+     * example {@code superadmin}.
+     * 
      * @parameter
      */
     private String importUser;
@@ -258,8 +258,9 @@ public class PackageMojo extends AbstractMojo
 
         // Replace maven properties in start shell scripts
         VelocityContext context = createVelocityContext();
-        Collection<File> startFiles = org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory,
-            new WildcardFileFilter("start_xwiki*.*"), null);
+        Collection<File> startFiles =
+            org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory, new WildcardFileFilter(
+                "start_xwiki*.*"), null);
 
         // Note: Init is done once even if this method is called several times...
         Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new SLF4JLogChute());
@@ -328,23 +329,27 @@ public class PackageMojo extends AbstractMojo
         try {
             JarInputStream jarInputStream =
                 new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()));
-            JarEntry entry;
-            while ((entry = jarInputStream.getNextJarEntry()) != null) {
-                if (entry.getName().endsWith(".vm")) {
 
-                    String fileName = entry.getName().replace(".vm", "");
-                    File outputFile = new File(configurationFileTargetDirectory, fileName);
-                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
-                    getLog().info("Writing config file: " + outputFile);
-                    // Note: Init is done once even if this method is called several times...
-                    Velocity.init();
-                    Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
-                    writer.close();
-                    jarInputStream.closeEntry();
+            try {
+                JarEntry entry;
+                while ((entry = jarInputStream.getNextJarEntry()) != null) {
+                    if (entry.getName().endsWith(".vm")) {
+
+                        String fileName = entry.getName().replace(".vm", "");
+                        File outputFile = new File(configurationFileTargetDirectory, fileName);
+                        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
+                        getLog().info("Writing config file: " + outputFile);
+                        // Note: Init is done once even if this method is called several times...
+                        Velocity.init();
+                        Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
+                        writer.close();
+                        jarInputStream.closeEntry();
+                    }
                 }
+            } finally {
+                // Flush and close all the streams
+                jarInputStream.close();
             }
-            // Flush and close all the streams
-            jarInputStream.close();
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to extract configuration files", e);
         }

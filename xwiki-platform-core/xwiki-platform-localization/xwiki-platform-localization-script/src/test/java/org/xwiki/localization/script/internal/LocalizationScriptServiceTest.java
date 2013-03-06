@@ -38,8 +38,8 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 @MockingRequirement(value = LocalizationScriptService.class, exceptions = {Provider.class})
@@ -82,5 +82,20 @@ public class LocalizationScriptServiceTest extends AbstractMockingComponentTestC
         });
 
         Assert.assertEquals("print result", getMockedComponent().render("key", Syntax.PLAIN_1_0, Arrays.asList()));
+    }
+
+    @Test
+    public void getCurrentLocale() throws Exception
+    {
+        final LocalizationContext localizationContext = getComponentManager().getInstance(LocalizationContext.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(localizationContext).getCurrentLocale();
+                will(returnValue(Locale.ENGLISH));
+            }
+        });
+
+        Assert.assertEquals(Locale.ENGLISH, getMockedComponent().getCurrentLocale());
     }
 }

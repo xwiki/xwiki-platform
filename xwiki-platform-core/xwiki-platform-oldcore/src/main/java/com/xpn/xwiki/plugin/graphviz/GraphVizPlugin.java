@@ -410,6 +410,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
         /**
          * {@inheritDoc}
          */
+        @Override
         public void run()
         {
             try {

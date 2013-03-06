@@ -86,7 +86,7 @@ public class ServletRequestTest
     @Test
     public void getPropertiesWhenConflict()
     {
-        final HttpServletRequest httpRequest = mockery.mock(HttpServletRequest.class);
+        final HttpServletRequest httpRequest = this.mockery.mock(HttpServletRequest.class);
         this.mockery.checking(new Expectations() {{
             oneOf(httpRequest).getParameterValues("key");
                 will(returnValue(new String[] {"value"}));
@@ -97,5 +97,22 @@ public class ServletRequestTest
         ServletRequest request = new ServletRequest(httpRequest);
         List<Object> values = request.getProperties("key");
         Assert.assertEquals(Arrays.asList("value", "value"), values);
+    }
+
+    @Test
+    public void getPropertiesWhenNoExistAsRequestParam()
+    {
+        final HttpServletRequest httpRequest = this.mockery.mock(HttpServletRequest.class);
+        this.mockery.checking(new Expectations() {{
+            oneOf(httpRequest).getParameterValues("key");
+                will(returnValue(null));
+            oneOf(httpRequest).getAttribute("key");
+                will(returnValue("value"));
+        }});
+
+        ServletRequest request = new ServletRequest(httpRequest);
+        List<Object> result = request.getProperties("key");
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("value", result.get(0));
     }
 }

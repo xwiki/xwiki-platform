@@ -15,15 +15,14 @@ XWiki.ExtensionBehaviour = Class.create({
     // whether the extension is displayed alone or in the administration.
     this._fixExtensionLinks();
 
-    // Handle extension details.
-    this._enhanceShowDetailsBehaviour();
-
-    // Asynchronous fetch of install/uninstall plan.
-    this._enhanceInstallBehaviour();
-    this._enhanceUninstallBehaviour();
+    // Trigger the extension jobs asynchronously.
+    this._enhanceActions();
 
     // Enhances the behaviour of the extension details menu (Description/Dependencies/Progress).
     this._enhanceMenuBehaviour();
+
+    // Enhances the behaviour of the Description section.
+    this._enhanceDescriptionBehaviour();
 
     // Enhances the behaviour of the Dependencies section.
     this._enhanceDependenciesBehaviour();
@@ -121,7 +120,10 @@ XWiki.ExtensionBehaviour = Class.create({
 
     // Prepare the data for the AJAX call.
     var form = event.element().form;
-    var formData = new Hash(form.serialize({submit: event.element().name}));
+    var formData = new Hash(form.serialize({submit: false}));
+    // The extension action buttons have the same name and different values so we can't rely on Form#serialize() because
+    // it looks for the first button with the given name.
+    formData.set(event.element().name, event.element().value);
 
     // Disable the form to prevent it from being re-submitted while we wait for the response.
     form.disable();
@@ -168,6 +170,8 @@ XWiki.ExtensionBehaviour = Class.create({
     if (oldStatus != this.getStatus()) {
       document.fire('xwiki:extension:statusChanged', {extension: this});
     }
+    // Notify the others that the DOM has been updated.
+    document.fire('xwiki:dom:updated', {elements: [this.container]});
   },
 
   /**
@@ -196,22 +200,21 @@ XWiki.ExtensionBehaviour = Class.create({
    * Enables the asynchronous loading of extension details and the show/hide extension details toggle.
    */
   _enhanceShowDetailsBehaviour : function() {
-    var showDetailsButton = this.container.down('input[name="actionShowDetails"]');
-    if (showDetailsButton) {
-      // Load the extension details asynchronously.
-      showDetailsButton.observe('click', this._onShowDetails.bindAsEventListener(this));
-    } else {
-      showDetailsButton = this.container.down('input[name="showDetails"]');
-      if (!showDetailsButton) {
-        return;
-      }
+    var showDetailsButton = this.container.down('button[value="showDetails"]');
+    if (!showDetailsButton) {
+      return;
+    }
+    if (showDetailsButton.hasClassName('visibilityAction')) {
       // Show/hide extension details toggle.
       showDetailsButton = showDetailsButton.up();
-      var hideDetailsButton = this.container.down('input[name="hideDetails"]').up();
+      var hideDetailsButton = this.container.down('button[value="hideDetails"]').up();
       showDetailsButton.__otherButton = hideDetailsButton;
       hideDetailsButton.__otherButton = showDetailsButton;
       this.container.select('.visibilityAction').invoke('observe', 'click', this._onToggleShowHideDetails.bindAsEventListener(this));
       showDetailsButton.remove();
+    } else {
+      // Load the extension details asynchronously.
+      showDetailsButton.observe('click', this._onShowDetails.bindAsEventListener(this));
     }
   },
 
@@ -226,23 +229,18 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   /**
-   * Enhances the behaviour of the install button: computes the install plan asynchronously.
+   * Trigger the extension jobs asynchronously.
    */
-  _enhanceInstallBehaviour : function() {
-    var installButton = this.container.down('input[name="actionInstall"]');
-    installButton && installButton.observe('click', this._startJob.bindAsEventListener(this));
-    var installGloballyButton = this.container.down('input[name="actionInstallGlobally"]');
-    installGloballyButton && installGloballyButton.observe('click', this._startJob.bindAsEventListener(this));
-  },
-
-  /**
-   * Enhances the behaviour of the uninstall button: computes the uninstall plan asynchronously.
-   */
-  _enhanceUninstallBehaviour : function() {
-    var uninstallButton = this.container.down('input[name="actionUninstall"]');
-    uninstallButton && uninstallButton.observe('click', this._startJob.bindAsEventListener(this));
-    var uninstallGloballyButton = this.container.down('input[name="actionUninstallGlobally"]');
-    uninstallGloballyButton && uninstallGloballyButton.observe('click', this._startJob.bindAsEventListener(this));
+  _enhanceActions : function() {
+    // Handle the Show/Hide Details buttons separately.
+    this._enhanceShowDetailsBehaviour();
+    // Handle the buttons that trigger extension jobs.
+    var startJobHandler = this._startJob.bindAsEventListener(this);
+    this.container.select('button[name="extensionAction"]').each(function(button) {
+      if (!button.value.endsWith('Details')) {
+        button.observe('click', startJobHandler);
+      }
+    });
   },
 
   /**
@@ -255,7 +253,7 @@ XWiki.ExtensionBehaviour = Class.create({
       // Make sure the extension details are visible.
       extensionBody.hasClassName('hidden') && this._onToggleShowHideDetails({
         stop : function() {},
-        element : function() {return this.container.down('input[name="showDetails"]')}.bind(this)
+        element : function() {return this.container.down('button[value="showDetails"]')}.bind(this)
       });
       // Prepare the progress section: create one if it is missing, clear its contents otherwise.
       var progressSection = this._prepareProgressSectionForLoading();
@@ -289,7 +287,7 @@ XWiki.ExtensionBehaviour = Class.create({
       this.container.down('.innerMenu').insert(new Element('li').insert(progressMenu));
     } else if (progressSection.down('.extension-log-item-loading')) {
       // Just hide the question that has been answered if there is any progress item loading.
-      progressSection.down('form').hide();
+      progressSection.down('.extension-question').hide();
     } else {
       // Hide all the contents of the progress section and display the loading animation.
       progressSection.childElements().invoke('hide');
@@ -342,11 +340,13 @@ XWiki.ExtensionBehaviour = Class.create({
 
   /**
    * Redisplays the extension using updated information from the server.
+   *
+   * @param extraParams additional submit parameters
    */
-  _refresh : function() {
+  _refresh : function(extraParams) {
     // Prepare the data for the AJAX call.
-    var form = this.container.down('.extension-actions');
-    var formData = new Hash(form.serialize({submit: false}));
+    var formData = new Hash(this.container.serialize({submit: false}));
+    extraParams && formData.update(extraParams);
 
     // Preserve the menu selection while the extension display is refreshed.
     this._preserveMenuSelection = true;
@@ -374,7 +374,7 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _maybeScheduleRefresh : function(timeout) {
     timeout = timeout || 1;
-    this.container.hasClassName('extension-item-loading') && !this.container.down('input[name="confirm"]') && this._refresh.bind(this).delay(timeout);
+    this.container.hasClassName('extension-item-loading') && !this.container.down('button[value="continue"]') && this._refresh.bind(this).delay(timeout);
   },
 
   /**
@@ -464,12 +464,6 @@ XWiki.ExtensionBehaviour = Class.create({
       var log = loadingLogItem.up();
       log.scrollTop = log.scrollHeight;
     }
-    // Execute Extension Manager jobs asynchronously.
-    var confirmJobButton = this.container.down('input[name="confirm"]');
-    confirmJobButton && confirmJobButton.observe('click', this._startJob.bindAsEventListener(this));
-    // Compute the changes asynchronously when there is a merge conflict.
-    var diffButton = this.container.down('input[name="diff"]');
-    diffButton && diffButton.observe('click', this._startJob.bindAsEventListener(this));
   },
 
   /**
@@ -491,10 +485,9 @@ XWiki.ExtensionBehaviour = Class.create({
     }
 
     // Prepare the data for the AJAX call.
-    var form = this.container.down('.extension-actions');
-    var formData = new Hash(form.serialize({submit: false}));
+    var formData = new Hash(this.container.serialize({submit: false}));
     formData.unset('extensionVersion');
-    formData.unset('confirm');
+    formData.unset('form_token');
 
     var dependency = dependencies[index];
     formData.set('extensionId', dependency.down('.extension-name').innerHTML);
@@ -522,6 +515,19 @@ XWiki.ExtensionBehaviour = Class.create({
         response.request.options.onFailure(response);
       }
     });
+  },
+
+  /**
+   * Enhances the behaviour of the Description section within the extension details.
+   */
+  _enhanceDescriptionBehaviour : function() {
+    var extensionVersionsLink = this.container.down('.extension-versions-link');
+    extensionVersionsLink && extensionVersionsLink.observe('click', function(event) {
+      event.stop();
+      // Hide the link and show the loading annimation.
+      event.element().hide().up().addClassName('loading').setStyle({'height': '16px', 'width': '16px'});
+      this._refresh({'listVersions': true});
+    }.bindAsEventListener(this));
   }
 });
 

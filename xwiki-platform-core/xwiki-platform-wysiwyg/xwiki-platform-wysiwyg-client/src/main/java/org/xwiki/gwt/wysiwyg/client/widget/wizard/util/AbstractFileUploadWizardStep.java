@@ -51,6 +51,16 @@ public abstract class AbstractFileUploadWizardStep extends AbstractInteractiveWi
     protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
+     * The style used on the field label.
+     */
+    protected static final String FIELD_LABEL_STYLE = "xInfoLabel";
+
+    /**
+     * The style used on the field hint.
+     */
+    protected static final String FIELD_HINT_STYLE = "xHelpLabel";
+
+    /**
      * The file upload form.
      */
     private final FormPanel fileUploadForm = new FormPanel();
@@ -92,7 +102,7 @@ public abstract class AbstractFileUploadWizardStep extends AbstractInteractiveWi
         // set the url on submit time, just before upload
 
         Panel fileLabel = new FlowPanel();
-        fileLabel.setStyleName("xInfoLabel");
+        fileLabel.setStyleName(FIELD_LABEL_STYLE);
         fileLabel.add(new InlineLabel(getFileLabel()));
         InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
         mandatoryLabel.addStyleName("xMandatory");
@@ -101,7 +111,7 @@ public abstract class AbstractFileUploadWizardStep extends AbstractInteractiveWi
         FlowPanel formPanel = new FlowPanel();
 
         formPanel.add(fileLabel);
-        fileHelpLabel.setStyleName("xHelpLabel");
+        fileHelpLabel.setStyleName(FIELD_HINT_STYLE);
         fileHelpLabel.setVisible(false);
         formPanel.add(fileHelpLabel);
 

@@ -38,11 +38,11 @@ import com.xpn.xwiki.web.Utils;
  * <dt>className[objectNumber]
  * <dd>interpreted as the object of class className with number objectNumber. refers the object returned by
  * XWikiDocument.getObject(String className, int objectNumber). In this case, className is obtained by calling
- * {@link #getClassName()} and object index by calling {@link #getObjectNumber()}.
+ * {@link #getXClassReference()} and object index by calling {@link #getObjectNumber()}.
  * <dt>className
  * <dd>interpreted as the first object of class className. refers the object returned by XWikiDocument.getObject(String
  * className). In this case, {@link #getObjectNumber()} will return {@code null} and {@code className} is obtained by
- * calling {@link #getClassName()}.
+ * calling {@link #getXClassReference()}.
  * </dl>
  * 
  * @version $Id$

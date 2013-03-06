@@ -39,6 +39,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.QueryManager;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -77,6 +78,12 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
      */
     @Inject
     protected DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * Query manager used to perform queries on the XWiki model.
+     */
+    @Inject
+    protected QueryManager queryManager;
 
     @Override
     public List<EntityReference> getReferences(EntityReference startReference) throws SolrIndexException
@@ -197,7 +204,7 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
         // FIXME: The GSoC implementation had a second part in the if. Remove this comment if it proves to be not
         // important in, say... version 5.1.
         // && !documentReference.getName().contains("WatchList")
-        if (context.getWiki().exists(documentReference, context)) {
+        if (documentAccessBridge.exists(documentReference)) {
 
             // Document itself
             result.add(documentReference);
@@ -251,18 +258,12 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
 
         // Ignore the space reference because it is not indexable.
 
-        XWikiContext context = getXWikiContext();
-        String currentDatabase = context.getDatabase();
-
-        // Make sure the list of documents in the space is retrieved from the space's wiki.
-        context.setDatabase(spaceReference.getParent().getName());
         List<String> documentNames = null;
-        try {
-            documentNames = context.getWiki().getSpaceDocsName(spaceReference.getName(), context);
-        } finally {
-            // Reset the context database.
-            context.setDatabase(currentDatabase);
-        }
+
+        // Make sure the list of spaces is from the requested wiki.
+        documentNames =
+            queryManager.getNamedQuery("getSpaceDocsName").setWiki(spaceReference.getParent().getName())
+                .bindValue("space", spaceReference.getName()).execute();
 
         for (String documentName : documentNames) {
             DocumentReference documentReference = new DocumentReference(documentName, spaceReference);
@@ -284,18 +285,10 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
 
         // Ignore the wiki reference because it is not indexable.
 
-        XWikiContext context = getXWikiContext();
-        String currentDatabase = context.getDatabase();
+        List<String> spaces = null;
 
         // Make sure the list of spaces is from the requested wiki.
-        context.setDatabase(wikiReference.getName());
-        List<String> spaces = null;
-        try {
-            spaces = context.getWiki().getSpaces(context);
-        } finally {
-            // Reset the context database.
-            context.setDatabase(currentDatabase);
-        }
+        spaces = queryManager.getNamedQuery("getSpaces").setWiki(wikiReference.getName()).execute();
 
         // Visit each space
         for (String space : spaces) {

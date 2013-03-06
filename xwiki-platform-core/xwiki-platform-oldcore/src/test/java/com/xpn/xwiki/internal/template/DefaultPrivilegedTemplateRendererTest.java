@@ -39,7 +39,6 @@ import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
@@ -54,7 +53,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 import org.junit.Test;
-import org.junit.Assert;
 import org.junit.Rule;
 
 
@@ -95,7 +93,7 @@ public class DefaultPrivilegedTemplateRendererTest
     @Test
     public void ordinaryTemplate() throws Exception
     {
-        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getMockedComponent();
+        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getComponentUnderTest();
 
         final XWikiContext context = mock(XWikiContext.class);
 
@@ -119,7 +117,7 @@ public class DefaultPrivilegedTemplateRendererTest
         // Required in order to instantiate an XWikiDocument
         Utils.setComponentManager(mocker);
 
-        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getMockedComponent();
+        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getComponentUnderTest();
 
         final XWikiContext context = mock(XWikiContext.class);
 

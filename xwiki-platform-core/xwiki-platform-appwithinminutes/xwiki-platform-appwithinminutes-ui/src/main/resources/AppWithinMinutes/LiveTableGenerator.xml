@@ -25,38 +25,61 @@
   <hidden>true</hidden>
   <content>{{velocity output="false" filter="none"}}
 #macro(prepareColumnProperties)
-${escapetool.h}set (${escapetool.d}columnsProperties = {##
-#set($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
-#set($specialColumns = ['_avatar', '_images', '_attachments', '_actions'])
-#set($separator = '')
-#foreach($column in $columns)
-#set($field = $xclass.get($column))
-#if($field)
-#set($isHTML = false)
-#set($type = 'text')
-#if($field.classType.endsWith("TextAreaClass"))
-#set($isHTML = true)
-#elseif($field.classType.endsWith("ListClass"))
-#set($type = 'list')
-#end
-$separator
-  '$column': {'type': '$type', 'size': 10, 'filterable': true, 'sortable': true, 'html': $isHTML}##
-#set($separator = ',')
-#elseif($genericColumns.contains($column))
-#set($link = 'view')
-#if($column == 'doc.creator' || $column == 'doc.author')
-#set($link = 'author')
-#end
-$separator
-  '$column': {'type': 'text', 'link': '$link', 'size': #if($column == 'doc.title')20#{else}10#end, 'filterable': true, 'sortable': true}##
-#set($separator = ',')
-#elseif($specialColumns.contains($column))
-$separator
-  '$column': {'html': true, 'sortable': false#if($column == '_actions'), 'actions': ['edit', 'delete']#end}##
-#set($separator = ',')
-#end
+  #set ($columnProperties = {})
+  #set ($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
+  #set ($specialColumns = ['_avatar', '_images', '_attachments', '_actions'])
+  #foreach ($column in $columns)
+    #set ($field = $xclass.get($column))
+    #if ($field.getProperty('customDisplay').value == '{{include reference="AppWithinMinutes.Title"/}}')
+      ## This field is a place-holder for the document title.
+      #set ($field = $NULL)
+      #set ($column = 'doc.title')
+      #set ($discard = $columns.set($mathtool.sub($velocityCount, 1), $column))
+    #end
+    #if ($field)
+      #set ($properties = {'type': 'text'})
+      #if ($field.classType.endsWith('List'))
+        #set ($discard = $properties.put('type', 'list'))
+      #elseif ($field.classType == 'Number')
+        #set ($discard = $properties.put('type', 'number'))
+      #end
+      #if ($field.classType == 'TextArea' || $field.classType == 'ComputedField')
+        #set ($discard = $properties.put('filterable', false))
+        #set ($discard = $properties.put('sortable', false))
+      #else
+        ## The size of the filter input.
+        #set ($discard = $properties.put('size', 10))
+      #end
+      #if ($field.classType == 'TextArea' || $field.getProperty('customDisplay').value != '')
+        #set ($discard = $properties.put('html', true))
+      #end
+    #elseif ($genericColumns.contains($column))
+      #set ($properties = {'type': 'text', 'size': 10})
+      #if ($column == 'doc.title')
+        #set ($discard = $properties.put('size', 20))
+      #end
+      #if ($column == 'doc.creator' || $column == 'doc.author')
+        #set ($discard = $properties.put('link', 'author'))
+      #elseif ($column != 'doc.date' &amp;&amp; $column != 'doc.creationDate')
+        #set ($discard = $properties.put('link', 'view'))
+      #end
+    #elseif ($specialColumns.contains($column))
+      #set ($properties = {'sortable': false, 'filterable': false, 'html': true})
+      #if ($column == '_actions')
+        #set ($discard = $properties.put('actions', ['edit', 'delete']))
+      #end
+    #end
+    #set ($discard = $columnProperties.put($column, $properties))
+  #end
 #end
 
+#macro(generateColumnProperties)
+#set ($discard = "#prepareColumnProperties()")
+${escapetool.h}set (${escapetool.d}columnsProperties = {
+#foreach($entry in $columnProperties.entrySet())
+  '$entry.key': $jsontool.serialize($entry.value)#if ($foreach.hasNext),#end
+
+#end
 })
 #end
 
@@ -80,7 +103,7 @@ ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localizatio
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
 #set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
-#prepareColumnProperties()
+#generateColumnProperties()
 ${escapetool.h}set (${escapetool.d}options = {
   'className': '$className',
   'resultPage': '$stringtool.removeEnd($className, 'Class')LiveTableResults',
@@ -96,7 +119,37 @@ ${escapetool.h}livetable('$shortName' ${escapetool.d}columns ${escapetool.d}colu
 {{/velocity}}##
 }}}
 #end
+
+#**
+ * We keep this macro only to preserve backwards compatibility with applications created on versions older than 4.5M1.
+ * New applications don't use this document as a custom live table results page any more. A dedicated live table results
+ * page is now generated for each application.
+ *
+ * @deprecated since 4.5M1
+ *#
+#macro (outputLiveTableResults)
+  #set ($output = "#gridresult($!request.classname $request.collist.split(','))")
+  ## We have to escape the translation key because it appears as JSON value in the output.
+  #set ($escapedEmptyValueTranslationKey = $escapetool.javascript("${request.transprefix}emptyvalue"))
+  $output.replace($escapedEmptyValueTranslationKey, '-')
+#end
 {{/velocity}}{{velocity}}
-#maybeGenerateLiveTable()
+## We keep the following code only to preserve backwards compatibility with old applications (&lt;4.5M1) that use this
+## document as a live table results page. For these applications we need to distinguish between a request for generating
+## a live table and a request for live table data.
+#set ($isLiveTableResultsRequest = $xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
+## We do the include separately because the wiki syntax is evaluated after the Velocity code.
+#if ($isLiveTableResultsRequest)
+  {{include document="XWiki.LiveTableResultsMacros" /}}
+#end
+{{/velocity}}{{velocity wiki="false"}}
+## Old applications need custom live table results just because they don't have a document translation bundle generated.
+#if ($isLiveTableResultsRequest)
+  #outputLiveTableResults()
+#end
+{{/velocity}}{{velocity}}
+#if (!$isLiveTableResultsRequest)
+  #maybeGenerateLiveTable()
+#end
 {{/velocity}}</content>
 </xwikidoc>

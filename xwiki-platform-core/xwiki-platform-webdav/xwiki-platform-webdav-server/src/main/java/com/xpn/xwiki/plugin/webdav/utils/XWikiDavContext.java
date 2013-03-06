@@ -135,7 +135,7 @@ public class XWikiDavContext
 
             ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(xwikiContext.getRequest().getHttpServletRequest(), xwikiContext);
-            containerInitializer.initializeResponse(xwikiContext.getResponse().getHttpServletResponse());
+            containerInitializer.initializeResponse(xwikiContext.getResponse());
             containerInitializer.initializeSession(xwikiContext.getRequest().getHttpServletRequest());
             containerInitializer.initializeApplicationContext(servletContext);
 

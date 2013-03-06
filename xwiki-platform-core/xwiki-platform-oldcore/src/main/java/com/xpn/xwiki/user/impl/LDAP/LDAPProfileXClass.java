@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -51,6 +53,9 @@ public class LDAPProfileXClass
 
     public static final String LDAP_XFIELDPN_UID = "LDAP user unique identifier";
 
+    public static final EntityReference LDAPPROFILECLASS_REFERENCE = new EntityReference("LDAPProfileClass",
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
     /**
      * The XWiki space where users are stored.
      */
@@ -69,7 +74,7 @@ public class LDAPProfileXClass
     {
         this.context = context;
 
-        XWikiDocument ldapClassDoc = context.getWiki().getDocument(LDAP_XCLASS, context);
+        XWikiDocument ldapClassDoc = context.getWiki().getDocument(LDAPPROFILECLASS_REFERENCE, context);
 
         this.ldapClass = ldapClassDoc.getXClass();
 
@@ -87,7 +92,7 @@ public class LDAPProfileXClass
      */
     public String getDn(XWikiDocument userDocument)
     {
-        BaseObject ldapObject = userDocument.getObject(this.ldapClass.getName());
+        BaseObject ldapObject = userDocument.getXObject(this.ldapClass.getDocumentReference());
 
         return ldapObject == null ? null : getDn(ldapObject);
     }
@@ -109,7 +114,7 @@ public class LDAPProfileXClass
      */
     public String getUid(XWikiDocument userDocument)
     {
-        BaseObject ldapObject = userDocument.getObject(this.ldapClass.getName());
+        BaseObject ldapObject = userDocument.getXObject(this.ldapClass.getDocumentReference());
 
         return ldapObject == null ? null : getUid(ldapObject);
     }
@@ -155,7 +160,7 @@ public class LDAPProfileXClass
      */
     public boolean updateLDAPObject(XWikiDocument userDocument, String dn, String uid)
     {
-        BaseObject ldapObject = userDocument.getObject(this.ldapClass.getName(), true, this.context);
+        BaseObject ldapObject = userDocument.getXObject(this.ldapClass.getDocumentReference(), true, this.context);
 
         Map<String, String> map = new HashMap<String, String>();
 

@@ -52,6 +52,7 @@ public class XWikiAsyncCallback implements AsyncCallback {
         }
     }
 
+    @Override
     public void onFailure(Throwable caught) {
         if (app != null){
             app.finishLoading();
@@ -59,6 +60,7 @@ public class XWikiAsyncCallback implements AsyncCallback {
         app.showError(caught);
     }
 
+    @Override
     public void onSuccess(Object result) {
         if (app != null)
             app.finishLoading();

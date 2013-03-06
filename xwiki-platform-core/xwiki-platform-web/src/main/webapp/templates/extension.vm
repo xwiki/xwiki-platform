@@ -1,9 +1,16 @@
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set ($extensionManager = $services.extension)
-#set ($extensionNamespace = "wiki:$xcontext.database")
+## From the main wiki we can manage other namespaces.
+#if ($xcontext.isMainWiki() && "$!request.extensionNamespace" != '')
+  #set ($extensionNamespace = $request.extensionNamespace)
+#else
+  #set ($extensionNamespace = "wiki:$xcontext.database")
+#end
 #set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
 
 #macro (displayExtensionSearchBar)
@@ -15,7 +22,8 @@
           <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
         #end
         <label class="hidden" for="extensionSearchInput">$msg.get('extensions.search.tip')</label>
-        <input type="text" #if ("$!request.search" == '')class="withTip" #{end}id="extensionSearchInput" name="search" value="#if ("$!request.search" != '')$escapetool.xml($request.search)#{else}$msg.get('extensions.search.tip')#{end}" />
+        <input type="text" #if ("$!request.search" == '')class="withTip" #{end}id="extensionSearchInput" name="search"
+          value="#if ("$!request.search" != '')$escapetool.xml($request.search)#{else}$msg.get('extensions.search.tip')#{end}" />
         <label class="hidden" for="extensionSearchRepositoryList">$msg.get('extensions.search.repository.label')</label>
         <select id="extensionSearchRepositoryList" name="repo">
           <option value="">$msg.get('extensions.search.repository.all.label')</option>
@@ -23,7 +31,8 @@
             #set ($selectedRepositoryId = $request.repo)
           #end
           #foreach ($repositoryId in ['core', 'installed', 'local'])
-            <option value="$repositoryId"#if ($selectedRepositoryId == $repositoryId) selected="selected"#end>$msg.get("extensions.search.repository.${repositoryId}.label")</option>
+            <option value="$repositoryId"#if ($selectedRepositoryId == $repositoryId) selected="selected"#end>
+              $msg.get("extensions.search.repository.${repositoryId}.label")</option>
           #end
         </select>
       </div>
@@ -66,59 +75,79 @@
 #end
 
 #macro (displayExtensionActionButtons $extension)
-  <form action="" class="extension-actions">
-    <fieldset>
-      #extensionHiddenFormFields($extension.id.id $extension.id.version true)
-      ##
-      ## Generic actions.
-      ##
-      #computeXBack()
-      ## Check if the current request targets the given extension.
-      #if ($request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
-        #if ($isAjaxRequest)
-          ## AJAX request to show extension details.
-          #em_submitButton('extensions.actions.showDetails' 'showDetails' true 'visibilityAction')
-          #em_submitButton('extensions.actions.hideDetails' 'hideDetails' true 'visibilityAction')
-        #else
-          ## The given extension is displayed alone.
-          #em_linkButton($xback 'extensions.actions.back')
-        #end
-      #else
-        ## The given extension is displayed in a list of extensions.
-        #em_submitButton('extensions.actions.showDetails' 'actionShowDetails' true)
-        <input type="hidden" name="xback" value="$escapetool.xml($xback)" />
-      #end
-      ##
-      ## Specific actions.
-      ##
-      #if(!$extensionStatus)
-        #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
-      #end
-      ## TODO: Find a better way to 'force' the repair XAR extension button.
-      #if ($xcontext.action == 'distribution' && $showRepairXARButton)
-        #set ($showRepairXARButton = $NULL)
-        #em_submitButton('extensions.actions.repairXAR' 'actionRepairXAR')
-        ## The repair job is executed without confirmation.
-        <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
-        <input name="confirm" value="1" type="hidden" />
-      #elseif ($extensionStatus.startsWith('installed'))
-        ## This extension can be uninstalled.
-        #extensionActionButton($extension 'uninstall' true)
-      #elseif ($extensionStatus == 'remote')
-        ## Installable extension.
-        #extensionActionButton($NULL 'install')
-      #elseif ($extensionStatus.startsWith('remote-installed'))
-        ## An extension that can be either upgraded or downgraded.
-        ## Compare this version with the version that is currently installed to determine which button to display.
-        #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
-        #if ($extension.id.version.compareTo($installedExtension.id.version) > 0)
-          #extensionActionButton($installedExtension 'upgrade')
-        #else
-          #extensionActionButton($installedExtension 'downgrade' true)
-        #end
-      #end
-    </fieldset>
-  </form>
+  <div class="extension-actions">
+    #displayExtensionActionButtons_detailsToggle($extension)
+    ## Group the buttons that trigger an extension job.
+    <span class="dynamic-button-group">
+      #displayExtensionActionButtons_jobTriggers($extension)
+    </span>
+  </div>
+#end
+
+#macro (displayExtensionActionButtons_detailsToggle $extension)
+  #computeXBack()
+  ## Check if the current request targets the given extension.
+  #if ($request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
+    #if ($isAjaxRequest)
+      ## AJAX request to show extension details.
+      #extensionActionButton('showDetails' true 'visibilityAction')
+      #extensionActionButton('hideDetails' true 'visibilityAction')
+    #else
+      ## The given extension is displayed alone.
+      #em_linkButton($xback 'extensions.actions.back')
+    #end
+  #else
+    ## The given extension is displayed in a list of extensions.
+    #extensionActionButton('showDetails' true)
+    <input type="hidden" name="xback" value="$escapetool.xml($xback)" />
+  #end
+#end
+
+#macro (displayExtensionActionButtons_jobTriggers $extension)
+  #if(!$extensionStatus)
+    #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
+  #end
+  ## Determine if there is an extension job waiting to be resumed or a previously created job plan that can be executed.
+  #set ($showContinueButton = $jobState == 'WAITING')
+  #if (!$showContinueButton)
+    #isExtensionPlan($jobStatus $showContinueButton)
+  #end
+  #if ($showContinueButton)
+    ## One of the following statements is true:
+    ## * the current extension job is waiting for user input and the user needs a button to resume the job,
+    ## * an extension job plan was previously computed and the user needs a button to execute the plan.
+    #extensionActionButton('continue')
+    <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
+    #if ($jobState == 'WAITING')
+      ## Only the Continue button should be available when a job is waiting.
+      #break
+    #end
+  #end
+  ## Note that the Continue button doesn't exclude the following buttons, unless a job is waiting. The user should be
+  ## able for instance to recompute the install plan.
+  #if ($xcontext.action == 'distribution' && $showRepairXARButton)
+    ## NOTE: This code is normally reached only when JavaScript is disabled since otherwise the button is added from JavaScript.
+    ## TODO: Find a better way to 'force' the repair XAR extension button.
+    #set ($showRepairXARButton = $NULL)
+    #extensionActionButton('repairXAR')
+    ## The repair job is executed without confirmation (i.e. without a plan).
+    <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
+  #elseif ($extensionStatus.startsWith('installed'))
+    ## This extension can be uninstalled.
+    #extensionActionButtons($extension 'uninstall' true)
+  #elseif ($extensionStatus == 'remote')
+    ## Installable extension.
+    #extensionActionButtons($NULL 'install')
+  #elseif ($extensionStatus.startsWith('remote-installed'))
+    ## An extension that can be either upgraded or downgraded.
+    ## Compare this version with the version that is currently installed to determine which button to display.
+    #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+    #if ($extension.id.version.compareTo($installedExtension.id.version) > 0)
+      #extensionActionButtons($installedExtension 'upgrade')
+    #else
+      #extensionActionButtons($installedExtension 'downgrade' true)
+    #end
+  #end
 #end
 
 #macro (displayExtensionAuthors $extension)
@@ -170,7 +199,7 @@
 #end
 
 #macro (displayExtensionDetails_menuLink $detail $selected)
-  <a href="#extension-body-${detail}-${extension.id.id}-${extension.id.version}"#if ($selected) class="current"#end>
+  <a href="#extension-body-${detail}-$extensionIdHashCode"#if ($selected) class="current"#end>
     $msg.get("extensions.info.category.$detail")
   </a>
 #end
@@ -182,10 +211,6 @@
 #end
 <ul class="innerMenu">
 <li>#displayExtensionDetails_menuLink('description')</li>##
-##
-#if ("$!{extension.releaseNotes}" != '')
-<li>#displayExtensionDetails_menuLink('releaseNotes')</li>##
-#end
 ##
 #if ($extension.dependencies.size() > 0 || $backwardDependencies.size() > 0)
 <li>#displayExtensionDetails_menuLink('dependencies')</li>##
@@ -199,69 +224,135 @@
 #end
 
 #macro (displayExtensionDetails_description $extension)
-  <div id="extension-body-description-${extension.id.id}-${extension.id.version}"></div>
+  <div id="extension-body-description-$extensionIdHashCode"></div>
   <div class="extension-body-description extension-body-section">
-    <ul class="extension-metadata">
-      <li>$msg.get('extensions.info.license', [$extension.licenses.size()]) ##
-        #foreach ($license in $extension.licenses)
-          ${license.name}##
-          #if ($foreach.hasNext), #end
-        #end
-      </li>
-      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
-        <li>
-          $msg.get('extensions.info.repository')
-          <a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a>
-        </li>
-      #end
-      #if ($extension.dependency)
-        <li>$msg.get('extensions.info.dependency')</li>
-      #end
-      #if ("$!{extension.webSite}" != '')
-        <li>
-          $msg.get('extensions.info.website')
-          <a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a>
-        </li>
-      #end
+    <dl class="extension-metadata">
+      <dt>$msg.get('extensions.info.id')</dt>
+      <dd>$extension.id.id</dd>
+
       #if ($extension.features.size() > 0)
-        <li>$msg.get('extensions.info.features') $escapetool.xml($extension.features)</li>
+        <dt>$msg.get('extensions.info.features', [$extension.features.size()])</dt>
+        <dd>
+        #if ($extension.features.size() == 1)
+          $escapetool.xml($extension.features.iterator().next())
+        #else
+          <ul>
+            #foreach ($feature in $extension.features)
+              <li>$escapetool.xml($feature)</li>
+            #end
+          </ul>
+        #end
+        </dd>
       #end
-      #if ($xwiki.isVirtualMode() && $extension.isInstalled("wiki:${xcontext.database}"))
-        <li>#displayExtensionDetails_description_wikis($extension)</li>
+
+      <dt>$msg.get('extensions.info.type')</dt>
+      <dd>$extension.type</dd>
+
+      <dt>$msg.get('extensions.info.license', [$extension.licenses.size()])</dt>
+      #if ($extension.licenses.size() > 0)
+        <dd>
+          #if ($extension.licenses.size() == 1)
+            $extension.licenses.iterator().next().name
+          #else
+            <ul>
+              #foreach ($license in $extension.licenses)
+                <li>$license.name</li>
+              #end
+            </ul>
+          #end
+        </dd>
       #end
-    </ul>
-    ##
-    ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax, server side generated HTML, etc)
-    ## $!extension.description
+
+      #if ("$!{extension.webSite}" != '')
+        <dt>$msg.get('extensions.info.website')</dt>
+        <dd><a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
+      #end
+
+      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
+        <dt>$msg.get('extensions.info.repository')</dt>
+        <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
+      #end
+
+      #if ($extension.isInstalled())
+        #displayExtensionDetails_description_wikis($extension)
+      #end
+
+      #if ($extensionStatus != 'loading')
+        #displayExtensionDetails_description_versions($extension)
+      #end
+
+      ##
+      ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax,
+      ## server side generated HTML, etc.)
+      ## <dt>Description</dt>
+      ## <dd>$!extension.description</dd>
+    </dl>
   </div>
 #end
 
 #macro (displayExtensionDetails_description_wikis $extension)
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
-    $msg.get('extensions.info.namespaces.global')
-  #else
-    #set ($wikis = [])
-    #foreach ($namespace in $extension.namespaces)
-      #if ($namespace.startsWith('wiki:'))
-        #set ($discard = $wikis.add($namespace.substring(5)))
+    <dt>$msg.get('extensions.info.namespaces.global')</dt>
+  #elseif ($xwiki.isVirtualMode() && $xcontext.isMainWiki())
+    ## Display the list of namespaces where the given extension is installed only if we are on the main wiki.
+    <dt>$msg.get('extensions.info.namespaces.list')</dt>
+    <dd><ul>
+      #foreach ($namespace in $extension.namespaces)
+        <li>#displayExtensionNamespace($namespace)</li>
       #end
-    #end
-    ## List the wikis where the given extension was installed.
-    $msg.get('extensions.info.namespaces.list') $escapetool.xml($stringtool.join($wikis, ', '))
+    </ul></dd>
   #end
 #end
 
-#macro (displayExtensionDetails_releaseNotes $extension)
-  #if ("$!extension.releaseNotes" != '')
-    <div id="extension-body-releaseNotes-${extension.id.id}-${extension.id.version}"></div>
-    <div class="extension-body-releaseNotes extension-body-section">
-      $escapetool.xml($extension.releaseNotes)
-    </div>
+#macro (displayExtensionNamespace $namespace)
+#if ("$!namespace" == '' && $namespace != '')
+$msg.get('extensions.info.globalNamespace')##
+#elseif ($namespace.startsWith('wiki:'))
+#wikiHomePageLink($namespace)##
+#else
+$namespace##
+#end
+#end
+
+#macro (displayExtensionDetails_description_versions $extension)
+  #if (!$request.listVersions)
+    <dt></dt>
+    <dd>
+      <a href="#getExtensionURL($extension.id.id $extension.id.version.value {'listVersions': true})"
+        class="extension-versions-link">
+        $msg.get('extensions.info.stableVersions.linkLabel')
+      </a>
+    </dd>
+  #else
+    <dt>$msg.get('extensions.info.stableVersions.label')</dt>
+    <dd>
+      #set ($stableVersions = [])
+      #foreach ($version in $extensionManager.resolveVersions($extension.id.id, 0, -1))
+        #if ($version.type == 'STABLE')
+          #set ($discard = $stableVersions.add($version.value))
+        #end
+      #end
+      #if ($stableVersions.size() > 0)
+        <ul>
+        ## Latest version first.
+        #foreach ($i in [$mathtool.sub($stableVersions.size(), 1)..0])
+          #set ($version = $stableVersions.get($i))
+          <li><a href="#getExtensionURL($extension.id.id $version)" class="extension-link">$version</a></li>
+        #end
+        </ul>
+      #else
+        $msg.get('extensions.info.stableVersions.noResults')
+      #end
+    </dd>
   #end
 #end
 
-#macro (displayDependency $dependencyOrExtension $namespace $resolveRemotely)
+#**
+ * NOTE: We explicitly overwrite the $extensionNamespace global variable because we want the dependency status to be
+ * determined for the given namespace. See #determineExtensionStatus() macro.
+ *#
+#macro (displayDependency $dependencyOrExtension $extensionNamespace $resolveRemotely)
   #if ($dependencyOrExtension.versionConstraint)
     ## Dependency object.
     #set ($dependencyId = $dependencyOrExtension.id)
@@ -287,14 +378,16 @@
   #set ($dependencyStatusMessage = $NULL)
   #set ($dependencyName = $dependencyId)
   #if ($dependencyExtension)
+    ## The extension status is determined for the $extensionNamespace . The name of this parameter is very important
+    ## because it has to overwrite the global variable with the same name.
     #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage $dependencyOrExtension.versionConstraint)
     #set ($dependencyURL = "#getExtensionURL($dependencyId $dependencyVersion)")
     #set ($dependencyName = "<a href=""$dependencyURL"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
   #end
   <div class="dependency-item extension-item-$dependencyStatus">
     <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
-    #if ($xwiki.isVirtualMode() && $namespace.startsWith('wiki:'))
-      <span class="extension-namespace">$msg.get('extensions.info.dependency.wiki', [$namespace.substring(5)])</span>
+    #if ($xwiki.isVirtualMode() && $extensionNamespace.startsWith('wiki:'))
+      <span class="extension-namespace">$msg.get('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
     #end
     #if ("$!dependencyStatusMessage" != '')
       <span class="extension-status">$dependencyStatusMessage</span>
@@ -307,7 +400,7 @@
     <p>$msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</p>
     <ul>
       #foreach ($dependency in $extension.dependencies)
-        <li>#displayDependency($dependency)</li>
+        <li>#displayDependency($dependency $extensionNamespace)</li>
       #end
     </ul>
   #end
@@ -328,7 +421,7 @@
 
 #macro (displayExtensionDetails_dependencies $extension $backwardDependencies)
   #if ($extension.dependencies.size() > 0 || $backwardDependencies.size() > 0)
-    <div id="extension-body-dependencies-${extension.id.id}-${extension.id.version}"></div>
+    <div id="extension-body-dependencies-$extensionIdHashCode"></div>
     #computeXBack()
     <div class="extension-body-dependencies extension-body-section">
       #displayExtensionDetails_dependencies_upstream($extension)
@@ -343,212 +436,29 @@
     #set ($jobState = $jobStatus.state)
   #end
   #if ($jobStatus)
-    <div id="extension-body-progress-${extension.id.id}-${extension.id.version}"></div>
+    <div id="extension-body-progress-$extensionIdHashCode"></div>
     <div class="extension-body-progress extension-body-section">
       #displayExtensionJobStatus($jobStatus)
       #if ($jobState == 'WAITING')
-        #displayExtensionDetails_progressQuestion($extension $jobStatus)
+        <div class="extension-question xform">
+          #displayExtensionDetails_progressQuestion($extension $jobStatus)
+        </div>
       #end
     </div>
-  #end
-#end
-
-#macro (displayExtensionDetails_progressQuestion $extension $jobStatus)
-  #set ($question = $jobStatus.question)
-  <form action="" method="post" class="xform">
-    <div class="hidden">
-      #extensionHiddenFormFields($extension.id.id $extension.id.version)
-      <input name="actionContinue" type="hidden" />
-    </div>
-    <dl>
-      <dt>
-        <label>$msg.get('extensions.upgrade.mergeConflict.label')</label>
-        <span class="xHint">$msg.get('extensions.upgrade.mergeConflict.hint', ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</span>
-      </dt>
-      <dd>
-        <select name="versionToKeep">
-        #set ($versions = {'NEXT': $question.nextDocument, 'MERGED': $question.mergedDocument, 'CURRENT': $question.currentDocument})
-        #foreach($entry in $versions.entrySet())
-          ## Make sure that each version has a document associated. We don't have for instance a merged document when
-          ## there is no previous installed version of a XAR extension but the imported documents already exist in the wiki.
-          #if ($entry.value)
-            <option value="$entry.key"#if ($question.globalAction == $entry.key) selected="selected"#end>$msg.get("extensions.upgrade.mergeConflict.versionToKeep.$entry.key.toLowerCase()")</option>
-          #end
-        #end
-        </select>
-      </dd>
-    </dl>
-    <p>#em_submitButton('extensions.actions.continue' 'confirm')</p>
-    #displayExtensionDetails_progressChanges($question)
-  </form>
-#end
-
-#macro (displayExtensionDetails_progressChanges $question)
-  <h3 class="extension-diff-title">$msg.get('extensions.upgrade.mergeConflict.changes.title', ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</h3>
-  <div class="extension-diff-options">
-    #set ($versions = {'PREVIOUS': $question.previousDocument, 'CURRENT': $question.currentDocument, 'NEXT': $question.nextDocument, 'MERGED': $question.mergedDocument})
-    <span class="label">$msg.get('extensions.upgrade.mergeConflict.changes.original')</span><select name="original">
-    #if ("$!request.original" != '')
-      #set ($originalVersion = $request.original)
-    #else
-      #set ($originalVersion = 'CURRENT')
-    #end
-    #set ($originalDocument = $versions.get($originalVersion))
-    #foreach($entry in $versions.entrySet())
-      #if ($entry.value)
-        <option value="$entry.key"#if ($entry.key == $originalVersion) selected="selected"#end>$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")</option>
-      #end
-    #end
-    </select><span class="label">$msg.get('extensions.upgrade.mergeConflict.changes.revised')</span><select name="revised">
-    #if ("$!request.revised" != '')
-      #set ($revisedVersion = $request.revised)
-    #elseif ($question.mergedDocument)
-      #set ($revisedVersion = 'MERGED')
-    #else
-      #set ($revisedVersion = 'NEXT')
-    #end
-    #set ($revisedDocument = $versions.get($revisedVersion))
-    #foreach($entry in $versions.entrySet())
-      #if ($entry.value)
-        <option value="$entry.key"#if ($entry.key == $revisedVersion) selected="selected"#end>$msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")</option>
-      #end
-    #end
-    </select>#em_submitButton('extensions.actions.diff' 'diff' true)
-  </div>
-  #if ($originalDocument && $revisedDocument)
-    <div id="changescontent">
-      #set ($rev1 = $originalVersion.toLowerCase())
-      #set ($rev2 = $revisedVersion.toLowerCase())
-      #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
-      #set ($origdoc = $wrappedDocs.get(0))
-      #set ($newdoc = $wrappedDocs.get(1))
-      #set ($headingLevel = 4)
-      #template('changesdoc.vm')
-    </div>
-  #end
-#end
-
-#macro (displayExtensionDetails $extension)
-  #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extension.id.id, $extension.id.version.value))
-  #if (!$backwardDependencies)
-    #set ($backwardDependencies = {})
-  #end
-  <div class="extension-body">
-    #displayExtensionDetails_menu($extension)
-
-    #displayExtensionDetails_description($extension)
-    #displayExtensionDetails_releaseNotes($extension)
-    #displayExtensionDetails_dependencies($extension $backwardDependencies)
-    #displayExtensionDetails_progress($extension)
-  </div>
-#end
-
-#macro (displayExtension $extension)
-  ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
-  #set ($jobStatus = $NULL)
-  #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
-  <div class="extension-item extension-item-${extensionStatus}">
-    <div class="extension-header">
-      <h2 class="extension-title">
-        <span class="extension-name">#displayExtensionName($extension)</span>
-        <span class="extension-version">$escapetool.xml($extension.id.version)</span>
-      </h2>
-      #if ($extensionStatusMessage)
-        <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
-      #end
-      #displayExtensionActionButtons($extension)
-      #if ($extension.authors.size() > 0)
-        #displayExtensionAuthors($extension)
-      #end
-      #if ("$!extension.summary" != '')
-        <div class="extension-summary">$escapetool.xml($extension.summary)</div>
-      #end
-      #displayProgressBar($extension)
-      <div class="clearfloats"></div>
-    </div>
-    ## Show the extension details if this extension has been explicitely requested or if the extension has a job waiting.
-    #set ($showDetails = $request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
-    #if (!$showDetails)
-      #if (!$jobStatus)
-        #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-        #set ($jobState = $jobStatus.state)
-      #end
-      #set ($showDetails = $jobState == 'WAITING')
-    #end
-    #if ($showDetails)
-      #displayExtensionDetails($extension)
-    #end
-  </div>
-#end
-
-#macro (installExtension $extensionId $extensionVersion $extensionNamespace)
-  #set ($installRequest = $extensionManager.createInstallRequest($extensionId, $extensionVersion, $extensionNamespace))
-  ## TODO: Add a way to preserve the extension author without preventing extensions from being installed with guest user as author.
-  #if (!$xcontext.userReference)
-    #set ($discard = $installRequest.removeProperty('user.reference'))
-  #end
-  #set ($discard = $extensionManager.install($installRequest))
-  #handleExtensionJobStartFailure('extensions.install.error.installFailure')
-#end
-
-#macro (computeInstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #set($discard = $extensionManager.createInstallPlan($extensionId, $extensionVersion, $extensionNamespace))
-  #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
-#end
-
-#macro (uninstallExtension $extensionId $extensionVersion $extensionNamespace)
-  #if ($extensionNamespace && $xwiki.isVirtualMode())
-    ## Uninstall only from the specified wiki.
-    #set ($discard = $extensionManager.uninstall($extensionId, $extensionNamespace))
-  #else
-    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
-    #if ($extension)
-      ## Uninstall from the entire farm.
-      #set ($discard = $extensionManager.uninstall($extension.id))
-    #end
-  #end
-  #handleExtensionJobStartFailure('extensions.uninstall.error.uninstallFailure')
-#end
-
-#macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #if ($extensionNamespace && $xwiki.isVirtualMode())
-    ## Create the uninstall plan only for the specified wiki.
-    #set ($discard = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
-  #else
-    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
-    #if ($extension)
-      ## Create the uninstall plan for the entire farm.
-      #set ($discard = $extensionManager.createUninstallPlan($extension.id))
-    #end
-  #end
-  #handleExtensionJobStartFailure('extensions.uninstall.error.prepareFailure')
-#end
-
-#macro (handleExtensionJobStartFailure $errorMessageKey $scriptService)
-  #if ($scriptService)
-    #set ($lastError = $scriptService.lastError)
-  #else
-    #set ($lastError = $extensionManager.lastError)
-  #end
-  #if ($lastError)
-    #set ($errorMessage = $msg.get($errorMessageKey, [$extensionId, $extensionVersion]))
-    #if ($isAjaxRequest)
-      ## Send error back.
-      $response.sendError(400, $errorMessage)
-    #else
-      <div class="errormessage">$errorMessage #printThrowable($lastError)</div>
-    #end
-  #else
-    ## Redirect to extension display.
-    $response.sendRedirect("#getExtensionURL($extensionId $extensionVersion {'extensionSection': 'progress'})")
   #end
 #end
 
 #macro (displayExtensionJobStatus $jobStatus)
-  #if (!$jobState)
-    #set ($jobState = $jobStatus.state)
+  #isExtensionPlan($jobStatus $isExtensionPlan)
+  #if ($isExtensionPlan)
+    #displayExtensionPlan($jobStatus)
+  #else
+    #printStatusLog($jobStatus)
   #end
-  #set ($isExtensionPlan = $jobState == 'FINISHED' && $jobStatus.actions)
+#end
+
+#macro (isExtensionPlan $jobStatus $return)
+  #set ($isExtensionPlan = $jobStatus.state == 'FINISHED' && $jobStatus.actions)
   #if ($isExtensionPlan)
     ## Check if there are any logged errors.
     #foreach($log in $jobStatus.log)
@@ -558,11 +468,8 @@
       #end
     #end
   #end
-  #if ($isExtensionPlan)
-    #displayExtensionPlan($jobStatus)
-  #else
-    #printStatusLog($jobStatus)
-  #end
+  #set ($return = $NULL)
+  #setVariable ("$return" $isExtensionPlan)
 #end
 
 #macro (displayExtensionPlan $plan)
@@ -594,57 +501,498 @@
         </ul>
       #end
     #end
-    <form action="" class="xform">
-      <div class="hidden">
-        #set ($_extensionId = $plan.request.extensions.get(0))
-        #extensionHiddenFormFields($_extensionId.id $_extensionId.version.value)
-        #set ($_action = $stringtool.capitalize($stringtool.removeEnd($plan.request.getProperty('job.type'), 'plan')))
-        <input name="action$_action#if (!$plan.request.hasNamespaces())Globally#end" type="hidden" />
-      </div>
-      <p>
-        #em_submitButton('extensions.install.actions.submit' 'confirm')
-        #if ("$!{request.xback}" != '')
-          #em_linkButton($request.xback 'extensions.install.actions.cancel')
-        #end
-      </p>
-    </form>
   #end
 #end
 
-#macro (getExtensionURL $extensionId $extensionVersion $extraParams)
-#set ($parameters = {})
-##
-#if ($extraParams)
-  #set ($discard = $parameters.putAll($extraParams))
+#macro (printStatusLog $status)
+  #if ($status.log.size() > 0)
+  <ul>
+  #foreach ($log in $status.log)
+    #set ($logLevel = $log.level.toString().toLowerCase())
+    #if (!$foreach.hasNext && $status.state != 'FINISHED')
+      ## Display the last log item as loading if the job is in progress.
+      #set ($logLevel = 'loading')
+    #end
+    <li class="extension-log-item extension-log-item-$logLevel">
+      #if ($log.throwable)
+        #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
+        #if ("$!message.trim()" != '')
+          <div>$escapetool.xml($message)</div>
+        #else
+          <div>#printLogMessage($log)</div>
+        #end
+        #printThrowable($log.throwable)
+      #else
+        <div>#printLogMessage($log)</div>
+      #end
+    </li>
+  #end
+  </ul>
+  #end
 #end
-##
-#if ($extensionId)
-#set ($discard = $parameters.put('extensionId', $extensionId))
-#elseif ($request.extensionId)
-#set ($discard = $parameters.put('extensionId', $request.extensionId))
+
+#macro (getThrowableRootCauseMessage $throwable)
+  #if ($throwable.cause)
+    #getThrowableRootCauseMessage($throwable.cause)
+  #else
+    $!{throwable.message}##
+  #end
 #end
-##
-#if ($extensionVersion)
-#set ($discard = $parameters.put('extensionVersion', $extensionVersion))
-#elseif ($request.extensionVersion)
-#set ($discard = $parameters.put('extensionVersion', $request.extensionVersion))
+
+#macro (printThrowable $throwable $isCause)
+#if (!$isCause)
+  <div class="stacktrace">##
 #end
-##
-#if ($xback)
-#set ($discard = $parameters.put('xback', $xback))
-#elseif ($request.xback)
-#set ($discard = $parameters.put('xback', $request.xback))
+$throwable.class: #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
+
+#foreach($stackTraceElement in $throwable.stackTrace)
+    at $stackTraceElement
 #end
-##
-#if ($request.section)
-#set ($discard = $parameters.put('section', $request.section))
+#if ($throwable.cause)
+Caused by: #printThrowable($throwable.cause true)
 #end
-##
-#set ($queryString = '')
-#foreach ($entry in $parameters.entrySet())
-#set ($queryString = "$queryString&$escapetool.url($entry.key)=$escapetool.url($entry.value)")
+#if (!$isCause)</div>#end
 #end
-$doc.getURL($xcontext.action, $queryString.substring(1))##
+
+#macro (printLogMessage $log $resolveRemotely)
+  #set ($message = '')
+  #set ($messageElements = $log.messageElements)
+  #foreach ($argument in $log.argumentArray)
+    #set ($message = "$message$escapetool.xml($messageElements.get($mathtool.sub($velocityCount, 1)))")
+    ## Assume the argument is an entity reference.
+    #set ($reference = $services.model.serialize($argument))
+    #if ($reference)
+      #set ($message = "$message<a href=""$xwiki.getURL($argument)"">$escapetool.xml($reference)</a>")
+    #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
+      #if ($resolveRemotely)
+        ## Assume the argument is an extension dependency.
+        #set ($_extension = $extensionManager.resolve($argument))
+        #if (!$_extension)
+          ## Assume the argument is an extension id.
+          #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
+        #end
+      #else
+        ## Search for the extension/dependency only in the core and local repositories.
+        ## TODO: Check also the remote extensions that have been partially cached locally (e.g. only their pom has been
+        ## downloaded). We need a resolve method that doesn't perform any remote calls.
+        #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
+        #if (!$_extension)
+          #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
+        #end
+      #end
+      #if ($_extension)
+        #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
+        #set ($_extensionName = "#displayExtensionName($_extension)")
+        #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
+      #else
+        #set ($version = $argument.version)
+        #if (!$version)
+          #set ($version = $argument.versionConstraint)
+        #end
+        #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
+        #set ($_extensionName = $argument)
+      #end
+      #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
+    #elseif ($argument.listIterator())
+      ## Assume the argument is a job id.
+      #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
+    #elseif ($argument.startsWith('wiki:'))
+      #set ($message = "$message#wikiHomePageLink($argument)")
+    #else
+      #set ($message = "$message$escapetool.xml($argument)")
+    #end
+  #end
+  $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
+#end
+
+#macro (displayExtensionDetails_progressQuestion $extension $jobStatus)
+  #set ($question = $jobStatus.question)
+  <dl>
+    <dt>
+      <label>$msg.get('extensions.upgrade.mergeConflict.label')</label>
+      <span class="xHint">$msg.get('extensions.upgrade.mergeConflict.hint',
+        ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</span>
+    </dt>
+    <dd>
+      <select name="versionToKeep">
+      #set ($versions = {
+        'NEXT': $question.nextDocument,
+        'MERGED': $question.mergedDocument,
+        'CURRENT': $question.currentDocument
+      })
+      #foreach($entry in $versions.entrySet())
+        ## Make sure that each version has a document associated. We don't have for instance a merged document when
+        ## there is no previous installed version of a XAR extension but the imported documents already exist in the wiki.
+        #if ($entry.value)
+          <option value="$entry.key"#if ($question.globalAction == $entry.key) selected="selected"#end>
+            $msg.get("extensions.upgrade.mergeConflict.versionToKeep.$entry.key.toLowerCase()")
+          </option>
+        #end
+      #end
+      </select>
+    </dd>
+  </dl>
+  #displayExtensionDetails_progressChanges($question)
+#end
+
+#macro (displayExtensionDetails_progressChanges $question)
+  <h3 class="extension-diff-title">$msg.get('extensions.upgrade.mergeConflict.changes.title',
+    ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</h3>
+  <div class="extension-diff-options">
+    #set ($versions = {
+      'PREVIOUS': $question.previousDocument,
+      'CURRENT': $question.currentDocument,
+      'NEXT': $question.nextDocument,
+      'MERGED': $question.mergedDocument
+    })
+    <span class="label">$msg.get('extensions.upgrade.mergeConflict.changes.original')</span><select name="original">
+    #if ("$!request.original" != '')
+      #set ($originalVersion = $request.original)
+    #else
+      #set ($originalVersion = 'CURRENT')
+    #end
+    #set ($originalDocument = $versions.get($originalVersion))
+    #foreach($entry in $versions.entrySet())
+      #if ($entry.value)
+        <option value="$entry.key"#if ($entry.key == $originalVersion) selected="selected"#end>
+          $msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")
+        </option>
+      #end
+    #end
+    </select><span class="label">$msg.get('extensions.upgrade.mergeConflict.changes.revised')</span><select name="revised">
+    #if ("$!request.revised" != '')
+      #set ($revisedVersion = $request.revised)
+    #elseif ($question.mergedDocument)
+      #set ($revisedVersion = 'MERGED')
+    #else
+      #set ($revisedVersion = 'NEXT')
+    #end
+    #set ($revisedDocument = $versions.get($revisedVersion))
+    #foreach($entry in $versions.entrySet())
+      #if ($entry.value)
+        <option value="$entry.key"#if ($entry.key == $revisedVersion) selected="selected"#end>
+          $msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")
+        </option>
+      #end
+    #end
+    </select>#extensionActionButton('diff' true)
+  </div>
+  #if ($originalDocument && $revisedDocument)
+    <div id="changescontent">
+      #set ($rev1 = $originalVersion.toLowerCase())
+      #set ($rev2 = $revisedVersion.toLowerCase())
+      #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
+      #set ($origdoc = $wrappedDocs.get(0))
+      #set ($newdoc = $wrappedDocs.get(1))
+      #set ($headingLevel = 4)
+      #template('changesdoc.vm')
+    </div>
+  #end
+#end
+
+#macro (displayExtensionDetails $extension)
+  #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extension.id.id, $extension.id.version.value))
+  #if (!$backwardDependencies)
+    #set ($backwardDependencies = {})
+  #end
+  <div class="extension-body">
+    #set ($extensionIdHashCode = "$extensionNamespace/$extension.id.id/$extension.id.version.value")
+    #set ($extensionIdHashCode = $extensionIdHashCode.hashCode())
+    #displayExtensionDetails_menu($extension)
+
+    #displayExtensionDetails_description($extension)
+    #displayExtensionDetails_dependencies($extension $backwardDependencies)
+    #displayExtensionDetails_progress($extension)
+  </div>
+#end
+
+#macro (displayExtension $extension)
+  ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
+  #set ($jobStatus = $NULL)
+  #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
+  <form action="" method="post" class="extension-item extension-item-${extensionStatus}">
+    <div class="hidden">
+      <input name="extensionId" value="$!escapetool.xml($extension.id.id)" type="hidden" />
+      <input name="extensionVersion" value="$!escapetool.xml($extension.id.version.value)" type="hidden" />
+      <input name="extensionNamespace" value="$!escapetool.xml($extensionNamespace)" type="hidden" />
+      #if ($request.section)
+        <input name="section" value="$escapetool.xml($request.section)" type="hidden" />
+      #end
+    </div>
+    <div class="extension-header">
+      <h2 class="extension-title">
+        <span class="extension-name">#displayExtensionName($extension)</span>
+        <span class="extension-version">$escapetool.xml($extension.id.version)</span>
+      </h2>
+      #if ($extensionStatusMessage)
+        <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
+      #end
+      #displayExtensionActionButtons($extension)
+      #if ($extension.authors.size() > 0)
+        #displayExtensionAuthors($extension)
+      #end
+      #if ("$!extension.summary" != '')
+        <div class="extension-summary">$escapetool.xml($extension.summary)</div>
+      #end
+      #displayProgressBar($extension)
+      <div class="clearfloats"></div>
+    </div>
+    ## Show the extension details if this extension has been explicitely requested or if the extension has a job waiting.
+    #set ($showDetails = $request.extensionId == $extension.id.id
+      && $request.extensionVersion == $extension.id.version.value)
+    #if (!$showDetails)
+      #if (!$jobStatus)
+        #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+        #set ($jobState = $jobStatus.state)
+      #end
+      #set ($showDetails = $jobState == 'WAITING')
+    #end
+    #if ($showDetails)
+      #displayExtensionDetails($extension)
+    #end
+  </form>
+#end
+
+#macro (handleExtensionRequest)
+  #if ($request.form_token)
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #handleExtensionAction(true)
+    #elseif ($isAjaxRequest)
+      ## The CSRF token expired. We only redisplay the extension because the resubmission confirmation doesn't fit nicely in-line.
+      $response.sendRedirect("#getExtensionURL()")
+    #else
+      $response.sendRedirect($services.csrf.getResubmissionURL())
+    #end
+  #else
+    #handleExtensionAction(false)
+  #end
+#end
+
+#macro (handleExtensionAction $withValidToken)
+  #if ($request.extensionAction == 'continue' && $withValidToken)
+    #continueExtensionJob($request.extensionId $request.extensionVersion)
+  #elseif ($request.extensionAction == 'repairXAR' && $withValidToken)
+    #repairXarExtension($request.extensionId $request.extensionVersion)
+  #elseif ($request.extensionAction == 'install' || $request.extensionAction == 'upgrade'
+    || $request.extensionAction == 'downgrade')
+    #computeInstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
+  #elseif ($request.extensionAction == 'installGlobally')
+    #computeInstallPlan($request.extensionId $request.extensionVersion $NULL)
+  #elseif ($request.extensionAction == 'upgradeGlobally' || $request.extensionAction == 'downgradeGlobally')
+    #computeUpgradePlan($request.extensionId $request.extensionVersion)
+  #elseif ($request.extensionAction == 'uninstall')
+    #computeUninstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
+  #elseif ($request.extensionAction == 'uninstallGlobally')
+    #computeUninstallPlan($request.extensionId $request.extensionVersion $NULL)
+  #elseif ($request.extensionVersionConstraint)
+    #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersionConstraint))
+    #displayDependency($dependency $extensionNamespace true)
+  #else
+    ## Display the extension.
+    ## Create a dependency in order to support version constraints (e.g. a version range).
+    #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersion))
+    #set ($extension = $extensionManager.resolve($dependency))
+    #if ($extension)
+      #displayExtension($extension)
+    #else
+      <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
+        ["<strong>$!escapetool.xml($request.extensionId)</strong>",
+        "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
+    #end
+  #end
+#end
+
+#macro (computeInstallPlan $extensionId $extensionVersion $extensionNamespace)
+  #set ($discard = $extensionManager.createInstallPlan($extensionId, $extensionVersion, $extensionNamespace))
+  #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
+#end
+
+#macro (computeUpgradePlan $extensionId $extensionVersion)
+  ## Upgrade all the namespaces were the specified extension is installed.
+  #set ($namespaces = [])
+  #foreach ($extension in $extensionManager.installedExtensions)
+    #if ($extension.id.id == $extensionId)
+      #if ($extension.isInstalled($NULL))
+        #set ($discard = $namespaces.clear())
+        #break
+      #else
+        #foreach ($namespace in $extension.namespaces)
+          #set ($discard = $namespaces.add($namespace))
+        #end
+      #end
+    #end
+  #end
+  ## The namespace that will appear in the job id.
+  #set ($jobIdNamespace = $NULL)
+  #if ($namespaces.size() == 1)
+    #set ($jobIdNamespace = $namespaces.get(0))
+  #end
+  #set ($installPlanRequest = $extensionManager.createInstallPlanRequest($extensionId, $extensionVersion, $jobIdNamespace))
+  #foreach ($namespace in $namespaces)
+    #set ($discard = $installPlanRequest.addNamespace($namespace))
+  #end
+  #set ($discard = $extensionManager.createInstallPlan($installPlanRequest))
+  #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
+#end
+
+#macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
+  #if ($extensionNamespace && $xwiki.isVirtualMode())
+    ## Create the uninstall plan only for the specified wiki.
+    #set ($discard = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
+  #else
+    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
+    #if ($extension)
+      ## Create the uninstall plan for the entire farm.
+      #set ($discard = $extensionManager.createUninstallPlan($extension.id))
+    #end
+  #end
+  #handleExtensionJobStartFailure('extensions.uninstall.error.prepareFailure')
+#end
+
+#macro (continueExtensionJob $extensionId $extensionVersion)
+  #getExtensionJobStatus($extensionId $extensionVersion $jobStatus)
+  #set ($jobState = $jobStatus.state)
+  #set ($jobType = $jobStatus.request.getProperty('job.type'))
+  #if ($jobState == 'FINISHED')
+    #isExtensionPlan($jobStatus $isExtensionPlan)
+    #if ($isExtensionPlan)
+      ## Execute the latest extension job plan.
+      ## TODO: Would be nice to reuse somehow the job request that was used to create the plan.
+      #if ($jobType == 'installplan')
+        #installExtension($extensionId $extensionVersion $jobStatus.request.getNamespaces())
+        #break
+      #elseif ($jobType == 'uninstallplan')
+        #uninstallExtension($extensionId $extensionVersion $jobStatus.request.getNamespaces())
+        #break
+      #end
+    #end
+  #elseif ($jobState == 'WAITING')
+    ## Continue an interactive extension job using the data submitted by the user.
+    #if ($jobType == 'install')
+      ## A merge conflict occurred during installation.
+      #set ($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
+    #end
+    #set ($discard = $jobStatus.answered())
+  #end
+  ## Redirect to extension display.
+  $response.sendRedirect("#getExtensionURL()")
+#end
+
+#macro (installExtension $extensionId $extensionVersion $namespaces)
+  #set ($jobIdNamespace = $NULL)
+  #if ($namespaces && $namespaces.size() == 1)
+    ## The namespace that will appear in the job id.
+    #set ($jobIdNamespace = $namespaces.get(0))
+  #end
+  #set ($installRequest = $extensionManager.createInstallRequest($extensionId, $extensionVersion, $jobIdNamespace))
+  ## Add the rest of the namespaces.
+  #foreach ($namespace in $namespaces)
+    #if ($namespace != $jobIdNamespace)
+      #set ($discard = $installRequest.addNamespace($namespace))
+    #end
+  #end
+  ## TODO: Add a way to preserve the extension author without preventing extensions from being installed with guest
+  ## user as author.
+  #if (!$xcontext.userReference)
+    #set ($discard = $installRequest.removeProperty('user.reference'))
+  #end
+  #set ($discard = $extensionManager.install($installRequest))
+  #handleExtensionJobStartFailure('extensions.install.error.installFailure')
+#end
+
+#macro (uninstallExtension $extensionId $extensionVersion $namespaces)
+  #if ($xwiki.isVirtualMode() && $namespaces && $namespaces.size() == 1)
+    ## Uninstall only from the specified namespace.
+    #set ($discard = $extensionManager.uninstall($extensionId, $namespaces.get(0)))
+  #else
+    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
+    #if ($extension)
+      ## Uninstall from all namespaces.
+      #set ($discard = $extensionManager.uninstall($extension.id))
+    #end
+  #end
+  #handleExtensionJobStartFailure('extensions.uninstall.error.uninstallFailure')
+#end
+
+#macro (repairXarExtension $extensionId $extensionVersion)
+  #set ($discard = $services.xarextension.repairInstalledExtension($extensionId, $extensionVersion, $xcontext.database))
+  #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.xarextension)
+#end
+
+#macro (handleExtensionJobStartFailure $errorMessageKey $scriptService)
+  #if ($scriptService)
+    #set ($lastError = $scriptService.lastError)
+  #else
+    #set ($lastError = $extensionManager.lastError)
+  #end
+  #if ($lastError)
+    #set ($errorMessage = $msg.get($errorMessageKey, [$extensionId, $extensionVersion]))
+    #if ($isAjaxRequest)
+      ## Send error back.
+      $response.sendError(400, $errorMessage)
+    #else
+      <div class="errormessage">$errorMessage #printThrowable($lastError)</div>
+    #end
+  #else
+    ## Redirect to extension display.
+    $response.sendRedirect("#getExtensionURL($extensionId $extensionVersion {'extensionSection': 'progress'})")
+  #end
+#end
+
+#macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage $versionConstraint)
+  #set ($currentVersion = $NULL)
+  #if (!$jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #set ($jobState = $jobStatus.state)
+  #end
+  #if ($jobStatus && $jobState != 'FINISHED')
+    #set ($status = 'loading')
+  #else
+    #if ($extension.isInstalled($extensionNamespace))
+      ## Determine if the extension is still valid.
+      #if ("$!extension.isValid($extensionNamespace)" == 'false')
+        #set ($status = 'installed-invalid')
+      #else
+        #set ($status = 'installed')
+      #end
+    #elseif ($extension.repository.descriptor.id == 'core')
+      #set ($status = 'core')
+    #else
+      ## An extension, either local or remote, that might be available to install.
+      ## Check if a different version of this extension is installed or is a core dependency.
+      #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))
+      #if (!$currentVersion)
+        #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+      #end
+      #if ($currentVersion)
+        #set ($repoId = $currentVersion.repository.descriptor.id)
+        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
+        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
+      #else
+        #set ($status = 'remote')
+      #end
+    #end
+  #end
+  #set ($message = $NULL)
+  #if ($status != 'remote' && $status != 'loading')
+    #set ($message = $msg.get("extensions.info.status.$status", [$currentVersion.id.version.value]))
+  #end
+  #set ($extensionStatus = $NULL)
+  #setVariable ("$extensionStatus" $status)
+  #set ($extensionStatusMessage = $NULL)
+  #setVariable ("$extensionStatusMessage" $message)
+#end
+
+#macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
+#set ($status = $options.get(0))
+#if ($alice.id.equals($bob.id))
+#set ($status = $options.get(1))
+#elseif ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
+#set ($status = $options.get(2))
+#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
+#set ($status = $options.get(3))
+#end
+$status##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)
@@ -706,163 +1054,44 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #end
 #end
 
-#macro (continueExtensionUpgrade $extensionId $extensionVersion)
-  #getExtensionJobStatus($extensionId $extensionVersion $jobStatus)
-  #if ($jobStatus && $jobStatus.state == 'WAITING')
-    #set($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
-    #set($discard = $jobStatus.answered())
-  #end
-  ## Redirect to extension display.
-  $response.sendRedirect("#getExtensionURL()")
+#macro (getExtensionURL $extensionId $extensionVersion $extraParams)
+#set ($parameters = {})
+##
+#if ($extraParams)
+  #set ($discard = $parameters.putAll($extraParams))
 #end
-
-#macro (repairXarExtension $extensionId $extensionVersion)
-  #set ($discard = $services.xarextension.repairInstalledExtension($extensionId, $extensionVersion, $xcontext.database))
-  #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.xarextension)
+##
+#if ($extensionId)
+#set ($discard = $parameters.put('extensionId', $extensionId))
+#elseif ($request.extensionId)
+#set ($discard = $parameters.put('extensionId', $request.extensionId))
 #end
-
-#macro (handleExtensionRequest)
-  #if ($request.confirm)
-    #if ($services.csrf.isTokenValid($request.form_token))
-      #if ($request.actionInstall)
-        #installExtension($request.extensionId $request.extensionVersion $extensionNamespace)
-      #elseif ($request.actionInstallGlobally)
-        #installExtension($request.extensionId $request.extensionVersion $NULL)
-      #elseif ($request.actionUninstall)
-        #uninstallExtension($request.extensionId $request.extensionVersion $extensionNamespace)
-      #elseif ($request.actionUninstallGlobally)
-        #uninstallExtension($request.extensionId $request.extensionVersion $NULL)
-      #elseif ($request.actionContinue)
-        #continueExtensionUpgrade($request.extensionId $request.extensionVersion)
-      #elseif ($request.actionRepairXAR)
-        #repairXarExtension($request.extensionId $request.extensionVersion)
-      #else
-        $response.sendRedirect("#getExtensionURL()")
-      #end
-    #elseif ($isAjaxRequest)
-      ## The CSRF token expired. We only redisplay the extension because the resubmission confirmation doesn't fit nicely in-line.
-      $response.sendRedirect("#getExtensionURL()")
-    #else
-      $response.sendRedirect($services.csrf.getResubmissionURL())
-    #end
-  #elseif ($request.actionInstall)
-    #computeInstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
-  #elseif ($request.actionInstallGlobally)
-    #computeInstallPlan($request.extensionId $request.extensionVersion $NULL)
-  #elseif ($request.actionUninstall)
-    #computeUninstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
-  #elseif ($request.actionUninstallGlobally)
-    #computeUninstallPlan($request.extensionId $request.extensionVersion $NULL)
-  #elseif ($request.extensionVersionConstraint)
-    #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersionConstraint))
-    #displayDependency($dependency $extensionNamespace true)
-  #else
-    ## Display the extension.
-    ## Create a dependency in order to support version constraints (e.g. a version range).
-    #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersion))
-    #set ($extension = $extensionManager.resolve($dependency))
-    #if ($extension)
-      #displayExtension($extension)
-    #else
-      <div class="infomessage">$msg.get('extensions.advancedSearch.noResults', ["<strong>$!escapetool.xml($request.extensionId)</strong>", "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
-    #end
-  #end
+##
+#if ($extensionVersion)
+#set ($discard = $parameters.put('extensionVersion', $extensionVersion))
+#elseif ($request.extensionVersion)
+#set ($discard = $parameters.put('extensionVersion', $request.extensionVersion))
 #end
-
-#macro (printThrowable $throwable $isCause)
-#if (!$isCause)
-  <div class="stacktrace">##
+##
+#if ($request.extensionNamespace)
+#set ($discard = $parameters.put('extensionNamespace', $request.extensionNamespace))
 #end
-$throwable.class: #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
-
-#foreach($stackTraceElement in $throwable.stackTrace)
-    at $stackTraceElement
+##
+#if ($xback)
+#set ($discard = $parameters.put('xback', $xback))
+#elseif ($request.xback)
+#set ($discard = $parameters.put('xback', $request.xback))
 #end
-#if ($throwable.cause)
-Caused by: #printThrowable($throwable.cause true)
+##
+#if ($request.section)
+#set ($discard = $parameters.put('section', $request.section))
 #end
-#if (!$isCause)</div>#end
+##
+#set ($queryString = '')
+#foreach ($entry in $parameters.entrySet())
+#set ($queryString = "$queryString&$escapetool.url($entry.key)=$escapetool.url($entry.value)")
 #end
-
-#macro (getThrowableRootCauseMessage $throwable)
-  #if ($throwable.cause)
-    #getThrowableRootCauseMessage($throwable.cause)
-  #else
-    $!{throwable.message}##
-  #end
-#end
-
-#macro (printStatusLog $status)
-  #if ($status.log.size() > 0)
-  <ul>
-  #foreach ($log in $status.log)
-    #set ($logLevel = $log.level.toString().toLowerCase())
-    #if (!$foreach.hasNext && $status.state != 'FINISHED')
-      ## Display the last log item as loading if the job is in progress.
-      #set ($logLevel = 'loading')
-    #end
-    <li class="extension-log-item extension-log-item-$logLevel">
-      #if ($log.throwable)
-        #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
-        #if ("$!message.trim()" != '')
-          <div>$escapetool.xml($message)</div>
-        #else
-          <div>#printLogMessage($log)</div>
-        #end
-        #printThrowable($log.throwable)
-      #else
-        <div>#printLogMessage($log)</div>
-      #end
-    </li>
-  #end
-  </ul>
-  #end
-#end
-
-#macro (printLogMessage $log $resolveRemotely)
-  #set ($message = '')
-  #set ($messageElements = $log.messageElements)
-  #foreach ($argument in $log.argumentArray)
-    #set ($message = "$message$escapetool.xml($messageElements.get($mathtool.sub($velocityCount, 1)))")
-    ## Assume the argument is an entity reference.
-    #set ($reference = $services.model.serialize($argument))
-    #if ($reference)
-      #set ($message = "$message<a href=""$xwiki.getURL($argument)"">$escapetool.xml($reference)</a>")
-    #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
-      #if ($resolveRemotely)
-        ## Assume the argument is an extension dependency.
-        #set ($_extension = $extensionManager.resolve($argument))
-        #if (!$_extension)
-          ## Assume the argument is an extension id.
-          #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
-        #end
-      #else
-        ## Search for the extension/dependency only in the core and local repositories.
-        ## TODO: Check also the remote extensions that have been partially cached locally (e.g. only their pom has been
-        ## downloaded). We need a resolve method that doesn't perform any remote calls.
-        #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
-        #if (!$_extension)
-          #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
-        #end
-      #end
-      #if ($_extension)
-        #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
-        #set ($_extensionName = "#displayExtensionName($_extension)")
-        #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
-      #else
-        #set ($version = $argument.version)
-        #if (!$version)
-          #set ($version = $argument.versionConstraint)
-        #end
-        #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
-        #set ($_extensionName = $argument)
-      #end
-      #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
-    #else
-      #set ($message = "$message$escapetool.xml($argument)")
-    #end
-  #end
-  $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
+$doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (computeXBack)
@@ -870,7 +1099,7 @@ Caused by: #printThrowable($throwable.cause true)
   #if ($xback == '')
     #set ($params = '')
     #foreach ($parameterName in $request.parameterNames)
-      #if (!$parameterName.startsWith('action') && !$parameterName.startsWith('extension'))
+      #if (!$parameterName.startsWith('extension'))
         #foreach ($value in $request.getParameterValues($parameterName))
           #set ($params = "${params}&${parameterName}=${value}")
         #end
@@ -883,96 +1112,60 @@ Caused by: #printThrowable($throwable.cause true)
   #end
 #end
 
-#macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage $versionConstraint)
-  #set ($currentVersion = $NULL)
-  #if (!$jobStatus)
-    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-    #set ($jobState = $jobStatus.state)
-  #end
-  #if ($jobStatus && $jobState != 'FINISHED')
-    #set ($status = 'loading')
-  #else
-    #if ($extension.isInstalled($extensionNamespace))
-      ## Determine if the extension is still valid.
-      #if ("$!extension.isValid($extensionNamespace)" == 'false')
-        #set ($status = 'installed-invalid')
-      #else
-        #set ($status = 'installed')
-      #end
-    #elseif ($extension.repository.descriptor.id == 'core')
-      #set ($status = 'core')
-    #else
-      ## An extension, either local or remote, that might be available to install.
-      ## Check if a different version of this extension is installed or is a core dependency.
-      #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))
-      #if (!$currentVersion)
-        #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
-      #end
-      #if ($currentVersion)
-        #set ($repoId = $currentVersion.repository.descriptor.id)
-        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
-        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
-      #else
-        #set ($status = 'remote')
-      #end
-    #end
-  #end
-  #set ($message = $NULL)
-  #if ($status != 'remote' && $status != 'loading')
-    #set ($message = $msg.get("extensions.info.status.$status", [$currentVersion.id.version.value]))
-  #end
-  #set ($extensionStatus = $NULL)
-  #setVariable ("$extensionStatus" $status)
-  #set ($extensionStatusMessage = $NULL)
-  #setVariable ("$extensionStatusMessage" $message)
-#end
-
-#macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
-#set ($status = $options.get(0))
-#if ($alice.id.equals($bob.id))
-#set ($status = $options.get(1))
-#elseif ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
-#set ($status = $options.get(2))
-#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
-#set ($status = $options.get(3))
-#end
-$status##
-#end
-
-#macro(em_submitButton $value $name $secondary $extraClassName)
+#macro (em_submitButton $value $_name $secondary $extraClassName)
   <span class="buttonwrapper">
-    <input type="submit" value="$escapetool.xml($msg.get($value))"#if($name) name="$escapetool.xml($name)"#end class="button#if($secondary) secondary#end#if($extraClassName) $!escapetool.xml($extraClassName)#end"/>
+    <input type="submit" value="$escapetool.xml($msg.get($value))"#if($_name) name="$escapetool.xml($_name)"#end
+      class="button#if($secondary) secondary#end#if($extraClassName) $!escapetool.xml($extraClassName)#end"/>
   </span>
 #end
 
-#macro(em_linkButton $href $label $extraClassName)
+#macro (em_linkButton $href $label $extraClassName)
   <span class="buttonwrapper">
-    <a href="$escapetool.xml($href)" class="button secondary#if($extraClassName) $!escapetool.xml($extraClassName)#end">$msg.get($label)</a>
+    <a href="$escapetool.xml($href)" class="button secondary#if($extraClassName) $!escapetool.xml($extraClassName)#end">
+      $msg.get($label)
+    </a>
   </span>
 #end
 
-#macro(extensionActionButton $installedExtension $action $secondary)
-  #set ($actionName = 'Install')
-  #if ($action == 'uninstall')
-    #set ($actionName = 'Uninstall')
-  #end
-  #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace) && !$installedExtension.isInstalled($NULL)) || !$xwiki.isVirtualMode())
+#macro(extensionActionButtons $installedExtension $action $secondary)
+  #set ($isGlobalActionSecondary = $secondary)
+  #set ($globalActionExtraClassName = $NULL)
+  #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace)
+    && !$installedExtension.isInstalled($NULL)) || !$xwiki.isVirtualMode())
     ## Button that targets only the current wiki.
-    #em_submitButton("extensions.actions.$action" "action$actionName" $secondary)
+    #extensionActionButton($action $secondary)
+    #set ($isGlobalActionSecondary = true)
+    ## Indicate that the local action is available.
+    #set ($globalActionExtraClassName = 'alternative-action')
   #end
   #if ($xwiki.isVirtualMode() && $xcontext.isMainWiki())
     ## Button that targets the entire farm.
-    #em_submitButton("extensions.actions.${action}Globally" "action${actionName}Globally" true)
+    #extensionActionButton("${action}Globally" $isGlobalActionSecondary $globalActionExtraClassName)
   #end
 #end
 
-#macro(extensionHiddenFormFields $extensionId $extensionVersion $noCSRFToken)
-  #if (!$noCSRFToken)
-    <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
+#macro (extensionActionButton $action $secondary $extraClassName)
+  #set ($classNames = [])
+  #if ($secondary)
+    #set ($discard = $classNames.add('secondary'))
   #end
-  <input name="extensionId" value="${escapetool.xml($extensionId)}" type="hidden" />
-  <input name="extensionVersion" value="${escapetool.xml($extensionVersion)}" type="hidden" />
-  #if ($request.section)
-    <input name="section" value="$escapetool.xml($request.section)" type="hidden" />
+  #if ($extraClassName)
+    #set ($discard = $classNames.add($extraClassName))
   #end
+  <span class="buttonwrapper">
+    <button type="submit" name="extensionAction" value="$escapetool.xml($action)"
+      #if ($classNames.size() > 0) class="$escapetool.xml($stringtool.join($classNames, ' '))"#end>
+      $escapetool.xml($msg.get("extensions.actions.$action"))</button>
+  </span>
+#end
+
+#macro (wikiHomePageLink $namespace)
+#set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
+#set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
+#set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
+#set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
+#if ("$!wikiPrettyName.trim()" == '')
+#set ($wikiPrettyName = $wikiName)
+#end
+<a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a>##
 #end

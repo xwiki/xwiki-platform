@@ -19,30 +19,23 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormElement;
 
 /**
  * Represents a NumberClass property form.
- *
+ * 
  * @version $Id$
  * @since 3.2M3
  */
-public class NumberClassEditElement extends BaseElement
+public class NumberClassEditElement extends ClassPropertyEditPane
 {
-    private String propertyName;
-
-    private FormElement form;
-
     public NumberClassEditElement(FormElement form, String propertyName)
     {
-        this.form = form;
-        this.propertyName = propertyName;
+        super(form, propertyName);
     }
 
     public void setNumberType(String value)
     {
-        this.form.setFieldValue(By.id(this.propertyName + "_numberType"), value);
+        setMetaProperty("numberType", value);
     }
 }

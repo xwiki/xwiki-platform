@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-configuration</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-configuration-default</artifactId>
   <name>XWiki Platform - Configuration - Default</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Configuration - Default</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>77.92</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

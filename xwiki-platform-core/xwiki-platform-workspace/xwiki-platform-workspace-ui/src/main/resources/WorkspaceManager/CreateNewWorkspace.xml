@@ -129,11 +129,14 @@ function validate()
 
 function validateWikiName()
 {
-  if ($('wikiname').value != noaccent($('wikiname').value).toLowerCase()) {
-    $('wikiname').value = noaccent($('wikiname').value).toLowerCase();
-  }
+  var wikiNameElement = $('wikiname');
+  var wikiname = wikiNameElement.value;
+  var filteredWikiName = filterWikiName(wikiname);
 
-  var wikiname = $('wikiname').value;
+  if (wikiname != filteredWikiName) {
+    wikiNameElement.value = filteredWikiName;
+    wikiname = filteredWikiName;
+  }
 
   if (lastwikiname == wikiname)
   {
@@ -198,6 +201,29 @@ function validateWikiName()
   }
 }
 
+function filterWikiName(wikiName)
+{
+  var result = noaccent(wikiName);
+
+  // The server-side code strips '_' chars from the database name.
+  result = result.replace(/[_]/g, "");
+
+  // Classic requirement for an identifier is to start with a letter.
+  while (result.length &gt; 0 &amp;&amp; !isNaN(result.charAt(0))) {
+    result = result.substring(1);
+  }
+
+  // Out of all databases, Oracle seems to be the least permissive, limiting schema names to 30 chars.
+  if (result.length &gt; 30) {
+    result = result.substring(0, 30);
+  }
+
+  // Keep IDs lowercased.
+  result = result.toLowerCase();
+
+  return result;
+}
+
 function validatePrettyName()
 {
   if ($('XWiki.XWikiServerClass_0_wikiprettyname').value == '') {
@@ -260,10 +286,10 @@ function prettyNameChanged()
 #set ($documentBundlesValue = $xwikiPreferencesDocument.documentBundles)
 #if (!$documentBundlesValue.contains($WORKSPACE_MANAGER_TRANSLATIONS_PAGE))
   #set ($documentBundlesValue = "${WORKSPACE_MANAGER_TRANSLATIONS_PAGE},${documentBundlesValue}")
-  #set ($temp = $xwikiPreferencesDocument.set('documentBundles', $documentBundlesValue))
+  #set ($discard = $xwikiPreferencesDocument.set('documentBundles', $documentBundlesValue))
   ## Save the preferences page using programming rights of the current document.
   ## The save comment can not be translated at this point, since the translations are not yet registered.
-  #set ($temp = $xwiki.getXWiki().saveDocument($xwikiPreferencesDocument.document, "Added $WORKSPACE_MANAGER_TRANSLATIONS_PAGE to the list of document bundles.", true, $xcontext.context))
+  #set ($discard = $xwiki.getXWiki().saveDocument($xwikiPreferencesDocument.document, "Added $WORKSPACE_MANAGER_TRANSLATIONS_PAGE to the list of document bundles.", true, $xcontext.context))
   {{info}}$msg.get('workspacemanager.install.translations'){{/info}}
 
 #end
@@ -309,71 +335,70 @@ function prettyNameChanged()
 ############################################################################################
 ## TOOLS
 #set ($ALIASSUFFIX = "")
-##
-############################################################################################
-## REQUEST PARAMETERS
-#set ($wikidocument = $WikiManager.createWikiDocument())
-#set ($wikidocumentobject = $wikidocument.updateObjectFromRequest('XWiki.XWikiServerClass'))
-#set ($wikidocumentWorkspaceObject = $wikidocument.updateObjectFromRequest('WorkspaceManager.WorkspaceClass'))
-##
-#if ($request.actioncreate)
-  #set ($action = 'create')
-#else
-  #set ($action = $request.getParameter('action'))
-#end
-##
-#set ($wikiname = $request.getParameter('wikiname'))
-## Make sure to prefix the owner user with the wiki name.
-#if ($wikidocument.owner == "")
-  #set($temp = $wikidocument.set('owner', "${xcontext.mainWikiName}:${xcontext.user}"))
-#elseif (!($wikidocument.owner.startsWith("${xcontext.mainWikiName}:")))
-  #set($temp = $wikidocument.set('owner', "${xcontext.mainWikiName}:${wikidocument.owner}"))
-#end
-#if ($wikidocument.server == '' &amp;&amp; "$!wikiname" != '')
-  #set ($alias = "${wikiname}")
-  #if ("$!ALIASSUFFIX" != '')
-    #set ($alias = "${alias}.${ALIASSUFFIX}")
-  #else
-    #set ($usePath = $xwiki.xWiki.Param('xwiki.virtual.usepath', '1'))
-    #if ($usePath == '0')
-      #set ($serverURL = $xcontext.getURLFactory().getServerURL($xcontext.context))
-      #set ($alias = "${alias}.$serverURL.host")
-    #end
-  #end
-  #set($temp = $wikidocument.set('server', "${alias}"))
-#end
-##
-#set($members = [])
-#getRequestList($members 'members')
-## Remove any duplicate members (like the owner in some cases).
-#set ($discard = $members.remove($wikidocument.owner))
-## Remove empty strings from the list of members (the user picker submits by default an empty string).
-#set ($discard = $members.removeAll(['']))
 #############################################################################
 ##
-#if ($action &amp;&amp; $action == 'create')
-  #set ($templateName = "$!request.template")
-  #set ($discard = $WorkspaceManager.createWorkspace($wikiname, $wikidocument, $templateName))
+#if ($request.actioncreate)
+  #####################
+  ## REQUEST PARAMETERS
+  #set ($wikidocument = $WikiManager.createWikiDocument())
+  #set ($wikidocumentobject = $wikidocument.updateObjectFromRequest('XWiki.XWikiServerClass'))
+  #set ($wikidocumentWorkspaceObject = $wikidocument.updateObjectFromRequest('WorkspaceManager.WorkspaceClass'))
+  ##
+  ## Set the wiki name from the request and then get it back from the XWikiServer instance because some
+  ## filtering may happen inside the setWikiName method and we want to work with the real databse name.
+  #set ($wikiname = $request.getParameter('wikiname'))
+  #set ($discard = $wikidocument.setWikiName($wikiname))
+  #set ($wikiname = $wikidocument.wikiName)
+  ##
+  ## Make sure to prefix the owner user with the wiki name.
+  #if ($wikidocument.owner == "")
+    #set ($discard = $wikidocument.set('owner', "${xcontext.mainWikiName}:${xcontext.user}"))
+  #elseif (!($wikidocument.owner.startsWith("${xcontext.mainWikiName}:")))
+    #set ($discard = $wikidocument.set('owner', "${xcontext.mainWikiName}:${wikidocument.owner}"))
+  #end
+  #if ($wikidocument.server == '' &amp;&amp; "$!wikiname" != '')
+    #set ($alias = "${wikiname}")
+    #if ("$!ALIASSUFFIX" != '')
+      #set ($alias = "${alias}.${ALIASSUFFIX}")
+    #else
+      #set ($usePath = $xwiki.xWiki.Param('xwiki.virtual.usepath', '1'))
+      #if ($usePath == '0')
+        #set ($serverURL = $xcontext.getURLFactory().getServerURL($xcontext.context))
+        #set ($alias = "${alias}.${serverURL.host}")
+      #end
+    #end
+    #set ($discard = $wikidocument.set('server', "${alias}"))
+  #end
+  ##
+  #set ($members = [])
+  #getRequestList($members 'members')
+  ## Remove any duplicate members (like the owner in some cases).
+  #set ($discard = $members.remove($wikidocument.owner))
+  ## Remove empty strings from the list of members (the user picker submits by default an empty string).
+  #set ($discard = $members.removeAll(['']))
+  ##
+  ## Create the workspace.
+  #set ($templateName = "$!{request.template}")
+  #set ($discard = $WorkspaceManager.createWorkspace($wikidocument, $templateName))
   ##
   #if ("$!WorkspaceManager.lastException" == '')
     ## Add members.
     #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
-      #set ($WorkspaceManager = $services.workspace)
       #set ($workspace = $WorkspaceManager.getWorkspace($wikiname))
       #set ($groupsClassName = "$wikiname:XWiki.XWikiGroups")
       #set ($workspaceGroupDocument = $workspace.groupDocument)
-      #foreach($member in $members)
+      #foreach ($member in $members)
         #set($memberObject = $workspaceGroupDocument.newObject($groupsClassName))
         #if (!$member.startsWith("${xcontext.mainWikiName}:"))
           #set ($member = "${xcontext.mainWikiName}:${member}")
         #end
-        #set($temp = $memberObject.set('member', $member))
+        #set ($discard = $memberObject.set('member', $member))
       #end
       ## Save the group document to preserve the member additions.
-      #set($temp = $workspaceGroupDocument.save($msg.get('platform.workspace.createInitialMembersSaveComment'), true))
+      #set ($discard = $workspaceGroupDocument.save($msg.get('platform.workspace.createInitialMembersSaveComment'), true))
     #end
     ## Redirect to the new workspace's homepage.
-    #set($temp = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
+    #set ($discard = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
   #else
     {{error}}$msg.get('workspacemanager.errorcreatewiki', [$wikiname, $WorkspaceManager.lastException]){{/error}}
 
@@ -464,18 +489,18 @@ function prettyNameChanged()
         class="suggestUsers multipleSelection" #if(!$isInstallComplete)disabled='disabled' #{end}/&gt;
     &lt;/dd&gt;
 
-  #set($workspaceClass = $xwiki.getDocument('WorkspaceClass').getxWikiClass())
-  #set($membershipTypeProperty = $workspaceClass.get('membershipType'))
-  #set($membershipTypeValues = '')
-  #set($membershipTypeValues = $membershipTypeProperty.getListValues())
-  #set($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
+  #set ($workspaceClass = $xwiki.getDocument('WorkspaceClass').getxWikiClass())
+  #set ($membershipTypeProperty = $workspaceClass.get('membershipType'))
+  #set ($membershipTypeValues = '')
+  #set ($membershipTypeValues = $membershipTypeProperty.getListValues())
+  #set ($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
     &lt;dt&gt;
       &lt;label&gt;$msg.get('workspacemanager.prop.workspace.membershipType.label')&lt;/label&gt;
       &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.workspace.membershipType.hint')&lt;/span&gt;
     &lt;/dt&gt;
 
     &lt;dd&gt;
-    #foreach($membershipTypeValue in $membershipTypeValues)
+    #foreach ($membershipTypeValue in $membershipTypeValues)
       #set ($membershipTypeValueId = "WorkspaceManager.WorkspaceClass_0_membershipType${foreach.index}")
       &lt;div&gt;
         &lt;label for="$membershipTypeValueId"&gt;

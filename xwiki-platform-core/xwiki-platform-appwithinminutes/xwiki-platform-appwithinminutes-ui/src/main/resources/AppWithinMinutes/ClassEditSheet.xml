@@ -435,17 +435,19 @@ XWiki.FormField = Class.create({
     }
   },
   _injectHTML : function(html) {
+    // We don't use Element#update() because it doesn't move external scripts and sheets into HEAD and also because we
+    // don't want to support in-line scripts in displayers.
     var container = new Element('div');
     container.innerHTML = html;
     var head = document.body.previous('head');
-    container.select('script').each(function(script) {
-      if (script.src) {
-        head.insert(new Element('script', {type: script.type, src: script.src}));
-        script.remove();
-      }
-    });
     container.select('link').each(function(link) {
       head.insert(link);
+    });
+    container.select('script').each(function(script) {
+      if (script.src) {
+        head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
+      }
+      script.remove();
     });
     this.container.insert(container);
   },
@@ -1840,6 +1842,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
     #set($templateDoc = $xwiki.getDocument($templateRef))
     #set($discard = $templateDoc.setParent($doc.name))
+    #if ($request.templateTitle)
+      #set($discard = $templateDoc.setTitle($request.templateTitle))
+    #end
+    #if ($request.templateContent)
+      #set($discard = $templateDoc.setContent($request.templateContent))
+    #end
     #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
     #set($discard = $templateDoc.setHidden(true))
     #set($discard = $templateDoc.save($msg.get('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))

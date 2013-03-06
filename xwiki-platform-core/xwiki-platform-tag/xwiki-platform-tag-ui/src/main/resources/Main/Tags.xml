@@ -185,7 +185,7 @@ $xwiki.ssx.use('Main.Tags')##
   (% class="xapp" %)
   = (% class="highlight tag" %)${tag}##
       #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
-        [[Rename&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[Delete&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
+        [[$msg.get('xe.tag.rename.link')&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[$msg.get('xe.tag.delete.link')&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
       #end
     (%%) =
 #end
@@ -212,7 +212,7 @@ $xwiki.ssx.use('Main.Tags')##
     )))
     (((
       (% class="xapp" %)
-      === $msg.get('xe.tag.activity', [$tag]) ===
+      === $msg.get('xe.tag.activity', ["//${tag}//"]) ===
 
       {{activity tags="$tag" /}}
     )))

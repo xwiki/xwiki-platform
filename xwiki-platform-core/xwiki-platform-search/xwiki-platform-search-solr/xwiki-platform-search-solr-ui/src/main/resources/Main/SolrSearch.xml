@@ -240,7 +240,7 @@ document.observe("xwiki:dom:loaded", function(){
       <parse>0</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -365,13 +365,41 @@ document.observe("xwiki:dom:loaded", function(){
         }
     }
     
-function handleSortElement(e){
+    function handleSortElement(e){
         var element=$(e.id);
+        var oldElement;
+        var orderMarker;
         $$('li.sort-item').each(function(el){
+            // Remove the active class from all sort-items.
             el.removeClassName('active');
+
+            // Find the sort-item-order marker.
+            if (!orderMarker) {
+              orderMarker = el.down('.sort-item-order');
+              if (orderMarker) {
+                // Remove if from it's current sort-item.
+                el.removeChild(orderMarker);
+
+                oldElement = el;
+              }
+            }
         })
+        
+        // Mark the clicked element as the new active sort-item and attach the order marker to it.
         element.addClassName('active');
-        $('sort-hidden-field').value=e.title;
+        element.appendChild(orderMarker);
+
+        // Update the hidden sort form input.
+        var sortBy = e.id.substring(2);
+        $('sort-hidden-field').value=sortBy;
+
+        // Update the hidden sort order form input.
+        if (element === oldElement) {
+          var sortOrderHiddenField = $('sort-order-hidden-field');
+          sortOrderHiddenField.value = ((sortOrderHiddenField.value == 'desc') ? 'asc' : 'desc');
+        }
+
+        // Submit the updated search form so that the page gets reloaded with the new soring.
         document.forms['search-form'].submit();
     }
 </code>
@@ -841,7 +869,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 
 #if ($sortOrder == '')
   #set ($sortOrder = 'desc')
-#elseif ($sortOder != 'desc')
+#elseif ($sortOrder != 'desc')
   #set ($sortOrder = 'asc')
 #end
 
@@ -906,7 +934,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   #end
 
   #if ($space_f != '' &amp;&amp; !$blacklistedSpaces.contains($space_f))
-    #set ($filterQuery = "$filterQuery space:""$space_f""")
+    #set ($filterQuery = "$filterQuery space_exact:""$space_f""")
   #end
 
   #if ($type != '')
@@ -998,9 +1026,10 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       &lt;div&gt;
         &lt;label class='hidden' for='text'&gt;$msg.get('search.page.query.label')&lt;/label&gt;
         &lt;input type='text' id='text' name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
-        &lt;input type='hidden' id='sort-hidden-field' value='' name='si'/&gt;
+        &lt;input type='hidden' id='sort-hidden-field' value="$!{escapetool.xml($sort)}" name='sort'/&gt;
+        &lt;input type='hidden' id='sort-order-hidden-field' value="$!{escapetool.xml($sortOrder)}" name='sortOrder'/&gt;
         &lt;span class='buttonwrapper'&gt;
-          &lt;input type='submit' value='Search' title='Alt+S' class='button searchButton'&gt;
+          &lt;input type='submit' value='Search' title='Search query' class='button searchButton'&gt;
         &lt;/span&gt;
       &lt;/div&gt;
       &lt;div&gt;
@@ -1114,10 +1143,26 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   &lt;div id='search-results-sort'&gt;
     &lt;ul&gt;
       &lt;li&gt;Sort:&lt;/li&gt;
-      &lt;li id='s_score' class="#if($sort == 'score')active#end sort-item" title='score' onclick='handleSortElement(this);'&gt;Relevance&lt;/li&gt;
-      &lt;li id='s_name' class="#if($sort == 'name')active#end sort-item" title='name' onclick='handleSortElement(this);'&gt;Name&lt;/li&gt;
-      &lt;li id='s_date' class="#if($sort == 'date')active#end sort-item" title='date' onclick='handleSortElement(this);'&gt;Date&lt;/li&gt;
-      &lt;li id='s_author' class="#if($sort == 'author')active#end sort-item" title='author' onclick='handleSortElement(this);'&gt;Last Author&lt;/li&gt;
+      #set ($sortOptions = {
+        'score' : 'Relevance',
+        'title_sort' : 'Title',
+        'date' : 'Date',
+        'author_display_sort' : 'Last Author'
+      })
+      #foreach ($sortOption in $sortOptions.entrySet())
+      &lt;li id="s_${sortOption.key}" class="#if($sort == $sortOption.key)active #{end}sort-item" onclick='handleSortElement(this);'&gt;
+        $sortOption.value
+        #if ($sort == $sortOption.key)
+        &lt;span class='sort-item-order' title="$!{escapetool.xml($sortOrder)}"&gt;
+          #if ($sortOrder == 'desc')
+            &amp;#9660;
+          #else
+            &amp;#9650;
+          #end
+        &lt;/span&gt;
+        #end
+      &lt;/li&gt;
+      #end
     &lt;/ul&gt;
   &lt;/div&gt;
 
@@ -1178,6 +1223,22 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 
       #set ($resultHighlightingMap = $searchResponse.highlighting.get($searchResult.id))
 
+      ## Filter the highliting results map to have simple field names (without language suffixes).
+      #set ($filteredResultHighlightingMap = {})
+      #foreach ($highlighting in $resultHighlightingMap.entrySet())
+        #set ($highlightedField = $highlighting.key)
+        #if ($highlightedField.contains('_'))
+          ## Clean the field to remove any multilingual marker at the end (_ml, _en, _fr, etc.)
+          #set ($highlightedField = $highlightedField.substring(0, $highlightedField.indexOf('_')))
+        #end
+        #set ($highlightedValues = $highlighting.value)
+        ## Preffer the field variant that has the most highlightings to display.
+        #if (!$filteredResultHighlightingMap.containsKey($highlightedField) || $filteredResultHighlightingMap.get($highlightedField).size() &lt; $highlightedValues.size())
+          #set ($discard = $filteredResultHighlightingMap.put($highlightedField, $highlightedValues))
+        #end
+      #end
+      #set ($resultHighlightingMap = $filteredResultHighlightingMap)
+
       #set ($title = $escapetool.xml($searchResultDocument.plainTitle))
       #set ($titleUrl = $searchResultDocument.getURL())
       #set ($date = $datetool.format('d MMM yyyy', $searchResultDocument.date))
@@ -1189,38 +1250,39 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       #set ($propertyName = $searchResult.propertyname)
       #set ($mimeType = $searchResult.mimetype)
 
-      #set ($highlightText = '')
+      #set ($highlightTexts = [])
       #if ($searchResultType == 'ATTACHMENT')
         #set ($itemtypeclass = 'search-attachment')
         #set ($title = $searchResult.filename)
         #set ($titleUrl = $searchResultDocument.getAttachmentURL($searchResult.filename))
-        #set ($highlightText = $resultHighlightingMap.get('attcontent')[0])
+        #set ($highlightTexts = $resultHighlightingMap.get('attcontent'))
       #elseif ($searchResultType == 'OBJECT')
         #set ($itemtypeclass = 'search-object')
-        #set ($highlightText = $resultHighlightingMap.get('objcontent')[0])
+        #set ($highlightTexts = $resultHighlightingMap.get('objcontent'))
       #elseif ($searchResultType == 'OBJECT_PROPERTY')
         #set ($itemtypeclass = 'search-property')
-        #set ($highlightText = $resultHighlightingMap.get('propertyvalue')[0])
+        #set ($highlightTexts = $resultHighlightingMap.get('propertyvalue'))
       #elseif ($searchResultType == 'DOCUMENT')
         #set ($itemtypeclass = 'search-doc')
+        ## This always sets the language parameter to the URL. It can be improved on a per-result basis and not be set when the result's original document is the same
+        ## as the requested language. However, this complicates things and will cause problems when facets will be added and multiple languages will be queried at once.
+        #set ($titleUrl = $searchResultDocument.getURL('view', "language=${resultLanguage}"))
         ## Document content highlighting, if there is a valid hit on the content property.
-        ## FIXME: handling multiple languages the rought way for now
-        ## #set ($docContentFieldName = "doccontent_${resultLanguage}")
-        #set ($highlightText = "$!{resultHighlightingMap.get('doccontent')[0]}")
+        #set ($highlightTexts = $resultHighlightingMap.get('doccontent'))
         ## Display other highlighting if the doccontent was not hit.
-        #if ($highlightText == '')
-          #set ($highlightText = "$!{resultHighlightingMap.get('comment')[0]}")
+        #if ($highlightTexts == '')
+          #set ($highlightTexts = $resultHighlightingMap.get('comment'))
         #end
         #* TODO: Should we show object content hightlighting? It might be too messy.
-        #if ($highlightText == '')
-          #set ($highlightText = "$!{resultHighlightingMap.get('objcontent')[0]}")
+        #if ($highlightTexts == '')
+          #set ($highlightTexts = $resultHighlightingMap.get('objcontent'))
         #end
         *#
       #end
 
       ## Sanitize the highlightText.
       ## Note: Looks a bit dirty but seems to work well enough.
-      #if ("$!highlightText" != '')
+      #foreach ($highlightText in $highlightTexts)
         ##
         ## Escape the XML tags
         #set ($highlightText = $escapetool.xml($highlightText))
@@ -1248,6 +1310,8 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
             #break
           #end
         #end
+        #set ($highlighIndex = $mathtool.sub($foreach.count, 1))
+        #set ($discard = $highlightTexts.set($highlighIndex, $highlightText))
       #end
       &lt;div&gt;
         &lt;div class='search-item'&gt;
@@ -1272,13 +1336,20 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
             &lt;div class='search-item-mimetype'&gt;File type: $mimeType&lt;/div&gt;
             #end
             #if ("$!class" != '')
-            &lt;div class='search-item-class'&gt;Class: &lt;a href="$xwiki.getURL($class)"&gt;$class&lt;/a&gt;&lt;/div&gt;
+            #set ($classReference = $services.model.resolveDocument("${searchResult.wiki}:${class}"))
+            &lt;div class='search-item-class'&gt;Class: &lt;a href="$xwiki.getURL($classReference)"&gt;$class&lt;/a&gt;&lt;/div&gt;
             #end
             #if ("$!propertyName" != '')
             &lt;div class='search-item-propertyname'&gt;Property: $propertyName&lt;/div&gt;
             #end
-            #if ("$!highlightText" != '')
-            &lt;blockquote class='search-item-highlight'&gt;${highlightText}&lt;/blockquote&gt;
+            #if ($highlightTexts &amp;&amp; $highlightTexts.size() &gt; 0)
+              #set ($highlightUpperIndex = $mathtool.min(2, $mathtool.sub($highlightTexts.size(), 1)))
+              #foreach ($highlighIndex in [0..$highlightUpperIndex])
+                #if ($highlighIndex != 0)
+                ...
+                #end
+                &lt;blockquote class='search-item-highlight'&gt;$highlightTexts[$highlighIndex]&lt;/blockquote&gt;
+              #end
             #end
           &lt;/div&gt;
           &lt;div class='search-item-relevance'&gt;

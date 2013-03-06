@@ -27,111 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-lucene</artifactId>
-  <name>XWiki Platform - Search - Lucene</name>
-  <description>XWiki Platform - Search - Lucene</description>
-  <properties>
-    <lucene.version>4.0.0</lucene.version>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-core</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-queryparser</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-analyzers-common</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
-    <!-- Attachments parsing -->
-    <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parsers</artifactId>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <!-- TODO: Remove once http://jira.xwiki.org/browse/XWIKI-8656 is fixed -->
-        <exclusion>
-          <groupId>asm</groupId>
-          <artifactId>asm</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
-      <groupId>de.l3s.boilerpipe</groupId>
-      <artifactId>boilerpipe</artifactId>
-    </dependency>
-
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed for ClassImposteriser for mocking oldcore classes -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- For some tests we need to have the Servlet API JAR available -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            com/xpn/xwiki/plugin/lucene/internal/AbstractDocumentData.java,
-            com/xpn/xwiki/plugin/lucene/internal/AbstractIndexData.java,
-            com/xpn/xwiki/plugin/lucene/internal/AttachmentData.java,
-            com/xpn/xwiki/plugin/lucene/internal/DocumentData.java,
-            com/xpn/xwiki/plugin/lucene/internal/IndexFields.java,
-            com/xpn/xwiki/plugin/lucene/internal/IndexRebuilder.java,
-            com/xpn/xwiki/plugin/lucene/internal/IndexUpdater.java,
-            com/xpn/xwiki/plugin/lucene/LucenePlugin.java,
-            com/xpn/xwiki/plugin/lucene/LucenePluginApi.java,
-            com/xpn/xwiki/plugin/lucene/SearchResult.java,
-            com/xpn/xwiki/plugin/lucene/SearchResults.java,
-            com/xpn/xwiki/plugin/lucene/internal/WikiData.java,
-            com/xpn/xwiki/plugin/lucene/internal/XWikiDocumentQueue.java
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <packaging>pom</packaging>
+  <name>XWiki Platform - Search - Lucene - Parent POM</name>
+  <description>Parent project for the Lucene search engine.</description>
+  <modules>
+    <module>xwiki-platform-lucene-api</module>
+    <module>xwiki-platform-lucene-ui</module>
+  </modules>
 </project>

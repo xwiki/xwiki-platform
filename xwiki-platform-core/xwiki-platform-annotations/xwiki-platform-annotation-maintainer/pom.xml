@@ -25,11 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotations</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-maintainer</artifactId>
   <name>XWiki Platform - Annotations - Maintainer</name>
-  <packaging>jar</packaging> 
+  <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>88.44</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -27,17 +27,29 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Search - Solr - UI</name>
-  <description>Solr search and administration related pages</description>
+  <description>Allows searching on the wiki using Apache Solr</description>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Solr Search Application</xwiki.extension.name>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
+    <!-- Search UI which it extends. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-ui</artifactId>
+      <type>xar</type>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Solr module on which it depends. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-api</artifactId>

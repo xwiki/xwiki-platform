@@ -51,7 +51,7 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @since 2.4M2
  */
 @MockingRequirement(NestedScriptMacroValidatorListener.class)
-public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase
+public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase<EventListener>
 {
     private EventListener validator;
 

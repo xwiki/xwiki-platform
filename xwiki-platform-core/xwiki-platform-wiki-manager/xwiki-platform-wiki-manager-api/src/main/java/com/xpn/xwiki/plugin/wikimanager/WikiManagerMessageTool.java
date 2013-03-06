@@ -23,8 +23,11 @@ package com.xpn.xwiki.plugin.wikimanager;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Wiki Manager plugin translation messages manager.
@@ -34,6 +37,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  * 
  * @version $Id$
  */
+@Deprecated
 public class WikiManagerMessageTool extends XWikiPluginMessageTool
 {
     /**
@@ -231,11 +235,18 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     private static final WikiManagerMessageTool DEFAULTMESSAGETOOL = new WikiManagerMessageTool();
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system {@link Locale}.
      */
     private WikiManagerMessageTool()
     {
         super(ResourceBundle.getBundle(WikiManagerPlugin.PLUGIN_NAME + "/ApplicationResources"));
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -250,6 +261,18 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     WikiManagerMessageTool(Locale locale, WikiManagerPlugin plugin, XWikiContext context)
     {
         super(locale, plugin, context);
+    }
+
+    @Override
+    public String get(String key)
+    {
+        return this.localizationManager.getTranslationPlain(key);
+    }
+
+    @Override
+    public String get(String key, Object... params)
+    {
+        return this.localizationManager.getTranslationPlain(key, params);
     }
 
     /**

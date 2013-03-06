@@ -724,9 +724,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                     "The following data migration(s) will be applied for database [{}] currently in version [{}]:",
                     database, curversion);
                 for (XWikiMigration migration : neededMigrations) {
-                    logger.info("  {} - {}{}", new String[] {migration.dataMigration.getName(),
-                        migration.dataMigration.getDescription(),
-                        (migration.isForced ? " (forced)" : "")});
+                    logger.info("  {} - {}{}", migration.dataMigration.getName(),
+                        migration.dataMigration.getDescription(), (migration.isForced ? " (forced)" : ""));
                 }
             } else {
                 if (curversion != null) {
@@ -798,7 +797,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             setDBVersion(getLatestVersion());
         } else if (getLatestVersion().compareTo(curversion) > 0) {
             updateMigrationStatus(getLatestVersion());
-            if (logger.isInfoEnabled() && curversion != null) {
+            if (logger.isInfoEnabled()) {
                 logger.info("Database [{}] upgraded to latest version [{}] without needing{} data migration",
                     database, getDBVersion(), (migrations.size() > 0) ? " further" : "");
             }

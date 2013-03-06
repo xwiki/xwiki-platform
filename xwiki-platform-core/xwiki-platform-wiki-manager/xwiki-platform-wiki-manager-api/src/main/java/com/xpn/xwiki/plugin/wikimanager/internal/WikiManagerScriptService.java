@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -33,6 +34,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.globalsearch.GlobalSearchPluginApi;
+import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerPluginApi;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
@@ -57,6 +59,12 @@ public class WikiManagerScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * The plugin.
@@ -88,7 +96,7 @@ public class WikiManagerScriptService implements ScriptService
         WikiManagerPluginApi api = (WikiManagerPluginApi) econtext.getProperty(PLUGINAPI_KEY);
 
         if (api == null) {
-            XWikiContext xcontext = (XWikiContext) econtext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+            XWikiContext xcontext = this.xcontextProvider.get();
 
             api = (WikiManagerPluginApi) getPlugin(xcontext).getPluginApi(this.plugin, xcontext);
             econtext.setProperty(PLUGINAPI_KEY, api);
@@ -105,9 +113,10 @@ public class WikiManagerScriptService implements ScriptService
         return getAPI().getDefaultException();
     }
 
+    @Deprecated
     public XWikiMessageTool getMessageTool()
     {
-        return getAPI().getMessageTool();
+        return WikiManagerMessageTool.getDefault(this.xcontextProvider.get());
     }
 
     public GlobalSearchPluginApi getSearchApi()

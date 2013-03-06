@@ -27,11 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>  
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-php</artifactId>
   <name>XWiki Platform - Rendering - Macro - PHP</name>
   <description>XWiki macro for interpreting PHP code.</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-core-rendering-macro-php</xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

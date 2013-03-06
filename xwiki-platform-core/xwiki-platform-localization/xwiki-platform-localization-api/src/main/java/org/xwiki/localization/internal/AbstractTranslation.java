@@ -90,7 +90,7 @@ public abstract class AbstractTranslation implements Translation
     }
 
     @Override
-    public String getRawSource()
+    public Object getRawSource()
     {
         return this.message.getRawSource();
     }

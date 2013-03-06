@@ -30,11 +30,13 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerException;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
+import com.xpn.xwiki.web.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jfree.util.Log;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
  * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
@@ -215,12 +217,19 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     private static XWikiApplicationClass instance;
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * Construct the overload of AbstractXClassManager with spaceprefix={@link #CLASS_SPACE_PREFIX} and prefix=
      * {@link #CLASS_PREFIX}.
      */
     protected XWikiApplicationClass()
     {
         super(CLASS_SPACE_PREFIX, CLASS_PREFIX);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -362,7 +371,7 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
         if (listApp.isEmpty()) {
             if (validate) {
                 throw new ApplicationManagerException(ApplicationManagerException.ERROR_AM_DOESNOTEXIST,
-                    ApplicationManagerMessageTool.getDefault(context).get(
+                    this.localizationManager.getTranslationPlain(
                         ApplicationManagerMessageTool.ERROR_APPDOESNOTEXISTS, appName));
             } else {
                 return xwiki.getDocument(getItemDocumentDefaultFullName(appName, context), context);

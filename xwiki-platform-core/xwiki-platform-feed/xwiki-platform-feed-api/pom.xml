@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-feed</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-feed-api</artifactId>
   <name>XWiki Platform - Feed - API</name>
   <description>API for feeds (RSS, ATOM, etc)</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>13.76</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

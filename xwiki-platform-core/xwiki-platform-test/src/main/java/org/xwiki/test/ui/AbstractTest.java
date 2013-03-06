@@ -26,8 +26,6 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 import org.xwiki.test.ui.browser.BrowserTestRule;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
-import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.BaseElement;
 
 import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;

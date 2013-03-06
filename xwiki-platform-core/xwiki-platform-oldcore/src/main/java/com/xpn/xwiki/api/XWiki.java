@@ -50,7 +50,6 @@ import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class XWiki extends Api
@@ -404,7 +403,8 @@ public class XWiki extends Api
     public boolean checkAccess(String docname, String right)
     {
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, this.context);
+            DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docReference, this.context);
             return getXWikiContext().getWiki().checkAccess(right, doc, getXWikiContext());
         } catch (XWikiException e) {
             return false;
@@ -2354,7 +2354,6 @@ public class XWiki extends Api
      * 
      * @param doc page to rename
      * @param newFullName target page name to move the information to
-     * @throws XWikiException exception if the rename fails
      */
     public boolean renamePage(Document doc, String newFullName)
     {
@@ -2591,7 +2590,8 @@ public class XWiki extends Api
     {
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
-        return new Class(this.xwiki.getDocument(documentName, this.context).getXClass(), this.context);
+        DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(documentName);
+        return new Class(this.xwiki.getDocument(docReference, this.context).getXClass(), this.context);
     }
 
     /**
@@ -2804,8 +2804,8 @@ public class XWiki extends Api
      * scripts
      * 
      * @return Final message
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. From velocity you can access XWikiMessageTool
-     *             with $msg binding.
+     * @deprecated use {@link com.xpn.xwiki.web.XWikiMessageTool#get(String, List)} instead. From velocity you can
+     *             access XWikiMessageTool with $msg binding.
      */
     @Deprecated
     public String parseMessage()

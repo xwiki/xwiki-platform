@@ -32,7 +32,6 @@ import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.internal.BotData;
 import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
-import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
@@ -101,7 +100,7 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
     public void loadBotDataWhenNoConfigDataInConfigDocument() throws Exception
     {
         try {
-            this.componentManager.getMockedComponent().loadBotData();
+            this.componentManager.getComponentUnderTest().loadBotData();
             Assert.fail("Should have thrown an exception");
         } catch (IRCBotException expected) {
             Assert.assertEquals("Cannot find the IRC Configuration object in the [somewiki:IRC.IRCConfiguration] "
@@ -121,7 +120,7 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
         when(botDataObject.getStringValue("password")).thenReturn("mypassword");
         when(botDataObject.getIntValue("inactive")).thenReturn(0);
 
-        BotData botData = this.componentManager.getMockedComponent().loadBotData();
+        BotData botData = this.componentManager.getComponentUnderTest().loadBotData();
         Assert.assertEquals("mybotname", botData.getName());
         Assert.assertEquals("myserver", botData.getServer());
         Assert.assertEquals("mychannel", botData.getChannel());
@@ -141,7 +140,7 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
         when(queryManager.createQuery(anyString(), anyString())).thenReturn(query);
         when(query.execute()).thenReturn(results);
 
-        List<BotListenerData> data = this.componentManager.getMockedComponent().getWikiBotListenerData();
+        List<BotListenerData> data = this.componentManager.getComponentUnderTest().getWikiBotListenerData();
         Assert.assertEquals(1, data.size());
         Assert.assertEquals("space.name", data.get(0).getId());
         Assert.assertEquals("listenername", data.get(0).getName());
@@ -159,6 +158,6 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
         when(xwiki.getDocument(new DocumentReference("xwiki", "IRC", "IRCConfiguration"), this.xwikiContext))
             .thenReturn(mainConfigDoc);
 
-        Assert.assertSame(mainConfigDoc, this.componentManager.getMockedComponent().getConfigurationDocument());
+        Assert.assertSame(mainConfigDoc, this.componentManager.getComponentUnderTest().getConfigurationDocument());
     }
 }

@@ -27,12 +27,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-component</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-component-wiki</artifactId>
   <name>XWiki Platform - Component - Wiki Components</name>
   <packaging>jar</packaging>
   <description>Make it possible to implement a component in a wiki page, using wiki objects</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>40.80</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Component API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.commons</groupId>

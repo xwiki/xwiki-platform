@@ -1488,7 +1488,7 @@ document.observe('xwiki:dom:loaded', function() {
       });
     }
     $('body').observe('click', function (event) {
-      if (!event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
+      if (event.element().descendantOf && !event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
         hideParentSection();
       }
     })

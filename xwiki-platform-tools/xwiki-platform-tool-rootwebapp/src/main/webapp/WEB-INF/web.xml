@@ -20,10 +20,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
-<web-app id="WebApp_ID">
-  <display-name>XWiki</display-name>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+  <display-name>XWiki Root Redirector</display-name>
+  <description>Redirects root context calls to the xwiki context</description>
+
   <servlet>
     <servlet-name>XWikiDispatcherServlet</servlet-name>
     <servlet-class>com.xpn.xwiki.XWikiRootServlet</servlet-class>

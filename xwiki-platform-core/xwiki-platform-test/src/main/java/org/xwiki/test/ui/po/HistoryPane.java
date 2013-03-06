@@ -122,13 +122,15 @@ public class HistoryPane extends BaseElement
         return new ViewPage();
     }
 
-    public void deleteVersion(String version)
+    public HistoryPane deleteVersion(String version)
     {
         makeConfirmDialogSilent(true);
 
         pane.findElement(
             By.xpath(".//table[@class='xwikidatatable']//tr[contains(., '" + version
                 + "')]//td[@class='xwikibuttonlink']/a[contains(.,'Delete')]")).click();
+
+        return new HistoryPane();
     }
 
     /**

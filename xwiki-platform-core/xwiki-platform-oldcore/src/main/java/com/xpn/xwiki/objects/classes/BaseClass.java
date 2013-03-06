@@ -1058,8 +1058,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference classReference,
-     *             com.xpn.xwiki.XWikiContext)}
+     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference, XWikiContext)}
      */
     @Deprecated
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
@@ -1160,7 +1159,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context)
-        throws XWikiException
     {
         try {
             XWikiValidationInterface validObject =

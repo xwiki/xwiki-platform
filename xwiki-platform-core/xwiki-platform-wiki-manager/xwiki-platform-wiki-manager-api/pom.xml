@@ -27,14 +27,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-manager</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-manager-api</artifactId>
   <name>XWiki Platform - Wiki Manager - API</name>
   <description>XWiki Platform - Wiki Manager - API</description>
   <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform.plugins:xwiki-plugin-wiki-manager</xwiki.extension.features>
+
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Manager API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>8.69</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

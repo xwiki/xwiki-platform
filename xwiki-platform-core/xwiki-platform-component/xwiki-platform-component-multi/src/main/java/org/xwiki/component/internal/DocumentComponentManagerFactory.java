@@ -31,7 +31,7 @@ import org.xwiki.component.manager.ComponentManager;
  * Implementation of {@link ComponentManagerFactory} which force parent to be {@link SpaceComponentManager}.
  * 
  * @version $Id$
- * @since 5.0M1
+ * @since 5.0M2
  */
 @Component
 @Named(DocumentComponentManager.ID)

@@ -35,7 +35,7 @@ import org.xwiki.model.EntityType;
  * current space.
  * 
  * @version $Id$
- * @since 5.0M1
+ * @since 5.0M2
  */
 @Component
 @Named(SpaceComponentManager.ID)
@@ -54,6 +54,9 @@ public class SpaceComponentManager extends AbstractEntityComponentManager implem
     @Named(WikiComponentManager.ID)
     private ComponentManager wikiComponentManager;
 
+    /**
+     * Default constructor.
+     */
     public SpaceComponentManager()
     {
         super(EntityType.SPACE);

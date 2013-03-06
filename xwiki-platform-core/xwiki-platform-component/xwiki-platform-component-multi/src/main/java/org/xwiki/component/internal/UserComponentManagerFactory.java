@@ -28,7 +28,7 @@ import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * Implementation of {@link ComponentManagerFactory} which force parent to be {@link SpaceComponentManager}.
+ * Implementation of {@link ComponentManagerFactory} which force parent to be {@link DocumentComponentManager}.
  * 
  * @version $Id$
  * @since 3.3M2

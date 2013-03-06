@@ -29,6 +29,7 @@ import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current user in the
@@ -55,6 +56,12 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * Used to serialize the user reference.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> referenceSerializer;
+
+    /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
@@ -73,6 +80,6 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     @Override
     protected String getKey()
     {
-        return ID + ':' + this.documentAccessBridge.getCurrentUser();
+        return ID + ':' + this.referenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
     }
 }

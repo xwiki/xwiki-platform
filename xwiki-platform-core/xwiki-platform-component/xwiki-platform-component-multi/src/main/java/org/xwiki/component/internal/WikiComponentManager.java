@@ -53,6 +53,9 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
     @Inject
     private ComponentManager rootComponentManager;
 
+    /**
+     * Default constructor.
+     */
     public WikiComponentManager()
     {
         super(EntityType.WIKI);

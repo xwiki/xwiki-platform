@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * current entity.
  * 
  * @version $Id$
- * @since 5.0M1
+ * @since 5.0M2
  */
 public abstract class AbstractEntityComponentManager extends AbstractGenericComponentManager implements Initializable
 {
@@ -44,8 +44,14 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
     @Named("current")
     private EntityReferenceValueProvider currentProvider;
 
+    /**
+     * The type of entity associated to this {@link org.xwiki.component.manager.ComponentManager}.
+     */
     private EntityType type;
 
+    /**
+     * @param type the type of entity associated to this {@link org.xwiki.component.manager.ComponentManager}
+     */
     public AbstractEntityComponentManager(EntityType type)
     {
         this.type = type;

@@ -35,7 +35,7 @@ import org.xwiki.model.EntityType;
  * the current document.
  * 
  * @version $Id$
- * @since 5.0M1
+ * @since 5.0M2
  */
 @Component
 @Named(DocumentComponentManager.ID)
@@ -54,6 +54,9 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
     @Named(SpaceComponentManager.ID)
     private ComponentManager spaceComponentManager;
 
+    /**
+     * Default constructor.
+     */
     public DocumentComponentManager()
     {
         super(EntityType.DOCUMENT);

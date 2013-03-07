@@ -338,6 +338,12 @@
                <to>java.lang.Object</to>
                <justification>YOUNG API. There is no reason to limit it to String</justification>
              </difference>
+             <difference>
+               <differenceType>7004</differenceType>
+               <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+               <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, com.xpn.xwiki.XWikiContext)</method>
+               <justification>Method introduce very recently and already and not supposed to be used (internal retro-compatibility stuff)</justification>
+             </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

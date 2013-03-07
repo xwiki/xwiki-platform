@@ -5061,10 +5061,13 @@ public class XWiki implements EventListener
         return getUserName(user, format, true, context);
     }
 
+    /**
+     * @return a formatted and pretty printed user name for displaying
+     */
     public String getUserName(String user, String format, boolean link, XWikiContext context)
     {
         if (StringUtils.isBlank(user)) {
-            return "";
+            return context.getMessageTool().get("core.users.unknownUser");
         }
         XWikiDocument userdoc = null;
         try {

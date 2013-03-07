@@ -22,16 +22,17 @@ package org.xwiki.gwt.dom.client;
 import com.google.gwt.event.shared.EventHandler;
 
 /**
- * Handler interface for {@link PasteEvent} events.
+ * Handler interface for {@link CopyEvent} events.
  * 
  * @version $Id$
+ * @since 5.0M2
  */
-public interface PasteHandler extends EventHandler
+public interface CopyHandler extends EventHandler
 {
     /**
-     * Called when a {@link PasteEvent} is fired.
+     * Called when a {@link CopyEvent} is fired.
      * 
-     * @param event the {@link PasteEvent} that was fired
+     * @param event the {@link CopyEvent} that was fired
      */
-    void onPaste(PasteEvent event);
+    void onCopy(CopyEvent event);
 }

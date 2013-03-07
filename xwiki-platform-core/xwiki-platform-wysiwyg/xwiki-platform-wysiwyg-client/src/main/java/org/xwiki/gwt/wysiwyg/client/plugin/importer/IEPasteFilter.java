@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.xwiki.gwt.user.client.StringUtils;
 
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
 
@@ -46,17 +45,12 @@ import com.google.gwt.dom.client.NodeList;
  */
 public class IEPasteFilter extends PasteFilter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PasteFilter#filter(Document)
-     */
     @Override
-    public void filter(Document document)
+    public void filter(Element element)
     {
         // We get the list of elements using a native DOM API instead of traversing the document because the DOM
         // document can be in an invalid state.
-        NodeList<Element> descendants = document.getElementsByTagName("*");
+        NodeList<Element> descendants = element.getElementsByTagName("*");
         List<Element> nonHTMLElements = new ArrayList<Element>();
         for (int i = 0; i < descendants.getLength(); i++) {
             Element descendant = descendants.getItem(i);
@@ -65,14 +59,14 @@ public class IEPasteFilter extends PasteFilter
             }
         }
 
-        for (Element element : nonHTMLElements) {
+        for (Element nonHTMLElement : nonHTMLElements) {
             try {
-                element.getParentNode().removeChild(element);
+                nonHTMLElement.getParentNode().removeChild(nonHTMLElement);
             } catch (Exception e) {
                 // Skip this element. The DOM is in a bad state.
             }
         }
 
-        super.filter(document);
+        super.filter(element);
     }
 }

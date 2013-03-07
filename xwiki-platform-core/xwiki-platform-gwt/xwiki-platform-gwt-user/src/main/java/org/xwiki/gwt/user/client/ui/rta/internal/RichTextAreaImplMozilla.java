@@ -136,6 +136,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         elem.contentWindow.addEventListener('dblclick', elem.__gwt_handler, true);
         elem.contentWindow.addEventListener('paste', elem.__gwt_handler, true);
+        elem.contentWindow.addEventListener('copy', elem.__gwt_handler, true);
     }-*/;
 
     @Override
@@ -157,6 +158,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         elem.contentWindow.removeEventListener('dblclick', elem.__gwt_handler, true);
         elem.contentWindow.removeEventListener('paste', elem.__gwt_handler, true);
+        elem.contentWindow.removeEventListener('copy', elem.__gwt_handler, true);
     }-*/;
 
     @Override

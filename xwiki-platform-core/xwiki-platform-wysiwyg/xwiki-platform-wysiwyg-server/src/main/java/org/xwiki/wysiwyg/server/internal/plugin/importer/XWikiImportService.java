@@ -107,9 +107,15 @@ public class XWikiImportService implements ImportService
             HTMLCleaner cleaner = componentManager.getInstance(HTMLCleaner.class, cleanerHint);
             HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
             configuration.setParameters(cleaningParams);
-            Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
+            // Wrap the paste content in a DIV element because the DIV element, unlike BODY for instance, accepts both
+            // in-line and block content. The way we prevent the creation of a paragraph when in-line content is pasted.
+            StringReader input = new StringReader("<div>" + htmlPaste + "</div>");
+            Document cleanedDocument = cleaner.clean(input, configuration);
+            HTMLUtils.stripFirstElementInside(cleanedDocument, "body", "div");
             HTMLUtils.stripHTMLEnvelope(cleanedDocument);
-            return HTMLUtils.toString(cleanedDocument, true, true);
+            // Remove the HTML wrapper and the new lines before/after it.
+            String output = HTMLUtils.toString(cleanedDocument, true, true).trim();
+            return StringUtils.removeEndIgnoreCase(StringUtils.removeStartIgnoreCase(output, "<html>"), "</html>");
         } catch (Exception e) {
             this.logger.error("Exception while cleaning office HTML content.", e);
             throw new RuntimeException(e.getLocalizedMessage());

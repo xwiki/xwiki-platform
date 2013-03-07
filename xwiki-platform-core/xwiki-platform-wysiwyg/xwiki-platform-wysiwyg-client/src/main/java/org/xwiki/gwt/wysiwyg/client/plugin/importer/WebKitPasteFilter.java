@@ -19,36 +19,33 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.importer;
 
-import com.google.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.StringUtils;
+
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Node;
 
 /**
- * Filters the DOM tree generated from the text pasted into a right text area.
- * <p>
- * Note: The purpose of this filter is not to clean the pasted text but to adjust the DOM tree so that its HTML
- * serialization can be cleaned on the server side.
+ * A {@link PasteFilter} specific for the browsers based on the WebKit engine.
  * 
  * @version $Id$
+ * @since 5.0M2
  */
-public class PasteFilter
+public class WebKitPasteFilter extends PasteFilter
 {
-    /**
-     * Filters the given DOM document.
-     * 
-     * @param document the DOM document to be filtered
-     */
-    public void filter(Document document)
-    {
-        filter(document.getDocumentElement());
-    }
-
-    /**
-     * Filters the given element.
-     * 
-     * @param element the element to be filtered
-     */
+    @Override
     public void filter(Element element)
     {
-        // No filtering is done by default. Browser specific implementations may overwrite this method.
+        // WebKit adds sometimes a BR after the paste content. Also, since WebKit copies HTML elements with styles (in
+        // an attempt to preserve the style of the copied text from its source) the fact that the BR element doesn't
+        // have the style attribute is a good indicator that it's not part of the paste content.
+        Node lastLeaf = DOMUtils.getInstance().getLastLeaf(element);
+        if (Element.is(lastLeaf) && "br".equalsIgnoreCase(lastLeaf.getNodeName())
+            && StringUtils.isEmpty(Element.as(lastLeaf).getAttribute(Style.STYLE_ATTRIBUTE))) {
+            lastLeaf.removeFromParent();
+        }
+
+        super.filter(element);
     }
 }

@@ -17,21 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.dom.client;
+package org.xwiki.gwt.dom.client.internal.ie;
 
 import com.google.gwt.event.shared.EventHandler;
 
 /**
- * Handler interface for {@link PasteEvent} events.
+ * Handler interface for {@link BeforePasteEvent} events.
  * 
  * @version $Id$
+ * @since 5.0M2
  */
-public interface PasteHandler extends EventHandler
+public interface BeforePasteHandler extends EventHandler
 {
     /**
-     * Called when a {@link PasteEvent} is fired.
+     * Called when a {@link BeforePasteEvent} is fired.
      * 
-     * @param event the {@link PasteEvent} that was fired
+     * @param event the {@link BeforePasteEvent} that was fired
      */
-    void onPaste(PasteEvent event);
+    void onBeforePaste(BeforePasteEvent event);
 }

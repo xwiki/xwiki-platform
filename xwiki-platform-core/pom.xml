@@ -344,6 +344,14 @@
                <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, com.xpn.xwiki.XWikiContext)</method>
                <justification>Method introduce very recently and already and not supposed to be used (internal retro-compatibility stuff)</justification>
              </difference>
+            <!-- The following difference breaks CLIRR for some reason so I'm excluding the entire class below.
+            <difference>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>
+              <differenceType>7005</differenceType>
+              <method>void filter(com.google.gwt.dom.client.Document)</method>
+              <to>void filter(com.google.gwt.dom.client.Element)</to>
+              <justification>Nothing is broken because the method with a Document argument is still present but it is now inherited from PasteFilter.</justification>
+            </difference>-->
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -367,6 +375,8 @@
             <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</exclude>
             <!-- Added new translation keys. This interface is not meant to be implemented. -->
             <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
+            <!-- Nothing broken here. CLIRR doesn't detect that a method is inherited from the base class. See the difference above. -->
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</exclude>
           </excludes>
         </configuration>
       </plugin>

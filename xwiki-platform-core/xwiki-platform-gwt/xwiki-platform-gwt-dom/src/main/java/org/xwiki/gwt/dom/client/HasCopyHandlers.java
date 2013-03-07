@@ -19,19 +19,22 @@
  */
 package org.xwiki.gwt.dom.client;
 
-import com.google.gwt.event.shared.EventHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.HasHandlers;
 
 /**
- * Handler interface for {@link PasteEvent} events.
+ * A widget that implements this interface provides registration for {@link CopyHandler} instances.
  * 
  * @version $Id$
+ * @since 5.0M2
  */
-public interface PasteHandler extends EventHandler
+public interface HasCopyHandlers extends HasHandlers
 {
     /**
-     * Called when a {@link PasteEvent} is fired.
+     * Adds a {@link CopyEvent} handler.
      * 
-     * @param event the {@link PasteEvent} that was fired
+     * @param handler the copy handler
+     * @return {@link HandlerRegistration} used to remove this handler
      */
-    void onPaste(PasteEvent event);
+    HandlerRegistration addCopyHandler(CopyHandler handler);
 }

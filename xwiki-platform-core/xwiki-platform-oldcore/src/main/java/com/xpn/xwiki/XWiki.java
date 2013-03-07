@@ -6616,4 +6616,76 @@ public class XWiki implements EventListener
         }
         return new DocumentReference("XWikiPreferences", new SpaceReference(spaceReference));
     }
+
+    /**
+     * Search attachments by passing HQL where clause values as parameters.
+     * You can specify properties of the "attach" (the attachment) or "doc" (the document it is attached to)
+     * 
+     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param nb The number of rows to return. If 0 then all rows are returned
+     * @param start The number of rows to skip at the beginning.
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @param XWikiContext The underlying context used for running the database query
+     * @return A List of {@link XWikiAttachment} objects.
+     * @throws XWikiException in case of error while performing the query
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, List)
+     * @since 5.0M2
+     */
+    @Unstable
+    public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        // Get the attachment filenames and document fullNames
+        List<java.lang.Object[]> results = this.getStore().search(
+            "select attach.filename, doc.fullName from XWikiAttachment attach, XWikiDocument doc where doc.id = attach.docId and "
+             + parametrizedSqlClause, nb, start, parameterValues, context);
+
+        HashMap<String, List<String>> filenamesByDocFullName = new HashMap<String, List<String>>();
+
+        // Put each attachment name with the document name it belongs to
+        for (int i=0; i<results.size(); i++) {
+            String filename = (String) results.get(i)[0];
+            String docFullName = (String) results.get(i)[1];
+            if (!filenamesByDocFullName.containsKey(docFullName)){
+                filenamesByDocFullName.put(docFullName, new ArrayList<String>());
+            }
+            filenamesByDocFullName.get(docFullName).add((String) filename);
+        }
+
+        List<XWikiAttachment> out = new ArrayList<XWikiAttachment>();
+
+        // Index through the document names, get relivent attachments
+        for (String fullName : filenamesByDocFullName.keySet()) {
+            XWikiDocument doc = getDocument(fullName, context);
+            List<String> returnedAttachmentNames = filenamesByDocFullName.get(fullName);
+            for (XWikiAttachment attach : doc.getAttachmentList()) {
+                if (returnedAttachmentNames.contains(attach.getFilename())) {
+                    out.add(attach);
+                }
+            }
+        }
+
+        return out;
+    }
+
+    /**
+     * Count attachments returned by a given parameterized query
+     *
+     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @param XWikiContext The underlying context used for running the database query
+     * @return int number of attachments found.
+     * @throws XWikiException in event of an exception querying the database
+     * @see #searchAttachments(String, int, int, List, XWikiContext)
+     */
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        List l = getStore().search(
+            "select count(attach) from XWikiAttachment attach, XWikiDocument doc where doc.id = attach.docId and "
+             + parametrizedSqlClause, 0, 0, parameterValues, context);
+        return ((Number) l.get(0)).intValue();
+    }
+
 }

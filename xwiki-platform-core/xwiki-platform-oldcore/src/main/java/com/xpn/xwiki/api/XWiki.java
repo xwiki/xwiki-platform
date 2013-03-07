@@ -39,11 +39,13 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -796,6 +798,44 @@ public class XWiki extends Api
         return this.xwiki.getStore().search(
             "select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause, nb, start, parameterValues,
             this.context);
+    }
+
+    /**
+     * Search attachments by passing HQL where clause values as parameters. See
+     * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
+     * You can specify properties of attach (the attachment) or doc (the document it is attached to)
+     * 
+     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param nb The number of rows to return. If 0 then all rows are returned
+     * @param start The number of rows to skip at the beginning.
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @return A List of {@link Attachment} objects.
+     * @throws XWikiException in case of error while performing the query
+     * @since 5.0M2
+     */
+    @Unstable
+    public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
+        throws XWikiException
+    {
+        return convertAttachments(this.xwiki.searchAttachments(parametrizedSqlClause, nb, start, parameterValues, this.context));
+    }
+
+    /**
+     * Count attachments returned by a given parameterized query
+     *
+     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see: {@link #searchDocuments(String, int, int, List)}
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @return int number of attachments found.
+     * @throws XWikiException
+     * @see #searchAttachments(String, int, int, List)
+     * @since 5.0M2
+     */
+    @Unstable
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues)
+        throws XWikiException
+    {
+        return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);
     }
 
     /**

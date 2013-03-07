@@ -314,7 +314,7 @@ span.wikicreatelink a:after {
   visibility:hidden;
 }
 
-.edit_section a {
+.edit_section a, .edit_section span {
   background: transparent url("$xwiki.getSkinFile('icons/xwiki/edit-section.png')") no-repeat left top;
   height: 20px;
   margin: 0;
@@ -1513,7 +1513,7 @@ input.icon-button {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/search.png')");
 }
 
-*:disabled, input.disabled, button.disabled, .buttonwrapper a.disabled {
+*:disabled, input.disabled, button.disabled, .buttonwrapper a.disabled, .edit_section.disabled {
   opacity: .5;
   cursor: default;
 }

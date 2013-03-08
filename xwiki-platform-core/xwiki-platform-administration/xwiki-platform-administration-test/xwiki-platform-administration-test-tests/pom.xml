@@ -35,6 +35,17 @@
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Tests for the Administration Application</description>
+  <properties>
+    <!-- Override in order to add the Packager Plugin -->
+    <xwikiCfgPlugins>\
+      com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
+      com.xpn.xwiki.plugin.packaging.PackagePlugin
+    </xwikiCfgPlugins>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -59,6 +70,17 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
+           once -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/AllTests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
       <!-- TODO: Remove when the following issue is fixed: http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
       <plugin>
         <groupId>org.xwiki.platform</groupId>

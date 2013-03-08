@@ -122,16 +122,20 @@ public class DistributionJob extends AbstractJob<DistributionRequest, Distributi
         if (this.distributionManager.getDistributionExtension() != null) {
             DistributionJobStatus previousStatus = this.distributionManager.getPreviousJobStatus();
 
-            if (previousStatus != null
-                && previousStatus.getDistributionExtension() != null
-                && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
-                    this.distributionManager.getDistributionExtension())) {
-                status.setDistributionExtension(previousStatus.getDistributionExtension());
-                status.setDistributionExtensionUi(previousStatus.getDistributionExtensionUi());
+            if (previousStatus != null) {
+                if (previousStatus.getDistributionExtension() != null
+                    && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
+                        this.distributionManager.getDistributionExtension())) {
+                    status.setDistributionExtension(previousStatus.getDistributionExtension());
+                    status.setDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
+                } else {
+                    status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
+                    status.setDistributionExtensionUI(extensionUI);
+                }
             }
 
             status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
-            status.setDistributionExtensionUi(extensionUI);
+            status.setDistributionExtensionUI(extensionUI);
         }
 
         return status;

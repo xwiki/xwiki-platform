@@ -143,7 +143,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+            containerInitializer.initializeResponse(context.getResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize request/response or session", e);

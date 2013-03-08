@@ -22,6 +22,7 @@ package org.xwiki.localization;
 import java.util.Locale;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide various localization related contextual informations (current Locale, etc.).
@@ -30,10 +31,11 @@ import org.xwiki.component.annotation.Role;
  * @since 4.3M2
  */
 @Role
+@Unstable
 public interface LocalizationContext
 {
     /**
-     * @return the Locale to use by default in the current context
+     * @return the {@link Locale} to use by default in the current context
      */
     Locale getCurrentLocale();
 }

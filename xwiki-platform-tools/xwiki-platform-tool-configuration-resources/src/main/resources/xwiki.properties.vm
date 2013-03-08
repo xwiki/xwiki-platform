@@ -442,6 +442,15 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.repositories.privatemavenid.auth.user=someuser
 # extension.repositories.privatemavenid.auth.password=thepassword
 #-# 
+#-# Here's an example to add your local Maven Repository
+## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
+## Apache Commons Configuration syntax for specifying the user.home system property!
+#set ($userHome = '${sys:user.home}')
+# extension.repositories=local:maven:file://${userHome}/.m2/repository
+#-#
+#-# And an example to add the XWiki Maven Snapshot Repository
+# extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
+#-#
 #-# The default is:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/

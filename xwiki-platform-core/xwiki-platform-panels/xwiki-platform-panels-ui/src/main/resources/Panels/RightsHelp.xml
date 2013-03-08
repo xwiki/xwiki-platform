@@ -142,7 +142,6 @@
 )))## xwikirightshelp
 #panelfooter()
 )))## xwikirightshelppanel
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
 $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
 {{html clean="false"}}
 &lt;script type="text/javascript"&gt;

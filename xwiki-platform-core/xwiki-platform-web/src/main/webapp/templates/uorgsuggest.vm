@@ -25,7 +25,7 @@ $response.setContentType("text/xml")
       icon="$escapetool.xml($avatarURL.url)">$escapetool.xml($userStringReference)</rs>
   #end
 #else ## groups
-  #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups where lower(doc.name) like :input order by doc.name')
+  #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups where lower(doc.name) like :input and doc.fullName <> ''XWiki.XWikiGroupTemplate'' order by doc.name')
   #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter("unique"))
   #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
   #foreach($group in $query.execute())

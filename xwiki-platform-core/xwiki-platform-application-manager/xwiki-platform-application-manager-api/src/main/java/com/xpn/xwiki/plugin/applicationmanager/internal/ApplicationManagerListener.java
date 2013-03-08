@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -65,6 +66,12 @@ public class ApplicationManagerListener implements EventListener
         }
     };
 
+    /**
+     * Used to access translations.
+     */
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     @Inject
     private Logger logger;
 
@@ -72,17 +79,6 @@ public class ApplicationManagerListener implements EventListener
      * Protected API for managing applications.
      */
     private ApplicationManager applicationManager;
-
-    private ApplicationManagerMessageTool messageTool;
-
-    private ApplicationManagerMessageTool getApplicationManagerMessageTool(XWikiContext xcontext)
-    {
-        if (this.messageTool == null) {
-            this.messageTool = ApplicationManagerMessageTool.getDefault(xcontext);
-        }
-
-        return this.messageTool;
-    }
 
     @Override
     public List<Event> getEvents()
@@ -109,16 +105,15 @@ public class ApplicationManagerListener implements EventListener
                 getApplicationManager(xcontext).updateAllApplicationTranslation(xcontext);
             }
         } catch (XWikiException e) {
-            this.logger.error(
-                getApplicationManagerMessageTool(xcontext).get(
-                    ApplicationManagerMessageTool.LOG_AUTOUPDATETRANSLATIONS, document.getFullName()), e);
+            this.logger.error(this.localizationManager.getTranslationPlain(
+                ApplicationManagerMessageTool.LOG_AUTOUPDATETRANSLATIONS, document.getFullName()), e);
         }
     }
 
     private ApplicationManager getApplicationManager(XWikiContext xcontext)
     {
         if (this.applicationManager == null) {
-            this.applicationManager = new ApplicationManager(getApplicationManagerMessageTool(xcontext));
+            this.applicationManager = new ApplicationManager();
         }
 
         return this.applicationManager;

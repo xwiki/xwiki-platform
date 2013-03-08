@@ -265,5 +265,8 @@ public class DefaultStringEntityReferenceSerializerTest
 
         reference = new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
         Assert.assertEquals("space.page", serializer.serialize(reference));
+
+        // Ensure that the page part is not displayed in the serialized result
+        Assert.assertEquals("space", serializer.serialize(reference.extractReference(EntityType.SPACE)));
     }
 }

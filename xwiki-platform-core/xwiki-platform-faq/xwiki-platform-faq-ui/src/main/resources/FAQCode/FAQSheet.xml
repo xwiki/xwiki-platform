@@ -36,13 +36,13 @@
         {{/context}}
       #else
         {{error}}
-          No answer has been provided yet for this FAQ entry. Be the first to provide one! Register on this wiki and edit this page to add an answer to this FAQ entry.
+          $services.localization.render('platform.faq.noAnswer')
         {{/error}}
       #end
     #else
       $doc.display("answer")
     #end
 #else
-  This class sheet must be applied on a document containing an FAQCode.FAQClass object
+  $services.localization.render('platform.faq.sheet')
 #end</content>
 </xwikidoc>

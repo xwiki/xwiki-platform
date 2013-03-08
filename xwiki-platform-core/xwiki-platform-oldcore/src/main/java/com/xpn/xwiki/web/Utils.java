@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
@@ -176,7 +177,14 @@ public class Utils
                 }
             }
 
-            if (write) {
+            // We only write if the caller has asked and if the response isn't 302 which signify that a send redirect
+            // has already been called and thus we shouldn't write anymore to the servlet output stream!
+            // See: http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#sendRedirect(String)
+            // "After using this method, the response should be considered to be committed and should not be written
+            // to."
+            if (write && (!(response instanceof XWikiServletResponse) || ((response instanceof XWikiServletResponse)
+                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND)))
+            {
                 try {
                     try {
                         response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));

@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.script.service.ScriptService;
@@ -49,12 +50,10 @@ import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.wikimanager.WikiManager;
-import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.internal.WikiManagerScriptService;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Implementation of a <tt>WorkspaceManager</tt> component.
@@ -111,23 +110,19 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     @Named("wikimanager")
     private ScriptService wikiManagerService;
 
+    /**
+     * Used to access translations.
+     */
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     /** Internal wiki manager tookit required to overcome the rights checking of the API. */
     private WikiManager wikiManagerInternal;
-
-    /** The message tool to use to generate errors or comments. */
-    private XWikiMessageTool messageTool;
 
     @Override
     public void initialize() throws InitializationException
     {
-        XWikiContext deprecatedContext = getXWikiContext();
-
-        /* Should be ok if we initialize and cache message tools with the current context. */
-
-        WikiManagerMessageTool wikiManagerMessageTool = WikiManagerMessageTool.getDefault(deprecatedContext);
-        this.wikiManagerInternal = new WikiManager(wikiManagerMessageTool);
-
-        this.messageTool = new WorkspaceManagerMessageTool(deprecatedContext);
+        this.wikiManagerInternal = new WikiManager();
     }
 
     /**
@@ -194,7 +189,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
                 logger.error("Failed to check if user [{}] can edit workspace [{}]. Assuming false.", new Object[] {
-                userName, workspaceName, e});
+                    userName, workspaceName, e});
             }
 
             return false;
@@ -225,7 +220,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {
                 logger.error("Failed to check if user [{}] can delete workspace [{}]. Assuming false.", new Object[] {
-                userName, workspaceName, e});
+                    userName, workspaceName, e});
             }
 
             return false;
@@ -273,7 +268,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         String workspaceOwner = newWikiXObjectDocument.getOwner();
 
         try {
-            initializeOwner(workspaceName, workspaceOwner, comment, deprecatedContext);
+            initializeOwner(workspaceName, workspaceOwner, comment);
         } catch (Exception e) {
             logger.error("Failed to add owner to workspace group for workspace [{}].", workspaceName, e);
         }
@@ -282,7 +277,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         XWikiDocument wikiDocument = newWikiXObjectDocument.getDocument();
 
         try {
-            initializeMarker(wikiDocument, comment, deprecatedContext);
+            initializeMarker(wikiDocument, comment);
         } catch (Exception e) {
             logger.error("Failed to add workspace marker for workspace [{}].", workspaceName, e);
         }
@@ -294,45 +289,56 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
     /**
      * Initialize a newly created workspace by explicitly adding its owner in the XWikiAllGroup and XWikiAdminGroup
-     * local groups.
+     * local groups, only if he's not already a member.
      * 
      * @param workspaceName the workspace to initialize
      * @param workspaceOwner the owner user name to be used in the process
      * @param comment the comment used when saving the group documents
-     * @param deprecatedContext the XWikiContext instance to use
      * @throws Exception if problems occur
      */
-    private static void initializeOwner(String workspaceName, String workspaceOwner, String comment,
-        XWikiContext deprecatedContext) throws Exception
+    private void initializeOwner(String workspaceName, String workspaceOwner, String comment) throws Exception
     {
+        /* Add user as workspace member. */
+        DocumentReference workspaceGroupReference =
+            new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
+        addUserToGroupIfNotAlreadyMember(workspaceOwner, workspaceGroupReference, comment);
+
+        /* Add user as workspace admin. */
+        DocumentReference workspaceAdminGroupReference =
+            new DocumentReference(workspaceName, XWIKI_SPACE, "XWikiAdminGroup");
+        addUserToGroupIfNotAlreadyMember(workspaceOwner, workspaceAdminGroupReference, comment);
+    }
+
+    /**
+     * Adds a user to a group if the user is not already a member.
+     * 
+     * @param userStringReference serialized reference of the user to add
+     * @param workspaceGroupReference the group document where to add the user
+     * @param comment optional comment used when saving the group documents
+     * @throws Exception if problems occur
+     */
+    private void addUserToGroupIfNotAlreadyMember(String userStringReference,
+        DocumentReference workspaceGroupReference, String comment) throws Exception
+    {
+        XWikiContext deprecatedContext = getXWikiContext();
+        XWiki xwiki = deprecatedContext.getWiki();
+
         String currentWikiName = deprecatedContext.getDatabase();
         try {
-            deprecatedContext.setDatabase(workspaceName);
+            deprecatedContext.setDatabase(workspaceGroupReference.getWikiReference().getName());
 
-            XWiki wiki = deprecatedContext.getWiki();
-            DocumentReference groupClassReference = wiki.getGroupClass(deprecatedContext).getDocumentReference();
+            DocumentReference groupClassReference = xwiki.getGroupClass(deprecatedContext).getDocumentReference();
+            XWikiDocument workspaceGroupDocument = xwiki.getDocument(workspaceGroupReference, deprecatedContext);
 
-            /* Add user as workspace member. */
-            DocumentReference workspaceGroupReference =
-                new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
-            XWikiDocument workspaceGroupDocument = wiki.getDocument(workspaceGroupReference, deprecatedContext);
+            BaseObject workspaceGroupObject =
+                workspaceGroupDocument
+                    .getXObject(groupClassReference, GROUP_CLASS_MEMBER_PROPERTY, userStringReference);
+            if (workspaceGroupObject == null) {
+                workspaceGroupObject = workspaceGroupDocument.newXObject(groupClassReference, deprecatedContext);
+                workspaceGroupObject.setStringValue(GROUP_CLASS_MEMBER_PROPERTY, userStringReference);
 
-            BaseObject workspaceGroupObject = workspaceGroupDocument.newXObject(groupClassReference, deprecatedContext);
-            workspaceGroupObject.setStringValue(GROUP_CLASS_MEMBER_PROPERTY, workspaceOwner);
-
-            wiki.saveDocument(workspaceGroupDocument, comment, deprecatedContext);
-
-            /* Add user as workspace admin. */
-            DocumentReference workspaceAdminGroupReference =
-                new DocumentReference(workspaceName, XWIKI_SPACE, "XWikiAdminGroup");
-            XWikiDocument workspaceAdminGroupDocument =
-                wiki.getDocument(workspaceAdminGroupReference, deprecatedContext);
-
-            BaseObject workspaceAdminGroupObject =
-                workspaceAdminGroupDocument.newXObject(groupClassReference, deprecatedContext);
-            workspaceAdminGroupObject.setStringValue(GROUP_CLASS_MEMBER_PROPERTY, workspaceOwner);
-
-            wiki.saveDocument(workspaceAdminGroupDocument, comment, deprecatedContext);
+                xwiki.saveDocument(workspaceGroupDocument, comment, deprecatedContext);
+            }
 
             // FIXME: See if we need to update the group service cache.
             // try {
@@ -349,12 +355,12 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     /**
      * @param wikiDocument the wiki descriptor document to initialize
      * @param comment the comment used when saving the wiki descriptor document
-     * @param deprecatedContext the XWikiContext instance to use
      * @throws Exception if problems occur
      */
-    private static void initializeMarker(XWikiDocument wikiDocument, String comment, XWikiContext deprecatedContext)
-        throws Exception
+    private void initializeMarker(XWikiDocument wikiDocument, String comment) throws Exception
     {
+        XWikiContext deprecatedContext = getXWikiContext();
+
         String mainWikiName = deprecatedContext.getMainXWiki();
         DocumentReference workspaceClassReference =
             new DocumentReference(mainWikiName, WORKSPACE_MANAGER_SPACE, WORKSPACE_CLASS);
@@ -448,6 +454,13 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
         } catch (Exception e) {
             throw new WorkspaceException("Failed to save modifications.", e);
         }
+
+        // Re-initialize the owner of the workspace, since it could have changed
+        try {
+            this.initializeOwner(workspaceName, modifiedWikiXObjectDocument.getOwner(), "New owner");
+        } catch (Exception e) {
+            throw new WorkspaceException("Failed to add the new owner to the workspace all and admin groups.", e);
+        }
     }
 
     /**
@@ -466,7 +479,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
         Iterator<String> itfields = source.getPropertyList().iterator();
         while (itfields.hasNext()) {
-            String name = (String) itfields.next();
+            String name = itfields.next();
             destination.safeput(name, (PropertyInterface) ((BaseElement) source.safeget(name)).clone());
         }
     }
@@ -491,8 +504,8 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
 
             XWikiServer wikiDescriptor = wikiDocument.getFirstWikiAlias();
             if (wikiDescriptor == null || wikiDescriptor.isNew()) {
-                throw new WorkspaceException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
-                    Arrays.asList(workspaceName)));
+                throw new WorkspaceException(this.localizationManager.getTranslationPlain(
+                    WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID, Arrays.asList(workspaceName)));
             }
 
             BaseObject workspaceObject = getWorkspaceObject(wikiDocument);
@@ -503,17 +516,18 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             DocumentReference groupReference =
                 new DocumentReference(workspaceName, Workspace.WORKSPACE_GROUP_SPACE, Workspace.WORKSPACE_GROUP_PAGE);
             if (!xwiki.exists(groupReference, deprecatedContext)) {
-                throw new WorkspaceException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID,
-                    Arrays.asList(workspaceName)));
+                throw new WorkspaceException(this.localizationManager.getTranslationPlain(
+                    WorkspaceManagerMessageTool.ERROR_WORKSPACEINVALID, Arrays.asList(workspaceName)));
             }
 
             result =
                 new DefaultWorkspace(wikiDocument, wikiDescriptor, new Document(xwiki.getDocument(groupReference,
                     deprecatedContext), deprecatedContext));
         } catch (Exception e) {
-            logAndThrowException(
-                messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEGET, Arrays.asList(workspaceName,
-                    e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage())), e);
+            logAndThrowException(this.localizationManager.getTranslationPlain(
+                WorkspaceManagerMessageTool.ERROR_WORKSPACEGET,
+                Arrays.asList(workspaceName, e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage())),
+                e);
         }
 
         return result;
@@ -535,14 +549,14 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
                     }
                 } catch (Exception e) {
                     /* Log and skip. */
-                    logger.warn(
-                        messageTool.get(WorkspaceManagerMessageTool.LOG_WORKSPACEINVALID,
-                            Arrays.asList(wiki.getWikiName())), e);
+                    logger.warn(this.localizationManager.getTranslationPlain(
+                        WorkspaceManagerMessageTool.LOG_WORKSPACEINVALID, Arrays.asList(wiki.getWikiName())), e);
                     continue;
                 }
             }
         } catch (Exception e) {
-            logAndThrowException(messageTool.get(WorkspaceManagerMessageTool.ERROR_WORKSPACEGETALL), e);
+            logAndThrowException(
+                this.localizationManager.getTranslationPlain(WorkspaceManagerMessageTool.ERROR_WORKSPACEGETALL), e);
         }
 
         return result;

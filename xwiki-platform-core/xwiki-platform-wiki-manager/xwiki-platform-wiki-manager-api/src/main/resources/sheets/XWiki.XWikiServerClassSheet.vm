@@ -132,7 +132,7 @@
             <fieldset>
               <legend>$doc.display("server", $wikiAlias.objectApi)</legend>
               ##
-	          <br />
+              <br />
               <dl>
                 <dt>$msg.get("wikimanager.prop.alias.description"):</dt>
                   <dd>
@@ -150,7 +150,7 @@
                   </dd>
               </dl>
         #if ($xcontext.action == "view")
-  	          <br />
+              <br />
               <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
               <input type="hidden" name="action" value="delete"/>
               <input type="hidden" name="domain" value="$wikiAlias.server"/>

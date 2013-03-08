@@ -19,92 +19,37 @@
  */
 package org.xwiki.rendering.internal.transformation.macro;
 
-import java.util.Arrays;
-import java.util.Collections;
+import static org.mockito.Mockito.*;
+import junit.framework.Assert;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link CurrentMacroDocumentReferenceResolver}.
- *
+ * 
  * @version $Id$
- * @since 4.3M1
+ * @since 5.0M1
  */
-@MockingRequirement(CurrentMacroDocumentReferenceResolver.class)
 public class CurrentMacroDocumentReferenceResolverTest
-    extends AbstractMockingComponentTestCase<CurrentMacroDocumentReferenceResolver>
 {
-    @Test
-    public void resolveWhenNoBlockPassed() throws Exception
-    {
-        try {
-            getMockedComponent().resolve("something");
-            Assert.fail("Should have thrown an IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("You must pass one parameter of type [org.xwiki.rendering.block.Block]",
-                expected.getMessage());
-        }
-    }
+    @Rule
+    public MockitoComponentMockingRule<DocumentReferenceResolver<String>> mocker =
+        new MockitoComponentMockingRule<DocumentReferenceResolver<String>>(CurrentMacroDocumentReferenceResolver.class);
 
     @Test
-    public void resolveWhenWrongParameterPassed() throws Exception
+    public void resolve() throws Exception
     {
-        try {
-            getMockedComponent().resolve("something", "wrong param type must be Block");
-            Assert.fail("Should have thrown an IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("You must pass one parameter of type [org.xwiki.rendering.block.Block]",
-                expected.getMessage());
-        }
-    }
-
-    @Test
-    public void resolveWhenNoMetaDataBlock() throws Exception
-    {
-        final DocumentReference expectedReference = new DocumentReference("wiki", "space", "page");
-        final DocumentReferenceResolver currentDocumentReferenceResolver = getComponentManager().getInstance(
-            DocumentReferenceResolver.TYPE_STRING, "current");
-        getMockery().checking(new Expectations() {{
-            oneOf(currentDocumentReferenceResolver).resolve("space.page");
-            will(returnValue(expectedReference));
-        }});
-
-        final Block block = new WordBlock("whatever");
-        DocumentReference reference = getMockedComponent().resolve("space.page", block);
-        Assert.assertEquals(expectedReference, reference);
-    }
-
-    @Test
-    public void resolveWhenMetaDataBlock() throws Exception
-    {
-        final DocumentReference expectedReference = new DocumentReference("basewiki", "basespace", "page");
-        final DocumentReference baseReference = new DocumentReference("basewiki", "basespace", "basepage");
-        final DocumentReferenceResolver currentDocumentReferenceResolver = getComponentManager().getInstance(
-                DocumentReferenceResolver.TYPE_STRING, "current");
-        getMockery().checking(new Expectations() {{
-            oneOf(currentDocumentReferenceResolver).resolve("basewiki:basespace.basepage");
-            will(returnValue(baseReference));
-            oneOf(currentDocumentReferenceResolver).resolve("page", baseReference);
-            will(returnValue(expectedReference));
-        }});
-
-        Block wordBlock = new WordBlock("whatever");
-        MetaData metaData = new MetaData(
-            Collections.<String, Object> singletonMap(MetaData.BASE, "basewiki:basespace.basepage"));
-        new XDOM(Arrays.<Block>asList(new MetaDataBlock(Arrays.<Block>asList(wordBlock), metaData)));
-
-        DocumentReference reference = getMockedComponent().resolve("page", wordBlock);
-        Assert.assertEquals(expectedReference, reference);
+        EntityReference result = new DocumentReference("wiki", "Space", "Page");
+        EntityReferenceResolver<String> macroEntityReferenceResolver =
+            mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "macro");
+        when(macroEntityReferenceResolver.resolve("reference", EntityType.DOCUMENT, "parameter")).thenReturn(result);
+        Assert.assertEquals(result, mocker.getComponentUnderTest().resolve("reference", "parameter"));
     }
 }

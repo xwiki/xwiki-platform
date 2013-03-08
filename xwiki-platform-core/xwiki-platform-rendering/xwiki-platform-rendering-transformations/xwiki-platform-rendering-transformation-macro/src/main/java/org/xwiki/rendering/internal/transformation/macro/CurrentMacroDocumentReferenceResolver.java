@@ -24,20 +24,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
-import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Resolves a String reference, usually passed as a Macro parameter, into a {@link DocumentReference}, using any
- * {@link MetaDataBlock} with a {@link MetaData#BASE} setting to resolve the any relative reference parts into a fully
- * resolved object.
- *
+ * A {@link CurrentMacroEntityReferenceResolver} specialized for {@link DocumentReference}s.
+ * 
  * @version $Id$
  * @since 4.3M1
+ * @see CurrentMacroEntityReferenceResolver
  */
 @Component
 @Named("macro")
@@ -45,37 +42,16 @@ import org.xwiki.rendering.listener.MetaData;
 public class CurrentMacroDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
     /**
-     * Used to resolve references.
+     * The generic resolver.
      */
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    @Named("macro")
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
-        // There must one parameter and it must be of type Block
-        if (parameters.length != 1 || !(parameters[0] instanceof Block)) {
-            throw new IllegalArgumentException(
-                String.format("You must pass one parameter of type [%s]", Block.class.getName()));
-        }
-
-        Block currentBlock = (Block) parameters[0];
-
-        DocumentReference result;
-
-        MetaDataBlock metaDataBlock =
-            currentBlock.getFirstBlock(new MetadataBlockMatcher(MetaData.BASE), Block.Axes.ANCESTOR);
-
-        // If no Source MetaData was found resolve against the current document as a failsafe solution.
-        if (metaDataBlock == null) {
-            result = this.currentDocumentReferenceResolver.resolve(documentReferenceRepresentation);
-        } else {
-            String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.BASE);
-            result = this.currentDocumentReferenceResolver.resolve(documentReferenceRepresentation,
-                this.currentDocumentReferenceResolver.resolve(sourceMetaData));
-        }
-
-        return result;
+        return new DocumentReference(macroEntityReferenceResolver.resolve(documentReferenceRepresentation,
+            EntityType.DOCUMENT, parameters));
     }
 }

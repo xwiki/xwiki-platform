@@ -41,39 +41,35 @@
 ## Wikis
 #foreach($wiki in $wikis)
   #if("$!wiki" != '')
-    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
-    #set($wikiDoc = $xwiki.getDocument($wikiRef))
-    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiDoc.getURL(), $msg.get('watchlist.table.allspaces'), '', $msg.get('watchlist.table.alldocuments'), '', $wikiDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
+    #set($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
+    #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
+    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiHomeDoc.getURL(), $msg.get('watchlist.table.allspaces'), '', $msg.get('watchlist.table.alldocuments'), '', $wikiHomeDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
   #end
 #end
 ## Spaces
 #foreach($space in $spaces)
   #if("$!space" != '')
-    #set($wiki = $space.substring(0, $space.indexOf(':')))
-    #set($dotsindex = $space.indexOf(':') + 1)
-    #set($spaceName = $space.substring($dotsindex))
-    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
-    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
-    #set($wikiDoc = $xwiki.getDocument($wikiRef))
-    #set($spaceDoc = $xwiki.getDocument($spaceRef))
-    #set($discard = $elements.add([$space, $spaceType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $msg.get('watchlist.table.alldocuments'), '', $spaceDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
+    #set($spaceRef = $services.model.resolveSpace($space))
+    #set($wiki = $spaceRef.parent.name)
+    #set($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
+    #set($spaceHomeDocRef = $services.model.createDocumentReference($wiki, $spaceRef.name, '', 'default'))
+    #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
+    #set($spaceHomeDoc = $xwiki.getDocument($spaceHomeDocRef))
+    #set($discard = $elements.add([$spaceRef.name, $spaceType, $wiki, $wikiHomeDoc.getURL(), $spaceRef.name, $spaceHomeDoc.getURL(), $msg.get('watchlist.table.alldocuments'), '', $spaceHomeDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
   #end
 #end
 ## Pages
 #foreach($page in $pages)
   #if ("$!page" != '')
-    #set($wiki = $page.substring(0, $page.indexOf(':')))
-    #set($dotsindex = $page.indexOf(':') + 1)
-    #set($spaceName = $page.substring($dotsindex, $page.indexOf('.')))
-    #set($dotindex = $page.indexOf('.') + 1)
-    #set($pageName = $page.substring($dotindex))
-    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
-    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
-    #set($pageRef = $services.model.createDocumentReference($wiki, $spaceName, $pageName))
-    #set($wikiDoc = $xwiki.getDocument($wikiRef))
-    #set($spaceDoc = $xwiki.getDocument($spaceRef))
+    #set($pageRef = $services.model.resolveDocument($page))
+    #set($wiki = $pageRef.wikiReference.name)
+    #set($spaceName = $pageRef.lastSpaceReference.name)
+    #set($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
+    #set($spaceHomeDocRef = $services.model.createDocumentReference($wiki, $spaceName, '', 'default'))
+    #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
+    #set($spaceHomeDoc = $xwiki.getDocument($spaceHomeDocRef))
     #set($pageDoc = $xwiki.getDocument($pageRef))
-    #set($discard = $elements.add([$page, $pageType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $pageName, $pageDoc.getURL(), $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')]))
+    #set($discard = $elements.add([$page, $pageType, $wiki, $wikiHomeDoc.getURL(), $spaceName, $spaceHomeDoc.getURL(), $pageRef.name, $pageDoc.getURL(), $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')]))
   #end
 #end
 ##

@@ -19,8 +19,11 @@
  */
 package org.xwiki.gwt.user.client.ui.rta;
 
+import org.xwiki.gwt.dom.client.CopyEvent;
+import org.xwiki.gwt.dom.client.CopyHandler;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.dom.client.HasCopyHandlers;
 import org.xwiki.gwt.dom.client.HasPasteHandlers;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.dom.client.PasteEvent;
@@ -53,7 +56,7 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
  * @version $Id$
  */
 public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers,
-    HasLoadHandlers, LoadHandler, HasPasteHandlers, HasActionHandlers, ClosingHandler
+    HasLoadHandlers, LoadHandler, HasPasteHandlers, HasCopyHandlers, HasActionHandlers, ClosingHandler
 {
     /**
      * @see #setHTML(String)
@@ -220,6 +223,15 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public HandlerRegistration addPasteHandler(PasteHandler handler)
     {
         return addDomHandler(handler, PasteEvent.getType());
+    }
+
+    @Override
+    public HandlerRegistration addCopyHandler(CopyHandler handler)
+    {
+        // FIXME: We should use addDomHandler(handler, CopyEvent.getType()) but GWT currently doesn't support the copy
+        // event type and throws "Trying to sink unknown event type copy".
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=4030 .
+        return addHandler(handler, CopyEvent.getType());
     }
 
     @Override

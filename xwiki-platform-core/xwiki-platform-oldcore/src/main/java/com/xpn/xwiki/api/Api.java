@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -160,5 +161,31 @@ public class Api
             }
         }
         return XWikiRightService.GUEST_USER;
+    }
+
+    /**
+     * Convert an internal representation of an attachment to the public api Attachment.
+     *
+     * @param xattach The internal XWikiAttachment object
+     * @return The public api Attachment object
+     */
+    protected Attachment convert(XWikiAttachment xattach)
+    {
+        return xattach == null ? null : new Attachment(convert(xattach.getDoc()), xattach, this.context);
+    }
+
+    /**
+     * Convert a list of attachments in their internal form to a list of public api Attachments.
+     *
+     * @param xattaches The List of XWikiAttachment objects
+     * @return A List of Attachment objects
+     */
+    protected List<Attachment> convertAttachments(List<XWikiAttachment> xattaches)
+    {
+        List<Attachment> outList = new ArrayList<Attachment>(xattaches.size());
+        for (XWikiAttachment xattach : xattaches) {
+            outList.add(convert(xattach));
+        }
+        return outList;
     }
 }

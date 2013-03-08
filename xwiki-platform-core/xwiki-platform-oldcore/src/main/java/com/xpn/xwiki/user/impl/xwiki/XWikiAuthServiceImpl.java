@@ -54,7 +54,7 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Default implementation of {@link XWikiAuthService}.
+ * Default implementation of {@link com.xpn.xwiki.user.api.XWikiAuthService}.
  * 
  * @version $Id$
  */
@@ -223,14 +223,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         long time = System.currentTimeMillis();
 
         HttpServletRequest request = null;
-        HttpServletResponse response = null;
+        HttpServletResponse response = context.getResponse();
 
         if (context.getRequest() != null) {
             request = context.getRequest().getHttpServletRequest();
-        }
-
-        if (context.getResponse() != null) {
-            response = context.getResponse().getHttpServletResponse();
         }
 
         if (request == null) {
@@ -286,14 +282,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         throws XWikiException
     {
         HttpServletRequest request = null;
-        HttpServletResponse response = null;
+        HttpServletResponse response = context.getResponse();
 
         if (context.getRequest() != null) {
             request = context.getRequest().getHttpServletRequest();
-        }
-
-        if (context.getResponse() != null) {
-            response = context.getResponse().getHttpServletResponse();
         }
 
         if (request == null) {
@@ -349,8 +341,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     {
         try {
             if (context.getMode() == XWikiContext.MODE_SERVLET) {
-                getAuthenticator(context).showLogin(context.getRequest().getHttpServletRequest(),
-                    context.getResponse().getHttpServletResponse(), context);
+                getAuthenticator(context).showLogin(context.getRequest().getHttpServletRequest(), context.getResponse(),
+                    context);
             }
         } catch (IOException e) {
             LOGGER.error("Unknown failure when calling showLogin", e);

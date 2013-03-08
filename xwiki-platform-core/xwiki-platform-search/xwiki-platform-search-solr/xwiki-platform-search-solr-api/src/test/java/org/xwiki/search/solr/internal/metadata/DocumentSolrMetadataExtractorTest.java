@@ -53,13 +53,9 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -71,9 +67,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -85,22 +78,21 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * 
  * @version $Id$
  */
-@ComponentList({DefaultStringEntityReferenceSerializer.class, LocalStringEntityReferenceSerializer.class,
-RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceResolver.class,
-CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvider.class})
+@ComponentList({DefaultStringEntityReferenceSerializer.class, LocalStringEntityReferenceSerializer.class})
 public class DocumentSolrMetadataExtractorTest
 {
     @Rule
     public final MockitoComponentMockingRule<SolrMetadataExtractor> mocker = new MockitoComponentMockingRule(
-        DocumentSolrMetadataExtractor.class, SolrMetadataExtractor.class, "document", Arrays.asList(
-            EntityReferenceSerializer.class, DocumentReferenceResolver.TYPE_REFERENCE,
-            EntityReferenceResolver.TYPE_REFERENCE, EntityReferenceValueProvider.class));
+        DocumentSolrMetadataExtractor.class, SolrMetadataExtractor.class, "document",
+        Arrays.asList(EntityReferenceSerializer.class));
 
     private XWikiContext mockContext;
 
     private XWikiDocument mockDocument;
 
     private XWiki mockXWiki;
+
+    private DocumentAccessBridge mockDab;
 
     private DocumentReference documentReference;
 
@@ -181,7 +173,7 @@ public class DocumentSolrMetadataExtractorTest
         when(mockDocument.getRealLanguage()).thenReturn(language);
         when(mockDocument.getTranslatedDocument(any(String.class), eq(mockContext))).thenReturn(mockDocument);
 
-        DocumentAccessBridge mockDab = mocker.getInstance(DocumentAccessBridge.class);
+        mockDab = mocker.getInstance(DocumentAccessBridge.class);
         when(mockDab.getDocument(documentReference)).thenReturn(mockDocument);
 
         BlockRenderer mockPlainRenderer = mocker.getInstance(BlockRenderer.class, "plain/1.0");
@@ -215,7 +207,7 @@ public class DocumentSolrMetadataExtractorTest
     }
 
     @Test
-    public void testGetIdLanguageInLocale() throws Exception
+    public void getIdLanguageInLocale() throws Exception
     {
         DocumentSolrMetadataExtractor extractor = (DocumentSolrMetadataExtractor) mocker.getComponentUnderTest();
 
@@ -230,57 +222,40 @@ public class DocumentSolrMetadataExtractorTest
     }
 
     @Test
-    public void testGetIdLanguageInDatabase() throws Exception
+    public void getIdLanguageInDatabase() throws Exception
     {
         DocumentSolrMetadataExtractor extractor = (DocumentSolrMetadataExtractor) mocker.getComponentUnderTest();
 
-        // No locale provided.
-        DocumentReference reference = new DocumentReference("wiki", "space", "name");
-
-        // Mock
-
-        XWikiDocument mockDocument = mock(XWikiDocument.class);
-        when(mockDocument.getRealLanguage()).thenReturn("en");
-
-        DocumentAccessBridge mockDab = mocker.getInstance(DocumentAccessBridge.class);
-        when(mockDab.getDocument(reference)).thenReturn(mockDocument);
-
         // Call
-        String id = extractor.getId(reference);
+        String id = extractor.getId(documentReference);
 
         // Assert and verify
         Assert.assertEquals("wiki:space.name_en", id);
-        verify(mockDab, atMost(2)).getDocument(reference);
+        verify(mockDab, atMost(2)).getDocument(documentReference);
         verify(mockDocument, atMost(2)).getRealLanguage();
     }
 
     @Test
-    public void testGetIdLanguageNotAvailable() throws Exception
+    public void getIdLanguageNotAvailable() throws Exception
     {
         DocumentSolrMetadataExtractor extractor = (DocumentSolrMetadataExtractor) mocker.getComponentUnderTest();
 
-        // No locale provided.
-        DocumentReference reference = new DocumentReference("wiki", "space", "name");
-
         // Mock
 
-        XWikiDocument mockDocument = mock(XWikiDocument.class);
+        // Empty string returned as language. The default "en" will be used.
         when(mockDocument.getRealLanguage()).thenReturn("");
 
-        DocumentAccessBridge mockDab = mocker.getInstance(DocumentAccessBridge.class);
-        when(mockDab.getDocument(reference)).thenReturn(mockDocument);
-
         // Call
-        String id = extractor.getId(reference);
+        String id = extractor.getId(documentReference);
 
         // Assert and verify
         Assert.assertEquals("wiki:space.name_en", id);
-        verify(mockDab, times(1)).getDocument(reference);
+        verify(mockDab, times(1)).getDocument(documentReference);
         verify(mockDocument, times(1)).getRealLanguage();
     }
 
     @Test
-    public void testGetSimpleDocument() throws Exception
+    public void getSimpleDocument() throws Exception
     {
         // Mock
 
@@ -326,7 +301,7 @@ public class DocumentSolrMetadataExtractorTest
     }
 
     @Test
-    public void testGetDocumentWithObjects() throws Exception
+    public void getDocumentWithObjects() throws Exception
     {
         DocumentReference commentsClassReference = new DocumentReference("wiki", "space", "commentsClass");
         String commentContent = "This is a comment";
@@ -334,6 +309,7 @@ public class DocumentSolrMetadataExtractorTest
         Date commentDate = new Date();
         // Adding a fake password field to the comments class just to test the branch in the code.
         String commentPassword = "password";
+        List<String> commentList = Arrays.asList("a", "list");
 
         List<BaseProperty<EntityReference>> commentFields = new ArrayList<BaseProperty<EntityReference>>();
 
@@ -358,6 +334,11 @@ public class DocumentSolrMetadataExtractorTest
         when(mockPasswordField.getName()).thenReturn("password");
         when(mockPasswordField.getValue()).thenReturn(commentPassword);
         commentFields.add(mockPasswordField);
+
+        BaseProperty<EntityReference> mockListField = mock(BaseProperty.class);
+        when(mockListField.getName()).thenReturn("list");
+        when(mockListField.getValue()).thenReturn(commentList);
+        commentFields.add(mockListField);
 
         BaseClass mockXClass = mock(BaseClass.class);
 
@@ -397,7 +378,8 @@ public class DocumentSolrMetadataExtractorTest
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, language));
         MatcherAssert.assertThat(objectProperties, Matchers.containsInAnyOrder((Object) ("comment:" + commentContent),
-            (Object) ("author:" + commentAuthor), (Object) ("date:" + commentDate.toString())));
-        Assert.assertEquals(3, objectProperties.size());
+            (Object) ("author:" + commentAuthor), (Object) ("date:" + commentDate.toString()),
+            (Object) ("list:" + commentList.get(0)), (Object) ("list:" + commentList.get(1))));
+        Assert.assertEquals(5, objectProperties.size());
     }
 }

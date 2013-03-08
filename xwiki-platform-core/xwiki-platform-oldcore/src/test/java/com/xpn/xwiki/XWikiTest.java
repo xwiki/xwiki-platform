@@ -40,6 +40,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -86,6 +87,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         getContext().setRequest(new XWikiServletRequestStub());
         getContext().setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
 
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+        
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
             // Avoid all the error at XWiki initialization

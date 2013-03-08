@@ -325,8 +325,6 @@ document.observe("xwiki:dom:loaded", function(){
     <property>
       <code>function handleDebugClick(e){
     var toggl_text=$('debug_'+e.title);
-    console.log(e.title);
-    console.log(toggl_text);
     if(toggl_text.hasClassName('hidden')){
         toggl_text.removeClassName('hidden');
         toggl_text.addClassName('active');
@@ -338,7 +336,6 @@ document.observe("xwiki:dom:loaded", function(){
 
 
     function filterChange(cb){
-        console.log(cb);
         var filterDiv=$('filteredSearch');
         if(cb.checked){
             if(filterDiv.hasClassName('hidden')){
@@ -352,7 +349,6 @@ document.observe("xwiki:dom:loaded", function(){
     }
 
     function debugChange(cb){
-        console.log(cb);
         var debugDiv=$('search-debug');
         if(cb.checked){
             if(debugDiv.hasClassName('hidden')){

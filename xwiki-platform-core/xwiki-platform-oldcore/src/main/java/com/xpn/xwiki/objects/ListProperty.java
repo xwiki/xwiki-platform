@@ -50,12 +50,12 @@ public class ListProperty extends BaseProperty implements Cloneable
     private String formStringSeparator = "|";
 
     /**
-     * This is the actual list.  It will be used during serialization/deserialization.
+     * This is the actual list. It will be used during serialization/deserialization.
      */
     private List<String> actualList = new ArrayList<String>();
 
     {
-        list = new NotifyList(actualList, this);
+        this.list = new NotifyList(this.actualList, this);
     }
 
     public String getFormStringSeparator()
@@ -171,17 +171,17 @@ public class ListProperty extends BaseProperty implements Cloneable
     {
         // Hibernate will not set the owner of the notify list, so we must make sure this has been done before returning
         // the list.
-        if (list instanceof NotifyList) {
-            ((NotifyList) list).setOwner(this);
-        } else if (list instanceof ListPropertyPersistentList) {
-            ((ListPropertyPersistentList) list).setOwner(this);
+        if (this.list instanceof NotifyList) {
+            ((NotifyList) this.list).setOwner(this);
+        } else if (this.list instanceof ListPropertyPersistentList) {
+            ((ListPropertyPersistentList) this.list).setOwner(this);
         }
 
         return this.list;
     }
 
     /**
-     * Starting from 4.3M2, this method will copy the list passed as parameter.  Due to XWIKI-8398 we must be able to
+     * Starting from 4.3M2, this method will copy the list passed as parameter. Due to XWIKI-8398 we must be able to
      * detect when the values in the list changes, so we cannot store the values in any type of list.
      * 
      * @param list The list to copy.
@@ -191,7 +191,7 @@ public class ListProperty extends BaseProperty implements Cloneable
         if (list == this.list || list == this.actualList) {
             // Accept a caller that sets the already existing list instance.
             return;
-        } 
+        }
 
         if (this.list instanceof ListPropertyPersistentList) {
             ListPropertyPersistentList persistentList = (ListPropertyPersistentList) this.list;
@@ -211,8 +211,8 @@ public class ListProperty extends BaseProperty implements Cloneable
 
         if (list == null) {
             setValueDirty(true);
-            actualList = new ArrayList();
-            this.list = new NotifyList(actualList, this);
+            this.actualList = new ArrayList();
+            this.list = new NotifyList(this.actualList, this);
         } else {
             this.list.clear();
             this.list.addAll(list);
@@ -291,7 +291,7 @@ public class ListProperty extends BaseProperty implements Cloneable
             this.actualList = list;
         }
 
-        private NotifyList(List<String>list, ListProperty owner)
+        private NotifyList(List<String> list, ListProperty owner)
         {
             this(list);
 
@@ -309,11 +309,11 @@ public class ListProperty extends BaseProperty implements Cloneable
          */
         public void setOwner(ListProperty owner)
         {
-            if (dirty) {
+            if (this.dirty) {
                 owner.setValueDirty(true);
             }
             this.owner = owner;
-            owner.actualList = actualList;
+            owner.actualList = this.actualList;
         }
 
         /**
@@ -321,7 +321,7 @@ public class ListProperty extends BaseProperty implements Cloneable
          */
         public boolean isWrapper(Object collection)
         {
-            return actualList == collection;
+            return this.actualList == collection;
         }
 
         /**
@@ -329,10 +329,10 @@ public class ListProperty extends BaseProperty implements Cloneable
          */
         private void setDirty()
         {
-            if (owner != null) {
-                owner.setValueDirty(true);
+            if (this.owner != null) {
+                this.owner.setValueDirty(true);
             }
-            dirty = true;
+            this.dirty = true;
         }
     }
 }

@@ -8,7 +8,7 @@
 <div class="main layoutsubsection">
 <div id="mainContentArea">
 #if($doc.getObject("XWiki.XWikiUsers", 0))
-  #if($services.model.resolveDocument($xcontext.user) == $doc.documentReference || $hasAdmin)
+  #if($xcontext.userReference == $doc.documentReference || $hasAdmin)
     <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }" class="xform"><div>
       <div id="document-title"><h1>$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h1></div>
       ## CSRF prevention

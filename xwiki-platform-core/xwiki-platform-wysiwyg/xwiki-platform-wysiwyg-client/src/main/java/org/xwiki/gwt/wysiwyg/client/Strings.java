@@ -416,6 +416,12 @@ public interface Strings extends Constants
 
     String importOfficeContentFilterStylesCheckBoxLabel();
 
+    String importOfficeContentFilterStylesCheckBoxHint();
+
+    String importOfficeFileUseOfficeViewerCheckBoxLabel();
+
+    String importOfficeFileUseOfficeViewerCheckBoxHint();
+
     String importOfficeFileMenuItemCaption();
 
     String importOfficeFileFeatureNotAvailable();

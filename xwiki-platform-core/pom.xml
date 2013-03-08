@@ -34,9 +34,9 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.5.0-rc1</gwt.version>
-    <gwt.maven.plugin.version>2.5.0-rc1</gwt.maven.plugin.version>
-    <smartgwt.version>3.0</smartgwt.version>
+    <gwt.version>2.5.0</gwt.version>
+    <gwt.maven.plugin.version>2.5.0</gwt.maven.plugin.version>
+    <smartgwt.version>3.1</smartgwt.version>
     <!-- JS/CSS minification is on by default -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
   </properties>
@@ -331,6 +331,39 @@
                 * Thus we need to exclude it now that we've removed this getXWikiContext() ;)
               </justification>
             </difference>
+             <difference>
+               <differenceType>7006</differenceType>
+               <className>org/xwiki/localization/Translation</className>
+               <method>java.lang.String getRawSource()</method>
+               <to>java.lang.Object</to>
+               <justification>YOUNG API. There is no reason to limit it to String</justification>
+             </difference>
+             <difference>
+               <differenceType>7004</differenceType>
+               <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+               <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, com.xpn.xwiki.XWikiContext)</method>
+               <justification>Method introduce very recently and already and not supposed to be used (internal retro-compatibility stuff)</justification>
+             </difference>
+             <difference>
+               <differenceType>4000</differenceType>
+               <className>org/xwiki/localization/message/TranslationMessage</className>
+               <to>org/xwiki/localization/message/TranslationMessageElement</to>
+               <justification>YOUNG API. Forgot to move it out of internal when TranslationMessage has been</justification>
+             </difference>
+             <difference>
+               <differenceType>4001</differenceType>
+               <className>org/xwiki/localization/message/TranslationMessage</className>
+               <to>org/xwiki/localization/internal/message/TranslationMessageElement</to>
+               <justification>YOUNG API. Forgot to move it out of internal when TranslationMessage has been</justification>
+             </difference>
+            <!-- The following difference breaks CLIRR for some reason so I'm excluding the entire class below.
+            <difference>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>
+              <differenceType>7005</differenceType>
+              <method>void filter(com.google.gwt.dom.client.Document)</method>
+              <to>void filter(com.google.gwt.dom.client.Element)</to>
+              <justification>Nothing is broken because the method with a Document argument is still present but it is now inherited from PasteFilter.</justification>
+            </difference>-->
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -352,6 +385,10 @@
             <exclude>com/xpn/xwiki/gwt/api/server/XWikiRequestWrapper</exclude>
             <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</exclude>
             <exclude>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</exclude>
+            <!-- Added new translation keys. This interface is not meant to be implemented. -->
+            <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
+            <!-- Nothing broken here. CLIRR doesn't detect that a method is inherited from the base class. See the difference above. -->
+            <exclude>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -415,6 +452,7 @@
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-refactoring</module>
+    <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-repository</module>
     <module>xwiki-platform-rest</module>

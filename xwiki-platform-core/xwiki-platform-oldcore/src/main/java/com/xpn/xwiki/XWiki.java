@@ -99,7 +99,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
-import org.xwiki.localization.LocalizationManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -107,6 +107,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -119,6 +120,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.stability.Unstable;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
 import org.xwiki.xml.XMLUtils;
@@ -1410,6 +1412,7 @@ public class XWiki implements EventListener
     /**
      * @since 5.0M1
      */
+    @Unstable
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
         return getDocument(this.currentReferenceDocumentReferenceResolver.resolve(reference), context);
@@ -1790,7 +1793,8 @@ public class XWiki implements EventListener
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            XWikiDocument doc = getDocument(skin, context);
+            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
+            XWikiDocument doc = getDocument(skinReference, context);
             if (!doc.isNew()) {
                 // Try parsing the object property
                 BaseObject object =
@@ -1952,7 +1956,8 @@ public class XWiki implements EventListener
     {
         XWikiURLFactory urlf = context.getURLFactory();
         try {
-            XWikiDocument doc = getDocument(skin, context);
+            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
+            XWikiDocument doc = getDocument(skinReference, context);
             if (!doc.isNew()) {
                 // Look for an object property
                 BaseObject object =
@@ -2160,9 +2165,10 @@ public class XWiki implements EventListener
      */
     public String getBaseSkin(String skin, XWikiContext context)
     {
-        if (context.getWiki().exists(skin, context)) {
+        DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
+        if (context.getWiki().exists(skinReference, context)) {
             try {
-                return getDocument(skin, context).getStringValue("XWiki.XWikiSkins", "baseskin");
+                return getDocument(skinReference, context).getStringValue("XWiki.XWikiSkins", "baseskin");
             } catch (XWikiException e) {
                 // Do nothing and let return the empty string.
             }
@@ -2208,7 +2214,7 @@ public class XWiki implements EventListener
                 try {
                     result = object.getStringValue(prefname);
                 } catch (Exception e) {
-                    LOGGER.warn("Exception while getting wiki preference [" + prefname + "]", e);
+                    LOGGER.warn("Exception while getting wiki preference [{}]", prefname, e);
                 }
             }
             // If empty we take it from the default pref object
@@ -2223,7 +2229,7 @@ public class XWiki implements EventListener
                 return result;
             }
         } catch (Exception e) {
-            LOGGER.debug("Exception while getting wiki preference [" + prefname + "]", e);
+            LOGGER.debug("Exception while getting wiki preference [{}]", prefname, e);
         }
         return Param(fallback_param, default_value);
     }
@@ -2251,7 +2257,7 @@ public class XWiki implements EventListener
         // doc is not set).
         if (space != null) {
             try {
-                XWikiDocument doc = getDocument(space + ".WebPreferences", context);
+                XWikiDocument doc = getDocument(new LocalDocumentReference(space, "WebPreferences"), context);
 
                 // First we try to get a translated preference object
                 DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);
@@ -2275,8 +2281,7 @@ public class XWiki implements EventListener
     public String getUserPreference(String prefname, XWikiContext context)
     {
         try {
-            String user = context.getUser();
-            XWikiDocument userdoc = getDocument(user, context);
+            XWikiDocument userdoc = getDocument(context.getUserReference(), context);
             if (userdoc != null) {
                 String result = userdoc.getStringValue("XWiki.XWikiUsers", prefname);
                 if ((!result.equals("")) && (!result.equals("---"))) {
@@ -3605,13 +3610,7 @@ public class XWiki implements EventListener
             if (context.getResponse() != null) {
                 context.getResponse().setLocale(locale);
             }
-            ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", locale);
-            if (bundle == null) {
-                bundle = ResourceBundle.getBundle("ApplicationResources");
-            }
-            XWikiMessageTool msg =
-                new XWikiMessageTool(Utils.getComponent(LocalizationManager.class), Utils.getComponentManager(),
-                    context);
+            XWikiMessageTool msg = new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class));
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext != null) {
@@ -5062,14 +5061,18 @@ public class XWiki implements EventListener
         return getUserName(user, format, true, context);
     }
 
+    /**
+     * @return a formatted and pretty printed user name for displaying
+     */
     public String getUserName(String user, String format, boolean link, XWikiContext context)
     {
         if (StringUtils.isBlank(user)) {
-            return "";
+            return context.getMessageTool().get("core.users.unknownUser");
         }
         XWikiDocument userdoc = null;
         try {
-            userdoc = getDocument(user, context);
+            DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
+            userdoc = getDocument(userReference, context);
             if (userdoc == null) {
                 return XMLUtils.escape(user);
             }
@@ -5230,25 +5233,7 @@ public class XWiki implements EventListener
     @Deprecated
     public boolean exists(String fullname, XWikiContext context)
     {
-        String server = null, database = null;
-        try {
-            XWikiDocument doc = new XWikiDocument();
-            doc.setFullName(fullname, context);
-            server = doc.getDatabase();
-
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
-            }
-
-            return getStore().exists(doc, context);
-        } catch (XWikiException e) {
-            return false;
-        } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
-        }
+        return exists(this.currentMixedDocumentReferenceResolver.resolve(fullname), context);
     }
 
     public boolean exists(DocumentReference documentReference, XWikiContext context)
@@ -5256,7 +5241,7 @@ public class XWiki implements EventListener
         String server = null, database = null;
         try {
             XWikiDocument doc = new XWikiDocument(documentReference);
-            server = doc.getDatabase();
+            server = doc.getDocumentReference().getWikiReference().getName();
 
             if (server != null) {
                 database = context.getDatabase();
@@ -6631,4 +6616,76 @@ public class XWiki implements EventListener
         }
         return new DocumentReference("XWikiPreferences", new SpaceReference(spaceReference));
     }
+
+    /**
+     * Search attachments by passing HQL where clause values as parameters.
+     * You can specify properties of the "attach" (the attachment) or "doc" (the document it is attached to)
+     * 
+     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param nb The number of rows to return. If 0 then all rows are returned
+     * @param start The number of rows to skip at the beginning.
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @param XWikiContext The underlying context used for running the database query
+     * @return A List of {@link XWikiAttachment} objects.
+     * @throws XWikiException in case of error while performing the query
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, List)
+     * @since 5.0M2
+     */
+    @Unstable
+    public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        // Get the attachment filenames and document fullNames
+        List<java.lang.Object[]> results = this.getStore().search(
+            "select attach.filename, doc.fullName from XWikiAttachment attach, XWikiDocument doc where doc.id = attach.docId and "
+             + parametrizedSqlClause, nb, start, parameterValues, context);
+
+        HashMap<String, List<String>> filenamesByDocFullName = new HashMap<String, List<String>>();
+
+        // Put each attachment name with the document name it belongs to
+        for (int i=0; i<results.size(); i++) {
+            String filename = (String) results.get(i)[0];
+            String docFullName = (String) results.get(i)[1];
+            if (!filenamesByDocFullName.containsKey(docFullName)){
+                filenamesByDocFullName.put(docFullName, new ArrayList<String>());
+            }
+            filenamesByDocFullName.get(docFullName).add((String) filename);
+        }
+
+        List<XWikiAttachment> out = new ArrayList<XWikiAttachment>();
+
+        // Index through the document names, get relivent attachments
+        for (String fullName : filenamesByDocFullName.keySet()) {
+            XWikiDocument doc = getDocument(fullName, context);
+            List<String> returnedAttachmentNames = filenamesByDocFullName.get(fullName);
+            for (XWikiAttachment attach : doc.getAttachmentList()) {
+                if (returnedAttachmentNames.contains(attach.getFilename())) {
+                    out.add(attach);
+                }
+            }
+        }
+
+        return out;
+    }
+
+    /**
+     * Count attachments returned by a given parameterized query
+     *
+     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @param XWikiContext The underlying context used for running the database query
+     * @return int number of attachments found.
+     * @throws XWikiException in event of an exception querying the database
+     * @see #searchAttachments(String, int, int, List, XWikiContext)
+     */
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        List l = getStore().search(
+            "select count(attach) from XWikiAttachment attach, XWikiDocument doc where doc.id = attach.docId and "
+             + parametrizedSqlClause, 0, 0, parameterValues, context);
+        return ((Number) l.get(0)).intValue();
+    }
+
 }

@@ -22,6 +22,7 @@ package org.xwiki.localization;
 import java.util.Locale;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Internationalization service based on key/property values. The key is the id of the message being looked for, and the
@@ -35,6 +36,7 @@ import org.xwiki.component.annotation.Role;
  * @since 4.3M2
  */
 @Role
+@Unstable
 public interface LocalizationManager
 {
     /**
@@ -51,7 +53,7 @@ public interface LocalizationManager
      * Find a bundle.
      * 
      * @param bundleType a hint identifying the bundle type.
-     * @param bundleId the identifier of the bindle, for example a wiki document name, or the URL to a
+     * @param bundleId the identifier of the bundle, for example a wiki document name, or the URL to a
      *            <tt>.properties</tt> file.
      * @return the {@link TranslationBundle} or null if none could be found
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier

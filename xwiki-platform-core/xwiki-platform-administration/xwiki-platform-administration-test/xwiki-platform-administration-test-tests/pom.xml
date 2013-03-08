@@ -26,19 +26,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-panels-test</artifactId>
+    <artifactId>xwiki-platform-administration-test</artifactId>
     <version>5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-panels-test-tests</artifactId>
-  <name>XWiki Platform - Panels - Tests - Functional Tests</name>
+  <artifactId>xwiki-platform-administration-test-tests</artifactId>
+  <name>XWiki Platform - Administration - Tests - Functional Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
-  <description>XWiki Platform - Panels - Functional Tests</description>
+  <description>Tests for the Administration Application</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
@@ -51,51 +51,14 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Panels currently don't fully have their own Administration page. For example defining the left and right
-         panels or whether left/right panels are displayed or not are currently defined in the Administration
-         Application. In the future move those features in this Panel Application and remove this dependency. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
-         systems go through SLF4J -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
-           once -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-        </configuration>
-      </plugin>
       <!-- TODO: Remove when the following issue is fixed: http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
       <plugin>
         <groupId>org.xwiki.platform</groupId>

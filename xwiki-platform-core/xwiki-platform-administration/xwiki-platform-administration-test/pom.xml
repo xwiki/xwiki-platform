@@ -29,35 +29,18 @@
     <artifactId>xwiki-platform-administration</artifactId>
     <version>5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-administration-ui</artifactId>
-  <name>XWiki Platform - Administration - UI</name>
-  <packaging>xar</packaging>
+  <artifactId>xwiki-platform-administration-test</artifactId>
+  <name>XWiki Platform - Administration - Tests - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Tests for the Administration Application</description>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
+    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-administration</xwiki.extension.features>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Administration Application</xwiki.extension.name>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-administration-test-pageobjects</module>
+    <module>xwiki-platform-administration-test-tests</module>
+  </modules>
 </project>

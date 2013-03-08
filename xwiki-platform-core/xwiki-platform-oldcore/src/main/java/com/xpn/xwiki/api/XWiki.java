@@ -818,7 +818,8 @@ public class XWiki extends Api
     public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
         throws XWikiException
     {
-        return convertAttachments(this.xwiki.searchAttachments(parametrizedSqlClause, nb, start, parameterValues, this.context));
+        return convertAttachments(
+            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
     }
 
     /**

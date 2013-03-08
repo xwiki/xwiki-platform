@@ -28,6 +28,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from Velocity or Groovy in
  * XWiki documents.
@@ -169,6 +171,7 @@ public class Api
      * @param xattach The internal XWikiAttachment object
      * @return The public api Attachment object
      */
+    @Unstable
     protected Attachment convert(XWikiAttachment xattach)
     {
         return xattach == null ? null : new Attachment(convert(xattach.getDoc()), xattach, this.context);
@@ -180,6 +183,7 @@ public class Api
      * @param xattaches The List of XWikiAttachment objects
      * @return A List of Attachment objects
      */
+    @Unstable
     protected List<Attachment> convertAttachments(List<XWikiAttachment> xattaches)
     {
         List<Attachment> outList = new ArrayList<Attachment>(xattaches.size());

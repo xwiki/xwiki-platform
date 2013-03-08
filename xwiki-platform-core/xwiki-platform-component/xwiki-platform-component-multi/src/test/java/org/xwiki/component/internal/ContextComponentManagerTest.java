@@ -223,4 +223,36 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
                 + "should be done against specific Component Managers.", expected.getMessage());
         }
     }
+
+    @Test(expected = RuntimeException.class)
+    public void testRegisterComponentInstance() throws ComponentLookupException, Exception
+    {
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+
+        contextCM.registerComponent(null, null);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testRegisterComponentDesciptor() throws ComponentLookupException, Exception
+    {
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+
+        contextCM.registerComponent(null);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSetComponentEventManager() throws ComponentLookupException, Exception
+    {
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+
+        contextCM.setComponentEventManager(null);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSetParent() throws ComponentLookupException, Exception
+    {
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+
+        contextCM.setParent(null);
+    }
 }

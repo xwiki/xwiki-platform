@@ -132,9 +132,12 @@
   ##
   ## Compute the final query
   ##
+  #if ($query == "")
+    #set ($query = "1=1")
+  #end
   #set ($sortedQuery = $query + " order by $order $dir")
   #set ($items = $xwiki.searchAttachments($sortedQuery, $limit, $offset, $queryParameters))
-  #set ($totalItems = $xwiki.countAttachments($query, 0, 0, $queryParameters))
+  #set ($totalItems = $xwiki.countAttachments($query, $queryParameters))
   #set ($returnedItems = $items.size())
   ## ==============================================
   ## json starts
@@ -162,7 +165,7 @@
     "author" : "$!escapetool.javascript($attach.author)",
     "authorname" : "$!escapetool.javascript($xwiki.getDocument($attach.author).name)",
     "authorurl" : "$xwiki.getURL($attach.author)",
-    "type" : "$!escapetool.javascript($attach.getMimeType($context.context))"
+    "type" : "$!escapetool.javascript($attach.getMimeType())"
   #else
     "fullname": "$escapetool.javascript($docName)"
   #end
@@ -173,5 +176,5 @@
 ## json ended
 ## ==============================================
 #end
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content><
+/xwikidoc>

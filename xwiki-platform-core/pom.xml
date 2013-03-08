@@ -344,6 +344,18 @@
                <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, com.xpn.xwiki.XWikiContext)</method>
                <justification>Method introduce very recently and already and not supposed to be used (internal retro-compatibility stuff)</justification>
              </difference>
+             <difference>
+               <differenceType>4000</differenceType>
+               <className>org/xwiki/localization/message/TranslationMessage</className>
+               <to>org/xwiki/localization/message/TranslationMessageElement</to>
+               <justification>YOUNG API. Forgot to move it out of internal when TranslationMessage has been</justification>
+             </difference>
+             <difference>
+               <differenceType>4001</differenceType>
+               <className>org/xwiki/localization/message/TranslationMessage</className>
+               <to>org/xwiki/localization/internal/message/TranslationMessageElement</to>
+               <justification>YOUNG API. Forgot to move it out of internal when TranslationMessage has been</justification>
+             </difference>
             <!-- The following difference breaks CLIRR for some reason so I'm excluding the entire class below.
             <difference>
               <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>

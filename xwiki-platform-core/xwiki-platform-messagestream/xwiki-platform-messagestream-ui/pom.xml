@@ -26,15 +26,25 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-messagestream</artifactId>
     <version>5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-messagestream</artifactId>
-  <name>XWiki Platform - Message Stream - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Message Stream Feature</description>
-  <modules>
-    <module>xwiki-platform-messagestream-api</module>
-    <module>xwiki-platform-messagestream-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-messagestream-ui</artifactId>
+  <packaging>xar</packaging>
+  <name>XWiki Platform - Message Stream - UI</name>
+  <description>Macro to display a message stream</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Message Stream Application</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-messagestream-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

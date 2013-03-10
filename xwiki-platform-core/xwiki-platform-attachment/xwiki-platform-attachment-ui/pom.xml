@@ -26,27 +26,26 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-watchlist</artifactId>
+    <artifactId>xwiki-platform-attachment</artifactId>
     <version>5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-watchlist-test-pageobjects</artifactId>
-  <name>XWiki Platform - Watchlist - Page Objects</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Watchlist - Page Objects</description>
+  <artifactId>xwiki-platform-attachment-ui</artifactId>
+  <name>XWiki Platform - Attachment - UI</name>
+  <description>Provides a macro to easily upload and select attachments</description>
+  <packaging>xar</packaging>
   <properties>
-    <!-- None of the classes is valid -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Attachment Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- Needed since we have a wiki macro and we need the XWiki.WikiMacroClass xclass -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test</artifactId>
+      <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-test-pageobjects</artifactId>
-      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

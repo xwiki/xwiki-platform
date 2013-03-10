@@ -26,27 +26,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-watchlist</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-watchlist-test-pageobjects</artifactId>
-  <name>XWiki Platform - Watchlist - Page Objects</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Watchlist - Page Objects</description>
-  <properties>
-    <!-- None of the classes is valid -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-attachment</artifactId>
+  <name>XWiki Platform - Attachment - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Modules for managing attachments</description>
+  <modules>
+    <module>xwiki-platform-attachment-ui</module>
+  </modules>
 </project>

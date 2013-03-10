@@ -17,12 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.user.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.editor.ChangePasswordPage;
-import org.xwiki.test.ui.po.editor.PreferencesEditPage;
 
 /**
  * Represents the User Profile Preferences Tab.
@@ -69,17 +67,7 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
     public PreferencesEditPage editPreferences()
     {
         this.editPreferences.click();
-
-        PreferencesEditPage editPage = new PreferencesEditPage();
-        // The user profile and the user preferences are currently loaded together. This means that when we edit the
-        // preferences the entire user profile is edited but only the preferences are visible. The consequence is that
-        // the WYSIWYG editor is loaded (but not displayed) for the user profile fields even if they are hidden so we
-        // need to wait for it to be safe.
-        if (!"Text".equals(editPage.getDefaultEditor())) {
-            new ProfileUserProfilePage(getUsername()).waitForProfileEditionToLoad();
-        }
-
-        return editPage;
+        return new PreferencesEditPage();
     }
 
     public ChangePasswordPage changePassword()

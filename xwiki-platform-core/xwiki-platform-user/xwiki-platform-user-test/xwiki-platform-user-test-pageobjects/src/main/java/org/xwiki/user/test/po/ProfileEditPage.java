@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po.editor;
+package org.xwiki.user.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
+import org.xwiki.test.ui.po.editor.EditPage;
 
 /** User profile, the profile information pane, edit mode. */
 public class ProfileEditPage extends EditPage
@@ -47,15 +47,11 @@ public class ProfileEditPage extends EditPage
     @FindBy(id = "XWiki.XWikiUsers_0_blogfeed")
     private WebElement userBlogFeed;
 
-    /**
-     * The WYSIWYG editor used to edit the user description.
-     */
-    private final EditorElement userAbout = new EditorElement("XWiki.XWikiUsers_0_comment");
+    @FindBy(id = "XWiki.XWikiUsers_0_comment")
+    private WebElement userAbout;
 
-    /**
-     * The WYSIWYG editor used to edit the user address.
-     */
-    private final EditorElement userAddress = new EditorElement("XWiki.XWikiUsers_0_address");
+    @FindBy(id = "XWiki.XWikiUsers_0_address")
+    private WebElement userAddress;
 
     public String getUserFirstName()
     {
@@ -92,13 +88,13 @@ public class ProfileEditPage extends EditPage
 
     public String getUserAbout()
     {
-        return userAbout.getRichTextArea().getText();
+        return this.userAbout.getText();
     }
 
     public void setUserAbout(String userAbout)
     {
-        this.userAbout.getRichTextArea().clear();
-        this.userAbout.getRichTextArea().sendKeys(userAbout);
+        this.userAbout.clear();
+        this.userAbout.sendKeys(userAbout);
     }
 
     public String getUserEmail()
@@ -125,13 +121,13 @@ public class ProfileEditPage extends EditPage
 
     public String getUserAddress()
     {
-        return userAddress.getRichTextArea().getText();
+        return this.userAddress.getText();
     }
 
     public void setUserAddress(String userAddress)
     {
-        this.userAddress.getRichTextArea().clear();
-        this.userAddress.getRichTextArea().sendKeys(userAddress);
+        this.userAddress.clear();
+        this.userAddress.sendKeys(userAddress);
     }
 
     public String getUserBlog()

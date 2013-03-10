@@ -17,48 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po.editor;
+package org.xwiki.user.test.po;
+
+import java.net.URL;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.BasePage;
 
-/** User profile, change password action. */
-public class ChangePasswordPage extends EditPage
+/** User profile, change avatar action. */
+public class ChangeAvatarPage extends BasePage
 {
-    private static final String DEFAULT_PASSWORD = "admin";
+    @FindBy(xpath = "//input[@id='attachfile']")
+    private WebElement avatarInput;
 
-    @FindBy(xpath = "//input[@id='xwikipassword']")
-    private WebElement password1;
+    @FindBy(xpath = "//*[@id='uploadAttachment']//input[@type='submit']")
+    private WebElement submitButton;
 
-    @FindBy(xpath = "//input[@id='xwikipassword2']")
-    private WebElement password2;
+    @FindBy(xpath = "//*[@id='attachment-picker-close']")
+    private WebElement cancelButton;
 
-    @FindBy(xpath = "//input[@value='Update']")
-    private WebElement changePassword;
-
-    @FindBy(xpath = "//a[@class='secondary button']")
-    private WebElement cancelPasswordChange;
-
-    public void changePassword(String password, String password2)
+    public void setAvatarImage(String imageName)
     {
-        this.password1.clear();
-        this.password1.sendKeys(password);
-        this.password2.clear();
-        this.password2.sendKeys(password2);
-    }
-
-    public void changePasswordToDefault()
-    {
-        changePassword(DEFAULT_PASSWORD, DEFAULT_PASSWORD);
+        URL fileUrl = this.getClass().getResource("/" + imageName);
+        this.avatarInput.sendKeys(fileUrl.getPath());
     }
 
     public void submit()
     {
-        this.changePassword.click();
+        this.submitButton.click();
     }
 
     public void cancel()
     {
-        this.cancelPasswordChange.click();
+        this.cancelButton.click();
     }
 }

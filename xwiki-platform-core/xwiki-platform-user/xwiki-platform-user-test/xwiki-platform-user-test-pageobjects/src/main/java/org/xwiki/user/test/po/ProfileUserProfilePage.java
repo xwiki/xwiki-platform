@@ -17,15 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.user.test.po;
 
 import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.editor.ChangeAvatarPage;
-import org.xwiki.test.ui.po.editor.ProfileEditPage;
-import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 
 /**
  * Represents the User Profile Profile Tab.
@@ -85,18 +82,7 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     public ProfileEditPage editProfile()
     {
         this.editProfile.click();
-
-        // Make sure we wait for the WYSIWYG fields to be loaded since otherwise they'll steal the focus and if we
-        // start typing in other fields before they're loaded what we type will end up in the wrong fields...
-        waitForProfileEditionToLoad();
-
         return new ProfileEditPage();
-    }
-
-    public void waitForProfileEditionToLoad()
-    {
-        new EditorElement("XWiki.XWikiUsers_0_comment").waitToLoad();
-        new EditorElement("XWiki.XWikiUsers_0_address").waitToLoad();
     }
 
     public String getURL()

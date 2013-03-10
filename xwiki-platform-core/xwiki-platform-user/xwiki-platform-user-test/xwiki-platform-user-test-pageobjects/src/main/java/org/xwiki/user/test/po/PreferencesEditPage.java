@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po.editor;
+package org.xwiki.user.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
+import org.xwiki.test.ui.po.editor.EditPage;
 
 /** User profile, the preferences pane, edit mode. */
 public class PreferencesEditPage extends EditPage
@@ -36,13 +37,13 @@ public class PreferencesEditPage extends EditPage
 
     private static final String EDITOR_TEXT = "Text";
 
-    @FindBy(xpath = "//select[@id='XWiki.XWikiUsers_0_editor']")
+    @FindBy(id = "XWiki.XWikiUsers_0_editor")
     private WebElement defaultEditor;
 
-    @FindBy(xpath = "//select[@id='XWiki.XWikiUsers_0_usertype']")
+    @FindBy(id = "XWiki.XWikiUsers_0_usertype")
     private WebElement userType;
 
-    @FindBy(xpath = "//select[@id='XWiki.XWikiUsers_0_timezone']")
+    @FindBy(id = "XWiki.XWikiUsers_0_timezone")
     private WebElement timezone;
 
     public void setSimpleUserType()
@@ -82,7 +83,11 @@ public class PreferencesEditPage extends EditPage
 
     public void setTimezone(String value)
     {
-        Select select = new Select(this.timezone);
-        select.selectByValue(value);
+        // See http://jira.xwiki.org/browse/XWIKI-8905
+        // When it's fixed use instead:
+        //   Select select = new Select(this.timezone);
+        //   select.selectByValue(value);
+        this.timezone.clear();
+        this.timezone.sendKeys(value);
     }
 }

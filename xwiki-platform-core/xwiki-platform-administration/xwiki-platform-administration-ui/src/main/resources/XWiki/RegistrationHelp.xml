@@ -166,7 +166,7 @@ ul.showCircles li {
 ** If login button is enabled, then you can have a piece of Javascript push the login button for the user.
 
 {{id name=defaultRedirect/}}
-* **Redirect here after registration** (Default: "$xwiki.getURL('Main.WebHome')")
+* **Redirect here after registration** (Default: "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
 ** This is the URL of the which the user will be redirected to after pushing the login button if the xredirect parameter is not specified.  Velocity code may be used.
 
 {{id name=requireCaptcha/}}

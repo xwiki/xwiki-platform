@@ -241,7 +241,7 @@
     #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
     #if($xwiki.isVirtualMode())
       #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
-      #set($discard = $row.put('doc_wiki_url', $xwiki.getURL("${itemDoc.wiki}:Main.WebHome")))
+      #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
     #end
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $context.user, $fullname)))
@@ -307,7 +307,7 @@
     ## only retrieve an URL for a DBListClass item
     #if($propType == 'DBListClass')
       #set($fieldUrl = $xwiki.getDocument($fieldValue).getURL())
-      #if($fieldUrl == $xwiki.getURL('Main.WebHome'))
+      #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
         #set($fieldUrl = '')
       #end
     #end

@@ -1064,7 +1064,7 @@ $heading
     #set($useLiveValidation = true)
     #set($defaultFieldOkayMessage = "$msg.get('core.validation.valid.message')")
     #set($loginButton = true)
-    #set($defaultRedirect = "$xwiki.getURL('Main.WebHome')")
+    #set($defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
     #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
     #set($registrationSuccessMessage = '{{info}}$msg.get("core.register.successful", ["[[${userFullName}&gt;&gt;${userSpace}${userName}]]", ${userName}]){{/info}}')
   #else

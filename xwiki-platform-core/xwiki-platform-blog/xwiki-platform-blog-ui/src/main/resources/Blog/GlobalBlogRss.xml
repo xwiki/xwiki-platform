@@ -34,7 +34,7 @@ $response.setContentType('application/rss+xml')
 #set($feedMetadata = {
   "title": $title,
   "description": "Most recent blog posts in the wiki",
-  "url": $xwiki.getDocument('Main.WebHome').externalURL
+  "url": $xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))).externalURL
   })
 #getBlogEntriesBaseQuery($query)
 $xwiki.feed.getBlogFeedOutput("${query} order by publishDate.value desc", 10, 0, $feedMetadata, 'rss_2.0')

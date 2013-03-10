@@ -64,7 +64,7 @@
       #set($blogDocName = "${space}.Blog")
     #end
     #set($title = $escapetool.url($title))
-    #set($parent = 'Main.WebHome')
+    #set($parent = $services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))
     $response.sendRedirect($xwiki.getURL($blogDocName, 'save', "parent=${parent}&amp;title=${escapetool.url($title)}&amp;template=${blogTemplate}&amp;${blogClassname}_0_title=${escapetool.url($title)}&amp;form_token=$!{request.getParameter('form_token')}"))
   #end
 #end

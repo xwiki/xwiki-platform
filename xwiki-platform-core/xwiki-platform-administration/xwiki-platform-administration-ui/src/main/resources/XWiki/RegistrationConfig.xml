@@ -305,7 +305,7 @@
     <className>XWiki.Registration</className>
     <guid>1a0c3cf7-de63-4f07-8a74-5c30bf880641</guid>
     <property>
-      <defaultRedirect>$xwiki.getURL("Main.WebHome")</defaultRedirect>
+      <defaultRedirect>$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))</defaultRedirect>
     </property>
     <property>
       <heading>$msg.get('core.register.title')</heading>

@@ -29,32 +29,17 @@
     <artifactId>xwiki-platform-messagestream</artifactId>
     <version>5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-messagestream-ui</artifactId>
-  <packaging>xar</packaging>
-  <name>XWiki Platform - Message Stream - UI</name>
-  <description>Macro to display a message stream</description>
+  <artifactId>xwiki-platform-messagestream-test</artifactId>
+  <name>XWiki Platform - Message Stream - Tests - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Functional tests for the Message Stream feature</description>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
+    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Message Stream Application</xwiki.extension.name>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-messagestream-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- The Admin application is an optional dependency since the Message Stream application can work even without
-         the Admin application but if it's there it creates an Admin section in it. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-messagestream-test-tests</module>
+  </modules>
 </project>

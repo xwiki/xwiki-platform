@@ -265,19 +265,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
                 // Delete the three attachment entries
                 try {
-                    loadAttachmentContent(attachment, context, false);
-                    try {
-                        session.delete(attachment.getAttachment_content());
-                    } catch (Exception e) {
-                        if (LOGGER.isWarnEnabled()) {
-                            LOGGER.warn("Error deleting attachment content " + attachment.getFilename() + " of doc "
-                                + attachment.getDoc().getFullName());
-                        }
-                    }
+                    session.delete(new XWikiAttachmentContent(attachment));
                 } catch (Exception e) {
                     if (LOGGER.isWarnEnabled()) {
-                        LOGGER.warn("Error loading attachment content when deleting attachment "
-                            + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                        LOGGER.warn("Error deleting attachment content " + attachment.getFilename() + " of doc "
+                            + attachment.getDoc().getFullName());
                     }
                 }
 

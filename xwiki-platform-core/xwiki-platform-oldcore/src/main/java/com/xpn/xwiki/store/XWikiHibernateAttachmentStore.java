@@ -267,10 +267,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 try {
                     session.delete(new XWikiAttachmentContent(attachment));
                 } catch (Exception e) {
-                    if (LOGGER.isWarnEnabled()) {
-                        LOGGER.warn("Error deleting attachment content " + attachment.getFilename() + " of doc "
-                            + attachment.getDoc().getFullName());
-                    }
+                    LOGGER.warn("Error deleting attachment content [{}] of document [{}]", attachment.getFilename(),
+                        attachment.getDoc().getDocumentReference());
                 }
 
                 context.getWiki().getAttachmentVersioningStore().deleteArchive(attachment, context, false);
@@ -278,10 +276,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 try {
                     session.delete(attachment);
                 } catch (Exception e) {
-                    if (LOGGER.isWarnEnabled()) {
-                        LOGGER.warn("Error deleting attachment meta data " + attachment.getFilename() + " of doc "
-                            + attachment.getDoc().getFullName());
-                    }
+                    LOGGER.warn("Error deleting attachment meta data [{}] of document [{}]", attachment.getFilename(),
+                        attachment.getDoc().getDocumentReference());
                 }
 
             } finally {
@@ -301,10 +297,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
                 }
             } catch (Exception e) {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Error updating document when deleting attachment " + attachment.getFilename()
-                        + " of doc " + attachment.getDoc().getFullName());
-                }
+                LOGGER.warn("Error updating document when deleting attachment [{}] of document [{}]",
+                    attachment.getFilename(), attachment.getDoc().getDocumentReference());
             }
 
             if (bTransaction) {

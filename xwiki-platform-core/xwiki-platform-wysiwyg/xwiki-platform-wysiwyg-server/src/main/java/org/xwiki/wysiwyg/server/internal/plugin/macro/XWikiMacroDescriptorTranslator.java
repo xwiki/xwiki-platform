@@ -22,12 +22,17 @@ package org.xwiki.wysiwyg.server.internal.plugin.macro;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
-import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.LocalizationContext;
+import org.xwiki.localization.LocalizationManager;
+import org.xwiki.localization.Translation;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
 
 /**
@@ -58,7 +63,21 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
      * The component used to translate the macro descriptor.
      */
     @Inject
-    private ContextualLocalizationManager localizationManager;
+    private LocalizationManager localizationManager;
+
+    /**
+     * The component used to get the current locale to be passed to the {@link #localizationManager} when translating
+     * the macro descriptors.
+     */
+    @Inject
+    private LocalizationContext localizationContext;
+
+    /**
+     * The plain text renderer used to render the translations.
+     */
+    @Inject
+    @Named("plain/1.0")
+    private BlockRenderer plainRenderer;
 
     @Override
     public MacroDescriptor translate(MacroDescriptor macroDescriptor)
@@ -102,7 +121,15 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
      */
     private String translate(String key, String defaultValue)
     {
-        String translation = localizationManager.getTranslationPlain(key);
-        return translation == null ? defaultValue : translation;
+        Translation translation = localizationManager.getTranslation(key, localizationContext.getCurrentLocale());
+
+        if (translation == null) {
+            return defaultValue;
+        }
+
+        DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
+        plainRenderer.render(translation.render(), wikiPrinter);
+
+        return wikiPrinter.toString();
     }
 }

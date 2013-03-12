@@ -6579,8 +6579,8 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
-     *             {@link XWikiContext#getMessageTool()}.
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
+     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
      */
     @Deprecated
     public String parseMessage(String id, XWikiContext context)

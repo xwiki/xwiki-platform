@@ -50,6 +50,7 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
@@ -187,7 +188,7 @@ public class JARTranslationBundleFactoryTest
             Arrays.<InstalledExtension> asList(mockInstalledExtension(extensionId, null)));
 
         // Trigger initialization
-        getObservationManager();
+        this.componentManager.getInstance(EventListener.class, JARTranslationBundleFactoryListener.NAME);
 
         assertTranslation("test.key", "default translation", Locale.ROOT);
         assertTranslation("test.key", "en translation", Locale.ENGLISH);

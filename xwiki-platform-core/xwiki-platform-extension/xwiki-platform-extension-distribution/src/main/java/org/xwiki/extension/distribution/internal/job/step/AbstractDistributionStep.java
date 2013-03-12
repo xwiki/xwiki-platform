@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -40,13 +42,30 @@ import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 public abstract class AbstractDistributionStep implements DistributionStep
 {
+    protected class StringContent
+    {
+        public String content;
+
+        public Syntax syntax;
+
+        public StringContent(String content, Syntax syntax)
+        {
+            this.content = content;
+            this.syntax = syntax;
+        }
+    }
+
+    private static final Pattern FIRSTLINE = Pattern.compile("^.#syntax=(.*)$", Pattern.MULTILINE);
+
     @Inject
     private ComponentManager componentManager;
 
@@ -55,6 +74,9 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
     @Inject
     private Environment environment;
+
+    @Inject
+    private SyntaxFactory syntaxFactory;
 
     private String stepId;
 
@@ -89,25 +111,34 @@ public abstract class AbstractDistributionStep implements DistributionStep
         this.state = stepState;
     }
 
-    protected Syntax getSyntax()
-    {
-        return Syntax.XWIKI_2_1;
-    }
-
     protected String getTemplate()
     {
-        return "distribution/" + getId() + ".wiki";
+        return "templates/distribution/" + getId() + ".wiki";
     }
 
-    protected String getStringContent() throws IOException
+    protected StringContent getStringContent() throws IOException, ParseException
     {
         InputStream stream = this.environment.getResourceAsStream(getTemplate());
 
+        String content;
         try {
-            return IOUtils.toString(stream, "UTF-8");
+            content = IOUtils.toString(stream, "UTF-8");
         } finally {
             IOUtils.closeQuietly(stream);
         }
+
+        Matcher matcher = FIRSTLINE.matcher(content);
+
+        Syntax syntax;
+        if (matcher.find()) {
+            String syntaxString = matcher.group(1);
+            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxString);
+            content = content.substring(matcher.end());
+        } else {
+            throw new ParseException("Distribution step template [" + getTemplate() + "] does not provide its syntax");
+        }
+
+        return new StringContent(content, syntax);
     }
 
     protected XDOM getXDOM()
@@ -115,8 +146,10 @@ public abstract class AbstractDistributionStep implements DistributionStep
         XDOM xdom;
 
         try {
-            Parser parser = this.componentManager.getInstance(Parser.class, getSyntax().toIdString());
-            xdom = parser.parse(new StringReader(getStringContent()));
+            StringContent content = getStringContent();
+
+            Parser parser = this.componentManager.getInstance(Parser.class, content.syntax.toIdString());
+            xdom = parser.parse(new StringReader(content.content));
         } catch (Throwable e) {
             xdom = generateError(e);
         }
@@ -149,7 +182,7 @@ public abstract class AbstractDistributionStep implements DistributionStep
     {
         XDOM content = getXDOM();
 
-        TransformationContext txContext = new TransformationContext(content, getSyntax(), false);
+        TransformationContext txContext = new TransformationContext(content, null, false);
         try {
             this.transformationManager.performTransformations(content, txContext);
         } catch (Exception e) {

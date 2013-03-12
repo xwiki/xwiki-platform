@@ -26,13 +26,15 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 @Component
-@Named("welcome")
+@Named(WelcomeDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class WelcomeDistributionStep extends AbstractDistributionStep
 {
+    public static final String ID = "welcome";
+
     public WelcomeDistributionStep()
     {
-        super("welcome");
+        super(ID);
     }
 
     @Override

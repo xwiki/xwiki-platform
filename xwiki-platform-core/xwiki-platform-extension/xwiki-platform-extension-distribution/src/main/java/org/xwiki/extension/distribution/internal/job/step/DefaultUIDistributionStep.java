@@ -31,10 +31,12 @@ import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 @Component
-@Named("extension.defaultui")
+@Named(DefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultUIDistributionStep extends AbstractDistributionStep
 {
+    public static final String ID = "extension.defaultui";
+
     @Inject
     protected DistributionManager distributionManager;
 
@@ -45,7 +47,7 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
 
     public DefaultUIDistributionStep()
     {
-        super("extension.defaultui");
+        super(ID);
     }
 
     public void setWiki(String wiki)

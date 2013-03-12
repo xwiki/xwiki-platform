@@ -26,13 +26,15 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 @Component
-@Named("extension.outdatedextensions")
+@Named(OutdatedExtensionsDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
 {
+    public static final String ID = "extension.outdatedextensions";
+
     public OutdatedExtensionsDistributionStep()
     {
-        super("extension.outdatedextensions");
+        super(ID);
     }
 
     @Override

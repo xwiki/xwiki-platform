@@ -24,7 +24,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.internal.AbstractJob;
@@ -60,7 +62,12 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         // Step 0: A welcome message. Only if there is actually something to do
         for (DistributionStep step : steps) {
             if (step.getState() == null) {
-                steps.add(0, new WelcomeDistributionStep());
+                try {
+                    steps.add(0, this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                        WelcomeDistributionStep.ID));
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
+                }
                 break;
             }
         }

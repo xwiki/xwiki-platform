@@ -1,0 +1,23 @@
+##syntax=xwiki/2.1
+{{velocity}}
+{{html}}
+<p>$msg.get('platform.extension.distributionWizard.welcomeStepDescription', ['</p><ul><li>', '</li><li>'])</li></ul>
+  <p class="steps-hint">$msg.get('platform.extension.distributionWizard.welcomeStepStepsHint')</p>
+  #set ($stepGoals = {
+    'extension.mainui': $msg.get('platform.extension.distributionWizard.uiStepSummary'),
+    'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepSummary')
+  })
+  <ul class="steps vertical">
+    #foreach ($step in $steps)
+    <li>
+      <span class="number">$velocityCount</span>
+      <span class="name">$stepNames.get($step.id)</span>
+      <span class="description">$stepGoals.get($step.id)</span>
+    </li>
+    #end
+  </ul>
+  <p class="xHint">$msg.get('platform.extension.distributionWizard.welcomeStepActionsHint')</p>
+{{/html}}
+#set ($showCompleteStepButton = true)
+#set ($canCloseWizard = true)
+{{/velocity}}

@@ -51,7 +51,7 @@
   <div class="wizard-header">
     #set ($stepNames = {
       'welcome': $msg.get('platform.extension.distributionWizard.welcomeStepTitle'),
-      'extension.mainui': $msg.get('platform.extension.distributionWizard.uiStepTitle'),
+      'extension.defaultui': $msg.get('platform.extension.distributionWizard.uiStepTitle'),
       'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepTitle')
     })
     #set ($currentStepIndex = $services.distribution.jobStatus.currentStateIndex)
@@ -64,14 +64,14 @@
         <li>
           #set ($stepStatus = "")
           #set ($stepNumber = $velocityCount)
-          #if ($step.stepId == $currentStepId)
+          #if ($step.id == $currentStepId)
             #set ($stepStatus = " active")
           #elseif($velocityCount < $currentStepIndex)
             #set ($stepStatus = " done")
             #set ($stepNumber = '&#10004;')
           #end
           <span class="number$stepStatus">$stepNumber</span>
-          <span class="name$stepStatus">$stepNames.get($step.stepId)</span>
+          <span class="name$stepStatus">$stepNames.get($step.id)</span>
         </li>
       #end
     </ul>
@@ -95,8 +95,8 @@
     #foreach ($step in $steps)
     <li>
       <span class="number">$velocityCount</span>
-      <span class="name">$stepNames.get($step.stepId)</span>
-      <span class="description">$stepGoals.get($step.stepId)</span>
+      <span class="name">$stepNames.get($step.id)</span>
+      <span class="description">$stepGoals.get($step.id)</span>
     </li>
     #end
   </ul>

@@ -26,10 +26,12 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 @Component
-@Named("upgrademode")
+@Named(UpgradeModeDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class UpgradeModeDistributionStep extends AbstractDistributionStep
 {
+    public static final String ID = "upgrademode";
+
     public enum UpgradeMode
     {
         WIKI,
@@ -40,7 +42,7 @@ public class UpgradeModeDistributionStep extends AbstractDistributionStep
 
     public UpgradeModeDistributionStep()
     {
-        super("upgrademode");
+        super(ID);
     }
 
     public UpgradeMode getUpgradeMode()

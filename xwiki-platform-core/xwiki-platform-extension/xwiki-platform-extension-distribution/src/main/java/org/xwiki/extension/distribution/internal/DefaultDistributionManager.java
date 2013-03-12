@@ -287,12 +287,17 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             (DistributionJobStatus<DistributionRequest>) this.jobManager.getJobStatus(JOBID);
 
         FarmDistributionJobStatus farmJobStatus;
-        if (jobStatus instanceof FarmDistributionJobStatus) {
-            farmJobStatus = (FarmDistributionJobStatus) jobStatus;
+        if (jobStatus != null) {
+            if (jobStatus instanceof FarmDistributionJobStatus) {
+                farmJobStatus = (FarmDistributionJobStatus) jobStatus;
+            } else {
+                // RETRO-COMPATIBILITY: the status used to be a DistributionJobStatus
+                farmJobStatus =
+                    new FarmDistributionJobStatus(jobStatus, this.observationManagerProvider.get(),
+                        this.loggerManagerProvider.get());
+            }
         } else {
-            farmJobStatus =
-                new FarmDistributionJobStatus(jobStatus, this.observationManagerProvider.get(),
-                    this.loggerManagerProvider.get());
+            farmJobStatus = null;
         }
 
         return farmJobStatus;

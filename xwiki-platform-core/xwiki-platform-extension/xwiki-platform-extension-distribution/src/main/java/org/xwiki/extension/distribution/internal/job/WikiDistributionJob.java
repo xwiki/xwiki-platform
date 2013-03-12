@@ -28,6 +28,7 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
@@ -58,29 +59,42 @@ public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributio
 
         // Step 1: Install/upgrade main wiki UI
 
-        DistributionStep step1 = new DefaultUIDistributionStep();
-        steps.add(step1);
-        // Only if the UI is not already installed
-        step1.setState(DistributionStep.State.COMPLETED);
-        if (extensionUI != null) {
-            InstalledExtension installedExtension =
-                this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
-            if (installedExtension == null || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
-                step1.setState(null);
+        try {
+            DistributionStep step1 =
+                this.componentManager.getInstance(DistributionStep.class, DefaultUIDistributionStep.ID);
+
+            steps.add(step1);
+            step1.setState(DistributionStep.State.COMPLETED);
+            // Only if the UI is not already installed
+            if (extensionUI != null) {
+                InstalledExtension installedExtension =
+                    this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
+                if (installedExtension == null
+                    || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
+                    step1.setState(null);
+                }
             }
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to get step instance for id [{}]", DefaultUIDistributionStep.ID);
         }
 
         // Step 2: Upgrade outdated extensions
 
-        DistributionStep step2 = new OutdatedExtensionsDistributionStep();
-        steps.add(step2);
-        step2.setState(DistributionStep.State.COMPLETED);
-        // Upgrade outdated extensions only when there is outdated extensions
-        for (InstalledExtension extension : this.installedRepository.getInstalledExtensions(namespace)) {
-            if (!extension.isValid(namespace)) {
-                step2.setState(null);
-                break;
+        try {
+            DistributionStep step2 =
+                this.componentManager.getInstance(DistributionStep.class, OutdatedExtensionsDistributionStep.ID);
+
+            steps.add(step2);
+            step2.setState(DistributionStep.State.COMPLETED);
+            // Upgrade outdated extensions only when there is outdated extensions
+            for (InstalledExtension extension : this.installedRepository.getInstalledExtensions(namespace)) {
+                if (!extension.isValid(namespace)) {
+                    step2.setState(null);
+                    break;
+                }
             }
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to get step instance for id [{}]", OutdatedExtensionsDistributionStep.ID);
         }
 
         return steps;

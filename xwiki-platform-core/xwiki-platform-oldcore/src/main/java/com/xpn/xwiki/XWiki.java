@@ -6700,8 +6700,8 @@ public class XWiki implements EventListener
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
 
-        List l = getStore().search("select count(attach) from XWikiAttachment attach where "
-            + parametrizedSqlClause, 0, 0, parameterValues, context);
+        List l = getStore().search("select count(attach) from XWikiAttachment attach, XWikiDocument doc where "
+                                   + "attach.docId=doc.id and " + parametrizedSqlClause, 0, 0, parameterValues, context);
         return ((Number) l.get(0)).intValue();
     }
 }

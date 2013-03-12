@@ -117,6 +117,12 @@ public class PasteManager implements PasteHandler, CopyHandler
     @Override
     public void onPaste(PasteEvent event)
     {
+        // If the selection has been saved but not yet restored then it means that multiple paste events were triggered
+        // one after another (e.g. by keeping the paste shortcut key pressed). We can reuse the existing paste container
+        // in this case. This way we perform the cleaning only once, after the sequence of paste events.
+        if (selectionPreserver.hasSelection()) {
+            return;
+        }
         selectionPreserver.saveSelection();
         final Element pasteContainer = createPasteContainer();
         Scheduler.get().scheduleDeferred(new ScheduledCommand()

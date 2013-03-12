@@ -2845,8 +2845,8 @@ public class XWiki extends Api
      * scripts
      * 
      * @return Final message
-     * @deprecated use {@link com.xpn.xwiki.web.XWikiMessageTool#get(String, List)} instead. From velocity you can
-     *             access XWikiMessageTool with $msg binding.
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
+     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
      */
     @Deprecated
     public String parseMessage()

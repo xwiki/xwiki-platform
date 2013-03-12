@@ -342,7 +342,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassDocument(XWikiContext context) throws XWikiException
+    protected void checkClassDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClass) {
             return;
@@ -425,7 +425,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassSheetDocument(XWikiContext context) throws XWikiException
+    protected void checkClassSheetDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClassSheet) {
             return;
@@ -476,7 +476,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassTemplateDocument(XWikiContext context) throws XWikiException
+    protected void checkClassTemplateDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClassTemplate) {
             return;

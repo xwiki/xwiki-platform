@@ -1,0 +1,1 @@
+##syntax=xwiki/2.1

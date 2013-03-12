@@ -22,6 +22,7 @@ package org.xwiki.extension.distribution.internal;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
 import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
@@ -115,4 +116,9 @@ public interface DistributionManager
      * @since 5.0M1
      */
     WikiDistributionJob getWikiJob(String wiki);
+
+    /**
+     * @return the current distribution job
+     */
+    DistributionJob getCurrentDitributionJob();
 }

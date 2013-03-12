@@ -39,6 +39,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionRequest;
 import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
@@ -52,6 +53,8 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default {@link DistributionManager} implementation.
@@ -102,6 +105,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
      */
     @Inject
     protected Provider<LoggerManager> loggerManagerProvider;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private Logger logger;
@@ -308,5 +314,13 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     public WikiDistributionJob getWikiJob(String wiki)
     {
         return this.wikiDistributionJobs.get(wiki);
+    }
+
+    @Override
+    public DistributionJob getCurrentDitributionJob()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki() ? getFarmJob() : getWikiJob(xcontext.getDatabase());
     }
 }

@@ -1,0 +1,4 @@
+##syntax=xwiki/2.1
+{{velocity}}
+$services.distribution.jobStatus.surrentStep
+{{/velocity}}

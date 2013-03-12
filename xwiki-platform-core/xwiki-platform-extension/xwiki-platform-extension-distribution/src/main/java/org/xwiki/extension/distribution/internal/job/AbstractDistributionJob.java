@@ -34,7 +34,7 @@ import org.xwiki.job.internal.AbstractJob;
  * @since 5.0M1
  */
 public abstract class AbstractDistributionJob<R extends DistributionRequest, S extends DistributionJobStatus<R>>
-    extends AbstractJob<R, S>
+    extends AbstractJob<R, S> implements DistributionJob
 {
     /**
      * The component used to get information about the current distribution.
@@ -129,5 +129,13 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         } finally {
             notifyPopLevelProgress();
         }
+    }
+
+    // DistributionJob
+
+    @Override
+    public DistributionStep getCurrentStep()
+    {
+        return getStatus().getCurrentStep();
     }
 }

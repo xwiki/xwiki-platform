@@ -81,15 +81,7 @@
 
 #macro(displayStepContent $stepId)
   <div class="warningmessage">$msg.get('platform.extension.distributionWizard.experimentalWarning', ['<a href="http://jira.xwiki.org/browse/XWIKI/component/10987">', '</a>'])</div>
-  #if ($stepId == 'welcome')
-    #displayWelcomeStep()
-  #elseif ($stepId == 'extension.mainui')
-    #displayMainUIStep()
-  #elseif ($stepId == 'extension.outdatedextensions')
-    #displayOutdatedExtensionsStep()
-  #else
-    <div class="errormessage">$msg.get('platform.extension.distributionWizard.unknownStepError')</div>
-  #end
+  $services.distribution.renderCurrentStepToXHTML()
 #end
 
 #macro(displayWelcomeStep)

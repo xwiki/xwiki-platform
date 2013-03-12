@@ -45,17 +45,26 @@ public class FarmDistributionJobStatus extends DistributionJobStatus<Distributio
     {
         super(request, observationManager, loggerManager, steps);
 
-        for (DistributionStep step : getSteps()) {
-            if (step instanceof UpgradeModeDistributionStep) {
-                this.upgradeModeStep = (UpgradeModeDistributionStep) step;
-            }
-        }
+        init();
     }
 
     public FarmDistributionJobStatus(DistributionJobStatus<DistributionRequest> status,
         ObservationManager observationManager, LoggerManager loggerManager)
     {
-        this(status.getRequest(), observationManager, loggerManager, status.getSteps());
+        super(status, observationManager, loggerManager);
+
+        init();
+    }
+
+    private void init()
+    {
+        if (getSteps() != null) {
+            for (DistributionStep step : getSteps()) {
+                if (step instanceof UpgradeModeDistributionStep) {
+                    this.upgradeModeStep = (UpgradeModeDistributionStep) step;
+                }
+            }
+        }
     }
 
     public UpgradeMode getUpgradeMode()

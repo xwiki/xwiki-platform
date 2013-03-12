@@ -36,7 +36,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
     /**
      * Serialization identifier.
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private ExtensionId previousDistributionExtension;
 
@@ -46,21 +46,32 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     private ExtensionId distributionExtensionUi;
 
-    private List<DistributionStep> steps;
+    private List<DistributionStep> stepList;
 
     private int currentStateIndex;
 
+    public DistributionJobStatus(DistributionJobStatus<R> status, ObservationManager observationManager, LoggerManager loggerManager)
+    {
+        super(status.getRequest(), observationManager, loggerManager, false);
+
+        this.previousDistributionExtension = status.previousDistributionExtension;
+        this.previousDistributionExtensionUi = status.previousDistributionExtensionUi;
+        this.distributionExtension = status.distributionExtension;
+        this.distributionExtensionUi = status.distributionExtensionUi;
+        this.stepList = status.stepList;
+    }
+    
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
         List<DistributionStep> steps)
     {
         super(request, observationManager, loggerManager, false);
 
-        this.steps = steps;
+        this.stepList = steps;
     }
 
     public List<DistributionStep> getSteps()
     {
-        return this.steps;
+        return this.stepList;
     }
 
     public int getCurrentStateIndex()
@@ -68,7 +79,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
         return this.currentStateIndex;
     }
 
-    public DistributionStep getCurrentState()
+    public DistributionStep getCurrentStep()
     {
         return getCurrentStateIndex() < getSteps().size() ? getSteps().get(getCurrentStateIndex()) : null;
     }

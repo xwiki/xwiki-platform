@@ -28,9 +28,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.job.Job;
+import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -68,6 +74,10 @@ public class DistributionScriptService implements ScriptService
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    @Named("xhtml/1.0")
+    private BlockRenderer xhtmlRenderer;
 
     /**
      * @param <T> the type of the object
@@ -119,15 +129,33 @@ public class DistributionScriptService implements ScriptService
      */
     public DistributionJobStatus< ? > getJobStatus()
     {
-        XWikiContext xcontext = xcontextProvider.get();
-
-        Job job;
-        if (xcontext.isMainWiki()) {
-            job = this.distributionManager.getFarmJob();
-        } else {
-            job = this.distributionManager.getWikiJob(xcontext.getDatabase());
-        }
+        DistributionJob job = this.distributionManager.getCurrentDitributionJob();
 
         return job != null ? (DistributionJobStatus< ? >) job.getStatus() : null;
+    }
+
+    public String renderCurrentStepToXHTML()
+    {
+        DistributionJob job = this.distributionManager.getCurrentDitributionJob();
+
+        if (job != null) {
+            JobStatus jobStatus = job.getStatus();
+
+            if (jobStatus != null) {
+                State jobState = jobStatus.getState();
+
+                if (jobState == State.RUNNING || jobState == State.WAITING) {
+                    Block block = job.getCurrentStep().render();
+
+                    WikiPrinter printer = new DefaultWikiPrinter();
+
+                    this.xhtmlRenderer.render(block, printer);
+
+                    return printer.toString();
+                }
+            }
+        }
+
+        return null;
     }
 }

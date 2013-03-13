@@ -49,6 +49,11 @@ public class DistributionQuestion
         this.step = step;
     }
 
+    public DistributionStep getStep()
+    {
+        return this.step;
+    }
+
     public String getStepId()
     {
         return this.step.getId();

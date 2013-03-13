@@ -1,1 +1,112 @@
 ##syntax=xwiki/2.1
+{{velocity ouput="false"}}
+#macro(displayUpgradePlanStatus $status)
+  ## The status is null after the job is created, until the job is scheduled.
+  #set ($isLoading = !$status || ($status.log.isEmpty() && $status.state != 'FINISHED'))
+  <div class="extension-body-progress#if($isLoading) loading#end">
+    #if ($status)
+      #printStatusLog($status)
+    #end
+  </div>
+#end
+
+#macro (displayUpgradePlan $plan)
+  #set($hasError = false)
+  #foreach($log in $plan.log)
+    #if ($log.level.name() == 'ERROR')
+      #set($hasError = true)
+      #break
+    #end
+  #end
+  ##
+  #if ($hasError)
+    #displayUpgradePlanStatus($plan)
+  #else
+    ## Group extensions by status (invalid/outdated) and by namespace.
+    #set ($invalid = {})
+    #set ($outdated = {})
+    ## Iterate the first level nodes from the upgrade plan tree.
+    #foreach ($firstLevelNode in $plan.tree)
+      #set ($planAction = $firstLevelNode.action)
+      #set ($status = $NULL)
+      #set ($installedVersion = $services.extension.getInstalledExtension($planAction.extension.id.id, $planAction.namespace))
+      #if (!$installedVersion.isValid($planAction.namespace))
+        #set ($status = $invalid)
+      ## Check if the latest version has been installed after the upgrade plan was created.
+      #elseif ($installedVersion.id.version.value != $planAction.extension.id.version.value)
+        #set ($status = $outdated)
+      #end
+      #if ($status)
+        #set ($statusForNamespace = $status.get($planAction.namespace))
+        #if (!$statusForNamespace)
+          #set ($statusForNamespace = [])
+          #set ($discard = $status.put($planAction.namespace, $statusForNamespace))
+        #end
+        #set ($discard = $statusForNamespace.add($planAction))
+      #end
+    #end
+    #set ($showCompleteStepButton = $invalid.isEmpty())
+    ##
+    #if ($outdated.isEmpty() && $invalid.isEmpty())
+      <div class="infomessage">$msg.get('platform.extension.distributionWizard.extensionsStepUpToDate')</div>
+    #else
+      #displayPlanActionByNamespace($invalid 'Invalid')
+      #displayPlanActionByNamespace($outdated 'Outdated')
+    #end
+  #end
+  <p class="xHint">$msg.get('platform.extension.distributionWizard.extensionsStepReloadHint', ["<a id=""prepareUpgradeLink""
+    href=""?action=prepareUpgrade&xredirect=$!escapetool.url($request.xredirect)"">", '</a>'])</p>
+#end
+
+#macro(displayPlanActionByNamespace $actionByNamespace $key)
+  #if (!$actionByNamespace.isEmpty())
+    <div class="xLabel">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsLabel")</div>
+  #end
+  #foreach ($entry in $actionByNamespace.entrySet())
+    <div class="xHint">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint",
+      ["#displayExtensionNamespace($entry.key)"])</div>
+    <div class="$key.toLowerCase()Extensions">
+    #foreach ($planAction in $entry.value)
+      #set ($extensionNamespace = $planAction.namespace)
+      #displayExtension($planAction.extension)
+    #end
+    </div>
+  #end
+#end
+
+#macro(prepareUpgrade $upgradePlan)
+  ## Create the upgrade plan for the entire farm.
+  #set ($upgradePlanJob = $services.extension.createUpgradePlan())
+  #set ($lastError = $services.extension.lastError)
+  #if ($lastError)
+    <div class="errormessage">$msg.get('platform.extension.distributionWizard.extensionsStepPrepareUpgradeFailure') #printThrowable($lastError)</div>
+  #else
+    #set ($distributionId = "$services.distribution.distributionExtension.id")
+    #set ($discard = $upgradePlanJob.request.setProperty('distribution.id', $distributionId))
+    #set ($upgradePlan = $null)
+    #setVariable ("$upgradePlan" $upgradePlanJob.status)
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+{{html}}
+  #if (!$isAjaxRequest)
+    <p>$msg.get('platform.extension.distributionWizard.extensionsStepDescription', ['<a href="http://platform.xwiki.org/xwiki/bin/view/Features/Applications">', '</a>', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices">'])</p>
+  #end
+  #set ($distributionId = "$services.distribution.distributionExtension.id")
+  ## Get the status of the upgrade plan job for the entire farm.
+  #set ($upgradePlan = $services.extension.getExtensionPlanJobStatus($null, $null))
+  #if (!$upgradePlan || $upgradePlan.request.getProperty('distribution.id') != $distributionId)
+    ## Schedule the upgrade plan creation job.
+    #prepareUpgrade($upgradePlan)
+  #end
+  #if ($upgradePlan.state != 'FINISHED')
+    <p>$msg.get('platform.extension.distributionWizard.extensionsStepLoading')</p>
+    #displayJobProgressBar($upgradePlan)
+    #displayUpgradePlanStatus($upgradePlan)
+  #else
+    #displayUpgradePlan($upgradePlan)
+  #end
+{{/html}}
+{{/velocity}}

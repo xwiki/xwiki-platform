@@ -20,4 +20,5 @@
 {{/html}}
 #set ($showCompleteStepButton = true)
 #set ($canCloseWizard = true)
+#set ($void = $currentStep.setState('COMPLETED'))
 {{/velocity}}

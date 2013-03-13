@@ -117,16 +117,18 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                     // Waiting to start
                     getStatus().ask(question);
 
-                    switch (question.getAction()) {
-                        case CANCEL:
-                            for (; index < steps.size(); ++index) {
-                                steps.get(index).setState(DistributionStep.State.CANCELED);
-                            }
-                        case SKIP:
-                            index = steps.size() - 1;
-                            break;
-                        default:
-                            break;
+                    if (question.getAction() != null) {
+                        switch (question.getAction()) {
+                            case CANCEL:
+                                for (; index < steps.size(); ++index) {
+                                    steps.get(index).setState(DistributionStep.State.CANCELED);
+                                }
+                            case SKIP:
+                                index = steps.size() - 1;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
 

@@ -485,9 +485,60 @@ public class XWiki implements EventListener
     {
         XWiki xwiki = getMainXWiki(context);
 
+        String wikiName = xwiki.getRequestWikiName(context);
+        if (wikiName.equals(context.getMainXWiki())) {
+            // The main wiki was requested.
+            return xwiki;
+        }
+
+        // Get the wiki descriptor for the requested wiki
+        DocumentReference wikiDescriptorReference =
+            new DocumentReference(context.getMainXWiki(), XWiki.SYSTEM_SPACE, String.format("XWikiServer%s",
+                StringUtils.capitalize(wikiName.toLowerCase())));
+        XWikiDocument wikiDescriptorDocument = xwiki.getDocument(wikiDescriptorReference, context);
+
+        // Check if this wiki descriptor exists in the database
+        XWikiDocument doc = xwiki.getDocument(wikiDescriptorDocument, context);
+        if (doc.isNew()) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                String.format("The wiki [%s] does not exist", wikiName));
+        }
+
+        // Set the wiki owner
+        String wikiOwner = wikiDescriptorDocument.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
+        if (wikiOwner.indexOf(':') == -1) {
+            wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
+        }
+        context.setWikiOwner(wikiOwner);
+        context.setWikiServer(wikiDescriptorDocument);
+
+        context.setDatabase(wikiName);
+        context.setOriginalDatabase(wikiName);
+
+        try {
+            // Let's make sure the virtual wikis are upgraded to the latest database version
+            xwiki.updateDatabase(wikiName, false, context);
+        } catch (HibernateException ex) {
+            // Just report it, hopefully the database is in a good enough state
+            LOGGER.error("Failed to upgrade database: " + wikiName, ex);
+        }
+        return xwiki;
+    }
+
+    /**
+     * Extracts the name of the wiki from a context's request. In some cases, including autowww, the main wiki may be
+     * returned instead of what was requested, as a result of some assumptions. Even so, the resulting wiki name is not
+     * guaranteed to exist, it is just what XWiki understood from the request.
+     * 
+     * @param context the context which contains the request
+     * @return the name of the wiki that was requested
+     * @throws XWikiException if problems occur
+     */
+    public String getRequestWikiName(XWikiContext context) throws XWikiException
+    {
         // Host is full.host.name in DNS-based multiwiki, and wikiname in path-based multiwiki.
         String host = "";
-        // Canonical name of the wiki (database)
+        // Canonical name of the wiki (database).
         String wikiName = "";
         // wikiDefinition should be the document holding the definition of the virtual wiki, a document in the main
         // wiki with a XWiki.XWikiServerClass object attached to it
@@ -502,7 +553,7 @@ public class XWiki implements EventListener
 
         // In path-based multi-wiki, the wiki name is an element of the request path.
         // The url is in the form /xwiki (app name)/wiki (servlet name)/wikiname/
-        if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "1"))) {
+        if ("1".equals(this.Param("xwiki.virtual.usepath", "1"))) {
             String uri = request.getRequestURI();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Request uri is: " + uri);
@@ -513,7 +564,7 @@ public class XWiki implements EventListener
             String servletPath = request.getServletPath();
             uri = stripSegmentFromPath(uri, servletPath);
 
-            if (servletPath.equals("/" + xwiki.Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
+            if (servletPath.equals("/" + this.Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
                 // Requested path corresponds to a path-based wiki, now the wiki name is between the first and
                 // second "/"
                 host = StringUtils.substringBefore(StringUtils.removeStart(uri, "/"), "/");
@@ -522,66 +573,46 @@ public class XWiki implements EventListener
 
         if (StringUtils.isEmpty(host) || host.equals(context.getMainXWiki())) {
             // Can't find any wiki name, return the main wiki
-            return xwiki;
+            return context.getMainXWiki();
         }
 
-        wikiDefinition = xwiki.findWikiServer(host, context);
+        // Try to use the full domain name/path wiki name and see if it corresponds to any existing wiki descriptors
+        wikiDefinition = this.findWikiServer(host, context);
 
         if (wikiDefinition == null) {
             // No definition found based on the full domain name/path wiki name, try to use the first part of the domain
             // name as the wiki name
             String servername = StringUtils.substringBefore(host, ".");
 
-            // Note: Starting 5.0M1, the autowww behavior is default and the ability to disable it is now deprecated.
-            if (!"0".equals(xwiki.Param("xwiki.virtual.autowww"))) {
-                // As a convenience, allow sites starting with www, localhost or using an
-                // IP address not to have to create a XWikiServerXwiki page since we consider
-                // in that case that they're pointing to the main wiki.
+            // Note: Starting 5.0M2, the autowww behavior is default and the ability to disable it is now deprecated.
+            if (!"0".equals(this.Param("xwiki.virtual.autowww"))) {
+                // As a convenience, we do not require the creation of an xwiki:XWiki.XWikiServerXwiki page for the main
+                // wiki and automatically go to the main wiki in certain cases:
+                // - "www.<anyDomain>.<domainExtension>" - if it starts with www, we first check if a subwiki with that
+                // name exists; if yes, the go to the "www" subwiki, if not, go to the main wiki
+                // - "localhost"
+                // - IP address
                 if ("www".equals(servername)) {
                     // Check that "www" is not actually the name of an existing subwiki.
-                    wikiDefinition = xwiki.findWikiServer(servername, context);
+                    wikiDefinition = this.findWikiServer(servername, context);
                     if (wikiDefinition == null) {
                         // Not the case, use the main wiki.
-                        return xwiki;
+                        return context.getMainXWiki();
                     }
                 } else if ("localhost".equals(host) || host.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}")) {
                     // Direct access to the main wiki.
-                    return xwiki;
+                    return context.getMainXWiki();
                 }
             }
 
-            wikiDefinition =
-                new DocumentReference(DEFAULT_MAIN_WIKI, SYSTEM_SPACE, "XWikiServer"
-                    + StringUtils.capitalize(servername));
+            // Use the name from the subdomain
+            wikiName = servername;
+        } else {
+            // Use the name from the located wiki descriptor
+            wikiName = StringUtils.removeStart(wikiDefinition.getName(), "XWikiServer").toLowerCase();
         }
 
-        // Check if this wiki definition exists in the Database
-        XWikiDocument doc = xwiki.getDocument(wikiDefinition, context);
-        if (doc.isNew()) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                "The wiki " + host + " does not exist");
-        }
-
-        // Set the wiki owner
-        String wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
-        if (wikiOwner.indexOf(':') == -1) {
-            wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
-        }
-        context.setWikiOwner(wikiOwner);
-        context.setWikiServer(doc);
-
-        wikiName = StringUtils.removeStart(wikiDefinition.getName(), "XWikiServer").toLowerCase();
-        context.setDatabase(wikiName);
-        context.setOriginalDatabase(wikiName);
-
-        try {
-            // Let's make sure the virtual wikis are upgraded to the latest database version
-            xwiki.updateDatabase(wikiName, false, context);
-        } catch (HibernateException ex) {
-            // Just report it, hopefully the database is in a good enough state
-            LOGGER.error("Failed to upgrade database: " + wikiName, ex);
-        }
-        return xwiki;
+        return wikiName;
     }
 
     public static URL getRequestURL(XWikiRequest request) throws XWikiException

@@ -150,7 +150,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      */
     public boolean canEditWiki()
     {
-        return this.wikiManager.canDeleteWiki(this.context);
+        return this.wikiManager.canEditWiki(this.context);
     }
 
     /**
@@ -158,7 +158,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      */
     public boolean canDeleteWiki()
     {
-        return this.wikiManager.canEditWiki(this.context);
+        return this.wikiManager.canDeleteWiki(this.context);
     }
 
     // ////////////////////////////////////////////////////////////////////////////

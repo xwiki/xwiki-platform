@@ -260,7 +260,8 @@ Znb7sTCr7KOA/VhSQOTtlANpxVFiMquJtnOpGfwW449oH+CR9XNmOl4hrqQo0ZbM/tVs3r02Go2O
 VJc6Uobsy6M/iJJAJ4G/LktE9SjnIv9MArK7B+gRfLAy3ZNrATvWlcvLC3nffIh+wqn827jisPYC
 fEEyAvgPQDcf8T50jL2UxrwU+CqUsUkQHSw8y0u2j6BDXCtmOhoMW62n1MUAPdRNlgJ4Aa/KPnQf
 vDHYXecbFegLFc5cvff06pssIewCH+JCPz4+MQMPDg7H47W8jYosvyh0ov8lWcvPX5eV7+34Mm1x
-AAAAAElFTkSuQmCC</content>
+AAAAAElFTkSuQmCC
+</content>
   </attachment>
   <class>
     <name>XWiki.SearchSuggestConfig</name>
@@ -520,15 +521,17 @@ AAAAAElFTkSuQmCC</content>
       </name>
       <query>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>query</name>
         <number>3</number>
         <picker>0</picker>
         <prettyName>query</prettyName>
-        <size>30</size>
+        <rows>5</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </query>
       <resultsNumber>
         <disabled>0</disabled>
@@ -536,7 +539,7 @@ AAAAAElFTkSuQmCC</content>
         <number>4</number>
         <picker>0</picker>
         <prettyName>resultsNumber</prettyName>
-        <size>30</size>
+        <size>3</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -643,15 +646,17 @@ AAAAAElFTkSuQmCC</content>
       </name>
       <query>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>query</name>
         <number>3</number>
         <picker>0</picker>
         <prettyName>query</prettyName>
-        <size>30</size>
+        <rows>5</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </query>
       <resultsNumber>
         <disabled>0</disabled>
@@ -659,7 +664,7 @@ AAAAAElFTkSuQmCC</content>
         <number>4</number>
         <picker>0</picker>
         <prettyName>resultsNumber</prettyName>
-        <size>30</size>
+        <size>3</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -766,15 +771,17 @@ AAAAAElFTkSuQmCC</content>
       </name>
       <query>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>query</name>
         <number>3</number>
         <picker>0</picker>
         <prettyName>query</prettyName>
-        <size>30</size>
+        <rows>5</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </query>
       <resultsNumber>
         <disabled>0</disabled>
@@ -782,7 +789,7 @@ AAAAAElFTkSuQmCC</content>
         <number>4</number>
         <picker>0</picker>
         <prettyName>resultsNumber</prettyName>
-        <size>30</size>
+        <size>3</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -818,7 +825,7 @@ AAAAAElFTkSuQmCC</content>
       <name>Attachment name</name>
     </property>
     <property>
-      <query>name:__INPUT__* AND type:attachment</query>
+      <query>filename:__INPUT__* AND type:attachment</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -889,15 +896,17 @@ AAAAAElFTkSuQmCC</content>
       </name>
       <query>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>query</name>
         <number>3</number>
         <picker>0</picker>
         <prettyName>query</prettyName>
-        <size>30</size>
+        <rows>5</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </query>
       <resultsNumber>
         <disabled>0</disabled>
@@ -905,7 +914,7 @@ AAAAAElFTkSuQmCC</content>
         <number>4</number>
         <picker>0</picker>
         <prettyName>resultsNumber</prettyName>
-        <size>30</size>
+        <size>3</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -941,7 +950,7 @@ AAAAAElFTkSuQmCC</content>
       <name>Attachment content</name>
     </property>
     <property>
-      <query>__INPUT__* AND type:attachment</query>
+      <query>ft:__INPUT__* AND type:attachment</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1012,15 +1021,17 @@ AAAAAElFTkSuQmCC</content>
       </name>
       <query>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>query</name>
         <number>3</number>
         <picker>0</picker>
         <prettyName>query</prettyName>
-        <size>30</size>
+        <rows>5</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </query>
       <resultsNumber>
         <disabled>0</disabled>
@@ -1028,7 +1039,7 @@ AAAAAElFTkSuQmCC</content>
         <number>4</number>
         <picker>0</picker>
         <prettyName>resultsNumber</prettyName>
-        <size>30</size>
+        <size>3</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -1135,15 +1146,17 @@ AAAAAElFTkSuQmCC</content>
       </name>
       <query>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>query</name>
         <number>3</number>
         <picker>0</picker>
         <prettyName>query</prettyName>
-        <size>30</size>
+        <rows>5</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </query>
       <resultsNumber>
         <disabled>0</disabled>
@@ -1151,7 +1164,7 @@ AAAAAElFTkSuQmCC</content>
         <number>4</number>
         <picker>0</picker>
         <prettyName>resultsNumber</prettyName>
-        <size>30</size>
+        <size>3</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>

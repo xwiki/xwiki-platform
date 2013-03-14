@@ -26,30 +26,7 @@
   <content>{{velocity}}
 #set ($needsAdminRights = false)
 ##
-## 1. Register translations
-##
-#set ($xwikiPreferencesDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiPreferences'))
-#set ($xwikiPreferencesDocument = $xwiki.getDocument($xwikiPreferencesDocumentReference))
-#set ($xwikiPreferencesObject = $xwikiPreferencesDocument.getObject('XWiki.XWikiPreferences'))
-#set ($documentBundles = "$!xwikiPreferencesObject.getProperty('documentBundles').value")
-#if (!$documentBundles.contains('WorkspaceManager.Translations'))
-  #if ($hasGlobalAdmin)
-    #set ($discard = $xwikiPreferencesObject.set('documentBundles', "$documentBundles, WorkspaceManager.Translations"))
-    #set ($discard = $xwikiPreferencesDocument.save($msg.get('platform.workspace.translationsInstallSaveComment'), true))
-    {{success}}$msg.get('workspacemanager.translations.install.success'){{/success}}
-  #else
-    #set ($needsAdminRights = true)
-  #end
-#else
-  ##
-  ## Don't display this information if the code is included from somewhere else.
-  ##
-  #if ($context.doc == $context.tdoc)
-    {{success}}$msg.get('workspacemanager.translations.install.success'){{/success}}
-  #end
-#end
-##
-## 2. Register workspace search suggestions
+## 2(1). Register workspace search suggestions
 ##
 #macro (registerWorkspaceSearchSuggestions $wikiName $skipSuccessMessage $skipNeedsAdminRightsCheck)
   #set ($searchSuggestConfigDocumentReference = $services.model.createDocumentReference($wikiName, 'XWiki', 'SearchSuggestConfig'))
@@ -219,22 +196,7 @@
       #set ($xwikiPreferencesObject = $xwikiPreferencesDocument.getObject($xwikiPreferencesClassName))
       #set ($xwikiPreferencesNeedsSaving = false)
       ##
-      ## 1. Register workspace translations
-      ##
-      #set ($workspaceManagerTranslations = "${xcontext.mainWikiName}:WorkspaceManager.Translations")
-      #set ($currentTranslations = $xwikiPreferencesObject.getProperty('documentBundles').value)
-      #if (!$currentTranslations.contains($workspaceManagerTranslations))
-        #set ($currentTranslations = "$workspaceManagerTranslations,$!currentTranslations")
-        #set ($xwikiPreferencesNeedsSaving = true)
-      #end
-      #set ($templateTranslations = "${xcontext.mainWikiName}:WorkspaceManager.TemplateTranslations")
-      #if (!$currentTranslations.contains($templateTranslations))
-        #set ($currentTranslations = "$templateTranslations,$!currentTranslations")
-        #set ($xwikiPreferencesNeedsSaving = true)
-      #end
-      #set ($discard = $xwikiPreferencesObject.set('documentBundles', "$!currentTranslations"))
-      ##
-      ## 2. Register the Workspace Information Panel
+      ## 2(1). Register the Workspace Information Panel
       ##
       #set ($workspaceInformationPanel = 'Panels.WorkspaceInformationPanel')
       #set ($currentRightPanels = $xwikiPreferencesObject.getProperty('rightPanels').value)

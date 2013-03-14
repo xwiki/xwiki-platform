@@ -405,7 +405,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
         &lt;div&gt;$msg.get('watchlist.diff.error')&lt;/div&gt;
       #else
         &lt;div class="diff"&gt;
-          #displayhtmldiff()
+          #displayhtmldiff($htmlDiff)
         &lt;/div&gt;
       #end
     #end

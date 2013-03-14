@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>Le Bac à Sable est l'endroit que vous pouvez librement modifier car son but est de vous faire habituer avec l'édition des documents wiki. De cette façon vous découvrirez comment créer et éditer des pages. Pour commencer, cliquez tout simplement sur "Éditer".
+
+{{info}}Ne vous inquiétez pas d'écraser ou de perdre des informations lors de l'édition de la page car vous pouvez toujours revenir à la version initiale du document via l'onglet "Historique" en bas de page.{{/info}}
+
+Vous avez trois pages de test sur lesquelles expérimenter:
+
+* [[Page de Test 1&gt;&gt;Sandbox.TestPage1]]
+* [[Page de Test 2&gt;&gt;Sandbox.TestPage2]]
+* [[Page de Test 3&gt;&gt;Sandbox.TestPage3]]
+
+= Titres =
+
+XWiki vous offre 6 niveaux pour les titres que vous pouvez utiliser afin d'organiser le contenu de vos pages. 
+
+== Titre 2 ==
+
+=== Titre 3 ===
+
+==== Titre 4 ====
+
+===== Titre 5 =====
+
+====== Titre 6 ======
+
+= Styles =
+
+XWiki supporte les styles de base suivants:
+
+* **Texte Gras**
+* //Texte Italique//
+* __Texte Souligné__
+* --Texte Barré--
+* Texte en ,,indice,,
+* Texte en ^^exposant^^
+
+= Liste =
+
+Vous pouvez créer des divers types de listes dans vos pages wiki:
+
+== Liste à puces ==
+
+* Niveau 1
+** Niveau 2
+*** Niveau 3
+** Niveau 2
+* Niveau 1
+
+== Liste numérotée ==
+
+1. Élément
+11. Sous-élément
+111. Élément
+1. Sous-élément
+
+= Tableaux =
+
+Vous pouvez créer des tableaux simples directement dans vos pages wiki:
+
+== Tableau simple ==
+
+| cellule 1 | cellule 2 | cellule 3
+| cellule 4 | cellule 5 | cellule 6
+| cellule 7 | cellule 8 | cellule 9
+
+== Tableau dont l’en-tête est sur la première ligne ==
+
+|= en-tête |= en-tête |= en-tête 
+| cellule | cellule | cellule
+| cellule | cellule | cellule
+
+== Tableau dont l'en-tête est sur la première ligne est la première colonne ==
+
+|= en-tête |= en-tête |= en-tête
+|= en-tête | cellule | cellule
+|= en-tête | cellule | cellule
+
+
+= Liens =
+
+XWiki vous permet de créer des liens vers d'autres documents wiki ou vers des pages Web:
+
+* [[WebHome]] -&gt; lien vers la page d'accueil de l'espace courant
+* [[Sandbox Home&gt;&gt;WebHome]] -&gt; les liens peuvent contenir des titres
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; un lien peut utiliser le format NomEspace.NomPage pour référer une page d'un autre espace. 
+* [[http://www.xwiki.org]] -&gt; vous pouvez également référer des pages wiki ou des sites Web externes
+* [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; les titres des liens s'appliquent également pour les liens externes.
+
+= Images =
+
+Vous pouvez avoir des images dans vos pages wiki:
+
+[[image:XWikiLogo.png]]
+
+= Macros = 
+
+Les macros vous permettent de personnaliser l'aspect du contenu du wiki ainsi que d'y ajouter des fonctionnalités. Ci-dessous vous avez 2 exemples d'usage des macros dans les pages wiki:
+
+== La macro d'avertissement ==
+
+Cette macro vous permet d'attirer l'attention des utilisateurs sur un certain détail:
+
+{{warning}}Salut à tous!{{/warning}}
+
+== Table de matières ==
+
+Cette macro génère automatiquement une table de matières à partir des titres présentes dans le contenu de votre page wiki:
+
+{{toc/}} </content>
+</xwikidoc>

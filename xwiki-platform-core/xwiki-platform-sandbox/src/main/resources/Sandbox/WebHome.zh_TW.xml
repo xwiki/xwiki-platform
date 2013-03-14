@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>zh_TW</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>The sandbox is a part of your wiki that you can freely modify. It’s meant to let you practice editing. You will discover how page editing works and create new pages. Simply click on **Edit** to get started!
+
+{{info}}Don’t worry about overwriting or losing stuff when editing the page, you can always roll back to the first version of the page from the "History" tab at the bottom of the page.{{/info}}
+
+If you want to give a look to the underlying [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]], you can click on "Wiki code" in the "Show" menu or click on the "Source" tab when editing the page.
+
+Here are a number of test pages you can play with:
+
+* [[測試頁面 1&gt;&gt;Sandbox.TestPage1]]
+* [[測試頁面 2&gt;&gt;Sandbox.TestPage2]]
+* [[測試頁面 3&gt;&gt;Sandbox.TestPage3]]
+
+以下是 [[XWiki 語法&gt;&gt;XWiki.XWikiSyntax]] 中的語法使用示範，you can use in wiki pages (headings, images, tables).
+
+= 標題 =
+
+XWiki 提供六階層標題，你可以使用它們來組織你的頁面。
+
+== 標題 2 ==
+
+=== 標題 3 ===
+
+==== 標題 4 ====
+
+===== 標題 5 =====
+
+====== 標題 6 ======
+
+= Styles =
+
+Basic styles are supported in XWiki:
+
+* **粗體字**
+* //斜體字//
+* __底線文字__
+* --刪除線文字--
+* 文字 ,,下標,,
+* 文字 ^^上標^^
+
+= 列表 =
+
+You can create various types of lists in your wiki pages:
+
+== 符號列表 ==
+
+* Level 1
+** Level 2
+*** Level 3
+** Level 2
+* Level 1
+
+== Numbered list ==
+
+1. Item
+11. Subitem
+111. Item
+1. Subitem
+
+== 混合的列表 ==
+
+1. Item 1
+11. Item 2
+11*. Item 3
+11*. Item 4
+1. Item 5
+
+= 表格 =
+
+You can create simple tables right into wiki pages:
+
+== Simple table ==
+
+| cell 1 | cell 2 | cell 3
+| cell 4 | cell 5 | cell 6
+| cell 7 | cell 8 | cell 9
+
+== Table with headers in the top row ==
+
+|= table header |= table header |= table header
+| cell | cell | cell
+| cell | cell | cell
+
+== Table with headers in the top row and left column ==
+
+|= table header |= table header |= table header
+|= table header | cell | cell
+|= table header | cell | cell
+
+= 鏈結 =
+
+XWiki allows you to create links to other pages in your wiki or on the web:
+
+* [[WebHome]] -&gt; links to the homepage of the current space
+* [[Sandbox Home&gt;&gt;WebHome]] -&gt; links can have labels
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; a link can use the SpaceName.PageName format to link to a page located in another space
+* [[http://www.xwiki.org]] -&gt; you can link to wiki pages or to external websites
+* [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; link labels work for exernal links too
+
+= 圖片 =
+
+You can insert images in your wiki pages:
+
+[[image:XWikiLogo.png]]
+
+= 巨集 =
+
+Macros allow you to make wiki content look better and to add additional features to your wiki. Here are 2 examples of how macros can be used in wiki pages:
+
+== 警告巨集 ==
+
+This macro allows you to draw users’ attention to a specific piece of information:
+
+{{warning}}Hello World{{/warning}}
+
+== 目錄 ==
+
+This macro automatically generates a table of contents of your wiki page based on headings:
+
+{{toc/}}</content>
+</xwikidoc>

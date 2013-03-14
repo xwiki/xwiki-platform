@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>lv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>Smilšu kaste ir viki vieta, kuru jūs varat brīvi mainīt. Jūs šeit varat mācīties un mēģināt. Jūs varat pārbaudīt, kā tiek rediģēti esošie dokumenti, un kā var veidot jaunas lapas. Lai sāktu, spiediet **Rediģēt**! {{info}}Neuztraucieties par satura zaudēšanu šajā lapā, jo jūs vienmēr varat atritināt saturu uz iepriekšējo versiju, "Vēsture" cilnē lapas apakšā.{{/info}} Ja vēlaties izpētīt [[XWiki sintaksi&gt;&gt;XWiki.XWikiSyntax]], aktivizējiet izvēlni "Rādīt" "Viki kodu", vai izvēlieties "Kods" cilni, lapas rediģēšanas režīmā.
+
+Tālāk ir vairākas lapas ar kurām jūs varat darboties:
+* [[1. testa lapa&gt;&gt;Sandbox.TestPage1]]
+* [[2. testa lapa&gt;&gt;Sandbox.TestPage2]]
+* [[3. testa lapa&gt;&gt;Sandbox.TestPage3]] 
+
+Tālāk ir saturs, kas demonstrē [[XWiki dokumentu sintaksi&gt;&gt;XWiki.XWikiSyntax]]. Xwiki lapās jūs varat izmantot dažādus noformējum elementus (virsraktus, attēlus, tabulas u.c.). 
+
+= Virsraksti =
+XWiki ļauj veidot 6 līmeņu virsrakstus. Virsrakstus jūs varat izmantot, lai strukturētu lapas tekstu. 
+
+== 2. līmeņa virsraksts ==
+=== 3. līmeņa virsraksts ===
+==== 4. līmeņa virsraksts ====
+===== 5. līmeņa virsraksts =====
+====== 6. līmeņa virsraksts ======
+
+= Stili =
+XWiki nodrošina visus pamata noformējuma stilus:
+* **Teksts treknrakstā** 
+* //Teksts slīprakstā// 
+* __Pasvītrots teksts__ 
+* --Nosvitrots teksts-- 
+* Teksts ,,apakšrakstā,, 
+* Teksts ^^augšrakstā^^ 
+
+= Saraksti =
+XWiki var veidot dažādus sarakstus: 
+
+== Nesakārtots saraksts ==
+* 1. līmenis
+** 2. līmenis
+*** 3. līmenis
+** 2. līmenis
+* 1. līmenis
+
+== Numurēts saraksts ==
+1. 1. līmeņa vienība 
+11. 2. līmeņa vienība
+111. 3. līmeņa vienība
+1. 1. līmeņa vienība
+
+== Jaukti saraksti == 
+1. 1. līmeņa vienība
+11. 1. līmeņa vienība
+11*. 3. līmeņa vienība ar iezīmi
+11*. otra 3. līmeņa vienība ar iezīmi
+1. 1. līmeņa vienība
+
+= Tabulas =
+XWiki dokumentā var veidot tabulas: 
+
+== Vienkārša tabula ==
+| 1. šūna | 2. šūna | 3. šūna | 4. šūna | 5. šūna | 6. šūna | 7. šūna | 8. šūna | 9. šūna
+
+== Tabula ar virsrakstu 1. rindā ==
+|= tabulas virsraksts |= tabulas virsraksts |= tabulas virsraksts
+| šūna | šūna | šūna
+| šūna | šūna | šūna
+
+== Tabula ar virsrakstu 2. rindās ==
+|= tabulas virsraksts |= tabulas virsraksts
+|= tabulas virsraksts |= tabulas virsraksts
+| šūna | šūna 
+| šūna | šūna
+
+
+= Saites =
+XWiki dokumentā var veidot saites uz citām Xwiki lapām (šajā vietnē) un ārējām lapām: 
+* [[WebHome]] -&gt; saite uz vietas mājas lapu (to sauc WebHome)
+* [[Šīs vietas sākuma lapa&gt;&gt;WebHome]] -&gt; saite ar nosaukumu
+* [[Viki sākuma lapa&gt;&gt;Main.WebHome]] -&gt; nosaukta saite uz citas vietas sākuma lapu. Saites mērķi raksta formā Vieta.lapa 
+* [[http://www.xwiki.org]] -&gt; saite uz citu, ārēju vietni tiek norādīta ar vietrādi (URL)
+* [[XWiki.org mājas lapa&gt;&gt;http://www.xwiki.org]] -&gt; nosaukta saite uz citu, ārēju vietni
+
+= Attēli =
+XWiki dokumentā var ievietot lapas pielikumā augšuplādētus attēlus:
+
+[[image:XWikiLogo.png]] 
+
+
+= Makrosi =
+Ar makrosiem var veidot dinamisku lapu saturu un tie paver daudz un dažādas iespējas. Ir arī makrosi īpašam teksta noformējumam, piemēram:
+
+== Brīdinājuma ziņojuma makross ==
+
+Sekojošais makross parāda tekstu brīdinājuma ziņojuma rāmī:
+
+{{warning}}Sveika pasaule!{{/warning}} 
+
+
+== Satura rādītājs ==
+
+Šis makross automātiski izveido lapas satura rādītāju, izmantojot lapā saliktos virsrakstus:
+
+{{toc/}}</content>
+</xwikidoc>

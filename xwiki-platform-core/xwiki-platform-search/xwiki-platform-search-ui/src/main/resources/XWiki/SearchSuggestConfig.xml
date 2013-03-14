@@ -572,7 +572,7 @@ AAAAAElFTkSuQmCC
       <icon>$xwiki.getSkinFile('icons/silk/page_white_text.png')</icon>
     </property>
     <property>
-      <name>Document name</name>
+      <name>$msg.get('platform.search.suggestSourceDocumentName')</name>
     </property>
     <property>
       <query>name:__INPUT__* OR web:__INPUT__*</query>
@@ -697,7 +697,7 @@ AAAAAElFTkSuQmCC
       <icon>$xwiki.getSkinFile('icons/silk/page_white_text.png')</icon>
     </property>
     <property>
-      <name>Document content</name>
+      <name>$msg.get('platform.search.suggestSourceDocumentContent')</name>
     </property>
     <property>
       <query>__INPUT__*</query>
@@ -822,7 +822,7 @@ AAAAAElFTkSuQmCC
       <icon>$xwiki.getSkinFile('icons/silk/attach.png')</icon>
     </property>
     <property>
-      <name>Attachment name</name>
+      <name>$msg.get('platform.search.suggestSourceAttachmentName')</name>
     </property>
     <property>
       <query>filename:__INPUT__* AND type:attachment</query>
@@ -947,7 +947,7 @@ AAAAAElFTkSuQmCC
       <icon>$xwiki.getSkinFile('icons/silk/attach.png')</icon>
     </property>
     <property>
-      <name>Attachment content</name>
+      <name>$msg.get('platform.search.suggestSourceAttachmentContent')</name>
     </property>
     <property>
       <query>ft:__INPUT__* AND type:attachment</query>
@@ -1072,7 +1072,7 @@ AAAAAElFTkSuQmCC
       <icon>$xwiki.getSkinFile('icons/silk/page_white_picture.png')</icon>
     </property>
     <property>
-      <name>Blog Posts</name>
+      <name>$msg.get('platform.search.suggestSourceBlogPost')</name>
     </property>
     <property>
       <query>__INPUT__* AND object:Blog.BlogPostClass</query>
@@ -1197,7 +1197,7 @@ AAAAAElFTkSuQmCC
       <icon>$xwiki.getSkinFile('icons/silk/user.png')</icon>
     </property>
     <property>
-      <name>Users</name>
+      <name>$msg.get('platform.search.suggestSourceUsers')</name>
     </property>
     <property>
       <query>__INPUT__* AND object:XWiki.XWikiUsers</query>

@@ -204,6 +204,7 @@ platform.workspace.newWorkspaceTemplateLabel=Template
 WorkspaceManager.WorkspaceClass_membershipType_open=Open for any user to join
 WorkspaceManager.WorkspaceClass_membershipType_request=Any user can request to join but an admin must accept
 WorkspaceManager.WorkspaceClass_membershipType_invite=Only an admin can invite a user
+platform.workspace.searchSuggestSourceWorkspaces=Workspaces
 
 # PROPERTIES
 workspacemanager.prop.wiki.wikiname=Workspace Identifier

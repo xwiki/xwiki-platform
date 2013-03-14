@@ -35,7 +35,7 @@
   #if (!$searchSuggestConfigObject)
     #if ($hasGlobalAdmin)
       #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject('XWiki.SearchSuggestSourceClass'))
-      #set ($discard = $searchSuggestConfigObject.set('name', 'Workspaces'))
+      #set ($discard = $searchSuggestConfigObject.set('name', '$msg.get(''platform.workspace.searchSuggestSourceWorkspaces'')'))
       #set ($discard = $searchSuggestConfigObject.set('query', 'XWiki.XWikiServerClass.wikiprettyname:__INPUT__* AND object:WorkspaceManager.WorkspaceClass'))
       #set ($discard = $searchSuggestConfigObject.set('resultsNumber', '3'))
       #set ($suggestUrl = '$xwiki.getURL(' + $escapetool.quote + '${xcontext.mainWikiName}:WorkspaceManager.WorkspacesSuggestLuceneService' + $escapetool.quote + ', ' + $escapetool.singleQuote + 'get' + $escapetool.singleQuote + ', ' + $escapetool.singleQuote + 'outputSyntax=plain' + $escapetool.singleQuote + ')')

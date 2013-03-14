@@ -399,9 +399,15 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
       &lt;h4 style="$h4Style"&gt;$msg.get("watchlist.event.update.multiple", [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])&lt;/h4&gt;
     #end
     #if ($event.getType() == "update" || $event.getType() == "create")
-      &lt;div class="diff"&gt;
-        #displayhtmldiff($event.getHTMLDiff())
-      &lt;/div&gt;
+      #set ($htmlDiff = $event.getHTMLDiff())
+      ## If the HTML Diff failed, display some error message
+      #if(!$htmlDiff)
+        &lt;div&gt;$msg.get('watchlist.diff.error')&lt;/div&gt;
+      #else
+        &lt;div class="diff"&gt;
+          #displayhtmldiff()
+        &lt;/div&gt;
+      #end
     #end
   &lt;/div&gt;
   #set($previousEvent = $event)

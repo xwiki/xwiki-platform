@@ -514,7 +514,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     }
 
     /**
-     * @return The diff, formated in HTML, to display to the user when a document has been updated
+     * @return The diff, formatted in HTML, to display to the user when a document has been updated, or null if an
+     *         error occurred while computing the diff
      */
     public String getHTMLDiff()
     {
@@ -523,7 +524,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 DiffPluginApi diff = (DiffPluginApi) context.getWiki().getPluginApi("diff", context);
                 StringBuffer result = new StringBuffer();
                 XWikiDocument d2 = context.getWiki().getDocument(getPrefixedFullName(), context);
-                
+
                 if (getType().equals(WatchListEventType.CREATE)) {
                     d2 = context.getWiki().getDocument(d2, INITIAL_DOCUMENT_VERSION, context);                    
                 }

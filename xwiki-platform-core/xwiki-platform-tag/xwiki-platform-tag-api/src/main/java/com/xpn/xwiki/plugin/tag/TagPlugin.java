@@ -465,17 +465,23 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);
             List<String> tags = getTagsFromDocument(doc);
-            for (int i = 0; i < tags.size(); i++) {
-                if (tags.get(i).equalsIgnoreCase(tag)) {
-                    tags.set(i, newTag);
+
+            if (tags.contains(newTag)) {
+                // The new tag might already be present in the document, in this case we just need to remove the old one
+                removeTagFromDocument(tag, doc.getFullName(), context);
+            } else {
+                for (int i = 0; i < tags.size(); i++) {
+                    if (tags.get(i).equalsIgnoreCase(tag)) {
+                        tags.set(i, newTag);
+                    }
                 }
+                setDocumentTags(doc, tags, context);
+
+                // Since we're changing the document we need to set the new author
+                doc.setAuthorReference(context.getUserReference());
+
+                context.getWiki().saveDocument(doc, comment, true, context);
             }
-            setDocumentTags(doc, tags, context);
-
-            // Since we're changing the document we need to set the new author
-            doc.setAuthorReference(context.getUserReference());
-
-            context.getWiki().saveDocument(doc, comment, true, context);
         }
 
         return TagOperationResult.OK;

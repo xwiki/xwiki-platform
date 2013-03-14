@@ -114,7 +114,7 @@
 #end
 #getBlogDocument($space $blogDoc)
 #if ($space == $blogDoc.space || $showEmptyPanels)
-  #panelheader('Blog Archive')
+  #panelheader($msg.get('xe.blog.archive.paneltitle'))
   #getBlogEntriesBaseQuery($query)
   #set ($query = "${query} and (doc.space = ? or doc.parent = ?)")
   #set ($queryParams = [$blogDoc.space, $blogDoc.fullName])

@@ -108,7 +108,7 @@
       <content>{{include document="Blog.CategoriesCode"/}}
 
 {{velocity}}
-#panelheader('Blog Categories')
+#panelheader($msg.get('xe.blog.categories.paneltitle'))
 #getCategoriesHierarchy('Blog' $tree)
 {{html wiki="true"}}
 #displayCategoriesHierarchy($tree 'simple')

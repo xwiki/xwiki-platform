@@ -402,7 +402,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
       #set ($htmlDiff = $event.getHTMLDiff())
       ## If the HTML Diff failed, display some error message
       #if(!$htmlDiff)
-        &lt;div&gt;$msg.get('watchlist.diff.error')&lt;/div&gt;
+        &lt;div&gt;$services.localization.render('watchlist.diff.error')&lt;/div&gt;
       #else
         &lt;div class="diff"&gt;
           #displayhtmldiff($htmlDiff)

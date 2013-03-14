@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>XWiki</web>
-  <name>WorkspaceTranslations</name>
+  <web>WorkspaceManager</web>
+  <name>TemplateTranslations</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.WebHome</parent>
+  <parent>WorkspaceManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -15,7 +15,7 @@
   <date>1307445978000</date>
   <contentUpdateDate>1307445978000</contentUpdateDate>
   <version>1.1</version>
-  <title>Workspace Translations</title>
+  <title>TemplateTranslations</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

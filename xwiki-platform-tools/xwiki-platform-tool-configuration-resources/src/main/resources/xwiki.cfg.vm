@@ -168,10 +168,7 @@ xwiki.store.migration=1
 # Virtual wikis (farm)
 #
 
-#-# Starting with XWiki 5.0, virtual mode is enabled by default.
-
-#-# URL to redirect to when a requested wiki does not exist. This should be changed to a real page.
-xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
+#-# Starting with XWiki 5.0M2, virtual mode is enabled by default.
 
 #-# Forbidden names that should not be allowed when creating a new wiki.
 # xwiki.virtual.reserved_wikis=

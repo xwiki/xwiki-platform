@@ -67,11 +67,19 @@ public class AttachmentDiff
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer(fileName);
+        StringBuffer buf = new StringBuffer(this.fileName);
         buf.append(": ");
-        buf.append(origVersion);
-        buf.append(" &gt; ");
-        buf.append(newVersion);
+        if (this.origVersion != null) {
+            buf.append(this.origVersion);
+        } else {
+            buf.append("()");
+        }
+        buf.append(" -&gt; ");
+        if (this.newVersion != null) {
+            buf.append(this.newVersion);
+        } else {
+            buf.append("()");
+        }
         return buf.toString();
     }
 }

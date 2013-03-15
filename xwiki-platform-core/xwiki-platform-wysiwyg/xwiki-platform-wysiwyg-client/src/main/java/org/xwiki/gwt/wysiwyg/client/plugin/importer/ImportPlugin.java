@@ -100,8 +100,10 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
     {
         super.init(textArea, config);
 
-        PasteManager pasteManager = GWT.create(PasteManager.class);
-        saveRegistrations(pasteManager.initialize(textArea, importService));
+        if (Boolean.valueOf(config.getParameter("cleanPaste", "true"))) {
+            PasteManager pasteManager = GWT.create(PasteManager.class);
+            saveRegistrations(pasteManager.initialize(textArea, importService));
+        }
 
         this.importMenuExtension = new ImportMenuExtension(this);
         getUIExtensionList().add(importMenuExtension);

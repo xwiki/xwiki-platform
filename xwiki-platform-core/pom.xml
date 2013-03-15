@@ -356,6 +356,12 @@
                <to>org/xwiki/localization/internal/message/TranslationMessageElement</to>
                <justification>YOUNG API. Forgot to move it out of internal when TranslationMessage has been</justification>
              </difference>
+            <difference>
+              <className>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</className>
+              <differenceType>7012</differenceType>
+              <method>java.lang.Boolean isPasteContentCleanedAutomatically()</method>
+              <justification>Added a new configuration property for the WYSIWYG Editor.</justification>
+            </difference>-->
             <!-- The following difference breaks CLIRR for some reason so I'm excluding the entire class below.
             <difference>
               <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>

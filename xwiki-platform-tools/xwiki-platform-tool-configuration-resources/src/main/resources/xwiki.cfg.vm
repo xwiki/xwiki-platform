@@ -170,6 +170,12 @@ xwiki.store.migration=1
 
 #-# Starting with XWiki 5.0M2, virtual mode is enabled by default.
 
+#-# [Since 5.0M2]
+#-# What to do when the requested wiki does not exist:
+#-# - 0: (default) serve the main wiki
+#-# - 1: display an error (customizable through wikidoesnotexist.vm or xwiki:XWiki.WikiDoesNotExist)
+# xwiki.virtual.failOnWikiDoesNotExist=0
+
 #-# Forbidden names that should not be allowed when creating a new wiki.
 # xwiki.virtual.reserved_wikis=
 

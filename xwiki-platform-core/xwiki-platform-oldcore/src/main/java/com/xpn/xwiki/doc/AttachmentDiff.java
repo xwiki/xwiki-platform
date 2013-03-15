@@ -36,7 +36,7 @@ public class AttachmentDiff
 
     public String getFileName()
     {
-        return fileName;
+        return this.fileName;
     }
 
     public void setFileName(String fileName)
@@ -46,7 +46,7 @@ public class AttachmentDiff
 
     public String getOrigVersion()
     {
-        return origVersion;
+        return this.origVersion;
     }
 
     public void setOrigVersion(String origVersion)
@@ -56,7 +56,7 @@ public class AttachmentDiff
 
     public String getNewVersion()
     {
-        return newVersion;
+        return this.newVersion;
     }
 
     public void setNewVersion(String newVersion)

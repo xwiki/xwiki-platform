@@ -22,46 +22,56 @@ package com.xpn.xwiki.doc;
 public class MetaDataDiff
 {
     private String field;
+
     private Object prevValue;
+
     private Object newValue;
 
-    public MetaDataDiff(String field, Object prevValue, Object newValue) {
+    public MetaDataDiff(String field, Object prevValue, Object newValue)
+    {
         this.setField(field);
         this.setPrevValue(prevValue);
         this.setNewValue(newValue);
     }
 
-    public String getField() {
-        return field;
+    public String getField()
+    {
+        return this.field;
     }
 
-    public void setField(String field) {
+    public void setField(String field)
+    {
         this.field = field;
     }
 
-    public Object getPrevValue() {
-        return prevValue;
+    public Object getPrevValue()
+    {
+        return this.prevValue;
     }
 
-    public void setPrevValue(Object prevvalue) {
+    public void setPrevValue(Object prevvalue)
+    {
         this.prevValue = prevvalue;
     }
 
-    public Object getNewValue() {
-        return newValue;
+    public Object getNewValue()
+    {
+        return this.newValue;
     }
 
-    public void setNewValue(Object newValue) {
+    public void setNewValue(Object newValue)
+    {
         this.newValue = newValue;
     }
 
     @Override
-    public String toString() {
-        StringBuffer buf = new StringBuffer(field);
+    public String toString()
+    {
+        StringBuffer buf = new StringBuffer(this.field);
         buf.append(": ");
-        buf.append(prevValue.toString());
+        buf.append(this.prevValue.toString());
         buf.append(" &gt; ");
-        buf.append(newValue.toString());
+        buf.append(this.newValue.toString());
         return buf.toString();
     }
 }

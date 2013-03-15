@@ -36,7 +36,7 @@ public class ObjectDiff
     public static final String ACTION_OBJECTADDED = "object-added";
 
     public static final String ACTION_OBJECTREMOVED = "object-removed";
-    
+
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "current");
 

@@ -67,7 +67,7 @@ public class MetaDataDiff
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer(this.field);
+        StringBuilder buf = new StringBuilder(this.field);
         buf.append(": ");
         buf.append(this.prevValue.toString());
         buf.append(" &gt; ");

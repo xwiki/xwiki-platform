@@ -159,6 +159,12 @@ public abstract class XWikiAction extends Action
                 // redirects. If here are none, then we display the specific error template.
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
+                        // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
+                        if (!StringUtils.isEmpty(context.getWiki().Param("xwiki.virtual.redirect"))) {
+                            LOGGER.warn(String.format("%s %s", "'xwiki.virtual.redirect' is no longer supported.",
+                                "Please update your configuration and/or see XWIKI-8914 for more details."));
+                        }
+
                         boolean currentActionShouldFail = !ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST.contains(action);
 
                         // Display the error template only for actions that are not ignored

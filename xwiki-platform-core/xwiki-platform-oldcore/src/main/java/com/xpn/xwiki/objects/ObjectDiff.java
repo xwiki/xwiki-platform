@@ -196,7 +196,7 @@ public class ObjectDiff
         buffer.append(getPropName());
         buffer.append(": ");
         buffer.append(getPrevValue().toString());
-        buffer.append(" &gt; ");
+        buffer.append(" \u21E8 ");
         buffer.append(getNewValue().toString());
 
         return buffer.toString();

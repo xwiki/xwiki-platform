@@ -74,7 +74,7 @@ public class AttachmentDiff
         } else {
             buf.append("()");
         }
-        buf.append(" -&gt; ");
+        buf.append(" \u21E8 ");
         if (this.newVersion != null) {
             buf.append(this.newVersion);
         } else {

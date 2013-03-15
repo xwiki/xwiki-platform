@@ -35,27 +35,27 @@ public class AttachmentDiffTest
     public void toStringWhenVersionsNotNull()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", "1.1", "1.2");
-        Assert.assertEquals("filename: 1.1 -&gt; 1.2", diff.toString());
+        Assert.assertEquals("filename: 1.1 \u21E8 1.2", diff.toString());
     }
 
     @Test
     public void toStringWhenNoOriginalVersion()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", null, "1.1");
-        Assert.assertEquals("filename: () -&gt; 1.1", diff.toString());
+        Assert.assertEquals("filename: () \u21E8 1.1", diff.toString());
     }
 
     @Test
     public void toStringWhenNoNewVersion()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", "1.1", null);
-        Assert.assertEquals("filename: 1.1 -&gt; ()", diff.toString());
+        Assert.assertEquals("filename: 1.1 \u21E8 ()", diff.toString());
     }
 
     @Test
     public void toStringWhenNoVersions()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", null, null);
-        Assert.assertEquals("filename: () -&gt; ()", diff.toString());
+        Assert.assertEquals("filename: () \u21E8 ()", diff.toString());
     }
 }

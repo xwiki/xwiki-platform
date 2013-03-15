@@ -70,7 +70,7 @@ public class MetaDataDiff
         StringBuilder buf = new StringBuilder(this.field);
         buf.append(": ");
         buf.append(this.prevValue.toString());
-        buf.append(" &gt; ");
+        buf.append(" \u21E8 ");
         buf.append(this.newValue.toString());
         return buf.toString();
     }

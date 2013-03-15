@@ -584,25 +584,28 @@ public class XWiki implements EventListener
             // name as the wiki name
             String servername = StringUtils.substringBefore(host, ".");
 
-            // Note: Starting 5.0M2, the autowww behavior is default and the ability to disable it is now deprecated.
-            if (!"0".equals(this.Param("xwiki.virtual.autowww"))) {
-                // As a convenience, we do not require the creation of an xwiki:XWiki.XWikiServerXwiki page for the main
-                // wiki and automatically go to the main wiki in certain cases:
-                // - "www.<anyDomain>.<domainExtension>" - if it starts with www, we first check if a subwiki with that
-                // name exists; if yes, the go to the "www" subwiki, if not, go to the main wiki
-                // - "localhost"
-                // - IP address
-                if ("www".equals(servername)) {
-                    // Check that "www" is not actually the name of an existing subwiki.
-                    wikiDefinition = this.findWikiServer(servername, context);
-                    if (wikiDefinition == null) {
-                        // Not the case, use the main wiki.
-                        return context.getMainXWiki();
-                    }
-                } else if ("localhost".equals(host) || host.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}")) {
-                    // Direct access to the main wiki.
+            // Note: Starting 5.0M2, the autowww behavior is default and the ability to disable it is now removed.
+            if ("0".equals(this.Param("xwiki.virtual.autowww"))) {
+                LOGGER.warn(String.format("%s %s", "'xwiki.virtual.autowww' is no longer supported.",
+                    "Please update your configuration and/or see XWIKI-8877 for more details."));
+            }
+
+            // As a convenience, we do not require the creation of an xwiki:XWiki.XWikiServerXwiki page for the main
+            // wiki and automatically go to the main wiki in certain cases:
+            // - "www.<anyDomain>.<domainExtension>" - if it starts with www, we first check if a subwiki with that
+            // name exists; if yes, the go to the "www" subwiki, if not, go to the main wiki
+            // - "localhost"
+            // - IP address
+            if ("www".equals(servername)) {
+                // Check that "www" is not actually the name of an existing subwiki.
+                wikiDefinition = this.findWikiServer(servername, context);
+                if (wikiDefinition == null) {
+                    // Not the case, use the main wiki.
                     return context.getMainXWiki();
                 }
+            } else if ("localhost".equals(host) || host.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}")) {
+                // Direct access to the main wiki.
+                return context.getMainXWiki();
             }
 
             // Use the name from the subdomain

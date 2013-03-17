@@ -49,4 +49,12 @@ public class UserSecurityReference extends SecurityReference
     {
         return (DocumentReference) super.getOriginalReference();
     }
+
+    /**
+     * @return true for global user
+     */
+    public boolean isGlobal()
+    {
+        return getOriginalReference().getWikiReference().getParent() == null;
+    }
 }

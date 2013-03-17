@@ -195,12 +195,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         {
             this.entry = entry;
             SecurityReference entity = entry.getReference();
-            SecurityReference parentReference = entry.getReference().getParentSecurityReference();
+            SecurityReference parentReference = entity.getParentSecurityReference();
             int parentSize = groups.size() + ((parentReference == null) ? 0 : 1);
             if (parentSize > 0) {
                 this.parents = new ArrayList<SecurityCacheEntry>(parentSize);
                 if (parentReference != null) {
-                    SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(entity.getParentSecurityReference());
+                    SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(parentReference);
                     if (parent == null) {
                         throw new ParentEntryEvictedException();
                     }
@@ -293,7 +293,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     }
                 }
             }
-            String key = getKey();
             disposed = true;
             return true;
         }

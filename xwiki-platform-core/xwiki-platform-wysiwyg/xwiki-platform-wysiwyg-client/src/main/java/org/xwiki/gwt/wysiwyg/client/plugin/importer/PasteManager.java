@@ -151,8 +151,7 @@ public class PasteManager implements PasteHandler, CopyHandler
         // change. Note that fixed position doesn't work because the code that scrolls the selection into view doesn't
         // compute correctly the position of the paste container. Also make sure the paste container is not visible.
         pasteContainer.getStyle().setPosition(Position.ABSOLUTE);
-        pasteContainer.getStyle().setLeft(document.getScrollLeft() + document.getClientWidth() / 2, Unit.PX);
-        pasteContainer.getStyle().setTop(document.getScrollTop() + document.getClientHeight() / 2, Unit.PX);
+        centerPasteContainer(pasteContainer);
         pasteContainer.getStyle().setWidth(1, Unit.PX);
         pasteContainer.getStyle().setHeight(1, Unit.PX);
         pasteContainer.getStyle().setOverflow(Overflow.HIDDEN);
@@ -160,8 +159,34 @@ public class PasteManager implements PasteHandler, CopyHandler
         pasteContainer.appendChild(document.createTextNode("\u00A0"));
         // Insert the paste container and select its contents.
         document.getBody().appendChild(pasteContainer);
-        document.getSelection().selectAllChildren(pasteContainer.getFirstChild());
+        selectPasteContainer(pasteContainer);
         return pasteContainer;
+    }
+
+    /**
+     * Select the contents of the given paste container.
+     * 
+     * @param pasteContainer the paste container
+     */
+    protected void selectPasteContainer(Element pasteContainer)
+    {
+        textArea.getDocument().getSelection().selectAllChildren(pasteContainer.getFirstChild());
+    }
+
+    /**
+     * We added this method just to be able to override it for IE9 so that we can overcome a GWT bug.
+     * 
+     * @param pasteContainer the paste container
+     * @see <a href="http://code.google.com/p/google-web-toolkit/issues/detail?id=6256">getAbsoluteTop/getScrollTop
+     *      returns wrong values for IE9 when body has been scrolled</a>
+     * @see <a href="https://gwt-review.googlesource.com/#/c/2260/">Document#getScrollTop() and Document#getScrollLeft()
+     *      are broken for nested documents in IE9</a>
+     */
+    protected void centerPasteContainer(Element pasteContainer)
+    {
+        Document document = textArea.getDocument();
+        pasteContainer.getStyle().setLeft(document.getScrollLeft() + document.getClientWidth() / 2, Unit.PX);
+        pasteContainer.getStyle().setTop(document.getScrollTop() + document.getClientHeight() / 2, Unit.PX);
     }
 
     /**

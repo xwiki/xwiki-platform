@@ -61,6 +61,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
  */
 public class LegacyTestWiki extends AbstractTestWiki
 {
+    private final boolean legacymock;
 
     private final XWikiContext context;
 
@@ -93,8 +94,10 @@ public class LegacyTestWiki extends AbstractTestWiki
      * @param componentManager The component manager.
      * @param testWikiFilename The file name of the test wiki configuration.
      */
-    public LegacyTestWiki(Mockery mockery, ComponentManager componentManager, String testWikiFilename) throws Exception
+    public LegacyTestWiki(Mockery mockery, ComponentManager componentManager, String testWikiFilename,
+        boolean legacymock) throws Exception
     {
+        this.legacymock = legacymock;
         this.mockery = mockery;
         this.documentReferenceResolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
         this.entityReferenceSerializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
@@ -836,9 +839,12 @@ public class LegacyTestWiki extends AbstractTestWiki
 
             final BaseObject baseObj = mockery.mock(BaseObject.class, getName() + objectNumber);
 
-            final BaseProperty<BaseObjectReference> usersProperty = mockery.mock(BaseProperty.class, getName() + objectNumber + "users");
-            final BaseProperty<BaseObjectReference> groupsProperty = mockery.mock(BaseProperty.class, getName() + objectNumber + "groups");
-            final BaseProperty<BaseObjectReference> levelsProperty = mockery.mock(BaseProperty.class, getName() + objectNumber + "levels");
+            final BaseProperty<BaseObjectReference> usersProperty =
+                mockery.mock(BaseProperty.class, getName() + objectNumber + "users");
+            final BaseProperty<BaseObjectReference> groupsProperty =
+                mockery.mock(BaseProperty.class, getName() + objectNumber + "groups");
+            final BaseProperty<BaseObjectReference> levelsProperty =
+                mockery.mock(BaseProperty.class, getName() + objectNumber + "levels");
 
             final List<String> users = isUser ? Arrays.<String> asList(name) : Collections.<String> emptyList();
             final String usersString = users.isEmpty() ? "" : name;
@@ -852,14 +858,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                 {
                     allowing(baseObj).getIntValue("allow");
                     will(returnValue(allow ? 1 : 0));
-
-                    // Old security module
-                    allowing(baseObj).getStringValue("users");
-                    will(returnValue(usersString));
-                    allowing(baseObj).getStringValue("groups");
-                    will(returnValue(groupsString));
-                    allowing(baseObj).getStringValue("levels");
-                    will(returnValue(levelsString));
 
                     // New security module
                     allowing(baseObj).safeget("users");
@@ -876,6 +874,21 @@ public class LegacyTestWiki extends AbstractTestWiki
                     will(returnValue(levels));
                 }
             });
+
+            if (legacymock) {
+                mockery.checking(new Expectations()
+                {
+                    {
+                        // Old security module
+                        allowing(baseObj).getStringValue("users");
+                        will(returnValue(usersString));
+                        allowing(baseObj).getStringValue("groups");
+                        will(returnValue(groupsString));
+                        allowing(baseObj).getStringValue("levels");
+                        will(returnValue(levelsString));
+                    }
+                });
+            }
 
             return baseObj;
         }

@@ -215,9 +215,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                     }
                 });
 
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(true));
-
                 allowing(mockXWiki).getStore();
                 will(returnValue(mockStore));
 

@@ -123,7 +123,7 @@
     (% id="xwikihelpgroupsHeader" class="accordionTabTitleBar" %)
     (((= $msg.get('xe.panels.rights.groups') =)))
     (% id="xwikihelpgroupsContent" class="accordionTabContentBox" %)
-    ((({{html}}$msg.get('xe.panels.rights.groupsexplanation')#if ($xwiki.isVirtualMode()) $msg.get('xe.panels.rights.groupsvirtualexplanation')#end{{/html}})))
+    ((({{html}}$msg.get('xe.panels.rights.groupsexplanation') $msg.get('xe.panels.rights.groupsvirtualexplanation'){{/html}})))
   )))
   (% id="xwikihelplevels" %)
   (((

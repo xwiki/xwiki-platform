@@ -239,10 +239,8 @@
     #set($discard = $row.put('doc_space', $itemDoc.space))
     #set($discard = $row.put('doc_url', $xwiki.getURL($item)))
     #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
-    #if($xwiki.isVirtualMode())
-      #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
-      #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
-    #end
+    #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
+    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $context.user, $fullname)))
     #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $context.user, $fullname)))

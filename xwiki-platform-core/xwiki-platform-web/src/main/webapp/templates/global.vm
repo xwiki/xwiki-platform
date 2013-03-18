@@ -39,12 +39,14 @@
   </div> ## companylogo
   </div> ## company
   <div id="globallinks">
+    #if ($displayQuickSearch && ($xwiki.exists('Main.Search') || $xwiki.exists('Main.WebSearch')))
     <form action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end">
       <div class="globalsearch">
         <label class="hidden" for="headerglobalsearchinput">$msg.get('panels.search.inputLabel')</label><input class="globalsearchinput withTip" id="headerglobalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15"/><input class="button" type="image" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"/>
       </div>
     </form>
-#if($xwiki.isMultiLingual())
+    #end
+#if ($displayLanguageChoice && $xwiki.isMultiLingual())
   <span class="glink" id="headerlanguages">
   #set($defaultLanguage = "$!{doc.getDefaultLanguage()}")
   #if($defaultLanguage == '')

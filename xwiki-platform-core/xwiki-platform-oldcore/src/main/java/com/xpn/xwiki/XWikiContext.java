@@ -336,8 +336,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public boolean isMainWiki(String wikiName)
     {
-        return (getWiki() != null && !getWiki().isVirtualMode())
-            || StringUtils.equalsIgnoreCase(wikiName, getMainXWiki());
+        return StringUtils.equalsIgnoreCase(wikiName, getMainXWiki());
     }
 
     public XWikiDocument getDoc()

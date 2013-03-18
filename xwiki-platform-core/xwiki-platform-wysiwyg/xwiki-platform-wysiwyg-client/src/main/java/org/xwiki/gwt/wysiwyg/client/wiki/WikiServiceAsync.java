@@ -34,6 +34,7 @@ public interface WikiServiceAsync
     /**
      * Checks if the editor is running in a multiwiki environment.
      * 
+     * @deprecated Multiwiki is on by default, starting with XWiki 5.0.
      * @param async object used for asynchronous communication between server and client
      */
     void isMultiWiki(AsyncCallback<Boolean> async);

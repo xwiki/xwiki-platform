@@ -121,11 +121,11 @@ xwiki.tags=1
 # xwiki.store.cache.capacity=100
 
 #-# [Since 1.6M1]
-#-# Force the database name for the main wiki in virtual mode and for the wiki itself in non virtual mode.
+#-# Force the database name for the main wiki.
 # xwiki.db=xwiki
 
 #-# [Since 1.6M1]
-#-# Add a prefix to all databases names of the wikis in virtual mode and to the wiki name in non virtual mode.
+#-# Add a prefix to all databases names of each wiki.
 # xwiki.db.prefix=
 
 
@@ -168,19 +168,21 @@ xwiki.store.migration=1
 # Virtual wikis (farm)
 #
 
-#-# This parameter allows XWiki to operate in Hosting mode allowing to create multiple wikis having their own database
-#-# and responding to different URLs
-xwiki.virtual=$xwikiCfgVirtual
+#-# Starting with XWiki 5.0M2, virtual mode is enabled by default.
 
-#-# URL to redirect to when a requested wiki does not exist. This should be changed to a real page.
-xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
+#-# [Since 5.0M2]
+#-# What to do when the requested wiki does not exist:
+#-# - 0: (default) serve the main wiki
+#-# - 1: display an error (customizable through wikidoesnotexist.vm or xwiki:XWiki.WikiDoesNotExist)
+# xwiki.virtual.failOnWikiDoesNotExist=0
 
 #-# Forbidden names that should not be allowed when creating a new wiki.
 # xwiki.virtual.reserved_wikis=
 
-#-# How virtual wikis are mapped to different URLs. If set to 0, then virtual wikis have different domain
-#-# names, in the format http://wikiname.myfarm.net/. If set to 1 (the default), then the domain is common for the entire farm, but
-#-# the path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/.
+#-# How virtual wikis are mapped to different URLs.
+#-# If set to 0, then virtual wikis have different domain names, in the format http://wikiname.myfarm.net/.
+#-# If set to 1 (the default), then the domain is common for the entire farm, but the path contains the wiki name,
+#-# in the format http://myfarm.net/xwiki/wiki/wikiname/.
 #-# Note that you can configure the "/wiki/" part with xwiki.virtual.usepath.servletpath property.
 #if ($xwikiCfgVirtualUsepath)
 xwiki.virtual.usepath=$xwikiCfgVirtualUsepath

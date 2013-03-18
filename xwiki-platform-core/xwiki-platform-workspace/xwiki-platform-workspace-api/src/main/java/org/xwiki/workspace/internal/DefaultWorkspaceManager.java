@@ -140,13 +140,6 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
     @Override
     public boolean canCreateWorkspace(String userName, String workspaceName)
     {
-        XWikiContext deprecatedContext = getXWikiContext();
-
-        /* If XWiki is not in virtual mode, don`t bother. */
-        if (!deprecatedContext.getWiki().isVirtualMode()) {
-            return false;
-        }
-
         /* User name input validation. */
         if (userName == null || userName.trim().length() == 0) {
             return false;
@@ -214,8 +207,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
                 String.format(WIKI_PREFERENCES_PREFIXED_FORMAT, deprecatedContext.getMainXWiki());
 
             /* Owner or main wiki admin. */
-            return deprecatedContext.getWiki().isVirtualMode()
-                && (wikiOwner.equals(userName) || rightService.hasAccessLevel(RIGHT_ADMIN, userName,
+            return (wikiOwner.equals(userName) || rightService.hasAccessLevel(RIGHT_ADMIN, userName,
                     mainWikiPreferencesDocumentName, deprecatedContext));
         } catch (Exception e) {
             if (logger.isErrorEnabled()) {

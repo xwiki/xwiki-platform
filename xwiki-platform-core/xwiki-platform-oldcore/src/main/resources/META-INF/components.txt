@@ -24,6 +24,7 @@ com.xpn.xwiki.internal.mandatory.XWikiGlobalRightsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiRightsDocumentInitializer
+com.xpn.xwiki.internal.mandatory.XWikiServerClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiSkinsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider

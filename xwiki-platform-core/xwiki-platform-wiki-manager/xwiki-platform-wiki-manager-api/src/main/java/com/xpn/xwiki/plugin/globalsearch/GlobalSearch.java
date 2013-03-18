@@ -138,11 +138,6 @@ final class GlobalSearch
     private Collection<String> getAllWikiNameList(XWikiContext context) throws XWikiException
     {
         Collection<String> wikiNames = context.getWiki().getVirtualWikisDatabaseNames(context);
-
-        if (!wikiNames.contains(context.getMainXWiki())) {
-            wikiNames.add(context.getMainXWiki());
-        }
-
         return wikiNames;
     }
 
@@ -163,14 +158,9 @@ final class GlobalSearch
         List<String> selectColumns = parseSelectColumns(query.getHql());
         List<Object[]> orderColumns = parseOrderColumns(query.getHql());
 
-        Collection<String> wikiNameList;
-        if (context.getWiki().isVirtualMode()) {
-            wikiNameList = query.getWikiNameList();
-            if (wikiNameList.isEmpty()) {
-                wikiNameList = getAllWikiNameList(context);
-            }
-        } else {
-            wikiNameList = Collections.singletonList(context.getMainXWiki());
+        Collection<String> wikiNameList = query.getWikiNameList();
+        if (wikiNameList.isEmpty()) {
+            wikiNameList = getAllWikiNameList(context);
         }
 
         int max = query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0) : 0;

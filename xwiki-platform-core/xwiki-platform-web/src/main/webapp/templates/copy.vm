@@ -73,7 +73,7 @@
       ##------------------
       ## Wiki Source field
       ##------------------
-      #if($xwiki.isVirtualMode() && $xwiki.hasProgrammingRights())
+      #if($xwiki.hasProgrammingRights())
       <dt>
         <label for="sourceWikiName">$msg.get("core.copy.sourcewiki")</label>
         <span class="xHint">$msg.get('core.copy.sourcewiki.hint')</span>
@@ -119,18 +119,14 @@
       ##------------------
       ## Wiki Target field
       ##------------------
-      #if($xwiki.isVirtualMode() && $xwiki.hasProgrammingRights())
+      #if($xwiki.hasProgrammingRights())
       <dt>
         <label for="targetWikiName">$msg.get("core.copy.targetwiki")</label>
         <span class="xHint">$msg.get('core.copy.targetwiki.hint')</span>
       </dt>
       <dd>
         <select id="targetWikiName" name="targetWikiName">
-          #set ($wikis = $xwiki.getXWiki().getVirtualWikisDatabaseNames($context.getContext()))
-          ## Add the main wiki in case of it does not have a proper descriptor
-          #if (!$wikis.contains($context.getMainWikiName()))
-            $wikis.add($context.getMainWikiName())
-          #end
+          #set ($wikis = $xwiki.allWikiNames)
           #foreach ($wiki in $wikis)
             <option #if ($wiki == $doc.wiki) selected="selected" #end>$!{escapetool.xml($wiki)}</option>
           #end

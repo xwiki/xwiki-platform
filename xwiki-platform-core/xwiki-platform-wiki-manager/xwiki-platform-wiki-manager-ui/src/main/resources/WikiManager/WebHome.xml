@@ -70,9 +70,6 @@ $xwiki.ssfx.use('js/xwiki/table/table.css', true)##
 #set($wikiList = $WikiManager.getAllWikis())
 $msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
 #############################################################################
-#if(!$xwiki.isVirtualMode())
-  #warning($msg.get("wikimanager.notinvirtualmode"))
-#end
 #if($WikiManager.canCreateWiki())
 \\
     [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki?stepbystep=0&amp;amp;doc=1]    

@@ -113,18 +113,10 @@ public class DefaultPackager implements Packager, Initializable
     {
         if (configuration.getWiki() == null) {
             XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().isVirtualMode()) {
-                List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(xcontext.getMainXWiki())) {
-                    importXARToWiki(xarFile, xcontext.getMainXWiki(), configuration);
-                }
-
-                for (String subwiki : wikis) {
-                    importXARToWiki(xarFile, subwiki, configuration);
-                }
-            } else {
-                importXARToWiki(xarFile, xcontext.getMainXWiki(), configuration);
+            for (String subwiki : wikis) {
+                importXARToWiki(xarFile, subwiki, configuration);
             }
         } else {
             importXARToWiki(xarFile, configuration.getWiki(), configuration);
@@ -208,18 +200,10 @@ public class DefaultPackager implements Packager, Initializable
     {
         if (configuration.getWiki() == null) {
             XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().isVirtualMode()) {
-                List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(xcontext.getMainXWiki())) {
-                    unimportXARFromWiki(xarFile, xcontext.getMainXWiki(), configuration);
-                }
-
-                for (String subwiki : wikis) {
-                    unimportXARFromWiki(xarFile, subwiki, configuration);
-                }
-            } else {
-                unimportXARFromWiki(xarFile, xcontext.getMainXWiki(), configuration);
+            for (String subwiki : wikis) {
+                unimportXARFromWiki(xarFile, subwiki, configuration);
             }
         } else {
             unimportXARFromWiki(xarFile, configuration.getWiki(), configuration);
@@ -236,18 +220,10 @@ public class DefaultPackager implements Packager, Initializable
     {
         if (configuration.getWiki() == null) {
             XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().isVirtualMode()) {
-                List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(xcontext.getMainXWiki())) {
-                    unimportPagesFromWiki(pages, xcontext.getMainXWiki(), configuration);
-                }
-
-                for (String subwiki : wikis) {
-                    unimportPagesFromWiki(pages, subwiki, configuration);
-                }
-            } else {
-                unimportPagesFromWiki(pages, xcontext.getMainXWiki(), configuration);
+            for (String subwiki : wikis) {
+                unimportPagesFromWiki(pages, subwiki, configuration);
             }
         } else {
             unimportPagesFromWiki(pages, configuration.getWiki(), configuration);

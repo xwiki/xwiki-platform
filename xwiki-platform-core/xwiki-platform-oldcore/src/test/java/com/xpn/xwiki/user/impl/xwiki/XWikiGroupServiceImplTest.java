@@ -54,7 +54,6 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.groupService = new XWikiGroupServiceImpl();
 
         this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWiki.stubs().method("isReadOnly").will(returnValue(false));
         this.mockXWiki.stubs().method("getWikiOwner").will(returnValue(null));
         this.mockXWiki.stubs().method("getMaxRecursiveSpaceChecks").will(returnValue(0));

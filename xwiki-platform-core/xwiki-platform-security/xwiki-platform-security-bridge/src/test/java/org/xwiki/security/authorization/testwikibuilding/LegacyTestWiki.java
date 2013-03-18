@@ -227,7 +227,6 @@ public class LegacyTestWiki extends AbstractTestWiki {
                     }
             });
             allowing(xwiki).getGroupService(with(any(XWikiContext.class))); will(returnValue(groupService));
-            allowing(xwiki).isVirtualMode(); will(returnValue(wikis.size() > 1));
 
             // Expectations for XWikiGroupService
 

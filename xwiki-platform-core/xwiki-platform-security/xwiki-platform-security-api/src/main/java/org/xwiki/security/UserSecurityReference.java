@@ -19,6 +19,7 @@
  */
 package org.xwiki.security;
 
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -56,6 +57,6 @@ public class UserSecurityReference extends SecurityReference
      */
     public boolean isGlobal()
     {
-        return getOriginalReference().getWikiReference().getParent() == null;
+        return this.extractReference(EntityType.WIKI).getParent() == null;
     }
 }

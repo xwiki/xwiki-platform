@@ -47,7 +47,7 @@ public class SecurityReference extends EntityReference
     private static final long serialVersionUID = 1L;
 
     /** Main wiki reference. */
-    private SecurityReference mainWikiReference;
+    protected SecurityReference mainWikiReference;
 
     /** Original reference represented by this reference. */
     private EntityReference originalReference;

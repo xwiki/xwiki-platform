@@ -46,7 +46,7 @@ interface XWikiConstants
     String LOCAL_CLASSNAME = "XWikiRights";
 
     /** Field name for level in xwiki rights object. */
-    String LEVEL_FIELD_NAME = "level";
+    String LEVEL_FIELD_NAME = "levels";
 
     /** Field name for group in xwiki rights object. */
     String GROUPS_FIELD_NAME = "groups";

@@ -2236,8 +2236,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if ((objects == null) || (objects.size() == 0)) {
                 return null;
             }
-            for (int i = 0; i < objects.size(); i++) {
-                BaseObject obj = objects.get(i);
+            for (BaseObject obj : objects) {
                 if (obj != null) {
                     if (value.equals(obj.getStringValue(key))) {
                         return obj;
@@ -2255,7 +2254,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 return getXObject(classReference);
             }
 
-            e.printStackTrace();
+            LOGGER.warn("Exception while accessing objects for document [{}]: {}", this, e.getMessage(), e);
             return null;
         }
     }
@@ -3805,7 +3804,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             toXML(baos, bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
             return baos.toString(context.getWiki().getEncoding());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Exception while generating XML serialization of document [{}]: {}", this, e.getMessage(), e);
             return "";
         }
     }

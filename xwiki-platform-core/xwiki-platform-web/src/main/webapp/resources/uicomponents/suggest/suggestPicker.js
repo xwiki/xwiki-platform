@@ -143,7 +143,7 @@ var XWiki = (function (XWiki) {
    * @return default suggestion data for when a selected value is not found in any of the configured sources
    */
   getDefaultSuggestion: function(value) {
-    return {id: value, value: value};
+    return {id: value, value: value, info: value};
   },
 
   /**

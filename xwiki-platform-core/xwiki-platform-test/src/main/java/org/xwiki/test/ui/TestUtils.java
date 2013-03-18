@@ -267,6 +267,18 @@ public class TestUtils
         return loggedInUserName;
     }
 
+    public void createUser(final String username, final String password, Object... properties)
+    {
+        registerLoginAndGotoPage(username, password, null);
+        if (properties.length > 0) {
+            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
+        }
+    }
+
+    /**
+     * @deprecated starting with 5.0M2 use {@link #createUser(String, String, Object...)} instead
+     */
+    @Deprecated
     public void registerLoginAndGotoPage(final String username, final String password, final String pageURL)
     {
         String registerURL = getURL("XWiki", "Register", "register", new HashMap<String, String>()
@@ -283,7 +295,9 @@ public class TestUtils
         });
         getDriver().get(registerURL);
         recacheSecretToken();
-        getDriver().get(pageURL);
+        if (pageURL != null) {
+            getDriver().get(pageURL);
+        }
     }
 
     public ViewPage gotoPage(String space, String page)

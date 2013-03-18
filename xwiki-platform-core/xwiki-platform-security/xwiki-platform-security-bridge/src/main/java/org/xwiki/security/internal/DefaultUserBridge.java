@@ -64,10 +64,10 @@ public class DefaultUserBridge implements UserBridge
     }
 
     @Override
-    public Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user) throws AuthorizationException
+    public Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user, WikiReference wikiReference)
+        throws AuthorizationException
     {
-        Collection<DocumentReference> groupRefs = getGroupsReferencesFor(user.getOriginalReference().getWikiReference(),
-            user.getOriginalReference());
+        Collection<DocumentReference> groupRefs = getGroupsReferencesFor(wikiReference, user.getOriginalReference());
 
         Collection<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>(groupRefs.size());
         for (DocumentReference groupRef : groupRefs) {

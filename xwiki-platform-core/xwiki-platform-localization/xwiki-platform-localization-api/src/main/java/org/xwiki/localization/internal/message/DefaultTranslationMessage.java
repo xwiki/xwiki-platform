@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.message.TranslationMessage;
+import org.xwiki.localization.message.TranslationMessageElement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 

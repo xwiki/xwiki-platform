@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>es</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>La zona de pruebas es una parte de su wiki que puede modificar líbremente. Esta pendasa para permitirle practicar la edición. Podrá escribir como funciona la creación y edición de páginas. Para empezar simplemente pinche en **Editar**.
+
+{{info}}No se preocupe acerca de sobreescribir o perder cosas cuando edite la página, simpre puede volver a la versión inicial de la página desde la pestaña de "Historial" al final de la página.{{/info}}
+
+Aquí hay unas cuantas páginas de prueba con las que puede jugar:
+
+* [[Página de Pruebas 1&gt;&gt;Sandbox.TestPage1]]
+* [[Página de Pruebas 2&gt;&gt;Sandbox.TestPage2]]
+* [[Página de Pruebas 3&gt;&gt;Sandbox.TestPage3]]
+
+Abajo hay una demostración de la [[Sintaxis XWiki&gt;&gt;XWiki.XWikiSyntax]] que puede usar en las páginas del wiki (encabezados, imágenes, tablas).
+
+= Encabezados = 
+
+XWiki ofrece 6 niveles de encabezado. Puede usarlos para escructurar sus páginas.
+
+== Nivel 2 de Encabezado ==
+
+=== Nivel 3 de Encabezado ===
+
+==== Nivel 4 de Encabezado 4 ====
+
+===== Nivel 5 de Encabezado 5 =====
+
+====== Nivel 6 de Encabezado 6 ======
+
+= Estilos =
+
+Puede crear varios tipos de lista en las páginas de su wiki:
+
+== Listas no ordenadas ==
+
+* Nivel 1
+** Nivel 2
+*** Nivel 3
+** Nivel 2
+* Nivel 1
+
+== Listas numeradas ==
+
+1. Elemento
+11. Subelemento
+111. Elemento
+1. Subelemento
+
+== Listas mixtas ==
+
+1. Elemento 1
+11. Elemento 2
+11*. Elemento 3
+11*. Elemento 4
+1. Elemento 5
+
+= Tablas =
+
+Puede crear tablas sencillas dentro de sus páginas wiki:
+
+== Tabla sencilla ==
+
+| celda 1 | celda 2 | celda 3
+| celda 4 | celda 5 | celda 6
+| celda 7 | celda 8 | celda 9
+
+== Tabla con cabecera en la fila superior ==
+
+|= cabecera de tabla |= cabecera de tabla |= cabecera de tabla
+| celda | celda | celda
+| celda | celda | celda
+
+= Enlaces =
+
+XWiki le permite crear enlaces a otras páginas de su wiki o de la web:
+
+* [[WebHome]] -&gt; enlaces a la página de inicio del espacio actual
+* [[Sandbox Home&gt;&gt;WebHome]] -&gt; los enlaces pueden tener texto
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; un enlace puede usar en formato de enlace NombreEspacio.NombrePagina para enlazar con una página ubicada en otro espacio.
+* [[http://www.xwiki.org]] -&gt; puede enlazar a páginas del wiki o de sitios webs externos.
+* [[Sitio Web XWiki.org&gt;&gt;http://www.xwiki.org]] -&gt; el texto de los enlaces funciona también para los enlaces externos
+
+= Imágenes =
+
+Puede insertar imágenes en sus páginas del wiki:
+
+[[image:XWikiLogo.png]]
+
+= Macros =
+
+Las macros le permiten hacer que el contenido del wiki luzca mejor y para añadir características acicionales a su wiki. Aquí hay dos ejemplos de como las macros pueden usarse en las páginas del wiki:
+
+== Macro de Atención ==
+
+Esta macro le permite atraer la atención de los usuarios a un trozo específico de información:
+
+{{warning}}Hola Mundo{{/warning}}
+
+== Tabla de Contenidos ==
+
+Este macro genera de forma automática la tabla de contenidos de su página wiki basada en los encabezados:
+
+{{toc/}}</content>
+</xwikidoc>

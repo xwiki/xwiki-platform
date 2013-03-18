@@ -39,11 +39,11 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     private ExtensionId previousDistributionExtension;
 
-    private ExtensionId previousDistributionExtensionUi;
+    private ExtensionId previousDistributionExtensionUI;
 
     private ExtensionId distributionExtension;
 
-    private ExtensionId distributionExtensionUi;
+    private ExtensionId distributionExtensionUI;
 
     private List<DistributionStepStatus> steps;
 
@@ -89,14 +89,14 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         this.previousDistributionExtension = previousDistributionExtension;
     }
 
-    public ExtensionId getPreviousDistributionExtensionUi()
+    public ExtensionId getPreviousDistributionExtensionUI()
     {
-        return this.previousDistributionExtensionUi;
+        return this.previousDistributionExtensionUI;
     }
 
-    public void setPreviousDistributionExtensionUi(ExtensionId previousDistributionExtensionUi)
+    public void setPreviousDistributionExtensionUI(ExtensionId previousDistributionExtensionUI)
     {
-        this.previousDistributionExtensionUi = previousDistributionExtensionUi;
+        this.previousDistributionExtensionUI = previousDistributionExtensionUI;
     }
 
     public ExtensionId getDistributionExtension()
@@ -109,13 +109,13 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         this.distributionExtension = distributionExtension;
     }
 
-    public ExtensionId getDistributionExtensionUi()
+    public ExtensionId getDistributionExtensionUI()
     {
-        return this.distributionExtensionUi;
+        return this.distributionExtensionUI;
     }
 
-    public void setDistributionExtensionUi(ExtensionId distributionExtensionUi)
+    public void setDistributionExtensionUI(ExtensionId distributionExtensionUI)
     {
-        this.distributionExtensionUi = distributionExtensionUi;
+        this.distributionExtensionUI = distributionExtensionUI;
     }
 }

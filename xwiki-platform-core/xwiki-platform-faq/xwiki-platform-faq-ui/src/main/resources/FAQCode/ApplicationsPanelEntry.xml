@@ -86,7 +86,7 @@
       <name>platform.faq.faqApplication</name>
     </property>
     <property>
-      <parameters>label=$msg.get('faq.applicationsPanelEntryLabel')
+      <parameters>label=$services.localization.render('faq.applicationsPanelEntryLabel')
 target=FAQ.WebHome
 icon=icon:help</parameters>
     </property>

@@ -56,7 +56,7 @@
 #else
   ## Call getDefaultEditMode() for backward compatibility with existing skins.
   * [[$msg.get('xe.admin.skin.editskin')&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
-  * [[$msg.get('xe.admin.skin.testskin')&gt;&gt;Main.WebHome||queryString="skin=${doc.fullName}"]]
+  * [[$msg.get('xe.admin.skin.testskin')&gt;&gt;$services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))||queryString="skin=${doc.fullName}"]]
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -23,6 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface XWikiResponse extends HttpServletResponse
 {
+    /**
+     * @deprecated starting with 5.0M1, don't call this method and instead pass "this"
+     */
+    @Deprecated
     public HttpServletResponse getHttpServletResponse();
 
     public void removeCookie(String cookieName, XWikiRequest request);

@@ -279,21 +279,6 @@ function prettyNameChanged()
   <content>{{velocity}}
 #set ($discard = $xwiki.jsx.use($doc.fullName))
 ############################################################################################
-## TRANLSATIONS AUTOMATIC REGISTRATION
-#set ($WORKSPACE_MANAGER_TRANSLATIONS_PAGE = 'WorkspaceManager.Translations')
-#set ($xwikiPreferencesDocumentReference = $services.model.createDocumentReference('xwiki', 'XWiki', 'XWikiPreferences'))
-#set ($xwikiPreferencesDocument = $xwiki.getDocument($xwikiPreferencesDocumentReference))
-#set ($documentBundlesValue = $xwikiPreferencesDocument.documentBundles)
-#if (!$documentBundlesValue.contains($WORKSPACE_MANAGER_TRANSLATIONS_PAGE))
-  #set ($documentBundlesValue = "${WORKSPACE_MANAGER_TRANSLATIONS_PAGE},${documentBundlesValue}")
-  #set ($discard = $xwikiPreferencesDocument.set('documentBundles', $documentBundlesValue))
-  ## Save the preferences page using programming rights of the current document.
-  ## The save comment can not be translated at this point, since the translations are not yet registered.
-  #set ($discard = $xwiki.getXWiki().saveDocument($xwikiPreferencesDocument.document, "Added $WORKSPACE_MANAGER_TRANSLATIONS_PAGE to the list of document bundles.", true, $xcontext.context))
-  {{info}}$msg.get('workspacemanager.install.translations'){{/info}}
-
-#end
-############################################################################################
 ## PLUGINS DEPENDANCIES
 #set ($WorkspaceManager = $services.workspace)
 #if (!$WorkspaceManager)

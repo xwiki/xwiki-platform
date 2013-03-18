@@ -42,7 +42,7 @@
   ##
   #set ($list = $xwiki.searchDocuments($sql , 20 , 0))
   #set ($feed = $xwiki.feed.getDocumentFeed($list, {}, {}))
-  #set ($feedURI = $xwiki.getDocument("Main.WebHome").getExternalURL("view"))
+  #set ($feedURI = $xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))).getExternalURL("view"))
   #set ($discard = $feed.setLink($feedURI))
   #set ($discard = $feed.setUri($feedURI))
   #set ($discard = $feed.setAuthor('XWiki'))

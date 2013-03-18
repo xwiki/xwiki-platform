@@ -22,10 +22,10 @@ package com.xpn.xwiki.plugin.globalsearch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -33,9 +33,9 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchQuery;
 import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchResult;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * API tool to be able to make and merge multi wikis search queries.
@@ -60,9 +60,9 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
     protected static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchPluginApi.class);
 
     /**
-     * The plugin internationalization service.
+     * Used to access translations.
      */
-    private XWikiPluginMessageTool messageTool;
+    private ContextualLocalizationManager localizationManager;
 
     /**
      * Tool to be able to make and merge multi wikis search queries.
@@ -79,12 +79,9 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
     {
         super(plugin, context);
 
-        // Message Tool
-        Locale locale = (Locale) context.get("locale");
-        this.messageTool = new GlobalSearchMessageTool(locale, plugin, context);
-        context.put(GlobalSearchMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
 
-        this.search = new GlobalSearch(this.messageTool);
+        this.search = new GlobalSearch();
     }
 
     /**
@@ -135,7 +132,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
                 results = Collections.emptyList();
             }
         } catch (GlobalSearchException e) {
-            logError(this.messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
+            logError(this.localizationManager.getTranslationPlain(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             results = Collections.emptyList();
         }
@@ -172,7 +169,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
                 documentList.add(doc.newDocument(this.context));
             }
         } catch (GlobalSearchException e) {
-            logError(this.messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
+            logError(this.localizationManager.getTranslationPlain(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             documentList = Collections.emptyList();
         }
@@ -204,7 +201,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
         try {
             results = this.search.searchDocumentsNames(query, distinctbylanguage, false, checkRight, this.context);
         } catch (GlobalSearchException e) {
-            logError(this.messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
+            logError(this.localizationManager.getTranslationPlain(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             results = Collections.emptyList();
         }

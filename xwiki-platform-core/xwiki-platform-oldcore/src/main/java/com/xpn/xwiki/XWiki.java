@@ -99,7 +99,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
-import org.xwiki.localization.LocalizationManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -120,6 +120,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.stability.Unstable;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
 import org.xwiki.xml.XMLUtils;
@@ -1461,6 +1462,7 @@ public class XWiki implements EventListener
     /**
      * @since 5.0M1
      */
+    @Unstable
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
         return getDocument(this.currentReferenceDocumentReferenceResolver.resolve(reference), context);
@@ -3658,13 +3660,7 @@ public class XWiki implements EventListener
             if (context.getResponse() != null) {
                 context.getResponse().setLocale(locale);
             }
-            ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", locale);
-            if (bundle == null) {
-                bundle = ResourceBundle.getBundle("ApplicationResources");
-            }
-            XWikiMessageTool msg =
-                new XWikiMessageTool(Utils.getComponent(LocalizationManager.class), Utils.getComponentManager(),
-                    context);
+            XWikiMessageTool msg = new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class));
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext != null) {
@@ -5117,10 +5113,13 @@ public class XWiki implements EventListener
         return getUserName(user, format, true, context);
     }
 
+    /**
+     * @return a formatted and pretty printed user name for displaying
+     */
     public String getUserName(String user, String format, boolean link, XWikiContext context)
     {
         if (StringUtils.isBlank(user)) {
-            return "";
+            return context.getMessageTool().get("core.users.unknownUser");
         }
         XWikiDocument userdoc = null;
         try {
@@ -6611,8 +6610,8 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
-     *             {@link XWikiContext#getMessageTool()}.
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
+     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
      */
     @Deprecated
     public String parseMessage(XWikiContext context)
@@ -6626,8 +6625,8 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
-     *             {@link XWikiContext#getMessageTool()}.
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
+     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
      */
     @Deprecated
     public String parseMessage(String id, XWikiContext context)
@@ -6662,5 +6661,93 @@ public class XWiki implements EventListener
             spaceReference = this.currentMixedEntityReferenceResolver.resolve(SYSTEM_SPACE, EntityType.SPACE);
         }
         return new DocumentReference("XWikiPreferences", new SpaceReference(spaceReference));
+    }
+
+    /**
+     * Search attachments by passing HQL where clause values as parameters.
+     * You can specify properties of the "attach" (the attachment) or "doc" (the document it is attached to)
+     * 
+     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param checkRight if true, only return attachments in documents which the "current user" has permission to view.
+     * @param nb The number of rows to return. If 0 then all rows are returned
+     * @param start The number of rows to skip at the beginning.
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @param XWikiContext The underlying context used for running the database query
+     * @return A List of {@link XWikiAttachment} objects.
+     * @throws XWikiException in case of error while performing the query
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, List)
+     * @since 5.0M2
+     */
+    @Unstable
+    public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause,
+                                                   boolean checkRight,
+                                                   int nb,
+                                                   int start,
+                                                   List< ? > parameterValues,
+                                                   XWikiContext context)
+        throws XWikiException
+    {
+        parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
+
+        // Get the attachment filenames and document fullNames
+        List<java.lang.Object[]> results = this.getStore().search(
+            "select attach.filename, doc.fullName from XWikiAttachment attach, XWikiDocument doc where doc.id = attach.docId and "
+             + parametrizedSqlClause, nb, start, parameterValues, context);
+
+        HashMap<String, List<String>> filenamesByDocFullName = new HashMap<String, List<String>>();
+
+        // Put each attachment name with the document name it belongs to
+        for (int i=0; i<results.size(); i++) {
+            String filename = (String) results.get(i)[0];
+            String docFullName = (String) results.get(i)[1];
+            if (!filenamesByDocFullName.containsKey(docFullName)){
+                filenamesByDocFullName.put(docFullName, new ArrayList<String>());
+            }
+            filenamesByDocFullName.get(docFullName).add((String) filename);
+        }
+
+        List<XWikiAttachment> out = new ArrayList<XWikiAttachment>();
+
+        // Index through the document names, get relivent attachments
+        for (String fullName : filenamesByDocFullName.keySet()) {
+            XWikiDocument doc = getDocument(fullName, context);
+            if (checkRight) {
+                if (!context.getWiki().getRightService()
+                    .hasAccessLevel("view", context.getUser(), doc.getFullName(), context)) {
+                    continue;
+                }
+            }
+            List<String> returnedAttachmentNames = filenamesByDocFullName.get(fullName);
+            for (XWikiAttachment attach : doc.getAttachmentList()) {
+                if (returnedAttachmentNames.contains(attach.getFilename())) {
+                    out.add(attach);
+                }
+            }
+        }
+
+        return out;
+    }
+
+    /**
+     * Count attachments returned by a given parameterized query
+     *
+     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @param XWikiContext The underlying context used for running the database query
+     * @return int number of attachments found.
+     * @throws XWikiException in event of an exception querying the database
+     * @see #searchAttachments(String, int, int, List, XWikiContext)
+     * @since 5.0M2
+     */
+    @Unstable
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
+
+        List l = getStore().search("select count(attach) from XWikiAttachment attach, XWikiDocument doc where "
+                                   + "attach.docId=doc.id and " + parametrizedSqlClause, 0, 0, parameterValues, context);
+        return ((Number) l.get(0)).intValue();
     }
 }

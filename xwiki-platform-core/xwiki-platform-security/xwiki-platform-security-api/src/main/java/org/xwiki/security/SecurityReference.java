@@ -104,7 +104,7 @@ public class SecurityReference extends EntityReference
     }
 
     /**
-     * @return the entity reference type, but for the main wiki, return {@link Right.FARM}.
+     * @return the entity reference type, but for the main wiki, return {@link SecurityRefere.FARM}.
      */
     public EntityType getSecurityType()
     {

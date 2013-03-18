@@ -66,8 +66,6 @@
 ## ============================================================================================
 ## This page is called from live grids via Ajax with the argument xpage=plain. It returns a
 ## set of results serialized in JSON.
-## @programming This service page needs to be saved by a user with the programming access level
-## to work as expected
 ## ============================================================================================
 #if ("$!request.get('xpage')" == 'plain')
   $response.setContentType('application/json')##
@@ -134,10 +132,12 @@
   ##
   ## Compute the final query
   ##
-  #set ($countQuery = "select count(*) from XWikiDocument as doc, XWikiAttachment as attach where attach.docId=doc.id" + $query)
-  #set ($query = "select doc.fullName, attach from XWikiDocument as doc, XWikiAttachment as attach where attach.docId=doc.id" + $query + " order by $order $dir")
-  #set ($items = $xwiki.search($query, $limit, $offset, $queryParameters))
-  #set ($totalItems = $xwiki.search($countQuery, 0, 0, $queryParameters).get(0))
+  #if ($query == "")
+    #set ($query = "1=1")
+  #end
+  #set ($sortedQuery = $query + " order by $order $dir")
+  #set ($items = $xwiki.searchAttachments($sortedQuery, $limit, $offset, $queryParameters))
+  #set ($totalItems = $xwiki.countAttachments($query, $queryParameters))
   #set ($returnedItems = $items.size())
   ## ==============================================
   ## json starts
@@ -148,26 +148,24 @@
 "offset": $mathtool.add($offset, 1),
 "reqNo": $mathtool.toInteger($request.reqNo),
 "rows": [
-#foreach ($item in $items)
-  #set ($docName = $item.get(0))
-  #set ($hasAccess = $xwiki.hasAccessLevel('view', $context.user, $docName))
-  #set ($attachment = $item.get(1))
+#foreach ($attach in $items)
+  #set ($document = $attach.getDocument())
+  #set ($hasAccess = $xwiki.hasAccessLevel('view', $context.user, $document.getFullName()))
   #if ($velocityCount &gt; 1) , #end
   { "acclev" : $hasAccess,
   #if ($hasAccess)
-    #set ($document = $xwiki.getDocument($docName))
     "page" : "$escapetool.javascript($document.name)",
     "space" : "$escapetool.javascript($document.space)",
     "fullname" : "$escapetool.javascript($document.fullName)",
-    "filename" : "$escapetool.javascript($attachment.filename)",
-    "fileurl" : "$document.getAttachmentURL($attachment.filename)",
+    "filename" : "$escapetool.javascript($attach.filename)",
+    "fileurl" : "$document.getAttachmentURL($attach.filename)",
     "url" : "$document.getURL('view')",
     "spaceurl" : "$xwiki.getURL("${document.space}.WebHome")",
-    "date" : "$xwiki.formatDate($attachment.date, $formatDate)",
-    "author" : "$!escapetool.javascript($attachment.author)",
-    "authorname" : "$!escapetool.javascript($xwiki.getDocument($attachment.author).name)",
-    "authorurl" : "$xwiki.getURL($attachment.author)",
-    "type" : "$!escapetool.javascript($attachment.getMimeType($context.context))"
+    "date" : "$xwiki.formatDate($attach.date, $formatDate)",
+    "author" : "$!escapetool.javascript($attach.author)",
+    "authorname" : "$!escapetool.javascript($xwiki.getDocument($attach.author).name)",
+    "authorurl" : "$xwiki.getURL($attach.author)",
+    "type" : "$!escapetool.javascript($attach.getMimeType())"
   #else
     "fullname": "$escapetool.javascript($docName)"
   #end

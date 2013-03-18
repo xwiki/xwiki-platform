@@ -542,6 +542,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
             query.setLong("id", doc.getId());
             if (query.uniqueResult() == null) {
+                // Reset the creationDate to reflect the date of the first save, not the date of the object creation
+                doc.setCreationDate(new Date());
                 session.save(doc);
             } else {
                 session.update(doc);

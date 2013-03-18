@@ -528,8 +528,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
             if (attachment != null) {
                 resourceReference =
-                    new AttachmentResourceReference(
-                        this.entityReferenceSerializer.serialize(attachment.getReference()));
+                    new AttachmentResourceReference(this.entityReferenceSerializer.serialize(attachment.getReference()));
             }
         }
 
@@ -780,9 +779,11 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         String authorId = resolveAuthorIdOnWiki(xcontext.getDatabase(), authorName, authorElements, xcontext);
 
         if (authorId == null && !xcontext.isMainWiki()) {
-            authorId =
-                xcontext.getMainXWiki() + ':'
-                    + resolveAuthorIdOnWiki(xcontext.getMainXWiki(), authorName, authorElements, xcontext);
+            authorId = resolveAuthorIdOnWiki(xcontext.getMainXWiki(), authorName, authorElements, xcontext);
+
+            if (authorId != null) {
+                authorId = xcontext.getMainXWiki() + ':' + authorId;
+            }
         }
 
         return authorId != null ? authorId : authorName;
@@ -841,8 +842,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
                 if (dependencyObject != null) {
                     String extensionVersion =
-                        getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION,
-                            (String) null);
+                        getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, (String) null);
 
                     if (StringUtils.isNotEmpty(extensionVersion)
                         && extension.getId().getVersion().equals(new DefaultVersion(extensionVersion))) {

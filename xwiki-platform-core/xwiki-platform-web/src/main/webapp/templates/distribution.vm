@@ -285,17 +285,27 @@
   #if ($hasError)
     #displayUpgradePlanStatus($plan)
   #else
-    #set ($invalid = [])
-    #set ($outdated = [])
+    ## Group extensions by status (invalid/outdated) and by namespace.
+    #set ($invalid = {})
+    #set ($outdated = {})
     ## Iterate the first level nodes from the upgrade plan tree.
     #foreach ($firstLevelNode in $plan.tree)
       #set ($planAction = $firstLevelNode.action)
+      #set ($status = $NULL)
       #set ($installedVersion = $services.extension.getInstalledExtension($planAction.extension.id.id, $planAction.namespace))
       #if (!$installedVersion.isValid($planAction.namespace))
-        #set ($discard = $invalid.add($planAction))
+        #set ($status = $invalid)
       ## Check if the latest version has been installed after the upgrade plan was created.
       #elseif ($installedVersion.id.version.value != $planAction.extension.id.version.value)
-        #set ($discard = $outdated.add($planAction))
+        #set ($status = $outdated)
+      #end
+      #if ($status)
+        #set ($statusForNamespace = $status.get($planAction.namespace))
+        #if (!$statusForNamespace)
+          #set ($statusForNamespace = [])
+          #set ($discard = $status.put($planAction.namespace, $statusForNamespace))
+        #end
+        #set ($discard = $statusForNamespace.add($planAction))
       #end
     #end
     #set ($showCompleteStepButton = $invalid.isEmpty())
@@ -303,20 +313,23 @@
     #if ($outdated.isEmpty() && $invalid.isEmpty())
       <div class="infomessage">$msg.get('platform.extension.distributionWizard.extensionsStepUpToDate')</div>
     #else
-      #displayPlanActionList($invalid 'Invalid')
-      #displayPlanActionList($outdated 'Outdated')
+      #displayPlanActionByNamespace($invalid 'Invalid')
+      #displayPlanActionByNamespace($outdated 'Outdated')
     #end
   #end
   <p class="xHint">$msg.get('platform.extension.distributionWizard.extensionsStepReloadHint', ["<a id=""prepareUpgradeLink""
     href=""?action=prepareUpgrade&xredirect=$!escapetool.url($request.xredirect)"">", '</a>'])</p>
 #end
 
-#macro(displayPlanActionList $list $key)
-  #if ($list.size() > 0)
+#macro(displayPlanActionByNamespace $actionByNamespace $key)
+  #if (!$actionByNamespace.isEmpty())
     <div class="xLabel">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsLabel")</div>
-    <div class="xHint">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint")</div>
-    <div id="$key.toLowerCase()Extensions">
-    #foreach ($planAction in $list)
+  #end
+  #foreach ($entry in $actionByNamespace.entrySet())
+    <div class="xHint">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint",
+      ["#displayExtensionNamespace($entry.key)"])</div>
+    <div class="$key.toLowerCase()Extensions">
+    #foreach ($planAction in $entry.value)
       #set ($extensionNamespace = $planAction.namespace)
       #displayExtension($planAction.extension)
     #end

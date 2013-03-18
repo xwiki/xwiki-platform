@@ -19,7 +19,9 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,16 +30,18 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndex;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
- * Script service exposing interaction with the Solr index. Queries on the index are performed using XWiki's <a
+ * Script service exposing interaction with the {@link SolrIndex}. Queries on the index are performed using XWiki's <a
  * href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Query+Module">Query Module API</a> with query type "solr".
  * 
  * @version $Id$
@@ -77,7 +81,7 @@ public class SolrIndexScriptService implements ScriptService
     protected SolrIndex solrIndex;
 
     /**
-     * TODO DOCUMENT ME!
+     * Index an entity and all it's contained entities recursively.
      * 
      * @param reference the reference to index.
      */
@@ -86,14 +90,16 @@ public class SolrIndexScriptService implements ScriptService
         clearException();
 
         try {
+            checkAccessToWikiIndex(reference);
+
             solrIndex.index(reference);
-        } catch (SolrIndexException e) {
+        } catch (Exception e) {
             error(e);
         }
     }
 
     /**
-     * TODO DOCUMENT ME!
+     * Index multiple entities and all their contained entities recursively. This is a batch operation.
      * 
      * @param references the references to index.
      */
@@ -102,14 +108,16 @@ public class SolrIndexScriptService implements ScriptService
         clearException();
 
         try {
+            checkAccessToWikiIndex(references);
+
             solrIndex.index(references);
-        } catch (SolrIndexException e) {
+        } catch (Exception e) {
             error(e);
         }
     }
 
     /**
-     * TODO DOCUMENT ME!
+     * Delete an indexed entity and all its contained entities recursively.
      * 
      * @param reference the reference to delete from the index.
      */
@@ -118,14 +126,16 @@ public class SolrIndexScriptService implements ScriptService
         clearException();
 
         try {
+            checkAccessToWikiIndex(reference);
+
             solrIndex.delete(reference);
-        } catch (SolrIndexException e) {
+        } catch (Exception e) {
             error(e);
         }
     }
 
     /**
-     * TODO DOCUMENT ME!
+     * Delete multiple entities and all their contained entities recursively. This is a batch operation.
      * 
      * @param references the references to delete from the index.
      */
@@ -134,8 +144,10 @@ public class SolrIndexScriptService implements ScriptService
         clearException();
 
         try {
+            checkAccessToWikiIndex(references);
+
             solrIndex.delete(references);
-        } catch (SolrIndexException e) {
+        } catch (Exception e) {
             error(e);
         }
     }
@@ -207,11 +219,61 @@ public class SolrIndexScriptService implements ScriptService
     {
         ExecutionContext executionContext = this.execution.getContext();
         XWikiContext context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        // FIXME: Do we need this? Maybe when running an index Thread?
-        // if (context == null) {
-        // context = this.contextProvider.createStubContext();
-        // executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
-        // }
+
         return context;
+    }
+
+    /**
+     * Check the current user's access to alter the index of the wiki owning the given referenced entity.
+     * 
+     * @param reference the reference whose owning wiki to check.
+     * @throws IllegalAccessException if the user is not allowed or if problems occur.
+     */
+    private void checkAccessToWikiIndex(EntityReference reference) throws IllegalAccessException
+    {
+        EntityReference wikiReference = (WikiReference) reference.extractReference(EntityType.WIKI);
+        String wikiName = wikiReference.getName();
+
+        XWikiContext context = getXWikiContext();
+        XWikiRightService rightService = context.getWiki().getRightService();
+
+        String currentDatabase = context.getDatabase();
+        try {
+            // RightService works only on the current wiki, so we need to change the context wiki.
+            context.setDatabase(wikiName);
+            if (!rightService.hasWikiAdminRights(context) || !rightService.hasProgrammingRights(context)) {
+                throw new IllegalAccessException(String.format(
+                    "The user '%s' is not allowed to alter the index for the entity '%s'", getXWikiContext()
+                        .getUserReference(), reference));
+            }
+        } finally {
+            // Restore the context wiki
+            context.setDatabase(currentDatabase);
+        }
+    }
+
+    /**
+     * Check the current user's access to alter the index of the wikis owning the given referenced entities. This is an
+     * optimized method that only checks one reference for each distinct wiki.
+     * 
+     * @param references the references whose owning wikis to check.
+     * @throws IllegalAccessException if the user is not allowed for at least one of the passed references or if
+     *             problems occur.
+     */
+    private void checkAccessToWikiIndex(List<EntityReference> references) throws IllegalAccessException
+    {
+        // Build a map of representatives for each wiki to avoid checking every reference.
+        Map<EntityReference, EntityReference> representatives = new HashMap<EntityReference, EntityReference>();
+        for (EntityReference reference : references) {
+            EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+            if (!representatives.containsKey(wikiReference)) {
+                representatives.put(wikiReference, reference);
+            }
+        }
+
+        // Check only the representatives for each wiki.
+        for (EntityReference reference : representatives.values()) {
+            checkAccessToWikiIndex(reference);
+        }
     }
 }

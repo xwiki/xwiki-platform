@@ -40,6 +40,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -232,19 +233,20 @@ public class DocumentContentDisplayer implements DocumentDisplayer
      */
     protected XDOM display(DocumentModelBridge document, String nameSpace, DocumentDisplayerParameters parameters)
     {
+        // This is a clone of the cached content that can be safely modified.
         XDOM content = getContent(document, parameters);
 
         if (!parameters.isContentTransformed()) {
             return content;
         }
 
-        // Make sure we clone the XDOM since the transformations are going to modify it and we don't want the original
-        // XDOM to carry away the changes.
-        content = content.clone();
+        // Before executing the XDOM transformations make sure the references used by them (e.g. the 'reference'
+        // parameter of the Include macro) are resolved relative to the current document on the execution context.
+        content.getMetaData().addMetaData(MetaData.BASE,
+            defaultEntityReferenceSerializer.serialize(documentAccessBridge.getCurrentDocumentReference()));
 
         TransformationContext txContext =
-            new TransformationContext(content, document.getSyntax(),
-                                      parameters.isTransformationContextRestricted());
+            new TransformationContext(content, document.getSyntax(), parameters.isTransformationContextRestricted());
         txContext.setId(nameSpace);
         try {
             transformationManager.performTransformations(content, txContext);

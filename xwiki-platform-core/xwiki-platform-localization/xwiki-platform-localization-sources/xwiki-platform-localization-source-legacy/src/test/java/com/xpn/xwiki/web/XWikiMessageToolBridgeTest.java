@@ -36,6 +36,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -88,7 +89,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
         ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
         this.mockServletContext = environment.getServletContext();
-        
+
         // checking
 
         getMockery().checking(new Expectations()
@@ -219,7 +220,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockXWiki).getCurrentContentSyntaxId(with(any(String.class)), with(any(XWikiContext.class)));
                 will(returnValue("plain/1.0"));
-                
+
                 allowing(mockServletContext).getResourceAsStream("/META-INF/MANIFEST.MF");
                 will(returnValue(null));
             }
@@ -243,8 +244,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         // MessageTool
 
         this.tool =
-            new XWikiMessageTool(getComponentManager().<LocalizationManager> getInstance(LocalizationManager.class),
-                getComponentManager(), getContext());
+            new XWikiMessageTool(getComponentManager().<ContextualLocalizationManager> getInstance(
+                ContextualLocalizationManager.class));
     }
 
     private void setBundles(String bundles)

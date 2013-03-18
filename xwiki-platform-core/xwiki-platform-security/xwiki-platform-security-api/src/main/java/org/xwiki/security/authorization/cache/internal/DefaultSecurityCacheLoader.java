@@ -21,8 +21,8 @@ package org.xwiki.security.authorization.cache.internal;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.Formatter;
+import java.util.LinkedList;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
@@ -218,7 +219,9 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     private Collection<GroupSecurityReference> loadGroupEntries(UserSecurityReference user)
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
-        Collection<GroupSecurityReference> groups = userBridge.getAllGroupsFor(user);
+        WikiReference userWiki = user.getOriginalReference().getWikiReference();
+
+        Collection<GroupSecurityReference> groups = userBridge.getAllGroupsFor(user, userWiki);
 
         for (GroupSecurityReference group : groups) {
             getRules(group);

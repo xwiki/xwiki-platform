@@ -143,7 +143,7 @@ var XWiki = (function (XWiki) {
     #foreach($source in $sourceDocument.getObjects('XWiki.SearchSuggestSourceClass'))
       #if($source.getProperty('activated').value == 1)
       {
-        name : "$escapetool.javascript($source.display('name','view'))",
+        name : "$escapetool.javascript("#evaluate($source.getProperty('name').value)")",
         varname : 'input',
         script : "#evaluate($source.getProperty('url').value)&query=$source.getProperty('query').value&nb=$source.getProperty('resultsNumber').value&",
         icon : "#evaluate($source.getProperty('icon').value)",

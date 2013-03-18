@@ -1,4 +1,3 @@
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
 $xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
 $xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
 $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##

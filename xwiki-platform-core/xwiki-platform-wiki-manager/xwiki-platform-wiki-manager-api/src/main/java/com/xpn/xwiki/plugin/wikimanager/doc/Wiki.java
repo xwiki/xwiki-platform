@@ -26,6 +26,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -52,6 +53,11 @@ public class Wiki extends Document
     protected static final Logger LOGGER = LoggerFactory.getLogger(Wiki.class);
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * Create instance of wiki descriptor.
      * 
      * @param xdoc the encapsulated XWikiDocument.
@@ -61,6 +67,8 @@ public class Wiki extends Document
     public Wiki(XWikiDocument xdoc, XWikiContext context) throws XWikiException
     {
         super(xdoc, context);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -84,8 +92,8 @@ public class Wiki extends Document
         String wikiName = getWikiName();
 
         if (wikiName.equals(this.context.getMainXWiki())) {
-            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool.getDefault(
-                this.context).get(WikiManagerMessageTool.ERROR_DELETEMAINWIKI, wikiName));
+            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_DELETEMAINWIKI, wikiName));
         }
 
         if (deleteDatabase) {
@@ -96,8 +104,9 @@ public class Wiki extends Document
                     LOGGER.error("Failed to delete wiki from database", e);
                 }
             } else {
-                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool
-                    .getDefault(this.context).get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI,
+                        wikiName));
             }
         }
 
@@ -146,8 +155,8 @@ public class Wiki extends Document
             }
         }
 
-        throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALIASDOESNOTEXISTS, WikiManagerMessageTool
-            .getDefault(this.context).get(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS,
+        throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALIASDOESNOTEXISTS,
+            this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS,
                 getWikiName() + " - " + domain));
     }
 

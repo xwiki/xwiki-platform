@@ -55,6 +55,15 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Panels currently don't fully have their own Administration page. For example defining the left and right
+         panels or whether left/right panels are displayed or not are currently defined in the Administration
+         Application. In the future move those features in this Panel Application and remove this dependency. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
          systems go through SLF4J -->
     <dependency>
@@ -76,6 +85,17 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
+           once -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/AllTests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
       <!-- TODO: Remove when the following issue is fixed: http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
       <plugin>
         <groupId>org.xwiki.platform</groupId>

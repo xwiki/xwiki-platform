@@ -52,7 +52,7 @@
     {{warning}}$msg.get('xe.admin.accountvalidation.failure'){{/warning}}
   #end
 #else
-  $response.sendRedirect($xwiki.getURL('Main.WebHome'))
+  $response.sendRedirect($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
 #end
 {{/velocity}}</content>
 </xwikidoc>

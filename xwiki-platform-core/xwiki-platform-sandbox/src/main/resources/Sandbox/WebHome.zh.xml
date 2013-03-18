@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>zh</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>沙箱是您的wiki中可以任意改动的部分。您可以用它来练习和测试wiki页面的编辑。通过这些练习，你能够学习和发现页面是怎样被创建和修改的。让我们从点击 **编辑** 链接开始！
+
+{{info}}请不用担心您的修改会覆盖或者删除页面的原有内容，您总可以通过页面底部的”历史“标签页回滚到该页面的最初版本。{{/info}}
+
+如果您想查看当前页面的[[XWiki语法格式&amp;gt;&amp;gt;XWiki.XWikiSyntax]]，请选择”查看“菜单中的”Wiki代码“或者在编辑页面时选择”源代码“标签页。
+
+下面是一系列你可以用来测试的页面：
+
+* [[沙箱测试页面1&amp;gt;&amp;gt;Sandbox.TestPage1]]
+* [[沙箱测试页面2&amp;gt;&amp;gt;Sandbox.TestPage2]]
+* [[沙箱测试页面3&amp;gt;&amp;gt;Sandbox.TestPage3]]
+
+下面是[[XWiki语法&amp;gt;&amp;gt;XWiki.XWikiSyntax]]的一个基本说明，你可以在wiki页面中使用这些语法（比如：标题，图片，表格）。 
+
+= 标题 =
+
+XWiki提供了6级标题。您可以用它们来组织您的页面。
+
+== 2级标题 ==
+
+=== 3级标题 ===
+
+==== 4级标题 ====
+
+===== 5级标题 =====
+
+====== 6级标题 ======
+
+= 样式 =
+
+XWiki支持的基本样式：
+
+* **粗体**
+* //斜体//
+* __下划线__
+* --中划线/删除线--
+* ,,下标,,
+* ^^上标^^
+
+= 列表 =
+
+您可以在您的wiki页面中创建不同类型的列表：
+
+== 无序列表 ==
+
+* 1级列表项
+** 2级列表项
+*** 3级列表项
+** 2级列表项
+* 1级列表项
+
+== 数字排序列表 ==
+
+1. 1级列表项
+11. 2级列表项
+111. 3级列表项
+1. 1级列表项
+
+== 混合列表 ==
+
+1. 列表项1
+11. 列表项2
+11*. 列表项3
+11*. 列表项4
+1. 列表项5
+
+= 表格 =
+
+你可以直接在wiki页面中创建表格：
+
+== 简单表格 ==
+
+| 表格单元1 | 表格单元2 | 表格单元3
+| 表格单元4 | 表格单元5 | 表格单元6
+| 表格单元7 | 表格单元8 | 表格单元9
+
+== 首行为表头的表格 ==
+
+|= 表头 |= 表头 |= 表头 
+| 表格单元 | 表格单元 | 表格单元
+| 表格单元 | 表格单元 | 表格单元
+
+== 首行首列为表头的表格 ==
+
+|= 表头 |= 表头 |= 表头 
+|= 表头 | 表格单元 | 表格单元
+|= 表头 | 表格单元 | 表格单元
+
+= 链接 =
+
+XWiki允许您创建连接到wiki中其他页面或者互联网页面的链接：
+
+* [[WebHome]] -&amp;gt; 连接到当前wiki空间的首页；
+* [[沙箱首页&amp;gt;&amp;gt;WebHome]] -&amp;gt; 链接可以有自己的标题，这里使用了”沙箱首页“；
+* [[Wiki Home&amp;gt;&amp;gt;Main.WebHome]] -&amp;gt; 使用”空间名称.页面名称“的格式可以连接到同一wiki其他空间的指定页面；
+* [[http://www.xwiki.org]] -&amp;gt; 您还可以直接连接到外部web网站；
+* [[XWiki.org网站&amp;gt;&amp;gt;http://www.xwiki.org]] -&amp;gt; 当然，也可以给外部链接加上自己的标题。
+
+= 图片=
+
+您可以在您的wiki页面中插入图片：
+
+[[image:XWikiLogo.png]]
+
+= 宏 =
+
+Macros allow you to make wiki content look better and to add additional features to your wiki. Here are 2 examples of how macros can be used in wiki pages:
+
+== 告警宏 ==
+
+该宏可以赋予一段文字以特别的格式来引起用户和读者的注意：
+
+{{warning}}世界，您好！{{/warning}}
+
+== 目录列表宏 ==
+
+该宏能够根据wiki页面中的标题自动生成页面目录列表：
+
+{{toc/}}</content>
+</xwikidoc>

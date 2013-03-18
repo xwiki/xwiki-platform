@@ -455,7 +455,7 @@ public abstract class XWikiAction extends Action
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+            containerInitializer.initializeResponse(context.getResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize Request/Response or Session", e);

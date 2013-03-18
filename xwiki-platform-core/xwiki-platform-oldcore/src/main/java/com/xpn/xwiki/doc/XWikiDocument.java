@@ -1563,7 +1563,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @param action the action
+     * @param action the action, see the {@code struts-config.xml} file for a list of all existing action names
      * @param params the URL query string
      * @param redirect true if the URL is going to be used in {@link HttpServletResponse#sendRedirect(String)}
      * @param context the XWiki context
@@ -2188,8 +2188,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(EntityReference classReference, int nb)
     {
-        return getXObject(this.currentReferenceDocumentReferenceResolver.resolve(classReference,
-            getDocumentReference(), nb));
+        return getXObject(
+            this.currentReferenceDocumentReferenceResolver.resolve(classReference, getDocumentReference()), nb);
     }
 
     /**
@@ -3597,10 +3597,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return false;
         }
 
-        if (ObjectUtils.notEqual(getTemplateDocumentReference(), doc.getTemplateDocumentReference())) {
-            return false;
-        }
-
         if (!getDefaultTemplate().equals(doc.getDefaultTemplate())) {
             return false;
         }
@@ -3943,15 +3939,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         el = new DOMElement("title");
         el.addText(getTitle());
-        wr.write(el);
-
-        el = new DOMElement("template");
-        if (getTemplateDocumentReference() == null) {
-            // No template doc have been specified
-            el.addText("");
-        } else {
-            el.addText(this.localEntityReferenceSerializer.serialize(getTemplateDocumentReference()));
-        }
         wr.write(el);
 
         el = new DOMElement("defaultTemplate");
@@ -7019,21 +7006,69 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         List<HeaderBlock> filteredHeaders = new ArrayList<HeaderBlock>();
 
-        // get the headers
-        List<HeaderBlock> headers =
-            getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
-
-        // get the maximum header level
+        // Get the maximum header level
         int sectionDepth = 2;
         XWikiContext context = getXWikiContext();
         if (context != null) {
             sectionDepth = (int) context.getWiki().getSectionEditingDepth();
         }
 
-        // filter the headers
-        for (HeaderBlock header : headers) {
-            if (header.getLevel().getAsInt() <= sectionDepth) {
-                filteredHeaders.add(header);
+        // Get the headers.
+        //
+        // Note that we need to only take into account SectionBlock that are children of other SectionBlocks so that
+        // we are in sync with the section editing buttons added in xwiki.js. Being able to section edit any heading is
+        // too complex. For example if you have (in XWiki Syntax 2.0):
+        //   = Heading1 =
+        //   para1
+        //   == Heading2 ==
+        //   para2
+        //   (((
+        //   == Heading3 ==
+        //   para3
+        //   (((
+        //   == Heading4 ==
+        //   para4
+        //   )))
+        //   )))
+        //   == Heading5 ==
+        //   para5
+        //
+        // Then if we were to support editing "Heading4", its content would be:
+        //   para4
+        //   )))
+        //   )))
+        //
+        // Which obviously is not correct...
+
+        final XDOM xdom = getXDOM();
+        if (!xdom.getChildren().isEmpty()) {
+            Block currentBlock = xdom.getChildren().get(0);
+            while (currentBlock != null) {
+                if (currentBlock instanceof SectionBlock) {
+                    // The next children block is a HeaderBlock but we check to be on the safe side...
+                    Block nextChildrenBlock = currentBlock.getChildren().get(0);
+                    if (nextChildrenBlock instanceof  HeaderBlock) {
+                        HeaderBlock headerBlock = (HeaderBlock) nextChildrenBlock;
+                        if (headerBlock.getLevel().getAsInt() <= sectionDepth) {
+                            filteredHeaders.add(headerBlock);
+                        }
+                    }
+                    currentBlock = nextChildrenBlock;
+                } else {
+                    Block nextSibling = currentBlock.getNextSibling();
+                    if (nextSibling == null) {
+                        currentBlock = currentBlock.getParent();
+                        while (currentBlock != null) {
+                            if (currentBlock.getNextSibling() != null) {
+                                currentBlock = currentBlock.getNextSibling();
+                                break;
+                            }
+                            currentBlock = currentBlock.getParent();
+                        }
+                    } else {
+                        currentBlock = nextSibling;
+                    }
+                }
             }
         }
 
@@ -7695,7 +7730,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @return the XDOM corresponding to the document's string content.
+     * NOTE: This method caches the XDOM and returns a clone that can be safely modified.
+     * 
+     * @return the XDOM corresponding to the document's string content
      */
     @Override
     public XDOM getXDOM()
@@ -8209,10 +8246,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         if (!StringUtils.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
             setDefaultTemplate(document.getDefaultTemplate());
-            modified = true;
-        }
-        if (ObjectUtils.notEqual(getTemplateDocumentReference(), document.getTemplateDocumentReference())) {
-            setTemplateDocumentReference(document.getTemplateDocumentReference());
             modified = true;
         }
         if (ObjectUtils.notEqual(getRelativeParentReference(), document.getRelativeParentReference())) {

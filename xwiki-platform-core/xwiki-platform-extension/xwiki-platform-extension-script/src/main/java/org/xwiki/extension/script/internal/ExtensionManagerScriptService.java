@@ -428,21 +428,11 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public InstallRequest createInstallRequest(String id, String version, String namespace)
     {
-        InstallRequest installRequest = new InstallRequest();
+        InstallRequest installRequest = createInstallPlanRequest(id, version, namespace);
+
         installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
         installRequest.setInteractive(true);
-        installRequest.addExtension(new ExtensionId(id, version));
-        if (StringUtils.isNotBlank(namespace)) {
-            installRequest.addNamespace(namespace);
-        }
-
-        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
-        XWikiDocument callerDocument = getCallerDocument();
-        if (callerDocument != null) {
-            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
-        }
-
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
 
         return installRequest;
     }
@@ -489,19 +479,16 @@ public class ExtensionManagerScriptService implements ScriptService
     }
 
     /**
-     * Start the asynchronous installation plan creation process for an extension.
+     * Create an {@link InstallRequest} instance based on given parameters, to be used to create the install plan.
      * 
      * @param id the identifier of the extension to install
      * @param version the version to install
      * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
      *            will be installed globally
-     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
-     *         {@code null} in case of failure
+     * @return the {@link InstallRequest}
      */
-    public Job createInstallPlan(String id, String version, String namespace)
+    public InstallRequest createInstallPlanRequest(String id, String version, String namespace)
     {
-        setError(null);
-
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, id, namespace));
         installRequest.addExtension(new ExtensionId(id, version));
@@ -518,6 +505,25 @@ public class ExtensionManagerScriptService implements ScriptService
         installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
         installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
 
+        return installRequest;
+    }
+
+    /**
+     * Start the asynchronous installation plan creation process for an extension.
+     * 
+     * @param installRequest installation instructions
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public Job createInstallPlan(InstallRequest installRequest)
+    {
+        setError(null);
+
+        if (installRequest.getProperty(PROPERTY_CHECKRIGHTS) != Boolean.TRUE
+            && !this.documentAccessBridge.hasProgrammingRights()) {
+            installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        }
+
         Job job = null;
         try {
             job = this.jobManager.addJob(InstallPlanJob.JOBTYPE, installRequest);
@@ -526,6 +532,21 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         return job;
+    }
+
+    /**
+     * Start the asynchronous installation plan creation process for an extension.
+     * 
+     * @param id the identifier of the extension to install
+     * @param version the version to install
+     * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
+     *            will be installed globally
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public Job createInstallPlan(String id, String version, String namespace)
+    {
+        return createInstallPlan(createInstallPlanRequest(id, version, namespace));
     }
 
     /**
@@ -588,6 +609,7 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallJob.JOBTYPE);
 
         Job job = null;
         try {

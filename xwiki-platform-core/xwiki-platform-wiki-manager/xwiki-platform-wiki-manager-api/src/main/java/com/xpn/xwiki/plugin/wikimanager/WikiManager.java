@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.script.service.ScriptService;
 
@@ -60,9 +61,9 @@ public final class WikiManager
     protected static final Logger LOGGER = LoggerFactory.getLogger(WikiManager.class);
 
     /**
-     * The message tool to use to generate error or comments.
+     * Used to access translations.
      */
-    private XWikiPluginMessageTool messageTool;
+    private ContextualLocalizationManager localizationManager;
 
     /**
      * Used to fill newly created wiki.
@@ -74,10 +75,19 @@ public final class WikiManager
     /**
      * @param messageTool the message tool
      */
+    @Deprecated
     public WikiManager(XWikiPluginMessageTool messageTool)
     {
-        this.messageTool = messageTool;
-        this.wikiCopy = new WikiCopy(messageTool);
+        this();
+    }
+
+    /**
+     * Default constructor.
+     */
+    public WikiManager()
+    {
+        this.wikiCopy = new WikiCopy();
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -86,9 +96,10 @@ public final class WikiManager
      * @param context the XWiki context.
      * @return a translated strings manager.
      */
+    @Deprecated
     public XWikiPluginMessageTool getMessageTool(XWikiContext context)
     {
-        return this.messageTool != null ? this.messageTool : WikiManagerMessageTool.getDefault(context);
+        return WikiManagerMessageTool.getDefault(context);
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -415,8 +426,6 @@ public final class WikiManager
     public XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist, String templateWikiName,
         String packageName, String comment, XWikiContext context) throws XWikiException
     {
-        XWikiPluginMessageTool msg = getMessageTool(context);
-
         XWiki xwiki = context.getWiki();
 
         String newWikiName = userWikiSuperDoc.getWikiName();
@@ -430,8 +439,9 @@ public final class WikiManager
             // Wiki name forbidden
             String wikiForbiddenList = xwiki.Param("xwiki.virtual.reserved_wikis");
             if (Util.contains(newWikiName, wikiForbiddenList, ", ")) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN, msg.get(
-                    WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, newWikiName));
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN,
+                    this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN,
+                        newWikiName));
             }
 
             // Update or create wiki descriptor document that will be saved.
@@ -439,7 +449,8 @@ public final class WikiManager
 
             // Check owner
             if (getDocument(xwiki.getDatabase(), wikiSuperDocToSave.getOwner(), context).isNew()) {
-                LOGGER.warn(msg.get(WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, wikiSuperDocToSave.getOwner()));
+                LOGGER.warn(this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_USERDOESNOTEXIST,
+                    wikiSuperDocToSave.getOwner()));
                 wikiSuperDocToSave.setOwner(XWikiRightService.SUPERADMIN_USER);
             }
 
@@ -500,8 +511,6 @@ public final class WikiManager
     private XWikiServer getWikiDescriptorToSave(XWikiServer userWikiSuperDoc, boolean failOnExist, XWikiContext context)
         throws XWikiException
     {
-        XWikiPluginMessageTool msg = getMessageTool(context);
-
         XWiki xwiki = context.getWiki();
 
         XWikiServerClass wikiClass = XWikiServerClass.getInstance(context);
@@ -517,11 +526,12 @@ public final class WikiManager
                 // If we are not allowed to continue in case wiki descriptor page already
                 // exists.
                 if (failOnExist) {
-                    throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALREADYEXISTS, msg.get(
-                        WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.getFullName()));
+                    throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALREADYEXISTS,
+                        this.localizationManager.getTranslationPlain(
+                            WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.getFullName()));
                 } else if (LOGGER.isWarnEnabled()) {
-                    LOGGER
-                        .warn(msg.get(WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.toString()));
+                    LOGGER.warn(this.localizationManager.getTranslationPlain(
+                        WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.toString()));
                 }
             }
 
@@ -554,23 +564,23 @@ public final class WikiManager
     private void createWikiDatabase(String targetWiki, XWikiContext context, boolean initClasses)
         throws WikiManagerException
     {
-        XWikiPluginMessageTool msg = getMessageTool(context);
-
         XWiki xwiki = context.getWiki();
 
         // Create database/schema
         try {
             xwiki.getStore().createWiki(targetWiki, context);
         } catch (Exception e) {
-            LOGGER.warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki), e);
+            LOGGER.warn(this.localizationManager.getTranslationPlain(
+                WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki), e);
         }
 
         // Init database/schema
         try {
             xwiki.updateDatabase(targetWiki, true, initClasses, context);
         } catch (Exception e) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE, msg.get(
-                WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki), e);
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE,
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki),
+                e);
         }
     }
 
@@ -592,8 +602,9 @@ public final class WikiManager
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
 
         if (!XWikiServerClass.getInstance(context).isInstance(wiki)) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, getMessageTool(context)
-                .get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS, wikiNameToDelete));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS,
+                    wikiNameToDelete));
         }
 
         wiki.delete(deleteDatabase);

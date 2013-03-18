@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>Java API for the User Interface extensions</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>68.42</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>68.80</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

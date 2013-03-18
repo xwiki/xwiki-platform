@@ -23,6 +23,41 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>WorkspaceManager.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>31bb7dd5-7ccc-43e8-bed3-bd1a16eb355e</guid>
+    <property>
+      <scope>GLOBAL</scope>
+    </property>
+  </object>
   <content># Workspace Manager translation page
 
 # MESSAGES
@@ -168,6 +203,7 @@ platform.workspace.newWorkspaceTemplateLabel=Template
 WorkspaceManager.WorkspaceClass_membershipType_open=Open for any user to join
 WorkspaceManager.WorkspaceClass_membershipType_request=Any user can request to join but an admin must accept
 WorkspaceManager.WorkspaceClass_membershipType_invite=Only an admin can invite a user
+platform.workspace.searchSuggestSourceWorkspaces=Workspaces
 
 # PROPERTIES
 workspacemanager.prop.wiki.wikiname=Workspace Identifier

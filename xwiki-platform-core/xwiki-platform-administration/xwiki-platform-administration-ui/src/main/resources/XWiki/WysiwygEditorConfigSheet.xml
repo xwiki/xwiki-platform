@@ -1576,6 +1576,10 @@ $xwiki.ssx.use('XWiki.WysiwygEditorConfigSheet')
 ; &lt;label&gt;$doc.displayPrettyName('toolBar', false, false)&lt;/label&gt;##
 (% class="xHint" %)$msg.get('wysiwyg.admin.toolBar.hint')
 : &lt;div class="noScript"&gt;$doc.display('toolBar', $mode)&lt;/div&gt;
+##
+; &lt;label&gt;$doc.displayPrettyName('cleanPaste', false, false)&lt;/label&gt;##
+(% class="xHint" %)$msg.get('wysiwyg.admin.cleanPaste.hint')
+: $doc.display('cleanPaste', $mode)
 
 ##
 == $msg.get('wysiwyg.admin.link') ==

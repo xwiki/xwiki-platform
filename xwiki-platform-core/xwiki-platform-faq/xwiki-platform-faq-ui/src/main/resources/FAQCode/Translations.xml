@@ -61,5 +61,22 @@
   <content>faq.doc.title=Question
 faq.doc.creationDate=Created On
 faq.doc.date=Last Modified
-faq.applicationsPanelEntryLabel=FAQ</content>
+faq.applicationsPanelEntryLabel=FAQ
+
+platform.faq.about=Frequently Asked Questions (FAQ) are an easy way to find answers to most of your questions.
+platform.faq.search.title=Search FAQ...
+platform.faq.create.title=Contribute FAQ...
+platform.faq.search.questionHint=question text...
+platform.faq.create.questionHint=question text...
+platform.faq.search.submit=Search
+platform.faq.create.submit=Add
+
+platform.faq.need=You need first to {0} log in {1} or {2} register {3}
+
+platform.faq.noAnswer= No answer has been provided yet for this FAQ entry. Be the first to provide one! Register on this wiki and edit this page to add an answer to this FAQ entry.
+platform.faq.sheet=This class sheet must be applied on a document containing an FAQCode.FAQClass object
+
+platform.faq.technical=Contains technical pages for the FAQ application.
+platform.faq.list=Documents in this space
+</content>
 </xwikidoc>

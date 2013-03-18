@@ -73,7 +73,10 @@ public class ServletRequest implements Request
         List<Object> result = new ArrayList<Object>();
 
         // Look first in the Query Parameters and then in the Query Attributes
-        result.addAll(Arrays.asList(this.httpServletRequest.getParameterValues(key)));
+        Object[] requestParameters = this.httpServletRequest.getParameterValues(key);
+        if (requestParameters != null) {
+            result.addAll(Arrays.asList(requestParameters));
+        }
         result.add(this.httpServletRequest.getAttribute(key));
 
         return result;

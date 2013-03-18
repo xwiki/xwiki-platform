@@ -119,7 +119,7 @@ public class WatchListJob extends AbstractJob implements Job
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+            containerInitializer.initializeResponse(context.getResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize Request/Response or Session", e);

@@ -31,9 +31,27 @@ public class XWikiServletResponse implements XWikiResponse
 {
     private HttpServletResponse response;
 
+    /**
+     * The HTTP response status (200, 302, etc), see {@link #getStatus()}.
+     */
+    private int httpStatus;
+
     public XWikiServletResponse(HttpServletResponse response)
     {
         this.response = response;
+    }
+
+    /**
+     * Note that in Servlet 3.0 there's a better way to get the servlet response's code by calling
+     * <a href="http://download.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#getStatus%28%29">
+     * getStatus()</a>.
+     *
+     * @return the HTTP response status (200, 302, etc)
+     * @since 5.0M1
+     */
+    public int getStatus()
+    {
+        return this.httpStatus;
     }
 
     @Override
@@ -45,6 +63,7 @@ public class XWikiServletResponse implements XWikiResponse
     @Override
     public void sendRedirect(String redirect) throws IOException
     {
+        this.httpStatus = SC_FOUND;
         this.response.sendRedirect(redirect);
     }
 
@@ -203,6 +222,7 @@ public class XWikiServletResponse implements XWikiResponse
     public void setStatus(int i)
     {
         this.response.setStatus(i);
+        this.httpStatus = i;
     }
 
     /**
@@ -213,6 +233,7 @@ public class XWikiServletResponse implements XWikiResponse
     public void setStatus(int i, String s)
     {
         this.response.setStatus(i, s);
+        this.httpStatus = i;
     }
 
     @Override
@@ -256,18 +277,20 @@ public class XWikiServletResponse implements XWikiResponse
     @Override
     public void sendError(int i, String s) throws IOException
     {
+        this.httpStatus = i;
         this.response.sendError(i, s);
     }
 
     @Override
     public void sendError(int i) throws IOException
     {
+        this.httpStatus = i;
         this.response.sendError(i);
     }
 
     @Override
     public String getContentType()
     {
-        return null;
+        return this.response.getContentType();
     }
 }

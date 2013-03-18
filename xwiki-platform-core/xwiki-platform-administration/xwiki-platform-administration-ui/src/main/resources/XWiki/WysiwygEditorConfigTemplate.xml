@@ -67,6 +67,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </attachmentSelectionLimited>
+      <cleanPaste>
+        <customDisplay/>
+        <defaultValue>1</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>radio</displayFormType>
+        <displayType/>
+        <name>cleanPaste</name>
+        <number>13</number>
+        <prettyName>Clean paste content automatically</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </cleanPaste>
       <colorPalette>
         <customDisplay/>
         <disabled>0</disabled>
@@ -234,6 +248,9 @@
     <guid>9666430e-2e43-48f5-9a0f-cce3012f17a0</guid>
     <property>
       <attachmentSelectionLimited>0</attachmentSelectionLimited>
+    </property>
+    <property>
+      <cleanPaste>1</cleanPaste>
     </property>
     <property>
       <colorPalette>#000000, #444444, #666666, #999999, #CCCCCC, #EEEEEE, #F3F3F3, #FFFFFF,

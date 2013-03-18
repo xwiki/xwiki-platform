@@ -21,7 +21,10 @@ package org.xwiki.workspace;
 
 import java.util.ResourceBundle;
 
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
@@ -29,6 +32,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  * 
  * @version $Id$
  */
+@Deprecated
 public class WorkspaceManagerMessageTool extends XWikiMessageTool
 {
     /** Used as {@link WorkspaceException} message when failing to get a workspace. */
@@ -56,11 +60,30 @@ public class WorkspaceManagerMessageTool extends XWikiMessageTool
     public static final String LOG_WORKSPACEINVALID = "workspacemanager.log.workspaceinvalid";
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
      *            documents
      */
     public WorkspaceManagerMessageTool(XWikiContext context)
     {
         super(ResourceBundle.getBundle("workspacemanager" + "/ApplicationResources"), context);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
+    }
+
+    @Override
+    public String get(String key)
+    {
+        return this.localizationManager.getTranslationPlain(key);
+    }
+
+    @Override
+    public String get(String key, Object... params)
+    {
+        return this.localizationManager.getTranslationPlain(key, params);
     }
 }

@@ -204,6 +204,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void putAll(Map<? extends Right, ? extends V> map)
     {
         if (map instanceof RightMap) {
@@ -612,6 +613,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
      * @throws IOException on error
      * @throws ClassNotFoundException on error
      */
+    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException
     {
         // Read in the key type and any hidden stuff

@@ -21,9 +21,12 @@
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import junit.framework.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
@@ -689,5 +692,28 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
             DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_objdoc_multi, list);
 
         assertEquals(WHERECLAUSE_objdoc_multi, where);
+    }
+    
+    public void testnewXObjectDocument() throws XWikiException
+    {
+        XObjectDocument document = DispatchXClassManager.getInstance(getContext()).newXObjectDocument(getContext());
+
+        Assert.assertNotNull(document);
+    }
+    
+    public void testnewXObjectDocumentList() throws XWikiException
+    {
+        BaseClass baseClass = DispatchXClassManager.getInstance(getContext()).getBaseClass();
+        
+        XWikiDocument document1 = new XWikiDocument(new DocumentReference(baseClass.getDocumentReference().getWikiReference().getName(), "space", "page"));
+        document1.newXObject(baseClass.getDocumentReference(), getContext());
+
+        XWikiDocument document2 = new XWikiDocument(new DocumentReference(baseClass.getDocumentReference().getWikiReference().getName(), "space", "page"));
+        document2.newXObject(baseClass.getDocumentReference(), getContext());
+        document2.newXObject(baseClass.getDocumentReference(), getContext());
+
+        List<XObjectDocument> list = DispatchXClassManager.getInstance(getContext()).newXObjectDocumentList(Arrays.asList(document1, document2), getContext());
+        
+        Assert.assertEquals(3, list.size());
     }
 }

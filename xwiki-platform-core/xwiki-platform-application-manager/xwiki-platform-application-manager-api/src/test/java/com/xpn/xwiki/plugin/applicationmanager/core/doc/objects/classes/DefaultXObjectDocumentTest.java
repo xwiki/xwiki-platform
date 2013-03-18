@@ -34,10 +34,12 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.localization.LocalizationContext;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -65,6 +67,9 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
         // //////////////////////////////////////////////////
         // XWikiHibernateStore
+
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
@@ -171,7 +176,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentEmpty() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
@@ -189,7 +194,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentDocName() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
@@ -208,12 +213,12 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentDocNameExists() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
-        XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
-        xwiki.saveDocument(doc, getContext());
+        XWikiDocument doc = this.xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
+        this.xwiki.saveDocument(doc, getContext());
 
         XClassManager sclass = XClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc =

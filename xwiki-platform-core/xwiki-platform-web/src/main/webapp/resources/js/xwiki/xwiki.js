@@ -313,12 +313,21 @@ Object.extend(XWiki, {
 
               if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
                   var editspan = document.createElement("SPAN");
-                  var editlink = document.createElement("A");
-
-                  editlink.href = window.docediturl + "?section=" + sectioncount;
-                  editlink.style.textDecoration = "none";
-                  editlink.innerHTML = "$msg.get('edit')";
                   editspan.className = "edit_section";
+
+                  // If there's no Syntax Renderer for the current document's syntax then make sure the section edit
+                  // button will be displayed inactive since editing a section requires a Syntax Renderer.
+                  var editlink;
+                  if (!XWiki.hasRenderer) {
+                      editlink = document.createElement("SPAN");
+                      editspan.className = editspan.className + " disabled";
+                      editlink.title = "$msg.get('platform.core.rendering.noRendererForSectionEdit')";
+                  } else {
+                      editlink = document.createElement("A");
+                      editlink.href = window.docediturl + "?section=" + sectioncount;
+                      editlink.style.textDecoration = "none";
+                      editlink.innerHTML = "$msg.get('edit')";
+                  }
 
                   editspan.appendChild(editlink);
                   node.insert( { 'after': editspan } );
@@ -1488,7 +1497,7 @@ document.observe('xwiki:dom:loaded', function() {
       });
     }
     $('body').observe('click', function (event) {
-      if (!event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
+      if (event.element().descendantOf && !event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
         hideParentSection();
       }
     })

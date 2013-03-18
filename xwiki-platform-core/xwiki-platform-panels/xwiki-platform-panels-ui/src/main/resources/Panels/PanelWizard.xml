@@ -574,7 +574,6 @@ div.pagelayoutoption:hover .lmleftcolumn,
       #else
         #set ($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
       #end
-      $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
       $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
       $xwiki.jsfx.use('js/xwiki/panelwizard/Drag.js')##
       $xwiki.jsfx.use('js/xwiki/panelwizard/ieemu.js')##

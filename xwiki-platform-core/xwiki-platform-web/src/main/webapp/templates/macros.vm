@@ -2055,6 +2055,9 @@ var $jsVarName = {
 #set($ok = $parameters.put('plugins', $services.wysiwyg.config.getPlugins()))
 #set($ok = $parameters.put('menu', $services.wysiwyg.config.getMenuBar()))
 #set($ok = $parameters.put('toolbar', $services.wysiwyg.config.getToolBar()))
+#if ("$!services.wysiwyg.config.isPasteContentCleanedAutomatically()" == 'false')
+  #set ($ok = $parameters.put('cleanPaste', 'false'))
+#end
 #if("$!services.wysiwyg.config.isAttachmentSelectionLimited()" == 'true')
   #set($ok = $parameters.put('linkfiles', 'currentpage'))
 #end

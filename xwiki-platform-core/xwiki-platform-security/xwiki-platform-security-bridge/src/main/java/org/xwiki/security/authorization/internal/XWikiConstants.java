@@ -28,7 +28,7 @@ package org.xwiki.security.authorization.internal;
 interface XWikiConstants
 {
     /** Name of the space where user document and global preferences is stored. */
-    String WIKI_SPACE = "XWiki";
+    String XWIKI_SPACE = "XWiki";
 
     /** Name of document where wiki rights are stored. */
     String WIKI_DOC = "XWikiPreferences";
@@ -45,6 +45,9 @@ interface XWikiConstants
     /** XWiki class for storing rights. */
     String LOCAL_CLASSNAME = "XWikiRights";
 
+    /** Field name for level in xwiki rights object. */
+    String LEVEL_FIELD_NAME = "level";
+
     /** Field name for group in xwiki rights object. */
     String GROUPS_FIELD_NAME = "groups";
 
@@ -58,5 +61,5 @@ interface XWikiConstants
     String GUEST_USER = "XWikiGuest";
 
     /** The Guest full name. */
-    String GUEST_USER_FULLNAME = WIKI_SPACE + '.' + GUEST_USER;
+    String GUEST_USER_FULLNAME = XWIKI_SPACE + '.' + GUEST_USER;
 }

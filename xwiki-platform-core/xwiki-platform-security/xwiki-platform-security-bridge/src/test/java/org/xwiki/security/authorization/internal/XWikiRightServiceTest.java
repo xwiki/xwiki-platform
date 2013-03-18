@@ -158,7 +158,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         Assert.assertFalse(getCachingImpl().hasProgrammingRights(ctx));
 
         // superadmin should always have PR
-        testWiki.setUser(XWikiConstants.WIKI_SPACE + '.' + AuthorizationManager.SUPERADMIN_USER);
+        testWiki.setUser(XWikiConstants.XWIKI_SPACE + '.' + AuthorizationManager.SUPERADMIN_USER);
         Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
         Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 

@@ -20,10 +20,11 @@
 package org.xwiki.security.authorization.internal;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -36,10 +37,7 @@ import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.text.XWikiToStringStyle;
 
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.xpn.xwiki.objects.BaseProperty;
 
 
 /**
@@ -69,6 +67,7 @@ public class XWikiSecurityRule implements SecurityRule
      * @param resolver A document reference resolver for user and group pages.
      * @param wikiReference The name of the current wiki.
      */
+    @SuppressWarnings("unchecked")
     protected XWikiSecurityRule(BaseObject obj, DocumentReferenceResolver<String> resolver,
         WikiReference wikiReference)
     {
@@ -77,21 +76,19 @@ public class XWikiSecurityRule implements SecurityRule
         groups = new HashSet<DocumentReference>();
         rights = new RightSet();
 
-        String levels = obj.getStringValue("levels");
-        String[] levelsarray = StringUtils.split(levels, " ,|");
-        for (String s : levelsarray) {
+        for (String s : (List<String>) ((BaseProperty) obj.safeget(XWikiConstants.LEVEL_FIELD_NAME)).getValue()) {
             Right right = Right.toRight(s);
             if (right != Right.ILLEGAL) {
                 rights.add(right);
             }
         }
 
-        for (String user : UsersClass.getListFromString(obj.getStringValue(XWikiConstants.USERS_FIELD_NAME))) {
+        for (String user : (List<String>) ((BaseProperty) obj.safeget(XWikiConstants.USERS_FIELD_NAME)).getValue()) {
             DocumentReference ref = resolver.resolve(user, wikiReference);
             this.users.add(ref);
         }
 
-        for (String group : GroupsClass.getListFromString(obj.getStringValue(XWikiConstants.GROUPS_FIELD_NAME))) {
+        for (String group : (List<String>) ((BaseProperty) obj.safeget(XWikiConstants.GROUPS_FIELD_NAME)).getValue()) {
             DocumentReference ref = resolver.resolve(group, wikiReference);
             this.groups.add(ref);
         }

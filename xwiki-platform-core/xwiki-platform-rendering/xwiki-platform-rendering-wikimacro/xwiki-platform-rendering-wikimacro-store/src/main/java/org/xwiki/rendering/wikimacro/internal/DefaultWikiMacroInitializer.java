@@ -126,12 +126,8 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         try {
             if (!local) {
                 Set<String> wikiNames = new HashSet<String>();
-                // Always add the main wiki to the list of wikis for which to load defined wiki macros.
-                wikiNames.add(xcontext.getMainXWiki());
-                // If we're in multi wiki mode add the list of all subwikis
-                if (xcontext.getWiki().isVirtualMode()) {
-                    wikiNames.addAll(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
-                }
+                // Add the list of all subwikis
+                wikiNames.addAll(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
 
                 for (String wikiName : wikiNames) {
                     registerMacrosForWiki(wikiName, xcontext);

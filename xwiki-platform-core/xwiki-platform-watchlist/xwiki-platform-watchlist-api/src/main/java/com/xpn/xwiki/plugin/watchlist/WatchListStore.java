@@ -600,18 +600,10 @@ public class WatchListStore implements EventListener
         List<String> wikiServers = new ArrayList<String>();
         List<String> results = new ArrayList<String>();
 
-        if (context.getWiki().isVirtualMode()) {
-            try {
-                wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
-                if (!wikiServers.contains(context.getMainXWiki())) {
-                    wikiServers.add(context.getMainXWiki());
-                }
-            } catch (Exception e) {
-                LOGGER.error("error getting list of wiki servers", e);
-            }
-        } else {
-            wikiServers = new ArrayList<String>();
-            wikiServers.add(context.getMainXWiki());
+        try {
+            wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
+        } catch (Exception e) {
+            LOGGER.error("error getting list of wiki servers", e);
         }
 
         String oriDatabase = context.getDatabase();

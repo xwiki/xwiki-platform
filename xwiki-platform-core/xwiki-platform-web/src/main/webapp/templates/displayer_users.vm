@@ -27,7 +27,7 @@
         <div>
           <span class="user-alias">$escapetool.xml($userReference.name)</span>
           ## Display the wiki only for local users.
-          #if ($xwiki.isVirtualMode() && $userReference.wikiReference.name != $xcontext.getMainWikiName())
+          #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
             <span class="user-wiki">$escapetool.xml($userReference.wikiReference.name)</span>
           #end
         </div>

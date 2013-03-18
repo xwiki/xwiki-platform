@@ -224,11 +224,6 @@ public final class WikiCopy
     {
         XWiki xwiki = context.getWiki();
 
-        if (!xwiki.isVirtualMode()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
-                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
-        }
-
         // Prepare to import
         XWikiDocument doc = context.getDoc();
 

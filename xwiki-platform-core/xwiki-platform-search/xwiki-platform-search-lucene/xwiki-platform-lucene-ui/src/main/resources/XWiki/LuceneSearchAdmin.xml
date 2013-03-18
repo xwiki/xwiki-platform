@@ -184,7 +184,7 @@ search=Main.LuceneSearch</parameters>
 &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 
   ## Does not really make sense to reindex the whole farm from a subwiki
-  #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
+  #if ($xcontext.isMainWiki())
 &lt;p&gt;
     &lt;label for="indexfarm"&gt;&lt;input id="indexfarm" name="action" type="radio" value="indexfarm" #if (!$request.action || $request.action == 'indexfarm')checked="checked" #end/&gt; $msg.get('search.admin.lucene.indexing.action.indexfarm')&lt;/label&gt;
 &lt;/p&gt;
@@ -200,7 +200,7 @@ search=Main.LuceneSearch</parameters>
 &lt;/p&gt;
 
 &lt;p&gt;
-  #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
+  #if ($xcontext.isMainWiki())
     &lt;label for="indexcustom_wikis"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.wikis')&lt;/label&gt; &lt;input id="indexcustom_wikis" name="wikis" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.wikis.title'))" value="$!wikisString" /&gt;
   #else
     &lt;input id="indexcustom_wikis" name="wikis" value="${xcontext.database}" type="hidden" value="$!wikisString" /&gt;

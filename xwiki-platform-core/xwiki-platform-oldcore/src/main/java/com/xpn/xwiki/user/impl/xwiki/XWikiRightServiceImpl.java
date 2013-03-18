@@ -433,8 +433,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         addMemberGroups(doc.getWikiName(), prefixedFullName, userOrGroupDocumentReference, grouplist, context);
 
         // Get member groups from member's wiki
-        if (context.getWiki().isVirtualMode()
-            && !context.getDatabase().equalsIgnoreCase(userOrGroupDocumentReference.getWikiReference().getName())) {
+        if (!context.getDatabase().equalsIgnoreCase(userOrGroupDocumentReference.getWikiReference().getName())) {
             addMemberGroups(userOrGroupDocumentReference.getWikiReference().getName(), prefixedFullName,
                 userOrGroupDocumentReference, grouplist, context);
         }
@@ -963,16 +962,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
 
             // programming rights can only been given for user of the main wiki
-            if (context.getWiki().isVirtualMode()) {
-                String maindb = context.getWiki().getDatabase();
-                if ((maindb == null) || (!username.startsWith(maindb))) {
-                    return false;
-                }
+            // FIXME: Isn't this wrong? The main db is context.getMainWikiName(), not context.getWiki().getDatabase()
+            // (which is the current db).
+            String maindb = context.getWiki().getDatabase();
+            if ((maindb == null) || (!username.startsWith(maindb))) {
+                return false;
             }
 
             return hasAccessLevel("programming", username, docname, context);
         } catch (Exception e) {
-            LOGGER.error("Faile to check programming right for document [{}]", doc.getPrefixedFullName(), e);
+            LOGGER.error("Failed to check programming right for document [{}]", doc.getPrefixedFullName(), e);
 
             return false;
         }

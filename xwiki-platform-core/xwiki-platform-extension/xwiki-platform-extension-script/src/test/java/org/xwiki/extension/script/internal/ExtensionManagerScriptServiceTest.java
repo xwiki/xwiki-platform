@@ -71,12 +71,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         this.mockXWiki = new XWiki()
         {
             @Override
-            public boolean isVirtualMode()
-            {
-                return true;
-            }
-
-            @Override
             public XWikiRightService getRightService()
             {
                 return mockRightService;

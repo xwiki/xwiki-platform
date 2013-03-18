@@ -124,9 +124,9 @@ public class Context extends Api
 
     /**
      * Returns the current database name. If {@link #isMainWiki()} returns <code>true</code> then the current database
-     * name is the same as {@link #getMainWikiName()}. Otherwise, in virtual mode, each virtual wiki has it's own
-     * database. In this case the returned string identifies the current virtual wiki we operate on and prefixes
-     * document names like in <i>databaseName:spaceName.pageName</i>.
+     * name is the same as {@link #getMainWikiName()}. Otherwise, each virtual wiki has it's own database. In this case
+     * the returned string identifies the current virtual wiki we operate on and prefixes document names like in
+     * <i>databaseName:spaceName.pageName</i>.
      * 
      * @return The current database name.
      * @see #isMainWiki()

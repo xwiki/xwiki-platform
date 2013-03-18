@@ -113,10 +113,7 @@ search=Main.SolrSearch</parameters>
   <content>{{velocity output='false'}}
 ## TODO: CSRF protection
 
-#set ($allWikis = $sorttool.sort($xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context)))
-#if (!$allWikis.contains($xcontext.database))
-  #set ($discard = $allWikis.add($xcontext.database))
-#end
+#set ($allWikis = $sorttool.sort($xwiki.wikiNames))
 
 ## Handle request
 #if ("$!request.action" != '')
@@ -209,7 +206,7 @@ search=Main.SolrSearch</parameters>
 &lt;dd&gt;
   &lt;select name='wiki' size='1'&gt;
     ## Indexing on the entire farm or on various wikis is done only on the main wiki.
-    #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
+    #if ($xcontext.isMainWiki())
       &lt;option value=''&gt;Entire farm&lt;/option&gt;
       #foreach ($wiki in $allWikis)
         &lt;option value='$wiki'&gt;$wiki&lt;/option&gt;

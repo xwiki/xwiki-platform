@@ -131,8 +131,6 @@ public class ContextTest extends AbstractComponentTestCase
             // Decide that there's no custom Displayer for the String field
             allowing(xwiki).exists(new DocumentReference("testwiki", "XWiki", "StringDisplayer"), xcontext);
             will(returnValue(false));
-            allowing(xwiki).isVirtualMode();
-            will(returnValue(false));
             allowing(xwiki).evaluateTemplate("displayer_string.vm", xcontext);
             will(returnValue(""));
         }});

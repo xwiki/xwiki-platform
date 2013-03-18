@@ -265,16 +265,11 @@ public class LegacyTestWiki extends AbstractTestWiki
                         TestWiki wiki = wikis.get(wikiName);
                         return wiki.getOwner();
                     }
-<<<<<<< Updated upstream
-            });
-            allowing(xwiki).getGroupService(with(any(XWikiContext.class))); will(returnValue(groupService));
-=======
                 });
                 allowing(xwiki).getGroupService(with(any(XWikiContext.class)));
                 will(returnValue(groupService));
                 allowing(xwiki).isVirtualMode();
                 will(returnValue(wikis.size() > 1));
->>>>>>> Stashed changes
 
                 // Expectations for XWikiGroupService
 

@@ -19,14 +19,16 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
-import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 
 import com.xpn.xwiki.XWikiContext;
-
-import junit.framework.Assert;
-import org.junit.Test;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
@@ -188,6 +190,13 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         assertAccessLevelTrueExpectedDifference("Guest does not have programming right on empty wiki.", "programming",
             "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
 
+        testWiki.setUser("xwiki:XWiki.XWikiGuest");
+
+        assertWikiAdminRightsTrue("Guest does not have admin right on empty wiki.", ctx);
+
+        testWiki.setDoc("xwiki:Space.Page");
+
+        assertAdminRightsTrue("Guest does not have admin right on empty wiki.", ctx);
     }
 
     @Test

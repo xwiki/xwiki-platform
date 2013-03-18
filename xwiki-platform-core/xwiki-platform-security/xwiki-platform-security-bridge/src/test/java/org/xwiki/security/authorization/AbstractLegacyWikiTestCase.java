@@ -99,6 +99,58 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
 
     /**
      * @param message A message explaining the assertion.
+     * @param ctx The context.
+     */
+    protected void assertAdminRightsTrue(String message, XWikiContext ctx) throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasAdminRights(ctx));
+
+        Assert.assertTrue("Caching implementation: " + message, this.cachingImpl.hasAdminRights(ctx));
+    }
+
+    /**
+     * @param message A message explaining the assertion.
+     * @param ctx The context.
+     */
+    protected void assertAdminRightsFalse(String message, XWikiContext ctx) throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertFalse("Old implementation: " + message, this.legacyImpl.hasAdminRights(ctx));
+
+        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasAdminRights(ctx));
+    }
+
+    /**
+     * @param message A message explaining the assertion.
+     * @param ctx The context.
+     */
+    protected void assertWikiAdminRightsTrue(String message, XWikiContext ctx) throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasWikiAdminRights(ctx));
+
+        Assert.assertTrue("Caching implementation: " + message, this.cachingImpl.hasWikiAdminRights(ctx));
+    }
+
+    /**
+     * @param message A message explaining the assertion.
+     * @param ctx The context.
+     */
+    protected void assertWikiAdminRightsFalse(String message, XWikiContext ctx) throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertFalse("Old implementation: " + message, this.legacyImpl.hasWikiAdminRights(ctx));
+
+        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasWikiAdminRights(ctx));
+    }
+
+    /**
+     * @param message A message explaining the assertion.
      * @param accessLevel The access level to check.
      * @param userName The name of the user.
      * @param documentName The document name.

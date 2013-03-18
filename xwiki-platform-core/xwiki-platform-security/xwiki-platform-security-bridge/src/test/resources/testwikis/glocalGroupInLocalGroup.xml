@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin">
+    <user name="XWiki.user" />
+    <group name="XWiki.group">
+      <user name="user" />
+    </group>
+    <allowGroup name="XWiki.AdminGroup" type="admin" />
+  </wiki>
+  <wiki name="wiki2" mainWiki="false" owner="wiki:XWiki.Admin" >
+    <group name="XWiki.group">
+      <user name="wiki:XWiki.group" />
+    </group>
+    <allowGroup name="XWiki.group" type="view" />
+    <space name="Space">
+      <document name="Page">
+      </document>
+    </space>
+  </wiki>
+</wikis>

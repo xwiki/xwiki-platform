@@ -46,8 +46,8 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         // TODO: Here we have a mismatch.
 
-        assertAccessLevelFalseExpectedDifference("User from another wiki has right on a local wiki",
-                                                 "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+        assertAccessLevelFalseExpectedDifference("User from another wiki has right on a local wiki", "view",
+            "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
     }
 
@@ -61,15 +61,15 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         ctx.setDatabase("wiki");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
-                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+            "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
         ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
-                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+            "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
-                              "view", "wiki:XWiki.user", "Space.Page", ctx);
+            "view", "wiki:XWiki.user", "Space.Page", ctx);
 
     }
 
@@ -82,20 +82,21 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         ctx.setDatabase("wiki");
 
-        assertAccessLevelTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
-                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+        assertAccessLevelTrue(
+            "User group from another wiki does not have right on a local wiki when tested from user wiki", "view",
+            "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        assertAccessLevelTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
-                              "view", "XWiki.user", "wiki2:Space.Page", ctx);
-
+        assertAccessLevelTrue(
+            "User group from another wiki does not have right on a local wiki when tested from user wiki", "view",
+            "XWiki.user", "wiki2:Space.Page", ctx);
 
         ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
-                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+            "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
-                              "view", "wiki:XWiki.user", "Space.Page", ctx);
+            "view", "wiki:XWiki.user", "Space.Page", ctx);
 
     }
 
@@ -108,24 +109,29 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         ctx.setDatabase("wiki");
 
-        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from user wiki",
-                              "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+        assertAccessLevelTrue(
+            "Wiki owner from another wiki does not have right on a local wiki when tested from user wiki", "view",
+            "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from user wiki",
-                          "view", "XWiki.user", "wiki2:Space.Page", ctx);
+        assertAccessLevelTrue(
+            "Wiki owner from another wiki does not have right on a local wiki when tested from user wiki", "view",
+            "XWiki.user", "wiki2:Space.Page", ctx);
 
         ctx.setDatabase("wiki2");
 
-        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from local wiki",
-                          "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+        assertAccessLevelTrue(
+            "Wiki owner from another wiki does not have right on a local wiki when tested from local wiki", "view",
+            "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
-        assertAccessLevelTrue("Wiki owner from another wiki does not have right on a local wiki when tested from local wiki",
-                          "view", "wiki:XWiki.user", "Space.Page", ctx);
+        assertAccessLevelTrue(
+            "Wiki owner from another wiki does not have right on a local wiki when tested from local wiki", "view",
+            "wiki:XWiki.user", "Space.Page", ctx);
 
     }
 
     /**
      * Test that programming rights are checked on the context user when no context document is set.
+     * 
      * @throws com.xpn.xwiki.XWikiException on error
      */
     @Test
@@ -167,20 +173,49 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         ctx.setDatabase("xwiki");
 
-        assertAccessLevelTrue("Guest does not have view right on empty wiki.",
-                              "view", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
-        
-        assertAccessLevelTrue("Guest does not have edit right on empty wiki.",
-                              "edit", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
-        
-        assertAccessLevelTrue("Guest does not have delete right on empty wiki.",
-                              "delete", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
-        
-        assertAccessLevelTrue("Guest does not have admin right on empty wiki.",
-                              "admin", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
-        
-        assertAccessLevelTrueExpectedDifference("Guest does not have programming right on empty wiki.",
-                              "programming", "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
-        
+        assertAccessLevelTrue("Guest does not have view right on empty wiki.", "view", "xwiki:XWiki.XWikiGuest",
+            "xwiki:Space.Page", ctx);
+
+        assertAccessLevelTrue("Guest does not have edit right on empty wiki.", "edit", "xwiki:XWiki.XWikiGuest",
+            "xwiki:Space.Page", ctx);
+
+        assertAccessLevelTrue("Guest does not have delete right on empty wiki.", "delete", "xwiki:XWiki.XWikiGuest",
+            "xwiki:Space.Page", ctx);
+
+        assertAccessLevelTrue("Guest does not have admin right on empty wiki.", "admin", "xwiki:XWiki.XWikiGuest",
+            "xwiki:Space.Page", ctx);
+
+        assertAccessLevelTrueExpectedDifference("Guest does not have programming right on empty wiki.", "programming",
+            "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+
+    }
+
+    @Test
+    public void testGlobalUserInLocalGroup() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("glocalUserInLocalGroup.xml");
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+
+        ctx.setDatabase("wiki2");
+
+        assertAccessLevelTrue("User from global wiki should have right on local wiki through local group", "view",
+            "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+    }
+
+    @Test
+    public void testGlobalGroupInLocalGroup() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("glocalGroupInLocalGroup.xml");
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+
+        ctx.setDatabase("wiki2");
+
+        assertAccessLevelTrue("Users from global wiki should have right on local wiki through local group", "view",
+            "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+
+        assertAccessLevelTrue("Groups from global wiki should have right on local wiki through local group", "view",
+            "wiki:XWiki.group", "wiki2:Space.Page", ctx);
     }
 }

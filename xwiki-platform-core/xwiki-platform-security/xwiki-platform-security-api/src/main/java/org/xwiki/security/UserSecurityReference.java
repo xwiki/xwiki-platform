@@ -52,6 +52,7 @@ public class UserSecurityReference extends SecurityReference
 
     /**
      * @return true for global user
+     * @since 5.0M2
      */
     public boolean isGlobal()
     {

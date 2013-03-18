@@ -361,7 +361,7 @@
               <differenceType>7012</differenceType>
               <method>java.lang.Boolean isPasteContentCleanedAutomatically()</method>
               <justification>Added a new configuration property for the WYSIWYG Editor.</justification>
-            </difference>-->
+            </difference>
             <!-- The following difference breaks CLIRR for some reason so I'm excluding the entire class below.
             <difference>
               <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>
@@ -370,6 +370,18 @@
               <to>void filter(com.google.gwt.dom.client.Element)</to>
               <justification>Nothing is broken because the method with a Document argument is still present but it is now inherited from PasteFilter.</justification>
             </difference>-->
+            <difference>
+              <className>org/xwiki/workspace/WorkspaceWikiManagerMessageTool</className>
+              <differenceType>8001</differenceType>
+              <justification>This class is percieved as removed due to a class added as a special workspaces fix applied only for the 4.5.2 release.</justification>
+            </difference>
+            <!-- The following difference does not register (though I have tried many versions). Probbaly because it's a constructor or because the parameter is generic. Anyway, I am excluding the entire class below. -->
+            <difference>
+              <className>org/xwiki/workspace/WorkspaceManagerMessageTool</className>
+              <differenceType>7002</differenceType>
+              <method>WorkspaceManagerMessageTool(javax.inject.Provider&lt;com.xpn.xwiki.XWikiContext&gt;)</method>
+              <justification>This constructor is percieved as removed as a result of the constructor added as a special workspace fix applied only for the 4.5.2 release</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -395,6 +407,8 @@
             <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
             <!-- Nothing broken here. CLIRR doesn't detect that a method is inherited from the base class. See the difference above. -->
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</exclude>
+            <!-- Can not make clirr exclude the removal of a constructor. See above in the difference list. -->
+            <exclude>org/xwiki/workspace/WorkspaceManagerMessageTool</exclude>
           </excludes>
         </configuration>
       </plugin>

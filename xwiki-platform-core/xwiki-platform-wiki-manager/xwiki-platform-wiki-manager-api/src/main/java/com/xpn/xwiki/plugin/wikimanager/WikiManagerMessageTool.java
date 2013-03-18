@@ -71,7 +71,7 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
      * Used as {@link WikiManagerException} message when trying to make action that require virtual mode in a wiki not
      * in virtual mode.
      * 
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M1.
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      */
     public static final String ERROR_XWIKINOTVIRTUAL = "wikimanager.plugin.error.xwikinotvirtual";
 

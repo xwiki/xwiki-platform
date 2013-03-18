@@ -1245,7 +1245,7 @@ public class XWiki extends Api
     /**
      * API to check if wiki is in multi-wiki mode (virtual)
      * 
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M1.
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      * @return true for multi-wiki/false for mono-wiki
      */
     public boolean isVirtualMode()

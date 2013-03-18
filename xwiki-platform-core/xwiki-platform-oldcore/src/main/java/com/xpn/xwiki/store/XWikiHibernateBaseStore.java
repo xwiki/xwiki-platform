@@ -595,7 +595,7 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Checks if this xwiki setup is virtual meaning if multiple wikis can be accessed using the same database pool
      * 
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M1.
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
      */

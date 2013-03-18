@@ -4562,7 +4562,7 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M1. Use
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2. Use
      *             {@link #getVirtualWikisDatabaseNames(XWikiContext)} to get the list of wikis if needed.
      * @return true for multi-wiki/false for mono-wiki
      */

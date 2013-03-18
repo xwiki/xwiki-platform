@@ -26,16 +26,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheEntry;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -47,10 +48,12 @@ import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccessEntry;
+import org.xwiki.security.authorization.SecurityEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCache;
+import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 import org.xwiki.test.jmock.annotation.MockingRequirements;
@@ -251,6 +254,59 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         return entries;
     }
 
+    private List<SecurityShadowEntry> AddUserEntries(List<SecurityRuleEntry> userEntries)
+        throws ParentEntryEvictedException, ConflictingInsertionException
+    {
+        return AddUserEntries(userEntries, null, null);
+    }
+
+
+    private List<SecurityShadowEntry> AddUserEntries(List<SecurityRuleEntry> userEntries,
+        Map<SecurityReference, String> keys)
+        throws ParentEntryEvictedException, ConflictingInsertionException
+    {
+        return AddUserEntries(userEntries, null, null);
+    }
+
+    private List<SecurityShadowEntry> AddUserEntries(List<SecurityRuleEntry> userEntries,
+        Map<SecurityReference, String> keys, Map<SecurityReference, String> shadowkeys)
+        throws ParentEntryEvictedException, ConflictingInsertionException
+    {
+        final List<SecurityShadowEntry> userShadows = new ArrayList<SecurityShadowEntry>();
+        for (final SecurityRuleEntry userEntry : userEntries) {
+            final List<GroupSecurityReference> localGroups = new ArrayList<GroupSecurityReference>();
+            final List<GroupSecurityReference> externalGroups = new ArrayList<GroupSecurityReference>();
+            for (GroupSecurityReference group : groupRefs.keySet()) {
+                if (groupRefs.get(group).contains(userEntry.getReference())) {
+                    if (group.getOriginalReference().getWikiReference().equals(userEntry.getReference().getOriginalDocumentReference().getWikiReference())) {
+                        localGroups.add(group);
+                    } else {
+                        externalGroups.add(group);
+                    }
+                }
+            }
+            securityCache.add(userEntry, localGroups);
+            if (keys != null) {
+                keys.put(userEntry.getReference(),cache.getLastInsertedKey());
+            }
+            if (!externalGroups.isEmpty()) {
+                final SecurityShadowEntry entry = getMockery().mock(SecurityShadowEntry.class,
+                    "Shadow for " +  userEntry.getReference().getName());
+                getMockery().checking(new Expectations() {{
+                    allowing (entry).getReference(); will(returnValue(userEntry.getReference()));
+                    allowing (entry).getWikiReference(); will(returnValue(factory.newEntityReference(
+                        externalGroups.get(0).getOriginalDocumentReference().getWikiReference())));
+                }});
+                userShadows.add(entry);
+                securityCache.add(entry, externalGroups);
+                if (shadowkeys != null) {
+                    shadowkeys.put(userEntry.getReference(),cache.getLastInsertedKey());
+                }
+            }
+        }
+        return userShadows;
+    }
+
     private List<SecurityAccessEntry> getMockedSecurityAccessEntries(final UserSecurityReference user,
         final List<SecurityReference> references)
     {
@@ -274,6 +330,22 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         return entries;
     }
 
+    private void AddAccessEntry(SecurityAccessEntry entry)
+        throws ParentEntryEvictedException, ConflictingInsertionException
+    {
+        if(entry.getUserReference().isGlobal()) {
+            SecurityReference wiki = factory.newEntityReference(entry.getReference().getOriginalReference().extractReference(
+                EntityType.WIKI));
+            if (entry.getUserReference().getOriginalDocumentReference().getWikiReference() != wiki.getOriginalWikiReference()) {
+                securityCache.add(entry, wiki);
+            } else {
+                securityCache.add(entry);
+            }
+        } else {
+            securityCache.add(entry);
+        }
+    }
+
     private class CacheFiller
     {
         private Map<SecurityReference, String> keys;
@@ -282,6 +354,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         private Map<UserSecurityReference, Collection<SecurityAccessEntry>> userAccessEntries;
         private List<SecurityRuleEntry> allRuleEntries;
         private List<SecurityAccessEntry> allAccessEntries;
+        private Map<String, SecurityShadowEntry> allShadowEntries;
 
         public Map<SecurityReference, String> getKeys()
         {
@@ -313,6 +386,11 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             return allAccessEntries;
         }
 
+        public Map<String, SecurityShadowEntry> getAllShadowEntries()
+        {
+            return allShadowEntries;
+        }
+
         public CacheFiller fill() throws ParentEntryEvictedException, ConflictingInsertionException
         {
             keys = new HashMap<SecurityReference, String>();
@@ -321,6 +399,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             userAccessEntries = new HashMap<UserSecurityReference, Collection<SecurityAccessEntry>>();
             allRuleEntries = new ArrayList<SecurityRuleEntry>();
             allAccessEntries = new ArrayList<SecurityAccessEntry>();
+            allShadowEntries = new HashMap<String, SecurityShadowEntry>();
 
             for (SecurityRuleEntry entry : getMockedSecurityRuleEntries(entityRefs)) {
                 securityCache.add(entry);
@@ -353,12 +432,10 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             }
 
             final List<SecurityRuleEntry> userEntries = getMockedSecurityRuleEntries(groupUserRefs);
-            securityCache.add(userEntries.get(0), Arrays.asList(groupRef));
-            keys.put(userEntries.get(0).getReference(),cache.getLastInsertedKey());
-            securityCache.add(userEntries.get(1), Arrays.asList(anotherGroupRef));
-            keys.put(userEntries.get(1).getReference(),cache.getLastInsertedKey());
-            securityCache.add(userEntries.get(2), Arrays.asList(groupRef, anotherGroupRef));
-            keys.put(userEntries.get(2).getReference(),cache.getLastInsertedKey());
+            final Map<SecurityReference, String> shadowKeys = new HashMap<SecurityReference, String>();
+            for (SecurityShadowEntry shadowEntry : AddUserEntries(userEntries, keys, shadowKeys)) {
+                allShadowEntries.put(shadowKeys.get(shadowEntry.getReference()), shadowEntry);
+            }
             for (SecurityRuleEntry userEntry : userEntries) {
                 entityEntries.put(userEntry.getReference(), userEntry);
             }
@@ -366,7 +443,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
             for (UserSecurityReference userRef : new ArrayList<UserSecurityReference>(){{ addAll(userRefs); addAll(groupUserRefs); }}) {
                 for (SecurityAccessEntry entry : getMockedSecurityAccessEntries(userRef, entityRefs)) {
-                    securityCache.add(entry);
+                    AddAccessEntry(entry);
                     Collection<SecurityAccessEntry> entries = entityAccessEntries.get(entry.getReference());
                     if (entries == null) {
                         entries = new ArrayList<SecurityAccessEntry>(userRefs.size());
@@ -404,7 +481,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
         
         // XWiki spaces are required to load user entries
-        List<SecurityRuleEntry> spaceEntries = getMockedSecurityRuleEntries(Arrays.asList(xwikiSpace));
+        List<SecurityRuleEntry> spaceEntries = getMockedSecurityRuleEntries(Arrays.asList(xwikiSpace, xXWikiSpace));
         for (SecurityRuleEntry entry : spaceEntries) {
             securityCache.add(entry);
         }
@@ -417,14 +494,17 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         // Check inserting users in groups
         final List<SecurityRuleEntry> userEntries = getMockedSecurityRuleEntries(groupUserRefs);
+        final Map<SecurityReference, String> shadowKeys = new HashMap<SecurityReference, String>();
         for (SecurityRuleEntry userEntry : userEntries) {
             assertThat(securityCache.get(userEntry.getReference()), is(nullValue()));
         }
-        securityCache.add(userEntries.get(0), Arrays.asList(groupRef));
-        securityCache.add(userEntries.get(1), Arrays.asList(anotherGroupRef));
-        securityCache.add(userEntries.get(2), Arrays.asList(groupRef, anotherGroupRef));
+        List<SecurityShadowEntry> userShadows = AddUserEntries(userEntries, null, shadowKeys);
         for (SecurityRuleEntry userEntry : userEntries) {
             assertThat(securityCache.get(userEntry.getReference()), sameInstance(userEntry));
+        }
+        for (SecurityShadowEntry userShadow : userShadows) {
+            String key = shadowKeys.get(userShadow.getReference());
+            assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) userShadow));
         }
 
         // Check a non-conflicting duplicate insertion
@@ -520,7 +600,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     
             for (SecurityAccessEntry entry : entries) {
                 assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), is(nullValue()));
-                securityCache.add(entry);
+                AddAccessEntry(entry);
                 assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
             }
             
@@ -534,7 +614,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         // Check a non-conflicting duplicate insertion
         try {
-            securityCache.add(allEntries.get(0));
+            AddAccessEntry(allEntries.get(0));
         } catch (ConflictingInsertionException e) {
             fail("Inserting the same access entry twice should NOT throw a ConflictingInsertionException.");
         }
@@ -547,7 +627,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }});
 
         try {
-            securityCache.add(aDifferentEntry);
+            AddAccessEntry(aDifferentEntry);
             fail("Inserting a different access entry for the same reference should throw a ConflictingInsertionException.");
         } catch (ConflictingInsertionException ignore) {
             // Expected.
@@ -564,14 +644,14 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }});
 
         try {
-            securityCache.add(aMissingEntityEntry);
+            AddAccessEntry(aMissingEntityEntry);
             fail("Inserting a access entry without inserting its entity first should throw a ParentEntryEvictedException.");
         } catch (ParentEntryEvictedException ignore) {
             // Expected.
         }
 
         try {
-            securityCache.add(aMissingUserEntry);
+            AddAccessEntry(aMissingUserEntry);
             fail("Inserting a access entry without inserting its user first should throw a ParentEntryEvictedException.");
         } catch (ParentEntryEvictedException ignore) {
             // Expected.
@@ -590,6 +670,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         List<SecurityAccessEntry> allAccessEntries = cacheFiller.getAllAccessEntries();
         Map<UserSecurityReference, Collection<SecurityAccessEntry>> userAccessEntries =
             cacheFiller.getUserAccessEntries();
+        Map<String, SecurityShadowEntry> allShadowEntries = cacheFiller.getAllShadowEntries();
 
         // Remove an document entity
         securityCache.remove(docRef);
@@ -605,6 +686,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         for (SecurityRuleEntry entry : allRuleEntries) {
             assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
         }
+        for (String key : allShadowEntries.keySet()) {
+            assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) allShadowEntries.get(key)));
+        }
 
         // Remove an user entity
         securityCache.remove(anotherWikiUserRef);
@@ -619,6 +703,32 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
         for (SecurityRuleEntry entry : allRuleEntries) {
             assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
+        }
+        for (String key : allShadowEntries.keySet()) {
+            assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) allShadowEntries.get(key)));
+        }
+
+        // Remove an global user entity with shadow entry
+        securityCache.remove(anotherGroupXUserRef);
+        allRuleEntries.remove(entityEntries.get(anotherGroupXUserRef));
+        assertThat(securityCache.get(anotherGroupXUserRef), nullValue());
+        for (SecurityAccessEntry entry : userAccessEntries.get(anotherGroupXUserRef)) {
+            allAccessEntries.remove(entry);
+            assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), nullValue());
+        }
+        for (SecurityAccessEntry entry : allAccessEntries) {
+            assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
+        }
+        for (SecurityRuleEntry entry : allRuleEntries) {
+            assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
+        }
+        for (String key : allShadowEntries.keySet()) {
+            SecurityShadowEntry entry = allShadowEntries.get(key);
+            if (entry.getReference().equals(anotherGroupXUserRef)) {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
+            } else {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) entry));
+            }
         }
 
         // Remove a group entity
@@ -641,6 +751,16 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         for (SecurityRuleEntry entry : allRuleEntries) {
             assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
         }
+        for (String key : allShadowEntries.keySet()) {
+            SecurityShadowEntry entry = allShadowEntries.get(key);
+            if (entry.getReference().equals(anotherGroupXUserRef)
+                || entry.getReference().equals(bothGroupXUserRef) || entry.getReference().equals(groupXUserRef)) {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
+            } else {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) entry));
+            }
+        }
+
 
         // Remove a space entry
         securityCache.remove(spaceRef);
@@ -658,7 +778,15 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         for (SecurityRuleEntry entry : allRuleEntries) {
             assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
         }
-
+        for (String key : allShadowEntries.keySet()) {
+            SecurityShadowEntry entry = allShadowEntries.get(key);
+            if (entry.getReference().equals(anotherGroupXUserRef)
+                || entry.getReference().equals(bothGroupXUserRef) || entry.getReference().equals(groupXUserRef)) {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
+            } else {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) entry));
+            }
+        }
 
         // Remove an wiki entity
         securityCache.remove(wikiRef);
@@ -687,6 +815,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         for (SecurityRuleEntry entry : allRuleEntries) {
             assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
         }
+        for (String key : allShadowEntries.keySet()) {
+            assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
+        }
 
         // Remove the main wiki entry
         securityCache.remove(xwikiRef);
@@ -711,6 +842,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         List<SecurityAccessEntry> allAccessEntries = cacheFiller.getAllAccessEntries();
         Map<UserSecurityReference, Collection<SecurityAccessEntry>> userAccessEntries =
             cacheFiller.getUserAccessEntries();
+        Map<String, SecurityShadowEntry> allShadowEntries = cacheFiller.getAllShadowEntries();
 
         // Remove a document entry
         cache.remove(keys.get(anotherWikiDocRef));
@@ -728,6 +860,10 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         for (SecurityAccessEntry entry : allAccessEntries) {
             assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
         }
+        for (String key : allShadowEntries.keySet()) {
+            assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) allShadowEntries.get(key)));
+        }
+
 
         // Remove a user entry
         cache.remove(keys.get(anotherWikiUserRef));
@@ -745,6 +881,62 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         for (SecurityAccessEntry entry : allAccessEntries) {
             assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
         }
+        for (String key : allShadowEntries.keySet()) {
+            assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) allShadowEntries.get(key)));
+        }
+
+        // Remove an global user entity with shadow entry
+        cache.remove(keys.get(anotherGroupXUserRef));
+        allRuleEntries.remove(entityEntries.get(anotherGroupXUserRef));
+        assertThat(securityCache.get(anotherGroupXUserRef), nullValue());
+        for (SecurityAccessEntry entry : userAccessEntries.get(anotherGroupXUserRef)) {
+            allAccessEntries.remove(entry);
+            assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), nullValue());
+        }
+        for (SecurityAccessEntry entry : allAccessEntries) {
+            assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
+        }
+        for (SecurityRuleEntry entry : allRuleEntries) {
+            assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
+        }
+        for (String key : allShadowEntries.keySet()) {
+            SecurityShadowEntry entry = allShadowEntries.get(key);
+            if (entry.getReference().equals(anotherGroupXUserRef)) {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
+            } else {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) entry));
+            }
+        }
+
+        // Remove a group entity
+        cache.remove(keys.get(groupRef));
+        for(SecurityReference ref : Arrays.asList(groupRef, groupUserRef, bothGroupUserRef)) {
+            allRuleEntries.remove(entityEntries.get(ref));
+            assertThat(securityCache.get(ref), nullValue());
+        }
+        for (SecurityAccessEntry entry : userAccessEntries.get(groupUserRef)) {
+            allAccessEntries.remove(entry);
+            assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), nullValue());
+        }
+        for (SecurityAccessEntry entry : userAccessEntries.get(bothGroupUserRef)) {
+            allAccessEntries.remove(entry);
+            assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), nullValue());
+        }
+        for (SecurityAccessEntry entry : allAccessEntries) {
+            assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
+        }
+        for (SecurityRuleEntry entry : allRuleEntries) {
+            assertThat(securityCache.get(entry.getReference()), sameInstance(entry));
+        }
+        for (String key : allShadowEntries.keySet()) {
+            SecurityShadowEntry entry = allShadowEntries.get(key);
+            if (entry.getReference().equals(anotherGroupXUserRef)
+                || entry.getReference().equals(bothGroupXUserRef) || entry.getReference().equals(groupXUserRef)) {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
+            } else {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) entry));
+            }
+        }
 
         // Remove a space entry
         cache.remove(keys.get(spaceRef));
@@ -761,6 +953,15 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
         for (SecurityAccessEntry entry : allAccessEntries) {
             assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
+        }
+        for (String key : allShadowEntries.keySet()) {
+            SecurityShadowEntry entry = allShadowEntries.get(key);
+            if (entry.getReference().equals(anotherGroupXUserRef)
+                || entry.getReference().equals(bothGroupXUserRef) || entry.getReference().equals(groupXUserRef)) {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
+            } else {
+                assertThat(((DefaultSecurityCache) securityCache).get(key), sameInstance((SecurityEntry) entry));
+            }
         }
 
         // Remove a wiki entry
@@ -792,6 +993,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
         for (SecurityAccessEntry entry : allAccessEntries) {
             assertThat(securityCache.get(entry.getUserReference(), entry.getReference()), sameInstance(entry));
+        }
+        for (String key : allShadowEntries.keySet()) {
+            assertThat(((DefaultSecurityCache) securityCache).get(key), nullValue());
         }
 
         // Remove the main wiki entry

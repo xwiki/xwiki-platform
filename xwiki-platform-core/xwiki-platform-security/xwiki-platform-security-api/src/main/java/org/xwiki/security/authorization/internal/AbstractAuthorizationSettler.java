@@ -181,20 +181,6 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
     }
 
     /**
-     * Check if the user is a user of the main wiki.
-     * 
-     * @param user a user identifier.
-     * @return {\code true} if the user is a user of the main wiki.
-     */
-    private boolean isMainWikiUser(UserSecurityReference user) {
-        SecurityReference wikiReference = user;
-        while (wikiReference.getType() != EntityType.WIKI) {
-            wikiReference = wikiReference.getParentSecurityReference();
-        }
-        return wikiReference.getParentSecurityReference() == null;
-    }
-
-    /**
      * Determine if the wiki is in its initial import state.
      *
      * @param user A user reference.
@@ -205,7 +191,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
     private boolean isInitialImportState(UserSecurityReference user,
          Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries)
     {
-        if (ruleEntries.getLast().getRules().size() == 0 && isMainWikiUser(user)) {
+        if (ruleEntries.getLast().getRules().size() == 0 && user.isGlobal()) {
 
             // No rules at main wiki indicate initial import state of the wiki.  Initial import rights are granted to
             // users of main wiki to all entities in main wiki.

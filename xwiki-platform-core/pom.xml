@@ -382,6 +382,18 @@
               <method>WorkspaceManagerMessageTool(javax.inject.Provider&lt;com.xpn.xwiki.XWikiContext&gt;)</method>
               <justification>This constructor is percieved as removed as a result of the constructor added as a special workspace fix applied only for the 4.5.2 release</justification>
             </difference>
+            <difference>
+              <className>org/xwiki/security/authorization/cache/SecurityCache</className>
+              <method>void add(org.xwiki.security.authorization.cache.SecurityShadowEntry, java.util.Collection)</method>
+              <differenceType>7012</differenceType>
+              <justification>New method to allow creation of shadow entries in the cache for global users in local wikis</justification>
+            </difference>
+            <difference>
+              <className>org/xwiki/security/authorization/cache/SecurityCache</className>
+              <method>void add(org.xwiki.security.authorization.SecurityAccessEntry, org.xwiki.security.SecurityReference)</method>
+              <differenceType>7012</differenceType>
+              <justification>New method to allow creation of access entries in the cache for access of global users to local wikis</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

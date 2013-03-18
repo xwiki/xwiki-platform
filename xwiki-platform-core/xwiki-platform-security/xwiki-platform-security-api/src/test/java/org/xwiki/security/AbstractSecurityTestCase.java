@@ -78,9 +78,16 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     protected GroupSecurityReference groupRef;
     protected GroupSecurityReference anotherGroupRef;
 
+    protected GroupSecurityReference xgroupRef;
+    protected GroupSecurityReference anotherXGroupRef;
+
     protected UserSecurityReference groupUserRef;
     protected UserSecurityReference anotherGroupUserRef;
     protected UserSecurityReference bothGroupUserRef;
+
+    protected UserSecurityReference groupXUserRef;
+    protected UserSecurityReference anotherGroupXUserRef;
+    protected UserSecurityReference bothGroupXUserRef;
 
     protected List<UserSecurityReference> userRefs;
     protected List<UserSecurityReference> groupUserRefs;
@@ -175,9 +182,17 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
         anotherGroupRef = newGroupReference(
             new DocumentReference("anotherGroup", xwikiSpace.getOriginalSpaceReference()));
 
+        xgroupRef = newGroupReference(new DocumentReference("xgroup", xXWikiSpace.getOriginalSpaceReference()));
+        anotherXGroupRef = newGroupReference(
+            new DocumentReference("anotherXGroup", xXWikiSpace.getOriginalSpaceReference()));
+
         groupUserRef = newUserReference(new DocumentReference("groupUser", xwikiSpace.getOriginalSpaceReference()));
         anotherGroupUserRef = newUserReference(new DocumentReference("anotherGroupUser", xwikiSpace.getOriginalSpaceReference()));
         bothGroupUserRef = newUserReference(new DocumentReference("bothGroupUserRef", xwikiSpace.getOriginalSpaceReference()));
+
+        groupXUserRef = newUserReference(new DocumentReference("groupXUser", xXWikiSpace.getOriginalSpaceReference()));
+        anotherGroupXUserRef = newUserReference(new DocumentReference("anotherGroupXUser", xXWikiSpace.getOriginalSpaceReference()));
+        bothGroupXUserRef = newUserReference(new DocumentReference("bothGroupXUserRef", xXWikiSpace.getOriginalSpaceReference()));
 
         entityRefs = Arrays.asList(xwikiRef, wikiRef, xspaceRef, spaceRef, xdocRef, docRef, anotherXspaceRef,
             anotherXdocRef, anotherSpaceRef, anotherSpaceDocRef, anotherDocRef, anotherWikiRef, anotherWikiSpaceRef,
@@ -187,8 +202,10 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
 
         userRefs = Arrays.asList(xuserRef, userRef, anotherXuserRef, anotherUserRef, anotherWikiUserRef);
 
-        groupUserRefs = Arrays.asList(groupUserRef, anotherGroupUserRef, bothGroupUserRef);
-        groupRefs.put(groupRef, Arrays.asList(groupUserRef, bothGroupUserRef));
-        groupRefs.put(anotherGroupRef, Arrays.asList(anotherGroupUserRef, bothGroupUserRef));
+        groupUserRefs = Arrays.asList(groupUserRef, anotherGroupUserRef, bothGroupUserRef, groupXUserRef, anotherGroupXUserRef, bothGroupXUserRef);
+        groupRefs.put(groupRef, Arrays.asList(groupUserRef, bothGroupUserRef, groupXUserRef, bothGroupXUserRef));
+        groupRefs.put(anotherGroupRef, Arrays.asList(anotherGroupUserRef, bothGroupUserRef, anotherGroupXUserRef, bothGroupXUserRef));
+        groupRefs.put(xgroupRef, Arrays.asList(groupXUserRef, bothGroupXUserRef));
+        groupRefs.put(anotherXGroupRef, Arrays.asList(anotherGroupXUserRef, bothGroupXUserRef));
     }
 }

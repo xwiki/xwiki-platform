@@ -64,10 +64,26 @@ public interface SecurityCache
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
-     * Add a user entry to this cache.
+     * Add an entry for access to a local wiki entity by a global user.
+     * @param entry The access entry to add.
+     * @param wiki The sub-wiki context of this entry
+     * @throws ParentEntryEvictedException when the parent entry of
+     * this entry was evicted before this insertion.  Since all
+     * entries, except wiki-entries, must have a parent cached, the
+     * {@link SecurityCacheLoader} must restart its load attempt.
+     * @throws ConflictingInsertionException when another thread have
+     * inserted this entry, but with a different content.
      *
-     * @param entry The user entry to insert.
-     * @param groups Groups references that this user is a member.
+     * @since 5.0M2
+     */
+    void add(SecurityAccessEntry entry, SecurityReference wiki)
+        throws ParentEntryEvictedException, ConflictingInsertionException;
+
+    /**
+     * Add a user/group entry to this cache.
+     *
+     * @param entry The user/group entry to insert.
+     * @param groups Local groups references that this user/group is a member.
      * @exception ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
@@ -78,6 +94,22 @@ public interface SecurityCache
     void add(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups)
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
+    /**
+     * Add a shadow user/group entry to this cache.
+     *
+     * @param entry The user entry to insert.
+     * @param groups Local group references that this user/group is a member.
+     * @exception ParentEntryEvictedException when the parent entry of
+     * this entry was evicted before this insertion.  Since all
+     * entries, except wiki-entries, must have a parent cached, the
+     * {@link SecurityCacheLoader} must restart its load attempt.
+     * @throws ConflictingInsertionException when another thread have
+     * inserted this entry, but with a different content.
+     *
+     * @since 5.0M2
+     */
+    void add(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups)
+        throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
      * Get a cached entry.

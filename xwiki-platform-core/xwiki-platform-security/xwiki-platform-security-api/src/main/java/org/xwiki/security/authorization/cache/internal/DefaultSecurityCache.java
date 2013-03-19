@@ -272,7 +272,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     if (group.equals(parentReference)) {
                         continue;
                     }
-                    SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(group);
+                    SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
+                        ? DefaultSecurityCache.this.getShadowEntry(group,
+                            ((SecurityShadowEntry) entry).getWikiReference())
+                        : DefaultSecurityCache.this.getEntry(group);
                     if (parent == null) {
                         throw new ParentEntryEvictedException();
                     }
@@ -638,7 +641,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (isAlreadyInserted(key, entry)) {
                 return;
             }
-            cache.set(key, (wiki != null) ? new SecurityCacheEntry(entry) : new SecurityCacheEntry(entry, wiki));
+            cache.set(key, new SecurityCacheEntry(entry, wiki));
             if (logger.isDebugEnabled()) {
                 logger.debug("Added access entry [{}] into the cache.", key);
             }

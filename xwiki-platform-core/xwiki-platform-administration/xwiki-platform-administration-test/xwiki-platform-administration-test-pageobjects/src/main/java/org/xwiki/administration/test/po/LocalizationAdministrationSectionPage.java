@@ -35,7 +35,10 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     private WebElement multiLingualSelect;
 
     @FindBy(id = "XWiki.XWikiPreferences_0_default_language")
-    private WebElement defaultLanguagesField;
+    private WebElement defaultLanguageInput;
+
+    @FindBy(id = "XWiki.XWikiPreferences_0_languages")
+    private WebElement supportedLanguagesInput;
 
     public LocalizationAdministrationSectionPage()
     {
@@ -52,9 +55,15 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
         }
     }
 
-    public void setDefaultLanguages(String defaultLanguages)
+    public void setDefaultLanguage(String defaultLanguage)
     {
-        this.defaultLanguagesField.clear();
-        this.defaultLanguagesField.sendKeys(defaultLanguages);
+        this.defaultLanguageInput.clear();
+        this.defaultLanguageInput.sendKeys(defaultLanguage);
+    }
+
+    public void setSupportedLanguages(String supportedLanguages)
+    {
+        this.supportedLanguagesInput.clear();
+        this.supportedLanguagesInput.sendKeys(supportedLanguages);
     }
 }

@@ -17,21 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input;
+package org.xwiki.wikistream.internal.filter;
 
-import java.io.File;
+import org.xwiki.rendering.listener.Listener;
+import org.xwiki.wikistream.filter.AttachmentFilter;
+import org.xwiki.wikistream.filter.ClassFilter;
+import org.xwiki.wikistream.filter.ClassPropertyFilter;
+import org.xwiki.wikistream.filter.DocumentFilter;
+import org.xwiki.wikistream.filter.FarmFilter;
+import org.xwiki.wikistream.filter.ObjectFilter;
+import org.xwiki.wikistream.filter.ObjectPropertyFilter;
+import org.xwiki.wikistream.filter.SpaceFilter;
+import org.xwiki.wikistream.filter.WikiFilter;
 
-public class FileInputSource implements InputSource
+public interface AllFilter extends FarmFilter, WikiFilter, SpaceFilter, DocumentFilter, AttachmentFilter, ClassFilter,
+    ClassPropertyFilter, ObjectFilter, ObjectPropertyFilter, Listener
 {
-    private final File file;
 
-    public FileInputSource(File file)
-    {
-        this.file = file;
-    }
-
-    public File getFile()
-    {
-        return this.file;
-    }
 }

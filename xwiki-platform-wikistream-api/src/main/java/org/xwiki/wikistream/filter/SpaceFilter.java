@@ -17,21 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input;
+package org.xwiki.wikistream.filter;
 
-import java.io.File;
+import org.xwiki.rendering.listener.MetaData;
 
-public class FileInputSource implements InputSource
+/**
+ * Space related events.
+ * 
+ * @version $Id$
+ */
+public interface SpaceFilter
 {
-    private final File file;
+    void beginSpace(MetaData metadata);
 
-    public FileInputSource(File file)
-    {
-        this.file = file;
-    }
+    void endSpace(MetaData metadata);
 
-    public File getFile()
-    {
-        return this.file;
-    }
+    void beginSpace(String name, MetaData metadata);
+
+    void endSpace(String name, MetaData metadata);
 }

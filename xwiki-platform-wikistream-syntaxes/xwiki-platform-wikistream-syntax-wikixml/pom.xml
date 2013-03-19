@@ -38,5 +38,12 @@
       <artifactId>xwiki-platform-wikistream-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
   </dependencies>
 </project>

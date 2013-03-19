@@ -17,21 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input;
+package org.xwiki.wikistream.filter;
 
-import java.io.File;
+import java.io.InputStream;
 
-public class FileInputSource implements InputSource
+import org.xwiki.rendering.listener.MetaData;
+
+/**
+ * Attachment related events.
+ * 
+ * @version $Id$
+ */
+public interface AttachmentFilter
 {
-    private final File file;
+    void beginAttachment(String attachmentName, MetaData metadata);
 
-    public FileInputSource(File file)
-    {
-        this.file = file;
-    }
+    void onAttachmentContent(byte[] content);
 
-    public File getFile()
-    {
-        return this.file;
-    }
+    void onAttachmentContent(InputStream content);
+
+    void endAttachment(String attachmentName, MetaData metadata);
 }

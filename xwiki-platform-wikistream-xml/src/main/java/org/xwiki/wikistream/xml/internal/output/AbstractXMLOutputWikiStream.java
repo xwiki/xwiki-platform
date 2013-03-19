@@ -74,7 +74,7 @@ public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputParameters> 
     }
 
     @Override
-    public Object getListener()
+    public Object getFilter()
     {
         if (this.listener != null) {
             this.listener = createListener();

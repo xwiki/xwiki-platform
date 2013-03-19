@@ -17,18 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.listener;
+package org.xwiki.wikistream.filter;
 
 import org.xwiki.rendering.listener.MetaData;
 
 /**
- * Contains call back events for Wiki Space
+ * Class property related events.
  * 
  * @version $Id$
  */
-public interface SpaceListener
+public interface ClassPropertyFilter
 {
-    void beginSpace(String spaceName, MetaData metadata);
+    void beginClassProperty(String propertyName, MetaData metadata);
 
-    void endSpace(String spaceName, MetaData metadata);
+    void endClassProperty(String propertyName, MetaData metadata);
 }

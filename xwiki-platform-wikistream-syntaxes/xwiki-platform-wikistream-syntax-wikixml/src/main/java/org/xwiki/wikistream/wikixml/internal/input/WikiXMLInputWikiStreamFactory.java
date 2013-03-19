@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wiki.xml.internal.output;
+package org.xwiki.wikistream.wikixml.internal.input;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,10 +25,9 @@ import javax.inject.Singleton;
 
 import org.xml.sax.ContentHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.xml.internal.serializer.XMLSerializerFactory;
-import org.xwiki.wikistream.internal.listener.AllListener;
+import org.xwiki.rendering.xml.internal.parser.XMLParserFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
+import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
 
 /**
  * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
@@ -39,12 +38,12 @@ import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamF
 @Component
 @Named("wiki+xml")
 @Singleton
-public class WikiXMLOutputWikiStreamFactory extends AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputParameters>
+public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputParameters>
 {
     @Inject
-    private XMLSerializerFactory serializerFactory;
+    private XMLParserFactory parserFactory;
 
-    public WikiXMLOutputWikiStreamFactory()
+    public WikiXMLInputWikiStreamFactory()
     {
         super(WikiStreamType.WIKI_XML);
 
@@ -53,8 +52,8 @@ public class WikiXMLOutputWikiStreamFactory extends AbstractXMLBeanOutputWikiStr
     }
 
     @Override
-    protected Object createListener(ContentHandler contentHandler)
+    protected ContentHandler createContentHandler(Object listener, WikiXMLInputParameters parameters)
     {
-        return this.serializerFactory.createSerializer(AllListener.class, contentHandler, null);
+        return this.parserFactory.createContentHandler(listener, null);
     }
 }

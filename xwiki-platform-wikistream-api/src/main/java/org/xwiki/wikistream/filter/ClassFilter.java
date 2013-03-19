@@ -17,38 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.listener;
+package org.xwiki.wikistream.filter;
 
 import org.xwiki.rendering.listener.MetaData;
 
 /**
- * Contains call back events for document
+ * Class related events.
  * 
  * @version $Id$
  */
-public interface DocumentListener
+public interface ClassFilter
 {
-    void beginDocument(String name, MetaData metadata);
-
-    void endDocument(String name, MetaData metadata);
-
-    void beginRevision(String version, MetaData metadata);
-
-    void beginObject(MetaData metadata);
-
-    void beginProperty(String propertyName, MetaData metadata);
-
-    void endProperty(String propertyName, MetaData metadata);
-
-    void endObject(MetaData metadata);
-
     void beginClass(MetaData metadata);
 
     void endClass(MetaData metadata);
-
-    void beginAttachment(String attachmentName, MetaData metadata);
-
-    void endAttachment(String attachmentName, MetaData metadata);
-
-    void endRevision(String version, MetaData metadata);
 }

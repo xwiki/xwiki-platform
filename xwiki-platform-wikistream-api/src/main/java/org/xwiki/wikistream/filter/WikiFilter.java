@@ -17,12 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.listener;
+package org.xwiki.wikistream.filter;
 
 import org.xwiki.rendering.listener.MetaData;
 
-public interface WikiListener
+/**
+ * Wiki related events.
+ * 
+ * @version $Id$
+ */
+public interface WikiFilter
 {
+    void beginWiki(MetaData metadata);
+
+    void endWiki(MetaData metadata);
+
     void beginWiki(String name, MetaData metadata);
 
     void endWiki(String name, MetaData metadata);

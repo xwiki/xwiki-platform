@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wiki.xml.internal.input;
+package org.xwiki.wikistream.wikixml.internal.output;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,9 +25,10 @@ import javax.inject.Singleton;
 
 import org.xml.sax.ContentHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.xml.internal.parser.XMLParserFactory;
+import org.xwiki.rendering.xml.internal.serializer.XMLSerializerFactory;
+import org.xwiki.wikistream.internal.filter.AllFilter;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
+import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
 /**
  * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
@@ -38,12 +39,12 @@ import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFac
 @Component
 @Named("wiki+xml")
 @Singleton
-public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputParameters>
+public class WikiXMLOutputWikiStreamFactory extends AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputParameters>
 {
     @Inject
-    private XMLParserFactory parserFactory;
+    private XMLSerializerFactory serializerFactory;
 
-    public WikiXMLInputWikiStreamFactory()
+    public WikiXMLOutputWikiStreamFactory()
     {
         super(WikiStreamType.WIKI_XML);
 
@@ -52,8 +53,8 @@ public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStrea
     }
 
     @Override
-    protected ContentHandler createContentHandler(Object listener, WikiXMLInputParameters parameters)
+    protected Object createListener(ContentHandler contentHandler)
     {
-        return this.parserFactory.createContentHandler(listener, null);
+        return this.serializerFactory.createSerializer(AllFilter.class, contentHandler, null);
     }
 }

@@ -149,29 +149,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          */
         SecurityCacheEntry(SecurityRuleEntry entry) throws ParentEntryEvictedException
         {
-            this(entry, entry.getReference().getParentSecurityReference());
-        }
-
-        /**
-         * Create a new cache entry for a security rule, linking it to its parent.
-         * @param entry the security rule entry to cache.
-         * @throws ParentEntryEvictedException if the parent required is no more available in the cache.
-         */
-        SecurityCacheEntry(SecurityShadowEntry entry) throws ParentEntryEvictedException
-        {
-            this(entry, entry.getWikiReference());
-        }
-
-        /**
-         * Create a new cache entry for a security rule, linking it to a parent.
-         * @param entry the security rule entry to cache.
-         * @param parentReference the reference to the parent to link to
-         * @throws ParentEntryEvictedException if the parent required is no more available in the cache.
-         */
-        private SecurityCacheEntry(SecurityEntry entry, SecurityReference parentReference)
-            throws ParentEntryEvictedException
-        {
             this.entry = entry;
+            SecurityReference parentReference = entry.getReference().getParentSecurityReference();
             if (parentReference != null) {
                 SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(parentReference);
                 if (parent == null) {
@@ -184,6 +163,26 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 this.parents = null;
                 logNewEntry();
             }
+
+        }
+
+        /**
+         * Create a new cache entry for a security shadow, linking it to its parent.
+         * @param entry the security rule entry to cache.
+         * @throws ParentEntryEvictedException if the parent required is no more available in the cache.
+         */
+        SecurityCacheEntry(SecurityShadowEntry entry) throws ParentEntryEvictedException
+        {
+            this.entry = entry;
+            SecurityCacheEntry parent1 = DefaultSecurityCache.this.getEntry(entry.getReference());
+            SecurityCacheEntry parent2 = DefaultSecurityCache.this.getEntry(entry.getWikiReference());
+            if (parent1 == null || parent2 == null) {
+                throw new ParentEntryEvictedException();
+            }
+            this.parents = Arrays.asList(parent1, parent2);
+            parent1.addChild(this);
+            parent2.addChild(this);
+            logNewEntry();
         }
 
         /**

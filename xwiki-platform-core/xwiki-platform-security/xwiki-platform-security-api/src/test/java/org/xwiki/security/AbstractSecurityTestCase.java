@@ -44,6 +44,9 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     protected SecurityReference xwikiRef;
     protected SecurityReference wikiRef;
     protected SecurityReference anotherWikiRef;
+
+    protected List<SecurityReference> wikiRefs;
+
     protected SecurityReference xspaceRef;
     protected SecurityReference anotherXspaceRef;
     protected SecurityReference spaceRef;
@@ -137,6 +140,8 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
         xwikiRef = newEntityReference(new WikiReference("xwiki"));
         wikiRef = newEntityReference(new WikiReference("wiki"));
         anotherWikiRef = newEntityReference(new WikiReference("anotherWiki"));
+
+        wikiRefs = Arrays.asList(xwikiRef, wikiRef, anotherWikiRef);
 
         xspaceRef = newEntityReference(new SpaceReference("space", xwikiRef.getOriginalWikiReference()));
         anotherXspaceRef = newEntityReference(new SpaceReference("anotherSpace",

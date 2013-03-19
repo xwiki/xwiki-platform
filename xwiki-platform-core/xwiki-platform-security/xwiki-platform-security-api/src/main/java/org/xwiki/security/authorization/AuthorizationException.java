@@ -19,10 +19,10 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.DocumentReference;
-
 import java.util.Formatter;
+
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * This is the base exception raised for various reasons by the authorization module.
@@ -78,10 +78,10 @@ public class AuthorizationException extends Exception
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("%s when checking access to %s for user %s",
-                                     message, 
-                                     userReference,
-                                     entityReference).toString(), cause);
+        super(new Formatter().format("[%s] when checking access to %s for user [%s]",
+                                     message,
+                                     entityReference,
+                                     userReference).toString(), cause);
     }
 
     /**
@@ -94,7 +94,7 @@ public class AuthorizationException extends Exception
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("%s when checking access to %s",
+        super(new Formatter().format("[%s] when checking access to [%s]",
                                      message, 
                                      entityReference).toString(), cause);
     }

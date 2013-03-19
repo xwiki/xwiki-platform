@@ -303,9 +303,9 @@
           <!-- List of specific CLIRR excludes. Example:
 
             <difference>
+              <differenceType>7012</differenceType>
               <className>org/xwiki/ircbot/IRCBot</className>
               <method>void initialize(java.lang.String)</method>
-              <differenceType>7012</differenceType>
               <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
                 IRC Bot application in a subwiki</justification>
             </difference>
@@ -357,42 +357,61 @@
                <justification>YOUNG API. Forgot to move it out of internal when TranslationMessage has been</justification>
              </difference>
             <difference>
-              <className>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</className>
               <differenceType>7012</differenceType>
+              <className>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</className>
               <method>java.lang.Boolean isPasteContentCleanedAutomatically()</method>
               <justification>Added a new configuration property for the WYSIWYG Editor.</justification>
             </difference>
             <!-- The following difference breaks CLIRR for some reason so I'm excluding the entire class below.
             <difference>
-              <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>
               <differenceType>7005</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>
               <method>void filter(com.google.gwt.dom.client.Document)</method>
               <to>void filter(com.google.gwt.dom.client.Element)</to>
               <justification>Nothing is broken because the method with a Document argument is still present but it is now inherited from PasteFilter.</justification>
             </difference>-->
             <difference>
-              <className>org/xwiki/workspace/WorkspaceWikiManagerMessageTool</className>
-              <differenceType>8001</differenceType>
-              <justification>This class is percieved as removed due to a class added as a special workspaces fix applied only for the 4.5.2 release.</justification>
-            </difference>
-            <!-- The following difference does not register (though I have tried many versions). Probbaly because it's a constructor or because the parameter is generic. Anyway, I am excluding the entire class below. -->
-            <difference>
-              <className>org/xwiki/workspace/WorkspaceManagerMessageTool</className>
-              <differenceType>7002</differenceType>
-              <method>WorkspaceManagerMessageTool(javax.inject.Provider&lt;com.xpn.xwiki.XWikiContext&gt;)</method>
-              <justification>This constructor is percieved as removed as a result of the constructor added as a special workspace fix applied only for the 4.5.2 release</justification>
-            </difference>
-            <difference>
+              <differenceType>7012</differenceType>
               <className>org/xwiki/security/authorization/cache/SecurityCache</className>
               <method>void add(org.xwiki.security.authorization.cache.SecurityShadowEntry, java.util.Collection)</method>
-              <differenceType>7012</differenceType>
               <justification>New method to allow creation of shadow entries in the cache for global users in local wikis</justification>
             </difference>
             <difference>
+              <differenceType>7012</differenceType>
               <className>org/xwiki/security/authorization/cache/SecurityCache</className>
               <method>void add(org.xwiki.security.authorization.SecurityAccessEntry, org.xwiki.security.SecurityReference)</method>
-              <differenceType>7012</differenceType>
               <justification>New method to allow creation of access entries in the cache for access of global users to local wikis</justification>
+            </difference>
+
+            <!-- Special 4.5.2 fix -->
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>org/xwiki/workspace/WorkspaceWikiManagerMessageTool</className>
+              <justification>This class is percieved as removed due to a class added as a special workspaces fix applied only for the 4.5.2 release.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/workspace/WorkspaceManagerMessageTool</className>
+              <method>WorkspaceManagerMessageTool(javax.inject.Provider)</method>
+              <justification>This constructor is percieved as removed as a result of the constructor added as a special workspace fix applied only for the 4.5.2 release</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+              <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, com.xpn.xwiki.XWikiContext)</method>
+              <justification>This constructor is percieved as removed as a result of the constructor added as a special fix applied only for the 4.5.2 release</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+              <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, javax.inject.Provider)</method>
+              <justification>This constructor is percieved as removed as a result of the constructor added as a special fix applied only for the 4.5.2 release</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+              <field>xcontextProvider</field>
+              <justification>This field is percieved as removed as a result of protected field added as a special fix applied only for the 4.5.2 release</justification>
             </difference>
           </ignored>
           <excludes>
@@ -419,8 +438,6 @@
             <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
             <!-- Nothing broken here. CLIRR doesn't detect that a method is inherited from the base class. See the difference above. -->
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</exclude>
-            <!-- Can not make clirr exclude the removal of a constructor. See above in the difference list. -->
-            <exclude>org/xwiki/workspace/WorkspaceManagerMessageTool</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -302,25 +302,16 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testCanCreateWiki()
     {
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
         Assert.assertTrue(this.wikiManager.canCreateWiki(getContext()));
 
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
-        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
-        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
-
-        Assert.assertFalse(this.wikiManager.canCreateWiki(getContext()));
-
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(false));
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
         Assert.assertFalse(this.wikiManager.canCreateWiki(getContext()));
 
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(false));
 
@@ -347,25 +338,16 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testCanDeleteWiki()
     {
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
         Assert.assertTrue(this.wikiManager.canDeleteWiki(getContext()));
 
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
-        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
-        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
-
-        Assert.assertFalse(this.wikiManager.canDeleteWiki(getContext()));
-
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(false));
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
         Assert.assertFalse(this.wikiManager.canDeleteWiki(getContext()));
 
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(false));
 

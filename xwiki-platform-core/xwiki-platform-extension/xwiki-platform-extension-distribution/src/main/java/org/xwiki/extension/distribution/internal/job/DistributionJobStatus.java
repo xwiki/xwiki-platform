@@ -37,13 +37,25 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
      */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId previousDistributionExtension;
 
-    private ExtensionId previousDistributionExtensionUI;
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
+    private ExtensionId previousDistributionExtensionUi;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId distributionExtension;
 
-    private ExtensionId distributionExtensionUI;
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
+    private ExtensionId distributionExtensionUi;
 
     private List<DistributionStepStatus> steps;
 
@@ -91,12 +103,12 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     public ExtensionId getPreviousDistributionExtensionUI()
     {
-        return this.previousDistributionExtensionUI;
+        return this.previousDistributionExtensionUi;
     }
 
     public void setPreviousDistributionExtensionUI(ExtensionId previousDistributionExtensionUI)
     {
-        this.previousDistributionExtensionUI = previousDistributionExtensionUI;
+        this.previousDistributionExtensionUi = previousDistributionExtensionUI;
     }
 
     public ExtensionId getDistributionExtension()
@@ -111,11 +123,11 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     public ExtensionId getDistributionExtensionUI()
     {
-        return this.distributionExtensionUI;
+        return this.distributionExtensionUi;
     }
 
     public void setDistributionExtensionUI(ExtensionId distributionExtensionUI)
     {
-        this.distributionExtensionUI = distributionExtensionUI;
+        this.distributionExtensionUi = distributionExtensionUI;
     }
 }

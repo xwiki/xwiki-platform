@@ -19,24 +19,24 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import org.junit.Test;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 
 /**
- * Tests for assering the correctness of the {@link SecurityAccess} data structure.
+ * Tests for asserting the correctness of the {@link SecurityAccess} data structure.
  *
  * @version $Id$
  * @since 4.0M2 
  */
-public class SecurityAccessTest extends TestCase
+public class SecurityAccessTest
 {
 
     /**
@@ -57,6 +57,7 @@ public class SecurityAccessTest extends TestCase
     /**
      * Assert that access levels can be cleared and set on a SecurityAccess instance.
      */
+    @Test
     public void testAccessLevel() throws Exception
     {
         assertDefaultAccessLevel();
@@ -148,6 +149,7 @@ public class SecurityAccessTest extends TestCase
     /**
      * Assert that the clone method works.
      */
+    @Test
     public void testClone() throws Exception
     {
         XWikiSecurityAccess l = XWikiSecurityAccess.getDefaultAccess().clone();

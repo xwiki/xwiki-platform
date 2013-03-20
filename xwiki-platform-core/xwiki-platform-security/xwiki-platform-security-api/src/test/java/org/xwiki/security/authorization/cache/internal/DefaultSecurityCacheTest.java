@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
@@ -38,6 +38,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -55,9 +56,9 @@ import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
-import org.xwiki.test.jmock.annotation.MockingRequirements;
+import org.xwiki.security.internal.XWikiBridge;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -65,19 +66,27 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Default security cache Unit Test
  *
  * @version $Id$
  */
-@AllComponents
-@MockingRequirements({
-    @MockingRequirement(value = DefaultSecurityCache.class, exceptions = {EntityReferenceSerializer.class}),
-    @MockingRequirement(DefaultSecurityReferenceFactory.class)
-})
+@ComponentList(DefaultStringEntityReferenceSerializer.class)
 public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
+    @Rule
+    public final MockitoComponentMockingRule<SecurityCache> securityCacheMocker =
+        new MockitoComponentMockingRule<SecurityCache>(DefaultSecurityCache.class,
+            Arrays.asList(EntityReferenceSerializer.class));
+
+    @Rule
+    public final MockitoComponentMockingRule<SecurityReferenceFactory> securityReferenceFactoryMocker =
+        new MockitoComponentMockingRule<SecurityReferenceFactory>(DefaultSecurityReferenceFactory.class);
+
     private SecurityCache securityCache;
 
     private SecurityReferenceFactory factory;
@@ -209,15 +218,15 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (cache == null) {
             cache = new TestCache();
 
-            final CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
-
-            getMockery().checking(new Expectations() {{
-                oneOf (cacheManager).createNewCache(with(any(CacheConfiguration.class))); will(returnValue(cache));
-            }});
+            final CacheManager cacheManager = securityCacheMocker.getInstance(CacheManager.class);
+            when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn((Cache<Object>) cache);
         }
 
-        this.factory = getComponentManager().getInstance(SecurityReferenceFactory.class);
-        this.securityCache = getComponentManager().getInstance(SecurityCache.class);
+        XWikiBridge xwikiBridge = securityReferenceFactoryMocker.getInstance(XWikiBridge.class);
+        when(xwikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
+
+        this.factory = securityReferenceFactoryMocker.getComponentUnderTest();
+        this.securityCache = securityCacheMocker.getComponentUnderTest();
 
         aMissingParentRef = factory.newEntityReference(new SpaceReference("space", new WikiReference("missing")));
         aMissingEntityRef = factory.newEntityReference(new DocumentReference("missingPage",
@@ -229,40 +238,34 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             xXWikiSpace.getOriginalSpaceReference()));
         aMissingWikiRef = factory.newEntityReference(new WikiReference("missingWiki"));
 
-        final Logger mockLogger = getMockLogger(DefaultSecurityCache.class);
-        getMockery().checking(new Expectations() {{
-            allowing (mockLogger).isDebugEnabled(); will(returnValue(false));
-        }});
+        final Logger mockLogger = securityCacheMocker.getMockedLogger();
+        when(mockLogger.isDebugEnabled()).thenReturn(false);
     }
 
-    private SecurityRuleEntry mockSecurityRuleEntry(final SecurityReference ref) {
-        final SecurityRuleEntry entry = getMockery().mock(SecurityRuleEntry.class, "Rules for " + ref.toString());
-        getMockery().checking(new Expectations() {{
-                allowing (entry).getReference(); will(returnValue(ref));
-        }});
+    private SecurityRuleEntry mockSecurityRuleEntry(final SecurityReference ref)
+    {
+        SecurityRuleEntry entry = mock(SecurityRuleEntry.class, "Rules for " + ref.toString());
+        when(entry.getReference()).thenReturn(ref);
         return entry;
     }
 
     private SecurityShadowEntry mockSecurityShadowEntry(final UserSecurityReference user,
-        final SecurityReference wiki) {
-        final SecurityShadowEntry entry = getMockery().mock(SecurityShadowEntry.class,
+        final SecurityReference wiki)
+    {
+        SecurityShadowEntry entry = mock(SecurityShadowEntry.class,
             "Shadow for " +  user.toString() + " on " + wiki.toString());
-        getMockery().checking(new Expectations() {{
-            allowing (entry).getReference(); will(returnValue(user));
-            allowing (entry).getWikiReference(); will(returnValue(wiki));
-        }});
+        when(entry.getReference()).thenReturn(user);
+        when(entry.getWikiReference()).thenReturn(wiki);
         return entry;
     }
 
     private SecurityAccessEntry mockSecurityAccessEntry(final SecurityReference ref,
-        final UserSecurityReference user) {
-        final SecurityAccessEntry entry = getMockery().mock(SecurityAccessEntry.class,
+        final UserSecurityReference user)
+    {
+        SecurityAccessEntry entry = mock(SecurityAccessEntry.class,
             "Access for " +  user.toString() + " on " + ref.toString());
-
-        getMockery().checking(new Expectations() {{
-            allowing (entry).getReference(); will(returnValue(ref));
-            allowing (entry).getUserReference(); will(returnValue(user));
-        }});
+        when(entry.getReference()).thenReturn(ref);
+        when(entry.getUserReference()).thenReturn(user);
         return entry;
     }
 
@@ -682,11 +685,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Check a conflicting duplicate insertion
         try {
             final SecurityReference ref = ruleEntries.get(0).getReference();
-            final SecurityRuleEntry entry = getMockery().mock(SecurityRuleEntry.class, "Another entry for "
-                + ref.toString());
-            getMockery().checking(new Expectations() {{
-                allowing (entry).getReference(); will(returnValue(ref));
-            }});
+            SecurityRuleEntry entry = mock(SecurityRuleEntry.class, "Another entry for "
+                + ruleEntries.get(0).getReference().toString());
+            when(entry.getReference()).thenReturn(ref);
 
             AddRuleEntry(entry);
             fail("Inserting a different rule entry for the same reference should throw"
@@ -829,13 +830,12 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         // Check a conflicting duplicate insertion
         try {
             final SecurityReference ref = allEntries.get(0).getReference();
-            final SecurityReference user = allEntries.get(0).getUserReference();
-            final SecurityAccessEntry entry = getMockery().mock(SecurityAccessEntry.class, "Another access for "
-                + user.toString() + " on " + ref.toString());
-            getMockery().checking(new Expectations() {{
-                allowing (entry).getUserReference(); will(returnValue(user));
-                allowing (entry).getReference(); will(returnValue(ref));
-            }});
+            final UserSecurityReference user = allEntries.get(0).getUserReference();
+            SecurityAccessEntry entry = mock(SecurityAccessEntry.class, "Another access for "
+                + allEntries.get(0).getUserReference().toString() + " on "
+                + allEntries.get(0).getReference().toString());
+            when(entry.getUserReference()).thenReturn(user);
+            when(entry.getReference()).thenReturn(ref);
 
             AddAccessEntry(entry);
             fail("Inserting a different access entry for the same reference should throw"

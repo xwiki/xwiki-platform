@@ -31,7 +31,7 @@
   <description>XWiki Platform - Security - API - a new security API. Currently only a replacement for the old RightService (experimental)</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>61.55</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>60.60</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

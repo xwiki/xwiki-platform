@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.hamcrest.Matcher;
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.WikiReference;
@@ -47,11 +47,18 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.internal.EntityBridge;
 import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
 import static org.xwiki.security.authorization.RuleState.DENY;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
@@ -65,6 +72,10 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 @MockingRequirement(DefaultAuthorizationSettler.class)
 public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCase
 {
+    @Rule
+    public final MockitoComponentMockingRule<AuthorizationSettler> authorizationSettlerMocker =
+        new MockitoComponentMockingRule<AuthorizationSettler>(DefaultAuthorizationSettler.class);
+
     private AuthorizationSettler authorizationSettler;
 
     private XWikiSecurityAccess defaultAccess;
@@ -74,20 +85,14 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
     @Before
     public void configure() throws Exception
     {
-        final EntityBridge entityBridge= getComponentManager().getInstance(EntityBridge.class);
-        final XWikiBridge xwikiBridge = getComponentManager().getInstance(XWikiBridge.class);
+        EntityBridge entityBridge = authorizationSettlerMocker.getInstance(EntityBridge.class);
+        when(entityBridge.isDocumentCreator(eq(creatorRef), any(SecurityReference.class))).thenReturn(true);
+        when(entityBridge.isDocumentCreator(argThat(not(is(creatorRef))), any(SecurityReference.class)))
+            .thenReturn(false);
 
-        getMockery().checking(new Expectations() {{
-            allowing (entityBridge).isDocumentCreator(with(creatorRef),
-                with(any(SecurityReference.class))); will(returnValue(true));
-            allowing (entityBridge).isDocumentCreator(with(any(UserSecurityReference.class)), 
-                with(any(SecurityReference.class))); will(returnValue(false));
-
-            allowing (xwikiBridge).isWikiOwner(with(ownerRef),
-                with(any(WikiReference.class))); will(returnValue(true));
-            allowing (xwikiBridge).isWikiOwner(with(any(UserSecurityReference.class)),
-                with(any(WikiReference.class))); will(returnValue(false));
-        }});
+        XWikiBridge xwikiBridge = authorizationSettlerMocker.getInstance(XWikiBridge.class);
+        when(xwikiBridge.isWikiOwner(eq(ownerRef), any(WikiReference.class))).thenReturn(true);
+        when(xwikiBridge.isWikiOwner(argThat(not(is(ownerRef))), any(WikiReference.class))).thenReturn(false);
 
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
         denyAllAccess = new XWikiSecurityAccess();
@@ -104,7 +109,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
         }
         initialImportAccess.allow(Right.ADMIN);
 
-        this.authorizationSettler = getComponentManager().getInstance(AuthorizationSettler.class);
+        this.authorizationSettler = authorizationSettlerMocker.getComponentUnderTest();
     }
 
     private Deque<SecurityRuleEntry> getMockedSecurityRuleEntries(String name, final SecurityReference reference,
@@ -121,47 +126,44 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
         final Deque<SecurityRuleEntry> entries = new ArrayDeque<SecurityRuleEntry>(refs.size());
 
         for (SecurityReference ref : refs) {
-            entries.push(getMockery().mock(SecurityRuleEntry.class, name + ref));
+            entries.push(mock(SecurityRuleEntry.class, name + ref));
         }
 
-        getMockery().checking(new Expectations() {{
-            int i = 0;
-            SecurityReference ref = reference;
-            for (SecurityRuleEntry entry : entries) {
-                List<SecurityRule> rules;
+        int i = 0;
+        SecurityReference ref = reference;
+        for (SecurityRuleEntry entry : entries) {
+            List<SecurityRule> rules;
 
-                if (i < ruleEntries.size()) {
-                    rules = ruleEntries.get(i);
-                } else {
-                    rules = Collections.emptyList();
-                }
-
-                if (ref.getParentSecurityReference() == null && rules.size() == 0 && addMainWikiDefaultRules) {
-                    // Add some rule at the main wiki level to avoid that the wiki is determined to be in its initial
-                    // import state.  By setting DENY on all, this rule will not have any other side effects than
-                    // indicating that the initial import have been made.
-                    rules = Arrays.asList(getMockedSecurityRule(name + " non-initial import state indicator security rule",
-                                                                Arrays.asList(defaultUserRef),
-                                                                Collections.<GroupSecurityReference>emptyList(),
-                                                                allTestRights, DENY));
-                    
-                }
-
-                allowing (entry).getReference(); will(returnValue(ref));
-                allowing (entry).getRules(); will(returnValue(rules));
-
-                ref = ref.getParentSecurityReference();
-                i++;
+            if (i < ruleEntries.size()) {
+                rules = ruleEntries.get(i);
+            } else {
+                rules = Collections.emptyList();
             }
 
-        }});
+            if (ref.getParentSecurityReference() == null && rules.size() == 0 && addMainWikiDefaultRules) {
+                // Add some rule at the main wiki level to avoid that the wiki is determined to be in its initial
+                // import state.  By setting DENY on all, this rule will not have any other side effects than
+                // indicating that the initial import have been made.
+                rules = Arrays.asList(getMockedSecurityRule(name + " non-initial import state indicator security rule",
+                                                            Arrays.asList(defaultUserRef),
+                                                            Collections.<GroupSecurityReference>emptyList(),
+                                                            allTestRights, DENY));
+
+            }
+
+            when(entry.getReference()).thenReturn(ref);
+            when(entry.getRules()).thenReturn(rules);
+
+            ref = ref.getParentSecurityReference();
+            i++;
+        }
 
         return entries;
     }
 
     private SecurityRule getMockedSecurityRule(String name, Iterable<UserSecurityReference> users,
         Iterable<GroupSecurityReference> groups, Iterable<Right> rights, final RuleState state) {
-        final SecurityRule rule = getMockery().mock(SecurityRule.class, name);
+        final SecurityRule rule = mock(SecurityRule.class, name);
 
         final List<Matcher<? super UserSecurityReference>> userMatchers
             = new ArrayList<Matcher<? super UserSecurityReference>>();
@@ -169,7 +171,6 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             = new ArrayList<Matcher<? super GroupSecurityReference>>();
         final List<Matcher<? super Right>> rightMatchers = new ArrayList<Matcher<? super Right>>();
 
-//        Matcher<? extends UserSecurityReference>[] userMatchers = new Matcher<? extends UserSecurityReference>[users.
         for (UserSecurityReference user : users) {
             userMatchers.add(is(user));
         }
@@ -180,15 +181,13 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             rightMatchers.add(is(right));
         }
 
-        getMockery().checking(new Expectations() {{
-            allowing(rule).match(with(anyOf(userMatchers))); will(returnValue(true));
-            allowing(rule).match(with(anyOf(groupMatchers))); will(returnValue(true));
-            allowing(rule).match(with(anyOf(rightMatchers))); will(returnValue(true));
-            allowing(rule).match(with(any(UserSecurityReference.class))); will(returnValue(false));
-            allowing(rule).match(with(any(GroupSecurityReference.class))); will(returnValue(false));
-            allowing(rule).match(with(any(Right.class))); will(returnValue(false));
-            allowing(rule).getState(); will(returnValue(state));
-        }});
+        when(rule.match(argThat(anyOf(userMatchers)))).thenReturn(true);
+        when(rule.match(argThat(anyOf(groupMatchers)))).thenReturn(true);
+        when(rule.match(argThat(anyOf(rightMatchers)))).thenReturn(true);
+        when(rule.match(argThat(not(anyOf(userMatchers))))).thenReturn(false);
+        when(rule.match(argThat(not(anyOf(groupMatchers))))).thenReturn(false);
+        when(rule.match(argThat(not(anyOf(rightMatchers))))).thenReturn(false);
+        when(rule.getState()).thenReturn(state);
 
         return rule;
     }

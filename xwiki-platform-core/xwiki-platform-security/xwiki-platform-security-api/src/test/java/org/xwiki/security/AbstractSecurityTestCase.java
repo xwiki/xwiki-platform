@@ -24,14 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jmock.Expectations;
 import org.junit.Before;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 
 /**
  * A base class for security tests, defining some useful SecurityReference.
@@ -39,7 +36,7 @@ import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
  * @version $Id$
  * @since 4.0M2
  */
-public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
+public class AbstractSecurityTestCase
 {
     protected SecurityReference xwikiRef;
     protected SecurityReference wikiRef;
@@ -126,17 +123,8 @@ public class AbstractSecurityTestCase extends AbstractMockingComponentTestCase
     }
 
     @Before
-    @Override
     public void setUp() throws Exception
     {
-        super.setUp();
-
-        final XWikiBridge xwikiBridge = getComponentManager().getInstance(XWikiBridge.class);
-
-        getMockery().checking(new Expectations() {{
-            allowing (xwikiBridge).getMainWikiReference(); will(returnValue(new WikiReference("xwiki")));
-        }});
-
         xwikiRef = newEntityReference(new WikiReference("xwiki"));
         wikiRef = newEntityReference(new WikiReference("wiki"));
         anotherWikiRef = newEntityReference(new WikiReference("anotherWiki"));

@@ -20,8 +20,8 @@
 
 package org.xwiki.security.authorization;
 
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -29,11 +29,11 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 /**
  * Security Reference Unit Tests
@@ -41,9 +41,12 @@ import static org.junit.Assert.assertThat;
  * @version $Id$
  * @since 5.0M2
  */
-@MockingRequirement(DefaultSecurityReferenceFactory.class)
-public class UserSecurityReferenceTest extends AbstractMockingComponentTestCase<SecurityReferenceFactory>
+public class UserSecurityReferenceTest
 {
+    @Rule
+    public final MockitoComponentMockingRule<SecurityReferenceFactory> securityReferenceFactoryMocker =
+        new MockitoComponentMockingRule<SecurityReferenceFactory>(DefaultSecurityReferenceFactory.class);
+
     private WikiReference xwiki = new WikiReference("xwiki");
     private WikiReference wiki = new WikiReference("wiki");
     private SpaceReference xspace = new SpaceReference("XWiki", xwiki);
@@ -53,24 +56,23 @@ public class UserSecurityReferenceTest extends AbstractMockingComponentTestCase<
     private DocumentReference groupRef = new DocumentReference("group1", xspace);
     private DocumentReference anotherWikiGroupRef = new DocumentReference("group2", space);
 
+    private SecurityReferenceFactory factory;
+    
     @Before
     public void configure() throws Exception
     {
-        final XWikiBridge wikiBridge = getComponentManager().getInstance(XWikiBridge.class);
+        XWikiBridge xwikiBridge = securityReferenceFactoryMocker.getInstance(XWikiBridge.class);
+        when(xwikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
 
-        getMockery().checking(new Expectations()
-        {{
-                allowing(wikiBridge).getMainWikiReference();
-                will(returnValue(new WikiReference("xwiki")));
-        }});
+        factory = securityReferenceFactoryMocker.getComponentUnderTest();
     }
 
     @Test
     public void testIsGlobal() throws Exception
     {
-        assertThat(getMockedComponent().newUserReference(userRef).isGlobal(), is(true));
-        assertThat(getMockedComponent().newUserReference(anotherWikiUserRef).isGlobal(), is(false));
-        assertThat(getMockedComponent().newGroupReference(groupRef).isGlobal(), is(true));
-        assertThat(getMockedComponent().newGroupReference(anotherWikiGroupRef).isGlobal(), is(false));
+        assertThat(factory.newUserReference(userRef).isGlobal(), is(true));
+        assertThat(factory.newUserReference(anotherWikiUserRef).isGlobal(), is(false));
+        assertThat(factory.newGroupReference(groupRef).isGlobal(), is(true));
+        assertThat(factory.newGroupReference(anotherWikiGroupRef).isGlobal(), is(false));
     }
 }

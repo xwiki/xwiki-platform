@@ -4912,7 +4912,9 @@ public class XWiki implements EventListener
         }
     }
 
-    // added some log statements to make debugging easier - LBlaze 2005.06.02
+    private static final String DEFAULT_RIGHT_SERVICE_CLASS =
+        "org.xwiki.security.authorization.internal.XWikiCachingRightService";
+
     public XWikiRightService getRightService()
     {
         synchronized (this.RIGHT_SERVICE_LOCK) {
@@ -4920,14 +4922,14 @@ public class XWiki implements EventListener
                 LOGGER.info("Initializing RightService...");
 
                 String rightsClass = Param("xwiki.authentication.rightsclass");
-                if (rightsClass != null) {
+                if (rightsClass != null && !rightsClass.equals(DEFAULT_RIGHT_SERVICE_CLASS)) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Using custom RightsClass " + rightsClass + ".");
+                        LOGGER.warn("Using custom Right Service [{}].", rightsClass);
                     }
                 } else {
-                    rightsClass = "com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl";
+                    rightsClass = DEFAULT_RIGHT_SERVICE_CLASS;
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Using default RightsClass " + rightsClass + ".");
+                        LOGGER.debug("Using default Right Service [{}].", rightsClass);
                     }
                 }
 
@@ -4935,18 +4937,37 @@ public class XWiki implements EventListener
                     this.rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
                     LOGGER.debug("Initialized RightService using Reflection.");
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to initialize RightService " + rightsClass
-                        + " using Reflection, trying default implementation using 'new'.", e);
+                    Exception lastException = e;
 
-                    this.rightService = new XWikiRightServiceImpl();
+                    if (!rightsClass.equals(DEFAULT_RIGHT_SERVICE_CLASS)) {
+                        LOGGER.warn(String.format("Failed to initialize custom RightService [%s]"
+                            + " by Reflection, using default implementation [%s].", rightsClass,
+                            DEFAULT_RIGHT_SERVICE_CLASS), e);
+                        rightsClass = DEFAULT_RIGHT_SERVICE_CLASS;
+                        try {
+                            this.rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
+                            LOGGER.debug("Initialized default RightService using Reflection.");
+                        } catch (Exception e1) {
+                            lastException = e1;
+                        }
+                    }
 
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Initialized RightService " + this.rightService.getClass().getName()
-                            + " using 'new'.");
+                    if (this.rightService == null) {
+                        LOGGER.warn(String.format("Failed to initialize RightService [%s]"
+                            + " by Reflection, using OLD implementation [%s] with 'new'.", rightsClass,
+                            XWikiRightServiceImpl.class.getCanonicalName()),
+                            lastException);
+
+                        this.rightService = new XWikiRightServiceImpl();
+
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Initialized old RightService implementation "
+                                + this.rightService.getClass().getName()
+                                + " using 'new'.");
+                        }
                     }
                 }
             }
-
             return this.rightService;
         }
     }

@@ -22,6 +22,7 @@ package org.xwiki.cache.infinispan.internal;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.infinispan.configuration.cache.CacheLoaderConfiguration;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.FileCacheStoreConfiguration;
@@ -80,7 +81,7 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
      */
     private boolean containsIncompleteFileLoader(Configuration isconfiguration)
     {
-        for (Object cacheLoaderConfig : (List) isconfiguration.loaders().cacheLoaders()) {
+        for (CacheLoaderConfiguration cacheLoaderConfig : isconfiguration.loaders().cacheLoaders()) {
             if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
                 FileCacheStoreConfiguration fileCacheLoaderConfig = (FileCacheStoreConfiguration) cacheLoaderConfig;
                 String location = fileCacheLoaderConfig.location();
@@ -149,7 +150,7 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
             LoadersConfigurationBuilder loadersBuilder = builder.loaders();
             loadersBuilder.clearCacheLoaders();
 
-            for (Object cacheLoaderConfig : (List) configuration.loaders().cacheLoaders()) {
+            for (CacheLoaderConfiguration cacheLoaderConfig : configuration.loaders().cacheLoaders()) {
                 if (cacheLoaderConfig instanceof LoaderConfiguration) {
                     loadersBuilder.addCacheLoader().read((LoaderConfiguration) cacheLoaderConfig);
                 } else if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {

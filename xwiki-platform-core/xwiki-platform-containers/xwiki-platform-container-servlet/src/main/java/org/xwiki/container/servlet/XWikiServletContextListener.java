@@ -24,8 +24,8 @@ import javax.servlet.ServletContextListener;
 
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.internal.StackingComponentEventManager;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.environment.Environment;
@@ -42,7 +42,7 @@ import org.xwiki.observation.event.ApplicationStoppedEvent;
 public class XWikiServletContextListener implements ServletContextListener
 {
     /** The component manager used to lookup other components. */
-    private ComponentManager componentManager;
+    private EmbeddableComponentManager componentManager;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent)
@@ -134,6 +134,13 @@ public class XWikiServletContextListener implements ServletContextListener
             applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
         } catch (ComponentLookupException ex) {
             // Nothing to do here.
+            // TODO: Log a warning
+        }
+
+        // Make sure to dispose all components before leaving
+        try {
+            this.componentManager.dispose();
+        } catch (ComponentLifecycleException e) {
             // TODO: Log a warning
         }
     }

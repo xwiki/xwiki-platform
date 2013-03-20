@@ -29,12 +29,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test case for cleaning html {@code<br/>} elements in {@link OpenOfficeHTMLCleaner}.
+ * Test case for cleaning html {@code<br/>} elements in {@link OfficeHTMLCleaner}.
  * 
  * @version $Id$
  * @since 1.8
  */
-public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
+public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * {@code <br/>} elements placed next to paragraph elements should be converted to {@code<div
@@ -119,9 +119,9 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      */
     private void checkLineBreakReplacements(String html, int expectedBrCount, int expectedDivCount)
     {
-        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
-        Document doc = openOfficeHTMLCleaner.clean(new StringReader(header + html + footer), configuration);
+        Document doc = officeHTMLCleaner.clean(new StringReader(header + html + footer), configuration);
         NodeList lineBreaks = doc.getElementsByTagName("br");
         Assert.assertEquals(expectedBrCount, lineBreaks.getLength());
         NodeList divs = doc.getElementsByTagName("div");

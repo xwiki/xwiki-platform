@@ -22,15 +22,16 @@ package org.xwiki.officeimporter.internal.openoffice;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
+import org.xwiki.officeimporter.internal.office.DefaultOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 
 /**
- * Test case for {@link DefaultOpenOfficeConfiguration}.
+ * Test case for {@link DefaultOfficeConfiguration}.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeConfigurationTest extends AbstractOfficeImporterTest
+public class DefaultOfficeConfigurationTest extends AbstractOfficeImporterTest
 {
     /**
      * Test if default configuration values are present.

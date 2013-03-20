@@ -36,7 +36,7 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
 /**
- * {@link HTMLCleaner} for cleaning HTML generated from an OpenOffice server.
+ * {@link HTMLCleaner} for cleaning HTML generated from an office server.
  * 
  * @version $Id$
  * @since 1.8M1
@@ -44,7 +44,7 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 @Component
 @Named("openoffice")
 @Singleton
-public class OpenOfficeHTMLCleaner implements HTMLCleaner
+public class OfficeHTMLCleaner implements HTMLCleaner
 {
     /**
      * Default html cleaner component used internally.
@@ -136,7 +136,7 @@ public class OpenOfficeHTMLCleaner implements HTMLCleaner
     {
         HTMLCleanerConfiguration configuration = this.defaultHtmlCleaner.getDefaultConfiguration();
 
-        // Add OO cleaning filters after the default filters
+        // Add office cleaning filters after the default filters.
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>(configuration.getFilters());
         filters.addAll(Arrays.asList(
             this.stripperFilter,

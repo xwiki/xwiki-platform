@@ -56,7 +56,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
     /**
      * Mock {@link OpenOfficeManager} component.
      */
-    protected OpenOfficeManager mockOpenOfficeManager;
+    protected OpenOfficeManager mockOfficeManager;
 
     @Override
     protected void registerComponents() throws Exception
@@ -70,6 +70,6 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
             registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki", "s2");
         this.mockDocumentReferenceResolver =
             registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        this.mockOpenOfficeManager = registerMockComponent(OpenOfficeManager.class);
+        this.mockOfficeManager = registerMockComponent(OpenOfficeManager.class);
     }
 }

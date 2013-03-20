@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice;
+package org.xwiki.officeimporter.internal.office;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,8 +37,8 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 
 /**
- * Listens to application start and stop events in order to automatically start and stop an Open Office server instance
- * (if auto start/auto stop is configured).
+ * Listens to application start and stop events in order to automatically start and stop an office server instance (if
+ * auto start/auto stop is configured).
  * 
  * @version $Id$
  * @since 2.0M1
@@ -46,19 +46,19 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 @Component
 @Named("oomanager")
 @Singleton
-public class OpenOfficeManagerLifecycleListener implements EventListener
+public class OfficeManagerLifecycleListener implements EventListener
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
     @Inject
-    private OpenOfficeConfiguration ooConfig;
+    private OpenOfficeConfiguration officeConfig;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
     @Inject
-    private OpenOfficeManager ooManager;
+    private OpenOfficeManager officeManager;
 
     /**
      * The logger to log.
@@ -82,20 +82,20 @@ public class OpenOfficeManagerLifecycleListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (ApplicationStartedEvent.class.getName().equals(event.getClass().getName())) {
-            startOpenOffice();
+            startOfficeServer();
         } else if (ApplicationStoppedEvent.class.getName().equals(event.getClass().getName())) {
-            stopOpenOffice();
+            stopOfficeServer();
         }
     }
 
     /**
-     * Start Open Office if the configuration says to start it automatically.
+     * Start the office server if the configuration says to start it automatically.
      */
-    private void startOpenOffice()
+    private void startOfficeServer()
     {
-        if (this.ooConfig.isAutoStart()) {
+        if (this.officeConfig.isAutoStart()) {
             try {
-                this.ooManager.start();
+                this.officeManager.start();
             } catch (OpenOfficeManagerException ex) {
                 this.logger.error(ex.getMessage(), ex);
             }
@@ -103,14 +103,14 @@ public class OpenOfficeManagerLifecycleListener implements EventListener
     }
 
     /**
-     * Stop Open Office.
+     * Stop the office server.
      */
-    private void stopOpenOffice()
+    private void stopOfficeServer()
     {
-        // TODO: We shouldn't stop OO if it hasn't been started automatically or if the config doesn't
-        // say to stop it automatically.
+        // TODO: We shouldn't stop the office server if it hasn't been started automatically or if the configuration
+        // doesn't say to stop it automatically.
         try {
-            this.ooManager.stop();
+            this.officeManager.stop();
         } catch (OpenOfficeManagerException ex) {
             this.logger.error(ex.getMessage(), ex);
         }

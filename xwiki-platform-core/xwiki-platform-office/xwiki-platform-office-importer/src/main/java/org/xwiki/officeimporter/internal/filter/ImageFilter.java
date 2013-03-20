@@ -104,9 +104,9 @@ public class ImageFilter extends AbstractHTMLFilter
                 image.setAttribute(ATTRIBUTE_SRC, this.documentAccessBridge
                     .getAttachmentURL(attachmentReference, false));
 
-                // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
-                // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for
-                // avoiding content wrapping around images which is not valid xhtml. There for, to be consistent and
+                // The 'align' attribute of images creates a lot of problems. First,the office server has a problem with
+                // center aligning images (it aligns them to left). Next, the office server uses <br clear"xxx"> for
+                // avoiding content wrapping around images which is not valid XHTML. There for, to be consistent and
                 // simple we will remove the 'align' attribute of all the images so that they are all left aligned.
                 image.removeAttribute(ATTRIBUTE_ALIGN);
             } else if (src.startsWith("file://")) {

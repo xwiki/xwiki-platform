@@ -87,11 +87,11 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * OpenOffice HTML cleaner.
+     * Office HTML cleaner.
      */
     @Inject
     @Named("openoffice")
-    private HTMLCleaner ooHTMLCleaner;
+    private HTMLCleaner officeHTMLCleaner;
 
     /**
      * The component used to parse the XHTML obtained after cleaning.
@@ -104,7 +104,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName,
         DocumentReference documentReference) throws OfficeImporterException
     {
-        // Invoke OpenOffice document converter.
+        // Invoke the office document converter.
         Map<String, byte[]> artifacts = importPresentation(officeFileStream, officeFileName);
 
         // Create presentation HTML.
@@ -134,7 +134,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(officeFileName, officeFileStream);
         try {
-            // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
+            // The office converter uses the output file name extension to determine the output format/syntax.
             // The returned artifacts are of three types: imgX.jpg (slide screen shot), imgX.html (HTML page that
             // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
             // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
@@ -203,10 +203,10 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     protected String cleanPresentationHTML(String dirtyHTML, DocumentReference targetDocumentReference)
     {
-        HTMLCleanerConfiguration configuration = this.ooHTMLCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", this.entityReferenceSerializer
             .serialize(targetDocumentReference)));
-        Document xhtmlDocument = this.ooHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
+        Document xhtmlDocument = this.officeHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
         HTMLUtils.stripHTMLEnvelope(xhtmlDocument);
         return HTMLUtils.toString(xhtmlDocument);
     }

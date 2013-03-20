@@ -22,12 +22,12 @@ package org.xwiki.officeimporter.internal.cleaner;
 import org.junit.Test;
 
 /**
- * Test case for cleaning html tables in {@link OpenOfficeHTMLCleaner}.
+ * Test case for cleaning html tables in {@link OfficeHTMLCleaner}.
  * 
  * @version $Id$
  * @since 1.8
  */
-public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
+public class TableOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * An isolated paragraph inside a table cell item should be replaced with paragraph's content.

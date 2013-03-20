@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice;
+package org.xwiki.officeimporter.internal.office;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import java.util.UUID;
  * @version $Id$
  * @since 2.2M2
  */
-public class OpenOfficeConverterFileStorage
+public class OfficeConverterFileStorage
 {
     /**
      * Top-level temporary working directory.
@@ -58,15 +58,15 @@ public class OpenOfficeConverterFileStorage
     private File outputFile;
 
     /**
-     * Creates a new {@link OpenOfficeConverterFileStorage} instance for tracking file system storage for a convert
+     * Creates a new {@link OfficeConverterFileStorage} instance for tracking file system storage for a convert
      * operation.
      * 
      * @param parentDir parent directory under which temporary storage is to be allocated.
-     * @param inputFileName main input file which will be fed into openoffice server.
-     * @param outputFileName main output file into which result of the openoffice conversion will be written into.
+     * @param inputFileName main input file which will be fed into office server.
+     * @param outputFileName main output file into which result of the office conversion will be written into.
      * @throws IOException if an error occurs while creating temporary directory structure.
      */
-    public OpenOfficeConverterFileStorage(File parentDir, String inputFileName, String outputFileName)
+    public OfficeConverterFileStorage(File parentDir, String inputFileName, String outputFileName)
         throws IOException
     {
         boolean success = false;

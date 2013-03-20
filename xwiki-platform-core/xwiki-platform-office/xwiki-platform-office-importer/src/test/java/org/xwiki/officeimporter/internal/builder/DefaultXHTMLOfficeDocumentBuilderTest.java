@@ -81,7 +81,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
     @org.junit.Test
     public void testXHTMLOfficeDocumentBuilding()
     {
-        // Create & register a mock document converter to by-pass openoffice server.
+        // Create & register a mock document converter to by-pass the office server.
         final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
         final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
         mockInput.put(INPUT_FILE_NAME, mockOfficeFileStream);
@@ -92,7 +92,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockOpenOfficeManager).getConverter();
+                oneOf(mockOfficeManager).getConverter();
                 will(returnValue(mockDocumentConverter));
 
                 try {

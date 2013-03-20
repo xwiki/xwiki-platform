@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice.script;
+package org.xwiki.officeimporter.internal.office.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,17 +42,17 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("officemanager")
 @Singleton
-public class OpenOfficeManagerScriptService implements ScriptService
+public class OfficeManagerScriptService implements ScriptService
 {
     /**
-     * The key used to place any error messages while trying to control the oo server instance.
+     * The key used to place any error messages while trying to control the office server instance.
      */
     public static final String OFFICE_MANAGER_ERROR = "OFFICE_MANAGER_ERROR";
 
     /**
-     * Error message used to indicate that openoffice server administration is restricted for main xwiki.
+     * Error message used to indicate that office server administration is restricted for main wiki.
      */
-    private static final String ERROR_FORBIDDEN = "OpenOffice server administration is forbidden for sub-wikis.";
+    private static final String ERROR_FORBIDDEN = "Office server administration is forbidden for sub-wikis.";
 
     /**
      * Error message used to indicate that the current user does not have enough rights to perform the requested action.
@@ -81,7 +81,7 @@ public class OpenOfficeManagerScriptService implements ScriptService
      * The {@link OpenOfficeManager} component.
      */
     @Inject
-    private OpenOfficeManager ooManager;
+    private OpenOfficeManager officeManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
@@ -96,7 +96,7 @@ public class OpenOfficeManagerScriptService implements ScriptService
     private OpenOfficeConfiguration config;
 
     /**
-     * Tries to start the oo server process.
+     * Tries to start the office server process.
      * 
      * @return true if the operation succeeds, false otherwise
      */
@@ -108,7 +108,7 @@ public class OpenOfficeManagerScriptService implements ScriptService
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
-                this.ooManager.start();
+                this.officeManager.start();
                 return true;
             } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
@@ -119,7 +119,7 @@ public class OpenOfficeManagerScriptService implements ScriptService
     }
 
     /**
-     * Tries to stop the oo server process.
+     * Tries to stop the office server process.
      * 
      * @return true if the operation succeeds, false otherwise
      */
@@ -131,7 +131,7 @@ public class OpenOfficeManagerScriptService implements ScriptService
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
-                this.ooManager.stop();
+                this.officeManager.stop();
                 return true;
             } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
@@ -142,11 +142,11 @@ public class OpenOfficeManagerScriptService implements ScriptService
     }
 
     /**
-     * @return current status of the oo server process as a string
+     * @return current status of the office server process as a string
      */
     public String getServerState()
     {
-        return this.ooManager.getState().toString();
+        return this.officeManager.getState().toString();
     }
 
     /**
@@ -177,9 +177,9 @@ public class OpenOfficeManagerScriptService implements ScriptService
     }
 
     /**
-     * Utility method for checking if current context document is from main xwiki.
+     * Utility method for checking if current context document is from main wiki.
      * 
-     * @return true if the current context document is from main xwiki
+     * @return true if the current context document is from main wiki
      */
     private boolean isMainXWiki()
     {

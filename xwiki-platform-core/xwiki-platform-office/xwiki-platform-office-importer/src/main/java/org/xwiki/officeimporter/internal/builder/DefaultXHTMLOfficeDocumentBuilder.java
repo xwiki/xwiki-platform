@@ -69,11 +69,11 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
     private OpenOfficeManager officeManager;
 
     /**
-     * OpenOffice HTML cleaner.
+     * Office HTML cleaner.
      */
     @Inject
     @Named("openoffice")
-    private HTMLCleaner ooHtmlCleaner;
+    private HTMLCleaner officeHtmlCleaner;
 
     /**
      * Used to determine the encoding of the HTML byte array produced by the office server.
@@ -84,11 +84,11 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
     public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        // Invoke OpenOffice document converter.
+        // Invoke the office document converter.
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(officeFileName, officeFileStream);
         Map<String, byte[]> artifacts;
-        // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
+        // The office converter uses the output file name extension to determine the output format/syntax.
         String outputFileName = StringUtils.substringBeforeLast(officeFileName, ".") + ".html";
         try {
             artifacts = this.officeManager.getConverter().convert(inputStreams, officeFileName, outputFileName);
@@ -105,10 +105,10 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         }
 
         // Parse and clean the HTML output.
-        HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHtmlCleaner.getDefaultConfiguration();
         configuration.setParameters(params);
         Reader html = getReader(artifacts.remove(outputFileName));
-        Document xhtmlDoc = this.ooHtmlCleaner.clean(html, configuration);
+        Document xhtmlDoc = this.officeHtmlCleaner.clean(html, configuration);
 
         // Return a new XHTMLOfficeDocument instance.
         return new XHTMLOfficeDocument(xhtmlDoc, artifacts);

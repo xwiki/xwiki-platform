@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice;
+package org.xwiki.officeimporter.internal.office;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,12 +39,12 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultOpenOfficeConverter implements OpenOfficeConverter
+public class DefaultOfficeConverter implements OpenOfficeConverter
 {
     /**
      * The logger to log.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOpenOfficeConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOfficeConverter.class);
 
     /**
      * Converter provided by jodconverter library.
@@ -57,12 +57,12 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
     private File workDir;
 
     /**
-     * Creates a new {@link DefaultOpenOfficeConverter} instance.
+     * Creates a new {@link DefaultOfficeConverter} instance.
      * 
      * @param converter provided by jodconverter library.
      * @param workDir space for holding temporary file.
      */
-    public DefaultOpenOfficeConverter(OfficeDocumentConverter converter, File workDir)
+    public DefaultOfficeConverter(OfficeDocumentConverter converter, File workDir)
     {
         this.converter = converter;
         this.workDir = workDir;
@@ -78,10 +78,10 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
             throw new OpenOfficeConverterException(String.format(message, inputFileName));
         }
 
-        OpenOfficeConverterFileStorage storage = null;
+        OfficeConverterFileStorage storage = null;
         try {
             // Prepare temporary storage.
-            storage = new OpenOfficeConverterFileStorage(this.workDir, inputFileName, outputFileName);
+            storage = new OfficeConverterFileStorage(this.workDir, inputFileName, outputFileName);
 
             // Write out all the input streams.
             FileOutputStream fos = null;

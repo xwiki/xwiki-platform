@@ -96,13 +96,13 @@ public class OfficeImporterScriptService implements ScriptService
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
-     * Used to query openoffice server status.
+     * Used to query office server status.
      */
     @Inject
     private OpenOfficeManager officeManager;
 
     /**
-     * Used to query the OpenOffice server configuration.
+     * Used to query the office server configuration.
      */
     @Inject
     private OpenOfficeConfiguration officeConfiguration;
@@ -414,26 +414,26 @@ public class OfficeImporterScriptService implements ScriptService
     }
 
     /**
-     * Checks if the connection to the OpenOffice server has been established. If the OpenOffice server has been
-     * configured to start automatically then we make an attempt to start it (usually this means that the OpenOffice
+     * Checks if the connection to the office server has been established. If the office server has been
+     * configured to start automatically then we make an attempt to start it (usually this means that the office
      * server failed to start when XE started and so we try one more time to connect).
      * 
-     * @throws OfficeImporterException if the connection to the OpenOffice server is not established
-     * @throws OpenOfficeManagerException if the attempt to start the OpenOffice server failed
+     * @throws OfficeImporterException if the connection to the office server is not established
+     * @throws OpenOfficeManagerException if the attempt to start the office server failed
      */
     private void assertConnected() throws OfficeImporterException, OpenOfficeManagerException
     {
         boolean connected = this.officeManager.getState().equals(ManagerState.CONNECTED);
         if (!connected) {
-            // Check if the OpenOffice server was configured to start automatically.
+            // Check if the office server was configured to start automatically.
             if (this.officeConfiguration.isAutoStart()) {
-                // The OpenOffice server probably failed to start automatically when XE started. Try one more time to
+                // The office server probably failed to start automatically when XE started. Try one more time to
                 // connect.
                 this.officeManager.start();
                 connected = this.officeManager.getState().equals(ManagerState.CONNECTED);
             }
             if (!connected) {
-                throw new OfficeImporterException("OpenOffice server unavailable.");
+                throw new OfficeImporterException("Office server unavailable.");
             }
         }
     }

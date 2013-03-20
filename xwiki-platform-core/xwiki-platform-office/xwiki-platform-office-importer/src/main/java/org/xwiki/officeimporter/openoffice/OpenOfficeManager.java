@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.openoffice;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Component interface for managing openoffice server connection / process.
+ * Component interface for managing the office server connection / process.
  * 
  * @version $Id$
  * @since 1.8RC3
@@ -86,8 +86,8 @@ public interface OpenOfficeManager
     ManagerState getState();
 
     /**
-     * If an internally managed openoffice server is configured (xwiki.properties), this method will start an openoffice
-     * server process and connect to it. Otherwise this method will try to connect to an external openoffice server
+     * If an internally managed office server is configured (xwiki.properties), this method will start an office
+     * server process and connect to it. Otherwise this method will try to connect to an external office server
      * instance configured through xwiki.properties. Calling {@link OpenOfficeManager#start()} on an already started /
      * connected {@link OpenOfficeManager} has no effect.
      * 
@@ -96,9 +96,9 @@ public interface OpenOfficeManager
     void start() throws OpenOfficeManagerException;
 
     /**
-     * If an internally managed openoffice server is configured (xwiki.properties), this method will disconnect from the
-     * openoffice server and terminate the server process. Otherwise this method will simply disconnect from the
-     * external openoffice server. Calling {@link OpenOfficeManager#stop()} on an already stopped / disconnected
+     * If an internally managed office server is configured (xwiki.properties), this method will disconnect from the
+     * office server and terminate the server process. Otherwise this method will simply disconnect from the
+     * external office server. Calling {@link OpenOfficeManager#stop()} on an already stopped / disconnected
      * {@link OpenOfficeManager} has no effect.
      * 
      * @throws OpenOfficeManagerException if stop operation fails.

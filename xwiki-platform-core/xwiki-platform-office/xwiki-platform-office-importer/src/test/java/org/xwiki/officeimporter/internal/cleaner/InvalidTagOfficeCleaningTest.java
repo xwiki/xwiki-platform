@@ -27,12 +27,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 /**
- * Test case for tag removing in {@link OpenOfficeHTMLCleaner}.
+ * Test case for tag removing in {@link OfficeHTMLCleaner}.
  * 
  * @version $Id$
  * @since 1.8
  */
-public class InvalidTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
+public class InvalidTagOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * {@code STYLE} tags should be stripped from HTML content.
@@ -43,7 +43,7 @@ public class InvalidTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         String html =
             "<html><head><title>Title</title>" + "<style type=\"text/css\">h1 {color:red} p {color:blue} </style>"
                 + "</head><body>" + footer;
-        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
+        Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("style");
         Assert.assertEquals(0, nodes.getLength());
     }
@@ -55,7 +55,7 @@ public class InvalidTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     public void testScriptTagRemoving()
     {
         String html = header + "<script type=\"text/javascript\">document.write(\"Hello World!\")</script>" + footer;
-        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
+        Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("script");
         Assert.assertEquals(0, nodes.getLength());
     }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice;
+package org.xwiki.officeimporter.internal.office;
 
 import java.io.File;
 
@@ -37,10 +37,10 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
  * @since 1.8RC3
  */
 @Component
-public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, Initializable
+public class DefaultOfficeConfiguration implements OpenOfficeConfiguration, Initializable
 {
     /**
-     * Prefix for configuration keys for the OpenOffice module.
+     * Prefix for configuration keys for the office module.
      */
     private static final String PREFIX = "openoffice.";
 

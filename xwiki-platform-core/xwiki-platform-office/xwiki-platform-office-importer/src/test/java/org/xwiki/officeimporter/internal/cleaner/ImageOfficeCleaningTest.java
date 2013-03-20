@@ -33,12 +33,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 /**
- * Test case for cleaning HTML images in {@link OpenOfficeHTMLCleaner}.
+ * Test case for cleaning HTML images in {@link OfficeHTMLCleaner}.
  * 
  * @version $Id$
  * @since 1.8
  */
-public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
+public class ImageOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * The key used to store the target document string reference in the cleaning parameters map.
@@ -74,7 +74,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     public void testImageWrapping()
     {
         String html = header + "<img src=\"foo.png\"/>" + footer;
-        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap(TARGET_DOCUMENT_KEY, TARGET_DOCUMENT_VALUE));
 
         getMockery().checking(new Expectations()
@@ -88,7 +88,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             }
         });
 
-        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
+        Document doc = officeHTMLCleaner.clean(new StringReader(html), configuration);
 
         NodeList nodes = doc.getElementsByTagName("img");
         Assert.assertEquals(1, nodes.getLength());
@@ -110,7 +110,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     public void testCompoundImageLinkWrapping()
     {
         String html = header + "<a href=\"http://www.xwiki.org\"><img src=\"foo.png\"/></a>" + footer;
-        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap(TARGET_DOCUMENT_KEY, TARGET_DOCUMENT_VALUE));
 
         getMockery().checking(new Expectations()
@@ -124,7 +124,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             }
         });
 
-        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
+        Document doc = officeHTMLCleaner.clean(new StringReader(html), configuration);
 
         NodeList nodes = doc.getElementsByTagName("img");
         Assert.assertEquals(1, nodes.getLength());
@@ -149,7 +149,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     public void testRelativePathCleaning()
     {
         String html = header + "<img src=\"../../some/path/foo.png\"/>" + footer;
-        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap(TARGET_DOCUMENT_KEY, TARGET_DOCUMENT_VALUE));
 
         getMockery().checking(new Expectations()
@@ -163,7 +163,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             }
         });
 
-        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
+        Document doc = officeHTMLCleaner.clean(new StringReader(html), configuration);
 
         NodeList nodes = doc.getElementsByTagName("img");
         Assert.assertEquals(1, nodes.getLength());

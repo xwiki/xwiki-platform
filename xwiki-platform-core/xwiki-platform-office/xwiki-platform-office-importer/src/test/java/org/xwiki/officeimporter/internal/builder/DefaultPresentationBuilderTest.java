@@ -107,7 +107,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockOpenOfficeManager).getConverter();
+                oneOf(mockOfficeManager).getConverter();
                 will(returnValue(mockDocumentConverter));
 
                 try {

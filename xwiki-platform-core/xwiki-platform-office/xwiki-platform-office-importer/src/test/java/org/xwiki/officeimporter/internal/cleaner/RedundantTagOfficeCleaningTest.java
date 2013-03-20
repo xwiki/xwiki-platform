@@ -27,12 +27,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 /**
- * Test case for filtering redundant html tags in {@link OpenOfficeHTMLCleaner}.
+ * Test case for filtering redundant html tags in {@link OfficeHTMLCleaner}.
  * 
  * @version $Id$
  * @since 1.8
  */
-public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
+public class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * Test filtering of those tags which doesn't have any attributes set.
@@ -46,7 +46,7 @@ public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             String startTag = "<" + tag + ">";
             String endTag = "</" + tag + ">";
             String html = String.format(htmlTemplate, startTag, endTag);
-            Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
+            Document doc = officeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
             Assert.assertEquals(0, nodes.getLength());
         }
@@ -66,7 +66,7 @@ public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             String startTag = "<" + tag + ">";
             String endTag = "</" + tag + ">";
             String html = String.format(htmlTemplate, startTag, endTag, startTag, endTag);
-            Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
+            Document doc = officeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
             Assert.assertEquals(1, nodes.getLength());
         }

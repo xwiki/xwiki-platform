@@ -45,7 +45,7 @@ public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
     public void testParagraphsWithNamespaces()
     {
         String html = header + "<w:p>paragraph</w:p>" + footer;
-        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap(HTMLCleanerConfiguration.NAMESPACES_AWARE, "false"));
         Document doc = wysiwygHTMLCleaner.clean(new StringReader(html), configuration);
         NodeList nodes = doc.getElementsByTagName("p");

@@ -83,4 +83,25 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.PROGRAM,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
     }
+
+    @Test
+    public void testRightOnUserAndDelete() throws Exception
+    {
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "usersAndGroups.xml", false);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki");
+
+        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
+        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user2"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
+
+        testWiki.deleteUser("user", "wiki");
+
+        assertAccessFalse("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
+        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user2"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
+    }
 }

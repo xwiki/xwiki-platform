@@ -35,7 +35,6 @@ import com.xpn.xwiki.XWikiContext;
  */
 public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 {
-
     @Test
     public void testUserFromAnotherWiki1() throws Exception
     {

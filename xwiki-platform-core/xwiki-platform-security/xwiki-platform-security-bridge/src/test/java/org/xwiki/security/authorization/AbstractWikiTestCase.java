@@ -22,6 +22,7 @@ package org.xwiki.security.authorization;
 import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.observation.EventListener;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
@@ -54,6 +55,17 @@ public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
         Execution execution = getComponentManager().getInstance(Execution.class);
         execution.setContext(this.executionContext);
         Utils.setComponentManager(getComponentManager());
+    }
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        // Get rid of annoying listeners we don't need
+        getComponentManager().unregisterComponent(EventListener.class, "XObjectEventGeneratorListener");
+        getComponentManager().unregisterComponent(EventListener.class, "AttachmentEventGeneratorListener");
+        getComponentManager().unregisterComponent(EventListener.class, "XClassPropertyEventGeneratorListener");
     }
 
     protected void setContext(XWikiContext ctx)

@@ -28,6 +28,7 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,12 +39,16 @@ import org.jmock.Mockery;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -87,6 +92,8 @@ public class LegacyTestWiki extends AbstractTestWiki
 
     private final EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    private final ObservationManager observationManager;
+
     private final Map<String, TestWiki> wikis = new HashMap<String, TestWiki>();
 
     /**
@@ -99,8 +106,10 @@ public class LegacyTestWiki extends AbstractTestWiki
     {
         this.legacymock = legacymock;
         this.mockery = mockery;
+
         this.documentReferenceResolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
         this.entityReferenceSerializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        this.observationManager = componentManager.getInstance(ObservationManager.class);
 
         mockery.setImposteriser(ClassImposteriser.INSTANCE);
 
@@ -119,7 +128,6 @@ public class LegacyTestWiki extends AbstractTestWiki
         mockery.checking(new Expectations()
         {
             {
-
                 // Expectations for XWikiContext
 
                 allowing(context).setDatabase(with(any(String.class)));
@@ -157,15 +165,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                 allowing(context).get("grouplist");
                 will(returnValue(null));
                 allowing(context).put(with(equal("grouplist")), with(anything()));
-                allowing(context).getUser();
-                will(new CustomAction("return the current username")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation)
-                    {
-                        return currentUsername;
-                    }
-                });
                 allowing(context).getUserReference();
                 will(new CustomAction("return the current username")
                 {
@@ -216,28 +215,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                 });
                 allowing(xwiki).getMaxRecursiveSpaceChecks(with(any(XWikiContext.class)));
                 will(returnValue(100));
-                allowing(xwiki).getDocument(with(any(String.class)), with(any(XWikiContext.class)));
-                will(new CustomAction("return a mocked document")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation)
-                    {
-                        String documentName = (String) invocation.getParameter(0);
-                        return getDocument(documentName);
-                    }
-                });
-                allowing(xwiki).getDocument(with(any(String.class)), with(any(String.class)),
-                    with(any(XWikiContext.class)));
-                will(new CustomAction("return a mocked document")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation)
-                    {
-                        String spaceName = (String) invocation.getParameter(0);
-                        String documentName = (String) invocation.getParameter(1);
-                        return getDocument(spaceName, documentName);
-                    }
-                });
                 allowing(xwiki).getDocument(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
                 will(new CustomAction("return a mocked document")
                 {
@@ -271,8 +248,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                 });
                 allowing(xwiki).getGroupService(with(any(XWikiContext.class)));
                 will(returnValue(groupService));
-                allowing(xwiki).isVirtualMode();
-                will(returnValue(wikis.size() > 1));
 
                 // Expectations for XWikiGroupService
 
@@ -304,6 +279,47 @@ public class LegacyTestWiki extends AbstractTestWiki
 
             }
         });
+        
+        if (legacymock) {
+            mockery.checking(new Expectations()
+            {
+                {
+                    allowing(context).getUser();
+                    will(new CustomAction("return the current username")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            return currentUsername;
+                        }
+                    });
+                    allowing(xwiki).getDocument(with(any(String.class)), with(any(XWikiContext.class)));
+                    will(new CustomAction("return a mocked document")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            String documentName = (String) invocation.getParameter(0);
+                            return getDocument(documentName);
+                        }
+                    });
+                    allowing(xwiki).getDocument(with(any(String.class)), with(any(String.class)),
+                        with(any(XWikiContext.class)));
+                    will(new CustomAction("return a mocked document")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            String spaceName = (String) invocation.getParameter(0);
+                            String documentName = (String) invocation.getParameter(1);
+                            return getDocument(spaceName, documentName);
+                        }
+                    });
+                    allowing(xwiki).isVirtualMode();
+                    will(returnValue(wikis.size() > 1));
+                }
+            });
+        }
 
     }
 
@@ -371,6 +387,8 @@ public class LegacyTestWiki extends AbstractTestWiki
             wiki.getGroupsForUser(wiki.getName().equals(userWiki) ? userReference.getName()
                 : this.entityReferenceSerializer.serialize(userReference));
 
+        final SpaceReference userSpaceReference = new SpaceReference("XWiki", new WikiReference(wiki.getName()));
+
         return new AbstractCollection<DocumentReference>()
         {
 
@@ -399,7 +417,7 @@ public class LegacyTestWiki extends AbstractTestWiki
                     {
                         String groupName = groupNamesIterator.next();
 
-                        return documentReferenceResolver.resolve(groupName, new WikiReference(wiki.getName()));
+                        return documentReferenceResolver.resolve(groupName, userSpaceReference);
                     }
 
                     @Override
@@ -501,6 +519,12 @@ public class LegacyTestWiki extends AbstractTestWiki
             if (groupsForUser.get(name) == null) {
                 groupsForUser.put(name, new HashSet<String>());
             }
+
+            TestSpace testSpace = mockSpace("XWiki");
+
+            UserTestDocument userTestDocument = new UserTestDocument(name, testSpace, null, false);
+
+            testSpace.documents.put(name, userTestDocument);
         }
 
         @Override
@@ -513,22 +537,14 @@ public class LegacyTestWiki extends AbstractTestWiki
                 groups.put(groupName, groupMembers);
             }
 
-            final Set<String> finalGroupMembers = groupMembers;
+            TestSpace testSpace = mockSpace("XWiki");
 
-            return new HasUsers()
-            {
-                @Override
-                public void addUser(String userName)
-                {
-                    Set<String> groups = groupsForUser.get(userName);
-                    if (groups == null) {
-                        groups = new HashSet<String>();
-                        groupsForUser.put(userName, groups);
-                    }
-                    groups.add(groupName);
-                    finalGroupMembers.add(userName);
-                }
-            };
+            GroupTestDocument groupTestDocument = new GroupTestDocument(groupName, testSpace, null, false);
+
+            testSpace.documents.put(groupName, groupTestDocument);
+
+            return groupTestDocument;
+
         }
 
         @Override
@@ -556,11 +572,34 @@ public class LegacyTestWiki extends AbstractTestWiki
             return space;
         }
 
+        XWikiDocument removeDocument(DocumentReference documentReference)
+        {
+            return removeDocument(documentReference.getParent().getName(), documentReference.getName());
+        }
+
+        XWikiDocument removeDocument(String spaceName, String documentName)
+        {
+            TestSpace space = mockSpace(spaceName);
+
+            return space.removeDocument(documentName);
+        }
+
         XWikiDocument getDocument(DocumentReference documentReference)
         {
-            TestSpace space = mockSpace(documentReference.getLastSpaceReference().getName());
+            TestSpace space = mockSpace(documentReference.getParent().getName());
 
             return space.getDocument(documentReference);
+        }
+
+        TestDocument getTestDocument(String spaceName, String documentName)
+        {
+            if (spaces.containsKey(spaceName)) {
+                TestSpace space = mockSpace(spaceName);
+
+                return space.getTestDocument(documentName);
+            }
+
+            return null;
         }
 
         @Override
@@ -585,11 +624,63 @@ public class LegacyTestWiki extends AbstractTestWiki
             return groups == null ? Collections.<String> emptySet() : groups;
         }
 
+        void notifyDeleteDocument(XWikiDocument document)
+        {
+            XWikiDocument newDocument = new XWikiDocument(document.getDocumentReference());
+            newDocument.setOriginalDocument(document);
+
+            // Send event
+            observationManager.notify(new DocumentDeletedEvent(newDocument.getDocumentReference()), newDocument,
+                context);
+        }
+
+        void deleteUser(String userName)
+        {
+            if (users.contains(userName)) {
+                users.remove(userName);
+                groupsForUser.remove(userName);
+                for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
+                    entry.getValue().remove(userName);
+                    ((GroupTestDocument) getTestDocument("XWiki", entry.getKey())).removeUser(userName);
+                }
+
+                // Make sure user document is removed
+                XWikiDocument userDocument = removeDocument("XWiki", userName);
+
+                // Send event
+                notifyDeleteDocument(userDocument);
+            }
+        }
+
+        void deleteGroup(String groupName)
+        {
+            if (groups.containsKey(groupName)) {
+                groups.remove(groupName);
+                for (Set<String> groups : groupsForUser.values()) {
+                    groups.remove(groupName);
+                }
+
+                // Make sure group document is removed
+                XWikiDocument groupDocument = removeDocument("XWiki", groupName);
+
+                // Send event
+                notifyDeleteDocument(groupDocument);
+            }
+        }
+
+        void deleteDocument(DocumentReference documentReference)
+        {
+            XWikiDocument document = removeDocument(documentReference);
+
+            if (document != null) {
+                // Send event
+                notifyDeleteDocument(document);
+            }
+        }
     }
 
     private class TestSpace extends TestAcl implements HasDocuments
     {
-
         private final String name;
 
         private final TestWiki wiki;
@@ -608,9 +699,21 @@ public class LegacyTestWiki extends AbstractTestWiki
             return mockDocument(name, creator, false);
         }
 
-        TestDocument mockDocument(String name, String creator, boolean isNew)
+        @Override
+        public XWikiDocument removeDocument(String name)
         {
             TestDocument document = documents.get(name);
+
+            if (document == null) {
+                return null;
+            }
+
+            return document.getDocument();
+        }
+
+        TestDocument mockDocument(String name, String creator, boolean isNew)
+        {
+            TestDocument document = getTestDocument(name);
 
             if (document == null) {
                 if (creator == null) {
@@ -630,6 +733,11 @@ public class LegacyTestWiki extends AbstractTestWiki
             return document.getDocument();
         }
 
+        public TestDocument getTestDocument(String name)
+        {
+            return documents.get(name);
+        }
+
         @Override
         String getName()
         {
@@ -642,22 +750,136 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
     }
 
+    private class UserTestDocument extends TestDocument
+    {
+        private BaseObject userObject;
+
+        UserTestDocument(String name, TestSpace space, String creator, Boolean isNew)
+        {
+            super(name, space, creator, isNew);
+
+            this.userObject = mockUserBaseObject();
+
+            mockery.checking(new Expectations()
+            {
+                {
+                    allowing(mockedDocument).getXObject(with(equal(new LocalDocumentReference("XWiki", "XWikiUsers"))));
+                    will(new CustomAction("return the user object")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            return userObject;
+                        }
+                    });
+                }
+            });
+        }
+
+        private BaseObject mockUserBaseObject()
+        {
+            ++objectNumber;
+
+            final BaseObject userBaseObject = mockery.mock(BaseObject.class, getName() + objectNumber);
+
+            return userBaseObject;
+        }
+
+        @Override
+        public Map<DocumentReference, List<BaseObject>> getLegacyXObjects()
+        {
+            Map<DocumentReference, List<BaseObject>> xobjects = super.getLegacyXObjects();
+
+            xobjects.put(new DocumentReference(this.space.wiki.getName(), "XWiki", "XWikiUsers"),
+                Arrays.asList(this.userObject));
+
+            return xobjects;
+        }
+    }
+
+    private class GroupTestDocument extends TestDocument implements HasUsers
+    {
+        private Map<String, BaseObject> memberObjects = new LinkedHashMap<String, BaseObject>();
+
+        GroupTestDocument(String name, TestSpace space, String creator, Boolean isNew)
+        {
+            super(name, space, creator, isNew);
+
+            mockery.checking(new Expectations()
+            {
+                {
+                    allowing(mockedDocument).getXObjects(
+                        with(equal(new LocalDocumentReference("XWiki", "XWikiGroups"))));
+                    will(new CustomAction("return a vector of group members")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            return new Vector<BaseObject>(memberObjects.values());
+                        }
+                    });
+                }
+            });
+        }
+
+        private BaseObject mockGroupBaseObject(String user)
+        {
+            ++objectNumber;
+
+            final BaseObject userBaseObject = mockery.mock(BaseObject.class, getName() + objectNumber);
+
+            return userBaseObject;
+        }
+
+        @Override
+        public Map<DocumentReference, List<BaseObject>> getLegacyXObjects()
+        {
+            Map<DocumentReference, List<BaseObject>> xobjects = super.getLegacyXObjects();
+
+            xobjects.put(new DocumentReference(this.space.wiki.getName(), "XWiki", "XWikiUsers"),
+                new ArrayList<BaseObject>(this.memberObjects.values()));
+
+            return xobjects;
+        }
+
+        @Override
+        public void addUser(String userName)
+        {
+            TestWiki testWiki = space.getWiki();
+
+            Set<String> groups = testWiki.groupsForUser.get(userName);
+            if (groups == null) {
+                groups = new HashSet<String>();
+                testWiki.groupsForUser.put(userName, groups);
+            }
+            groups.add(getName());
+
+            testWiki.groups.get(getName()).add(userName);
+
+            this.memberObjects.put(userName, mockGroupBaseObject(userName));
+        }
+
+        public void removeUser(String userName)
+        {
+            this.memberObjects.remove(userName);
+        }
+    }
+
     private class TestDocument extends TestAcl
     {
+        protected final XWikiDocument mockedDocument;
 
-        private final XWikiDocument mockedDocument;
+        protected final TestSpace space;
 
-        private final TestSpace space;
+        protected final String name;
 
-        private final String name;
-
-        private final String creator;
+        protected final String creator;
 
         private List<BaseObject> globalRights;
 
         private List<BaseObject> documentRights;
 
-        TestDocument(String name, TestSpace space, String creator, final Boolean isNew)
+        TestDocument(final String name, final TestSpace space, final String creator, final Boolean isNew)
         {
             this.space = space;
             this.name = name;
@@ -674,17 +896,9 @@ public class LegacyTestWiki extends AbstractTestWiki
             mockery.checking(new Expectations()
             {
                 {
-                    allowing(mockedDocument).getObjects("XWiki.XWikiGlobalRights");
-                    will(new CustomAction("return a vector of global rights")
-                    {
-                        @Override
-                        public Object invoke(Invocation invocation)
-                        {
-                            return getLegacyGlobalRights();
-                        }
-                    });
-                    allowing(mockedDocument).getObjects("XWiki.XWikiRights");
-                    will(new CustomAction("return a vector of document rights")
+                    allowing(mockedDocument).getXObjects(
+                        with(equal(new LocalDocumentReference("XWiki", "XWikiRights"))));
+                    will(new CustomAction("return a vector of rights")
                     {
                         @Override
                         public Object invoke(Invocation invocation)
@@ -692,50 +906,76 @@ public class LegacyTestWiki extends AbstractTestWiki
                             return getLegacyDocumentRights();
                         }
                     });
-                    allowing(mockedDocument).getXObjects(with(any(DocumentReference.class)));
+                    allowing(mockedDocument).getXObjects(
+                        with(equal(new LocalDocumentReference("XWiki", "XWikiGlobalRights"))));
                     will(new CustomAction("return a vector of rights")
                     {
                         @Override
                         public Object invoke(Invocation invocation)
                         {
-                            DocumentReference classReference = (DocumentReference) invocation.getParameter(0);
-                            if (classReference.getName().equals("XWikiRights")) {
-                                return getLegacyDocumentRights();
-                            } else if (classReference.getName().equals("XWikiGlobalRights")) {
-                                return getLegacyGlobalRights();
-                            }
-                            return null;
+                            return getLegacyGlobalRights();
                         }
                     });
-                    allowing(mockedDocument).getXObjects(with(any(EntityReference.class)));
+                    allowing(mockedDocument).getXObjects(
+                        new DocumentReference(space.wiki.getName(), "XWiki", "XWikiRights"));
                     will(new CustomAction("return a vector of rights")
                     {
                         @Override
                         public Object invoke(Invocation invocation)
                         {
-                            EntityReference classReference = (EntityReference) invocation.getParameter(0);
-                            if (classReference.getName().equals("XWikiRights")) {
-                                return getLegacyDocumentRights();
-                            } else if (classReference.getName().equals("XWikiGlobalRights")) {
-                                return getLegacyGlobalRights();
-                            }
-                            return null;
+                            return getLegacyDocumentRights();
+                        }
+                    });
+                    allowing(mockedDocument).getXObjects(
+                        new DocumentReference(space.wiki.getName(), "XWiki", "XWikiGlobalRights"));
+                    will(new CustomAction("return a vector of rights")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            return getLegacyGlobalRights();
                         }
                     });
                     allowing(mockedDocument).getCreatorReference();
                     will(returnValue(documentReferenceResolver.resolve(TestDocument.this.creator, documentReference)));
-                    allowing(mockedDocument).getWikiName();
-                    will(returnValue(getSpace().getWiki().getName()));
                     allowing(mockedDocument).getDocumentReference();
                     will(returnValue(documentReference));
-                    allowing(mockedDocument).getDatabase();
-                    will(returnValue(getSpace().getWiki().getName()));
-                    allowing(mockedDocument).getSpace();
-                    will(returnValue(getSpace().getName()));
                     allowing(mockedDocument).isNew();
                     will(returnValue(isNew));
                 }
             });
+
+            if (legacymock) {
+                mockery.checking(new Expectations()
+                {
+                    {
+                        allowing(mockedDocument).getObjects("XWiki.XWikiGlobalRights");
+                        will(new CustomAction("return a vector of global rights")
+                        {
+                            @Override
+                            public Object invoke(Invocation invocation)
+                            {
+                                return getLegacyGlobalRights();
+                            }
+                        });
+                        allowing(mockedDocument).getObjects("XWiki.XWikiRights");
+                        will(new CustomAction("return a vector of document rights")
+                        {
+                            @Override
+                            public Object invoke(Invocation invocation)
+                            {
+                                return getLegacyDocumentRights();
+                            }
+                        });
+                        allowing(mockedDocument).getWikiName();
+                        will(returnValue(getSpace().getWiki().getName()));
+                        allowing(mockedDocument).getDatabase();
+                        will(returnValue(getSpace().getWiki().getName()));
+                        allowing(mockedDocument).getSpace();
+                        will(returnValue(getSpace().getName()));
+                    }
+                });
+            }
         }
 
         public XWikiDocument getDocument()
@@ -759,6 +999,23 @@ public class LegacyTestWiki extends AbstractTestWiki
             return getLegacyRightObjects();
         }
 
+        public Map<DocumentReference, List<BaseObject>> getLegacyXObjects()
+        {
+            Map<DocumentReference, List<BaseObject>> objects = new HashMap<DocumentReference, List<BaseObject>>();
+
+            Vector<BaseObject> globalRights = getLegacyGlobalRights();
+            if (globalRights != null) {
+                objects.put(new DocumentReference(this.space.wiki.getName(), "XWiki", "XWikiGlobalRights"),
+                    globalRights);
+            }
+            Vector<BaseObject> rights = getLegacyDocumentRights();
+            if (globalRights != null) {
+                objects.put(new DocumentReference(this.space.wiki.getName(), "XWiki", "XWikiRights"), rights);
+            }
+
+            return objects;
+        }
+
         @Override
         String getName()
         {
@@ -771,11 +1028,10 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
     }
 
-    private static int objectNumber = 0;
+    public static int objectNumber = 0;
 
     private abstract class TestAcl implements HasAcl
     {
-
         private final Map<String, String> allowUser = new HashMap<String, String>();
 
         private final Map<String, String> denyUser = new HashMap<String, String>();
@@ -817,27 +1073,28 @@ public class LegacyTestWiki extends AbstractTestWiki
             if (mockedObjects == null) {
                 mockedObjects = new ArrayList<BaseObject>();
                 for (String name : allowUser.keySet()) {
-                    mockedObjects.add(mockBaseObject(name, allowUser.get(name), true, true));
+                    mockedObjects.add(mockRightBaseObject(name, allowUser.get(name), true, true));
                 }
                 for (String name : denyUser.keySet()) {
-                    mockedObjects.add(mockBaseObject(name, denyUser.get(name), true, false));
+                    mockedObjects.add(mockRightBaseObject(name, denyUser.get(name), true, false));
                 }
                 for (String name : allowGroup.keySet()) {
-                    mockedObjects.add(mockBaseObject(name, allowGroup.get(name), false, true));
+                    mockedObjects.add(mockRightBaseObject(name, allowGroup.get(name), false, true));
                 }
                 for (String name : denyGroup.keySet()) {
-                    mockedObjects.add(mockBaseObject(name, denyGroup.get(name), false, false));
+                    mockedObjects.add(mockRightBaseObject(name, denyGroup.get(name), false, false));
                 }
             }
+
             return mockedObjects.size() == 0 ? null : new Vector<BaseObject>(mockedObjects);
         }
 
-        private BaseObject mockBaseObject(final String name, final String type, final boolean isUser,
+        private BaseObject mockRightBaseObject(final String name, final String type, final boolean isUser,
             final boolean allow)
         {
             objectNumber++;
 
-            final BaseObject baseObj = mockery.mock(BaseObject.class, getName() + objectNumber);
+            final BaseObject rightBaseObjects = mockery.mock(BaseObject.class, getName() + objectNumber);
 
             final BaseProperty<BaseObjectReference> usersProperty =
                 mockery.mock(BaseProperty.class, getName() + objectNumber + "users");
@@ -856,19 +1113,19 @@ public class LegacyTestWiki extends AbstractTestWiki
             mockery.checking(new Expectations()
             {
                 {
-                    allowing(baseObj).getIntValue("allow");
+                    allowing(rightBaseObjects).getIntValue("allow");
                     will(returnValue(allow ? 1 : 0));
 
                     // New security module
-                    allowing(baseObj).safeget("users");
+                    allowing(rightBaseObjects).safeget("users");
                     will(returnValue(usersProperty));
                     allowing(usersProperty).getValue();
                     will(returnValue(users));
-                    allowing(baseObj).safeget("groups");
+                    allowing(rightBaseObjects).safeget("groups");
                     will(returnValue(groupsProperty));
                     allowing(groupsProperty).getValue();
                     will(returnValue(groups));
-                    allowing(baseObj).safeget("levels");
+                    allowing(rightBaseObjects).safeget("levels");
                     will(returnValue(levelsProperty));
                     allowing(levelsProperty).getValue();
                     will(returnValue(levels));
@@ -880,19 +1137,40 @@ public class LegacyTestWiki extends AbstractTestWiki
                 {
                     {
                         // Old security module
-                        allowing(baseObj).getStringValue("users");
+                        allowing(rightBaseObjects).getStringValue("users");
                         will(returnValue(usersString));
-                        allowing(baseObj).getStringValue("groups");
+                        allowing(rightBaseObjects).getStringValue("groups");
                         will(returnValue(groupsString));
-                        allowing(baseObj).getStringValue("levels");
+                        allowing(rightBaseObjects).getStringValue("levels");
                         will(returnValue(levelsString));
                     }
                 });
             }
 
-            return baseObj;
+            return rightBaseObjects;
         }
-
     }
 
+    // Modifications
+
+    public void deleteUser(String userName, String wikiName)
+    {
+        final TestWiki wiki = this.wikis.get(wikiName);
+
+        wiki.deleteUser(userName);
+    }
+
+    public void deleteGroup(String groupName, String wikiName)
+    {
+        final TestWiki wiki = wikis.get(wikiName);
+
+        wiki.deleteGroup(groupName);
+    }
+
+    public void deleteDocument(DocumentReference documentReference)
+    {
+        final TestWiki wiki = wikis.get(documentReference.getWikiReference().getName());
+
+        wiki.deleteDocument(documentReference);
+    }
 }

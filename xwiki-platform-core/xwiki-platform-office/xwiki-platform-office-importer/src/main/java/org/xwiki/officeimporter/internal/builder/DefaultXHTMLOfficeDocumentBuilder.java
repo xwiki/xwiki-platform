@@ -40,9 +40,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
@@ -66,7 +66,7 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
      * Used to obtain document converter.
      */
     @Inject
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     /**
      * Office HTML cleaner.
@@ -91,8 +91,8 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         // The office converter uses the output file name extension to determine the output format/syntax.
         String outputFileName = StringUtils.substringBeforeLast(officeFileName, ".") + ".html";
         try {
-            artifacts = this.officeManager.getConverter().convert(inputStreams, officeFileName, outputFileName);
-        } catch (OpenOfficeConverterException ex) {
+            artifacts = this.officeServer.getConverter().convert(inputStreams, officeFileName, outputFileName);
+        } catch (OfficeConverterException ex) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), ex);
         }

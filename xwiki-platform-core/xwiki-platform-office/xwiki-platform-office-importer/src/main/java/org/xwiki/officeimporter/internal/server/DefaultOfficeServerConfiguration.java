@@ -17,27 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.office;
+package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.artofsolving.jodconverter.office.OfficeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
+import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 
 /**
- * Default implementation of {@link OpenOfficeConfiguration}.
+ * Default {@link OfficeServerConfiguration} implementation.
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 5.0M2
  */
 @Component
-public class DefaultOfficeConfiguration implements OpenOfficeConfiguration, Initializable
+@Singleton
+public class DefaultOfficeServerConfiguration implements OfficeServerConfiguration, Initializable
 {
     /**
      * Prefix for configuration keys for the office module.
@@ -45,32 +47,32 @@ public class DefaultOfficeConfiguration implements OpenOfficeConfiguration, Init
     private static final String PREFIX = "openoffice.";
 
     /**
-     * @see OpenOfficeConfiguration#getServerType()
+     * @see OfficeServerConfiguration#getServerType()
      */
     private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
 
     /**
-     * @see OpenOfficeConfiguration#getServerPort()
+     * @see OfficeServerConfiguration#getServerPort()
      */
     private static final int DEFAULT_SERVER_PORT = 8100;
 
     /**
-     * @see OpenOfficeConfiguration#isAutoStart()
+     * @see OfficeServerConfiguration#isAutoStart()
      */
     private static final boolean DEFAULT_AUTO_START = false;
 
     /**
-     * @see OpenOfficeConfiguration#getMaxTasksPerProcess()
+     * @see OfficeServerConfiguration#getMaxTasksPerProcess()
      */
     private static final int DEFAULT_MAX_TASKS_PER_PROCESS = 50;
 
     /**
-     * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
+     * @see OfficeServerConfiguration#getTaskExecutionTimeout()
      */
     private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
 
     /**
-     * @see OpenOfficeConfiguration#getHomePath()
+     * @see OfficeServerConfiguration#getHomePath()
      */
     private String defaultHomePath;
 

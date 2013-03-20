@@ -19,37 +19,35 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
+import org.xwiki.component.annotation.Role;
+import org.xwiki.officeimporter.server.OfficeServerConfiguration;
+
 /**
- * Represents exceptions encountered during operations related to {@link OpenOfficeManager} operations.
+ * Configuration properties for office importer module.
+ * <p>
+ * These configuration properties are defined in XWiki's global configuration file using the prefix of "officeimporter".
+ * </p>
  * 
  * @version $Id$
  * @since 1.8RC3
+ * @deprecated since 5.0M2, use the {@link OfficeServerConfiguration} instead.
  */
-public class OpenOfficeManagerException extends Exception
+@Role
+@Deprecated
+public interface OpenOfficeConfiguration extends OfficeServerConfiguration
 {
     /**
-     * Class version.
+     * Indicates an internally managed office server instance.
      */
-    private static final long serialVersionUID = 4165514722538231532L;
+    int SERVER_TYPE_INTERNAL = 0;
 
     /**
-     * Constructs a new {@link OpenOfficeManagerException}.
-     * 
-     * @param message the string explaining the error.
+     * Indicates an externally managed locally deployed office server instance.
      */
-    public OpenOfficeManagerException(String message)
-    {
-        super(message);
-    }
+    int SERVER_TYPE_EXTERNAL_LOCAL = 1;
 
     /**
-     * Constructs a new {@link OpenOfficeManagerException}.
-     * 
-     * @param message the string explaining the error.
-     * @param throwable the {@link Throwable} which is the cause of this exception.
+     * Indicates an externally managed remotely deployed office server instance.
      */
-    public OpenOfficeManagerException(String message, Throwable throwable)
-    {
-        super(message, throwable);
-    }
+    int SERVER_TYPE_EXTERNAL_REMOTE = 2;
 }

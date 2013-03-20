@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.office;
+package org.xwiki.officeimporter.internal.converter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,18 +28,19 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
+import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 
 /**
- * Default implementation of {@link OpenOfficeConverter}.
+ * Default {@link OfficeConverter} implementation.
  * 
  * @version $Id$
- * @since 2.2M1
+ * @since 5.0M2
  */
-public class DefaultOfficeConverter implements OpenOfficeConverter
+public class DefaultOfficeConverter implements OfficeConverter
 {
     /**
      * The logger to log.
@@ -47,7 +48,7 @@ public class DefaultOfficeConverter implements OpenOfficeConverter
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOfficeConverter.class);
 
     /**
-     * Converter provided by jodconverter library.
+     * Converter provided by JODConverter library.
      */
     private OfficeDocumentConverter converter;
 
@@ -59,7 +60,7 @@ public class DefaultOfficeConverter implements OpenOfficeConverter
     /**
      * Creates a new {@link DefaultOfficeConverter} instance.
      * 
-     * @param converter provided by jodconverter library.
+     * @param converter provided by JODConverter library.
      * @param workDir space for holding temporary file.
      */
     public DefaultOfficeConverter(OfficeDocumentConverter converter, File workDir)
@@ -70,12 +71,12 @@ public class DefaultOfficeConverter implements OpenOfficeConverter
 
     @Override
     public Map<String, byte[]> convert(Map<String, InputStream> inputStreams, String inputFileName,
-        String outputFileName) throws OpenOfficeConverterException
+        String outputFileName) throws OfficeConverterException
     {
         // Verify whether an input stream is present for the main input file.
         if (null == inputStreams.get(inputFileName)) {
             String message = "No input stream specified for main input file [%s].";
-            throw new OpenOfficeConverterException(String.format(message, inputFileName));
+            throw new OfficeConverterException(String.format(message, inputFileName));
         }
 
         OfficeConverterFileStorage storage = null;
@@ -112,7 +113,7 @@ public class DefaultOfficeConverter implements OpenOfficeConverter
 
             return result;
         } catch (Exception ex) {
-            throw new OpenOfficeConverterException("Error while performing conversion.", ex);
+            throw new OfficeConverterException("Error while performing conversion.", ex);
         } finally {
             if (!storage.cleanUp()) {
                 LOGGER.error("Could not cleanup temporary storage after conversion.");
@@ -121,8 +122,8 @@ public class DefaultOfficeConverter implements OpenOfficeConverter
     }
 
     @Override
-    public boolean isMediaTypeSupported(String mediaType)
+    public DocumentFormatRegistry getFormatRegistry()
     {
-        return this.converter.getFormatRegistry().getFormatByMediaType(mediaType) != null;
+        return converter.getFormatRegistry();
     }
 }

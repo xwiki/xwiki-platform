@@ -30,13 +30,17 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.artofsolving.jodconverter.document.DocumentFamily;
+import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -55,11 +59,6 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class DefaultOfficeViewer extends AbstractOfficeViewer
 {
     /**
-     * File extensions corresponding to presentation office documents.
-     */
-    private static final List<String> PRESENTATION_FORMATS = Arrays.asList("ppt", "pptx", "odp");
-
-    /**
      * Used to build XDOM documents from office documents.
      */
     @Inject
@@ -70,6 +69,12 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
      */
     @Inject
     private PresentationBuilder presentationBuilder;
+
+    /**
+     * Used to access the document converter.
+     */
+    @Inject
+    private OfficeServer officeServer;
 
     /**
      * The logger to log.
@@ -167,6 +172,11 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
     private boolean isPresentation(String fileName)
     {
         String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-        return PRESENTATION_FORMATS.contains(extension);
+        OfficeConverter officeConverter = officeServer.getConverter();
+        if (officeConverter != null) {
+            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
+            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+        }
+        return false;
     }
 }

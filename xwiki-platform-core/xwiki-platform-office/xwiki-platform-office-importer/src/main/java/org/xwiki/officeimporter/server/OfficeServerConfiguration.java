@@ -17,21 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.openoffice;
+package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Configuration properties for office importer module.
- * <p>
- * These configuration properties are defined in XWiki's global configuration file using the prefix of "officeimporter".
- * </p>
+ * Configuration properties for the {@link OfficeServer}. They are defined in XWiki's global configuration file using
+ * the prefix of "officeimporter".
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 5.0M2
  */
 @Role
-public interface OpenOfficeConfiguration
+@Unstable
+public interface OfficeServerConfiguration
 {
     /**
      * Indicates an internally managed office server instance.

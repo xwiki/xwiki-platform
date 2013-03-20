@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.office;
+package org.xwiki.officeimporter.internal.server;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +32,9 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
+import org.xwiki.officeimporter.server.OfficeServer;
+import org.xwiki.officeimporter.server.OfficeServerConfiguration;
+import org.xwiki.officeimporter.server.OfficeServerException;
 
 /**
  * Listens to application start and stop events in order to automatically start and stop an office server instance (if
@@ -44,21 +44,21 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @since 2.0M1
  */
 @Component
-@Named("oomanager")
+@Named("OfficeServerLifecycleListener")
 @Singleton
-public class OfficeManagerLifecycleListener implements EventListener
+public class OfficeServerLifecycleListener implements EventListener
 {
     /**
-     * The {@link OpenOfficeConfiguration} component.
+     * The configuration component.
      */
     @Inject
-    private OpenOfficeConfiguration officeConfig;
+    private OfficeServerConfiguration officeServerConfig;
 
     /**
-     * The {@link OpenOfficeManager} component.
+     * The office server component.
      */
     @Inject
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     /**
      * The logger to log.
@@ -75,7 +75,7 @@ public class OfficeManagerLifecycleListener implements EventListener
     @Override
     public String getName()
     {
-        return "oomanager";
+        return "OfficeServerLifecycleListener";
     }
 
     @Override
@@ -93,10 +93,10 @@ public class OfficeManagerLifecycleListener implements EventListener
      */
     private void startOfficeServer()
     {
-        if (this.officeConfig.isAutoStart()) {
+        if (this.officeServerConfig.isAutoStart()) {
             try {
-                this.officeManager.start();
-            } catch (OpenOfficeManagerException ex) {
+                this.officeServer.start();
+            } catch (OfficeServerException ex) {
                 this.logger.error(ex.getMessage(), ex);
             }
         }
@@ -110,8 +110,8 @@ public class OfficeManagerLifecycleListener implements EventListener
         // TODO: We shouldn't stop the office server if it hasn't been started automatically or if the configuration
         // doesn't say to stop it automatically.
         try {
-            this.officeManager.stop();
-        } catch (OpenOfficeManagerException ex) {
+            this.officeServer.stop();
+        } catch (OfficeServerException ex) {
             this.logger.error(ex.getMessage(), ex);
         }
     }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.office;
+package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
 import java.io.InputStream;
@@ -33,20 +33,21 @@ import org.artofsolving.jodconverter.office.OfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.internal.converter.DefaultOfficeConverter;
+import org.xwiki.officeimporter.server.OfficeServer;
+import org.xwiki.officeimporter.server.OfficeServerConfiguration;
+import org.xwiki.officeimporter.server.OfficeServerException;
 
 /**
- * Default implementation of {@link OpenOfficeManager} component.
+ * Default {@link OfficeServer} implementation.
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 5.0M2
  */
 @Component
 @Singleton
-public class DefaultOfficeManager implements OpenOfficeManager
+public class DefaultOfficeServer implements OfficeServer
 {
     /**
      * The path to the file that can be used to configure the office document conversion.
@@ -54,10 +55,10 @@ public class DefaultOfficeManager implements OpenOfficeManager
     private static final String DOCUMENT_FORMATS_PATH = "/document-formats.js";
 
     /**
-     * The {@link OpenOfficeConfiguration} component.
+     * The office server configuration.
      */
     @Inject
-    private OpenOfficeConfiguration conf;
+    private OfficeServerConfiguration config;
 
     /**
      * Used to query global temporary working directory.
@@ -84,53 +85,53 @@ public class DefaultOfficeManager implements OpenOfficeManager
     /**
      * Current office server process state.
      */
-    private ManagerState state;
+    private ServerState state;
 
     /**
      * Used for carrying out document conversion tasks.
      */
-    private OpenOfficeConverter converter;
+    private OfficeConverter converter;
 
     /**
      * Default constructor.
      */
-    public DefaultOfficeManager()
+    public DefaultOfficeServer()
     {
-        setState(ManagerState.NOT_CONNECTED);
+        setState(ServerState.NOT_CONNECTED);
     }
 
     /**
      * Initialize JodConverter.
      * 
-     * @throws OpenOfficeManagerException when failed to initialize
+     * @throws OfficeServerException when failed to initialize
      */
-    public void initialize() throws OpenOfficeManagerException
+    public void initialize() throws OfficeServerException
     {
-        if (this.conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
+        if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_INTERNAL) {
             DefaultOfficeManagerConfiguration configuration = new DefaultOfficeManagerConfiguration();
-            configuration.setPortNumber(this.conf.getServerPort());
+            configuration.setPortNumber(this.config.getServerPort());
 
-            String homePath = this.conf.getHomePath();
+            String homePath = this.config.getHomePath();
             if (homePath != null) {
                 configuration.setOfficeHome(homePath);
             }
 
-            String profilePath = this.conf.getProfilePath();
+            String profilePath = this.config.getProfilePath();
             if (profilePath != null) {
                 configuration.setTemplateProfileDir(new File(profilePath));
             }
 
-            configuration.setMaxTasksPerProcess(this.conf.getMaxTasksPerProcess());
-            configuration.setTaskExecutionTimeout(this.conf.getTaskExecutionTimeout());
+            configuration.setMaxTasksPerProcess(this.config.getMaxTasksPerProcess());
+            configuration.setTaskExecutionTimeout(this.config.getTaskExecutionTimeout());
             this.jodManager = configuration.buildOfficeManager();
-        } else if (this.conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
+        } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
             ExternalOfficeManagerConfiguration externalProcessOfficeManager = new ExternalOfficeManagerConfiguration();
-            externalProcessOfficeManager.setPortNumber(this.conf.getServerPort());
+            externalProcessOfficeManager.setPortNumber(this.config.getServerPort());
             externalProcessOfficeManager.setConnectOnStart(true);
             this.jodManager = externalProcessOfficeManager.buildOfficeManager();
         } else {
-            setState(ManagerState.CONF_ERROR);
-            throw new OpenOfficeManagerException("Invalid office server configuration.");
+            setState(ServerState.CONF_ERROR);
+            throw new OfficeServerException("Invalid office server configuration.");
         }
 
         this.jodConverter = null;
@@ -138,8 +139,7 @@ public class DefaultOfficeManager implements OpenOfficeManager
         InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH);
         if (input != null) {
             try {
-                this.jodConverter =
-                    new OfficeDocumentConverter(this.jodManager, new JsonDocumentFormatRegistry(input));
+                this.jodConverter = new OfficeDocumentConverter(this.jodManager, new JsonDocumentFormatRegistry(input));
             } catch (Exception e) {
                 this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
                     DOCUMENT_FORMATS_PATH, e);
@@ -158,13 +158,13 @@ public class DefaultOfficeManager implements OpenOfficeManager
     }
 
     @Override
-    public ManagerState getState()
+    public ServerState getState()
     {
         return this.state;
     }
 
     @Override
-    public void start() throws OpenOfficeManagerException
+    public void start() throws OfficeServerException
     {
         // If the office server is running then stop it in order to restart the connection.
         stop();
@@ -172,34 +172,34 @@ public class DefaultOfficeManager implements OpenOfficeManager
         initialize();
         try {
             this.jodManager.start();
-            setState(ManagerState.CONNECTED);
+            setState(ServerState.CONNECTED);
             this.logger.info("Open Office instance started.");
         } catch (Exception e) {
-            setState(ManagerState.ERROR);
-            throw new OpenOfficeManagerException("Error while connecting / starting the office server.", e);
+            setState(ServerState.ERROR);
+            throw new OfficeServerException("Error while connecting / starting the office server.", e);
         }
     }
 
     @Override
-    public void stop() throws OpenOfficeManagerException
+    public void stop() throws OfficeServerException
     {
         // We should try stopping the office server even if the status is not connected but we should not raise an
         // error if there is a failure to stop.
-        boolean connected = checkState(ManagerState.CONNECTED);
+        boolean connected = checkState(ServerState.CONNECTED);
         try {
             this.jodManager.stop();
-            setState(ManagerState.NOT_CONNECTED);
+            setState(ServerState.NOT_CONNECTED);
             this.logger.info("Open Office instance stopped.");
         } catch (Exception e) {
             if (connected) {
-                setState(ManagerState.ERROR);
-                throw new OpenOfficeManagerException("Error while disconnecting / shutting down the office server.", e);
+                setState(ServerState.ERROR);
+                throw new OfficeServerException("Error while disconnecting / shutting down the office server.", e);
             }
         }
     }
 
     @Override
-    public OpenOfficeConverter getConverter()
+    public OfficeConverter getConverter()
     {
         return this.converter;
     }
@@ -209,7 +209,7 @@ public class DefaultOfficeManager implements OpenOfficeManager
      * 
      * @param newState new state.
      */
-    private void setState(ManagerState newState)
+    private void setState(ServerState newState)
     {
         this.state = newState;
     }
@@ -220,7 +220,7 @@ public class DefaultOfficeManager implements OpenOfficeManager
      * @param expectedState expected state.
      * @return true if office manger is in given state, false otherwise.
      */
-    private boolean checkState(ManagerState expectedState)
+    private boolean checkState(ServerState expectedState)
     {
         return (this.state == expectedState);
     }

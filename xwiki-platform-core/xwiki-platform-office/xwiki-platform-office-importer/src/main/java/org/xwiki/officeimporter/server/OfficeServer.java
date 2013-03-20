@@ -17,26 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.openoffice;
+package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component interface for managing the office server connection / process.
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 5.0M2
  */
 @Role
-public interface OpenOfficeManager
+@Unstable
+public interface OfficeServer
 {
     /**
-     * Enum type used to represent the state of {@link OpenOfficeManager}.
-     * 
-     * @version $Id$
-     * @since 1.9M1
+     * Enumeration used to represent the office server state.
      */
-    public enum ManagerState
+    public enum ServerState
     {
         /**
          * Connected.
@@ -61,52 +61,51 @@ public interface OpenOfficeManager
         /**
          * Description of current server state.
          */
-        private String stateDescription;
+        private String description;
 
         /**
-         * Enum constructor.
+         * Creates a new instance.
          * 
-         * @param stateDescription description of current server state.
+         * @param description description of current server state
          */
-        private ManagerState(String stateDescription)
+        private ServerState(String description)
         {
-            this.stateDescription = stateDescription;
+            this.description = description;
         }
 
         @Override
         public String toString()
         {
-            return this.stateDescription;
+            return this.description;
         }
     }
 
     /**
-     * @return current state of {@link OpenOfficeManager}.
+     * @return current server state
      */
-    ManagerState getState();
+    ServerState getState();
 
     /**
-     * If an internally managed office server is configured (xwiki.properties), this method will start an office
-     * server process and connect to it. Otherwise this method will try to connect to an external office server
-     * instance configured through xwiki.properties. Calling {@link OpenOfficeManager#start()} on an already started /
-     * connected {@link OpenOfficeManager} has no effect.
+     * If an internally managed office server is configured (xwiki.properties), this method will start an office server
+     * process and connect to it. Otherwise this method will try to connect to an external office server instance
+     * configured through xwiki.properties. Calling {@link #start()} on an already started / connected server has no
+     * effect.
      * 
-     * @throws OpenOfficeManagerException if the start operation fails.
+     * @throws OfficeServerException if the start operation fails
      */
-    void start() throws OpenOfficeManagerException;
+    void start() throws OfficeServerException;
 
     /**
      * If an internally managed office server is configured (xwiki.properties), this method will disconnect from the
-     * office server and terminate the server process. Otherwise this method will simply disconnect from the
-     * external office server. Calling {@link OpenOfficeManager#stop()} on an already stopped / disconnected
-     * {@link OpenOfficeManager} has no effect.
+     * office server and terminate the server process. Otherwise this method will simply disconnect from the external
+     * office server. Calling {@link #stop()} on an already stopped / disconnected server has no effect.
      * 
-     * @throws OpenOfficeManagerException if stop operation fails.
+     * @throws OfficeServerException if stop operation fails
      */
-    void stop() throws OpenOfficeManagerException;
+    void stop() throws OfficeServerException;
 
     /**
-     * @return {@link OpenOfficeConverter} instance suitable for performing document conversion tasks.
+     * @return {@link OfficeConverter} instance suitable for performing document conversion tasks
      */
-    OpenOfficeConverter getConverter();
+    OfficeConverter getConverter();
 }

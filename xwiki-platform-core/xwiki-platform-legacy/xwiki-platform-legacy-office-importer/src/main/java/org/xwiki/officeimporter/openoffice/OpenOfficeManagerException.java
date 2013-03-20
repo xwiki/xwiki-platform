@@ -20,36 +20,38 @@
 package org.xwiki.officeimporter.openoffice;
 
 /**
- * Represents exceptions encountered during office document conversion operations.
+ * Represents exceptions encountered during operations related to {@link OpenOfficeManager} operations.
  * 
  * @version $Id$
- * @since 2.2M1
+ * @since 1.8RC3
+ * @deprecated since 5.0M2, use {@link org.xwiki.officeimporter.server.OfficeServerException} instead.
  */
-public class OpenOfficeConverterException extends Exception
+@Deprecated
+public class OpenOfficeManagerException extends Exception
 {
     /**
      * Class version.
      */
-    private static final long serialVersionUID = 7417601047224881884L;
+    private static final long serialVersionUID = 4165514722538231532L;
 
     /**
-     * Constructs a new {@link OpenOfficeConverterException}.
+     * Constructs a new {@link OpenOfficeManagerException}.
      * 
      * @param message the string explaining the error.
      */
-    public OpenOfficeConverterException(String message)
+    public OpenOfficeManagerException(String message)
     {
         super(message);
     }
 
     /**
-     * Constructs a new {@link OpenOfficeConverterException}.
+     * Constructs a new {@link OpenOfficeManagerException}.
      * 
      * @param message the string explaining the error.
-     * @param cause the {@link Throwable} which is the cause of this exception.
+     * @param throwable the {@link Throwable} which is the cause of this exception.
      */
-    public OpenOfficeConverterException(String message, Throwable cause)
+    public OpenOfficeManagerException(String message, Throwable throwable)
     {
-        super(message, cause);
+        super(message, throwable);
     }
 }

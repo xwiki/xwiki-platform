@@ -40,9 +40,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -72,7 +72,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * Used to obtain document converter.
      */
     @Inject
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     /**
      * Used to access current context document.
@@ -139,8 +139,8 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
             // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
             // artifact displays a screen shot of the first presentation slide.
-            return this.officeManager.getConverter().convert(inputStreams, officeFileName, "img0.html");
-        } catch (OpenOfficeConverterException e) {
+            return this.officeServer.getConverter().convert(inputStreams, officeFileName, "img0.html");
+        } catch (OfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), e);
         }
@@ -153,7 +153,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * with the given {@code nameSpace} to avoid name conflicts.
      * 
      * @param presentationArtifacts the map of presentation artifacts; this method removes some of the presentation
-     *        artifacts and renames others so be aware of the side effects
+     *            artifacts and renames others so be aware of the side effects
      * @param nameSpace the prefix to add in front of all slide image names to prevent name conflicts
      * @return the presentation HTML
      */
@@ -204,8 +204,8 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     protected String cleanPresentationHTML(String dirtyHTML, DocumentReference targetDocumentReference)
     {
         HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
-        configuration.setParameters(Collections.singletonMap("targetDocument", this.entityReferenceSerializer
-            .serialize(targetDocumentReference)));
+        configuration.setParameters(Collections.singletonMap("targetDocument",
+            this.entityReferenceSerializer.serialize(targetDocumentReference)));
         Document xhtmlDocument = this.officeHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
         HTMLUtils.stripHTMLEnvelope(xhtmlDocument);
         return HTMLUtils.toString(xhtmlDocument);
@@ -216,7 +216,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * 
      * @param html the HTML text to parse
      * @param targetDocumentReference specifies the document where the presentation will be imported; we use the target
-     *        document reference to get the syntax of the target document;
+     *            document reference to get the syntax of the target document;
      * @return a XDOM tree
      * @throws OfficeImporterException if parsing the given HTML fails
      */

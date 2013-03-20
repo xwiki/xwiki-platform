@@ -32,11 +32,11 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.server.OfficeServer;
 
 /**
  * Test case for {@link DefaultXHTMLOfficeDocumentBuilder}.
@@ -64,7 +64,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
     /**
      * Used to setup a mock document converter.
      */
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     @Override
     @Before
@@ -72,7 +72,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
     {
         super.setUp();
         this.xhtmlDocumentBuilder = getComponentManager().getInstance(XHTMLOfficeDocumentBuilder.class);
-        this.officeManager = getComponentManager().getInstance(OpenOfficeManager.class);
+        this.officeServer = getComponentManager().getInstance(OfficeServer.class);
     }
 
     /**
@@ -88,22 +88,22 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put(OUTPUT_FILE_NAME, "<html><head><title></tile></head><body></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
+        final OfficeConverter mockDocumentConverter = getMockery().mock(OfficeConverter.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockOfficeManager).getConverter();
+                oneOf(mockOfficeServer).getConverter();
                 will(returnValue(mockDocumentConverter));
 
                 try {
                     allowing(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
                     will(returnValue(mockOutput));
-                } catch (OpenOfficeConverterException e) {
+                } catch (OfficeConverterException e) {
                     Assert.fail(e.getMessage());
                 }
             }
         });
-        ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
+        ReflectionUtils.setFieldValue(officeServer, "converter", mockDocumentConverter);
 
         // Create & register a mock entity reference serializer.
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");

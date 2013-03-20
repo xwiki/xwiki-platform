@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.office;
+package org.xwiki.officeimporter.internal.converter;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
 /**
- * Keeps track of file system storage used by {@link org.xwiki.officeimporter.openoffice.OpenOfficeConverter} for a
+ * Keeps track of file system storage used by {@link org.xwiki.officeimporter.converter.OfficeConverter} for a
  * particular conversion.
  * 
  * @version $Id$
@@ -66,8 +66,7 @@ public class OfficeConverterFileStorage
      * @param outputFileName main output file into which result of the office conversion will be written into.
      * @throws IOException if an error occurs while creating temporary directory structure.
      */
-    public OfficeConverterFileStorage(File parentDir, String inputFileName, String outputFileName)
-        throws IOException
+    public OfficeConverterFileStorage(File parentDir, String inputFileName, String outputFileName) throws IOException
     {
         boolean success = false;
 

@@ -19,7 +19,7 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
-import org.xwiki.officeimporter.internal.office.script.OfficeManagerScriptService;
+import org.xwiki.officeimporter.internal.server.script.OfficeServerScriptService;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -28,7 +28,7 @@ import org.xwiki.script.service.ScriptService;
  * @version $Id$
  * @since 1.9RC1
  * @deprecated since 4.1M1 use the {@link ScriptService} with hint "officemanager" instead; the office manager script
- *             service has a method to retrieve the configuration, {@link OfficeManagerScriptService#getConfig()}
+ *             service has a method to retrieve the configuration, {@link OfficeServerScriptService#getConfig()}
  */
 @Deprecated
 public class OpenOfficeConfigurationVelocityBridge

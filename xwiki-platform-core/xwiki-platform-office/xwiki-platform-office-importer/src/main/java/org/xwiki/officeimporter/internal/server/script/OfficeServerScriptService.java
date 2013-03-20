@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.office.script;
+package org.xwiki.officeimporter.internal.server.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,9 +28,9 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.ModelContext;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
+import org.xwiki.officeimporter.server.OfficeServer;
+import org.xwiki.officeimporter.server.OfficeServerConfiguration;
+import org.xwiki.officeimporter.server.OfficeServerException;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -42,7 +42,7 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("officemanager")
 @Singleton
-public class OfficeManagerScriptService implements ScriptService
+public class OfficeServerScriptService implements ScriptService
 {
     /**
      * The key used to place any error messages while trying to control the office server instance.
@@ -78,10 +78,10 @@ public class OfficeManagerScriptService implements ScriptService
     private ModelContext modelContext;
 
     /**
-     * The {@link OpenOfficeManager} component.
+     * The office server.
      */
     @Inject
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     /**
      * The {@link DocumentAccessBridge} component.
@@ -93,7 +93,7 @@ public class OfficeManagerScriptService implements ScriptService
      * The office server configuration.
      */
     @Inject
-    private OpenOfficeConfiguration config;
+    private OfficeServerConfiguration officeServerConfig;
 
     /**
      * Tries to start the office server process.
@@ -108,9 +108,9 @@ public class OfficeManagerScriptService implements ScriptService
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
-                this.officeManager.start();
+                this.officeServer.start();
                 return true;
-            } catch (OpenOfficeManagerException ex) {
+            } catch (OfficeServerException ex) {
                 logger.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
@@ -131,9 +131,9 @@ public class OfficeManagerScriptService implements ScriptService
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
-                this.officeManager.stop();
+                this.officeServer.stop();
                 return true;
-            } catch (OpenOfficeManagerException ex) {
+            } catch (OfficeServerException ex) {
                 logger.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
@@ -146,15 +146,15 @@ public class OfficeManagerScriptService implements ScriptService
      */
     public String getServerState()
     {
-        return this.officeManager.getState().toString();
+        return this.officeServer.getState().toString();
     }
 
     /**
      * @return the office server configuration
      */
-    public OpenOfficeConfiguration getConfig()
+    public OfficeServerConfiguration getConfig()
     {
-        return config;
+        return officeServerConfig;
     }
 
     /**

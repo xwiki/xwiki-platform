@@ -33,9 +33,8 @@ import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.server.OfficeServer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -59,7 +58,7 @@ public class OfficeExporter extends PdfExportImpl
     /**
      * The component used to access the office document converter.
      */
-    private OpenOfficeManager ooManager = Utils.getComponent(OpenOfficeManager.class);
+    private OfficeServer ooManager = Utils.getComponent(OfficeServer.class);
 
     /**
      * The object used to get the media type corresponding to a filename extension. This object knows all the document
@@ -79,7 +78,7 @@ public class OfficeExporter extends PdfExportImpl
      */
     public ExportType getExportType(String format)
     {
-        if (ooManager.getState() == ManagerState.CONNECTED) {
+        if (ooManager.getState() == OfficeServer.ServerState.CONNECTED) {
             DocumentFormat documentFormat = documentFormatRegistry.getFormatByExtension(format);
             if (documentFormat != null) {
                 return new ExportType(documentFormat.getMediaType(), documentFormat.getExtension());
@@ -119,7 +118,7 @@ public class OfficeExporter extends PdfExportImpl
         inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes(charset)));
         addEmbeddedObjects(inputStreams, context);
 
-        OpenOfficeConverter documentConverter = ooManager.getConverter();
+        OfficeConverter documentConverter = ooManager.getConverter();
         try {
             Map<String, byte[]> ouput = documentConverter.convert(inputStreams, inputFileName, outputFileName);
 

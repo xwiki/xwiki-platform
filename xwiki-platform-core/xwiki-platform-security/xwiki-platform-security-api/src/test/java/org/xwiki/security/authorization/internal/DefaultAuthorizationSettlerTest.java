@@ -46,7 +46,6 @@ import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.internal.EntityBridge;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -69,7 +68,6 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * @version $Id$
  * @since 4.0M2
  */
-@MockingRequirement(DefaultAuthorizationSettler.class)
 public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCase
 {
     @Rule

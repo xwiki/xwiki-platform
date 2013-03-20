@@ -39,7 +39,9 @@ import org.jmock.Mockery;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -279,7 +281,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
             }
         });
-        
+
         if (legacymock) {
             mockery.checking(new Expectations()
             {
@@ -513,41 +515,6 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
 
         @Override
-        public void addUser(String name)
-        {
-            users.add(name);
-            if (groupsForUser.get(name) == null) {
-                groupsForUser.put(name, new HashSet<String>());
-            }
-
-            TestSpace testSpace = mockSpace("XWiki");
-
-            UserTestDocument userTestDocument = new UserTestDocument(name, testSpace, null, false);
-
-            testSpace.documents.put(name, userTestDocument);
-        }
-
-        @Override
-        public HasUsers addGroup(final String groupName)
-        {
-            Set<String> groupMembers = groups.get(groupName);
-
-            if (groupMembers == null) {
-                groupMembers = new HashSet<String>();
-                groups.put(groupName, groupMembers);
-            }
-
-            TestSpace testSpace = mockSpace("XWiki");
-
-            GroupTestDocument groupTestDocument = new GroupTestDocument(groupName, testSpace, null, false);
-
-            testSpace.documents.put(groupName, groupTestDocument);
-
-            return groupTestDocument;
-
-        }
-
-        @Override
         public HasDocuments addSpace(String name)
         {
             return mockSpace(name);
@@ -624,6 +591,12 @@ public class LegacyTestWiki extends AbstractTestWiki
             return groups == null ? Collections.<String> emptySet() : groups;
         }
 
+        void notifyCreatedDocument(XWikiDocument document)
+        {
+            // Send event
+            observationManager.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
+        }
+
         void notifyDeleteDocument(XWikiDocument document)
         {
             XWikiDocument newDocument = new XWikiDocument(document.getDocumentReference());
@@ -632,6 +605,24 @@ public class LegacyTestWiki extends AbstractTestWiki
             // Send event
             observationManager.notify(new DocumentDeletedEvent(newDocument.getDocumentReference()), newDocument,
                 context);
+        }
+
+        @Override
+        public void addUser(String name)
+        {
+            users.add(name);
+            if (groupsForUser.get(name) == null) {
+                groupsForUser.put(name, new HashSet<String>());
+            }
+
+            TestSpace testSpace = mockSpace("XWiki");
+
+            UserTestDocument userTestDocument = new UserTestDocument(name, testSpace, null, false);
+
+            testSpace.documents.put(name, userTestDocument);
+
+            // Send event
+            notifyCreatedDocument(userTestDocument.getDocument());
         }
 
         void deleteUser(String userName)
@@ -652,6 +643,28 @@ public class LegacyTestWiki extends AbstractTestWiki
             }
         }
 
+        @Override
+        public GroupTestDocument addGroup(final String groupName)
+        {
+            Set<String> groupMembers = groups.get(groupName);
+
+            if (groupMembers == null) {
+                groupMembers = new HashSet<String>();
+                groups.put(groupName, groupMembers);
+            }
+
+            TestSpace testSpace = mockSpace("XWiki");
+
+            GroupTestDocument groupTestDocument = new GroupTestDocument(groupName, testSpace, null, false);
+
+            testSpace.documents.put(groupName, groupTestDocument);
+
+            // Send event
+            notifyCreatedDocument(groupTestDocument.getDocument());
+
+            return groupTestDocument;
+        }
+
         void deleteGroup(String groupName)
         {
             if (groups.containsKey(groupName)) {
@@ -666,6 +679,16 @@ public class LegacyTestWiki extends AbstractTestWiki
                 // Send event
                 notifyDeleteDocument(groupDocument);
             }
+        }
+
+        TestDocument addDocument(DocumentReference documentReference, String creator, boolean isNew)
+        {
+            TestDocument document = mockDocument(documentReference.getParent().getName(), creator, creator, isNew);
+
+            // Send event
+            notifyCreatedDocument(document.getDocument());
+
+            return document;
         }
 
         void deleteDocument(DocumentReference documentReference)
@@ -1153,24 +1176,55 @@ public class LegacyTestWiki extends AbstractTestWiki
 
     // Modifications
 
+    public void addUser(String userName, String wikiName)
+    {
+        TestWiki wiki = this.wikis.get(wikiName);
+
+        wiki.addUser(userName);
+    }
+
     public void deleteUser(String userName, String wikiName)
     {
-        final TestWiki wiki = this.wikis.get(wikiName);
+        TestWiki wiki = this.wikis.get(wikiName);
 
         wiki.deleteUser(userName);
     }
 
+    public void addGroup(String groupName, String wikiName)
+    {
+        TestWiki wiki = wikis.get(wikiName);
+
+        wiki.addGroup(groupName);
+    }
+
     public void deleteGroup(String groupName, String wikiName)
     {
-        final TestWiki wiki = wikis.get(wikiName);
+        TestWiki wiki = wikis.get(wikiName);
 
         wiki.deleteGroup(groupName);
     }
 
+    public TestDocument addDocument(DocumentReference documentReference, String creator, boolean isNew)
+    {
+        TestWiki wiki = wikis.get(documentReference.getWikiReference().getName());
+
+        return wiki.addDocument(documentReference, creator, isNew);
+    }
+
     public void deleteDocument(DocumentReference documentReference)
     {
-        final TestWiki wiki = wikis.get(documentReference.getWikiReference().getName());
+        TestWiki wiki = wikis.get(documentReference.getWikiReference().getName());
 
         wiki.deleteDocument(documentReference);
+    }
+
+    public void notifyDocumentModified(DocumentReference documentReference)
+    {
+        TestWiki wiki = wikis.get(documentReference.getWikiReference().getName());
+
+        XWikiDocument document = wiki.getDocument(documentReference);
+
+        // Send event
+        observationManager.notify(new DocumentUpdatedEvent(documentReference), document, context);
     }
 }

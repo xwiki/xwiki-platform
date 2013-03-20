@@ -39,12 +39,6 @@ public class XWikiSecurityAccess implements SecurityAccess
     /** The default access size. Check to update defaultAccess if a new Right is added. */
     private static int defaultAccessSize;
 
-    /** The initial import access. */
-    private static XWikiSecurityAccess initialImportAccess;
-
-    /** The initial import access size. Check to update defaultAccess if a new Right is added. */
-    private static int initialImportAccessSize;
-
     /** Allowed rights. */
     protected RightSet allowed = new RightSet();
 
@@ -64,27 +58,6 @@ public class XWikiSecurityAccess implements SecurityAccess
             }
         }
         return defaultAccess;
-    }
-
-
-    /**
-     * @return the initial import access, which is all rights implied by admin.
-     */
-    public static synchronized XWikiSecurityAccess getInitialImportAccess()
-    {
-        if (initialImportAccess == null || Right.size() != initialImportAccessSize) {
-            initialImportAccessSize = Right.size();
-            initialImportAccess = new XWikiSecurityAccess();
-            for (Right right : Right.values()) {
-                if (Right.ADMIN.getImpliedRights().contains(right)) {
-                    initialImportAccess.allow(right);
-                } else {
-                    initialImportAccess.set(right, right.getDefaultState());
-                }
-            }
-            initialImportAccess.allow(Right.ADMIN);
-        }
-        return initialImportAccess;
     }
 
     /**

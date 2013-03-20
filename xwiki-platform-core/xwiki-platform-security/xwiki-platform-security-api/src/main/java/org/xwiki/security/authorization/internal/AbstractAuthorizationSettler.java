@@ -22,7 +22,6 @@ package org.xwiki.security.authorization.internal;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Set;
-import java.util.Iterator;
 
 import javax.inject.Inject;
 
@@ -31,11 +30,11 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.RightSet;
-import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
+import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.internal.EntityBridge;
@@ -180,51 +179,13 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         }
     }
 
-    /**
-     * Determine if the wiki is in its initial import state.
-     *
-     * @param user A user reference.
-     * @param groups A collection of group references.
-     * @param ruleEntries The set of rule entries that has been collected for the current entity.
-     * @return {\code true} if the wiki is in its initial import state.
-     */
-    private boolean isInitialImportState(UserSecurityReference user,
-         Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries)
-    {
-        if (ruleEntries.getLast().getRules().size() == 0 && user.isGlobal()) {
-
-            // No rules at main wiki indicate initial import state of the wiki.  Initial import rights are granted to
-            // users of main wiki to all entities in main wiki.
-
-            int level = 0;
-            for (Iterator<SecurityRuleEntry> r = ruleEntries.descendingIterator(); r.hasNext(); level++) {
-                SecurityRuleEntry e = r.next();
-
-                if (level == 1) {
-                    // If the entity type at the second level is wiki, we are settling for an entity in a
-                    // virtual wiki.  But the initial import state is only relevant for the main wiki.
-
-                    return e.getReference().getType() != EntityType.WIKI;
-                }
-            }
-
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public SecurityAccessEntry settle(UserSecurityReference user,
         Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries)
     {
+        XWikiSecurityAccess access = new XWikiSecurityAccess();
         SecurityReference reference = ruleEntries.getFirst().getReference();
 
-        if (isInitialImportState(user, groups, ruleEntries)) {
-            return new InternalSecurityAccessEntry(user, reference,
-                                                   XWikiSecurityAccess.getInitialImportAccess());
-        }
-
-        XWikiSecurityAccess access = new XWikiSecurityAccess();
         Policies policies = new Policies();
 
         for (SecurityRuleEntry entry : ruleEntries) {

@@ -136,7 +136,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         switch (entity.getType()) {
             case WIKI:
                 wikiReference = new WikiReference(entity);
-                SpaceReference wikiSpace = new SpaceReference(XWikiConstants.WIKI_SPACE, wikiReference);
+                SpaceReference wikiSpace = new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference);
                 documentReference = new DocumentReference(XWikiConstants.WIKI_DOC, wikiSpace);
                 classReference = new DocumentReference(XWikiConstants.GLOBAL_CLASSNAME, wikiSpace);
                 break;
@@ -144,7 +144,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                 wikiReference = new WikiReference(entity.extractReference(EntityType.WIKI));
                 documentReference = new DocumentReference(XWikiConstants.SPACE_DOC, new SpaceReference(entity));
                 classReference = new DocumentReference(XWikiConstants.GLOBAL_CLASSNAME,
-                    new SpaceReference(XWikiConstants.WIKI_SPACE, wikiReference));
+                    new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
                 break;
             default:
                 EntityReference relatedDocument = entity.extractReference(EntityType.DOCUMENT);
@@ -152,7 +152,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                     wikiReference = new WikiReference(relatedDocument.extractReference(EntityType.WIKI));
                     documentReference = new DocumentReference(relatedDocument);
                     classReference = new DocumentReference(XWikiConstants.LOCAL_CLASSNAME,
-                        new SpaceReference(XWikiConstants.WIKI_SPACE, wikiReference));
+                        new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
                 } else {
                     this.logger.debug("Rights on entities of type {} is not supported by this reader!",
                                       entity.getType());

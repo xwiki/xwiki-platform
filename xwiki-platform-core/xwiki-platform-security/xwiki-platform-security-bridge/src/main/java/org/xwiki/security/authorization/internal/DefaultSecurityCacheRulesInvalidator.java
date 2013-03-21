@@ -222,7 +222,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     private void deliverUpdateEvent(DocumentReference ref)
     {
         if (ref.getName().equals(XWikiConstants.WIKI_DOC)
-            && ref.getLastSpaceReference().getName().equals(XWikiConstants.WIKI_SPACE)) {
+            && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)) {
             securityCache.remove(securityReferenceFactory.newEntityReference(ref.getWikiReference()));
         } else if (ref.getName().equals(XWikiConstants.SPACE_DOC)) {
             securityCache.remove(securityReferenceFactory.newEntityReference(ref.getParent()));

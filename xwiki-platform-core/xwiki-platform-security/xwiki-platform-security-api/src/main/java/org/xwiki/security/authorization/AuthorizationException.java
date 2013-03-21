@@ -78,7 +78,7 @@ public class AuthorizationException extends Exception
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("[%s] when checking access to %s for user [%s]",
+        super(new Formatter().format("%s when checking access to %s for user [%s]",
                                      message,
                                      entityReference,
                                      userReference).toString(), cause);
@@ -94,7 +94,7 @@ public class AuthorizationException extends Exception
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("[%s] when checking access to [%s]",
+        super(new Formatter().format("%s when checking access to [%s]",
                                      message, 
                                      entityReference).toString(), cause);
     }

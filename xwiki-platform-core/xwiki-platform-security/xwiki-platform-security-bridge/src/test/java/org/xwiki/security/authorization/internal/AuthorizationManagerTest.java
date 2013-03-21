@@ -87,27 +87,6 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testRightOnUserAndDelete() throws Exception
-    {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "usersAndGroups.xml", false);
-
-        XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setDatabase("wiki");
-
-        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user"),
-            new DocumentReference("wiki", "Space", "Page"), ctx);
-        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user2"),
-            new DocumentReference("wiki", "Space", "Page"), ctx);
-
-        testWiki.deleteUser("user", "wiki");
-
-        assertAccessFalse("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user"),
-            new DocumentReference("wiki", "Space", "Page"), ctx);
-        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user2"),
-            new DocumentReference("wiki", "Space", "Page"), ctx);
-    }
-
-    @Test
     public void testPublicAccess() throws Exception
     {
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
@@ -192,5 +171,28 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
             document, ctx);
         assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.ADMIN, user,
             document, ctx);
+    }
+
+    // Cache tests
+
+    @Test
+    public void testRightOnUserAndDelete() throws Exception
+    {
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "usersAndGroups.xml", false);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki");
+
+        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
+        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user2"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
+
+        testWiki.deleteUser("user", "wiki");
+
+        assertAccessFalse("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
+        assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user2"),
+            new DocumentReference("wiki", "Space", "Page"), ctx);
     }
 }

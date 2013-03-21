@@ -41,6 +41,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * Migration for XWIKI-8948: Each property type should be stored in its own database table.
  * 
  * @version $Id$
+ * @since 5.0M2
  */
 @Component
 @Named("R50000XWIKI8948")

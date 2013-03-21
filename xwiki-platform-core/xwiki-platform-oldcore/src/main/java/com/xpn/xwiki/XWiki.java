@@ -1028,32 +1028,40 @@ public class XWiki implements EventListener
         }
     }
 
-    public String getWikiOwner(String servername, XWikiContext context) throws XWikiException
+    /**
+     * Get the reference of the owner for the provider wiki.
+     * 
+     * @param wikiName the technical name of the wiki
+     * @param context the XWiki context
+     * @return the wiki owner or null if none is set
+     * @throws XWikiException failed to get wiki descriptor document
+     */
+    public String getWikiOwner(String wikiName, XWikiContext context) throws XWikiException
     {
-        String wikiOwner = context.getWikiOwner();
+        String wikiOwner;
 
-        if (!context.isMainWiki(servername)) {
-            String serverwikipage = getServerWikiPage(servername);
+        String currentdatabase = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
 
-            String currentdatabase = context.getDatabase();
+            String serverwikipage = getServerWikiPage(wikiName);
+            XWikiDocument doc = getDocument(serverwikipage, context);
 
-            try {
-                context.setDatabase(context.getMainXWiki());
-
-                XWikiDocument doc = getDocument(serverwikipage, context);
-
-                if (doc.isNew()) {
+            if (doc.isNew()) {
+                if (!context.isMainWiki(wikiName)) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki " + servername + " does not exist");
+                        "The wiki " + wikiName + " does not exist");
+                } else {
+                    wikiOwner = null;
                 }
-
+            } else {
                 wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
                 if (wikiOwner.indexOf(':') == -1) {
                     wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
                 }
-            } finally {
-                context.setDatabase(currentdatabase);
             }
+        } finally {
+            context.setDatabase(currentdatabase);
         }
 
         return wikiOwner;

@@ -34,6 +34,8 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -64,7 +66,8 @@ public class XWikiContext extends Hashtable<Object, Object>
      * 
      * @since 5.0M1
      */
-    public static ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class, XWikiContext.class);
+    public static ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class,
+        XWikiContext.class);
 
     public static final int MODE_SERVLET = 0;
 
@@ -81,6 +84,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     public static final int MODE_GWT_DEBUG = 6;
 
     public static final String EXECUTIONCONTEXT_KEY = "xwikicontext";
+
+    /** Logging helper object. */
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiContext.class);
 
     private static final String WIKI_KEY = "wiki";
 
@@ -123,10 +129,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     private XWikiURLFactory URLFactory;
 
     private XmlRpcServer xmlRpcServer;
-
-    private String wikiOwner;
-
-    private XWikiDocument wikiServer;
 
     private int cacheDuration = 0;
 
@@ -560,24 +562,52 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.xmlRpcServer = xmlRpcServer;
     }
 
+    /**
+     * @deprecated never made any sense since the context database can change any time
+     */
+    @Deprecated
     public void setWikiOwner(String wikiOwner)
     {
-        this.wikiOwner = wikiOwner;
+        // Cannot do anything
     }
 
+    /**
+     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
+     */
+    @Deprecated
     public String getWikiOwner()
     {
-        return this.wikiOwner;
+        try {
+            return getWiki().getWikiOwner(getDatabase(), this);
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to get owner for wiki [{}]", getDatabase(), e);
+        }
+
+        return null;
     }
 
+    /**
+     * @deprecated never made any sense since the context database can change any time
+     */
+    @Deprecated
     public void setWikiServer(XWikiDocument doc)
     {
-        this.wikiServer = doc;
+        // Cannot do anything
     }
 
+    /**
+     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
+     */
+    @Deprecated
     public XWikiDocument getWikiServer()
     {
-        return this.wikiServer;
+        try {
+            return getWiki().getDocument(XWiki.getServerWikiPage(getDatabase()), this);
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to get wiki descriptor for wiki [{}]", getDatabase(), e);
+        }
+
+        return null;
     }
 
     public int getCacheDuration()
@@ -756,7 +786,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * There are several places where the XWiki context needs to be declared in the execution, so we add a common method
      * here.
-     *
+     * 
      * @param executionContext The execution context.
      */
     public void declareInExecutionContext(ExecutionContext executionContext)

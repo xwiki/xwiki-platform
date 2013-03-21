@@ -53,9 +53,9 @@ public class UserAndGroupReferenceResolver implements DocumentReferenceResolver<
         EntityReference defaultSpace;
         if (parameters.length > 0) {
             EntityReference defaultWiki = ((EntityReference) parameters[0]).extractReference(EntityType.WIKI);
-            defaultSpace = new EntityReference(XWikiConstants.XWIKI_SPACE, EntityType.SPACE, defaultWiki);
+            defaultSpace = new EntityReference(XWikiConstants.WIKI_SPACE, EntityType.SPACE, defaultWiki);
         } else {
-            defaultSpace = resolver.resolve(XWikiConstants.XWIKI_SPACE, EntityType.SPACE);
+            defaultSpace = resolver.resolve(XWikiConstants.WIKI_SPACE, EntityType.SPACE);
         }
         return new DocumentReference(resolver.resolve(documentReferenceRepresentation,
                                                       EntityType.DOCUMENT,

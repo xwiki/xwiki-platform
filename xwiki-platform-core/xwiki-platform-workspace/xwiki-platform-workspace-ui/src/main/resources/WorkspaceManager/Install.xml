@@ -134,7 +134,7 @@
       #if ($xwiki.version.endsWith('SNAPSHOT'))
         #set ($repositoryLocation = 'public-snapshots')
       #end
-      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/${repositoryLocation}/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/xwiki-enterprise-ui-all-${xwiki.version}.xar"]){{/error}}
+      {{error}}$msg.get('workspacemanager.template.install.error.missingtemplateattachment', [$TEMPLATE_PACKAGE, $doc.fullName, "http://nexus.xwiki.org/nexus/content/groups/${repositoryLocation}/org/xwiki/enterprise/xwiki-enterprise-ui-all/${xwiki.version}/"]){{/error}}
     #end
   #else
     #set ($needsAdminRights = true)

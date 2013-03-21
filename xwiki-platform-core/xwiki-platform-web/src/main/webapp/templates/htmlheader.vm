@@ -35,9 +35,9 @@
     ## Legacy, for IE
     <link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" />
     ## Present, HTML5
-    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" sizes="16x16" type="image/png" />
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" />
     ## The future, scalable icons
-    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" sizes="any" type="image/svg+xml" />
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" />
     ## For smart phones and tablets
     <link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" />
     ## ---------------------------------------------------------------------------------------------------------------

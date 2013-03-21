@@ -80,7 +80,10 @@ public class DefaultXWikiBridge implements XWikiBridge
     @Override
     public boolean isWikiOwner(UserSecurityReference user, WikiReference wikiReference)
     {
-        if (user == null || wikiReference == null) {
+        if (user == null || user.getOriginalReference() == null || wikiReference == null
+            || getMainWikiReference().equals(wikiReference)) {
+            // Public users (not logged in) could not be a owner
+            // Main wiki could not be owner due to http://jira.xwiki.org/browse/XWIKI-8952
             return false;
         }
 

@@ -229,7 +229,7 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 
         for (Right right : Right.values()) {
             if (access.get(right) == RuleState.UNDETERMINED) {
-                if (!user.getOriginalReference().getWikiReference()
+                if (!user.isGlobal() && !user.getOriginalReference().getWikiReference()
                         .equals(reference.extractReference(EntityType.WIKI))) {
                     /*
                      * Deny all by default for users from another wiki.

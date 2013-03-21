@@ -21,6 +21,7 @@ package org.xwiki.security.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Formatter;
 
 import javax.inject.Inject;
@@ -67,7 +68,14 @@ public class DefaultUserBridge implements UserBridge
     public Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user, WikiReference wikiReference)
         throws AuthorizationException
     {
-        Collection<DocumentReference> groupRefs = getGroupsReferencesFor(wikiReference, user.getOriginalReference());
+        DocumentReference userRef = user.getOriginalReference();
+
+        if (userRef == null) {
+            // Public users (not logged in) may not appears in any group
+            return Collections.emptyList();
+        }
+
+        Collection<DocumentReference> groupRefs = getGroupsReferencesFor(wikiReference, userRef);
 
         Collection<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>(groupRefs.size());
         for (DocumentReference groupRef : groupRefs) {

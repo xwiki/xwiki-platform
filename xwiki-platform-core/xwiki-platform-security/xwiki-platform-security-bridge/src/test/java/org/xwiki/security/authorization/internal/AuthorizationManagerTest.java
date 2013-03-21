@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.xwiki.security.authorization.internal;
 
 import org.junit.Assert;
@@ -70,15 +71,15 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki2");
 
-        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.VIEW,
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.VIEW,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.EDIT,
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.EDIT,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.COMMENT,
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.COMMENT,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
         assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.DELETE,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.REGISTER,
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.REGISTER,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
         assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.ADMIN,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
@@ -89,7 +90,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     @Test
     public void testPublicAccess() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "emptySubWiki.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki");
@@ -147,7 +148,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     @Test
     public void testRightOnTopLevel() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "emptySubWiki.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki2");

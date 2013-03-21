@@ -85,7 +85,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      */
     private boolean isSuperAdmin(DocumentReference user)
     {
-        return StringUtils.equalsIgnoreCase(user.getName(), AuthorizationManager.SUPERADMIN_USER);
+        return user != null && StringUtils.equalsIgnoreCase(user.getName(), AuthorizationManager.SUPERADMIN_USER);
     }
 
     @Override
@@ -107,7 +107,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         try {
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
-            this.logger.error("Failed to load rights for user {}.", userReference, e);
+            this.logger.error(String.format("Failed to load rights for user [%s] on [%s].",
+                userReference, entityReference), e);
             return false;
         }
     }
@@ -130,11 +131,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         boolean check)
         throws AuthorizationException
     {
-        if (userReference == null) {
-            logDeny(userReference, entityReference, right, "missing user");
-            return false;
-        }
-
         if (isSuperAdmin(userReference)) {
             return true;
         }

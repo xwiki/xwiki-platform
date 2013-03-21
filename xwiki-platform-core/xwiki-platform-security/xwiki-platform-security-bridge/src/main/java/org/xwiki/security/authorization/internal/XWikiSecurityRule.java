@@ -33,6 +33,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
+import org.xwiki.security.internal.XWikiConstants;
 import org.xwiki.text.XWikiToStringStyle;
 
 import com.xpn.xwiki.objects.BaseObject;
@@ -66,7 +67,7 @@ public class XWikiSecurityRule implements SecurityRule
      * xwiki object.
      * @param obj An xwiki rights object.
      * @param resolver A document reference resolver for user and group pages.
-     * @param wikiReference The name of the current wiki.
+     * @param wikiReference A reference to the wiki from which these rules are extracted.
      */
     protected XWikiSecurityRule(BaseObject obj, DocumentReferenceResolver<String> resolver,
         WikiReference wikiReference)
@@ -85,6 +86,12 @@ public class XWikiSecurityRule implements SecurityRule
 
         for (String user : UsersClass.getListFromString(obj.getStringValue(XWikiConstants.USERS_FIELD_NAME))) {
             DocumentReference ref = resolver.resolve(user, wikiReference);
+            if (XWikiConstants.GUEST_USER.equals(ref.getName())) {
+                // In the database, Rights for public users (not logged in) are stored using a user named XWikiGuest,
+                // while in SecurityUserReference the original reference for those users is null. So, store rules for
+                // XWikiGuest to be matched by null.
+                ref = null;
+            }
             this.users.add(ref);
         }
 
@@ -95,7 +102,7 @@ public class XWikiSecurityRule implements SecurityRule
     }
 
     /** 
-     * Constructor used only by test code.
+     * Constructor to be used only by test code.
      * @param rights The set of rights.
      * @param state The state of this rights object.
      * @param users The set of users.

@@ -208,8 +208,8 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             userRef, docRef, defaultAccess,
             authorizationSettler.settle(userRef, Collections.<GroupSecurityReference>emptyList(), emptydocRules));
 
-        assertAccess("When no rules are defined, deny all access for main wiki user on local wiki doc",
-            xuserRef, docRef, denyAllAccess,
+        assertAccess("When no rules are defined, return default access for main wiki on local wiki doc",
+            xuserRef, docRef, defaultAccess,
             authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptydocRules));
 
         assertAccess("When no rules are defined, deny all access for another wiki user on local wiki doc",

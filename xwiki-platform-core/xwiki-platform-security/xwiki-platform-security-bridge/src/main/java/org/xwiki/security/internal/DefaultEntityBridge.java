@@ -53,6 +53,22 @@ public class DefaultEntityBridge implements EntityBridge
         return ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
     }
 
+    /**
+     * @param documentReference Reference to the document to get
+     * @return the document
+     */
+    private XWikiDocument getDocument(DocumentReference documentReference) {
+        XWikiContext context = getXWikiContext();
+        XWikiDocument document;
+        try {
+            document = context.getWiki().getDocument(documentReference, context);
+        } catch (XWikiException e) {
+            return null;
+        }
+
+        return document;
+    }
+
     @Override
     public boolean isDocumentCreator(UserSecurityReference user, SecurityReference entity)
     {
@@ -65,19 +81,19 @@ public class DefaultEntityBridge implements EntityBridge
             return false;
         }
 
-        XWikiContext context = getXWikiContext();
-        XWikiDocument document;
-        try {
-            document = context.getWiki().getDocument(documentReference, context);
-        } catch (XWikiException e) {
-            return false;
-        }
-
+        XWikiDocument document = getDocument(documentReference);
         if (document == null) {
             return false;
         }
 
         DocumentReference creator = document.getCreatorReference();
-        return user.getOriginalReference().equals(creator);
+        DocumentReference userRef = user.getOriginalReference();
+        if (userRef == null) {
+            // Document creator for public users (not logged in) may be returned as a user named XWikiGuest,
+            // so we check against it as well.
+            return creator == null || XWikiConstants.GUEST_USER.equals(creator.getName());
+        } else {
+            return userRef.equals(creator);
+        }
     }
 }

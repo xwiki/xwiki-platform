@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.security.internal.XWikiConstants;
 
 /**
  * Specialized version of {@link org.xwiki.model.reference.DocumentReferenceResolver<String>} which ensure the

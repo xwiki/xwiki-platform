@@ -40,9 +40,10 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.EntityTypeNotSupportedException;
-import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.SecurityEntryReader;
 import org.xwiki.security.authorization.SecurityRule;
+import org.xwiki.security.authorization.SecurityRuleEntry;
+import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -129,6 +130,16 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      */
     public SecurityRuleEntry read(SecurityReference entity) throws AuthorizationException
     {
+        if (entity == null) {
+            return null;
+        }
+
+        if (entity.getOriginalReference() == null) {
+            // Public users (not logged in) are not stored anywhere and does not have their own rules
+            // More generally, any reference without a valid original reference should not be considered.
+            return new InternalSecurityRuleEntry(entity, Collections.<SecurityRule>emptyList());
+        }
+
         DocumentReference documentReference;
         DocumentReference classReference;
         WikiReference wikiReference;
@@ -160,6 +171,21 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                 }
         }
 
+        return new InternalSecurityRuleEntry(entity,
+            getSecurityRules(documentReference, classReference, wikiReference));
+    }
+
+    /**
+     * Read right objects from an XWikiDocument and return them as XWikiSecurityRule.
+     * @param documentReference reference to document to read
+     * @param classReference reference to the right class to read
+     * @param wikiReference reference to the wiki of the document
+     * @return a collection of rules read from the document
+     * @throws AuthorizationException on error reading object from the document
+     */
+    private Collection<SecurityRule> getSecurityRules(DocumentReference documentReference,
+        DocumentReference classReference, WikiReference wikiReference) throws AuthorizationException
+    {
         XWikiContext context = getXWikiContext();
         List<BaseObject> baseObjects;
         List<SecurityRule> securityRules = new ArrayList<SecurityRule>();
@@ -167,7 +193,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         try {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             if (doc == null) {
-                return new InternalSecurityRuleEntry(entity, Collections.<SecurityRule>emptyList());
+                return Collections.emptyList();
             }
             baseObjects = doc.getXObjects(classReference);
         } catch (XWikiException e) {
@@ -184,7 +210,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
             }
         }
 
-        return new InternalSecurityRuleEntry(entity, securityRules);
+        return securityRules;
     }
 }
 

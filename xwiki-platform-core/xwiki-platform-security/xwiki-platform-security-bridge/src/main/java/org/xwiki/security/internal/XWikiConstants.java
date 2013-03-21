@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal;
+package org.xwiki.security.internal;
 
 /**
  * This class contains constants for accessing various xwiki elements.
@@ -25,7 +25,7 @@ package org.xwiki.security.authorization.internal;
  * @version $Id$
  * @since 4.0M2
  */
-interface XWikiConstants
+public interface XWikiConstants
 {
     /** Name of the space where user document and global preferences is stored. */
     String XWIKI_SPACE = "XWiki";

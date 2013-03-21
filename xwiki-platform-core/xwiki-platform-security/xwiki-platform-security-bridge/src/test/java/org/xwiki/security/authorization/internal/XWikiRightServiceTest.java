@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
+import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -42,9 +43,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki");
 
-        // TODO: Here we have a mismatch.
-
-        assertAccessLevelFalseExpectedDifference("User from another wiki has right on a local wiki", "view",
+        assertAccessLevelTrue("User from another wiki has right on a local wiki", "view",
             "wiki:XWiki.user", "wiki2:Space.Page", ctx);
     }
 
@@ -168,28 +167,30 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setDatabase("xwiki");
+        ctx.setDatabase("wiki");
 
-        assertAccessLevelTrue("Guest does not have view right on empty wiki.", "view", "xwiki:XWiki.XWikiGuest",
-            "xwiki:Space.Page", ctx);
+        assertAccessLevelTrue("Guest does not have view right on empty wiki.", "view", "wiki:XWiki.XWikiGuest",
+            "wiki:Space.Page", ctx);
 
-        assertAccessLevelTrue("Guest does not have edit right on empty wiki.", "edit", "xwiki:XWiki.XWikiGuest",
-            "xwiki:Space.Page", ctx);
+        assertAccessLevelTrue("Guest does not have edit right on empty wiki.", "edit", "wiki:XWiki.XWikiGuest",
+            "wiki:Space.Page", ctx);
 
-        assertAccessLevelFalseExpectedDifference("Guest should not have delete right on empty wiki.", "delete", "xwiki:XWiki.XWikiGuest",
-            "xwiki:Space.Page", ctx);
+        assertAccessLevelFalseExpectedDifference("Guest should not have delete right on empty wiki.", "delete",
+            "wiki:XWiki.XWikiGuest",
+            "wiki:Space.Page", ctx);
 
-        assertAccessLevelFalseExpectedDifference("Guest should not have admin right on empty wiki.", "admin", "xwiki:XWiki.XWikiGuest",
-            "xwiki:Space.Page", ctx);
+        assertAccessLevelFalseExpectedDifference("Guest should not have admin right on empty wiki.", "admin",
+            "wiki:XWiki.XWikiGuest",
+            "wiki:Space.Page", ctx);
 
         assertAccessLevelFalse("Guest should not have programming right on empty wiki.", "programming",
-            "xwiki:XWiki.XWikiGuest", "xwiki:Space.Page", ctx);
+            "wiki:XWiki.XWikiGuest", "wiki:Space.Page", ctx);
 
-        testWiki.setUser("xwiki:XWiki.XWikiGuest");
+        testWiki.setUser("wiki:XWiki.XWikiGuest");
 
         assertWikiAdminRightsFalseExpectedDifference("Guest should not have admin right on empty wiki.", ctx);
 
-        testWiki.setDoc("xwiki:Space.Page");
+        testWiki.setDoc("wiki:Space.Page");
 
         assertAdminRightsFalseExpectedDifference("Guest should not have admin right on empty wiki.", ctx);
     }

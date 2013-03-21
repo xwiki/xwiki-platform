@@ -100,7 +100,7 @@ public class R50000XWIKI8948DataMigration extends AbstractHibernateDataMigration
                 connection.createStatement().execute(
                     "DELETE FROM xwikilargestrings xls WHERE EXISTS (SELECT * FROM xwikiproperties xwp WHERE"
                         + "  xwp.XWP_ID = xls.XWL_ID AND xwp.XWP_NAME = xls.XWL_NAME AND XWP_CLASSTYPE = '"
-                        + StringListProperty.class.getName() + "')");
+                        + StringListProperty.class.getName() + "' )");
             }
         }
     }

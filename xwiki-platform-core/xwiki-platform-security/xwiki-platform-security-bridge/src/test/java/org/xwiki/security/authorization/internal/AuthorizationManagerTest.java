@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.AbstractWikiTestCase;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -44,19 +45,19 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     protected void assertAccessTrue(String message, Right right, DocumentReference userReference,
-        DocumentReference documentReference, XWikiContext ctx) throws Exception
+        EntityReference entityReference, XWikiContext ctx) throws Exception
     {
         setContext(ctx);
 
-        Assert.assertTrue(message, this.authorizationManager.hasAccess(right, userReference, documentReference));
+        Assert.assertTrue(message, this.authorizationManager.hasAccess(right, userReference, entityReference));
     }
 
     protected void assertAccessFalse(String message, Right right, DocumentReference userReference,
-        DocumentReference documentReference, XWikiContext ctx) throws Exception
+        EntityReference entityReference, XWikiContext ctx) throws Exception
     {
         setContext(ctx);
 
-        Assert.assertFalse(message, this.authorizationManager.hasAccess(right, userReference, documentReference));
+        Assert.assertFalse(message, this.authorizationManager.hasAccess(right, userReference, entityReference));
     }
 
     // Tests
@@ -114,17 +115,82 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki");
 
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.VIEW,
-            null, new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.EDIT,
-            null, new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.COMMENT,
-            null, new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.DELETE,
-            null, new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.REGISTER,
-            null, new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.PROGRAM,
-            null, new DocumentReference("wiki2", "Space", "Page"), ctx);
+        DocumentReference user = null;
+        EntityReference document = new DocumentReference("wiki2", "Space", "Page");
+
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.LOGIN, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.VIEW, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.EDIT, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.DELETE, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.REGISTER, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.COMMENT, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.PROGRAM, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.ADMIN, user,
+            document, ctx);
+    }
+
+    @Test
+    public void testPublicAccessOnTopLevel() throws Exception
+    {
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki");
+
+        DocumentReference user = null;
+        EntityReference document = null;
+
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.LOGIN, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.VIEW, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.EDIT, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.DELETE, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.REGISTER, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.COMMENT, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.PROGRAM, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.ADMIN, user,
+            document, ctx);
+    }
+
+    @Test
+    public void testRightOnTopLevel() throws Exception
+    {
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki2");
+
+        DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
+        EntityReference document = null;
+
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.LOGIN, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.VIEW, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.EDIT, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.DELETE, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.REGISTER, user,
+            document, ctx);
+        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.COMMENT, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.PROGRAM, user,
+            document, ctx);
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.ADMIN, user,
+            document, ctx);
     }
 }

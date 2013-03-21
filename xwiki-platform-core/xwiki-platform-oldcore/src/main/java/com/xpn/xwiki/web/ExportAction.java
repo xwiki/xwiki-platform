@@ -224,7 +224,7 @@ public class ExportAction extends XWikiAction
         String[] pages = request.getParameterValues("pages");
         boolean isBackup = ((pages == null) || (pages.length == 0));
 
-        if (!context.getWiki().getRightService().hasAdminRights(context)) {
+        if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");
             return "exception";
         }

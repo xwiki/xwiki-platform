@@ -617,7 +617,7 @@ public class Package
 
     public int install(XWikiContext context) throws XWikiException
     {
-        boolean isAdmin = context.getWiki().getRightService().hasAdminRights(context);
+        boolean isAdmin = context.getWiki().getRightService().hasWikiAdminRights(context);
 
         if (testInstall(isAdmin, context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             setStatus(DocumentInfo.INSTALL_IMPOSSIBLE, context);
@@ -732,7 +732,7 @@ public class Package
         try {
             context.setDatabase(context.getMainXWiki());
 
-            return context.getWiki().getRightService().hasAdminRights(context);
+            return context.getWiki().getRightService().hasWikiAdminRights(context);
         } finally {
             context.setDatabase(wiki);
         }

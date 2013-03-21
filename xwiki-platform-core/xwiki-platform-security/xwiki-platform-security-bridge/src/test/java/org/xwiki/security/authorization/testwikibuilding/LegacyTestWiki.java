@@ -56,8 +56,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseObjectReference;
-import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
@@ -1119,18 +1117,8 @@ public class LegacyTestWiki extends AbstractTestWiki
 
             final BaseObject rightBaseObjects = mockery.mock(BaseObject.class, getName() + objectNumber);
 
-            final BaseProperty<BaseObjectReference> usersProperty =
-                mockery.mock(BaseProperty.class, getName() + objectNumber + "users");
-            final BaseProperty<BaseObjectReference> groupsProperty =
-                mockery.mock(BaseProperty.class, getName() + objectNumber + "groups");
-            final BaseProperty<BaseObjectReference> levelsProperty =
-                mockery.mock(BaseProperty.class, getName() + objectNumber + "levels");
-
-            final List<String> users = isUser ? Arrays.<String> asList(name) : Collections.<String> emptyList();
-            final String usersString = users.isEmpty() ? "" : name;
-            final List<String> groups = isUser ? Collections.<String> emptyList() : Arrays.<String> asList(name);
-            final String groupsString = groups.isEmpty() ? "" : name;
-            final List<String> levels = Arrays.<String> asList(type);
+            final String usersString = isUser ? name : "";
+            final String groupsString = isUser ? "" : name;
             final String levelsString = type;
 
             mockery.checking(new Expectations()
@@ -1139,36 +1127,14 @@ public class LegacyTestWiki extends AbstractTestWiki
                     allowing(rightBaseObjects).getIntValue("allow");
                     will(returnValue(allow ? 1 : 0));
 
-                    // New security module
-                    allowing(rightBaseObjects).safeget("users");
-                    will(returnValue(usersProperty));
-                    allowing(usersProperty).getValue();
-                    will(returnValue(users));
-                    allowing(rightBaseObjects).safeget("groups");
-                    will(returnValue(groupsProperty));
-                    allowing(groupsProperty).getValue();
-                    will(returnValue(groups));
-                    allowing(rightBaseObjects).safeget("levels");
-                    will(returnValue(levelsProperty));
-                    allowing(levelsProperty).getValue();
-                    will(returnValue(levels));
+                    allowing(rightBaseObjects).getStringValue("users");
+                    will(returnValue(usersString));
+                    allowing(rightBaseObjects).getStringValue("groups");
+                    will(returnValue(groupsString));
+                    allowing(rightBaseObjects).getStringValue("levels");
+                    will(returnValue(levelsString));
                 }
             });
-
-            if (legacymock) {
-                mockery.checking(new Expectations()
-                {
-                    {
-                        // Old security module
-                        allowing(rightBaseObjects).getStringValue("users");
-                        will(returnValue(usersString));
-                        allowing(rightBaseObjects).getStringValue("groups");
-                        will(returnValue(groupsString));
-                        allowing(rightBaseObjects).getStringValue("levels");
-                        will(returnValue(levelsString));
-                    }
-                });
-            }
 
             return rightBaseObjects;
         }

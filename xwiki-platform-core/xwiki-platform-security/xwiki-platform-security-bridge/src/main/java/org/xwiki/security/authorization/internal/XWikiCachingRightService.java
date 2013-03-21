@@ -377,8 +377,12 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasAdminRights(XWikiContext context)
     {
+        XWikiDocument doc = context.getDoc();
+        if (doc == null) {
+            return hasWikiAdminRights(context);
+        }
         DocumentReference user = context.getUserReference();
-        DocumentReference document = context.getDoc().getDocumentReference();
+        DocumentReference document = doc.getDocumentReference();
         return authorizationManager.hasAccess(Right.ADMIN, user, document);
     }
 

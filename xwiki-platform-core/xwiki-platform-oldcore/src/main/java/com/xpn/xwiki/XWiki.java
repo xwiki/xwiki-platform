@@ -966,9 +966,9 @@ public class XWiki implements EventListener
      *         prefix and making it lower case. For example a page named "XWiki.XWikiServerMyDatabase" would return
      *         "mydatabase" as the wiki name. This list will also contain the main wiki.
      *         <p/>
-     *         Note: the wiki name is commonly also the name of the databse where the wiki's data is stored. However,
-     *         if configured accordingly, the database can be diferent from the wiki name, like for example when
-     *         setting a wiki database prefix.
+     *         Note: the wiki name is commonly also the name of the databse where the wiki's data is stored. However, if
+     *         configured accordingly, the database can be diferent from the wiki name, like for example when setting a
+     *         wiki database prefix.
      */
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
@@ -1077,32 +1077,40 @@ public class XWiki implements EventListener
         }
     }
 
-    public String getWikiOwner(String servername, XWikiContext context) throws XWikiException
+    /**
+     * Get the reference of the owner for the provider wiki.
+     * 
+     * @param wikiName the technical name of the wiki
+     * @param context the XWiki context
+     * @return the wiki owner or null if none is set
+     * @throws XWikiException failed to get wiki descriptor document
+     */
+    public String getWikiOwner(String wikiName, XWikiContext context) throws XWikiException
     {
-        String wikiOwner = context.getWikiOwner();
+        String wikiOwner;
 
-        if (!context.isMainWiki(servername)) {
-            String serverwikipage = getServerWikiPage(servername);
+        String currentdatabase = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
 
-            String currentdatabase = context.getDatabase();
+            String serverwikipage = getServerWikiPage(wikiName);
+            XWikiDocument doc = getDocument(serverwikipage, context);
 
-            try {
-                context.setDatabase(context.getMainXWiki());
-
-                XWikiDocument doc = getDocument(serverwikipage, context);
-
-                if (doc.isNew()) {
+            if (doc.isNew()) {
+                if (!context.isMainWiki(wikiName)) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki " + servername + " does not exist");
+                        "The wiki " + wikiName + " does not exist");
+                } else {
+                    wikiOwner = null;
                 }
-
+            } else {
                 wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
                 if (wikiOwner.indexOf(':') == -1) {
                     wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
                 }
-            } finally {
-                context.setDatabase(currentdatabase);
             }
+        } finally {
+            context.setDatabase(currentdatabase);
         }
 
         return wikiOwner;
@@ -4955,15 +4963,13 @@ public class XWiki implements EventListener
                     if (this.rightService == null) {
                         LOGGER.warn(String.format("Failed to initialize RightService [%s]"
                             + " by Reflection, using OLD implementation [%s] with 'new'.", rightsClass,
-                            XWikiRightServiceImpl.class.getCanonicalName()),
-                            lastException);
+                            XWikiRightServiceImpl.class.getCanonicalName()), lastException);
 
                         this.rightService = new XWikiRightServiceImpl();
 
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Initialized old RightService implementation "
-                                + this.rightService.getClass().getName()
-                                + " using 'new'.");
+                                + this.rightService.getClass().getName() + " using 'new'.");
                         }
                     }
                 }
@@ -6584,12 +6590,10 @@ public class XWiki implements EventListener
 
     private void onPluginPreferenceEvent(Event event, XWikiDocument doc, XWikiContext context)
     {
-        /* FIXME: This does not make sense anymore. Discard it?
-        if (!isVirtualMode()) {
-            // If the XWikiPreferences plugin propery is modified, reload all plugins.
-            preparePlugins(context);
-        }
-        */
+        /*
+         * FIXME: This does not make sense anymore. Discard it? if (!isVirtualMode()) { // If the XWikiPreferences
+         * plugin propery is modified, reload all plugins. preparePlugins(context); }
+         */
     }
 
     /**
@@ -6631,8 +6635,8 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
-     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it using
+     *             the {@code $services.localization} binding, see {@code LocalizationScriptService}
      */
     @Deprecated
     public String parseMessage(XWikiContext context)
@@ -6646,8 +6650,8 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
-     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it using
+     *             the {@code $services.localization} binding, see {@code LocalizationScriptService}
      */
     @Deprecated
     public String parseMessage(String id, XWikiContext context)
@@ -6685,8 +6689,8 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Search attachments by passing HQL where clause values as parameters.
-     * You can specify properties of the "attach" (the attachment) or "doc" (the document it is attached to)
+     * Search attachments by passing HQL where clause values as parameters. You can specify properties of the "attach"
+     * (the attachment) or "doc" (the document it is attached to)
      * 
      * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
@@ -6701,28 +6705,24 @@ public class XWiki implements EventListener
      * @since 5.0M2
      */
     @Unstable
-    public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause,
-                                                   boolean checkRight,
-                                                   int nb,
-                                                   int start,
-                                                   List< ? > parameterValues,
-                                                   XWikiContext context)
-        throws XWikiException
+    public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
 
         // Get the attachment filenames and document fullNames
-        List<java.lang.Object[]> results = this.getStore().search(
-            "select attach.filename, doc.fullName from XWikiAttachment attach, XWikiDocument doc where doc.id = attach.docId and "
-             + parametrizedSqlClause, nb, start, parameterValues, context);
+        List<java.lang.Object[]> results =
+            this.getStore().search(
+                "select attach.filename, doc.fullName from XWikiAttachment attach, XWikiDocument doc where doc.id = attach.docId and "
+                    + parametrizedSqlClause, nb, start, parameterValues, context);
 
         HashMap<String, List<String>> filenamesByDocFullName = new HashMap<String, List<String>>();
 
         // Put each attachment name with the document name it belongs to
-        for (int i=0; i<results.size(); i++) {
+        for (int i = 0; i < results.size(); i++) {
             String filename = (String) results.get(i)[0];
             String docFullName = (String) results.get(i)[1];
-            if (!filenamesByDocFullName.containsKey(docFullName)){
+            if (!filenamesByDocFullName.containsKey(docFullName)) {
                 filenamesByDocFullName.put(docFullName, new ArrayList<String>());
             }
             filenamesByDocFullName.get(docFullName).add((String) filename);
@@ -6752,7 +6752,7 @@ public class XWiki implements EventListener
 
     /**
      * Count attachments returned by a given parameterized query
-     *
+     * 
      * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
      * @param XWikiContext The underlying context used for running the database query
@@ -6767,8 +6767,10 @@ public class XWiki implements EventListener
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
 
-        List l = getStore().search("select count(attach) from XWikiAttachment attach, XWikiDocument doc where "
-                                   + "attach.docId=doc.id and " + parametrizedSqlClause, 0, 0, parameterValues, context);
+        List l =
+            getStore().search(
+                "select count(attach) from XWikiAttachment attach, XWikiDocument doc where "
+                    + "attach.docId=doc.id and " + parametrizedSqlClause, 0, 0, parameterValues, context);
         return ((Number) l.get(0)).intValue();
     }
 }

@@ -19,14 +19,13 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 
 import com.xpn.xwiki.XWikiContext;
-
-import junit.framework.Assert;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
@@ -47,7 +46,6 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         assertAccessLevelFalseExpectedDifference("User from another wiki has right on a local wiki", "view",
             "wiki:XWiki.user", "wiki2:Space.Page", ctx);
-
     }
 
     @Test

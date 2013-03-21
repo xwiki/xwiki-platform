@@ -64,15 +64,5 @@
       <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <!--
-        Required by org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry which is used in
-        DefaultOfficeViewerScriptServiceTest.
-      -->
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20080701</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>

@@ -28,9 +28,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.artofsolving.jodconverter.document.DocumentFormat;
-import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
@@ -58,30 +56,18 @@ public class OfficeExporter extends PdfExportImpl
     /**
      * The component used to access the office document converter.
      */
-    private OfficeServer ooManager = Utils.getComponent(OfficeServer.class);
+    private OfficeServer officeServer = Utils.getComponent(OfficeServer.class);
 
     /**
-     * The object used to get the media type corresponding to a filename extension. This object knows all the document
-     * formats supported by the office converter.
-     * <p>
-     * Note: This is a hack! We rely on the fact that currently the office converter uses JODConverter to convert
-     * from/to office document formats and so we use its {@link DocumentFormatRegistry} class. We can't expose this in
-     * the office importer module because all its interfaces are independent of the underlying tool used for conversion.
-     * Writing our own classes to wrap {@link DocumentFormatRegistry} and {@link DocumentFormat} is not worth at this
-     * point.
-     */
-    private DocumentFormatRegistry documentFormatRegistry = new DefaultDocumentFormatRegistry();
-
-    /**
-     * @param format the export format; usually this is a filename extension
+     * @param extension the output file name extension, which specifies the export format (e.g. pdf, odt)
      * @return the export type matching the specified format, or {@code null} if the specified format is not supported
      */
-    public ExportType getExportType(String format)
+    public ExportType getExportType(String extension)
     {
-        if (ooManager.getState() == OfficeServer.ServerState.CONNECTED) {
-            DocumentFormat documentFormat = documentFormatRegistry.getFormatByExtension(format);
-            if (documentFormat != null) {
-                return new ExportType(documentFormat.getMediaType(), documentFormat.getExtension());
+        if (officeServer.getState() == OfficeServer.ServerState.CONNECTED) {
+            DocumentFormat format = officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
+            if (format != null) {
+                return new ExportType(format.getMediaType(), format.getExtension());
             }
         }
         return null;
@@ -91,7 +77,9 @@ public class OfficeExporter extends PdfExportImpl
     protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
-        exportXHTML(xhtml, out, documentFormatRegistry.getFormatByExtension(type.getExtension()), context);
+        // We assume the office server is connected. The code calling this method should check the server state.
+        exportXHTML(xhtml, out,
+            officeServer.getConverter().getFormatRegistry().getFormatByExtension(type.getExtension()), context);
     }
 
     /**
@@ -118,9 +106,9 @@ public class OfficeExporter extends PdfExportImpl
         inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes(charset)));
         addEmbeddedObjects(inputStreams, context);
 
-        OfficeConverter documentConverter = ooManager.getConverter();
+        OfficeConverter officeConverter = officeServer.getConverter();
         try {
-            Map<String, byte[]> ouput = documentConverter.convert(inputStreams, inputFileName, outputFileName);
+            Map<String, byte[]> ouput = officeConverter.convert(inputStreams, inputFileName, outputFileName);
 
             out.write(ouput.values().iterator().next());
         } catch (Exception e) {

@@ -22,13 +22,12 @@ package org.xwiki.office.viewer.internal;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 
 import junit.framework.Assert;
 
-import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
+import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -73,9 +72,7 @@ public class DefaultOfficeViewerScriptServiceTest
         OfficeServer officeServer = mocker.getInstance(OfficeServer.class);
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(officeServer.getConverter()).thenReturn(officeConverter);
-
-        InputStream input = getClass().getResourceAsStream("/document-formats.js");
-        when(officeConverter.getFormatRegistry()).thenReturn(new JsonDocumentFormatRegistry(input));
+        when(officeConverter.getFormatRegistry()).thenReturn(new DefaultDocumentFormatRegistry());
 
         for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
             "application/vnd.oasis.opendocument.presentation", "application/vnd.ms-powerpoint",

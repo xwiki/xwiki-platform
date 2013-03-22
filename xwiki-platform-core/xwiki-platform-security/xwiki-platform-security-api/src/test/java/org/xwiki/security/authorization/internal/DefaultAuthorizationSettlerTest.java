@@ -639,7 +639,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
                 getMockedSecurityRuleEntries("denyAccessADT", docRef,
                     Arrays.asList(Arrays.asList(denyImpliedADT)))));
 
-        assertAccess("When a right implying others rights is denied, do not denied implied rights (ADT)",
+        assertAccess("When a right implying others rights is denied, do not denied implied rights (DAF)",
             userRef, docRef, denyDAFAccess,
             authorizationSettler.settle(userRef, Arrays.asList(groupRef),
                 getMockedSecurityRuleEntries("denyAccessDAF", docRef,

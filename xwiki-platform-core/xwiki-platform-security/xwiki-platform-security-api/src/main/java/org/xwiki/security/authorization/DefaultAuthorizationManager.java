@@ -136,7 +136,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         }
 
         if (right == null || right == Right.ILLEGAL) {
-            logDeny(userReference, entityReference, right, "no such right");
+            if (check) {
+                logDeny(userReference, entityReference, right, "no such right");
+            }
             return false;
         }
 
@@ -244,8 +246,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         boolean debugLevel)
     {
         if ((debugLevel && logger.isDebugEnabled()) || (!debugLevel && logger.isInfoEnabled())) {
-            String userName = (user != null) ? entityReferenceSerializer.serialize(user) : "no user";
-            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : "no entity";
+            String userName = (user != null) ? entityReferenceSerializer.serialize(user) : "Public access";
+            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : "main Wiki";
             String rightName = (right != null) ? right.getName() : "no right";
             String accessName = (access == RuleState.ALLOW) ? "granted" : "denied";
             String message = "Access has been %s for (%s,%s,%s): %s";

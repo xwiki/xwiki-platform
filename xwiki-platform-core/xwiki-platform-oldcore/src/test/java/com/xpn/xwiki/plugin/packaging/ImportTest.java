@@ -164,7 +164,7 @@ public class ImportTest extends AbstractPackageTest
         // mock the right service
         this.mockRightService = mock(XWikiRightService.class);
         this.mockRightService.stubs().method("checkAccess").will(returnValue(true));
-        this.mockRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockRightService.stubs().method("hasWikiAdminRights").will(returnValue(true));
         this.mockRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
         this.xwiki.setRightService((XWikiRightService) this.mockRightService.proxy());
     }

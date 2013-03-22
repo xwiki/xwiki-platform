@@ -120,11 +120,11 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         REGISTER = new Right("register",    ALLOW,  ALLOW, false, null, WIKI_ONLY          , false);
         COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
 
-        PROGRAM  = new Right("programming", DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), FARM_ONLY         , true);
-
         ADMIN    = new Right("admin",       DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, PROGRAM), WIKI_SPACE, true);
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), WIKI_SPACE         , true);
+
+        PROGRAM  = new Right("programming", DENY,   ALLOW, false,
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, ADMIN), FARM_ONLY   , true);
 
         ILLEGAL  = new Right("illegal",     DENY,   DENY,  false, null, null               , false);
     }

@@ -115,7 +115,8 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     static {
         LOGIN    = new Right("login",       ALLOW,  ALLOW, true,  null, WIKI_ONLY          , true);
         VIEW     = new Right("view",        ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, true);
-        EDIT     = new Right("edit",        ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
+        EDIT     = new Right("edit",        ALLOW,  DENY,  true,
+                                                    new RightSet(VIEW), WIKI_SPACE_DOCUMENT, false);
         DELETE   = new Right("delete",      DENY,   DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
         REGISTER = new Right("register",    ALLOW,  ALLOW, false, null, WIKI_ONLY          , false);
         COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);

@@ -90,13 +90,13 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     @Test
     public void testPublicAccess() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "emptySubWiki.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki");
 
         DocumentReference user = null;
-        EntityReference document = new DocumentReference("wiki2", "Space", "Page");
+        EntityReference document = new DocumentReference("wiki", "Space", "Page");
 
         assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.LOGIN, user,
             document, ctx);
@@ -148,10 +148,10 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     @Test
     public void testRightOnTopLevel() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "emptySubWiki.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setDatabase("wiki2");
+        ctx.setDatabase("wiki");
 
         DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
         EntityReference document = null;

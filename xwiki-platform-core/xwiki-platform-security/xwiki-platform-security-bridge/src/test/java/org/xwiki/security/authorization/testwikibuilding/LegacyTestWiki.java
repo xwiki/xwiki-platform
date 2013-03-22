@@ -1132,7 +1132,8 @@ public class LegacyTestWiki extends AbstractTestWiki
         {
             objectNumber++;
 
-            final BaseObject rightBaseObjects = mockery.mock(BaseObject.class, getName() + objectNumber);
+            final BaseObject rightBaseObjects =
+                mockery.mock(BaseObject.class, getName() + objectNumber + ' ' + name + ' ' + type + ' ' + allow);
 
             final String usersString = isUser ? name : "";
             final String groupsString = isUser ? "" : name;

@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.security.authorization.internal;
 
 import org.junit.Assert;
@@ -71,15 +70,15 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki2");
 
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.VIEW,
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.VIEW,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.EDIT,
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.EDIT,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.COMMENT,
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.COMMENT,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
         assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.DELETE,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
-        assertAccessTrue("User from global wiki should have the same rights on empty subwiki", Right.REGISTER,
+        assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.REGISTER,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
         assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.ADMIN,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);

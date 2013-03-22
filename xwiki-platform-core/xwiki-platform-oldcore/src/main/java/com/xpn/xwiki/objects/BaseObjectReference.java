@@ -56,18 +56,6 @@ public class BaseObjectReference extends ObjectReference
     private static final long serialVersionUID = 1L;
 
     /**
-     * Used to parse object reference name to class reference.
-     */
-    private static final DocumentReferenceResolver<String> RESOLVER = Utils
-        .getComponent(DocumentReferenceResolver.TYPE_STRING);
-
-    /**
-     * Used to serialize class reference to object reference name.
-     */
-    private static final EntityReferenceSerializer<String> SERIALIZER = Utils
-        .getComponent(EntityReferenceSerializer.TYPE_STRING);
-
-    /**
      * Used to match number part of the object reference name.
      */
     private static final Pattern NUMBERPATTERN = Pattern.compile("(\\\\*)\\[(\\d*)\\]$");
@@ -117,7 +105,9 @@ public class BaseObjectReference extends ObjectReference
      */
     private static String toName(DocumentReference classReference, Integer objectNumber)
     {
-        String name = SERIALIZER.serialize(classReference);
+        String name =
+            Utils.<EntityReferenceSerializer<String>> getComponent(EntityReferenceSerializer.TYPE_STRING).serialize(
+                classReference);
 
         if (objectNumber != null) {
             StringBuilder builder = new StringBuilder(name);
@@ -186,7 +176,9 @@ public class BaseObjectReference extends ObjectReference
             objectNumberStr = null;
         }
 
-        this.xclassReference = RESOLVER.resolve(classReferenceStr);
+        this.xclassReference =
+            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
+                classReferenceStr);
         if (objectNumberStr != null) {
             this.objectNumber = Integer.valueOf(objectNumberStr);
         }

@@ -896,10 +896,6 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         protected final String creator;
 
-        private List<BaseObject> globalRights;
-
-        private List<BaseObject> documentRights;
-
         TestDocument(final String name, final TestSpace space, final String creator, final Boolean isNew)
         {
             this.space = space;
@@ -1006,7 +1002,6 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         public Vector<BaseObject> getLegacyGlobalRights()
         {
-            Vector<BaseObject> baseObjects = new Vector<BaseObject>();
             if ("XWikiPreferences".equals(getName())) {
                 return getSpace().getWiki().getLegacyRightObjects();
             } else if ("WebPreferences".equals(getName())) {
@@ -1040,12 +1035,12 @@ public class LegacyTestWiki extends AbstractTestWiki
         @Override
         String getName()
         {
-            return name;
+            return this.name;
         }
 
         TestSpace getSpace()
         {
-            return space;
+            return this.space;
         }
     }
 
@@ -1053,61 +1048,83 @@ public class LegacyTestWiki extends AbstractTestWiki
 
     private abstract class TestAcl implements HasAcl
     {
-        private final Map<String, String> allowUser = new HashMap<String, String>();
+        private final Map<String, Set<String>> allowUser = new HashMap<String, Set<String>>();
 
-        private final Map<String, String> denyUser = new HashMap<String, String>();
+        private final Map<String, Set<String>> denyUser = new HashMap<String, Set<String>>();
 
-        private final Map<String, String> allowGroup = new HashMap<String, String>();
+        private final Map<String, Set<String>> allowGroup = new HashMap<String, Set<String>>();
 
-        private final Map<String, String> denyGroup = new HashMap<String, String>();
+        private final Map<String, Set<String>> denyGroup = new HashMap<String, Set<String>>();
 
         private List<BaseObject> mockedObjects = null;
+
+        private void addType(Map<String, Set<String>> map, String key, String type)
+        {
+            Set<String> types = map.get(key);
+
+            if (types == null) {
+                types = new HashSet<String>();
+                map.put(key, types);
+            }
+
+            types.add(type);
+        }
 
         @Override
         public void addAllowUser(String name, String type)
         {
-            allowUser.put(name, type);
+            addType(this.allowUser, name, type);
         }
 
         @Override
         public void addDenyUser(String name, String type)
         {
-            denyUser.put(name, type);
+            addType(this.denyUser, name, type);
         }
 
         @Override
         public void addAllowGroup(String name, String type)
         {
-            allowGroup.put(name, type);
+            addType(this.allowGroup, name, type);
         }
 
         @Override
         public void addDenyGroup(String name, String type)
         {
-            denyGroup.put(name, type);
+            addType(this.denyGroup, name, type);
         }
 
         abstract String getName();
 
         public Vector<BaseObject> getLegacyRightObjects()
         {
-            if (mockedObjects == null) {
-                mockedObjects = new ArrayList<BaseObject>();
-                for (String name : allowUser.keySet()) {
-                    mockedObjects.add(mockRightBaseObject(name, allowUser.get(name), true, true));
+            if (this.mockedObjects == null) {
+                this.mockedObjects = new ArrayList<BaseObject>();
+                for (Map.Entry<String, Set<String>> entry : this.allowUser.entrySet()) {
+                    for (String type : entry.getValue()) {
+                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, true));
+                    }
                 }
-                for (String name : denyUser.keySet()) {
-                    mockedObjects.add(mockRightBaseObject(name, denyUser.get(name), true, false));
+                for (Map.Entry<String, Set<String>> entry : this.denyUser.entrySet()) {
+                    for (String type : entry.getValue()) {
+                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, true));
+                    }
                 }
-                for (String name : allowGroup.keySet()) {
-                    mockedObjects.add(mockRightBaseObject(name, allowGroup.get(name), false, true));
+
+                for (Map.Entry<String, Set<String>> entry : this.allowGroup.entrySet()) {
+                    for (String type : entry.getValue()) {
+                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, true));
+                    }
                 }
-                for (String name : denyGroup.keySet()) {
-                    mockedObjects.add(mockRightBaseObject(name, denyGroup.get(name), false, false));
+
+                for (Map.Entry<String, Set<String>> entry : this.denyGroup.entrySet()) {
+                    for (String type : entry.getValue()) {
+                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, true));
+                    }
                 }
             }
 
-            return mockedObjects.size() == 0 ? null : new Vector<BaseObject>(mockedObjects);
+            return this.mockedObjects.size() == 0 ? null : new Vector<BaseObject>(this.mockedObjects);
         }
 
         private BaseObject mockRightBaseObject(final String name, final String type, final boolean isUser,

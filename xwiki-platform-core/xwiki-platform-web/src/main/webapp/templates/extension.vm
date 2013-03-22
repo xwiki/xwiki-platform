@@ -294,7 +294,7 @@
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
     <dt>$msg.get('extensions.info.namespaces.global')</dt>
-  #elseif ($xwiki.hasSubWikis() && $xcontext.isMainWiki())
+  #elseif ($xcontext.isMainWiki())
     ## Display the list of namespaces where the given extension is installed only if we are on the main wiki.
     <dt>$msg.get('extensions.info.namespaces.list')</dt>
     <dd><ul>
@@ -386,7 +386,7 @@ $namespace##
   #end
   <div class="dependency-item extension-item-$dependencyStatus">
     <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
-    #if ($xwiki.hasSubWikis() && $extensionNamespace.startsWith('wiki:'))
+    #if ($extensionNamespace.startsWith('wiki:'))
       <span class="extension-namespace">$msg.get('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
     #end
     #if ("$!dependencyStatusMessage" != '')
@@ -836,16 +836,7 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (computeUninstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #if ($extensionNamespace && $xwiki.hasSubWikis())
-    ## Create the uninstall plan only for the specified wiki.
-    #set ($discard = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
-  #else
-    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
-    #if ($extension)
-      ## Create the uninstall plan for the entire farm.
-      #set ($discard = $extensionManager.createUninstallPlan($extension.id))
-    #end
-  #end
+  #set ($discard = $extensionManager.createUninstallPlan($extensionId, $extensionNamespace))
   #handleExtensionJobStartFailure('extensions.uninstall.error.prepareFailure')
 #end
 
@@ -901,16 +892,11 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (uninstallExtension $extensionId $extensionVersion $namespaces)
-  #if ($xwiki.hasSubWikis() && $namespaces && $namespaces.size() == 1)
-    ## Uninstall only from the specified namespace.
-    #set ($discard = $extensionManager.uninstall($extensionId, $namespaces.get(0)))
-  #else
-    #set ($extension = $extensionManager.resolve($extensionId, $extensionVersion))
-    #if ($extension)
-      ## Uninstall from all namespaces.
-      #set ($discard = $extensionManager.uninstall($extension.id))
-    #end
+  #set ($namespace = $NULL)
+  #if ($namespaces && $namespaces.size() == 1)
+    #set ($namespace = $namespaces.get(0))
   #end
+  #set ($discard = $extensionManager.uninstall($extensionId, $namespace))
   #handleExtensionJobStartFailure('extensions.uninstall.error.uninstallFailure')
 #end
 
@@ -1131,14 +1117,14 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #set ($isGlobalActionSecondary = $secondary)
   #set ($globalActionExtraClassName = $NULL)
   #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace)
-    && !$installedExtension.isInstalled($NULL)) || !$xwiki.hasSubWikis())
+    && !$installedExtension.isInstalled($NULL)))
     ## Button that targets only the current wiki.
     #extensionActionButton($action $secondary)
     #set ($isGlobalActionSecondary = true)
     ## Indicate that the local action is available.
     #set ($globalActionExtraClassName = 'alternative-action')
   #end
-  #if ($xwiki.hasSubWikis() && $xcontext.isMainWiki())
+  #if ($xcontext.isMainWiki())
     ## Button that targets the entire farm.
     #extensionActionButton("${action}Globally" $isGlobalActionSecondary $globalActionExtraClassName)
   #end

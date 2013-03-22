@@ -1107,19 +1107,19 @@ public class LegacyTestWiki extends AbstractTestWiki
                 }
                 for (Map.Entry<String, Set<String>> entry : this.denyUser.entrySet()) {
                     for (String type : entry.getValue()) {
-                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, true));
+                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, false));
                     }
                 }
 
                 for (Map.Entry<String, Set<String>> entry : this.allowGroup.entrySet()) {
                     for (String type : entry.getValue()) {
-                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, true));
+                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, false, true));
                     }
                 }
 
                 for (Map.Entry<String, Set<String>> entry : this.denyGroup.entrySet()) {
                     for (String type : entry.getValue()) {
-                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, true, true));
+                        this.mockedObjects.add(mockRightBaseObject(entry.getKey(), type, false, false));
                     }
                 }
             }

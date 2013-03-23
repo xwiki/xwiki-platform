@@ -43,6 +43,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -344,7 +345,7 @@ public class LegacyTestWiki extends AbstractTestWiki
             mainWikiName = name;
         }
 
-        return mockWiki(name, owner, isReadOnly, alt);
+        return mockWiki(name, owner, isReadOnly, isMainWiki, alt);
     }
 
     public void setUser(String username)
@@ -370,12 +371,12 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
     }
 
-    private TestWiki mockWiki(String name, String owner, boolean isReadOnly, String alt)
+    private TestWiki mockWiki(String name, String owner, boolean isReadOnly, boolean isMainWiki, String alt)
     {
         TestWiki wiki = wikis.get(name);
 
         if (wiki == null) {
-            wiki = new TestWiki(name, owner, isReadOnly, alt);
+            wiki = new TestWiki(name, owner, isReadOnly, isMainWiki, alt);
             wikis.put(name, wiki);
         }
 
@@ -545,16 +546,24 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         private final boolean isReadOnly;
 
+        private final boolean isMainWiki;
+
         TestWiki(String name, String owner, boolean isReadOnly)
         {
-            this(name, owner, isReadOnly, null);
+            this(name, owner, isReadOnly, false);
         }
 
-        TestWiki(String name, String owner, boolean isReadOnly, String alt)
+        TestWiki(String name, String owner, boolean isReadOnly, boolean isMainWiki)
+        {
+            this(name, owner, isReadOnly, isMainWiki, null);
+        }
+
+        TestWiki(String name, String owner, boolean isReadOnly, boolean isMainWiki, String alt)
         {
             this.name = name;
             this.owner = owner;
             this.isReadOnly = isReadOnly;
+            this.isMainWiki = isMainWiki;
             this.alt = alt;
 
             // The XWikiPreferences document always exist (unless explicitly deleted!) since it will be created on
@@ -631,6 +640,16 @@ public class LegacyTestWiki extends AbstractTestWiki
             }
 
             return null;
+        }
+
+        @Override
+        EntityType getType()
+        {
+            if (isMainWiki) {
+                return null; // FARM
+            } else {
+                return EntityType.WIKI;
+            }
         }
 
         @Override
@@ -842,6 +861,12 @@ public class LegacyTestWiki extends AbstractTestWiki
         public TestDocument getTestDocument(String name)
         {
             return documents.get(name);
+        }
+
+        @Override
+        EntityType getType()
+        {
+            return EntityType.SPACE;
         }
 
         @Override
@@ -1142,6 +1167,12 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
 
         @Override
+        EntityType getType()
+        {
+            return EntityType.DOCUMENT;
+        }
+
+        @Override
         public String getName()
         {
             return this.name;
@@ -1188,8 +1219,8 @@ public class LegacyTestWiki extends AbstractTestWiki
         private void addRightType(Map<String, Set<String>> map, String key, String type)
         {
             if (type == null) {
-                for(String right : Right.getAllRightsAsString()) {
-                    addType(map, key, right);
+                for(Right right : Right.getEnabledRights(getType())) {
+                    addType(map, key, right.toString());
                 }
             } else {
                 addType(map, key, type);
@@ -1219,6 +1250,8 @@ public class LegacyTestWiki extends AbstractTestWiki
         {
             addType(this.denyGroup, name, type);
         }
+
+        abstract EntityType getType();
 
         abstract String getName();
 

@@ -53,13 +53,13 @@ public class AbstractAuthorizationTestCase extends AbstractWikiTestCase
     protected static final RightSet ALL_RIGHTS = new RightSet();
 
     /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN. */
-    protected static final RightSet ALL_RIGHTS_BUT_PROGRAMING = new RightSet();
+    protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING = new RightSet();
 
     /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN. */
-    protected static final RightSet ALL_RIGHTS_BUT_ADMIN = new RightSet();
+    protected static final RightSet ALL_RIGHTS_EXCEPT_ADMIN = new RightSet();
 
     /** VIEW, EDIT, COMMENT, DELETE, REGISTER. */
-    protected static final RightSet ALL_RIGHTS_BUT_LOGIN = new RightSet();
+    protected static final RightSet ALL_RIGHTS_EXCEPT_LOGIN = new RightSet();
 
     /** VIEW, EDIT, COMMENT, DELETE, ADMIN. */
     protected static final RightSet ALL_SPACE_RIGHTS = new RightSet();
@@ -72,11 +72,11 @@ public class AbstractAuthorizationTestCase extends AbstractWikiTestCase
             if (right != ILLEGAL) {
                 ALL_RIGHTS.add(right);
                 if (right != PROGRAM) {
-                    ALL_RIGHTS_BUT_PROGRAMING.add(right);
+                    ALL_RIGHTS_EXCEPT_PROGRAMING.add(right);
                     if (right != ADMIN) {
-                        ALL_RIGHTS_BUT_ADMIN.add(right);
+                        ALL_RIGHTS_EXCEPT_ADMIN.add(right);
                         if (right != LOGIN) {
-                            ALL_RIGHTS_BUT_LOGIN.add(right);
+                            ALL_RIGHTS_EXCEPT_LOGIN.add(right);
                             if (right != REGISTER) {
                                 ALL_DOCUMENT_RIGHTS.add(right);
                             }

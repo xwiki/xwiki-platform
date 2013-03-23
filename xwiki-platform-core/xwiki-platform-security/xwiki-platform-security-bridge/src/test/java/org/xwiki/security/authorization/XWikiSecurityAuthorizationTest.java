@@ -61,80 +61,114 @@ public class XWikiSecurityAuthorizationTest extends AbstractAuthorizationTestCas
     }
 
     @Test
-    public void testInheritancePolicyInMainWiki() throws Exception
+    public void testInheritancePolicyForFullFarmAccess() throws Exception
     {
-        initialiseWikiMock("inheritancePolicy");
+        initialiseWikiMock("inheritancePolicyFullFarmAccess");
 
-        //
-        // Main Wiki
-        //
+        // Main wiki allowing all access to A
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getXDoc("any document", "spaceDenyA"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getXDoc("docAllowA",    "spaceDenyA"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getXDoc("docDenyA",     "any space"));
 
-        assertAccess(ALL_RIGHTS,           getXUser("userA"), getXDoc("any document", "any space"));
-        assertAccess(ALL_RIGHTS_BUT_ADMIN, getXUser("userB"), getXDoc("any document", "any space"));
-        assertAccess(null,                 getXUser("userC"), getXDoc("any document", "any space"));
-        assertAccess(null,                 getXUser("userD"), getXDoc("any document", "any space"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("any document", "any space",  "wikiNoRules"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("any document", "spaceDenyA", "wikiNoRules"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiNoRules"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiNoRules"));
 
-        assertAccess(ALL_RIGHTS,                    getXUser("userA"), getXDoc("any document", "spaceCDnoAB"));
-        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userB"), getXDoc("any document", "spaceCDnoAB"));
-        assertAccess(ALL_SPACE_RIGHTS,              getXUser("userC"), getXDoc("any document", "spaceCDnoAB"));
-        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userD"), getXDoc("any document", "spaceCDnoAB"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("any document", "any space",   "wikiDenyA"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("any document", "spaceAllowA", "wikiDenyA"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("docDenyA",     "spaceAllowA", "wikiDenyA"));
+        assertAccess(ALL_RIGHTS, getXUser("userA"), getDoc("docAllowA",    "any space",   "wikiDenyA"));
+    }
 
-        assertAccess(ALL_RIGHTS,           getXUser("userA"), getXDoc("docABnoCD", "spaceCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_ADMIN, getXUser("userB"), getXDoc("docABnoCD", "spaceCDnoAB"));
-        assertAccess(ALL_SPACE_RIGHTS,     getXUser("userC"), getXDoc("docABnoCD", "spaceCDnoAB"));
-        assertAccess(null,                 getXUser("userD"), getXDoc("docABnoCD", "spaceCDnoAB"));
+    @Test
+    public void testInheritancePolicyForGlobalFullWikiAccess() throws Exception
+    {
+        initialiseWikiMock("inheritancePolicyForGlobalFullWikiAccess");
 
-        assertAccess(ALL_RIGHTS,                    getXUser("userA"), getXDoc("docCDnoAB", "any space"));
-        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userB"), getXDoc("docCDnoAB", "any space"));
-        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userC"), getXDoc("docCDnoAB", "any space"));
-        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userD"), getXDoc("docCDnoAB", "any space"));
+        // Main wiki denying all access to A
+        assertAccess(null,                         getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccess(ALL_SPACE_RIGHTS,             getXUser("userA"), getXDoc("any document", "spaceAllowA"));
+        assertAccess(ALL_SPACE_RIGHTS,             getXUser("userA"), getXDoc("docDenyA",     "spaceAllowA"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,          getXUser("userA"), getXDoc("docAllowA",    "any space"));
 
-        //
-        // Subwiki with no rules
-        //
+        assertAccess(null,                         getXUser("userA"), getDoc("any document", "any space",   "wikiNoRules"));
+        assertAccess(ALL_SPACE_RIGHTS,             getXUser("userA"), getDoc("any document", "spaceAllowA", "wikiNoRules"));
+        assertAccess(ALL_SPACE_RIGHTS,             getXUser("userA"), getDoc("docDenyA",     "spaceAllowA", "wikiNoRules"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,          getXUser("userA"), getDoc("docAllowA",    "any space",   "wikiNoRules"));
 
-        assertAccess(ALL_RIGHTS,           getXUser("userA"), getDoc("any document", "any space", "wikinorules"));
-        assertAccess(ALL_RIGHTS_BUT_ADMIN, getXUser("userB"), getDoc("any document", "any space", "wikinorules"));
-        assertAccess(null,                 getXUser("userC"), getDoc("any document", "any space", "wikinorules"));
-        assertAccess(null,                 getXUser("userD"), getDoc("any document", "any space", "wikinorules"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space",  "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
+    }
 
-        assertAccess(ALL_RIGHTS,                    getXUser("userA"), getDoc("any document", "spaceCDnoAB", "wikinorules"));
-        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userB"), getDoc("any document", "spaceCDnoAB", "wikinorules"));
-        assertAccess(ALL_SPACE_RIGHTS,              getXUser("userC"), getDoc("any document", "spaceCDnoAB", "wikinorules"));
-        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userD"), getDoc("any document", "spaceCDnoAB", "wikinorules"));
+    @Test
+    public void testInheritancePolicyForLocalWikiAccess() throws Exception
+    {
+        initialiseWikiMock("inheritancePolicyForLocalWikiAccess");
 
-        assertAccess(ALL_RIGHTS,           getXUser("userA"), getDoc("docABnoCD", "spaceCDnoAB", "wikinorules"));
-        assertAccess(ALL_RIGHTS_BUT_ADMIN, getXUser("userB"), getDoc("docABnoCD", "spaceCDnoAB", "wikinorules"));
-        assertAccess(ALL_SPACE_RIGHTS,     getXUser("userC"), getDoc("docABnoCD", "spaceCDnoAB", "wikinorules"));
-        assertAccess(null,                 getXUser("userD"), getDoc("docABnoCD", "spaceCDnoAB", "wikinorules"));
+        // Main wiki denying all access to A
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("any document", "any space",  "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("any document", "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
 
-        assertAccess(ALL_RIGHTS,                    getXUser("userA"), getDoc("docCDnoAB", "any space", "wikinorules"));
-        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userB"), getDoc("docCDnoAB", "any space", "wikinorules"));
-        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userC"), getDoc("docCDnoAB", "any space", "wikinorules"));
-        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userD"), getDoc("docCDnoAB", "any space", "wikinorules"));
+        assertAccess(null,                         getUser("userA", "wikiDenyA"), getDoc("any document", "any space",   "wikiDenyA"));
+        assertAccess(ALL_SPACE_RIGHTS,             getUser("userA", "wikiDenyA"), getDoc("any document", "spaceAllowA", "wikiDenyA"));
+        assertAccess(ALL_SPACE_RIGHTS,             getUser("userA", "wikiDenyA"), getDoc("docDenyA",     "spaceAllowA", "wikiDenyA"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,          getUser("userA", "wikiDenyA"), getDoc("any document", "spaceAllowANoAdmin", "wikiDenyA"));
+        assertAccess(null,                         getUser("userA", "wikiDenyA"), getDoc("docDenyA",     "spaceAllowANoAdmin", "wikiDenyA"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,          getUser("userA", "wikiDenyA"), getDoc("docAllowA",    "any space",   "wikiDenyA"));
 
-        //
-        // Subwiki with inverted rules
-        //
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getUser("userA", "wikiAllowNoAdminA"), getDoc("any document", "any space",  "wikiAllowNoAdminA"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiAllowNoAdminA"), getDoc("any document", "spaceDenyA", "wikiAllowNoAdminA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getUser("userA", "wikiAllowNoAdminA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowNoAdminA"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiAllowNoAdminA"), getDoc("docDenyA",     "any space",  "wikiAllowNoAdminA"));
+    }
 
-        assertAccess(ALL_RIGHTS,                getXUser("userA"), getDoc("any document", "any space", "wikiCDnoAB"));
-        assertAccess(new RightSet(REGISTER),    getXUser("userB"), getDoc("any document", "any space", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_PROGRAMING, getXUser("userC"), getDoc("any document", "any space", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_ADMIN,      getXUser("userD"), getDoc("any document", "any space", "wikiCDnoAB"));
+    @Test
+    public void testInheritancePolicyForNoAdminFarmAccess() throws Exception
+    {
+        initialiseWikiMock("inheritancePolicyForNoAdminFarmAccess");
 
-        assertAccess(ALL_RIGHTS,                    getXUser("userA"), getDoc("any document", "spaceABnoCD", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_LOGIN,          getXUser("userB"), getDoc("any document", "spaceABnoCD", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_PROGRAMING,     getXUser("userC"), getDoc("any document", "spaceABnoCD", "wikiCDnoAB"));
-        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userD"), getDoc("any document", "spaceABnoCD", "wikiCDnoAB"));
+        // Main wiki allowing all but admin access to A
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("any document", "spaceDenyA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getXDoc("docAllowA",    "spaceDenyA"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("docDenyA",     "any space"));
 
-        assertAccess(ALL_RIGHTS,                    getXUser("userA"), getDoc("docCDnoAB", "spaceABnoCD", "wikiCDnoAB"));
-        assertAccess(new RightSet(REGISTER),        getXUser("userB"), getDoc("docCDnoAB", "spaceABnoCD", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_PROGRAMING,     getXUser("userC"), getDoc("docCDnoAB", "spaceABnoCD", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_ADMIN,          getXUser("userD"), getDoc("docCDnoAB", "spaceABnoCD", "wikiCDnoAB"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("any document", "any space",  "wikiNoRules"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getDoc("any document", "spaceDenyA", "wikiNoRules"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiNoRules"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiNoRules"));
 
-        assertAccess(ALL_RIGHTS,                    getXUser("userA"), getDoc("docABnoCD", "any space", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_LOGIN,          getXUser("userB"), getDoc("docABnoCD", "any space", "wikiCDnoAB"));
-        assertAccess(ALL_RIGHTS_BUT_PROGRAMING,     getXUser("userC"), getDoc("docABnoCD", "any space", "wikiCDnoAB"));
-        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userD"), getDoc("docABnoCD", "any space", "wikiCDnoAB"));
+        assertAccess(new RightSet(REGISTER),        getXUser("userA"), getDoc("any document", "any space",   "wikiDenyA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_LOGIN,       getXUser("userA"), getDoc("any document", "spaceAllowA", "wikiDenyA"));
+        assertAccess(new RightSet(REGISTER),        getXUser("userA"), getDoc("docDenyA",     "spaceAllowA", "wikiDenyA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_LOGIN,       getXUser("userA"), getDoc("docAllowA",    "any space",   "wikiDenyA"));
+    }
+
+    @Test
+    public void testInheritancePolicyForNoAdminWikiAccess() throws Exception
+    {
+        initialiseWikiMock("inheritancePolicyForNoAdminWikiAccess");
+
+        // Main wiki denying all access to A
+        assertAccess(null,                          getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userA"), getXDoc("any document", "spaceAllowA"));
+        assertAccess(null,                          getXUser("userA"), getXDoc("docDenyA",     "spaceAllowA"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userA"), getXDoc("docAllowA",    "any space"));
+
+        assertAccess(null,                          getXUser("userA"), getDoc("any document", "any space",   "wikiNoRules"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userA"), getDoc("any document", "spaceAllowA", "wikiNoRules"));
+        assertAccess(null,                          getXUser("userA"), getDoc("docDenyA",     "spaceAllowA", "wikiNoRules"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userA"), getDoc("docAllowA",    "any space",   "wikiNoRules"));
+
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("any document", "any space",  "wikiAllowA"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getDoc("any document", "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
     }
 }

@@ -72,6 +72,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** Illegal value. */
     public static final Right ILLEGAL;
 
+    /** Illegal right name. */
+    public static final String ILLEGAL_RIGHT_NAME = "illegal";
+
     /** Targeted entity type list to target only the main wiki. */
     public static final Set<EntityType> FARM_ONLY = null;
 
@@ -127,7 +130,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         PROGRAM  = new Right("programming", DENY,   ALLOW, false,
             new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, ADMIN), FARM_ONLY   , true);
 
-        ILLEGAL  = new Right("illegal",     DENY,   DENY,  false, null, null               , false);
+        ILLEGAL  = new Right(ILLEGAL_RIGHT_NAME, DENY, DENY, false, null, null             , false);
     }
 
     /** The numeric value of this access right. */
@@ -195,7 +198,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
                 throw new IndexOutOfBoundsException();
             }
             VALUES.add(this);
-            ALL_RIGHTS.add(name);
+            if (!name.equals(ILLEGAL_RIGHT_NAME)) {
+                ALL_RIGHTS.add(name);
+            }
             if (validEntityTypes != null) {
                 for (EntityType type : validEntityTypes) {
                     if (type == EntityType.WIKI) {
@@ -235,7 +240,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      */
     private void checkIllegalArguments(String name, RuleState defaultState, RuleState tieResolutionPolicy)
     {
-        if (name == null || ALL_RIGHTS.contains(name)) {
+        if (name == null || ALL_RIGHTS.contains(name) || (ILLEGAL != null && name.equals(ILLEGAL_RIGHT_NAME))) {
             throw new IllegalArgumentException(new Formatter()
                                                .format("Duplicate name for right [%s]", name).toString());
         }

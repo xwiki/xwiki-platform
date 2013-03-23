@@ -19,22 +19,23 @@
  */
 package org.xwiki.security.authorization.testwikibuilding;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URL;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import java.net.URL;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Stack;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Formatter;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -78,7 +79,8 @@ public abstract class AbstractTestWiki
      * wiki in a test wiki setup is marked as the mainwiki.
      * @param isReadOnly Wether the wiki is in read only mode.
      */
-    protected abstract HasWikiContents addWiki(String name, String owner, boolean isMainWiki, boolean isReadOnly);
+    protected abstract HasWikiContents addWiki(String name, String owner, boolean isMainWiki, boolean isReadOnly,
+        String alt);
 
     /**
      * @return The mocked context for this test wiki setup.
@@ -186,7 +188,8 @@ public abstract class AbstractTestWiki
                            String owner = attributes.getValue("owner");
                            boolean isMainWiki = "true".equals(attributes.getValue("mainWiki"));
                            boolean isReadOnly = "true".equals(attributes.getValue("readOnly"));
-                           HasWikiContents wiki = addWiki(name, owner, isMainWiki, isReadOnly);
+                           String alt = attributes.getValue("alt");
+                           HasWikiContents wiki = addWiki(name, owner, isMainWiki, isReadOnly, alt);
 
                            currentWiki = wiki;
                            currentRightsHolder.push(currentWiki);
@@ -236,8 +239,9 @@ public abstract class AbstractTestWiki
                        @Override
                        public void startElement(Attributes attributes) {
                            String name = attributes.getValue("name");
+                           String alt = attributes.getValue("alt");
 
-                           currentSpace = currentWiki.addSpace(name);
+                           currentSpace = currentWiki.addSpace(name, alt);
                            currentRightsHolder.push(currentSpace);
                        }
 
@@ -255,12 +259,13 @@ public abstract class AbstractTestWiki
                        public void startElement(Attributes attributes) {
                            String name = attributes.getValue("name");
                            String creator = attributes.getValue("creator");
+                           String alt = attributes.getValue("alt");
 
                            if (creator == null) {
                                creator = "XWiki.Admin";
                            }
 
-                           HasAcl document = currentSpace.addDocument(name, creator);
+                           HasAcl document = currentSpace.addDocument(name, creator, alt);
                            currentRightsHolder.push(document);
                        }
 

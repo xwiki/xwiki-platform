@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<!-- Used by XWikiSecurityAuthorizationTest#testDefaultAccessOnEmptyWikis() -->
+<wikis>
+  <wiki name="any Main Wiki" mainWiki="true" />
+  <wiki name="any SubWiki" />
+  <wiki name="any Other SubWiki" />
+</wikis>

@@ -1,0 +1,163 @@
+<?xml version="1.0" ?>
+<!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyInMainWiki() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin" alt="Main Wiki with full access for userA, all but admin to userB and no access for userC and userD">
+    <user name="XWiki.userA" />
+    <user name="XWiki.userB" />
+    <user name="XWiki.userC" />
+    <user name="XWiki.userD" />
+    <allowUser name="XWiki.userA" />
+    <allowUser type="view" name="XWiki.userB" />
+    <allowUser type="edit" name="XWiki.userB" />
+    <allowUser type="comment" name="XWiki.userB" />
+    <allowUser type="delete" name="XWiki.userB" />
+    <allowUser type="register" name="XWiki.userB" />
+    <allowUser type="login" name="XWiki.userB" />
+    <denyUser name="XWiki.userC" />
+    <denyUser name="XWiki.userD" />
+
+    <space name="any space">
+      <document name="any document" />
+    </space>
+
+    <space name="spaceCDnoAB" alt="a space with full access to userC, all but admin to userD and no access to userA and userB">
+      <denyUser name="XWiki.userA" />
+      <denyUser name="XWiki.userB" />
+      <allowUser name="XWiki.userC" />
+      <allowUser type="view" name="XWiki.userD" />
+      <allowUser type="edit" name="XWiki.userD" />
+      <allowUser type="comment" name="XWiki.userD" />
+      <allowUser type="delete" name="XWiki.userD" />
+      <allowUser type="register" name="XWiki.userD" />
+      <allowUser type="login" name="XWiki.userD" />
+
+      <document name="any document" />
+
+      <document name="docABnoCD" alt="a document with full access to userA, all but admin to userB and no access to userC and userD">
+        <allowUser name="XWiki.userA" />
+        <allowUser type="view" name="XWiki.userB" />
+        <allowUser type="edit" name="XWiki.userB" />
+        <allowUser type="comment" name="XWiki.userB" />
+        <allowUser type="delete" name="XWiki.userB" />
+        <allowUser type="register" name="XWiki.userB" />
+        <allowUser type="login" name="XWiki.userB" />
+        <denyUser name="XWiki.userC" />
+        <denyUser name="XWiki.userD" />
+      </document>
+    </space>
+
+    <space name="any space">
+      <document name="docCDnoAB" alt="a document with full access to userC, all but admin to userD and no access to userA and userB">
+        <denyUser name="XWiki.userA" />
+        <denyUser name="XWiki.userB" />
+        <allowUser name="XWiki.userC" />
+        <allowUser type="view" name="XWiki.userD" />
+        <allowUser type="edit" name="XWiki.userD" />
+        <allowUser type="comment" name="XWiki.userD" />
+        <allowUser type="delete" name="XWiki.userD" />
+        <allowUser type="register" name="XWiki.userD" />
+        <allowUser type="login" name="XWiki.userD" />
+      </document>
+    </space>
+  </wiki>
+  <wiki name="wikinorules" alt="a subwiki without any rules" owner="wiki:XWiki.Admin">
+    <space name="any space">
+      <document name="any document" />
+    </space>
+
+    <space name="spaceCDnoAB" alt="a space with full access to userC, all but admin to userD and no access to userA and userB">
+      <denyUser name="wiki:XWiki.userA" />
+      <denyUser name="wiki:XWiki.userB" />
+      <allowUser name="wiki:XWiki.userC" />
+      <allowUser type="view" name="wiki:XWiki.userD" />
+      <allowUser type="edit" name="wiki:XWiki.userD" />
+      <allowUser type="comment" name="wiki:XWiki.userD" />
+      <allowUser type="delete" name="wiki:XWiki.userD" />
+      <allowUser type="register" name="wiki:XWiki.userD" />
+      <allowUser type="login" name="wiki:XWiki.userD" />
+
+      <document name="any document" />
+
+      <document name="docABnoCD" alt="a document with full access to userA, all but admin to userB and no access to userC and userD">
+        <allowUser name="wiki:XWiki.userA" />
+        <allowUser type="view" name="wiki:XWiki.userB" />
+        <allowUser type="edit" name="wiki:XWiki.userB" />
+        <allowUser type="comment" name="wiki:XWiki.userB" />
+        <allowUser type="delete" name="wiki:XWiki.userB" />
+        <allowUser type="register" name="wiki:XWiki.userB" />
+        <allowUser type="login" name="wiki:XWiki.userB" />
+        <denyUser name="wiki:XWiki.userC" />
+        <denyUser name="wiki:XWiki.userD" />
+      </document>
+    </space>
+
+    <space name="any space">
+      <document name="docCDnoAB" alt="a document with full access to userC, all but admin to userD and no access to userA and userB">
+        <denyUser name="wiki:XWiki.userA" />
+        <denyUser name="wiki:XWiki.userB" />
+        <allowUser name="wiki:XWiki.userC" />
+        <allowUser type="view" name="wiki:XWiki.userD" />
+        <allowUser type="edit" name="wiki:XWiki.userD" />
+        <allowUser type="comment" name="wiki:XWiki.userD" />
+        <allowUser type="delete" name="wiki:XWiki.userD" />
+        <allowUser type="register" name="wiki:XWiki.userD" />
+        <allowUser type="login" name="wiki:XWiki.userD" />
+      </document>
+    </space>
+  </wiki>
+  <wiki name="wikiCDnoAB" alt="a subwiki with full access to userC, all but admin to userD and no access to userA and userB" owner="wiki:XWiki.Admin">
+    <denyUser name="wiki:XWiki.userA" />
+    <denyUser name="wiki:XWiki.userB" />
+    <allowUser name="wiki:XWiki.userC" />
+    <allowUser type="view" name="wiki:XWiki.userD" />
+    <allowUser type="edit" name="wiki:XWiki.userD" />
+    <allowUser type="comment" name="wiki:XWiki.userD" />
+    <allowUser type="delete" name="wiki:XWiki.userD" />
+    <allowUser type="register" name="wiki:XWiki.userD" />
+    <allowUser type="login" name="wiki:XWiki.userD" />
+
+    <space name="any space">
+      <document name="any document" />
+    </space>
+
+    <space name="spaceABnoCD" alt="a space with full access to userA, all but admin to userB and no access to userC and userD">
+      <allowUser name="wiki:XWiki.userA" />
+      <allowUser type="view" name="wiki:XWiki.userB" />
+      <allowUser type="edit" name="wiki:XWiki.userB" />
+      <allowUser type="comment" name="wiki:XWiki.userB" />
+      <allowUser type="delete" name="wiki:XWiki.userB" />
+      <allowUser type="register" name="wiki:XWiki.userB" />
+      <allowUser type="login" name="wiki:XWiki.userB" />
+      <denyUser name="wiki:XWiki.userC" />
+      <denyUser name="wiki:XWiki.userD" />
+
+      <document name="any document" />
+
+      <document name="docCDnoAB" alt="a document with full access to userC, all but admin to userD and no access to userA and userB">
+        <denyUser name="wiki:XWiki.userA" />
+        <denyUser name="wiki:XWiki.userB" />
+        <allowUser name="wiki:XWiki.userC" />
+        <allowUser type="view" name="wiki:XWiki.userD" />
+        <allowUser type="edit" name="wiki:XWiki.userD" />
+        <allowUser type="comment" name="wiki:XWiki.userD" />
+        <allowUser type="delete" name="wiki:XWiki.userD" />
+        <allowUser type="register" name="wiki:XWiki.userD" />
+        <allowUser type="login" name="wiki:XWiki.userD" />
+      </document>
+    </space>
+
+    <space name="any space">
+      <document name="docABnoCD" alt="a document with full access to userA, all but admin to userB and no access to userC and userD">
+        <allowUser name="wiki:XWiki.userA" />
+        <allowUser type="view" name="wiki:XWiki.userB" />
+        <allowUser type="edit" name="wiki:XWiki.userB" />
+        <allowUser type="comment" name="wiki:XWiki.userB" />
+        <allowUser type="delete" name="wiki:XWiki.userB" />
+        <allowUser type="register" name="wiki:XWiki.userB" />
+        <allowUser type="login" name="wiki:XWiki.userB" />
+        <denyUser name="wiki:XWiki.userC" />
+        <denyUser name="wiki:XWiki.userD" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

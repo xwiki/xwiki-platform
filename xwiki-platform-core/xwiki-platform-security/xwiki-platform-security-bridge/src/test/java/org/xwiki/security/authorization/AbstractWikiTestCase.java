@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.xwiki.security.authorization;
 
 import org.junit.Before;
@@ -31,8 +32,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Abstract class that should be inherited when writing tests for comparing the result of different right service
- * implementations.
+ * Abstract class that should be inherited when writing tests case based on XML based mocked wikis
  * 
  * @version $Id$
  * @since 4.2
@@ -79,6 +79,8 @@ public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
      */
     protected LegacyTestWiki newTestWiki(String filename) throws Exception
     {
-        return new LegacyTestWiki(getMockery(), getComponentManager(), filename, true);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), filename, true);
+        setContext(testWiki.getXWikiContext());
+        return testWiki;
     }
 }

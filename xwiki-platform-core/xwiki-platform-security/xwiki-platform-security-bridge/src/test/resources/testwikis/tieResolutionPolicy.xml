@@ -60,4 +60,101 @@
     <denyGroup name="groupA" />
     <allowUser name="userA" />
   </wiki>
+  <wiki name="wikiUserAllowDenyNoAdmin" alt="a wiki with a conflicting of userA allow/userA deny all but admin access">
+    <user name="userA" />
+    <allowUser type="view" name="userA" />
+    <allowUser type="edit" name="userA" />
+    <allowUser type="comment" name="userA" />
+    <allowUser type="delete" name="userA" />
+    <allowUser type="register" name="userA" />
+    <allowUser type="login" name="userA" />
+    <denyUser name="userA" />
+  </wiki>
+  <wiki name="wikiUserDenyAllowNoAdmin" alt="a wiki with a conflicting of userA deny/userA allow all but admin access">
+    <user name="userA" />
+    <denyUser name="userA" />
+    <allowUser type="view" name="userA" />
+    <allowUser type="edit" name="userA" />
+    <allowUser type="comment" name="userA" />
+    <allowUser type="delete" name="userA" />
+    <allowUser type="register" name="userA" />
+    <allowUser type="login" name="userA" />
+  </wiki>
+  <wiki name="wikiGroupAllowDenyNoAdmin" alt="a wiki with a conflicting of groupA allow/groupA deny all but admin access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <allowGroup type="view" name="groupA" />
+    <allowGroup type="edit" name="groupA" />
+    <allowGroup type="comment" name="groupA" />
+    <allowGroup type="delete" name="groupA" />
+    <allowGroup type="register" name="groupA" />
+    <allowGroup type="login" name="groupA" />
+    <denyGroup name="groupA" />
+  </wiki>
+  <wiki name="wikiGroupDenyAllowNoAdmin" alt="a wiki with a conflicting of groupA deny/groupA allow all but admin access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <denyGroup name="groupA" />
+    <allowGroup type="view" name="groupA" />
+    <allowGroup type="edit" name="groupA" />
+    <allowGroup type="comment" name="groupA" />
+    <allowGroup type="delete" name="groupA" />
+    <allowGroup type="register" name="groupA" />
+    <allowGroup type="login" name="groupA" />
+  </wiki>
+  <wiki name="wikiUserGroupAllowDenyNoAdmin" alt="a wiki with a conflicting of userA allow/groupA deny all but admin access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <allowUser type="view" name="userA" />
+    <allowUser type="edit" name="userA" />
+    <allowUser type="comment" name="userA" />
+    <allowUser type="delete" name="userA" />
+    <allowUser type="register" name="userA" />
+    <allowUser type="login" name="userA" />
+    <denyGroup name="groupA" />
+  </wiki>
+  <wiki name="wikiUserGroupDenyAllowNoAdmin" alt="a wiki with a conflicting of userA deny/groupA allow all but admin access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <denyUser name="userA" />
+    <allowGroup type="view" name="groupA" />
+    <allowGroup type="edit" name="groupA" />
+    <allowGroup type="comment" name="groupA" />
+    <allowGroup type="delete" name="groupA" />
+    <allowGroup type="register" name="groupA" />
+    <allowGroup type="login" name="groupA" />
+  </wiki>
+  <wiki name="wikiGroupUserAllowDenyNoAdmin" alt="a wiki with a conflicting of groupA allow/userA deny all but admin access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <allowGroup type="view" name="groupA" />
+    <allowGroup type="edit" name="groupA" />
+    <allowGroup type="comment" name="groupA" />
+    <allowGroup type="delete" name="groupA" />
+    <allowGroup type="register" name="groupA" />
+    <allowGroup type="login" name="groupA" />
+    <denyUser name="userA" />
+  </wiki>
+  <wiki name="wikiGroupUserDenyAllowNoAdmin" alt="a wiki with a conflicting of groupA deny/userA allow all but admin access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <denyGroup name="groupA" />
+    <allowUser type="view" name="userA" />
+    <allowUser type="edit" name="userA" />
+    <allowUser type="comment" name="userA" />
+    <allowUser type="delete" name="userA" />
+    <allowUser type="register" name="userA" />
+    <allowUser type="login" name="userA" />  </wiki>
 </wikis>

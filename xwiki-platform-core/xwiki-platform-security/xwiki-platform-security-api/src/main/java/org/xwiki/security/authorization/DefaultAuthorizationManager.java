@@ -35,7 +35,6 @@ import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
-import org.xwiki.security.authorization.internal.XWikiSecurityAccess;
 import org.xwiki.security.internal.XWikiBridge;
 
 /**
@@ -229,8 +228,15 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             } 
         }
 
-        logger.debug("4. Returning default access level.");
-        return XWikiSecurityAccess.getDefaultAccess();
+        SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
+        if (logger.isDebugEnabled()) {
+            Formatter f = new Formatter();
+            logger.debug(f.format("4. Loaded a new default entry for %s@%s into cache: %s",
+                entityReferenceSerializer.serialize(user),
+                entityReferenceSerializer.serialize(entity),
+                access).toString());
+        }
+        return access;
     }
 
     /**

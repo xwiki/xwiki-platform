@@ -51,6 +51,14 @@ public class XWikiSecurityAuthorizationTest extends AbstractAuthorizationTestCas
         assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
             SUPERADMIN, getXDoc("an empty main wiki", "anySpace"));
 
+        // Any Global user without access rules on main wiki
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
+            getXUser("a global user without any access rule"), getXDoc("main wiki", "anySpace"));
+
+        // Any Local user on main wiki
+        assertAccess(null,
+            getUser("a local user", "any SubWiki"), getXDoc("main wiki", "anySpace"));
+
         // Public access on sub wiki
         assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
             null, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
@@ -58,6 +66,15 @@ public class XWikiSecurityAuthorizationTest extends AbstractAuthorizationTestCas
         // SuperAdmin access on sub wiki
         assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
             SUPERADMIN, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
+
+        // Any Global user without access rules on sub wiki
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
+            getXUser("a global user without any access rule"), getDoc("a subwiki", "anySpace", "any SubWiki"));
+
+        // Any Local user on another subwiki
+        assertAccess(null,
+            getUser("a local user", "any SubWiki"), getDoc("an another subwiki", "anySpace", "any Other SubWiki"));
+
     }
 
     @Test
@@ -185,5 +202,14 @@ public class XWikiSecurityAuthorizationTest extends AbstractAuthorizationTestCas
         assertAccess(null,                         getUser("userA", "wikiUserGroupDenyAllow"), getWiki("wikiUserGroupDenyAllow"));
         assertAccess(null,                         getUser("userA", "wikiGroupUserAllowDeny"), getWiki("wikiGroupUserAllowDeny"));
         assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiGroupUserDenyAllow"), getWiki("wikiGroupUserDenyAllow"));
+
+        assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiUserAllowDenyNoAdmin"), getWiki("wikiUserAllowDenyNoAdmin"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiUserDenyAllowNoAdmin"), getWiki("wikiUserDenyAllowNoAdmin"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiGroupAllowDenyNoAdmin"), getWiki("wikiGroupAllowDenyNoAdmin"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiGroupDenyAllowNoAdmin"), getWiki("wikiGroupDenyAllowNoAdmin"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getUser("userA", "wikiUserGroupAllowDenyNoAdmin"), getWiki("wikiUserGroupAllowDenyNoAdmin"));
+        assertAccess(null,                          getUser("userA", "wikiUserGroupDenyAllowNoAdmin"), getWiki("wikiUserGroupDenyAllowNoAdmin"));
+        assertAccess(null,                          getUser("userA", "wikiGroupUserAllowDenyNoAdmin"), getWiki("wikiGroupUserAllowDenyNoAdmin"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getUser("userA", "wikiGroupUserDenyAllowNoAdmin"), getWiki("wikiGroupUserDenyAllowNoAdmin"));
     }
 }

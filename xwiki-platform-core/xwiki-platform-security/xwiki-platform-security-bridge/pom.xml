@@ -33,7 +33,7 @@
   <description>XWiki Platform - Security - Bridge contains stuffs that depends/bridge oldcore and that are expected to be improved later</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>65.09</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>64.53</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

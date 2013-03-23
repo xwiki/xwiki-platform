@@ -222,7 +222,8 @@ public class XWikiCachingRightService implements XWikiRightService
      */
     private DocumentReference getCurrentUser(XWikiContext context)
     {
-        DocumentReference userReference = context.getUserReference();
+        DocumentReference contextUserReference = context.getUserReference();
+        DocumentReference userReference = contextUserReference;
 
         if (userReference == null && context.getMode() != XWikiContext.MODE_XMLRPC) {
             try {
@@ -239,6 +240,11 @@ public class XWikiCachingRightService implements XWikiRightService
             // Public users (not logged in) should be passed as null in the new API. It may happen that badly
             // design code, and poorly written API does not take care, so we prevent security issue here.
             userReference = null;
+        }
+
+        if (userReference != contextUserReference
+            && (userReference == null || !userReference.equals(contextUserReference))) {
+            context.setUserReference(userReference);
         }
 
         return userReference;

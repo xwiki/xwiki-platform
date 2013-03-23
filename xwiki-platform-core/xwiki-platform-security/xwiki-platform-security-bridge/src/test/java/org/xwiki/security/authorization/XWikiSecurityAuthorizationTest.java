@@ -171,4 +171,19 @@ public class XWikiSecurityAuthorizationTest extends AbstractAuthorizationTestCas
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
         assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
     }
+
+    @Test
+    public void testTieResolutionPolicy() throws Exception
+    {
+        initialiseWikiMock("tieResolutionPolicy");
+
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiUserAllowDeny"), getWiki("wikiUserAllowDeny"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiUserDenyAllow"), getWiki("wikiUserDenyAllow"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiGroupAllowDeny"), getWiki("wikiGroupAllowDeny"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiGroupDenyAllow"), getWiki("wikiGroupDenyAllow"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiUserGroupAllowDeny"), getWiki("wikiUserGroupAllowDeny"));
+        assertAccess(null,                         getUser("userA", "wikiUserGroupDenyAllow"), getWiki("wikiUserGroupDenyAllow"));
+        assertAccess(null,                         getUser("userA", "wikiGroupUserAllowDeny"), getWiki("wikiGroupUserAllowDeny"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiGroupUserDenyAllow"), getWiki("wikiGroupUserDenyAllow"));
+    }
 }

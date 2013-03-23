@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<!-- Used by XWikiSecurityAuthorizationTest#testTieResolutionPolicy() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin" />
+  <wiki name="wikiUserAllowDeny" alt="a wiki with a conflicting of userA allow/userA deny full access">
+    <user name="userA" />
+    <allowUser name="userA" />
+    <denyUser name="userA" />
+  </wiki>
+  <wiki name="wikiUserDenyAllow" alt="a wiki with a conflicting of userA deny/userA allow full access">
+    <user name="userA" />
+    <denyUser name="userA" />
+    <allowUser name="userA" />
+  </wiki>
+  <wiki name="wikiGroupAllowDeny" alt="a wiki with a conflicting of groupA allow/groupA deny full access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <allowGroup name="groupA" />
+    <denyGroup name="groupA" />
+  </wiki>
+  <wiki name="wikiGroupDenyAllow" alt="a wiki with a conflicting of groupA deny/groupA allow full access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <denyGroup name="groupA" />
+    <allowGroup name="groupA" />
+  </wiki>
+  <wiki name="wikiUserGroupAllowDeny" alt="a wiki with a conflicting of userA allow/groupA deny full access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <allowUser name="userA" />
+    <denyGroup name="groupA" />
+  </wiki>
+  <wiki name="wikiUserGroupDenyAllow" alt="a wiki with a conflicting of userA deny/groupA allow full access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <denyUser name="userA" />
+    <allowGroup name="groupA" />
+  </wiki>
+  <wiki name="wikiGroupUserAllowDeny" alt="a wiki with a conflicting of groupA allow/userA deny full access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <allowGroup name="groupA" />
+    <denyUser name="userA" />
+  </wiki>
+  <wiki name="wikiGroupUserDenyAllow" alt="a wiki with a conflicting of groupA deny/userA allow full access">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <denyGroup name="groupA" />
+    <allowUser name="userA" />
+  </wiki>
+</wikis>

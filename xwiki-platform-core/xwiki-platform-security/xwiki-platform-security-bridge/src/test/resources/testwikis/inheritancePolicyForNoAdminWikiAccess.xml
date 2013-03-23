@@ -1,30 +1,30 @@
 <?xml version="1.0" ?>
 <!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyForNoAdminWikiAccess() -->
 <wikis>
-  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin" alt="Main Wiki denying all access to userA">
-    <user name="XWiki.userA" />
-    <denyUser name="XWiki.userA" />
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki denying all access to userA">
+    <user name="userA" />
+    <denyUser name="userA" />
 
     <space name="any space">
       <document name="any document" />
     </space>
 
     <space name="spaceAllowA" alt="a space allowing all but admin access to userA">
-      <allowUser type="view" name="XWiki.userA" />
-      <allowUser type="edit" name="XWiki.userA" />
-      <allowUser type="comment" name="XWiki.userA" />
-      <allowUser type="delete" name="XWiki.userA" />
+      <allowUser type="view" name="userA" />
+      <allowUser type="edit" name="userA" />
+      <allowUser type="comment" name="userA" />
+      <allowUser type="delete" name="userA" />
 
       <document name="any document" />
 
       <document name="docDenyA" alt="a document denying all access to userA">
-        <denyUser name="XWiki.userA" />
+        <denyUser name="userA" />
       </document>
     </space>
 
     <space name="any space">
       <document name="docAllowA" alt="a document allowing full access to userA">
-        <allowUser name="XWiki.userA" />
+        <allowUser name="userA" />
       </document>
     </space>
   </wiki>

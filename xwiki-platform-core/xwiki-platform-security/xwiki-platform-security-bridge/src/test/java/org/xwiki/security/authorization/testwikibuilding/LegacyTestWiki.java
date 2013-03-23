@@ -391,11 +391,7 @@ public class LegacyTestWiki extends AbstractTestWiki
             return Collections.<DocumentReference> emptySet();
         }
 
-        String userWiki = userReference.getWikiReference().getName();
-
-        final Collection<String> groupNames =
-            wiki.getGroupsForUser(wiki.getName().equals(userWiki) ? userReference.getName()
-                : this.entityReferenceSerializer.serialize(userReference));
+        final Collection<String> groupNames = wiki.getGroupsForUser(userReference);
 
         final SpaceReference userSpaceReference = new SpaceReference("XWiki", new WikiReference(wiki.getName()));
 
@@ -529,6 +525,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
     private class TestWiki extends TestAcl implements HasWikiContents
     {
+        private final SpaceReference userSpaceReference;
 
         private final String name;
 
@@ -548,6 +545,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         private final boolean isMainWiki;
 
+
         TestWiki(String name, String owner, boolean isReadOnly)
         {
             this(name, owner, isReadOnly, false);
@@ -565,6 +563,7 @@ public class LegacyTestWiki extends AbstractTestWiki
             this.isReadOnly = isReadOnly;
             this.isMainWiki = isMainWiki;
             this.alt = alt;
+            this.userSpaceReference = new SpaceReference("XWiki", new WikiReference(name));
 
             // The XWikiPreferences document always exist (unless explicitly deleted!) since it will be created on
             // application startup or at wiki creation.
@@ -674,9 +673,21 @@ public class LegacyTestWiki extends AbstractTestWiki
             return isReadOnly;
         }
 
-        Collection<String> getGroupsForUser(String name)
+        Collection<String> getGroupsForUser(String userName)
         {
-            Set<String> groups = groupsForUser.get(name);
+            DocumentReference userDoc = documentReferenceResolver.resolve(userName, userSpaceReference);
+            return getGroupsForUser(userDoc);
+        }
+
+        Collection<String> getGroupsForUser(DocumentReference userDoc)
+        {
+            Set<String> groups;
+            if (userDoc.getWikiReference().getName().equals(getName())) {
+               groups = groupsForUser.get(userDoc.getName());
+            } else {
+                groups = groupsForUser.get(entityReferenceSerializer.serialize(userDoc));
+            }
+
             return groups == null ? Collections.<String> emptySet() : groups;
         }
 
@@ -697,18 +708,19 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
 
         @Override
-        public void addUser(String name)
+        public void addUser(String userName)
         {
-            users.add(name);
-            if (groupsForUser.get(name) == null) {
-                groupsForUser.put(name, new HashSet<String>());
+            DocumentReference userDoc = documentReferenceResolver.resolve(userName, userSpaceReference);
+            users.add(userDoc.getName());
+            if (groupsForUser.get(userDoc.getName()) == null) {
+                groupsForUser.put(userDoc.getName(), new HashSet<String>());
             }
 
-            TestSpace testSpace = mockSpace("XWiki");
+            TestSpace testSpace = mockSpace(userDoc.getParent().getName());
 
-            UserTestDocument userTestDocument = new UserTestDocument(name, testSpace, null, false);
+            UserTestDocument userTestDocument = new UserTestDocument(userDoc.getName(), testSpace, null, false);
 
-            testSpace.documents.put(name, userTestDocument);
+            testSpace.documents.put(userDoc.getName(), userTestDocument);
 
             // Send event
             notifyCreatedDocument(userTestDocument.getDocument());
@@ -716,16 +728,17 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         void deleteUser(String userName)
         {
-            if (users.contains(userName)) {
-                users.remove(userName);
-                groupsForUser.remove(userName);
+            DocumentReference userDoc = documentReferenceResolver.resolve(userName, userSpaceReference);
+            if (users.contains(userDoc.getName())) {
+                users.remove(userDoc.getName());
+                groupsForUser.remove(userDoc.getName());
                 for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
-                    entry.getValue().remove(userName);
-                    ((GroupTestDocument) getTestDocument("XWiki", entry.getKey())).removeUser(userName);
+                    entry.getValue().remove(userDoc.getName());
+                    ((GroupTestDocument) getTestDocument(userDoc.getParent().getName(), entry.getKey())).removeUser(userDoc.getName());
                 }
 
                 // Make sure user document is removed
-                XWikiDocument userDocument = removeDocument("XWiki", userName);
+                XWikiDocument userDocument = removeDocument(userDoc.getParent().getName(), userDoc.getName());
 
                 // Send event
                 notifyDeleteDocument(userDocument);
@@ -735,18 +748,19 @@ public class LegacyTestWiki extends AbstractTestWiki
         @Override
         public GroupTestDocument addGroup(final String groupName)
         {
-            Set<String> groupMembers = groups.get(groupName);
+            DocumentReference groupDoc = documentReferenceResolver.resolve(groupName, userSpaceReference);
+            Set<String> groupMembers = groups.get(groupDoc.getName());
 
             if (groupMembers == null) {
                 groupMembers = new HashSet<String>();
-                groups.put(groupName, groupMembers);
+                groups.put(groupDoc.getName(), groupMembers);
             }
 
-            TestSpace testSpace = mockSpace("XWiki");
+            TestSpace testSpace = mockSpace(groupDoc.getParent().getName());
 
-            GroupTestDocument groupTestDocument = new GroupTestDocument(groupName, testSpace, null, false);
+            GroupTestDocument groupTestDocument = new GroupTestDocument(groupDoc.getName(), testSpace, null, false);
 
-            testSpace.documents.put(groupName, groupTestDocument);
+            testSpace.documents.put(groupDoc.getName(), groupTestDocument);
 
             // Send event
             notifyCreatedDocument(groupTestDocument.getDocument());
@@ -756,14 +770,15 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         void deleteGroup(String groupName)
         {
-            if (groups.containsKey(groupName)) {
-                groups.remove(groupName);
+            DocumentReference groupDoc = documentReferenceResolver.resolve(groupName, userSpaceReference);
+            if (groups.containsKey(groupDoc.getName())) {
+                groups.remove(groupDoc.getName());
                 for (Set<String> groups : groupsForUser.values()) {
-                    groups.remove(groupName);
+                    groups.remove(groupDoc.getName());
                 }
 
                 // Make sure group document is removed
-                XWikiDocument groupDocument = removeDocument("XWiki", groupName);
+                XWikiDocument groupDocument = removeDocument(groupDoc.getParent().getName(), groupDoc.getName());
 
                 // Send event
                 notifyDeleteDocument(groupDocument);
@@ -993,22 +1008,42 @@ public class LegacyTestWiki extends AbstractTestWiki
         public void addUser(String userName)
         {
             TestWiki testWiki = space.getWiki();
+            DocumentReference userDoc = documentReferenceResolver.resolve(userName,
+                new SpaceReference("XWiki", new WikiReference(testWiki.getName())));
 
-            Set<String> groups = testWiki.groupsForUser.get(userName);
+            String uname;
+            if (userDoc.getWikiReference().getName().equals(testWiki.getName())) {
+                uname = userDoc.getName();
+            } else {
+                uname = entityReferenceSerializer.serialize(userDoc);
+            }
+
+            Set<String> groups = testWiki.groupsForUser.get(uname);
             if (groups == null) {
                 groups = new HashSet<String>();
-                testWiki.groupsForUser.put(userName, groups);
+                testWiki.groupsForUser.put(uname, groups);
             }
             groups.add(getName());
 
-            testWiki.groups.get(getName()).add(userName);
+            testWiki.groups.get(getName()).add(uname);
 
-            this.memberObjects.put(userName, mockGroupBaseObject(userName));
+            this.memberObjects.put(uname, mockGroupBaseObject(uname));
         }
 
         public void removeUser(String userName)
         {
-            this.memberObjects.remove(userName);
+            TestWiki testWiki = space.getWiki();
+            DocumentReference userDoc = documentReferenceResolver.resolve(userName,
+                new SpaceReference("XWiki", new WikiReference(testWiki.getName())));
+
+            String uname;
+            if (userDoc.getWikiReference().getName().equals(testWiki.getName())) {
+                uname = userDoc.getName();
+            } else {
+                uname = entityReferenceSerializer.serialize(userDoc);
+            }
+
+            this.memberObjects.remove(uname);
         }
     }
 
@@ -1242,13 +1277,13 @@ public class LegacyTestWiki extends AbstractTestWiki
         @Override
         public void addAllowGroup(String name, String type)
         {
-            addType(this.allowGroup, name, type);
+            addRightType(this.allowGroup, name, type);
         }
 
         @Override
         public void addDenyGroup(String name, String type)
         {
-            addType(this.denyGroup, name, type);
+            addRightType(this.denyGroup, name, type);
         }
 
         abstract EntityType getType();

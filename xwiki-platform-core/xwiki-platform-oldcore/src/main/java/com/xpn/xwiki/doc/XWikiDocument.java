@@ -64,6 +64,7 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.Diff;
@@ -1218,6 +1219,47 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @param userString the user {@link String} to convert to {@link DocumentReference}
+     * @return the user as {@link DocumentReference}
+     */
+    private DocumentReference userStringToReference(String userString)
+    {
+        DocumentReference userReference;
+
+        if (StringUtils.isEmpty(userString)) {
+            userReference = null;
+        } else {
+            userReference =
+                this.explicitReferenceDocumentReferenceResolver
+                    .resolve(this.xClassEntityReferenceResolver.resolve(userString, EntityType.DOCUMENT),
+                        getDocumentReference());
+
+            if (userReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                userReference = null;
+            }
+        }
+
+        return userReference;
+    }
+
+    /**
+     * @param userReference the user {@link DocumentReference} to convert to {@link String}
+     * @return the user as String
+     */
+    private String userReferenceToString(DocumentReference userReference)
+    {
+        String userString;
+
+        if (userReference != null) {
+            userString = this.compactWikiEntityReferenceSerializer.serialize(userReference, getDocumentReference());
+        } else {
+            userString = XWikiRightService.GUEST_USER_FULLNAME;
+        }
+
+        return userString;
+    }
+
+    /**
      * @since 3.0M3
      */
     public DocumentReference getAuthorReference()
@@ -1235,6 +1277,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         this.authorReference = authorReference;
+
+        // Log this since it's probably a mistake so that we find who is doing bad things
+        if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+            Log.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+                new Exception("See stack trace"));
+        }
     }
 
     /**
@@ -1245,15 +1293,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public String getAuthor()
     {
-        String author;
-        DocumentReference authorReference = getAuthorReference();
-        if (authorReference == null) {
-            author = "";
-        } else {
-            author = this.compactWikiEntityReferenceSerializer.serialize(authorReference, getDocumentReference());
-        }
-
-        return author;
+        return userReferenceToString(getAuthorReference());
     }
 
     /**
@@ -1264,15 +1304,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void setAuthor(String author)
     {
-        // Note: Consider "" or null as the same, i.e. the author not being set
-        DocumentReference authorReference = null;
-        if (author != null && author.length() > 0) {
-            authorReference =
-                this.explicitReferenceDocumentReferenceResolver.resolve(
-                    this.xClassEntityReferenceResolver.resolve(author, EntityType.DOCUMENT), getDocumentReference());
-        }
-
-        setAuthorReference(authorReference);
+        setAuthorReference(userStringToReference(author));
     }
 
     /**
@@ -1293,6 +1325,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         this.contentAuthorReference = contentAuthorReference;
+
+        // Log this since it's probably a mistake so that we find who is doing bad things
+        if (this.contentAuthorReference != null
+            && this.contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+            Log.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+                new Exception("See stack trace"));
+        }
     }
 
     /**
@@ -1303,16 +1342,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public String getContentAuthor()
     {
-        String contentAuthor;
-        DocumentReference contentAuthorReference = getContentAuthorReference();
-        if (contentAuthorReference == null) {
-            contentAuthor = "";
-        } else {
-            contentAuthor =
-                this.compactWikiEntityReferenceSerializer.serialize(contentAuthorReference, getDocumentReference());
-        }
-
-        return contentAuthor;
+        return userReferenceToString(getContentAuthorReference());
     }
 
     /**
@@ -1323,16 +1353,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void setContentAuthor(String contentAuthor)
     {
-        // Note: Consider "" or null as the same, i.e. the content author not being set
-        DocumentReference contentAuthorReference = null;
-        if (contentAuthor != null && contentAuthor.length() > 0) {
-            contentAuthorReference =
-                this.explicitReferenceDocumentReferenceResolver.resolve(
-                    this.xClassEntityReferenceResolver.resolve(contentAuthor, EntityType.DOCUMENT),
-                    getDocumentReference());
-        }
-
-        setContentAuthorReference(contentAuthorReference);
+        setContentAuthorReference(userStringToReference(contentAuthor));
     }
 
     /**
@@ -1353,6 +1374,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         this.creatorReference = creatorReference;
+
+        // Log this since it's probably a mistake so that we find who is doing bad things
+        if (this.creatorReference != null && this.creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+            Log.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+                new Exception("See stack trace"));
+        }
     }
 
     /**
@@ -1363,15 +1390,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public String getCreator()
     {
-        String creator;
-        DocumentReference creatorReference = getCreatorReference();
-        if (creatorReference == null) {
-            creator = "";
-        } else {
-            creator = this.compactWikiEntityReferenceSerializer.serialize(creatorReference, getDocumentReference());
-        }
-
-        return creator;
+        return userReferenceToString(getCreatorReference());
     }
 
     /**
@@ -1382,15 +1401,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void setCreator(String creator)
     {
-        // Note: Consider "" or null as the same, i.e. the creator not being set
-        DocumentReference creatorReference = null;
-        if (creator != null && creator.length() > 0) {
-            creatorReference =
-                this.explicitReferenceDocumentReferenceResolver.resolve(
-                    this.xClassEntityReferenceResolver.resolve(creator, EntityType.DOCUMENT), getDocumentReference());
-        }
-
-        setCreatorReference(creatorReference);
+        setCreatorReference(userStringToReference(creator));
     }
 
     public Date getDate()
@@ -7017,25 +7028,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Note that we need to only take into account SectionBlock that are children of other SectionBlocks so that
         // we are in sync with the section editing buttons added in xwiki.js. Being able to section edit any heading is
         // too complex. For example if you have (in XWiki Syntax 2.0):
-        //   = Heading1 =
-        //   para1
-        //   == Heading2 ==
-        //   para2
-        //   (((
-        //   == Heading3 ==
-        //   para3
-        //   (((
-        //   == Heading4 ==
-        //   para4
-        //   )))
-        //   )))
-        //   == Heading5 ==
-        //   para5
+        // = Heading1 =
+        // para1
+        // == Heading2 ==
+        // para2
+        // (((
+        // == Heading3 ==
+        // para3
+        // (((
+        // == Heading4 ==
+        // para4
+        // )))
+        // )))
+        // == Heading5 ==
+        // para5
         //
         // Then if we were to support editing "Heading4", its content would be:
-        //   para4
-        //   )))
-        //   )))
+        // para4
+        // )))
+        // )))
         //
         // Which obviously is not correct...
 
@@ -7046,7 +7057,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 if (currentBlock instanceof SectionBlock) {
                     // The next children block is a HeaderBlock but we check to be on the safe side...
                     Block nextChildrenBlock = currentBlock.getChildren().get(0);
-                    if (nextChildrenBlock instanceof  HeaderBlock) {
+                    if (nextChildrenBlock instanceof HeaderBlock) {
                         HeaderBlock headerBlock = (HeaderBlock) nextChildrenBlock;
                         if (headerBlock.getLevel().getAsInt() <= sectionDepth) {
                             filteredHeaders.add(headerBlock);

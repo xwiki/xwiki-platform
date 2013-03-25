@@ -79,7 +79,7 @@ public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
      */
     protected LegacyTestWiki newTestWiki(String filename, boolean legacymock) throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), filename, false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), filename, legacymock);
         setContext(testWiki.getXWikiContext());
         return testWiki;
     }

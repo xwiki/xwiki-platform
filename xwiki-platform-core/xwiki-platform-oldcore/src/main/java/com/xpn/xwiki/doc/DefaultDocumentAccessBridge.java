@@ -618,6 +618,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                             attachmentReference.getDocumentReference().getName(), attachmentVersion, queryString,
                             attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext), xcontext);
             }catch(XWikiException e){
+                // The attachment might not exist yet, but we still want the URL (for the future).
                 url =
                     xcontext.getURLFactory().getURL(
                         xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),

@@ -24,7 +24,6 @@ import javax.servlet.ServletContextListener;
 
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.internal.StackingComponentEventManager;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
@@ -138,10 +137,6 @@ public class XWikiServletContextListener implements ServletContextListener
         }
 
         // Make sure to dispose all components before leaving
-        try {
-            this.componentManager.dispose();
-        } catch (ComponentLifecycleException e) {
-            // TODO: Log a warning
-        }
+        this.componentManager.dispose();
     }
 }

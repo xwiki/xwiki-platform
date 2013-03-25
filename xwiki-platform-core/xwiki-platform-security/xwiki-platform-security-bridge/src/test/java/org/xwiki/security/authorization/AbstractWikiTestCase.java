@@ -77,9 +77,9 @@ public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
      * @param filename The filename of the wiki description file.
      * @return A mocked wiki instance that can be used by both the old, and the caching right service implementation.
      */
-    protected LegacyTestWiki newTestWiki(String filename) throws Exception
+    protected LegacyTestWiki newTestWiki(String filename, boolean legacymock) throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), filename, true);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), filename, false);
         setContext(testWiki.getXWikiContext());
         return testWiki;
     }

@@ -114,7 +114,7 @@ public class AbstractAuthorizationTestCase extends AbstractWikiTestCase
      */
     protected LegacyTestWiki initialiseWikiMock(String filename) throws Exception
     {
-        wikisMock = newTestWiki(filename + ".xml");
+        wikisMock = newTestWiki(filename + ".xml", false);
         return wikisMock;
     }
 

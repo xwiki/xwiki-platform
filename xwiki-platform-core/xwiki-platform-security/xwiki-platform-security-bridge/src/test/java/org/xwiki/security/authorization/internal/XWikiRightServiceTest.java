@@ -38,7 +38,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testUserFromAnotherWiki1() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki1.xml");
+        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki1.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setDatabase("wiki");
@@ -50,7 +50,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testUserFromAnotherWiki2() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml");
+        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
@@ -72,7 +72,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testGroupFromAnotherWiki1() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("groupFromAnotherWiki1.xml");
+        LegacyTestWiki testWiki = newTestWiki("groupFromAnotherWiki1.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
@@ -99,7 +99,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testWikiOwnerFromAnotherWiki() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml");
+        LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
@@ -133,7 +133,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testProgrammingRightsWhenNoContextDocumentIsSet() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("programmingRights.xml");
+        LegacyTestWiki testWiki = newTestWiki("programmingRights.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
@@ -163,7 +163,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testGuestRightsOnEmptyWiki() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("empty.xml");
+        LegacyTestWiki testWiki = newTestWiki("empty.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
@@ -198,7 +198,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testGlobalUserInLocalGroup() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("glocalUserInLocalGroup.xml");
+        LegacyTestWiki testWiki = newTestWiki("glocalUserInLocalGroup.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
@@ -211,7 +211,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     @Test
     public void testGlobalGroupInLocalGroup() throws Exception
     {
-        LegacyTestWiki testWiki = newTestWiki("glocalGroupInLocalGroup.xml");
+        LegacyTestWiki testWiki = newTestWiki("glocalGroupInLocalGroup.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
 

@@ -606,12 +606,25 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         String url;
         if (isFullURL) {
             XWikiContext xcontext = getContext();
-            url =
-                xcontext.getURLFactory().getURL(
-                    xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
-                        attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
-                        attachmentReference.getDocumentReference().getName(), "download", queryString,
-                        attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext), xcontext);
+            try{
+                XWikiDocument attachmentDocument = xcontext.getWiki().getDocument(
+                        attachmentReference.getDocumentReference(), xcontext);
+                XWikiAttachment attachment = attachmentDocument.getAttachment(attachmentReference.getName());
+                String attachmentVersion = (attachment != null) ? attachment.getVersion() : "1.1";
+                url =
+                    xcontext.getURLFactory().getURL(
+                        xcontext.getURLFactory().createAttachmentRevisionURL(attachmentReference.getName(),
+                            attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
+                            attachmentReference.getDocumentReference().getName(), attachmentVersion, queryString,
+                            attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext), xcontext);
+            }catch(XWikiException e){
+                url =
+                    xcontext.getURLFactory().getURL(
+                        xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
+                            attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
+                            attachmentReference.getDocumentReference().getName(), "download", queryString,
+                            attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext), xcontext);
+            }
         } else {
             XWikiContext xcontext = getContext();
             String documentReference =

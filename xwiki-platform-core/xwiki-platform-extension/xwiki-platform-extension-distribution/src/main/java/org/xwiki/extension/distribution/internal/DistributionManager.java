@@ -44,7 +44,10 @@ public interface DistributionManager
         NONE,
 
         /** Probably something to do. */
-        NEW, UPGRADE, DOWNGRADE, DIFFERENT
+        NEW,
+        UPGRADE,
+        DOWNGRADE,
+        DIFFERENT
     }
 
     /**
@@ -78,4 +81,9 @@ public interface DistributionManager
      * @return the distribution job object that can be used to get information like the job status
      */
     DistributionJob getJob();
+
+    /**
+     * @return true it's allowed to display the Distribution Wizard in the current context
+     */
+    boolean canDisplayDistributionWizard();
 }

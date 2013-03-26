@@ -20,6 +20,7 @@
 package org.xwiki.extension.distribution.internal;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
@@ -41,6 +42,13 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.internal.core.MavenCoreExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 
 /**
  * Default {@link DistributionManager} implementation.
@@ -79,6 +87,18 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
      */
     @Inject
     private ExecutionContextManager executionContextManager;
+
+    /**
+     * Used to check various rights.
+     */
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private Logger logger;
@@ -203,5 +223,28 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     public DistributionJob getJob()
     {
         return this.distributionJob;
+    }
+
+    @Override
+    public boolean canDisplayDistributionWizard()
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        if (xcontext.isMainWiki()) {
+            DocumentReference currentUser = xcontext.getUserReference();
+
+            if (currentUser != null) {
+                return this.authorizationManager.hasAccess(Right.ADMIN, currentUser, null);
+            }
+
+            // If there is no user on main wiki let guest access distribution wizard
+            try {
+                return RightsManager.getInstance().countAllGlobalUsersOrGroups(true, null, xcontext) == 0;
+            } catch (XWikiException e) {
+                this.logger.error("Failed to count global users", e);
+            }
+        }
+
+        return false;
     }
 }

@@ -109,6 +109,14 @@ public class DistributionScriptService implements ScriptService
     }
 
     /**
+     * @return indicate of it's allowed to display the Distribution Wizard in the current context
+     */
+    public boolean canDisplayDistributionWizard()
+    {
+        return this.distributionManager.canDisplayDistributionWizard();
+    }
+
+    /**
      * @return the status of the current distribution job
      */
     public DistributionJobStatus getJobStatus()

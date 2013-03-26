@@ -2,7 +2,7 @@
 ### Document does not exist message
 ###
 ###
-#if ($xcontext.isMainWiki() && $xwiki.hasWikiAdminRights() && $services.distribution.jobStatus && $services.distribution.jobStatus.state.name() != 'FINISHED')
+#if ($services.distribution.jobStatus && $services.distribution.jobStatus.state.name() != 'FINISHED' && $services.distribution.canDisplayDistributionWizard())
   $response.sendRedirect($xwiki.getURL('XWiki.Distribution', 'distribution', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
 #else
   $response.setStatus(404)

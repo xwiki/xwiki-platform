@@ -38,7 +38,7 @@
         $msg.get('core.viewers.attachments.webdavEdit')
       </a>
     #end ## hasEdit
-    #if("$!{oomanager.serverState}" == "Connected" && $services.officeviewer.isMimeTypeSupported($attach.getMimeType().toLowerCase()))
+    #if("$!{services.officemanager.serverState}" == "Connected" && $services.officeviewer.isMimeTypeSupported($attach.getMimeType().toLowerCase()))
       <a class="viewlink" title="$msg.get('core.viewers.attachments.officeView.title')"
         href="${doc.getURL('view', "xpage=office&attachment=$escapetool.url($attach.filename)")}"
         target="_blank">$msg.get('core.viewers.attachments.officeView')</a>

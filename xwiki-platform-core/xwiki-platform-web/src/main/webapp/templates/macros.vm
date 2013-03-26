@@ -2074,7 +2074,7 @@ var $jsVarName = {
 #set($ok = $parameters.put('wiki', $editedDocument.wiki))
 #set($ok = $parameters.put('space', $editedDocument.space))
 #set($ok = $parameters.put('page', $editedDocument.name))
-#if("$!{oomanager.serverState}" == 'Connected')
+#if("$!{services.officemanager.serverState}" == 'Connected')
   #set($ok = $parameters.put('openofficeServerConnected', 'true'))
 #end
 #if($full && $request.sync)

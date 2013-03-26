@@ -504,4 +504,16 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The list of multilingual fields for which to use optimized indexing.
 # solr.multilingual.fields=title,doccontent,comment,objcontent,propertyvalue,attcontent
 
+#-------------------------------------------------------------------------------------
+# Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.0M2]
+#-# Define the authorization policies by choosing another implementation of the AuthorizationSettler. This component
+#-# is solely responsible for settling access decisions based on user, target entity and available security rules.
+#-# The identifier provided here is matched with the component role hint.
+#-#
+#-# The default is:
+# security.authorization.settler=default
+
 $!xwikiPropertiesAdditionalProperties

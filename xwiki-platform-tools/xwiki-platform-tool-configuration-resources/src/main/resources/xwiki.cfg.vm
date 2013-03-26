@@ -312,7 +312,13 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 #-# The authentication management class.
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl
 
-#-# The authorization management class.
+#-# (Deprecated) The authorization management class.
+#-# [Since 5.0M2] The default right service is now org.xwiki.security.authorization.internal.XWikiCachingRightService
+#-# which is a bridge to the new security authorization component. It provides increased security and performance, but
+#-# its right policies differ sightly from the old Right Service implementation. In rare situation, you may want to
+#-# switch back to the old unmaintained implementation by uncommenting the following line. However, only old
+#-# implementation, still using a bridged RightService will be impacted by this parameter. Customization of the new
+#-# security authorization component should be done in the new xwiki.properties configuration (security.*).
 # xwiki.authentication.rightsclass=com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl
 
 #-# If an unauthenticated user (guest) tries to perform a restricted action, by default the wiki redirects to the login

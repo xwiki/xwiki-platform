@@ -126,7 +126,7 @@ public class AutomaticWatchModeListener implements EventListener
 
         if (register) {
             try {
-                if (StringUtils.isNotEmpty(user) && context.getWiki().exists(userReference, context)) {
+                if (StringUtils.isNotEmpty(user) && userReference != null && context.getWiki().exists(userReference, context)) {
                     this.store.addWatchedElement(user, currentDoc.getPrefixedFullName(), ElementType.DOCUMENT, context);
                 }
             } catch (XWikiException e) {

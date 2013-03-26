@@ -426,8 +426,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     {
         switch (scope) {
             case GLOBAL:
-                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), new WikiReference(
-                    this.xcontextProvider.get().getMainXWiki()));
+                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), null);
                 break;
             case WIKI:
                 this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), document

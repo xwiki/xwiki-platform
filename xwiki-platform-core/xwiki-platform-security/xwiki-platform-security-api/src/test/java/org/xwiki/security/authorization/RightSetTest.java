@@ -37,7 +37,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Test Set interface of RightSet using guava test library
+ * Test Set interface of RightSet using guava test library.
  *
  * @version $Id$
  * @since 4.0M2

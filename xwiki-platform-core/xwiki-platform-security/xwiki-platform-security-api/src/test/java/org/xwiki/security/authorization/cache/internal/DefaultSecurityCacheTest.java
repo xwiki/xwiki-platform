@@ -31,12 +31,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheEntry;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.event.CacheEntryEvent;
-import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -60,7 +56,6 @@ import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -71,7 +66,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Default security cache Unit Test
+ * Default security cache Unit Test.
  *
  * @version $Id$
  */
@@ -91,7 +86,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
     private SecurityReferenceFactory factory;
 
-    private TestCache<?> cache;
+    private TestCache<Object> cache;
 
     private SecurityReference aMissingParentRef;
     private SecurityReference aMissingEntityRef;
@@ -100,126 +95,14 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     private GroupSecurityReference aMissingGroupRef;
     private SecurityReference aMissingWikiRef;
 
-    class TestCache<T> implements Cache<T>
-    {
-        private Map<String,T> cache = new HashMap<String,T>();
-        private CacheEntryListener<T> listener;
-        private String lastInsertedKey;
-        
-        class TestCacheEntry implements CacheEntry<T>
-        {
-            private final String key;
-            private final T value;
-            
-            TestCacheEntry(String key, T value)
-            {
-                this.key = key;
-                this.value = value;
-            }
-            
-            @Override
-            public Cache<T> getCache()
-            {
-                return TestCache.this;
-            }
-
-            @Override
-            public String getKey()
-            {
-                return key;
-            }
-
-            @Override
-            public T getValue()
-            {
-                return value;
-            }
-        }
-        
-        private CacheEntryEvent<T> getEvent(final String key, final T value)
-        {
-            return new CacheEntryEvent<T>()
-                {
-                    @Override
-                    public CacheEntry<T> getEntry()
-                    {
-                        return new TestCacheEntry(key, value);
-                    }
-    
-                    @Override
-                    public Cache<T> getCache()
-                    {
-                        return TestCache.this;
-                    }
-                };
-        }
-        
-        
-        @Override
-        public void set(String key, T value)
-        {
-            T old = cache.put(key, value);
-            if (listener != null && old == null) {
-                listener.cacheEntryAdded(getEvent(key, value));
-            } else {
-                listener.cacheEntryModified(getEvent(key, value));                
-            }
-            lastInsertedKey = key;
-        }
-
-        @Override
-        public T get(String key)
-        {
-            return cache.get(key);
-        }
-
-        @Override
-        public void remove(String key)
-        {
-            T value = cache.remove(key);
-            if (listener != null) {
-                listener.cacheEntryRemoved(getEvent(key, value));
-            }
-        }
-
-        @Override
-        public void removeAll()
-        {
-            cache.clear();
-        }
-
-        @Override
-        public void addCacheEntryListener(CacheEntryListener<T> tCacheEntryListener)
-        {
-            listener = tCacheEntryListener;
-        }
-
-        @Override
-        public void removeCacheEntryListener(CacheEntryListener<T> tCacheEntryListener)
-        {
-            assertThat(tCacheEntryListener, equalTo(listener));
-            listener = null;
-        }
-
-        @Override
-        public void dispose()
-        {
-        }
-
-        public String getLastInsertedKey()
-        {
-            return lastInsertedKey;
-        }
-    }
-
     @Before
     public void configure() throws Exception
     {
         if (cache == null) {
-            cache = new TestCache();
+            cache = new TestCache<Object>();
 
             final CacheManager cacheManager = securityCacheMocker.getInstance(CacheManager.class);
-            when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn((Cache<Object>) cache);
+            when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
         }
 
         XWikiBridge xwikiBridge = securityReferenceFactoryMocker.getInstance(XWikiBridge.class);

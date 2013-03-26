@@ -20,23 +20,22 @@
 package org.xwiki.security.authorization;
 
 import java.util.Map;
-
-import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.RightMap;
-
 import com.google.common.collect.testing.MapInterfaceTest;
 
 /**
- * Test Map interface of RightMap using guava test library
+ * Test Map interface of RightMap using guava test library.
  *
  * @version $Id$
  * @since 4.0M2
  */
 public class RightMapTest extends MapInterfaceTest<Right, Object>
 {
+    private Map<Right, Object> populatedMap;
+    private Object valueNotInPopulatedMaplatedMap;
+
     public RightMapTest()
     {
-        super(false,true,true,true,true,true);
+        super(false, true, true, true, true, true);
     }
 
     @Override
@@ -60,13 +59,11 @@ public class RightMapTest extends MapInterfaceTest<Right, Object>
             }
         };
     }
-    
-    private Map<Right, Object> populatedMap;
 
     @Override
     protected Map<Right, Object> makePopulatedMap()
     {
-        if (populatedMap == null ) {
+        if (populatedMap == null) {
             populatedMap = new RightMap<Object>();
             populatedMap.put(Right.VIEW, getNewValue());
             populatedMap.put(Right.EDIT, getNewValue());
@@ -86,8 +83,6 @@ public class RightMapTest extends MapInterfaceTest<Right, Object>
     {
         return Right.PROGRAM;
     }
-
-    private Object valueNotInPopulatedMaplatedMap;
 
     @Override
     protected Object getValueNotInPopulatedMap()

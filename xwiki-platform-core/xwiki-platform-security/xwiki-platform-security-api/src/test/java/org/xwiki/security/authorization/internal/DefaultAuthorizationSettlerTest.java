@@ -36,7 +36,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AbstractAuthorizationTestCase;
+import org.xwiki.security.authorization.AbstractAdditionalRightsTestCase;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
@@ -68,7 +68,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * @version $Id$
  * @since 4.0M2
  */
-public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCase
+public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 {
     @Rule
     public final MockitoComponentMockingRule<AuthorizationSettler> authorizationSettlerMocker =
@@ -78,7 +78,6 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
 
     private XWikiSecurityAccess defaultAccess;
     private XWikiSecurityAccess denyAllAccess;
-    private XWikiSecurityAccess initialImportAccess;
 
     @Before
     public void configure() throws Exception
@@ -237,67 +236,67 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForXdocSpace
             = getMockedSecurityRuleEntries("allowThenDenyRulesForXdocSpace", xdocRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
-                allowAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
-                denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
+                    allowAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
+                    denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForXdocSpace
             = getMockedSecurityRuleEntries("denyThenAllowRulesForXdocSpace", xdocRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForDocSpace
             = getMockedSecurityRuleEntries("allowThenDenyRulesForDocSpace", docRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
-                allowAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
+                    allowAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForDocSpace
             = getMockedSecurityRuleEntries("denyThenAllowRulesForDocSpace", docRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
-                denyAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
+                    denyAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForXDocWiki
             = getMockedSecurityRuleEntries("allowThenDenyRulesForXDocWiki", xdocRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
-                allowAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
-                denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
+                    allowAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
+                    denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForXdocWiki
             = getMockedSecurityRuleEntries("denyThenAllowRulesForXdocWiki", xdocRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForDocWiki
             = getMockedSecurityRuleEntries("allowThenDenyRulesForDocWiki", docRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForDocWiki
             = getMockedSecurityRuleEntries("denyThenAllowRulesForDocWiki", docRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForDocXWiki
             = getMockedSecurityRuleEntries("allowThenDenyRulesForDocXWiki", docRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForDocXWiki
             = getMockedSecurityRuleEntries("denyThenAllowRulesForDocXWiki", docRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         XWikiSecurityAccess allowDenyAccess = new XWikiSecurityAccess();
         for (Right right : allTestRights) {

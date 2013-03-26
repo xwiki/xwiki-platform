@@ -36,7 +36,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 /**
- * Security Reference Unit Tests
+ * Security Reference Unit Tests.
  *
  * @version $Id$
  * @since 5.0M2

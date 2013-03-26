@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authorization;
 
-import java.util.Formatter;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -195,11 +193,10 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             if (entry == null) {
                 SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
                 if (logger.isDebugEnabled()) {
-                    Formatter f = new Formatter();
-                    this.logger.debug(f.format("1. Loaded a new entry for %s@%s into cache: %s",
-                                               entityReferenceSerializer.serialize(user),
-                                               entityReferenceSerializer.serialize(entity),
-                        access).toString());
+                    this.logger.debug("1. Loaded a new entry for user {} on {} into cache: [{}]",
+                        entityReferenceSerializer.serialize(user),
+                        entityReferenceSerializer.serialize(entity),
+                        access);
                 }
                 return access;
             }
@@ -208,21 +205,19 @@ public class DefaultAuthorizationManager implements AuthorizationManager
                 if (accessEntry == null) {
                     SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
                     if (logger.isDebugEnabled()) {
-                        Formatter f = new Formatter();
-                        logger.debug(f.format("2. Loaded a new entry for %s@%s into cache: %s",
+                        logger.debug("2. Loaded a new entry for user {} on {} into cache: [{}]",
                             entityReferenceSerializer.serialize(user),
                             entityReferenceSerializer.serialize(entity),
-                            access).toString());
+                            access);
                     }
                     return access;
                 } else {
                     SecurityAccess access = accessEntry.getAccess();
                     if (logger.isDebugEnabled()) {
-                        Formatter f = new Formatter();
-                        logger.debug(f.format("3. Got entry for %s@%s from cache: %s",
+                        logger.debug("3. Got entry for user {} on {} from cache: [{}]",
                             entityReferenceSerializer.serialize(user),
                             entityReferenceSerializer.serialize(entity),
-                            access).toString());
+                            access);
                     }
                     return access;
                 }
@@ -231,11 +226,10 @@ public class DefaultAuthorizationManager implements AuthorizationManager
 
         SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
         if (logger.isDebugEnabled()) {
-            Formatter f = new Formatter();
-            logger.debug(f.format("4. Loaded a new default entry for %s@%s into cache: %s",
+            logger.debug("4. Loaded a new default entry for user {} on {} into cache: [{}]",
                 entityReferenceSerializer.serialize(user),
                 entityReferenceSerializer.serialize(entity),
-                access).toString());
+                access);
         }
         return access;
     }
@@ -259,12 +253,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager
                                               : AuthorizationException.NULL_USER;
             String rightName = (right != null) ? right.getName() : "no right";
             String accessName = (access == RuleState.ALLOW) ? "granted" : "denied";
-            String message = "Access has been %s for (%s,%s,%s): %s";
-            Formatter f = new Formatter();
+            String message = "[{}] access has been {} for user [{}] on [{}]: {}";
             if (debugLevel) {
-                logger.debug(f.format(message, accessName, userName, docName, rightName, info).toString());
+                logger.debug(message, rightName, accessName, userName, docName, info);
             } else {
-                logger.info(f.format(message, accessName, userName, docName, rightName, info).toString());
+                logger.info(message, rightName, accessName, userName, docName, info);
             }
         }
     }

@@ -105,8 +105,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         try {
             return cacheManager.createNewCache(cacheConfig);
         } catch (Exception e) {
-            throw new InitializationException("Unable to create the security cache with a capacity of "
-                + lru.getMaxEntries(), e);
+            throw new InitializationException(
+                String.format("Unable to create the security cache with a capacity of [%d] entries",
+                    lru.getMaxEntries()), e);
         }
     }
 

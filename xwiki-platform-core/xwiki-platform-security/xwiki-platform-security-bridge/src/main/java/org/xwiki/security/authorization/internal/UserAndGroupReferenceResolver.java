@@ -49,7 +49,7 @@ public class UserAndGroupReferenceResolver implements DocumentReferenceResolver<
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
         if (parameters.length > 0 && !(parameters[0] instanceof EntityReference)) {
-            throw new IllegalArgumentException("The settler parameter is not a WikiReference.");
+            throw new IllegalArgumentException("This resolver accept only a single parameter of type WikiReference.");
         }
         EntityReference defaultSpace;
         if (parameters.length > 0) {

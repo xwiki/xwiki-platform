@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 
@@ -265,8 +264,7 @@ public class XWikiCachingRightService implements XWikiRightService
                     return true;
                 }
             } catch (NumberFormatException e) {
-                Formatter f = new Formatter();
-                LOGGER.warn(f.format("Failed to parse preference value: '%s'", value).toString());
+                LOGGER.warn("Failed to parse the authenticate_* preference value [{}]", value);
             }
         }
         return null;
@@ -303,7 +301,7 @@ public class XWikiCachingRightService implements XWikiRightService
         Right right = actionToRight(action);
         EntityReference entityReference = doc.getDocumentReference();
 
-        LOGGER.debug("checkAccess for action {} on entity {}.", right, entityReference);
+        LOGGER.debug("checkAccess for action [{}] on entity [{}].", right, entityReference);
 
         DocumentReference userReference = getCurrentUser(context);
 
@@ -323,7 +321,7 @@ public class XWikiCachingRightService implements XWikiRightService
         // has to call checkAccess. This happen really often, and this why we should not redirect to login on failed
         // delete, since it would prevent most user to do anything.
         if (userReference == null && !DELETE_ACTION.equals(action) && !LOGIN_ACTION.equals(action)) {
-            LOGGER.debug("Redirecting unauthenticated user to login, since it have been denied {} on {}.",
+            LOGGER.debug("Redirecting unauthenticated user to login, since it have been denied [{}] on [{}].",
                          right, entityReference);
             showLogin(context);
         }
@@ -337,7 +335,7 @@ public class XWikiCachingRightService implements XWikiRightService
     {
         WikiReference wikiReference = new WikiReference(context.getDatabase());
         DocumentReference document = resolveDocumentName(docname, wikiReference);
-        LOGGER.debug("Resolved '{}' into {}", docname, document);
+        LOGGER.debug("hasAccessLevel() resolved document named [{}] into reference [{}]", docname, document);
         DocumentReference user = resolveUserName(username, wikiReference);
 
         if (XWikiConstants.GUEST_USER.equals(user.getName())) {

@@ -43,7 +43,7 @@ public class GroupSecurityReference extends UserSecurityReference
     {
         super(reference, mainWiki);
         if (this.getOriginalReference() == null) {
-            throw new IllegalArgumentException("A security group could not be null.");
+            throw new IllegalArgumentException("A security group reference could not be null.");
         }
         // TODO: really check that we have a real group document
     }

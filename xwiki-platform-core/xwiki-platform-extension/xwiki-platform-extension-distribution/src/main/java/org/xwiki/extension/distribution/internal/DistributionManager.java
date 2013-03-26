@@ -44,9 +44,25 @@ public interface DistributionManager
         NONE,
 
         /** Probably something to do. */
+
+        /**
+         * No previous state.
+         */
         NEW,
+
+        /**
+         * Previous state is an older version of the same distribution.
+         */
         UPGRADE,
+
+        /**
+         * Previous state is a newer version of the same distribution.
+         */
         DOWNGRADE,
+
+        /**
+         * Previous state is a different distribution.
+         */
         DIFFERENT
     }
 

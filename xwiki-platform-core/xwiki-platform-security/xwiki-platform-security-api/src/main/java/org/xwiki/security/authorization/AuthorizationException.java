@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authorization;
 
-import java.util.Formatter;
-
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
@@ -32,6 +30,12 @@ import org.xwiki.model.reference.EntityReference;
  */
 public class AuthorizationException extends Exception
 {
+    /** Constant value displayed for null entityReference. */
+    static final String NULL_ENTITY = "Main Wiki";
+
+    /** Constant value displayed for null userReference. */
+    static final String NULL_USER = "Public";
+
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
 
@@ -106,11 +110,11 @@ public class AuthorizationException extends Exception
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("%s when checking %s access to [%s] for user [%s]",
-                                     message,
-                                     (right == null) ? "" : "[" + right.getName() + "]",
-                                     entityReference,
-                                     userReference).toString(), cause);
+        super(String.format("%s when checking %s access to [%s] for user [%s]",
+                            message,
+                            (right == null) ? "" : "[" + right.getName() + "]",
+                            (entityReference == null) ? NULL_ENTITY : entityReference,
+                            (userReference == null) ? NULL_USER : userReference), cause);
     }
 
     /**
@@ -123,9 +127,9 @@ public class AuthorizationException extends Exception
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("%s when checking access to [%s]",
-                                     message, 
-                                     entityReference).toString(), cause);
+        super(String.format("%s when checking access to [%s]",
+                            message,
+                            (entityReference == null) ? NULL_ENTITY : entityReference), cause);
     }
 
     /**

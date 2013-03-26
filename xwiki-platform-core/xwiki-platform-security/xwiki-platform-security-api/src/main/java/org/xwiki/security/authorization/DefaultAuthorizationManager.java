@@ -107,7 +107,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
             this.logger.error(String.format("Failed to load rights for user [%s] on [%s].",
-                userReference, entityReference), e);
+                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference,
+                (userReference == null) ? AuthorizationException.NULL_USER : userReference), e);
             return false;
         }
     }
@@ -252,8 +253,10 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         boolean debugLevel)
     {
         if ((debugLevel && logger.isDebugEnabled()) || (!debugLevel && logger.isInfoEnabled())) {
-            String userName = (user != null) ? entityReferenceSerializer.serialize(user) : "Public access";
-            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : "main Wiki";
+            String userName = (user != null) ? entityReferenceSerializer.serialize(user)
+                                             : AuthorizationException.NULL_USER;
+            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity)
+                                              : AuthorizationException.NULL_USER;
             String rightName = (right != null) ? right.getName() : "no right";
             String accessName = (access == RuleState.ALLOW) ? "granted" : "denied";
             String message = "Access has been %s for (%s,%s,%s): %s";

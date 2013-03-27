@@ -35,23 +35,27 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
 {
     @Override
     public SearchResults search(String wikiName, String keywords, List<String> searchScopeStrings, Integer number,
-            Integer start, String orderField, String order, Boolean withPrettyNames)
-            throws XWikiRestException
+        Integer start, String orderField, String order, Boolean withPrettyNames) throws XWikiRestException
     {
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s",
-                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString(),
-                    SEARCH_TEMPLATE_INFO));
+                UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString(),
+                SEARCH_TEMPLATE_INFO));
 
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            String contextWiki = wikiName;
+            if (contextWiki == null) {
+                contextWiki = getXWikiContext().getDatabase();
+            } else {
+                Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            }
 
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
-            searchResults.getSearchResults().addAll(search(searchScopes, keywords, wikiName, null,
-                    Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(
-                            Utils.getXWikiContext(componentManager)), number, start, true, orderField, order,
-                    withPrettyNames));
+            searchResults.getSearchResults().addAll(
+                search(searchScopes, keywords, contextWiki, null, Utils.getXWiki(componentManager).getRightService()
+                    .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true, orderField,
+                    order, withPrettyNames));
 
             return searchResults;
         } catch (Exception e) {

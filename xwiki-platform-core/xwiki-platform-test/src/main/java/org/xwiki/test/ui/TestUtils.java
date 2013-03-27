@@ -269,7 +269,16 @@ public class TestUtils
 
     public void createUser(final String username, final String password, Object... properties)
     {
-        registerLoginAndGotoPage(username, password, null);
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("register", "1");
+        parameters.put("xwikiname", username);
+        parameters.put("register_password", password);
+        parameters.put("register2_password", password);
+        parameters.put("register_email", "");
+        parameters.put("xredirect", getURLToLoginAndGotoPage(username, password, getURLToNonExistentPage()));
+        parameters.put("form_token", getSecretToken());
+        getDriver().get(getURL("XWiki", "Register", "register", parameters));
+        recacheSecretToken();
         if (properties.length > 0) {
             updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
         }
@@ -281,23 +290,8 @@ public class TestUtils
     @Deprecated
     public void registerLoginAndGotoPage(final String username, final String password, final String pageURL)
     {
-        String registerURL = getURL("XWiki", "Register", "register", new HashMap<String, String>()
-        {
-            {
-                put("register", "1");
-                put("xwikiname", username);
-                put("register_password", password);
-                put("register2_password", password);
-                put("register_email", "");
-                put("xredirect", getURLToLoginAndGotoPage(username, password, getURLToNonExistentPage()));
-                put("form_token", getSecretToken());
-            }
-        });
-        getDriver().get(registerURL);
-        recacheSecretToken();
-        if (pageURL != null) {
-            getDriver().get(pageURL);
-        }
+        createUser(username, password);
+        getDriver().get(pageURL);
     }
 
     public ViewPage gotoPage(String space, String page)

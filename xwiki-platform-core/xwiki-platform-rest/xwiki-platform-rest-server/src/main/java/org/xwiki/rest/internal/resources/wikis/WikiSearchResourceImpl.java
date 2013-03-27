@@ -43,19 +43,16 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
                 UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString(),
                 SEARCH_TEMPLATE_INFO));
 
-            String contextWiki = wikiName;
-            if (contextWiki == null) {
-                contextWiki = getXWikiContext().getDatabase();
-            } else {
+            if (wikiName != null) {
                 Utils.getXWikiContext(componentManager).setDatabase(wikiName);
             }
 
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
             searchResults.getSearchResults().addAll(
-                search(searchScopes, keywords, contextWiki, null, Utils.getXWiki(componentManager).getRightService()
-                    .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start, true, orderField,
-                    order, withPrettyNames));
+                search(searchScopes, keywords, getXWikiContext().getDatabase(), null, Utils.getXWiki(componentManager)
+                    .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start,
+                    true, orderField, order, withPrettyNames));
 
             return searchResults;
         } catch (Exception e) {

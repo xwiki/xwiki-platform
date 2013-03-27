@@ -105,8 +105,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
             this.logger.error(String.format("Failed to load rights for user [%s] on [%s].",
-                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference,
-                (userReference == null) ? AuthorizationException.NULL_USER : userReference), e);
+                (userReference == null) ? AuthorizationException.NULL_USER : userReference,
+                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference), e);
             return false;
         }
     }

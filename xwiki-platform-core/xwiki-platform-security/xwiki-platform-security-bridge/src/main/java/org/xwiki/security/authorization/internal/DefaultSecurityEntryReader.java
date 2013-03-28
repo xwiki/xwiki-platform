@@ -60,6 +60,9 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultSecurityEntryReader implements SecurityEntryReader
 {
+    /** A security rules to deny everyone the edit right by allowing edit to no one. */
+    private static final SecurityRule ALLOW_EDIT = new AllowEditToNoOneRule();
+
     /** Logger. **/
     @Inject
     private Logger logger;
@@ -176,6 +179,29 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     }
 
     /**
+     * Load Right object from the document.
+     * @param documentReference reference to the document to be loaded.
+     * @param classReference reference to the class of object to load.
+     * @return a list of matching base objects, or null if none where found.
+     * @throws AuthorizationException if an unexpected error occurs during retrieval.
+     */
+    private List<BaseObject> getXObjects(DocumentReference documentReference, DocumentReference classReference)
+        throws AuthorizationException
+    {
+        XWikiContext context = getXWikiContext();
+
+        try {
+            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
+            if (doc == null || doc.isNew()) {
+                return null;
+            }
+            return doc.getXObjects(classReference);
+        } catch (XWikiException e) {
+            throw new AuthorizationException(documentReference, "Couldn't read right objects", e);
+        }
+    }
+
+    /**
      * Read right objects from an XWikiDocument and return them as XWikiSecurityRule.
      * @param documentReference reference to document to read
      * @param classReference reference to the right class to read
@@ -186,31 +212,54 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     private Collection<SecurityRule> getSecurityRules(DocumentReference documentReference,
         DocumentReference classReference, WikiReference wikiReference) throws AuthorizationException
     {
-        XWikiContext context = getXWikiContext();
+
         List<BaseObject> baseObjects;
         List<SecurityRule> securityRules = new ArrayList<SecurityRule>();
 
-        try {
-            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
-            if (doc == null) {
-                return Collections.emptyList();
-            }
-            baseObjects = doc.getXObjects(classReference);
-        } catch (XWikiException e) {
-            throw new AuthorizationException(documentReference, "Couldn't read right objects", e);
+        boolean isGlobalRightsDocument = isGlobalRightsReference(documentReference)
+            && !classReference.getName().equals(XWikiConstants.GLOBAL_CLASSNAME);
+
+        if (isGlobalRightsDocument) {
+            securityRules.add(ALLOW_EDIT);
+        }
+
+        baseObjects = getXObjects(documentReference, classReference);
+        if (baseObjects == null) {
+            return isGlobalRightsDocument ? securityRules : Collections.<SecurityRule>emptyList();
         }
 
         if (baseObjects != null) {
             for (BaseObject obj : baseObjects) {
                 if (obj != null) {
-                    // The users and groups listed by the rights object, inherit
-                    // the wiki from the document, unless explicitly given.
-                    securityRules.add(new XWikiSecurityRule(obj, resolver, wikiReference));
+                    SecurityRule rule;
+                    try {
+                        // Thanks to the resolver, the users and groups listed by the rights object, inherit
+                        // the wiki from the document, unless explicitly given.
+                        rule = XWikiSecurityRule.createNewRule(obj, resolver, wikiReference, isGlobalRightsDocument);
+                    } catch (IllegalArgumentException e) {
+                        // Do not add badly formed security rules.
+                        continue;
+                    }
+                    securityRules.add(rule);
                 }
             }
         }
 
         return securityRules;
+    }
+
+    /**
+     * Check if the entity reference refers to a document that may contain global rights objects.  In other words
+     * '*:XWiki.XWikiPreferences' or '*:*.WebPreferences'.
+     *
+     * @param documentReference the document reference to check.
+     * @return true if the document is scanned for global rights objects during authorization.
+     */
+    private boolean isGlobalRightsReference(DocumentReference documentReference) {
+        return documentReference.getType() == EntityType.DOCUMENT
+            && (XWikiConstants.SPACE_DOC.equals(documentReference.getName())
+            || (XWikiConstants.WIKI_DOC.equals(documentReference.getName())
+            && XWikiConstants.XWIKI_SPACE.equals(documentReference.getParent().getName())));
     }
 }
 

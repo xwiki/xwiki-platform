@@ -195,4 +195,60 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user2"),
             new DocumentReference("wiki", "Space", "Page"), ctx);
     }
+
+    @Test
+    public void testEditAccessToGlobalRightObjectOnEmptyWiki() throws Exception
+    {
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki");
+
+        DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
+
+        assertAccessFalse("Non-admin should not have edit access to XWikiPreferences in an empty wiki",
+            Right.EDIT, user, new DocumentReference("wiki", "XWiki", "XWikiPreferences"), ctx);
+        assertAccessFalse("Non-admin should not have edit access to XWiki.WebPreferences in an empty wiki",
+            Right.EDIT, user, new DocumentReference("wiki", "XWiki", "WebPreferences"), ctx);
+        assertAccessFalse("Non-admin should not have edit access to WebPreferences in any space of an empty wiki",
+            Right.EDIT, user, new DocumentReference("wiki", "space", "WebPreferences"), ctx);
+    }
+
+    @Test
+    public void testEditAccessToGlobalRightObject() throws Exception
+    {
+        LegacyTestWiki testWiki =
+            new LegacyTestWiki(getMockery(), getComponentManager(), "accessToGlobalObjects.xml", false);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki");
+
+        DocumentReference userA = new DocumentReference("wiki", "XWiki", "userA");
+        DocumentReference userB = new DocumentReference("wiki", "XWiki", "userB");
+        DocumentReference userA2 = new DocumentReference("wiki2", "XWiki", "userA");
+        DocumentReference userB2 = new DocumentReference("wiki2", "XWiki", "userB");
+
+        assertAccessTrue("Admin should have edit access to XWikiPreferences when allowed by the wiki",
+            Right.EDIT, userA, new DocumentReference("wiki", "XWiki", "XWikiPreferences"), ctx);
+        assertAccessTrue("Admin should have edit access to XWikiPreferences when allowed by the XWiki space",
+            Right.EDIT, userA2, new DocumentReference("wiki2", "XWiki", "XWikiPreferences"), ctx);
+        assertAccessTrue("Global Admin should have edit access to XWikiPreferences",
+            Right.EDIT, userA, new DocumentReference("wiki2", "XWiki", "XWikiPreferences"), ctx);
+        assertAccessFalse("Non-admin should not have edit access to XWikiPreferences even when allowed by the document",
+            Right.EDIT, userB, new DocumentReference("wiki", "XWiki", "XWikiPreferences"), ctx);
+        assertAccessFalse("Non-admin should not have edit access to XWikiPreferences even when allowed by the space",
+            Right.EDIT, userB, new DocumentReference("wiki2", "XWiki", "XWikiPreferences"), ctx);
+
+        assertAccessTrue("Admin should have edit access to XWikiPreferences when allowed by the wiki",
+            Right.EDIT, userA, new DocumentReference("wiki", "XWiki", "WebPreferences"), ctx);
+        assertAccessTrue("Admin should have edit access to XWikiPreferences when allowed by the XWiki space",
+            Right.EDIT, userA2, new DocumentReference("wiki2", "XWiki", "WebPreferences"), ctx);
+        assertAccessTrue("Global Admin should have edit access to XWikiPreferences",
+            Right.EDIT, userA, new DocumentReference("wiki2", "XWiki", "WebPreferences"), ctx);
+        assertAccessFalse("Non-admin should not have edit access to XWikiPreferences even when allowed by the document",
+            Right.EDIT, userB, new DocumentReference("wiki", "XWiki", "WebPreferences"), ctx);
+        assertAccessFalse("Non-admin should not have edit access to XWikiPreferences even when allowed by the space",
+            Right.EDIT, userB, new DocumentReference("wiki2", "XWiki", "WebPreferences"), ctx);
+
+    }
 }

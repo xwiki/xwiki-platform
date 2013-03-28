@@ -48,16 +48,16 @@ import com.xpn.xwiki.objects.classes.UsersClass;
  * @version $Id$
  * @since 4.0M2
  */
-public class XWikiSecurityRule implements SecurityRule
+public final class XWikiSecurityRule implements SecurityRule
 {
     /** The set of users. */
-    private final Set<DocumentReference> users;
+    private final Set<DocumentReference> users = new HashSet<DocumentReference>();
 
     /** The set of groups. */
-    private final Set<DocumentReference> groups;
+    private final Set<DocumentReference> groups = new HashSet<DocumentReference>();
 
     /** The set of right levels. */
-    private final RightSet rights;
+    private final RightSet rights = new RightSet();
 
     /** The state specified by this object. */
     private final RuleState state;
@@ -68,55 +68,64 @@ public class XWikiSecurityRule implements SecurityRule
      * @param obj An xwiki rights object.
      * @param resolver A document reference resolver for user and group pages.
      * @param wikiReference A reference to the wiki from which these rules are extracted.
+     * @param disableEditRight when true, edit right is disregarded while building this rule.
+     * @throws IllegalArgumentException if the source object for the rules is badly formed.
      */
-    protected XWikiSecurityRule(BaseObject obj, DocumentReferenceResolver<String> resolver,
-        WikiReference wikiReference)
+    private XWikiSecurityRule(BaseObject obj, DocumentReferenceResolver<String> resolver,
+        WikiReference wikiReference, boolean disableEditRight)
     {
         state = (obj.getIntValue(XWikiConstants.ALLOW_FIELD_NAME) == 1) ? RuleState.ALLOW : RuleState.DENY;
-        users = new HashSet<DocumentReference>();
-        groups = new HashSet<DocumentReference>();
-        rights = new RightSet();
 
         for (String level : LevelsClass.getListFromString(obj.getStringValue(XWikiConstants.LEVELS_FIELD_NAME))) {
             Right right = Right.toRight(level);
-            if (right != Right.ILLEGAL) {
+            if (right != Right.ILLEGAL && (!disableEditRight || right != Right.EDIT)) {
                 rights.add(right);
             }
         }
 
-        for (String user : UsersClass.getListFromString(obj.getStringValue(XWikiConstants.USERS_FIELD_NAME))) {
-            DocumentReference ref = resolver.resolve(user, wikiReference);
-            if (XWikiConstants.GUEST_USER.equals(ref.getName())) {
-                // In the database, Rights for public users (not logged in) are stored using a user named XWikiGuest,
-                // while in SecurityUserReference the original reference for those users is null. So, store rules for
-                // XWikiGuest to be matched by null.
-                ref = null;
+        // No need to computes users when no right will match.
+        if (rights.size() > 0) {
+            for (String user : UsersClass.getListFromString(obj.getStringValue(XWikiConstants.USERS_FIELD_NAME))) {
+                DocumentReference ref = resolver.resolve(user, wikiReference);
+                if (XWikiConstants.GUEST_USER.equals(ref.getName())) {
+                    // In the database, Rights for public users (not logged in) are stored using a user named
+                    // XWikiGuest, while in SecurityUserReference the original reference for those users is null. So,
+                    // store rules for XWikiGuest to be matched by null.
+                    ref = null;
+                }
+                this.users.add(ref);
             }
-            this.users.add(ref);
-        }
 
-        for (String group : GroupsClass.getListFromString(obj.getStringValue(XWikiConstants.GROUPS_FIELD_NAME))) {
-            DocumentReference ref = resolver.resolve(group, wikiReference);
-            this.groups.add(ref);
+            for (String group : GroupsClass.getListFromString(obj.getStringValue(XWikiConstants.GROUPS_FIELD_NAME))) {
+                DocumentReference ref = resolver.resolve(group, wikiReference);
+                this.groups.add(ref);
+            }
         }
     }
 
-    /** 
-     * Constructor to be used only by test code.
-     * @param rights The set of rights.
-     * @param state The state of this rights object.
-     * @param users The set of users.
-     * @param groups The set of groups.
+    /**
+     * Create and return a new Security rule based on an existing BaseObject.
+     * @param obj An xwiki rights object.
+     * @param resolver A document reference resolver for user and group pages.
+     * @param wikiReference A reference to the wiki from which these rules are extracted.
+     * @param disableEditRight when true, edit right is disregarded while building this rule.
+     * @return a newly created security rule.
+     * @throws IllegalArgumentException if the source object for the rules is badly formed.
      */
-    protected XWikiSecurityRule(RightSet rights,
-        RuleState state,
-        Set<DocumentReference> users,
-        Set<DocumentReference> groups)
+    static SecurityRule createNewRule(BaseObject obj, DocumentReferenceResolver<String> resolver,
+        WikiReference wikiReference, boolean disableEditRight) throws IllegalArgumentException
     {
-        this.users = users;
-        this.groups = groups;
-        this.rights = rights;
-        this.state = state;
+        XWikiSecurityRule rule = new XWikiSecurityRule(obj, resolver, wikiReference, disableEditRight);
+
+        if (rule.rights.size() == 0) {
+            throw new IllegalArgumentException("No rights to build this rule.");
+        }
+
+        if (rule.users.size() == 0 && rule.groups.size() == 0) {
+            throw new IllegalArgumentException("No user/group to build this rule.");
+        }
+
+        return rule;
     }
 
     @Override

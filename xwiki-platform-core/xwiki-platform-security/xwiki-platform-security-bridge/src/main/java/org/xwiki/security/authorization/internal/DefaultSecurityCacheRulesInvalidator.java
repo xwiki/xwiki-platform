@@ -157,9 +157,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     }
 
     /**
-     * Due to the special case where a user have been added to the
-     * group, we need to step through all members of the group and
-     * remove all corresponding user entries.
+     * Drop from the cache all members of a given group.
      * @param group The group.
      * @param securityCache Right cache instance to invalidate.
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
@@ -205,6 +203,10 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
         try {
             deliverUpdateEvent(ref);
             if (isGroupDocument(source)) {
+                // When a group receive a new member, the update event is triggered and the above invalidate the group
+                // and also all its existing members already in cache, but NOT the new member that could be currently
+                // in the cache, and is not yet linked to the group. Here, we invalidate individually all members of
+                // the group based on the updated group, which will only have the effect of invaliding new members.
                 invalidateGroupMembers(ref, securityCache);
             }
         } catch (AuthorizationException e) {

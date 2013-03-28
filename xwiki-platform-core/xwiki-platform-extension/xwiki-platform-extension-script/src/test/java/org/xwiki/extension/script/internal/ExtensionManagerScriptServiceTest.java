@@ -152,6 +152,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
@@ -168,6 +170,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
@@ -184,6 +188,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
@@ -200,6 +206,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));

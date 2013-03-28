@@ -144,13 +144,26 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
     {
         ListItem<Attachment> imageItem = new ListItem<Attachment>();
         imageItem.setData(image);
-        Image htmlImage = new Image(image.getUrl() + "?width=135");
+        Image htmlImage = new Image(extendQueryString(image.getUrl(), "width=135"));
         htmlImage.setTitle(new AttachmentReference(image.getReference()).getFileName());
         FlowPanel previewPanel = new FlowPanel();
         previewPanel.addStyleName("xImagePreview");
         previewPanel.add(htmlImage);
         imageItem.add(previewPanel);
         return imageItem;
+    }
+
+    /**
+     * Extension the query string of the given URL.
+     * 
+     * @param url the URL whose query string is going to be extended
+     * @param extraQueryString the string to add to the existing query string
+     * @return the given URL with the query string extended
+     */
+    private String extendQueryString(String url, String extraQueryString)
+    {
+        char separator = url.indexOf('?') < 0 ? '?' : '&';
+        return url + separator + extraQueryString;
     }
 
     /**

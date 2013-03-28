@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
@@ -125,6 +126,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     public List<Event> getEvents()
     {
         Event[] events = {
+            new DocumentCreatedEvent(),
             new DocumentUpdatedEvent(),
             new DocumentDeletedEvent(),
         };

@@ -30,7 +30,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.EntityType;
@@ -53,6 +52,7 @@ import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 import org.xwiki.security.internal.XWikiBridge;
+import org.xwiki.test.LogRule;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -81,6 +81,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     @Rule
     public final MockitoComponentMockingRule<SecurityReferenceFactory> securityReferenceFactoryMocker =
         new MockitoComponentMockingRule<SecurityReferenceFactory>(DefaultSecurityReferenceFactory.class);
+
+    @Rule
+    public LogRule logCapture = new LogRule();
 
     private SecurityCache securityCache;
 
@@ -120,9 +123,6 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         aMissingGroupRef = factory.newGroupReference(new DocumentReference("missingGroup",
             xXWikiSpace.getOriginalSpaceReference()));
         aMissingWikiRef = factory.newEntityReference(new WikiReference("missingWiki"));
-
-        final Logger mockLogger = securityCacheMocker.getMockedLogger();
-        when(mockLogger.isDebugEnabled()).thenReturn(false);
     }
 
     private SecurityRuleEntry mockSecurityRuleEntry(final SecurityReference ref)

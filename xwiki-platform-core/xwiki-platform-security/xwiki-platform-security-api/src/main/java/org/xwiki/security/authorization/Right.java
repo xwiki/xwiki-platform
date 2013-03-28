@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Formatter;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
@@ -241,22 +240,17 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private void checkIllegalArguments(String name, RuleState defaultState, RuleState tieResolutionPolicy)
     {
         if (name == null || ALL_RIGHTS.contains(name) || (ILLEGAL != null && name.equals(ILLEGAL_RIGHT_NAME))) {
-            throw new IllegalArgumentException(new Formatter()
-                                               .format("Duplicate name for right [%s]", name).toString());
+            throw new IllegalArgumentException(String.format("Duplicate name for right [%s]", name));
         }
 
         if (defaultState == null || defaultState == UNDETERMINED) {
-            throw new IllegalArgumentException(new Formatter()
-                                               .format("Invalid default state [%s] for right [%s]", defaultState, name)
-                                               .toString());
+            throw new IllegalArgumentException(
+                String.format("Invalid default state [%s] for right [%s]", defaultState, name));
         }
 
         if (tieResolutionPolicy == null || tieResolutionPolicy == UNDETERMINED) {
-            throw new IllegalArgumentException(new Formatter()
-                                               .format("Invalid tie resolution policy [%s] for right [%s]",
-                                                       tieResolutionPolicy,
-                                                       name)
-                                               .toString());
+            throw new IllegalArgumentException(
+                String.format("Invalid tie resolution policy [%s] for right [%s]", tieResolutionPolicy, name));
         }
     }
 

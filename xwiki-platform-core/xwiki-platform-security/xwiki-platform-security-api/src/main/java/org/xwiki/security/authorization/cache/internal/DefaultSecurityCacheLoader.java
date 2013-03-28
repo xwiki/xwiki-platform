@@ -22,7 +22,6 @@ package org.xwiki.security.authorization.cache.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Formatter;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -115,8 +114,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             } finally {
                 rulesInvalidator.resume();
             }
-            String message = new Formatter().format("Failed to load the cache in %d attempts.  Giving up.",
-                                                    retries).toString();
+            String message = String.format("Failed to load the cache in %d attempts.  Giving up.", retries);
             this.logger.error(message);
             throw new AuthorizationException(user.getOriginalDocumentReference(),
                                              entity.getOriginalReference(), message);

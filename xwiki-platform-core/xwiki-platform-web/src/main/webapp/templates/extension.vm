@@ -1,3 +1,4 @@
+#set ($extensionConfig = {})
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
@@ -882,10 +883,8 @@ Caused by: #printThrowable($throwable.cause true)
       #set ($discard = $installRequest.addNamespace($namespace))
     #end
   #end
-  ## TODO: Add a way to preserve the extension author without preventing extensions from being installed with guest
-  ## user as author.
-  #if (!$xcontext.userReference)
-    #set ($discard = $installRequest.removeProperty('user.reference'))
+  #if ($extensionConfig.skipUserRightCheck)
+    #set ($discard = $installRequest.removeProperty('checkrights'))
   #end
   #set ($discard = $extensionManager.install($installRequest))
   #handleExtensionJobStartFailure('extensions.install.error.installFailure')

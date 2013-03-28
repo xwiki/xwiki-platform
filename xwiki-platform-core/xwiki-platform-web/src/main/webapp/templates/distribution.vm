@@ -114,6 +114,9 @@
 #end
 
 #macro(displayMainUIStep)
+  #if (!$xcontext.userReference)
+    #set ($extensionConfig.skipUserRightCheck = true)
+  #end
   #set ($distributionState = $services.distribution.state)
   #if (!$distributionState || $distributionState == 'NONE')
     <div class="errormessage">$msg.get('platform.extension.distributionWizard.uiStepNoStateError')</div>

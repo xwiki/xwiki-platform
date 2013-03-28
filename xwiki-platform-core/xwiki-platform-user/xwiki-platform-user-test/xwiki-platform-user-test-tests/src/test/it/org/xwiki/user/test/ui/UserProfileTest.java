@@ -19,10 +19,12 @@
  */
 package org.xwiki.user.test.ui;
 
-import junit.framework.Assert;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
@@ -33,8 +35,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.ChangePasswordPage;
 import org.xwiki.user.test.po.PreferencesEditPage;
-import org.xwiki.user.test.po.ProfileEditPage;
 import org.xwiki.user.test.po.PreferencesUserProfilePage;
+import org.xwiki.user.test.po.ProfileEditPage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
 
 /**
@@ -87,8 +89,9 @@ public class UserProfileTest extends AbstractTest
     public void setUp()
     {
         this.userName = getTestClassName() + getTestMethodName();
-        this.customProfilePage = new ProfileUserProfilePage(this.userName);
-        getUtil().registerLoginAndGotoPage(this.userName, "test", this.customProfilePage.getURL());
+        getUtil().createUser(this.userName, "test");
+
+        this.customProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
     }
 
     /** Functionality check: changing profile information. */
@@ -133,10 +136,30 @@ public class UserProfileTest extends AbstractTest
     })
     public void testChangeAvatarImage()
     {
+        // In order to change the avatar image we have to use the Attachment Selector macro which by default has
+        // wiki-level visibility and thus is not registered in our setup because we don't have the XWiki.Admin user.
+        // Let's change the macro visibility to current user to make sure it is registered.
+        setWikiMacroVisibility("XWiki", "AttachmentSelector", "Current User");
+
         ChangeAvatarPage changeAvatarImage = this.customProfilePage.changeAvatarImage();
         changeAvatarImage.setAvatarImage(IMAGE_NAME);
         changeAvatarImage.submit();
         Assert.assertEquals(IMAGE_NAME, this.customProfilePage.getAvatarImageName());
+    }
+
+    /**
+     * Sets the visibility level of the specified wiki macro.
+     * 
+     * @param space the space containing the wiki macro document
+     * @param page the name of the document that contains the wiki macro definition
+     * @param visibility the new visibility level
+     */
+    private void setWikiMacroVisibility(String space, String page, String visibility)
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("XWiki.WikiMacroClass_0_visibility", visibility);
+        parameters.put("xredirect", getDriver().getCurrentUrl());
+        getUtil().gotoPage("XWiki", "AttachmentSelector", "save", parameters);
     }
 
     /** Functionality check: changing the password. */

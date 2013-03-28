@@ -694,7 +694,10 @@ public class LegacyTestWiki extends AbstractTestWiki
         void notifyCreatedDocument(XWikiDocument document)
         {
             // Send event
-            observationManager.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
+            // Do not notify during parsing !
+            if (mainWikiName == null) {
+                observationManager.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
+            }
         }
 
         void notifyDeleteDocument(XWikiDocument document)

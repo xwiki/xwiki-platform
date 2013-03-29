@@ -538,25 +538,34 @@ public class PackageMojo extends AbstractMojo
 
     private Collection<Artifact> resolveJarArtifacts() throws MojoExecutionException
     {
-        Set<Artifact> jarArtifacts = new HashSet<Artifact>();
+        Set<Artifact> artifactsToResolve = new HashSet<Artifact>();
 
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
-                if (artifact.getType().equals("jar")) {
-                    jarArtifacts.add(artifact);
-                    // Note that we don't need to resolve transitively since getArtifacts() above will already
-                    // contain all transitive dependencies.
-                    resolveArtifact(artifact);
-                }
+                artifactsToResolve.add(artifact);
+                // Note that we don't need to resolve transitively here since getArtifacts() above will already
+                // contain all transitive dependencies.
+                resolveArtifact(artifact);
             }
         }
 
         // Add mandatory dependencies if they're not explicitly specified.
-        jarArtifacts.addAll(getMandatoryJarArtifacts());
+        artifactsToResolve.addAll(getMandatoryJarArtifacts());
 
         // Resolve all artifacts transitively in one go.
-        return resolveTransitively(jarArtifacts);
+        Set<Artifact> resolvedArtifacts = resolveTransitively(artifactsToResolve);
+
+        // Remove the non JAR artifacts. Note that we need to include non JAR artifacts before the transitive resolve
+        // because for example some XARs mayb depend on JARs and we need those JARs to be packaged!
+        Set<Artifact> jarArtifacts = new HashSet<Artifact>();
+        for (Artifact artifact : resolvedArtifacts) {
+            if (artifact.getType().equals("jar")) {
+                jarArtifacts.add(artifact);
+            }
+        }
+
+        return jarArtifacts;
     }
 
     private Set<Artifact> getMandatoryJarArtifacts() throws MojoExecutionException

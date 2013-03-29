@@ -31,9 +31,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1106311617000</creationDate>
-  <date>1364289719000</date>
-  <contentUpdateDate>1364289719000</contentUpdateDate>
+  <creationDate>1364502204000</creationDate>
+  <date>1364566342000</date>
+  <contentUpdateDate>1364566342000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki Preferences</title>
   <defaultTemplate/>
@@ -1043,7 +1043,7 @@
         {{html}}
           #if($xwiki.jodatime)
             &lt;select id='$prefix$name' name='$prefix$name'&gt;
-              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$msg.get('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
+              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$services.localization.render('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
               #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
                 &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
               #end
@@ -2452,7 +2452,7 @@
         {{html}}
           #if($xwiki.jodatime)
             &lt;select id='$prefix$name' name='$prefix$name'&gt;
-              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$msg.get('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
+              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$services.localization.render('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
               #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
                 &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
               #end

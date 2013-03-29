@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1267027868000</creationDate>
-  <date>1267027924000</date>
-  <contentUpdateDate>1267027924000</contentUpdateDate>
+  <creationDate>1364502206000</creationDate>
+  <date>1364567451000</date>
+  <contentUpdateDate>1364567451000</contentUpdateDate>
   <version>1.1</version>
   <title>Registration Page Documentation</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -205,7 +204,7 @@ Here is the definition of a field which is used in the registration page
 ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
 #set($field = 
   {'name' : 'xwikiname',
-    'label' : $msg.get('core.register.username'),
+    'label' : $services.localization.render('core.register.username'),
     'params' : {
       'type' : 'text',
       'onfocus' : 'prepareName(document.forms.register);',
@@ -213,11 +212,11 @@ Here is the definition of a field which is used in the registration page
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory') 
+        'failureMessage' : $services.localization.render('XWiki.Registration.fieldMandatory') 
       },
       'programmaticValidation' : {
         'code' : '#nameAvailable($request.get("xwikiname"))',
-        'failureMessage' : $msg.get('core.register.userAlreadyExists')
+        'failureMessage' : $services.localization.render('core.register.userAlreadyExists')
       }
     }
   })

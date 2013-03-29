@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1309440660000</creationDate>
-  <date>1309796049000</date>
-  <contentUpdateDate>1309796049000</contentUpdateDate>
+  <creationDate>1364502205000</creationDate>
+  <date>1364567133000</date>
+  <contentUpdateDate>1364567133000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('admin.analytics')</title>
-  <template/>
+  <title>$services.localization.render('admin.analytics')</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -542,12 +541,12 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
 	#set($jsObj = $analyticsCodeDoc.getObject('XWiki.JavaScriptExtension'))
 	#if("$!jsObj" != "")
 		#if ("$!analyticsCodeDoc.getValue('use', $jsObj)" == 'always')
-			{{info}}$msg.get("admin.analytics.running"){{/info}}
+			{{info}}{{translation key="admin.analytics.running"/}}{{/info}}
 		#else
-			{{info}}$msg.get("admin.analytics.notrunning"){{/info}}
+			{{info}}{{translation key="admin.analytics.notrunning"/}}{{/info}}
 		#end
 	#else
-		{{error}}$msg.get("admin.analytics.noscript"){{/error}}
+		{{error}}{{translation key="admin.analytics.noscript"/}}{{/error}}
 	#end
 #end ##macro
 {{/velocity}}
@@ -566,7 +565,7 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 #saveGoogleAccount($request.get('analytics_account'))##
 #end## save action
 #else## !hasAdmin
-{{error}}$msg.get('needadminrights').{{/error}}
+{{error}}{{translation key="needadminrights"/}}.{{/error}}
 #end##
 #displayAnalyticsStatus()
 
@@ -575,7 +574,7 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 	&lt;dl&gt;
 		&lt;dt&gt;
 			&lt;label for="analytics_account"&gt;$!accountPropertyClass.prettyName&lt;/label&gt;
-			&lt;span class="xHint"&gt;$msg.get("admin.analytics.sectiondesc")&lt;/span&gt;
+			&lt;span class="xHint"&gt;$services.localization.render("admin.analytics.sectiondesc")&lt;/span&gt;
 		&lt;/dt&gt;
 		&lt;dd&gt;
 			$analyticsConfigDoc.displayEdit($accountPropertyClass, 'analytics_', $analyticsObj)

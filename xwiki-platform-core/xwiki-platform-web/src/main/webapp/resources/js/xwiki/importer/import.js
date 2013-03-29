@@ -3,24 +3,24 @@ var XWiki = (function(XWiki){
     var importer = XWiki.importer = XWiki.importer || {};
 
     var translations = {
-                "availableDocuments" : "$msg.get('core.importer.availableDocuments')",
-                "importHistoryLabel" : "$msg.get('core.importer.importHistory')",
-                    "selectionEmpty" : "$msg.get('core.importer.selectionEmptyWarning')",
-                            "import" : "$msg.get('core.importer.import')",
-                           "package" : "$msg.get('core.importer.package')",
-                       "description" : "$msg.get('core.importer.package.description')",
-                           "version" : "$msg.get('core.importer.package.version')",
-                           "licence" : "$msg.get('core.importer.package.licence')",
-                            "author" : "$msg.get('core.importer.package.author')",
-                  "documentSelected" : "$msg.get('core.importer.documentSelected')",
-         "whenDocumentAlreadyExists" : "$msg.get('core.importer.whenDocumentAlreadyExists')",
-                     "addNewVersion" : "$msg.get('core.importer.addNewVersion')",
-            "replaceDocumentHistory" : "$msg.get('core.importer.replaceDocumentHistory')",
-                      "resetHistory" : "$msg.get('core.importer.resetHistory')",
-                    "importAsBackup" : "$msg.get('core.importer.importAsBackup')",
-                            "select" : "$msg.get('core.importer.select')",
-                               "all" : "$msg.get('core.importer.selectAll')",
-                              "none" : "$msg.get('core.importer.selectNone')"
+                "availableDocuments" : "$services.localization.render('core.importer.availableDocuments')",
+                "importHistoryLabel" : "$services.localization.render('core.importer.importHistory')",
+                    "selectionEmpty" : "$services.localization.render('core.importer.selectionEmptyWarning')",
+                            "import" : "$services.localization.render('core.importer.import')",
+                           "package" : "$services.localization.render('core.importer.package')",
+                       "description" : "$services.localization.render('core.importer.package.description')",
+                           "version" : "$services.localization.render('core.importer.package.version')",
+                           "licence" : "$services.localization.render('core.importer.package.licence')",
+                            "author" : "$services.localization.render('core.importer.package.author')",
+                  "documentSelected" : "$services.localization.render('core.importer.documentSelected')",
+         "whenDocumentAlreadyExists" : "$services.localization.render('core.importer.whenDocumentAlreadyExists')",
+                     "addNewVersion" : "$services.localization.render('core.importer.addNewVersion')",
+            "replaceDocumentHistory" : "$services.localization.render('core.importer.replaceDocumentHistory')",
+                      "resetHistory" : "$services.localization.render('core.importer.resetHistory')",
+                    "importAsBackup" : "$services.localization.render('core.importer.importAsBackup')",
+                            "select" : "$services.localization.render('core.importer.select')",
+                               "all" : "$services.localization.render('core.importer.selectAll')",
+                              "none" : "$services.localization.render('core.importer.selectNone')"
     };
 
     /**
@@ -53,7 +53,7 @@ var XWiki = (function(XWiki){
                     }
                     event.findElement('li').remove();
                 }},
-                {confirmationText: "$msg.get('core.viewers.attachments.delete.confirm')"}
+                {confirmationText: "$services.localization.render('core.viewers.attachments.delete.confirm')"}
             );
         });
     }

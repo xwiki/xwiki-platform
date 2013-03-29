@@ -218,8 +218,8 @@ widgets.FullScreen = Class.create({
     // Create HTML element
     var fullScreenActivator = new Element('img', {
       'class': 'fullScreenEditButton',
-      title: "$msg.get('core.editors.fullscreen.editFullScreen')",
-      alt: "$msg.get('core.editors.fullscreen.editFullScreen')",
+      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
+      alt: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
       src: "$xwiki.getSkinFile('icons/silk/arrow_out.png')"
     });
     // Add functionality
@@ -237,9 +237,9 @@ widgets.FullScreen = Class.create({
     });
     var fullScreenActivator = new Element('a', {
       'class': 'fullScreenEditLink',
-      title: "$msg.get('core.editors.fullscreen.editFullScreen')"
+      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')"
     });
-    fullScreenActivator.update("${msg.get('core.editors.fullscreen.editFullScreen')} &raquo;")
+    fullScreenActivator.update("${services.localization.render('core.editors.fullscreen.editFullScreen')} &raquo;")
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
     // Add it to the container
@@ -257,8 +257,8 @@ widgets.FullScreen = Class.create({
     // Create HTML element
     this.closeButton = new Element('img', {
       'class': 'fullScreenCloseButton',
-      title: "$msg.get('core.editors.fullscreen.exitFullScreen')",
-      alt: "$msg.get('core.editors.fullscreen.exitFullScreen')",
+      title: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
+      alt: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
       src: "$xwiki.getSkinFile('icons/silk/arrow_in.png')"
     });
     // Add functionality
@@ -272,7 +272,7 @@ widgets.FullScreen = Class.create({
     this.actionCloseButton = new Element('input', {
       "type" : "button",
       'class': 'button',
-      value: "$msg.get('core.editors.fullscreen.exitFullScreen')"
+      value: "$services.localization.render('core.editors.fullscreen.exitFullScreen')"
     });
     this.actionCloseButtonWrapper = new Element('span', {
       'class': 'buttonwrapper'

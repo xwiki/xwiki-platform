@@ -46,11 +46,11 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox,
   initialize : function($super, requestUrl, ajaxRequestParameters, interactionParameters) {
     this.interactionParameters = Object.extend({
       displayProgressMessage: true,
-      progressMessageText : "$msg.get('core.widgets.confirmationBox.notification.inProgress')",
+      progressMessageText : "$services.localization.render('core.widgets.confirmationBox.notification.inProgress')",
       displaySuccessMessage: true,
-      successMessageText : "$msg.get('core.widgets.confirmationBox.notification.done')",
+      successMessageText : "$services.localization.render('core.widgets.confirmationBox.notification.done')",
       displayFailureMessage: true,
-      failureMessageText : "$msg.get('core.widgets.confirmationBox.notification.failed')"
+      failureMessageText : "$services.localization.render('core.widgets.confirmationBox.notification.failed')"
     }, interactionParameters || {});
     this.requestUrl = requestUrl;
     this.ajaxRequestParameters = Object.extend(Object.clone(this.defaultAjaxRequestParameters), ajaxRequestParameters || {});

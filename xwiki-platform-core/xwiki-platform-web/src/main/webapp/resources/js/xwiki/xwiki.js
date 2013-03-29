@@ -243,7 +243,7 @@ Object.extend(XWiki, {
     $(content).select(".xwikirenderingerror").each(function(error) {
         if(error.next().innerHTML !== "" && error.next().hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
-            error.title = "$msg.get('platform.core.rendering.error.readTechnicalInformation')";
+            error.title = "$services.localization.render('platform.core.rendering.error.readTechnicalInformation')";
             Event.observe(error, "click", function(event){
                    event.element().next().toggleClassName("hidden");
             });
@@ -321,12 +321,12 @@ Object.extend(XWiki, {
                   if (!XWiki.hasRenderer) {
                       editlink = document.createElement("SPAN");
                       editspan.className = editspan.className + " disabled";
-                      editlink.title = "$msg.get('platform.core.rendering.noRendererForSectionEdit')";
+                      editlink.title = "$services.localization.render('platform.core.rendering.noRendererForSectionEdit')";
                   } else {
                       editlink = document.createElement("A");
                       editlink.href = window.docediturl + "?section=" + sectioncount;
                       editlink.style.textDecoration = "none";
-                      editlink.innerHTML = "$msg.get('edit')";
+                      editlink.innerHTML = "$services.localization.render('edit')";
                   }
 
                   editspan.appendChild(editlink);
@@ -383,7 +383,7 @@ Object.extend(XWiki, {
                           }
                       },
                       onFailure: function() {
-                        new XWiki.widgets.Notification("$msg.get('core.create.ajax.error')", 'error', {inactive: true}).show();
+                        new XWiki.widgets.Notification("$services.localization.render('core.create.ajax.error')", 'error', {inactive: true}).show();
                       }
                   });
                   event.stop();

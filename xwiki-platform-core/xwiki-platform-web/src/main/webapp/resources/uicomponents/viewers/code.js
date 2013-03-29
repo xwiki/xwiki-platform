@@ -8,8 +8,8 @@ viewers.Code = Class.create({
   initialize : function (initialShowLineNumbers) {
     this.showingLineNumbers = initialShowLineNumbers;
     this.toggleLink = $('toggleLineNumbers');
-    this.showText = "$msg.get('core.viewers.code.showLineNumbers')";
-    this.hideText = "$msg.get('core.viewers.code.hideLineNumbers')";
+    this.showText = "$services.localization.render('core.viewers.code.showLineNumbers')";
+    this.hideText = "$services.localization.render('core.viewers.code.hideLineNumbers')";
     if (this.toggleLink) {
       this.textarea = this.toggleLink.up().down('textarea');
       if (this.textarea) {

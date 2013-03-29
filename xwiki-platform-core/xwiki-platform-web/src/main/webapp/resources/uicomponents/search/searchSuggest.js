@@ -78,7 +78,7 @@ var XWiki = (function (XWiki) {
             .insert(new Element('span', {'class':'suggestValue'}))
             .insert(new Element('span', {'class':'suggestInfo'}))
       var allResultsNode = new XWiki.widgets.XList([
-        new XWiki.widgets.XListItem( "$msg.get('core.widgets.suggest.showResults')", {
+        new XWiki.widgets.XListItem( "$services.localization.render('core.widgets.suggest.showResults')", {
           'containerClasses': 'suggestItem',
           'classes': 'showAllResuts',
           'eventCallbackScope' : this,

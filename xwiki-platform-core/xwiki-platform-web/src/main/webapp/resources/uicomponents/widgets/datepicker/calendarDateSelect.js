@@ -27,12 +27,12 @@ Element.buildAndAppend = function(type, options, style) {
 var nil = null;
 
 Date.one_day = 24*60*60*1000;
-Date.weekdays = "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))".split(/\s*,\s*/);
+Date.weekdays = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))".split(/\s*,\s*/);
 for(var i = 0; i < Date.weekdays.length; i++) {
   Date.weekdays[i] = Date.weekdays[i].substring(0, 3);
 }
-Date.first_day_of_week = $msg.get('platform.appwithinminutes.classEditorDatePickerFirstWeekDay');
-Date.months = "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerMonthNames'))".split(/\s*,\s*/);
+Date.first_day_of_week = $services.localization.render('platform.appwithinminutes.classEditorDatePickerFirstWeekDay');
+Date.months = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerMonthNames'))".split(/\s*,\s*/);
 Date.padded2 = function(hour) {
   var padded2 = parseInt(hour, 10);
   if (hour < 10) {
@@ -78,10 +78,10 @@ window.f_scrollTop = function() {
 }
 
 _translations = {
-  "OK": "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate'))",
-  "Now": "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerSelectCurrentTime'))",
-  "Today": "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerSelectCurrentDate'))",
-  "Clear": "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerClearSelectedDate'))"
+  "OK": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate'))",
+  "Now": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerSelectCurrentTime'))",
+  "Today": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerSelectCurrentDate'))",
+  "Clear": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerClearSelectedDate'))"
 }
 
 SelectBox = Class.create();

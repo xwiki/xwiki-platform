@@ -115,7 +115,8 @@
 
 #macro(displayMainUIStep)
   #if (!$xcontext.userReference)
-    #set ($extensionConfig.skipUserRightCheck = true)
+    #set ($extensionConfig.skipCheckRight = true)
+    #set ($extensionConfig.skipCurrentUser = true)
   #end
   #set ($distributionState = $services.distribution.state)
   #if (!$distributionState || $distributionState == 'NONE')

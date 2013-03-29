@@ -1,3 +1,6 @@
+## Various configuration of extension.vm behavior
+## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
+## * skipCurrentUser: don't take into account context use (XAR extension documents will keep their author for example)
 #set ($extensionConfig = {})
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
@@ -883,8 +886,11 @@ Caused by: #printThrowable($throwable.cause true)
       #set ($discard = $installRequest.addNamespace($namespace))
     #end
   #end
-  #if ($extensionConfig.skipUserRightCheck)
+  #if ($extensionConfig.skipCheckRight)
     #set ($discard = $installRequest.removeProperty('checkrights'))
+  #end
+  #if ($extensionConfig.skipCurrentUser)
+    #set ($discard = $installRequest.removeProperty('user.reference'))
   #end
   #set ($discard = $extensionManager.install($installRequest))
   #handleExtensionJobStartFailure('extensions.install.error.installFailure')

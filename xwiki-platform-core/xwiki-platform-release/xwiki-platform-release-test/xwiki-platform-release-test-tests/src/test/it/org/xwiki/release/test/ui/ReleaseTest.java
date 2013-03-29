@@ -19,6 +19,7 @@
  */
 package org.xwiki.release.test.ui;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.release.test.po.ReleaseEntryEditPage;
@@ -27,11 +28,9 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
-import junit.framework.Assert;
-
 /**
  * UI tests for the Release application.
- *
+ * 
  * @version $Id$
  * @since 5.0M1
  */
@@ -50,17 +49,17 @@ public class ReleaseTest extends AbstractTest
     @Test
     public void testRelease()
     {
-        // Delete pages that we create in the test
-        getUtil().deletePage("Release", RELEASE_PAGE_NAME);
-
         // Create a user and log in with it so that we test the application with a standard user
         // Note that using the superadmin user would also fail since the uservatar macro doesn't work with it.
-        getUtil().registerLoginAndGotoPage(getTestClassName() + "User", "password", ApplicationsPanel.getURL());
+        getUtil().createUser(getTestClassName() + "User", "password");
+
+        // Delete pages that we create in the test (we have to be logged in).
+        getUtil().deletePage("Release", RELEASE_PAGE_NAME);
 
         // Navigate to the Release app by clicking in the Application Panel.
         // This verifies that the Release application is registered in the Applications Panel.
         // It also verifies that the Translation is registered properly.
-        ApplicationsPanel applicationPanel = new ApplicationsPanel();
+        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
         ViewPage vp = applicationPanel.clickApplication("Release");
 
         // Verify we're on the right page!
@@ -70,11 +69,11 @@ public class ReleaseTest extends AbstractTest
 
         // Add new Release
         ReleaseEntryEditPage entryPage = homePage.addRelease(RELEASE_VERSION);
-        vp = entryPage.clickSaveAndView();
+        vp = entryPage.waitUntilPageIsLoaded().clickSaveAndView();
 
         // Go back to the home page by clicking in the breadcrumb
         vp.clickBreadcrumbLink("Releases");
-        homePage = new ReleaseHomePage();
+        homePage.waitUntilPageIsLoaded();
 
         // Assert Livetable:
         // - verify that the Translation has been applied by checking the Translated livetable column name

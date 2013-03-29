@@ -19,14 +19,34 @@
  */
 package org.xwiki.release.test.po;
 
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.test.ui.po.editor.UserPicker;
 
 /**
  * Represents a Release entry page being added.
- *
+ * 
  * @version $Id$
  * @since 5.0M1
  */
 public class ReleaseEntryEditPage extends InlinePage
 {
+    @FindBy(id = "ReleaseCode.ReleaseClass_0_releaseManagers")
+    private WebElement releaseManagersInput;
+
+    @Override
+    public ReleaseEntryEditPage waitUntilPageIsLoaded()
+    {
+        getReleaseManagersPicker().waitToLoad();
+        return this;
+    }
+
+    /**
+     * @return the user picker used to select the release managers
+     */
+    public UserPicker getReleaseManagersPicker()
+    {
+        return new UserPicker(releaseManagersInput);
+    }
 }

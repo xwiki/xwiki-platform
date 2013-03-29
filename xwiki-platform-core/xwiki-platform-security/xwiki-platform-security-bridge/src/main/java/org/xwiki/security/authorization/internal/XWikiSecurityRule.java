@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -61,6 +62,26 @@ public final class XWikiSecurityRule implements SecurityRule
 
     /** The state specified by this object. */
     private final RuleState state;
+
+    /**
+     * Constructor to used for implied rules.
+     * @param rights The set of rights.
+     * @param state The state of this rights object.
+     * @param users The set of users.
+     * @param groups The set of groups.
+     */
+    protected XWikiSecurityRule(Set<Right> rights, RuleState state, Collection<DocumentReference> users,
+        Collection<DocumentReference> groups)
+    {
+        if (users != null) {
+            this.users.addAll(users);
+        }
+        if (groups != null) {
+            this.groups.addAll(groups);
+        }
+        this.rights.addAll(rights);
+        this.state = state;
+    }
 
     /**
      * Construct a more manageable java object from the corresponding

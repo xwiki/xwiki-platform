@@ -30,4 +30,7 @@ public interface XWikiConstants
 {
     /** Name of the space where user document and global preferences is stored. */
     String XWIKI_SPACE = "XWiki";
+
+    /** Name of the super admin user. */
+    String SUPERADMIN = "SuperAdmin";
 }

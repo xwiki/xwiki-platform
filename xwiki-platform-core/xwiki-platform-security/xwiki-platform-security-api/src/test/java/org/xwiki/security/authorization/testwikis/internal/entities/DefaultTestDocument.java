@@ -23,8 +23,10 @@ package org.xwiki.security.authorization.testwikis.internal.entities;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.security.authorization.testwikis.TestDocument;
 import org.xwiki.security.authorization.testwikis.TestEntity;
+import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants;
 
 /**
  * Entity representing documents.
@@ -54,7 +56,9 @@ public class DefaultTestDocument extends AbstractSecureTestEntity implements Tes
         TestEntity parent) {
         super(reference, parent);
 
-        this.creator = new DocumentReference(creator);
+        this.creator = (creator != null) ? new DocumentReference(creator) :
+            new DocumentReference(XWikiConstants.SUPERADMIN, new SpaceReference(XWikiConstants.XWIKI_SPACE,
+                getDocumentReference().getWikiReference()));
         this.description = description;
     }
 

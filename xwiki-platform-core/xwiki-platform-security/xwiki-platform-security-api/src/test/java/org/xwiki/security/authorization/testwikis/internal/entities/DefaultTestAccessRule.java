@@ -49,6 +49,9 @@ public class DefaultTestAccessRule extends AbstractTestEntity implements TestAcc
     /** The state defined by this access rule entity. */
     private final RuleState state;
 
+    /** True for a user access rule, and false for a group access rule. */
+    private final boolean isUser;
+
     /**
      * Create a new access rule entity.
      * @param user serialized reference to the user/group concerned by this access rule entity.
@@ -58,7 +61,7 @@ public class DefaultTestAccessRule extends AbstractTestEntity implements TestAcc
      * @param parent parent entity of this entity.
      */
     public DefaultTestAccessRule(String user, EntityReference userReference, Right right, boolean state,
-        TestEntity parent) {
+        boolean isUser, TestEntity parent) {
         super(
             new EntityReference(String.format("%s@@%s@@%b", user, right.getName(), state),
                 TYPE, parent.getReference()),
@@ -67,6 +70,7 @@ public class DefaultTestAccessRule extends AbstractTestEntity implements TestAcc
         this.userReference = new DocumentReference(userReference);
         this.right = right;
         this.state = state ? RuleState.ALLOW : RuleState.DENY;
+        this.isUser = isUser;
     }
 
     @Override
@@ -96,5 +100,11 @@ public class DefaultTestAccessRule extends AbstractTestEntity implements TestAcc
     public RuleState getState()
     {
         return state;
+    }
+
+    @Override
+    public boolean isUser()
+    {
+        return isUser;
     }
 }

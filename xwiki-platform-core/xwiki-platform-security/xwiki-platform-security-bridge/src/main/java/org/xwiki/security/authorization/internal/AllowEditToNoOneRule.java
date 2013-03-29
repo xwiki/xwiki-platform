@@ -26,7 +26,7 @@ import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRule;
 
 /**
- * A fake security rules allowind edit to no one, to in fact deny edit to anyone.
+ * A fake security rules allowing edit to no one, to in fact deny edit to anyone.
  *
  * @version $Id$
  * @since 5.0M2

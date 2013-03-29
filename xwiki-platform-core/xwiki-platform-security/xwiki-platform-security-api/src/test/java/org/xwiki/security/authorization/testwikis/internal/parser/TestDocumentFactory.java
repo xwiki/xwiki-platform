@@ -59,9 +59,11 @@ public class TestDocumentFactory extends AbstractSecureEntityFactory<TestDocumen
         EntityReference reference = parser.getResolver().resolve(attributes.getValue("name"),
             DefaultTestDocument.TYPE,
             parent.getReference());
-        EntityReference creator = parser.getResolver().resolve(attributes.getValue("creator"),
-            DefaultTestDocument.TYPE,
-            new EntityReference(XWikiConstants.XWIKI_SPACE, EntityType.SPACE, reference.getRoot()));
+        String creatorString = attributes.getValue("creator");
+        EntityReference creator = (creatorString) != null ? parser.getResolver().resolve(creatorString,
+            DefaultTestDocument.TYPE, new EntityReference(XWikiConstants.XWIKI_SPACE, EntityType.SPACE,
+            reference.getRoot()))
+            : null;
 
 
         return new DefaultTestDocument(reference, creator, attributes.getValue("alt"), parent);

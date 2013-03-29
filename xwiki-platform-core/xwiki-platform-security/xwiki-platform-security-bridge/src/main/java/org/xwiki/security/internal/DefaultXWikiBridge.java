@@ -25,13 +25,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.UserSecurityReference;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Temporary implementation of the (@link XWikiBridge} interface to access xwiki information.
@@ -75,31 +72,5 @@ public class DefaultXWikiBridge implements XWikiBridge
     public boolean isWikiReadOnly()
     {
         return getXWikiContext().getWiki().isReadOnly();
-    }
-
-    @Override
-    public boolean isWikiOwner(UserSecurityReference user, WikiReference wikiReference)
-    {
-        if (user == null || user.getOriginalReference() == null || wikiReference == null
-            || getMainWikiReference().equals(wikiReference)) {
-            // Public users (not logged in) could not be a owner
-            // Main wiki could not be owner due to http://jira.xwiki.org/browse/XWIKI-8952
-            return false;
-        }
-
-        XWikiContext context = getXWikiContext();
-        String wikiOwner;
-        try {
-            wikiOwner = context.getWiki().getWikiOwner(wikiReference.getName(), context);
-        } catch (XWikiException e) {
-            return false;
-        }
-
-        if (wikiOwner == null) {
-            return false;
-        }
-
-        DocumentReference ownerRef = resolver.resolve(wikiOwner, wikiReference);
-        return user.getOriginalReference().equals(ownerRef);
     }
 }

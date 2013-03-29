@@ -46,4 +46,9 @@ public interface TestAccessRule extends TestEntity
      * @return the state defined by this access rule entity.
      */
     RuleState getState();
+
+    /**
+     * @return true if this is a user rule and false for a group rule.
+     */
+    boolean isUser();
 }

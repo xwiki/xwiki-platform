@@ -46,6 +46,7 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.xwiki.security.authorization.Right.ADMIN;
+import static org.xwiki.security.authorization.Right.CREATOR;
 import static org.xwiki.security.authorization.Right.ILLEGAL;
 import static org.xwiki.security.authorization.Right.LOGIN;
 import static org.xwiki.security.authorization.Right.PROGRAM;
@@ -86,7 +87,7 @@ public abstract class AbstractAuthorizationTestCase
 
     static {
         for(Right right : Right.values()) {
-            if (right != ILLEGAL) {
+            if (right != ILLEGAL && right != CREATOR) {
                 ALL_RIGHTS.add(right);
                 if (right != PROGRAM) {
                     ALL_RIGHTS_EXCEPT_PROGRAMING.add(right);

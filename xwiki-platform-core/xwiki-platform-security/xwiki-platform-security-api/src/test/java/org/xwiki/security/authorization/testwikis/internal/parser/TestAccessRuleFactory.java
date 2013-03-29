@@ -68,9 +68,11 @@ public class TestAccessRuleFactory extends AbstractEntityFactory<TestAccessRule>
 
         String user = parser.getSerializer().serialize(userRef);
 
+        Boolean isUser = name.endsWith("User");
+
         if (type != null) {
             Right right = Right.toRight(type);
-            new DefaultTestAccessRule(user, userRef, right, allow, parent);
+            new DefaultTestAccessRule(user, userRef, right, allow, isUser, parent);
         } else {
             EntityType parentType = parent.getType();
             if (parentType == EntityType.WIKI && ((TestWiki) parent).isMainWiki()) {
@@ -78,7 +80,9 @@ public class TestAccessRuleFactory extends AbstractEntityFactory<TestAccessRule>
                 parentType = null;
             }
             for (Right right : Right.getEnabledRights(parentType)) {
-                new DefaultTestAccessRule(user, userRef, right, allow, parent);
+                if (right != Right.CREATOR) {
+                    new DefaultTestAccessRule(user, userRef, right, allow, isUser, parent);
+                }
             }
         }
         return null;

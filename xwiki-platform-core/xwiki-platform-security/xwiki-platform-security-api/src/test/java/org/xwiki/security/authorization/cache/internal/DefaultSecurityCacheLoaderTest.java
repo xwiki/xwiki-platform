@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.cache.internal;
 
-import static org.mockito.Mockito.*;
+package org.xwiki.security.authorization.cache.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,6 +51,10 @@ import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.LogRule;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultSecurityCacheLoader}.
@@ -126,6 +129,7 @@ public class DefaultSecurityCacheLoaderTest
         when(authorizationSettler.settle(user, groups, securityRuleEntries)).thenReturn(securityAccessEntry);
 
         doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry);
+        doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry, null);
 
         try {
             securityCacheLoader.load(user, entity);

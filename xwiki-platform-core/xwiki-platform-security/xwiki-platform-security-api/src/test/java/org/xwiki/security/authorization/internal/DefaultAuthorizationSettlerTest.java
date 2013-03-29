@@ -25,14 +25,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
-import java.util.Set;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
@@ -44,8 +41,6 @@ import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
-import org.xwiki.security.internal.EntityBridge;
-import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -53,9 +48,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
@@ -82,15 +75,6 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
     @Before
     public void configure() throws Exception
     {
-        EntityBridge entityBridge = authorizationSettlerMocker.getInstance(EntityBridge.class);
-        when(entityBridge.isDocumentCreator(eq(creatorRef), any(SecurityReference.class))).thenReturn(true);
-        when(entityBridge.isDocumentCreator(argThat(not(is(creatorRef))), any(SecurityReference.class)))
-            .thenReturn(false);
-
-        XWikiBridge xwikiBridge = authorizationSettlerMocker.getInstance(XWikiBridge.class);
-        when(xwikiBridge.isWikiOwner(eq(ownerRef), any(WikiReference.class))).thenReturn(true);
-        when(xwikiBridge.isWikiOwner(argThat(not(is(ownerRef))), any(WikiReference.class))).thenReturn(false);
-
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
         denyAllAccess = new XWikiSecurityAccess();
         for (Right right : Right.values()) {
@@ -697,36 +681,6 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
         assertAccess("When allowed implied right for group is denied for one of its user in another rule, deny it. (DAF)",
             anotherUserRef, docRef, denyAccessDAF,
             authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef), conflictAllowDenyUserGroupDAF));
-    }
-
-    @Test
-    public void testSettleAllowDeleteToCreator() throws Exception
-    {
-        XWikiSecurityAccess allowDelete = defaultAccess.clone();
-        allowDelete.allow(Right.DELETE);
-
-        assertAccess("Allow delete right to creator",
-            creatorRef, docRef, allowDelete,
-            authorizationSettler.settle(creatorRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("emptydocRules", docRef, Collections.<List<SecurityRule>>emptyList())));
-    }
-
-    @Test
-    public void testSettleAllowAdminToWikiOwner() throws Exception
-    {
-        XWikiSecurityAccess allowAdmin = defaultAccess.clone();
-        Set<Right> implied = Right.ADMIN.getImpliedRights();
-        allowAdmin.allow(Right.ADMIN);
-        for (Right right : Right.getEnabledRights(EntityType.DOCUMENT)) {
-            if (implied.contains(right)) {
-                allowAdmin.allow(right);
-            }
-        }
-
-        assertAccess("Allow admin right to wiki owner",
-            ownerRef, xdocRef, allowAdmin,
-            authorizationSettler.settle(ownerRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("emptydocRules", xdocRef, Collections.<List<SecurityRule>>emptyList())));
     }
 
     @Test

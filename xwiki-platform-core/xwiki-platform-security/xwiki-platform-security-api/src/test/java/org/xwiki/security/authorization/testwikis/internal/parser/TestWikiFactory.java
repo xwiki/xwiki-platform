@@ -63,9 +63,10 @@ public class TestWikiFactory extends AbstractSecureEntityFactory<TestWiki>
     {
         EntityReference reference = new WikiReference(attributes.getValue("name"));
         boolean isMainWiki = "true".equals(attributes.getValue("mainWiki"));
-        EntityReference owner = parser.getResolver().resolve(attributes.getValue("owner"),
-            DefaultTestDocument.TYPE,
-            new EntityReference(XWikiConstants.XWIKI_SPACE, EntityType.SPACE, reference));
+        String ownerString = attributes.getValue("owner");
+        EntityReference owner = (ownerString) != null ? parser.getResolver().resolve(ownerString,
+            DefaultTestDocument.TYPE, new EntityReference(XWikiConstants.XWIKI_SPACE, EntityType.SPACE, reference))
+            : null;
 
         if (isMainWiki && ((DefaultTestDefinition) parent).getMainWiki() != null) {
             throw new SAXException(parser.getLocatedMessage("Only one main wiki may be defined."));

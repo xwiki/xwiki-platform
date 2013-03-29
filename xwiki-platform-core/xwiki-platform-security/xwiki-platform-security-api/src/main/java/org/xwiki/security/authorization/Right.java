@@ -56,6 +56,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** The delete access right. */
     public static final Right DELETE;
 
+    /** Imply rights provided to creator of a document. */
+    public static final Right CREATOR;
+
     /** The Admin access right. */
     public static final Right ADMIN;
 
@@ -120,6 +123,8 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         EDIT     = new Right("edit",        ALLOW,  DENY,  true,
                                                     new RightSet(VIEW), WIKI_SPACE_DOCUMENT, false);
         DELETE   = new Right("delete",      DENY,   DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
+        CREATOR  = new Right("creator",     DENY,   ALLOW, false,
+            new RightSet(DELETE), EnumSet.of(EntityType.DOCUMENT), false);
         REGISTER = new Right("register",    ALLOW,  ALLOW, false, null, WIKI_ONLY          , false);
         COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
 

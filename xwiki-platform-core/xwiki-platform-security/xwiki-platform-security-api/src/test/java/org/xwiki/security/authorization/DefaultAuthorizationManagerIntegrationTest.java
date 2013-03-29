@@ -56,7 +56,6 @@ import org.xwiki.security.authorization.testwikis.TestEntity;
 import org.xwiki.security.authorization.testwikis.TestGroup;
 import org.xwiki.security.authorization.testwikis.TestUserDocument;
 import org.xwiki.security.authorization.testwikis.TestWiki;
-import org.xwiki.security.internal.EntityBridge;
 import org.xwiki.security.internal.UserBridge;
 import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -67,6 +66,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.Right.ADMIN;
 import static org.xwiki.security.authorization.Right.COMMENT;
+import static org.xwiki.security.authorization.Right.CREATOR;
 import static org.xwiki.security.authorization.Right.DELETE;
 import static org.xwiki.security.authorization.Right.EDIT;
 import static org.xwiki.security.authorization.Right.ILLEGAL;
@@ -95,9 +95,6 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     /** Mocked xWikiBridge */
     private XWikiBridge xWikiBridge;
 
-    /** Mocked entityBridge */
-    private EntityBridge entityBridge;
-
     /** Mocked userBridge */
     private UserBridge userBridge;
 
@@ -120,7 +117,6 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
 
         xWikiBridge = componentManager.registerMockComponent(XWikiBridge.class);
-        entityBridge = componentManager.registerMockComponent(EntityBridge.class);
         userBridge = componentManager.registerMockComponent(UserBridge.class);
         securityEntryReader = componentManager.registerMockComponent(SecurityEntryReader.class);
         securityCacheRulesInvalidator = componentManager.registerMockComponent(SecurityCacheRulesInvalidator.class);
@@ -192,6 +188,52 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         return entity1 == entity2 || (entity1 != null && entity1.equals(entity2));
     }
 
+    private SecurityRule mockSecurityRule(SecurityReference reference, final Right right, RuleState state,
+        final DocumentReference userOrGroup, boolean isUser) {
+        SecurityRule mockedRule = mock(SecurityRule.class,
+            String.format("Rule for [%s] %s [%s] right to %s [%s]", reference.toString(),
+                state == RuleState.ALLOW ? "allowing" : "denying",
+                right.getName(), (isUser) ? "user" : "group", userOrGroup.toString()));
+        when(mockedRule.getState()).thenReturn(state);
+        when(mockedRule.match(any(Right.class))).thenAnswer(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                Right reqRight = (Right) invocationOnMock.getArguments()[0];
+                return (reqRight == right);
+            }
+        });
+        if (isUser) {
+            when(mockedRule.match(any(UserSecurityReference.class))).thenAnswer(new Answer<Boolean>()
+            {
+                @Override
+                public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
+                {
+                    SecurityReference reference =
+                        (UserSecurityReference) invocationOnMock.getArguments()[0];
+                    return compareReferenceNullSafe(userOrGroup,
+                        reference.getOriginalDocumentReference());
+                }
+            });
+            //when(mockedRule.match(any(GroupSecurityReference.class))).thenReturn(false);
+        } else {
+            when(mockedRule.match(any(GroupSecurityReference.class))).thenAnswer(new Answer<Boolean>()
+            {
+                @Override
+                public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
+                {
+                    SecurityReference reference =
+                        (GroupSecurityReference) invocationOnMock.getArguments()[0];
+                    return compareReferenceNullSafe(userOrGroup,
+                        reference.getOriginalDocumentReference());
+                }
+            });
+            //when(mockedRule.match(any(UserSecurityReference.class))).thenReturn(false);
+        }
+        return mockedRule;
+    }
+
     @Override
     public TestDefinition initialiseWikiMock(String filename) throws Exception
     {
@@ -199,38 +241,6 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
 
         when(xWikiBridge.getMainWikiReference()).thenReturn(testDefinition.getMainWiki().getWikiReference());
         when(xWikiBridge.isWikiReadOnly()).thenReturn(false);
-        when(xWikiBridge.isWikiOwner(any(UserSecurityReference.class), any(WikiReference.class))).thenAnswer(
-            new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    UserSecurityReference userReference = (UserSecurityReference) invocationOnMock.getArguments()[0];
-                    WikiReference wikiReference = (WikiReference) invocationOnMock.getArguments()[1];
-
-                    TestWiki wiki = testDefinition.getWiki(wikiReference);
-                    return (wiki != null
-                        && compareReferenceNullSafe(wiki.getOwner(), userReference.getOriginalReference()));
-                }
-            }
-        );
-
-        when(entityBridge.isDocumentCreator(any(UserSecurityReference.class), any(SecurityReference.class))).thenAnswer(
-            new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    UserSecurityReference userReference = (UserSecurityReference) invocationOnMock.getArguments()[0];
-                    SecurityReference reference = (SecurityReference) invocationOnMock.getArguments()[1];
-
-                    TestEntity entity = testDefinition.searchEntity(reference);
-                    return (entity != null && entity instanceof TestDocument
-                        && compareReferenceNullSafe(((TestDocument) entity).getCreator(),
-                        userReference.getOriginalReference()));
-                }
-            }
-        );
 
         when(userBridge.getAllGroupsFor(any(UserSecurityReference.class), any(WikiReference.class))).thenAnswer(
             new Answer<Collection<GroupSecurityReference>>()
@@ -283,45 +293,30 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
 
                     final Collection<SecurityRule> mockedRules = new ArrayList<SecurityRule>();
                     for (final TestAccessRule rule : rules) {
-                        SecurityRule mockedRule = mock(SecurityRule.class);
-                        when(mockedRule.getState()).thenReturn(rule.getState());
-                        when(mockedRule.match(any(Right.class))).thenAnswer(new Answer<Boolean>()
-                        {
-                            @Override
-                            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
-                            {
-                                Right right = (Right) invocationOnMock.getArguments()[0];
-                                return (right == rule.getRight());
-                            }
-                        });
-                        when(mockedRule.match(any(GroupSecurityReference.class))).thenAnswer(new Answer<Boolean>()
-                        {
-                            @Override
-                            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
-                            {
-                                SecurityReference reference =
-                                    (GroupSecurityReference) invocationOnMock.getArguments()[0];
-                                return compareReferenceNullSafe(rule.getUser(),
-                                    reference.getOriginalDocumentReference());
-                            }
-                        });
-                        when(mockedRule.match(any(UserSecurityReference.class))).thenAnswer(new Answer<Boolean>()
-                        {
-                            @Override
-                            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable
-                            {
-                                SecurityReference reference =
-                                    (UserSecurityReference) invocationOnMock.getArguments()[0];
-                                return compareReferenceNullSafe(rule.getUser(),
-                                    reference.getOriginalDocumentReference());
-                            }
-                        });
-                        mockedRules.add(mockedRule);
+                        mockedRules.add(mockSecurityRule(reference, rule.getRight(), rule.getState(), rule.getUser(),
+                            rule.isUser()));
                     }
 
-                    SecurityRuleEntry accessEntry = mock(SecurityRuleEntry.class);
+                    if (entity instanceof TestWiki) {
+                        TestWiki wiki = (TestWiki) entity;
+                        if (wiki.getOwner() != null) {
+                            mockedRules.add(mockSecurityRule(reference, Right.ADMIN, RuleState.ALLOW, wiki.getOwner(),
+                                true));
+                        }
+                    }
+
+                    if (entity instanceof TestDocument) {
+                        TestDocument document = (TestDocument) entity;
+                        if (document.getCreator() != null) {
+                            mockedRules.add(mockSecurityRule(reference, Right.CREATOR, RuleState.ALLOW,
+                                document.getCreator(), true));
+                        }
+                    }
+
+                    SecurityRuleEntry accessEntry = mock(SecurityRuleEntry.class,
+                        String.format("Rule entry for %s containing %d rules", reference.toString(), mockedRules.size()));
                     when(accessEntry.getReference()).thenReturn(reference);
-                    when(accessEntry.isEmpty()).thenReturn(rules.isEmpty());
+                    when(accessEntry.isEmpty()).thenReturn(mockedRules.isEmpty());
                     when(accessEntry.getRules()).thenReturn(mockedRules);
 
                     return accessEntry;
@@ -342,7 +337,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             null, getXDoc("an empty main wiki", "anySpace"));
 
         // SuperAdmin access on main wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
             SUPERADMIN, getXDoc("an empty main wiki", "anySpace"));
 
         // Any Global user without access rules on main wiki
@@ -358,7 +353,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             null, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // SuperAdmin access on sub wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
             SUPERADMIN, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // Any Global user without access rules on sub wiki
@@ -505,5 +500,16 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         assertAccess(null,                          getUser("userA", "wikiUserGroupDenyAllowNoAdmin"), getWiki("wikiUserGroupDenyAllowNoAdmin"));
         assertAccess(null,                          getUser("userA", "wikiGroupUserAllowDenyNoAdmin"), getWiki("wikiGroupUserAllowDenyNoAdmin"));
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getUser("userA", "wikiGroupUserDenyAllowNoAdmin"), getWiki("wikiGroupUserDenyAllowNoAdmin"));
+    }
+
+    @Test
+    public void testDocumentCreator() throws Exception
+    {
+        initialiseWikiMock("documentCreator");
+
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userA"), getXDoc("userAdoc","space"));
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userA"), getXDoc("userBdoc","space"));
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userB"), getXDoc("userAdoc","space"));
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userB"), getXDoc("userBdoc","space"));
     }
 }

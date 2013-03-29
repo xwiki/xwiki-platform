@@ -349,6 +349,11 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
+        // Once dropPermissions has been called, the document in the
+        // context cannot have programming permission.
+        if (context.hasDroppedPermissions()) {
+            return false;
+        }
         XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
         return hasProgrammingRights((sdoc != null) ? sdoc : context.getDoc(), context);
     }

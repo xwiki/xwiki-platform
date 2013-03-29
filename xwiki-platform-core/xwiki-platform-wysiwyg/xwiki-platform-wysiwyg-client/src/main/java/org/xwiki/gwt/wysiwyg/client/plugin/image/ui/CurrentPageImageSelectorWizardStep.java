@@ -154,7 +154,8 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
     }
 
     /**
-     * Extension the query string of the given URL.
+     * Extend the query string of the given URL with additional parameters. If the URL doesn't already have a query
+     * string, one is created.
      * 
      * @param url the URL whose query string is going to be extended
      * @param extraQueryString the string to add to the existing query string

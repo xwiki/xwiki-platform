@@ -86,7 +86,6 @@
     ## ---------------------------------------------------------------------------------------------------------------
     <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
     #template("stylesheets.vm")
-    #template("analytics.vm")
     #template("javascript.vm")
   </head>
   #set($bodyTagName = 'body')

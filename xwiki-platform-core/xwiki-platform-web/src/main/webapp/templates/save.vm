@@ -1,2 +1,0 @@
-#set($message=$services.localization.render('changessaved'))
-#template("view.vm")

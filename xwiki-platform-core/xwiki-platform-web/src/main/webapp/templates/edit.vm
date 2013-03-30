@@ -89,7 +89,6 @@
   #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
     #template('editmeta.vm')
   #end
-  #template("editmodes.vm")
   #template("edit${editor}.vm")
   ## This javascript must be placed here since it uses velocity variables set in the template above.
   <script type="text/javascript">

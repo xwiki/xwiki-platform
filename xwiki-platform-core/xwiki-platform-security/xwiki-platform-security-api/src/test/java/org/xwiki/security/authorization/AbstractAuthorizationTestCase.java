@@ -76,9 +76,6 @@ public abstract class AbstractAuthorizationTestCase
     /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN. */
     protected static final RightSet ALL_RIGHTS_EXCEPT_ADMIN = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER. */
-    protected static final RightSet ALL_RIGHTS_EXCEPT_LOGIN = new RightSet();
-
     /** VIEW, EDIT, COMMENT, DELETE, ADMIN. */
     protected static final RightSet ALL_SPACE_RIGHTS = new RightSet();
 
@@ -93,11 +90,8 @@ public abstract class AbstractAuthorizationTestCase
                     ALL_RIGHTS_EXCEPT_PROGRAMING.add(right);
                     if (right != ADMIN) {
                         ALL_RIGHTS_EXCEPT_ADMIN.add(right);
-                        if (right != LOGIN) {
-                            ALL_RIGHTS_EXCEPT_LOGIN.add(right);
-                            if (right != REGISTER) {
-                                ALL_DOCUMENT_RIGHTS.add(right);
-                            }
+                        if (right != LOGIN && right != REGISTER) {
+                            ALL_DOCUMENT_RIGHTS.add(right);
                         }
                     }
                     if (right != LOGIN && right != REGISTER) {

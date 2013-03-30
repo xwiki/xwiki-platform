@@ -450,10 +450,10 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiNoRules"));
         assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiNoRules"));
 
-        assertAccess(new RightSet(REGISTER),        getXUser("userA"), getDoc("any document", "any space",   "wikiDenyA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_LOGIN,       getXUser("userA"), getDoc("any document", "spaceAllowA", "wikiDenyA"));
-        assertAccess(new RightSet(REGISTER),        getXUser("userA"), getDoc("docDenyA",     "spaceAllowA", "wikiDenyA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_LOGIN,       getXUser("userA"), getDoc("docAllowA",    "any space",   "wikiDenyA"));
+        assertAccess(null,                          getXUser("userA"), getDoc("any document", "any space",   "wikiDenyA"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userA"), getDoc("any document", "spaceAllowA", "wikiDenyA"));
+        assertAccess(null,                          getXUser("userA"), getDoc("docDenyA",     "spaceAllowA", "wikiDenyA"));
+        assertAccess(ALL_DOCUMENT_RIGHTS,           getXUser("userA"), getDoc("docAllowA",    "any space",   "wikiDenyA"));
     }
 
     @Test

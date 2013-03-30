@@ -125,7 +125,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         DELETE   = new Right("delete",      DENY,   DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
         CREATOR  = new Right("creator",     DENY,   ALLOW, false,
             new RightSet(DELETE), EnumSet.of(EntityType.DOCUMENT), false);
-        REGISTER = new Right("register",    ALLOW,  ALLOW, false, null, WIKI_ONLY          , false);
+        REGISTER = new Right("register",    ALLOW,  ALLOW, true,  null, WIKI_ONLY          , false);
         COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
 
         ADMIN    = new Right("admin",       DENY,   ALLOW, false,

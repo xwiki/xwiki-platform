@@ -49,7 +49,6 @@ import org.xwiki.security.authorization.SecurityEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
-import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 import org.xwiki.security.internal.XWikiBridge;
 import org.xwiki.test.LogRule;
@@ -75,7 +74,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
     @Rule
     public final MockitoComponentMockingRule<SecurityCache> securityCacheMocker =
-        new MockitoComponentMockingRule<SecurityCache>(DefaultSecurityCache.class,
+        new MockitoComponentMockingRule<SecurityCache>(DefaultSecurityCache.class, SecurityCache.class,
             Arrays.asList(EntityReferenceSerializer.class));
 
     @Rule

@@ -371,16 +371,22 @@
               <justification>Nothing is broken because the method with a Document argument is still present but it is now inherited from PasteFilter.</justification>
             </difference>-->
             <difference>
-              <differenceType>7012</differenceType>
+              <differenceType>7002</differenceType>
               <className>org/xwiki/security/authorization/cache/SecurityCache</className>
-              <method>void add(org.xwiki.security.authorization.cache.SecurityShadowEntry, java.util.Collection)</method>
-              <justification>New method to allow creation of shadow entries in the cache for global users in local wikis</justification>
+              <method>void add(org.xwiki.security.authorization.SecurityRuleEntry)</method>
+              <justification>Moved to the org.xwiki.security.authorization.cache.internal.SecurityCache</justification>
             </difference>
             <difference>
-              <differenceType>7012</differenceType>
+              <differenceType>7002</differenceType>
               <className>org/xwiki/security/authorization/cache/SecurityCache</className>
-              <method>void add(org.xwiki.security.authorization.SecurityAccessEntry, org.xwiki.security.SecurityReference)</method>
-              <justification>New method to allow creation of access entries in the cache for access of global users to local wikis</justification>
+              <method>void add(org.xwiki.security.authorization.SecurityAccessEntry)</method>
+              <justification>Moved to the org.xwiki.security.authorization.cache.internal.SecurityCache</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/security/authorization/cache/SecurityCache</className>
+              <method>void add(org.xwiki.security.authorization.SecurityRuleEntry, java.util.Collection)</method>
+              <justification>Moved to the org.xwiki.security.authorization.cache.internal.SecurityCache</justification>
             </difference>
 
             <!-- Special 4.5.2 fix -->

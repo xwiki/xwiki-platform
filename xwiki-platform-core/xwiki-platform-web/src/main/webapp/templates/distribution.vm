@@ -50,12 +50,12 @@
 #macro(displayStepHeader $currentStepId)
   <div class="wizard-header">
     #set ($stepNames = {
-      'welcome': $msg.get('platform.extension.distributionWizard.welcomeStepTitle'),
-      'extension.mainui': $msg.get('platform.extension.distributionWizard.uiStepTitle'),
-      'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepTitle')
+      'welcome': $services.localization.render('platform.extension.distributionWizard.welcomeStepTitle'),
+      'extension.mainui': $services.localization.render('platform.extension.distributionWizard.uiStepTitle'),
+      'extension.outdatedextensions': $services.localization.render('platform.extension.distributionWizard.extensionsStepTitle')
     })
     #set ($currentStepIndex = $services.distribution.jobStatus.currentStateIndex)
-    <h1>$msg.get('platform.extension.distributionWizard.stepHeading', [$currentStepIndex, $stepNames.get($currentStepId)])</h1>
+    <h1>$services.localization.render('platform.extension.distributionWizard.stepHeading', [$currentStepIndex, $stepNames.get($currentStepId)])</h1>
     #set ($steps = $services.distribution.jobStatus.steps)
     ## Ignore the welcome step.
     #set ($steps = $steps.subList(1, $steps.size()))
@@ -80,7 +80,7 @@
 #end
 
 #macro(displayStepContent $stepId)
-  <div class="warningmessage">$msg.get('platform.extension.distributionWizard.experimentalWarning', ['<a href="http://jira.xwiki.org/browse/XWIKI/component/10987">', '</a>'])</div>
+  <div class="warningmessage">$services.localization.render('platform.extension.distributionWizard.experimentalWarning', ['<a href="http://jira.xwiki.org/browse/XWIKI/component/10987">', '</a>'])</div>
   #if ($stepId == 'welcome')
     #displayWelcomeStep()
   #elseif ($stepId == 'extension.mainui')
@@ -88,16 +88,16 @@
   #elseif ($stepId == 'extension.outdatedextensions')
     #displayOutdatedExtensionsStep()
   #else
-    <div class="errormessage">$msg.get('platform.extension.distributionWizard.unknownStepError')</div>
+    <div class="errormessage">$services.localization.render('platform.extension.distributionWizard.unknownStepError')</div>
   #end
 #end
 
 #macro(displayWelcomeStep)
-  <p>$msg.get('platform.extension.distributionWizard.welcomeStepDescription', ['</p><ul><li>', '</li><li>'])</li></ul>
-  <p class="steps-hint">$msg.get('platform.extension.distributionWizard.welcomeStepStepsHint')</p>
+  <p>$services.localization.render('platform.extension.distributionWizard.welcomeStepDescription', ['</p><ul><li>', '</li><li>'])</li></ul>
+  <p class="steps-hint">$services.localization.render('platform.extension.distributionWizard.welcomeStepStepsHint')</p>
   #set ($stepGoals = {
-    'extension.mainui': $msg.get('platform.extension.distributionWizard.uiStepSummary'),
-    'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepSummary')
+    'extension.mainui': $services.localization.render('platform.extension.distributionWizard.uiStepSummary'),
+    'extension.outdatedextensions': $services.localization.render('platform.extension.distributionWizard.extensionsStepSummary')
   })
   <ul class="steps vertical">
     #foreach ($step in $steps)
@@ -108,7 +108,7 @@
     </li>
     #end
   </ul>
-  <p class="xHint">$msg.get('platform.extension.distributionWizard.welcomeStepActionsHint')</p>
+  <p class="xHint">$services.localization.render('platform.extension.distributionWizard.welcomeStepActionsHint')</p>
   #set ($showCompleteStepButton = true)
   #set ($canCloseWizard = true)
 #end
@@ -120,17 +120,17 @@
   #end
   #set ($distributionState = $services.distribution.state)
   #if (!$distributionState || $distributionState == 'NONE')
-    <div class="errormessage">$msg.get('platform.extension.distributionWizard.uiStepNoStateError')</div>
+    <div class="errormessage">$services.localization.render('platform.extension.distributionWizard.uiStepNoStateError')</div>
   #else
-    <p>$msg.get('platform.extension.distributionWizard.uiStepDescription')</p>
-    <div class="xLabel">$msg.get('platform.extension.distributionWizard.uiStepDistributionLabel')</div>
-    <div class="xHint">$msg.get('platform.extension.distributionWizard.uiStepDistributionHint')</div>
+    <p>$services.localization.render('platform.extension.distributionWizard.uiStepDescription')</p>
+    <div class="xLabel">$services.localization.render('platform.extension.distributionWizard.uiStepDistributionLabel')</div>
+    <div class="xHint">$services.localization.render('platform.extension.distributionWizard.uiStepDistributionHint')</div>
     #set ($distributionExtension = $services.distribution.distributionExtension)
     #if ($distributionExtension)
       ## Wrap the extension in a DIV so that its bottom border is displayed.
       <div>#displayExtension($distributionExtension)</div>
     #else
-      <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
+      <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($distributionExtension.id.id)</strong>",
         "<strong>$!escapetool.xml($distributionExtension.id.version)</strong>"])</div>
     #end
@@ -140,7 +140,7 @@
       #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
       #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
 
-      <div class="xLabel">$msg.get('platform.extension.distributionWizard.uiStepUILabel')</div>
+      <div class="xLabel">$services.localization.render('platform.extension.distributionWizard.uiStepUILabel')</div>
 
       #getExtensionJobStatus($distributionUIId.id $distributionUIId.version.value $distributionUIJobStatus)
       #if (!$showCompleteStepButton && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
@@ -154,19 +154,19 @@
         #end
       #end
 
-      <div class="xHint">$msg.get('platform.extension.distributionWizard.uiStepUIHint')</div>
+      <div class="xHint">$services.localization.render('platform.extension.distributionWizard.uiStepUIHint')</div>
       #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
       #if ($distributionUIExtension)
-        <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepInternetAccessWarning')</div>
+        <div class="warningmessage">$services.localization.render('platform.extension.distributionWizard.uiStepInternetAccessWarning')</div>
         ## Allow the user to install, upgrade or downgrade the UI.
         #displayExtension($distributionUIExtension)
       #else
-        <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
+        <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
           ["<strong>$!escapetool.xml($distributionUIId.id)</strong>",
           "<strong>$!escapetool.xml($distributionUIId.version)</strong>"])</div>
       #end
     #else
-      <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepUIUnspecifiedError')</div>
+      <div class="warningmessage">$services.localization.render('platform.extension.distributionWizard.uiStepUIUnspecifiedError')</div>
       ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the main UI.
     #end
   #end
@@ -178,21 +178,21 @@
   #end
   #if (!$previousUi)
     <form action="" class="xform hidden">
-      <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
+      <div class="xHint">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
       <p class="buttons">
         <span class="buttonwrapper">
-          <input type="submit" class="button" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIUpgradeYesLabel'))" />
+          <input type="submit" class="button" value="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIUpgradeYesLabel'))" />
         </span>
         <span class="buttonwrapper">
-          <input type="submit" class="button secondary" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIUpgradeNoLabel'))" />
+          <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIUpgradeNoLabel'))" />
         </span>
       </p>
     </form>
     <form id="previousUi" action="" method="post" class="xform">
-      <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
+      <div class="xHint">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
       <dl>
         <dt class="hidden">
-          <label for="previousUiVersionList">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+          <label for="previousUiVersionList">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
         </dt>
         <dd class="hidden">
           ## FIXME: We should retrieve the list of previous versions for the recommended UI, by getting the available
@@ -212,26 +212,26 @@
           </select>
         </dd>
         <dt>
-          <label for="previousUiVersion">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
-          <span class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIVersionHint')) 1.8<strong>,</strong> 2.7.2<strong>,</strong> 3.2-rc-1<strong>,</strong> 4.3-milestone-2</span>
+          <label for="previousUiVersion">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+          <span class="xHint">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIVersionHint')) 1.8<strong>,</strong> 2.7.2<strong>,</strong> 3.2-rc-1<strong>,</strong> 4.3-milestone-2</span>
         </dt>
         <dd><input id="previousUiVersion" name="previousUiVersion" type="text" value="$!escapetool.xml($request.previousUiVersion)" /></dd>
         <dt>
-          <label for="previousUiId">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIIdLabel'))</label>
-          <span class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIIdHint', [$distributionUIId.id]))</span>
+          <label for="previousUiId">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIIdLabel'))</label>
+          <span class="xHint">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIIdHint', [$distributionUIId.id]))</span>
         </dt>
         <dd><input id="previousUiId" name="previousUiId" type="text" value="$!escapetool.xml($request.previousUiId)" /></dd>
       </dl>
       <p class="buttons">
         <span class="buttonwrapper">
-          <input type="submit" class="button" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUISubmitLabel'))" />
+          <input type="submit" class="button" value="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUISubmitLabel'))" />
         </span>
         <span class="buttonwrapper hidden">
-          <input type="submit" class="button secondary" value="$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUICancelLabel'))" />
+          <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUICancelLabel'))" />
         </span>
       </p>
       #if ($request.previousUiId && $request.previousUiVersion)
-        <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
+        <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
           ["<strong>$!escapetool.xml($request.previousUiId)</strong>",
           "<strong>$!escapetool.xml($request.previousUiVersion)</strong>"])</div>
       #end
@@ -239,7 +239,7 @@
   #elseif (!$previousUi.isInstalled('wiki:xwiki'))
     ## Allow the user to repair the previous UI extension.
     ## NOTE: We shouldn't get here unless the JavaScript is disabled. The following code was added explicitly to support this use case.
-    <div class="xHint">$escapetool.xml($msg.get('platform.extension.distributionWizard.uiStepPreviousUIHint'))</div>
+    <div class="xHint">$escapetool.xml($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIHint'))</div>
     ## TODO: Find a better way to 'force' the repair XAR extension button.
     #set ($showRepairXARButton = true)
     ## Wrap the extension in a DIV so that its bottom border is displayed.
@@ -249,7 +249,7 @@
 
 #macro(displayOutdatedExtensionsStep)
   #if (!$isAjaxRequest)
-    <p>$msg.get('platform.extension.distributionWizard.extensionsStepDescription', ['<a href="http://platform.xwiki.org/xwiki/bin/view/Features/Applications">', '</a>', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices">'])</p>
+    <p>$services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', ['<a href="http://platform.xwiki.org/xwiki/bin/view/Features/Applications">', '</a>', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices">'])</p>
   #end
   #set ($distributionId = "$services.distribution.distributionExtension.id")
   ## Get the status of the upgrade plan job for the entire farm.
@@ -259,7 +259,7 @@
     #prepareUpgrade($upgradePlan)
   #end
   #if ($upgradePlan.state != 'FINISHED')
-    <p>$msg.get('platform.extension.distributionWizard.extensionsStepLoading')</p>
+    <p>$services.localization.render('platform.extension.distributionWizard.extensionsStepLoading')</p>
     #displayJobProgressBar($upgradePlan)
     #displayUpgradePlanStatus($upgradePlan)
   #else
@@ -315,22 +315,22 @@
     #set ($showCompleteStepButton = $invalid.isEmpty())
     ##
     #if ($outdated.isEmpty() && $invalid.isEmpty())
-      <div class="infomessage">$msg.get('platform.extension.distributionWizard.extensionsStepUpToDate')</div>
+      <div class="infomessage">$services.localization.render('platform.extension.distributionWizard.extensionsStepUpToDate')</div>
     #else
       #displayPlanActionByNamespace($invalid 'Invalid')
       #displayPlanActionByNamespace($outdated 'Outdated')
     #end
   #end
-  <p class="xHint">$msg.get('platform.extension.distributionWizard.extensionsStepReloadHint', ["<a id=""prepareUpgradeLink""
+  <p class="xHint">$services.localization.render('platform.extension.distributionWizard.extensionsStepReloadHint', ["<a id=""prepareUpgradeLink""
     href=""?action=prepareUpgrade&xredirect=$!escapetool.url($request.xredirect)"">", '</a>'])</p>
 #end
 
 #macro(displayPlanActionByNamespace $actionByNamespace $key)
   #if (!$actionByNamespace.isEmpty())
-    <div class="xLabel">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsLabel")</div>
+    <div class="xLabel">$services.localization.render("platform.extension.distributionWizard.extensionsStep${key}ExtensionsLabel")</div>
   #end
   #foreach ($entry in $actionByNamespace.entrySet())
-    <div class="xHint">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint",
+    <div class="xHint">$services.localization.render("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint",
       ["#displayExtensionNamespace($entry.key)"])</div>
     <div class="$key.toLowerCase()Extensions">
     #foreach ($planAction in $entry.value)
@@ -346,7 +346,7 @@
   #set ($upgradePlanJob = $services.extension.createUpgradePlan())
   #set ($lastError = $services.extension.lastError)
   #if ($lastError)
-    <div class="errormessage">$msg.get('platform.extension.distributionWizard.extensionsStepPrepareUpgradeFailure') #printThrowable($lastError)</div>
+    <div class="errormessage">$services.localization.render('platform.extension.distributionWizard.extensionsStepPrepareUpgradeFailure') #printThrowable($lastError)</div>
   #else
     #set ($distributionId = "$services.distribution.distributionExtension.id")
     #set ($discard = $upgradePlanJob.request.setProperty('distribution.id', $distributionId))
@@ -364,15 +364,15 @@
       ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
       ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
       <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
-        <button type="submit" name="action" value="COMPLETE_STEP">$msg.get('platform.extension.distributionWizard.continueLabel')</button>
+        <button type="submit" name="action" value="COMPLETE_STEP">$services.localization.render('platform.extension.distributionWizard.continueLabel')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
         <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($msg.get('platform.extension.distributionWizard.skipHint'))">$msg.get('platform.extension.distributionWizard.skipLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))">$services.localization.render('platform.extension.distributionWizard.skipLabel')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
         <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($msg.get('platform.extension.distributionWizard.cancelHint'))">$msg.get('platform.extension.distributionWizard.cancelLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))">$services.localization.render('platform.extension.distributionWizard.cancelLabel')</button>
       </span>
     </div>
   </form>

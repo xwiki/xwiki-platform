@@ -8,7 +8,7 @@
     <li class="xitem xhighlight">
       <div class="xitemcontainer package $!extra">
         <div class="name">
-          <a href="$!url" class="package" title="$msg.get('core.importer.selectThisPackage')">
+          <a href="$!url" class="package" title="$services.localization.render('core.importer.selectThisPackage')">
             #set($maxnamelength = 40)
             #packName($attach.filename)
           </a>
@@ -17,11 +17,11 @@
             #set($redirect = $doc.getURL('import', 'section=Import'))
             #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}&amp;form_token=$!{services.csrf.getToken()}"))
             <a class="deletelink" href="${attachurl}"
-               title="$msg.get('core.viewers.attachments.delete.title')"></a>
+               title="$services.localization.render('core.viewers.attachments.delete.title')"></a>
           </span>
         </div>
         <div class="infos">
-          $msg.get('core.importer.packageInformationExtract', [
+          $services.localization.render('core.importer.packageInformationExtract', [
             $xwiki.getUserName($attach.author, true),
             $!xwiki.formatDate($attach.date)
           ]) - <span class="size">(#dynamicsize($attach.filesize))</span>
@@ -31,5 +31,5 @@
   #end
   </ul>
 #else
-  #warning($msg.get('core.importer.noPackageAvailable'))
+  #warning($services.localization.render('core.importer.noPackageAvailable'))
 #end

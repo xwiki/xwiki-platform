@@ -9,12 +9,12 @@
     #set($tocreate = $request.getParameter('tocreate'))
     #if(!$tocreate || ($tocreate == '') || ($tocreate != 'space'))
       #if($doc.isNew())
-        #set ($title = $msg.get('core.create.newPageTitle', [$!{escapetool.xml($doc.fullName)}]))
+        #set ($title = $services.localization.render('core.create.newPageTitle', [$!{escapetool.xml($doc.fullName)}]))
       #else
-        #set ($title = $msg.get('core.create.pageTitle'))
+        #set ($title = $services.localization.render('core.create.pageTitle'))
       #end
     #else
-      #set ($title = $msg.get('core.create.spaceTitle'))
+      #set ($title = $services.localization.render('core.create.spaceTitle'))
     #end
     <div id="document-title"><h1>$title</h1></div>
     #template("createinline.vm")

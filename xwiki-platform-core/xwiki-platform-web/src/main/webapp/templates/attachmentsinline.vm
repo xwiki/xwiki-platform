@@ -28,14 +28,14 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
   <input type="hidden" name="xredirect" value="$escapetool.xml($redirect)" />
   <fieldset id="attachform">
-    <legend>$msg.get('core.viewers.attachments.upload.title')</legend>
+    <legend>$services.localization.render('core.viewers.attachments.upload.title')</legend>
     ## Temporarily disabled, until we fix attachment name handling
-    ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get('core.viewers.attachments.upload.filename')</label></div>
+    ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
     ## <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
-    <div class="fileupload-field"><label class="hidden" for="xwikiuploadfile">$msg.get('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40" class="uploadFileInput"/></div>
+    <div class="fileupload-field"><label class="hidden" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40" class="uploadFileInput"/></div>
     <div>
-      <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.attachments.upload.submit')" class="button"/></span>
-      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('core.viewers.attachments.upload.cancel')</a></span>
+      <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.viewers.attachments.upload.submit')" class="button"/></span>
+      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$services.localization.render('core.viewers.attachments.upload.cancel')</a></span>
     </div>
   </fieldset>
   </div>

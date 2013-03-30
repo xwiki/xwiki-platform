@@ -51,7 +51,7 @@ $xwiki.getTextArea($tdoc.content)
 });
      
    } else {
-            alert("$msg.get('browsernoncompatible')");
+            alert("$services.localization.render('browsernoncompatible')");
 	  }
 //]]>
 </script>

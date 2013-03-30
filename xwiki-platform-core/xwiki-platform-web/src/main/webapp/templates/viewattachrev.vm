@@ -9,8 +9,8 @@
 #end
 <table class="wiki-table" cellpadding="0" cellspacing="0" border="0">
     <tr>
-        <th></th><th>$msg.get("version")</th><th>$msg.get("size")</th>
-        <th>$msg.get("author")</th><th>$msg.get("date")</th>
+        <th></th><th>$services.localization.render('version')</th><th>$services.localization.render('size')</th>
+        <th>$services.localization.render('author')</th><th>$services.localization.render('date')</th>
     </tr>
 #foreach ($version in $attachment.getVersions())
     <tr#if($velocityCount % 2 == 1) class="table-odd"#else class="table-even"#end>

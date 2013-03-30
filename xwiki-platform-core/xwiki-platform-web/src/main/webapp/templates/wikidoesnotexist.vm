@@ -40,7 +40,7 @@ $response.setStatus(404)
             $xwiki.includeForm('XWiki.WikiDoesNotExist', false)
           #else
             ## If no such page exists, display the standard message instead
-            #xwikimessageboxstart($msg.get('notice') $msg.get('thiswikidoesnotexist'))
+            #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thiswikidoesnotexist'))
             #xwikimessageboxend()
           #end
           <div class="clearfloats"></div>

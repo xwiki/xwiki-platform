@@ -6,7 +6,7 @@
 ## End macro
 ## Define the "xwikiitem" macro used in the "More Actions" menu
 #macro(xwikiitem $url $msgname)
-<span class="xwikimoreactionitem"><a href="$url">$msg.get($msgname)</a></span><span class="xwikisep"> | </span>
+<span class="xwikimoreactionitem"><a href="$url">$services.localization.render($msgname)</a></span><span class="xwikisep"> | </span>
 #end
 ## End macro
 ## End macro definitions
@@ -29,7 +29,7 @@
 <div class="xwiki${xwikimode}a" id="xwikinav_header">
 ## Begin upper menu area
   <div id="xwikiwebusermenu">
-    <span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
+    <span id="xwikiwebusermenutitle">$services.localization.render('webusermenu')</span>
     $!xwiki.parseContent($!xwiki.getSpacePreference('menu'))
   </div>
 ## End upper menu area
@@ -53,17 +53,17 @@
         #set($languageparams="language=${tdoc.realLanguage}")
         #set($editparams="${languageparams}&${editparams}")
       #end
-      #xwikiimglink($doc.getURL($editaction,$editparams) $xwiki.getSkinFile("editPage.gif") $msg.get("editpage")) 
+      #xwikiimglink($doc.getURL($editaction, $editparams) $xwiki.getSkinFile('editPage.gif') $services.localization.render('editpage'))
     #end
 ## End "Edit this page" link
 ## Begin "Add Comment" link
     #if($xwiki.hasAccessLevel("comment"))
-      #xwikiimglink($doc.getURL("view", "xpage=comments") $xwiki.getSkinFile("addComment.gif") "$msg.get('addcomment') ($doc.getComments().size())")
+      #xwikiimglink($doc.getURL('view', 'xpage=comments') $xwiki.getSkinFile('addComment.gif') "$services.localization.render('addcomment') ($doc.getComments().size())")
     #end
 ## End "Add Comment" link
 ## Begin "Add Atachament" link
     #if($hasedit)
-      #xwikiimglink($doc.getURL("attach") $xwiki.getSkinFile("addFile.gif") "$msg.get('addattachment') ($doc.getAttachmentList().size())")
+      #xwikiimglink($doc.getURL('attach') $xwiki.getSkinFile('addFile.gif') "$services.localization.render('addattachment') ($doc.getAttachmentList().size())")
     #end
 ## End "Add Attachment" link
 ## Begin "PDF" link
@@ -72,19 +72,19 @@
       #if (($xwiki.isMultiLingual()==true)&&($tdoc.realLanguage!=""))
           #set($pdfparams="${languageparams}&$!{pdfparams}")
       #end
-    #xwikiimglink($doc.getExternalURL("pdf", "$!{pdfparams}") $xwiki.getSkinFile("pdf.gif") $msg.get("pdf"))
+    #xwikiimglink($doc.getExternalURL('pdf', "$!{pdfparams}") $xwiki.getSkinFile('pdf.gif') $services.localization.render('pdf'))
 ## End "PDF" link
 ## Begin "History" link
-    #xwikiimglink($doc.getURL("view","xpage=history") $xwiki.getSkinFile("history.gif") $msg.get("history"))
+    #xwikiimglink($doc.getURL('view', 'xpage=history') $xwiki.getSkinFile('history.gif') $services.localization.render('history'))
 ## End "History" link
 ## Begin "More Actions" menu
     <div id="xwikimoreactions">
 ## Menu title/opener
-      <div id="xwikimoreactionstitle"><a href="" onclick="showhide('xwikimoreactionsitems'); return false;">$msg.get("more")</a></div>
+      <div id="xwikimoreactionstitle"><a href="" onclick="showhide('xwikimoreactionsitems'); return false;">$services.localization.render('more')</a></div>
 ## Begin the inner menu
       <div id="xwikimoreactionsitems">
 ## View section
-        <div class="xwikimenutitle">$msg.get("view")</div>
+        <div class="xwikimenutitle">$services.localization.render('view')</div>
         #if($xcontext.action=="viewrev")
           #xwikiitem($doc.getURL("view","xpage=code&$!{revparams}") "raw")
         #else
@@ -93,7 +93,7 @@
         #xwikiitem($doc.getExternalURL("view","xpage=xml&$!{revparams}") "xml")
 ## Edit section
         #if($hasedit)
-          <div class="xwikimenutitle">$msg.get("edit")</div>
+          <div class="xwikimenutitle">$services.localization.render('edit')</div>
           #if (($xwiki.isMultiLingual()==true) && !$isReadOnly)
             #if ($tdoc.realLanguage!="")
               #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}") "editcontent")
@@ -103,7 +103,7 @@
               #xwikiitem($doc.getURL("edit","xpage=wysiwyg") "edithtmlcontent")
             #end
             <span class="xwikimoreactionitem">
-              <a href="$doc.getURL("edit", "language=en")">$msg.get("edit") En</a>
+              <a href="$doc.getURL('edit', 'language=en')">$services.localization.render('edit') En</a>
               <a href="$doc.getURL("edit", "language=fr")">Fr</a>
               <a href="$doc.getURL("edit", "language=de")">De</a>
               <a href="$doc.getURL("edit", "language=it")">It</a>
@@ -131,7 +131,7 @@
         #end
 ## Admin section
         #if($hasadmin && !$isReadOnly)
-          <div class="xwikimenutitle">$msg.get("admin")</div>
+          <div class="xwikimenutitle">$services.localization.render('admin')</div>
           #xwikiitem($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) 'space')
           #xwikiitem($xwiki.getURL($services.model.resolveDocument('WebPreferences', 'default', $doc.documentReference.extractReference('SPACE')), 'edit', 'xpage=editprefs') 'webprefs')
           #xwikiitem($xwiki.getURL($services.model.resolveDocument('WebPreferences', 'default', $doc.documentReference.extractReference('SPACE')), 'edit' , 'xpage=editrights&global=1') 'webrights')
@@ -140,7 +140,7 @@
           #xwikiitem($doc.getURL("edit", "xpage=editclass") "classeditor")
         #end
 ## Help section
-        <div class="xwikimenutitle">$msg.get("help")</div>
+        <div class="xwikimenutitle">$services.localization.render('help')</div>
         #xwikiitem($xwiki.getURL($services.model.resolveDocument('Doc.', 'default', $doc.documentReference.extractReference('WIKI'))) 'xwikidoc')
         #xwikiitem($xwiki.getURL($services.model.resolveDocument('Doc.XWikiSyntax', 'default', $doc.documentReference.extractReference('WIKI'))) 'xwikisyntax')
       </div>

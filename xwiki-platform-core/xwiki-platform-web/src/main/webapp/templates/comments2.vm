@@ -12,8 +12,8 @@
 <div class="xwikidatatitle2">
 <div class="xwikidatatitle1">&nbsp;</div>
 <div class="xwikidatatitle">
-<a href="" onclick="showhide('xwikicommentscontent'); return false">$msg.get("comments")</a>:
-$!comments.size() $msg.get("comments") #if($comments.size()>0) $msg.get("by")
+<a href="" onclick="showhide('xwikicommentscontent'); return false">$services.localization.render('comments')</a>:
+$!comments.size() $services.localization.render('comments') #if($comments.size()>0) $services.localization.render('by')
 $!xwiki.getUserName($doc.display('author','view',$comments.get(0))) ...
 #end
 </div>

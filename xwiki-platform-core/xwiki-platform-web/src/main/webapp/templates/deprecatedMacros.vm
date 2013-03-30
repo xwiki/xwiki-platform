@@ -8,9 +8,9 @@
     <a href="$doc.getURL('view', "rev=${rev}")">${rev}</a><span class="xwikisep"> | </span>
   #end
   #if ($tdoc.realLanguage != '')
-    <a href="$doc.getURL('view', "xpage=diff&amp;language=${tdoc.realLanguage}")">$msg.get('diff')</a><span class="xwikisep"> | </span>
+    <a href="$doc.getURL('view', "xpage=diff&amp;language=${tdoc.realLanguage}")">$services.localization.render('diff')</a><span class="xwikisep"> | </span>
   #else
-    <a href="$doc.getURL('view', "xpage=diff")">$msg.get('diff')</a><span class="xwikisep"> | </span>
+    <a href="$doc.getURL('view', "xpage=diff")">$services.localization.render('diff')</a><span class="xwikisep"> | </span>
   #end
 #end
 ##
@@ -351,22 +351,22 @@ $html
 <div class="pagedNavigation">
 #if($crtPageNumber > 0)
 #set($prevPage = $crtPageNumber - 1)
-<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=0&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.firstPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${prevPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.previousPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=0&amp;ipp=${itemsPerPage}")">$services.localization.render('web.paging.firstPage')</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${prevPage}&amp;ipp=${itemsPerPage}")">$services.localization.render('web.paging.previousPage')</a></span>
 #else
-<span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
-<span class="pagedLink inactive">$msg.get("web.paging.previousPage")</span>
+<span class="pagedLink inactive">$services.localization.render('web.paging.firstPage')</span>
+<span class="pagedLink inactive">$services.localization.render('web.paging.previousPage')</span>
 #end
 #set($displayCrtPageNumber = $crtPageNumber + 1)
 #set($displayTotalPages = $totalPages + 1)
-<span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$displayCrtPageNumber, $displayTotalPages])</span>
+<span class="pagedStatus">$services.localization.render('web.paging.pageNumberOf', [$displayCrtPageNumber, $displayTotalPages])</span>
 #if($crtPageNumber < $totalPages)
 #set($nextPage = $crtPageNumber + 1)
-<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${nextPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.nextPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.lastPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${nextPage}&amp;ipp=${itemsPerPage}")">$services.localization.render('web.paging.nextPage')</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")">$services.localization.render('web.paging.lastPage')</a></span>
 #else
-<span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
-<span class="pagedLink inactive">$msg.get("web.paging.lastPage")</span>
+<span class="pagedLink inactive">$services.localization.render('web.paging.nextPage')</span>
+<span class="pagedLink inactive">$services.localization.render('web.paging.lastPage')</span>
 #end
 </div>
 #end

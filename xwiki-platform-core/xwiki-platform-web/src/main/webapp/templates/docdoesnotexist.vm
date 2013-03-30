@@ -15,10 +15,10 @@
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
   #else
-    #xwikimessageboxstart($msg.get("notice") $msg.get("thispagedoesnotexist"))
+    #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thispagedoesnotexist'))
     #if($hasEdit)
       #set($url = $doc.getURL("create", $editparams))
-      $msg.get('core.viewers.content.doesnotexists.edittocreate', [$url])
+      $services.localization.render('core.viewers.content.doesnotexists.edittocreate', [$url])
     #end
     #template("recyclebinlist.vm")
     #xwikimessageboxend()

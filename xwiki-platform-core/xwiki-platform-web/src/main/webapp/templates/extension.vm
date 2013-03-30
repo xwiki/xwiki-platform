@@ -25,18 +25,18 @@
         #if ($request.section)
           <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
         #end
-        <label class="hidden" for="extensionSearchInput">$msg.get('extensions.search.tip')</label>
+        <label class="hidden" for="extensionSearchInput">$services.localization.render('extensions.search.tip')</label>
         <input type="text" #if ("$!request.search" == '')class="withTip" #{end}id="extensionSearchInput" name="search"
-          value="#if ("$!request.search" != '')$escapetool.xml($request.search)#{else}$msg.get('extensions.search.tip')#{end}" />
-        <label class="hidden" for="extensionSearchRepositoryList">$msg.get('extensions.search.repository.label')</label>
+          value="#if ("$!request.search" != '')$escapetool.xml($request.search)#{else}$services.localization.render('extensions.search.tip')#{end}" />
+        <label class="hidden" for="extensionSearchRepositoryList">$services.localization.render('extensions.search.repository.label')</label>
         <select id="extensionSearchRepositoryList" name="repo">
-          <option value="">$msg.get('extensions.search.repository.all.label')</option>
+          <option value="">$services.localization.render('extensions.search.repository.all.label')</option>
           #if ($request.repo)
             #set ($selectedRepositoryId = $request.repo)
           #end
           #foreach ($repositoryId in ['core', 'installed', 'local'])
             <option value="$repositoryId"#if ($selectedRepositoryId == $repositoryId) selected="selected"#end>
-              $msg.get("extensions.search.repository.${repositoryId}.label")</option>
+              $services.localization.render("extensions.search.repository.${repositoryId}.label")</option>
           #end
         </select>
       </div>
@@ -44,16 +44,16 @@
     ## Advanced search form.
     <form action="" class="xform">
       <fieldset id="extension-search-advanced">
-        <legend><a href="#extension-search-advanced-body">$msg.get('extensions.advancedSearch.title')</a></legend>
+        <legend><a href="#extension-search-advanced-body">$services.localization.render('extensions.advancedSearch.title')</a></legend>
         <div id="extension-search-advanced-body"></div>
         <div class="plainmessage extension-search-advanced-popup hidden">
           #if ($request.section)
             <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
           #end
           <dl>
-            <dt><label for="advancedExtensionSearch-id">$msg.get('extensions.advancedSearch.id.label')</label></dt>
+            <dt><label for="advancedExtensionSearch-id">$services.localization.render('extensions.advancedSearch.id.label')</label></dt>
             <dd><input type="text" name="extensionId" id="advancedExtensionSearch-id" value="" /></dd>
-            <dt><label for="advancedExtensionSearch-version">$msg.get('extensions.advancedSearch.version.label')</label></dt>
+            <dt><label for="advancedExtensionSearch-version">$services.localization.render('extensions.advancedSearch.version.label')</label></dt>
             <dd><input type="text" name="extensionVersion" id="advancedExtensionSearch-version" value="" /></dd>
           </dl>
           <p>
@@ -158,7 +158,7 @@
   #set ($authors = [])
   #foreach ($author in $extension.authors)
     #if ($author.name == 'devs')
-      #set ($discard = $authors.add("<a class=""extension-author"" href=""http://www.xwiki.org/"">$msg.get('extensions.info.authors.xwikiorg')</a>"))
+      #set ($discard = $authors.add("<a class=""extension-author"" href=""http://www.xwiki.org/"">$services.localization.render('extensions.info.authors.xwikiorg')</a>"))
     #elseif ("$!author.url" != '' && "$!author.name" != '')
       #set ($discard = $authors.add("<a class=""extension-author"" href=""$author.url"">$escapetool.xml($author.name)</a>"))
     #else
@@ -166,7 +166,7 @@
     #end
   #end
   #if (!$authors.isEmpty())
-    <p class="extension-authors">$msg.get('extensions.info.authors') $stringtool.join($authors, ', ')</p>
+    <p class="extension-authors">$services.localization.render('extensions.info.authors') $stringtool.join($authors, ', ')</p>
   #end
 #end
 
@@ -204,7 +204,7 @@
 
 #macro (displayExtensionDetails_menuLink $detail $selected)
   <a href="#extension-body-${detail}-$extensionIdHashCode"#if ($selected) class="current"#end>
-    $msg.get("extensions.info.category.$detail")
+    $services.localization.render("extensions.info.category.${detail}")
   </a>
 #end
 
@@ -231,11 +231,11 @@
   <div id="extension-body-description-$extensionIdHashCode"></div>
   <div class="extension-body-description extension-body-section">
     <dl class="extension-metadata">
-      <dt>$msg.get('extensions.info.id')</dt>
+      <dt>$services.localization.render('extensions.info.id')</dt>
       <dd>$extension.id.id</dd>
 
       #if ($extension.features.size() > 0)
-        <dt>$msg.get('extensions.info.features', [$extension.features.size()])</dt>
+        <dt>$services.localization.render('extensions.info.features', [$extension.features.size()])</dt>
         <dd>
         #if ($extension.features.size() == 1)
           $escapetool.xml($extension.features.iterator().next())
@@ -249,10 +249,10 @@
         </dd>
       #end
 
-      <dt>$msg.get('extensions.info.type')</dt>
+      <dt>$services.localization.render('extensions.info.type')</dt>
       <dd>$extension.type</dd>
 
-      <dt>$msg.get('extensions.info.license', [$extension.licenses.size()])</dt>
+      <dt>$services.localization.render('extensions.info.license', [$extension.licenses.size()])</dt>
       #if ($extension.licenses.size() > 0)
         <dd>
           #if ($extension.licenses.size() == 1)
@@ -268,12 +268,12 @@
       #end
 
       #if ("$!{extension.webSite}" != '')
-        <dt>$msg.get('extensions.info.website')</dt>
+        <dt>$services.localization.render('extensions.info.website')</dt>
         <dd><a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
       #end
 
       #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
-        <dt>$msg.get('extensions.info.repository')</dt>
+        <dt>$services.localization.render('extensions.info.repository')</dt>
         <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
       #end
 
@@ -297,10 +297,10 @@
 #macro (displayExtensionDetails_description_wikis $extension)
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
-    <dt>$msg.get('extensions.info.namespaces.global')</dt>
+    <dt>$services.localization.render('extensions.info.namespaces.global')</dt>
   #elseif ($xcontext.isMainWiki())
     ## Display the list of namespaces where the given extension is installed only if we are on the main wiki.
-    <dt>$msg.get('extensions.info.namespaces.list')</dt>
+    <dt>$services.localization.render('extensions.info.namespaces.list')</dt>
     <dd><ul>
       #foreach ($namespace in $extension.namespaces)
         <li>#displayExtensionNamespace($namespace)</li>
@@ -311,7 +311,7 @@
 
 #macro (displayExtensionNamespace $namespace)
 #if ("$!namespace" == '' && $namespace != '')
-$msg.get('extensions.info.globalNamespace')##
+$services.localization.render('extensions.info.globalNamespace')##
 #elseif ($namespace.startsWith('wiki:'))
 #wikiHomePageLink($namespace)##
 #else
@@ -325,11 +325,11 @@ $namespace##
     <dd>
       <a href="#getExtensionURL($extension.id.id $extension.id.version.value {'listVersions': true})"
         class="extension-versions-link">
-        $msg.get('extensions.info.stableVersions.linkLabel')
+        $services.localization.render('extensions.info.stableVersions.linkLabel')
       </a>
     </dd>
   #else
-    <dt>$msg.get('extensions.info.stableVersions.label')</dt>
+    <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
     <dd>
       #set ($stableVersions = [])
       #foreach ($version in $extensionManager.resolveVersions($extension.id.id, 0, -1))
@@ -346,7 +346,7 @@ $namespace##
         #end
         </ul>
       #else
-        $msg.get('extensions.info.stableVersions.noResults')
+        $services.localization.render('extensions.info.stableVersions.noResults')
       #end
     </dd>
   #end
@@ -391,7 +391,7 @@ $namespace##
   <div class="dependency-item extension-item-$dependencyStatus">
     <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
     #if ($extensionNamespace.startsWith('wiki:'))
-      <span class="extension-namespace">$msg.get('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
+      <span class="extension-namespace">$services.localization.render('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
     #end
     #if ("$!dependencyStatusMessage" != '')
       <span class="extension-status">$dependencyStatusMessage</span>
@@ -401,7 +401,7 @@ $namespace##
 
 #macro (displayExtensionDetails_dependencies_upstream $extension)
   #if ($extension.dependencies.size() > 0)
-    <p>$msg.get('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</p>
+    <p>$services.localization.render('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</p>
     <ul>
       #foreach ($dependency in $extension.dependencies)
         <li>#displayDependency($dependency $extensionNamespace)</li>
@@ -412,7 +412,7 @@ $namespace##
 
 #macro (displayExtensionDetails_dependencies_downstream $backwardDependencies)
   #if ($backwardDependencies.size() > 0)
-    <p>$msg.get('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</p>
+    <p>$services.localization.render('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</p>
     <ul>
       #foreach ($namespace in $backwardDependencies.entrySet())
         #foreach ($dependency in $namespace.value)
@@ -493,11 +493,11 @@ $namespace##
       'installplan': 'extensions.install.error.alreadyInstalled',
       'uninstallplan': 'extensions.uninstall.error.notInstalled'
     })
-    <div class="infomessage">$msg.get($emptyPlanMessageKeys.get($plan.request.getProperty('job.type')))</div>
+    <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.request.getProperty('job.type')))</div>
   #else
     #foreach($entry in $extensionsByAction.entrySet())
       #if (!$entry.value.isEmpty())
-        <p>$msg.get("extensions.install.list.$entry.key.toLowerCase()")</p>
+        <p>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</p>
         <ul>
           #foreach ($planAction in $entry.value)
             <li>#displayDependency($planAction.extension $planAction.namespace)</li>
@@ -613,8 +613,8 @@ Caused by: #printThrowable($throwable.cause true)
   #set ($question = $jobStatus.question)
   <dl>
     <dt>
-      <label>$msg.get('extensions.upgrade.mergeConflict.label')</label>
-      <span class="xHint">$msg.get('extensions.upgrade.mergeConflict.hint',
+      <label>$services.localization.render('extensions.upgrade.mergeConflict.label')</label>
+      <span class="xHint">$services.localization.render('extensions.upgrade.mergeConflict.hint',
         ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</span>
     </dt>
     <dd>
@@ -629,7 +629,7 @@ Caused by: #printThrowable($throwable.cause true)
         ## there is no previous installed version of a XAR extension but the imported documents already exist in the wiki.
         #if ($entry.value)
           <option value="$entry.key"#if ($question.globalAction == $entry.key) selected="selected"#end>
-            $msg.get("extensions.upgrade.mergeConflict.versionToKeep.$entry.key.toLowerCase()")
+            $services.localization.render("extensions.upgrade.mergeConflict.versionToKeep.${entry.key.toLowerCase()}")
           </option>
         #end
       #end
@@ -640,7 +640,7 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (displayExtensionDetails_progressChanges $question)
-  <h3 class="extension-diff-title">$msg.get('extensions.upgrade.mergeConflict.changes.title',
+  <h3 class="extension-diff-title">$services.localization.render('extensions.upgrade.mergeConflict.changes.title',
     ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</h3>
   <div class="extension-diff-options">
     #set ($versions = {
@@ -649,7 +649,7 @@ Caused by: #printThrowable($throwable.cause true)
       'NEXT': $question.nextDocument,
       'MERGED': $question.mergedDocument
     })
-    <span class="label">$msg.get('extensions.upgrade.mergeConflict.changes.original')</span><select name="original">
+    <span class="label">$services.localization.render('extensions.upgrade.mergeConflict.changes.original')</span><select name="original">
     #if ("$!request.original" != '')
       #set ($originalVersion = $request.original)
     #else
@@ -659,11 +659,11 @@ Caused by: #printThrowable($throwable.cause true)
     #foreach($entry in $versions.entrySet())
       #if ($entry.value)
         <option value="$entry.key"#if ($entry.key == $originalVersion) selected="selected"#end>
-          $msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")
+          $services.localization.render("extensions.upgrade.mergeConflict.changes.versionToCompare.${entry.key.toLowerCase()}")
         </option>
       #end
     #end
-    </select><span class="label">$msg.get('extensions.upgrade.mergeConflict.changes.revised')</span><select name="revised">
+    </select><span class="label">$services.localization.render('extensions.upgrade.mergeConflict.changes.revised')</span><select name="revised">
     #if ("$!request.revised" != '')
       #set ($revisedVersion = $request.revised)
     #elseif ($question.mergedDocument)
@@ -675,7 +675,7 @@ Caused by: #printThrowable($throwable.cause true)
     #foreach($entry in $versions.entrySet())
       #if ($entry.value)
         <option value="$entry.key"#if ($entry.key == $revisedVersion) selected="selected"#end>
-          $msg.get("extensions.upgrade.mergeConflict.changes.versionToCompare.$entry.key.toLowerCase()")
+          $services.localization.render("extensions.upgrade.mergeConflict.changes.versionToCompare.${entry.key.toLowerCase()}")
         </option>
       #end
     #end
@@ -799,7 +799,7 @@ Caused by: #printThrowable($throwable.cause true)
     #if ($extension)
       #displayExtension($extension)
     #else
-      <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
+      <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.extensionId)</strong>",
         "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
     #end
@@ -917,7 +917,7 @@ Caused by: #printThrowable($throwable.cause true)
     #set ($lastError = $extensionManager.lastError)
   #end
   #if ($lastError)
-    #set ($errorMessage = $msg.get($errorMessageKey, [$extensionId, $extensionVersion]))
+    #set ($errorMessage = $services.localization.render($errorMessageKey, [$extensionId, $extensionVersion]))
     #if ($isAjaxRequest)
       ## Send error back.
       $response.sendError(400, $errorMessage)
@@ -966,7 +966,7 @@ Caused by: #printThrowable($throwable.cause true)
   #end
   #set ($message = $NULL)
   #if ($status != 'remote' && $status != 'loading')
-    #set ($message = $msg.get("extensions.info.status.$status", [$currentVersion.id.version.value]))
+    #set ($message = $services.localization.render("extensions.info.status.${status}", [$currentVersion.id.version.value]))
   #end
   #set ($extensionStatus = $NULL)
   #setVariable ("$extensionStatus" $status)
@@ -1105,7 +1105,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 
 #macro (em_submitButton $value $_name $secondary $extraClassName)
   <span class="buttonwrapper">
-    <input type="submit" value="$escapetool.xml($msg.get($value))"#if($_name) name="$escapetool.xml($_name)"#end
+    <input type="submit" value="$escapetool.xml($services.localization.render($value))"#if($_name) name="$escapetool.xml($_name)"#end
       class="button#if($secondary) secondary#end#if($extraClassName) $!escapetool.xml($extraClassName)#end"/>
   </span>
 #end
@@ -1113,7 +1113,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #macro (em_linkButton $href $label $extraClassName)
   <span class="buttonwrapper">
     <a href="$escapetool.xml($href)" class="button secondary#if($extraClassName) $!escapetool.xml($extraClassName)#end">
-      $msg.get($label)
+      $services.localization.render($label)
     </a>
   </span>
 #end
@@ -1146,7 +1146,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   <span class="buttonwrapper">
     <button type="submit" name="extensionAction" value="$escapetool.xml($action)"
       #if ($classNames.size() > 0) class="$escapetool.xml($stringtool.join($classNames, ' '))"#end>
-      $escapetool.xml($msg.get("extensions.actions.$action"))</button>
+      $escapetool.xml($services.localization.render("extensions.actions.${action}"))</button>
   </span>
 #end
 

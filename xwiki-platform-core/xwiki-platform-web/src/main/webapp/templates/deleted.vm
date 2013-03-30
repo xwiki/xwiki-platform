@@ -8,7 +8,7 @@
 #if($message)
 <div id="xwikimessage">$message</div>
 #end
-#xwikimessageboxstart($msg.get("delete") $msg.get("deleted"))
+#xwikimessageboxstart($services.localization.render('delete') $services.localization.render('deleted'))
 #template("recyclebinlist.vm")
 #xwikimessageboxend()
 <div class="clearfloats"></div>

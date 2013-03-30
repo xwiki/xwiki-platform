@@ -2,7 +2,7 @@
 #set ($deletedDocument = $xwiki.getDeletedDocument($tdoc.getFullName(), $tdoc.getLanguage(), $request.get('id')))
 #if ($deletedDocument)
   #if (!$deletedDocument.getDocument())
-    #xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+    #xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
     #xwikimessageboxend()
   #else
     #set ($doc = $deletedDocument.getDocument())
@@ -12,7 +12,7 @@
     #template('docextra.vm')
   #end
 #else
-  #xwikimessageboxstart($msg.get('error') $msg.get('core.recyclebin.invalidEntry'))
+  #xwikimessageboxstart($services.localization.render('error') $services.localization.render('core.recyclebin.invalidEntry'))
   #template('recyclebinlist.vm')
   #xwikimessageboxend()
 #end

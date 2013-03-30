@@ -19,7 +19,7 @@
 #set ($discard = $collectionstool.reverse($versions))
 #set ($totalVersions = $versions.size())
 #if ($totalVersions == 0)
-  #warning ($msg.get('thispagedoesnotexist'))
+  #warning ($services.localization.render('thispagedoesnotexist'))
 #else
   #set ($paginationParameters = {'url' : "?${viewer}&amp;showminor=${minorVersions}", 'totalItems' : $totalVersions, 'defaultItemsPerPage' : 20, 'position': 'top'})
   #pagination ($paginationParameters)
@@ -53,19 +53,19 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="language" value="$!{context.language}" />
       <div class="centered">
-      <table class="xwikidatatable" summary="$msg.get('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])">
+      <table class="xwikidatatable" summary="$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])">
 ## Print the table header
         <tr>
         #if ($totalVersions > 1)
-          <th scope="col">$msg.get('core.viewers.history.from')</th>
-          <th scope="col">$msg.get('core.viewers.history.to')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.from')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.to')</th>
         #end
-          <th scope="col">$msg.get('core.viewers.history.version')</th>
-          <th scope="col">$msg.get('core.viewers.history.author')</th>
-          <th scope="col">$msg.get('core.viewers.history.date')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.version')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.author')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.date')</th>
 ## Might be disabled in certain wikis.
         #if($xwiki.hasEditComment())
-          <th scope="col">$msg.get('core.viewers.history.comment')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.comment')</th>
         #end
 ## Editors see the Revert button.
         #if($hasEdit && !$hasAdmin)
@@ -97,13 +97,13 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #end
     #if ($hasEdit || $hasAdmin)
       #if ($tdoc.getRCSVersion()==$version)
-        <td><span class="currentversionlabel">$msg.get('core.viewers.history.currentVersion')</span></td>
+        <td><span class="currentversionlabel">$services.localization.render('core.viewers.history.currentVersion')</span></td>
       #else
-        <td class="xwikibuttonlink"><a href="$tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.rollback')</a></td>
+        <td class="xwikibuttonlink"><a href="$tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>
       #end
     #end
     #if ($hasAdmin)
-      <td class="xwikibuttonlink"><a href="$tdoc.getURL('deleteversions',"form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.deleteSingle')</a></td>
+      <td class="xwikibuttonlink"><a href="$tdoc.getURL('deleteversions',"form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.deleteSingle')</a></td>
     #end
     </tr>
   #end ## foreach
@@ -123,18 +123,18 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #pagination ($paginationParameters)
       <div class="buttons">
         #if ($totalVersions > 1)
-          <div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get('core.viewers.history.compare')" class="button"/></div>
+          <div class="buttonwrapper"><input type="submit" accesskey="c" value="$services.localization.render('core.viewers.history.compare')" class="button"/></div>
           #if ($hasAdmin)
-            <div class="buttonwrapper"><input class="button" type="submit" name="deleteversions" value="$msg.get('core.viewers.history.deleteRange')"
-              onclick="var rev1 = ''; var rev2 = ''; $$('[name=rev1], [name=rev2]').each(function(item) {if(item.getValue()) { if(item.name == 'rev1') rev1 = item.getValue(); else rev2 = item.getValue(); }}); if (!confirm('$msg.get('core.viewers.history.confirmDeleteRange')'.replace('__rev1__', rev1).replace('__rev2__', rev2))){ return false; } document.forms.${formname}.action='$doc.getURL('deleteversions', 'confirm=1')'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
+            <div class="buttonwrapper"><input class="button" type="submit" name="deleteversions" value="$services.localization.render('core.viewers.history.deleteRange')"
+              onclick="var rev1 = ''; var rev2 = ''; $$('[name=rev1], [name=rev2]').each(function(item) {if(item.getValue()) { if(item.name == 'rev1') rev1 = item.getValue(); else rev2 = item.getValue(); }}); if (!confirm('$services.localization.render('core.viewers.history.confirmDeleteRange')'.replace('__rev1__', rev1).replace('__rev2__', rev2))){ return false; } document.forms.${formname}.action='$doc.getURL('deleteversions', 'confirm=1')'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #end
         #end
         #if ($xwiki.hasMinorEdit())
           #if (!$request.getParameter('showminor'))
-            <div class="buttonwrapper"><input class="button" type="submit" name="viewminorversions" value="$msg.get('core.viewers.history.showMinorEdits')"
+            <div class="buttonwrapper"><input class="button" type="submit" name="viewminorversions" value="$services.localization.render('core.viewers.history.showMinorEdits')"
               onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;showminor=true&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #else
-            <div class="buttonwrapper"><input class="button" type="submit" name="hideminorversions" value="$msg.get('core.viewers.history.hideMinorEdits')"
+            <div class="buttonwrapper"><input class="button" type="submit" name="hideminorversions" value="$services.localization.render('core.viewers.history.hideMinorEdits')"
               onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #end
         #end

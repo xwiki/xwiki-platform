@@ -27,8 +27,8 @@
 #set($discard = $syntax20Elements.add(['strikethrough', '--', '--', 'text_strikethrough']))
 #set($discard = $syntax20Elements.add(['subscript', ',,', ',,', 'text_subscript']))
 #set($discard = $syntax20Elements.add(['superscript', '^^', '^^', 'text_superscript']))
-#set($discard = $syntax20Elements.add(['ulist', '\n* ', "\n* $msg.get('core.edit.wikiToolbar.ulisttext')\n* $msg.get('core.edit.wikiToolbar.ulisttext')\n", 'text_list_bullets']))
-#set($discard = $syntax20Elements.add(['olist', '\n1. ', "\n1. $msg.get('core.edit.wikiToolbar.olisttext')\n1. $msg.get('core.edit.wikiToolbar.olisttext')\n", 'text_list_numbers']))
+#set($discard = $syntax20Elements.add(['ulist', '\n* ', "\n* $services.localization.render('core.edit.wikiToolbar.ulisttext')\n* $services.localization.render('core.edit.wikiToolbar.ulisttext')\n", 'text_list_bullets']))
+#set($discard = $syntax20Elements.add(['olist', '\n1. ', "\n1. $services.localization.render('core.edit.wikiToolbar.olisttext')\n1. $services.localization.render('core.edit.wikiToolbar.olisttext')\n", 'text_list_numbers']))
 #set($discard = $syntax20Elements.add(['ilink', '[[', ']]', 'link']))
 #set($discard = $syntax20Elements.add(['elink20', '[[', ']]', 'link_go']))
 #set($discard = $syntax20Elements.add(['h1', '\n= ', '=\n', 'text_heading_1']))
@@ -46,8 +46,8 @@
 #set($discard = $confluence10Elements.add(['strikethrough', '-', '-', 'text_strikethrough']))
 #set($discard = $confluence10Elements.add(['subscript', '~', '~', 'text_subscript']))
 #set($discard = $confluence10Elements.add(['superscript', '^', '^', 'text_superscript']))
-#set($discard = $confluence10Elements.add(['ulist', '\n* ', "\n* $msg.get('core.edit.wikiToolbar.ulisttext')\n* $msg.get('core.edit.wikiToolbar.ulisttext')\n", 'text_list_bullets']))
-#set($discard = $confluence10Elements.add(['olist', '\n# ', "\n# $msg.get('core.edit.wikiToolbar.olisttext')\n# $msg.get('core.edit.wikiToolbar.olisttext')\n", 'text_list_numbers']))
+#set($discard = $confluence10Elements.add(['ulist', '\n* ', "\n* $services.localization.render('core.edit.wikiToolbar.ulisttext')\n* $services.localization.render('core.edit.wikiToolbar.ulisttext')\n", 'text_list_bullets']))
+#set($discard = $confluence10Elements.add(['olist', '\n# ', "\n# $services.localization.render('core.edit.wikiToolbar.olisttext')\n# $services.localization.render('core.edit.wikiToolbar.olisttext')\n", 'text_list_numbers']))
 #set($discard = $confluence10Elements.add(['ilink', '[', ']', 'link']))
 #set($discard = $confluence10Elements.add(['h1', '\nh1. ', '\n', 'text_heading_1']))
 #set($discard = $confluence10Elements.add(['h2', '\nh2. ', '\n', 'text_heading_2']))
@@ -66,10 +66,10 @@
 document.writeln("<div class='leftmenu2'>");
 #foreach($item in $syntaxElements)
   #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.png"))
-  #set($speedTip = $escapetool.javascript($msg.get("core.edit.wikiToolbar.${item.get(0)}")))
+  #set($speedTip = $escapetool.javascript($services.localization.render("core.edit.wikiToolbar.${item.get(0)}")))
   #set($tagOpen = $escapetool.javascript($item.get(1)))
   #set($tagClose = $escapetool.javascript($item.get(2)))
-  #set($sampleText = $escapetool.javascript($msg.get("core.edit.wikiToolbar.${item.get(0)}text")))
+  #set($sampleText = $escapetool.javascript($services.localization.render("core.edit.wikiToolbar.${item.get(0)}text")))
   addButton('$imageFile', '$speedTip', '$tagOpen', '$tagClose', '$sampleText');
 #end
 document.writeln("<" + "/div>");

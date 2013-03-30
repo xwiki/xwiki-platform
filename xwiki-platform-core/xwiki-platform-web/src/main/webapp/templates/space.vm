@@ -22,9 +22,9 @@ $string
 #breadcrumb($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a>" 0)
   </div>
   #if($xcontext.action == 'edit' && ($editor == 'wiki' || $editor == 'wysiwyg'))
-    <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#headerspace' title="$msg.get('core.editors.content.parentField.edit.title')">[$msg.get('core.editors.content.parentField.edit')]</a></div>
+    <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#headerspace' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a></div>
     <div id="parentinput">
-      <label for="xwikidocparentinput">$msg.get('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$msg.get('core.editors.content.parentField.edit.hide')</a>
+      <label for="xwikidocparentinput">$services.localization.render('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$services.localization.render('core.editors.content.parentField.edit.hide')</a>
       <input type="text" id="xwikidocparentinput" name="parent" value="$!{tdoc.parent}" size="30" class="suggestDocuments"/></label>
     </div>
   #end

@@ -8,7 +8,7 @@
   #template("startpage.vm")
   <div class="main layoutsubsection">
   <div id="mainContentArea">
-    #error("$msg.get('core.rename.nonexistingDocument')")
+    #error($services.localization.render('core.rename.nonexistingDocument'))
   </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
@@ -16,7 +16,7 @@
   #template("startpage.vm")
   <div class="main layoutsubsection">
   <div id="mainContentArea">
-    <div id="document-title"><h1>$msg.get('core.copy.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
+    <div id="document-title"><h1>$services.localization.render('core.copy.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
     ##------------------------------------------------
     ## Get source reference
     ##------------------------------------------------
@@ -58,9 +58,9 @@
         #end
         #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
         #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
-        #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
+        #info($services.localization.render('core.copy.copyingdoc', [$sourcelink, $targetlink]))
       #else
-        #error("$msg.get('core.rename.targetNotWritable')")
+        #error($services.localization.render('core.rename.targetNotWritable'))
       #end
     #else
     <form action="" class="xform third">
@@ -75,8 +75,8 @@
       ##------------------
       #if($xwiki.hasProgrammingRights())
       <dt>
-        <label for="sourceWikiName">$msg.get("core.copy.sourcewiki")</label>
-        <span class="xHint">$msg.get('core.copy.sourcewiki.hint')</span>
+        <label for="sourceWikiName">$services.localization.render('core.copy.sourcewiki')</label>
+        <span class="xHint">$services.localization.render('core.copy.sourcewiki.hint')</span>
       </dt>
       <dd>$!{escapetool.xml($doc.wiki)} <input type="hidden" id="sourceWikiName" name="sourceWikiName" value="$!{escapetool.xml($doc.wiki)}" size="60"/></dd>
       #end
@@ -84,16 +84,16 @@
       ## Space Source field
       ##------------------
       <dt>
-        <label for="sourceSpaceName">$msg.get("core.copy.sourcespace")</label>
-        <span class="xHint">$msg.get('core.copy.sourcespace.hint')</span>
+        <label for="sourceSpaceName">$services.localization.render('core.copy.sourcespace')</label>
+        <span class="xHint">$services.localization.render('core.copy.sourcespace.hint')</span>
       </dt>
       <dd>$!{escapetool.xml($doc.space)} <input type="hidden" id="sourceSpaceName" name="sourceSpaceName" value="$!{escapetool.xml($doc.space)}" size="60"/></dd>
       ##------------------
       ## Page Source field
       ##------------------
       <dt>
-        <label for="sourcePageName">$msg.get("core.copy.sourcepage")</label>
-        <span class="xHint">$msg.get('core.copy.sourcepage.hint')</span>
+        <label for="sourcePageName">$services.localization.render('core.copy.sourcepage')</label>
+        <span class="xHint">$services.localization.render('core.copy.sourcepage.hint')</span>
       </dt>
       <dd>$!{escapetool.xml($doc.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.name)}" size="60"/></dd>
       ##------------------
@@ -102,13 +102,13 @@
       #set ($docTranslations = $doc.getTranslationList())
       #if ($xwiki.isMultiLingual() && $docTranslations.size() > 0)
       <dt>
-        <label for="language">$msg.get("language")</label>
-        <span class="xHint">$msg.get('core.copy.language.hint')</span>
+        <label for="language">$services.localization.render('language')</label>
+        <span class="xHint">$services.localization.render('core.copy.language.hint')</span>
       </dt>
       <dd>
         <select id="language" name="language">
           ## Add a special "All Translations" combo box entry to copy all translations.
-          <option value="ALL" selected="selected">$msg.get("core.copy.allTranslations")</option>
+          <option value="ALL" selected="selected">$services.localization.render('core.copy.allTranslations')</option>
           ## Add all the existing translations
           #foreach ($docTranslation in $docTranslations)
             <option>$docTranslation</option>
@@ -121,8 +121,8 @@
       ##------------------
       #if($xwiki.hasProgrammingRights())
       <dt>
-        <label for="targetWikiName">$msg.get("core.copy.targetwiki")</label>
-        <span class="xHint">$msg.get('core.copy.targetwiki.hint')</span>
+        <label for="targetWikiName">$services.localization.render('core.copy.targetwiki')</label>
+        <span class="xHint">$services.localization.render('core.copy.targetwiki.hint')</span>
       </dt>
       <dd>
         <select id="targetWikiName" name="targetWikiName">
@@ -137,8 +137,8 @@
       ## Space Target field
       ##-------------------
       <dt>
-        <label for="targetSpaceName">$msg.get('core.copy.targetspace')</label>
-        <span class="xHint">$msg.get('core.copy.targetspace.hint')</span>
+        <label for="targetSpaceName">$services.localization.render('core.copy.targetspace')</label>
+        <span class="xHint">$services.localization.render('core.copy.targetspace.hint')</span>
       </dt>
       <dd>
         <input type="text" name="targetSpaceName" id="targetSpaceName" size="60" class="suggestSpaces" value="$!{escapetool.xml($doc.space)}"/>
@@ -147,14 +147,14 @@
       ## Page Target field
       ##------------------
       <dt>
-        <label for="targetPageName">$msg.get("core.copy.targetpage")</label>
-        <span class="xHint">$msg.get('core.copy.targetpage.hint')</span>
+        <label for="targetPageName">$services.localization.render('core.copy.targetpage')</label>
+        <span class="xHint">$services.localization.render('core.copy.targetpage.hint')</span>
       </dt>
       <dd><input type="text" id="targetPageName" name="targetPageName" value="$!{escapetool.xml($doc.name)}" size="60" /></dd>
     </dl>
     <div class="buttons">
-      <span class="buttonwrapper"><input type="submit" value="$msg.get('core.copy.submit')" class="button"/></span>
-      <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$msg.get('core.copy.cancel')</a></span>
+      <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/></span>
+      <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a></span>
     </div>
     </form>
     #end

@@ -56,7 +56,7 @@ public interface AuthorizationManager
      * @param right the right needed for execution of the action
      * @param userReference the user to check the right for
      * @param entityReference the entity on which to check the right
-     * @throws AccessDeniedException if the action should be denied
+     * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
      */
     void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
         throws AccessDeniedException;

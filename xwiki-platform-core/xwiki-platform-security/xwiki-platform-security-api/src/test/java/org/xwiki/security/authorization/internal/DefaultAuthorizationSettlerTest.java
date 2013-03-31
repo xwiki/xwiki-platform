@@ -107,6 +107,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
 
             when(entry.getReference()).thenReturn(ref);
             when(entry.getRules()).thenReturn(rules);
+            when(entry.isEmpty()).thenReturn(rules.size() == 0);
 
             ref = ref.getParentSecurityReference();
             i++;
@@ -167,16 +168,16 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
             = getMockedSecurityRuleEntries("emptyXdocRules", xdocRef, Collections.<List<SecurityRule>>emptyList());
 
         assertAccess("When no rules are defined, return default access for main wiki user on main wiki doc",
-            xuserRef, xdocRef, defaultAccess,
+            xuserRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
             authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptyXdocRules));
 
         assertAccess("When no rules are defined, deny all access for local wiki user on main wiki doc",
-            userRef, xdocRef, denyAllAccess,
+            userRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,
             authorizationSettler.settle(userRef, Collections.<GroupSecurityReference>emptyList(),
                 emptyXdocRules));
 
         assertAccess("When no rules are defined, deny all access for another wiki user on main wiki doc",
-            anotherWikiUserRef, xdocRef, denyAllAccess,
+            anotherWikiUserRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,
             authorizationSettler.settle(anotherWikiUserRef, Collections.<GroupSecurityReference>emptyList(),
                 emptyXdocRules));
     }
@@ -188,15 +189,15 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
             = getMockedSecurityRuleEntries("emptydocRules", docRef, Collections.<List<SecurityRule>>emptyList());
 
         assertAccess("When no rules are defined, return default access for local wiki user on local wiki doc",
-            userRef, docRef, defaultAccess,
+            userRef, docRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
             authorizationSettler.settle(userRef, Collections.<GroupSecurityReference>emptyList(), emptydocRules));
 
         assertAccess("When no rules are defined, return default access for main wiki on local wiki doc",
-            xuserRef, docRef, defaultAccess,
+            xuserRef, docRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
             authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptydocRules));
 
         assertAccess("When no rules are defined, deny all access for another wiki user on local wiki doc",
-            anotherWikiUserRef, docRef, denyAllAccess,
+            anotherWikiUserRef, docRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,
             authorizationSettler.settle(anotherWikiUserRef, Collections.<GroupSecurityReference>emptyList(),
                 emptydocRules));
     }

@@ -137,7 +137,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         // No entity, return default rights for user in its wiki
         if (entity == null) {
             return authorizationSettlerProvider.get().settle(user,
-                loadUserEntry(user, getWikiReference(user), null), null);
+                loadUserEntry(user, user.getWikiReference(), null), null);
         }
 
         // Retrieve rules for the entity from the cache
@@ -164,9 +164,9 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
         // userWiki is the wiki of the user
-        SecurityReference userWiki = getWikiReference(user);
+        SecurityReference userWiki = user.getWikiReference();
         // entityWiki is the wiki of the entity when the user is global and the entity is local
-        SecurityReference entityWiki = user.isGlobal() ? getWikiReference(entity) : null;
+        SecurityReference entityWiki = user.isGlobal() ? entity.getWikiReference() : null;
         if (entityWiki != null && userWiki.equals(entityWiki)) {
             entityWiki = null;
         }

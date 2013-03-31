@@ -34,12 +34,12 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.testwikis.TestDefinition;
 import org.xwiki.security.authorization.testwikis.TestDefinitionParser;
 import org.xwiki.security.authorization.testwikis.TestDocument;
 import org.xwiki.security.authorization.testwikis.TestEntity;
 import org.xwiki.security.authorization.testwikis.TestSpace;
 import org.xwiki.security.authorization.testwikis.TestWiki;
-import org.xwiki.security.authorization.testwikis.TestDefinition;
 import org.xwiki.security.authorization.testwikis.internal.parser.DefaultTestDefinitionParser;
 import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants;
 import org.xwiki.test.annotation.ComponentList;
@@ -47,6 +47,7 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.xwiki.security.authorization.Right.ADMIN;
 import static org.xwiki.security.authorization.Right.CREATOR;
+import static org.xwiki.security.authorization.Right.DELETE;
 import static org.xwiki.security.authorization.Right.ILLEGAL;
 import static org.xwiki.security.authorization.Right.LOGIN;
 import static org.xwiki.security.authorization.Right.PROGRAM;
@@ -79,6 +80,9 @@ public abstract class AbstractAuthorizationTestCase
     /** VIEW, EDIT, COMMENT, DELETE, ADMIN. */
     protected static final RightSet ALL_SPACE_RIGHTS = new RightSet();
 
+    /** VIEW, EDIT, COMMENT, REGISTER, LOGIN. */
+    protected static final RightSet DEFAULT_DOCUMENT_RIGHTS = new RightSet();
+
     /** VIEW, EDIT, COMMENT, DELETE. */
     protected static final RightSet ALL_DOCUMENT_RIGHTS = new RightSet();
 
@@ -92,6 +96,9 @@ public abstract class AbstractAuthorizationTestCase
                         ALL_RIGHTS_EXCEPT_ADMIN.add(right);
                         if (right != LOGIN && right != REGISTER) {
                             ALL_DOCUMENT_RIGHTS.add(right);
+                        }
+                        if (right != DELETE) {
+                            DEFAULT_DOCUMENT_RIGHTS.add(right);
                         }
                     }
                     if (right != LOGIN && right != REGISTER) {

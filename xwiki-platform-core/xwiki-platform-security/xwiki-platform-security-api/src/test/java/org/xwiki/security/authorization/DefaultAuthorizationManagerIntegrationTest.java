@@ -26,6 +26,7 @@ import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -58,9 +59,13 @@ import org.xwiki.security.authorization.testwikis.TestUserDocument;
 import org.xwiki.security.authorization.testwikis.TestWiki;
 import org.xwiki.security.internal.UserBridge;
 import org.xwiki.security.internal.XWikiBridge;
+import org.xwiki.test.LogRule;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -89,8 +94,8 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
 {
     private AuthorizationManager authorizationManager;
 
-//    @Rule
-//    public final LogRule logCapture = new LogRule();
+    @Rule
+    public final LogRule logCapture = new LogRule();
 
     /** Mocked xWikiBridge */
     private XWikiBridge xWikiBridge;
@@ -172,12 +177,12 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         for (Right right : values()) {
             if (allowedRights != null && allowedRights.contains(right)) {
                 if (!authorizationManager.hasAccess(right, userReference, entityReference)) {
-                    Assert.fail(String.format("[%s] should have [%s] right on [%s].",
+                    fail(String.format("[%s] should have [%s] right on [%s].",
                         getUserReadableName(userReference), right, getEntityReadableName(entityReference)));
                 }
             } else {
                 if (authorizationManager.hasAccess(right, userReference, entityReference)) {
-                    Assert.fail(String.format("[%s] should not have [%s] right on [%s].",
+                    fail(String.format("[%s] should not have [%s] right on [%s].",
                         getUserReadableName(userReference), right, getEntityReadableName(entityReference)));
                 }
             }
@@ -270,7 +275,10 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
 
                     Collection<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>();
                     for (TestGroup group : user.getGroups()) {
-                        groups.add(securityReferenceFactory.newGroupReference(group.getGroupReference()));
+                        // Ensure we return only group of the requested wiki
+                        if (group.getGroupReference().getWikiReference().equals(wikiReference)) {
+                            groups.add(securityReferenceFactory.newGroupReference(group.getGroupReference()));
+                        }
                     }
                     return groups;
                 }
@@ -511,5 +519,64 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userA"), getXDoc("userBdoc","space"));
         assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userB"), getXDoc("userAdoc","space"));
         assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userB"), getXDoc("userBdoc","space"));
+    }
+
+    @Test
+    public void testOwnerAccess() throws Exception
+    {
+        initialiseWikiMock("ownerAccess");
+
+        // Owner of main wiki has admin access to all wikis whatever the wiki access is
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space", "wikiNoRules"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space", "wikiLocalUserA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space", "wikiDenyLocalUserA"));
+
+        // Local owner has admin access whatever the wiki access is
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiLocalUserA"), getDoc("any document", "any space", "wikiLocalUserA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiDenyLocalUserA"), getDoc("any document", "any space", "wikiDenyLocalUserA"));
+    }
+
+    @Test
+    public void testGroupAccess() throws Exception
+    {
+        initialiseWikiMock("groupAccess");
+
+        assertAccess(DEFAULT_DOCUMENT_RIGHTS,       getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getXDoc("docAllowGroupA", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getXDoc("docAllowGroupeB", "any space"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("docDenyGroupA", "any space"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("docDenyGroupB", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getXDoc("docDenyGroupAAllowUserA", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getXDoc("docDenyGroupBAllowUserA", "any space"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("docDenyGroupBAllowGroupA", "any space"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("docDenyGroupAAllowGroupB", "any space"));
+
+        assertAccess(DEFAULT_DOCUMENT_RIGHTS,       getUser("userB","subwiki"), getDoc("any document", "any space", "subwiki"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getUser("userB","subwiki"), getDoc("docAllowGroupA", "any space", "subwiki"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getUser("userB","subwiki"), getDoc("docAllowGroupB", "any space", "subwiki"));
+        assertAccess(new RightSet(LOGIN, REGISTER), getUser("userB","subwiki"), getDoc("docAllowGroupC", "any space", "subwiki"));
+
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowGlobalGroupA", "any space", "subwiki"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowGlobalGroupB", "any space", "subwiki"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowGroupA", "any space", "subwiki"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowGroupB", "any space", "subwiki"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN,       getXUser("userA"), getDoc("docAllowGroupC", "any space", "subwiki"));
+    }
+
+    @Test
+    public void testCheckAccess() throws Exception
+    {
+        initialiseWikiMock("emptyWikis");
+
+        authorizationManager.checkAccess(VIEW, null, getXDoc("an empty main wiki", "anySpace"));
+
+        try {
+            authorizationManager.checkAccess(ADMIN, null, getXDoc("an empty main wiki", "anySpace"));
+            fail("checkAccess should throw access denied exception when access is denied.");
+        } catch (AccessDeniedException e) {
+            assertThat("checkAccess should throw access denied exception without any cause when access is denied",
+                e.getCause(), nullValue());
+        }
     }
 }

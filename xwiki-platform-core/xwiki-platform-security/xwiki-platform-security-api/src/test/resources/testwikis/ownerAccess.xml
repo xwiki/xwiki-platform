@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<!-- Used by XWikiSecurityAuthorizationTest#testOwnerAccess() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="userA" alt="Main Wiki denying all access to userA but owned is A">
+    <user name="userA" />
+    <denyUser name="userA" />
+
+    <space name="any space">
+      <document name="any document" />
+    </space>
+  </wiki>
+  <wiki name="wikiNoRules" alt="a subwiki without any rules">
+    <space name="any space">
+      <document name="any document" />
+    </space>
+  </wiki>
+  <wiki name="wikiLocalUserA" alt="a subwiki without any rules owned by local userA" owner="userA">
+    <user name="userA" />
+    <space name="any space">
+      <document name="any document" />
+    </space>
+  </wiki>
+  <wiki name="wikiDenyLocalUserA" alt="a subwiki without any rules owned by local userA" owner="userA">
+    <user name="userA" />
+    <denyUser name="userA" />
+    <space name="any space">
+      <document name="any document" />
+    </space>
+  </wiki>
+</wikis>

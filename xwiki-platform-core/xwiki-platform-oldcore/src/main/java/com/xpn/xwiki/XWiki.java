@@ -6444,6 +6444,7 @@ public class XWiki implements EventListener
         rolledbackDoc.addXObjectsToRemoveFromVersion(tdoc);
 
         // now we save the final document..
+        rolledbackDoc.setOriginalDocument(tdoc);
         rolledbackDoc.setAuthorReference(context.getUserReference());
         rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
         rolledbackDoc.setVersion(tdoc.getVersion());

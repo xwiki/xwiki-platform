@@ -128,7 +128,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('xe.panels.tagcloud.title'))
+#panelheader($services.localization.render('xe.panels.tagcloud.title'))
 {{include document="XWiki.TagCloud"/}}
 #panelfooter()
 {{/velocity}}</content>

@@ -15,7 +15,7 @@
   <date>1196154233000</date>
   <contentUpdateDate>1196154233000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.statistics.visit")</title>
+  <title>$services.localization.render("xe.statistics.visit")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

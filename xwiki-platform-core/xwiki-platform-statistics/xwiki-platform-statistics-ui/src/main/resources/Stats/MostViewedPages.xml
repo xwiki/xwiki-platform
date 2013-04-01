@@ -100,7 +100,7 @@
     </property>
     <property>
       <content>{{include document="Stats.Macros" /}}((({{velocity}}
-#panelheader($msg.get('xe.statistics.pages.mostviewed'))
+#panelheader($services.localization.render('xe.statistics.pages.mostviewed'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($scope = $xwiki.criteriaService.scopeFactory.ALL_PAGES)

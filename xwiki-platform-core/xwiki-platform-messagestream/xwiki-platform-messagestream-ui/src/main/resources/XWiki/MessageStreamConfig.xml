@@ -15,7 +15,7 @@
   <date>1300230452000</date>
   <contentUpdateDate>1300230452000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('admin.messagestream')</title>
+  <title>$services.localization.render('admin.messagestream')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

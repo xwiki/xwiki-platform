@@ -134,11 +134,11 @@ XWiki.MessageStream = Class.create({
   suggestParameters : {
     user : {
       script: '$doc.getURL("get", "xpage=uorgsuggest&amp;uorg=user&amp;wiki=${userSuggestScope}")&amp;',
-      noresults: "$escapetool.javascript($msg.get('core.widgets.userPicker.noResults'))"
+      noresults: "$escapetool.javascript($services.localization.render('core.widgets.userPicker.noResults'))"
     },
     group : {
       script: "$doc.getURL('get', 'xpage=uorgsuggest&amp;uorg=group')&amp;",
-      noresults: "$escapetool.javascript($msg.get('core.widgets.groupPicker.noResults'))"
+      noresults: "$escapetool.javascript($services.localization.render('core.widgets.groupPicker.noResults'))"
     }
   },
   initialize : function() {
@@ -191,7 +191,7 @@ XWiki.MessageStream = Class.create({
             parameters: msForm.serialize(true),
             onCreate: function() {
               msForm._disabled = true;
-              msForm._notification = new XWiki.widgets.Notification("$msg.get('xe.activity.messages.submit.inProgress')", 'inprogress');
+              msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.inProgress')", 'inprogress');
             },
             onSuccess: function() {
               if (msForm) {
@@ -200,7 +200,7 @@ XWiki.MessageStream = Class.create({
               if (msForm &amp;&amp; msForm._notification) {
                 msForm._notification.hide();
               }
-              msForm._notification = new XWiki.widgets.Notification("$msg.get('xe.activity.messages.submit.success')", 'done');
+              msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.success')", 'done');
 
               document.fire('xwiki:activity:newActivity', msForm);
             },
@@ -216,7 +216,7 @@ XWiki.MessageStream = Class.create({
                 if (msForm._notification) {
                   msForm._notification.hide();
                 }
-                msForm._notification = new XWiki.widgets.Notification("$msg.get('xe.activity.messages.submit.failed'): " + failureReason, 'error');
+                msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.failed'): " + failureReason, 'error');
               }
             },
             on1223 : function(response) { /*SUCCESS*/
@@ -519,7 +519,7 @@ return XWiki;
     #else
       #smallUserAvatar("$!eventUser")
     #end
-    &lt;img class='activityActionAvatar' src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$msg.get("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$msg.get("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
+    &lt;img class='activityActionAvatar' src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
   &lt;/span&gt;
 #end
 ##
@@ -574,20 +574,20 @@ return XWiki;
             #else
               $response.setStatus(403)## Forbidden
             #end
-            $msg.get('xe.activity.messages.submit.failed')
+            $services.localization.render('xe.activity.messages.submit.failed')
           #elseif ("$!{request.xredirect}" != '')
             ## Pass the error message in the xredirect so that we display it in the calling page and not in the macro page.
-            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $msg.get('xe.activity.messages.submit.failed'))
+            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $services.localization.render('xe.activity.messages.submit.failed'))
             $response.sendRedirect($request.xredirect)
           #else
-            {{error}}$msg.get('xe.activity.messages.submit.failed'){{/error}}
+            {{error}}$services.localization.render('xe.activity.messages.submit.failed'){{/error}}
 
           #end
         #elseif ("$!{request.xredirect}" != '')
           $response.sendRedirect(${request.xredirect})
         #elseif ($request.xpage == 'plain')
           ## Just print something for confirmation.
-          $msg.get('xe.activity.messages.submit.success')
+          $services.localization.render('xe.activity.messages.submit.success')
         #end
       #end
     #end
@@ -640,13 +640,13 @@ return XWiki;
             #end
           #end
           #if (!$targetName)
-            #set ($targetName = ${msg.get('xe.activity.messages.visibility.targetName.tip')})
+            #set ($targetName = ${services.localization.render('xe.activity.messages.visibility.targetName.tip')})
             #set ($targetClassName = 'withTip')
           #end
-          &lt;label&gt;$msg.get('xe.activity.messages.visibility')
+          &lt;label&gt;$services.localization.render('xe.activity.messages.visibility')
             &lt;select name='visibilityLevel'#if($inEditMode) disabled='disabled'#end&gt;
             #foreach ($target in $possibleTargets)
-              &lt;option value="${target}"#if ($defaultTarget == $target) selected='selected'#end&gt;$msg.get("XWiki.MessageStreamConfig_visibilityLevel_${target}")&lt;/option&gt;
+              &lt;option value="${target}"#if ($defaultTarget == $target) selected='selected'#end&gt;$services.localization.render("XWiki.MessageStreamConfig_visibilityLevel_${target}")&lt;/option&gt;
             #end
             &lt;/select&gt;
           &lt;/label&gt;
@@ -661,7 +661,7 @@ return XWiki;
           #end
         &lt;/div&gt;
         &lt;div class='messagestream-buttons'&gt;
-          &lt;span class='butonwrapper'&gt;&lt;input type='submit' value="$msg.get('xe.activity.messages.submit')" class='button'#if($inEditMode) disabled='disabled'#end/&gt;&lt;/span&gt;
+          &lt;span class='butonwrapper'&gt;&lt;input type='submit' value="$services.localization.render('xe.activity.messages.submit')" class='button'#if($inEditMode) disabled='disabled'#end/&gt;&lt;/span&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     #if (!$inEditMode)

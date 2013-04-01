@@ -25,7 +25,7 @@
   <hidden>true</hidden>
   <content>#set($AppManager = $services.applicationmanager)
 #if(!$AppManager)
-  #error($msg.get("xapp.pluginnotenabled"))
+  #error($services.localization.render('xapp.pluginnotenabled'))
 #end
 ##
 #set($Exception = $AppManager.DefaultException)
@@ -57,28 +57,28 @@ $xwiki.ssfx.use('js/xwiki/table/table.css', true)##
 ##
 #############################################################################
 ##
-1 $msg.get("xapp.appmanager")
+1 $services.localization.render('xapp.appmanager')
 ##
 #set($listApp = $AppManager.getApplicationDocumentList())
 ##
-$msg.get("xapp.totalnumberofapp") : $listApp.size()
+$services.localization.render('xapp.totalnumberofapp'): $listApp.size()
 \\
-[$msg.get("xapp.createapplication")&gt;XAppManager.CreateApplication]
+[$services.localization.render('xapp.createapplication')&gt;XAppManager.CreateApplication]
 ##
 #if($listApp.size() &gt; 0)
   &lt;table id="wikiTable" class="grid sortable filterable doOddEven"&gt;
     &lt;tr class="sortHeader"&gt;
-      &lt;th scope="col"&gt;$msg.get("xapp.appname")&lt;/th&gt;
-      &lt;th scope="col"&gt;$msg.get("version")&lt;/th&gt;
-      &lt;th scope="col"&gt;$msg.get("xapp.description")&lt;/th&gt;
-      &lt;th scope="col" class="unsortable noFilter"&gt;$msg.get("more")&lt;/th&gt;
+      &lt;th scope="col"&gt;$services.localization.render('xapp.appname')&lt;/th&gt;
+      &lt;th scope="col"&gt;$services.localization.render('version')&lt;/th&gt;
+      &lt;th scope="col"&gt;$services.localization.render('xapp.description')&lt;/th&gt;
+      &lt;th scope="col" class="unsortable noFilter"&gt;$services.localization.render('more')&lt;/th&gt;
     &lt;/tr&gt;
     #foreach($app in $listApp)
       &lt;tr&gt;
         &lt;td&gt;[#if($app.appprettyname &amp;&amp; $app.appprettyname.trim() != "")$app.appprettyname ($app.appname)#else$app.appname#end&gt;$app.getFullName()]&lt;/td&gt;
         &lt;td&gt;$app.appversion&lt;/td&gt;
         &lt;td&gt;$app.description&lt;/td&gt;
-        &lt;td&gt;&lt;a href="$doc.getURL("view", "action=delete&amp;amp;appname=$app.appname")"&gt;$msg.get("delete")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=export&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.exportrecurse")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=reload&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.reloadapp")&lt;/a&gt; &lt;a href="$app.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="$doc.getURL("view", "action=delete&amp;amp;appname=$app.appname")"&gt;$services.localization.render('delete')&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=export&amp;amp;appname=$app.appname")"&gt;$services.localization.render('xapp.action.exportrecurse')&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=reload&amp;amp;appname=$app.appname")"&gt;$services.localization.render('xapp.action.reloadapp')&lt;/a&gt; &lt;a href="$app.getURL("inline")"&gt;$services.localization.render('edit')&lt;/a&gt;&lt;/td&gt;
       &lt;/tr&gt;
     #end
   &lt;/table&gt;
@@ -87,7 +87,7 @@ $msg.get("xapp.totalnumberofapp") : $listApp.size()
 #############################################################################
 ##
 #if($xcontext.hasAdminRights())
-  1.1 $msg.get("xapp.availablefilestoimport")
+  1.1 $services.localization.render('xapp.availablefilestoimport')
   ##
   #set($listpackage=$doc.getAttachmentList())
   #foreach ($package in $listpackage)

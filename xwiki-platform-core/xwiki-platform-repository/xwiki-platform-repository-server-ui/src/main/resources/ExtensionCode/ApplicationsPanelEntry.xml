@@ -86,7 +86,7 @@
       <name>platform.repository.repositoryApplication</name>
     </property>
     <property>
-      <parameters>label=$msg.get('admin.repository')
+      <parameters>label=$services.localization.render('admin.repository')
 target=Extension.WebHome
 icon=icon:plugin</parameters>
     </property>

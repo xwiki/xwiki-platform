@@ -46,7 +46,7 @@
   <content>{{velocity}}
 #set($obj = $doc.getObject("XWiki.XWikiUsers"))
 #if(!$obj)
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
+{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
 #else
 $doc.use($obj)
 $xwiki.ssx.use('XWiki.XWikiUserSheet')##
@@ -54,25 +54,25 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
   &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
     &lt;div class="userPreferences"&gt;
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=preferences')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.preferences.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=preferences')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.preferences.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end
-      &lt;h1&gt;$msg.get('platform.core.profile.section.displayPreferences')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.core.profile.section.displayPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.displayHiddenDocuments')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.displayHiddenDocuments')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('displayHiddenDocuments')&lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.enableAccessibility')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.enableAccessibility')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('accessibility')&lt;/dd&gt;
       &lt;/dl&gt;
-      &lt;h1&gt;$msg.get('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.timezone')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.timezone')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('timezone')&lt;/dd&gt;
       &lt;/dl&gt;
-      &lt;h1&gt;$msg.get('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editor')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.editor')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('editor')&lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.userType')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.userType')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('usertype')&lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/div&gt;
@@ -81,8 +81,8 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
   #if(($isMyProfile || $hasAdmin) &amp;&amp; !$doc.getObject('XWiki.LDAPProfileClass') &amp;&amp; $xcontext.action == 'view')
     &lt;div class="half column"&gt;
       &lt;div class="passwordManagement"&gt;
-        &lt;h1&gt;$msg.get('platform.core.profile.section.security')&lt;/h1&gt;
-        &lt;span class="buttonwrapper"&gt;&lt;a id="changePassword" href="$doc.getURL("view", "xpage=passwd")"&gt;$msg.get("platform.core.profile.changePassword")&lt;/a&gt;&lt;/span&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.security')&lt;/h1&gt;
+        &lt;span class="buttonwrapper"&gt;&lt;a id="changePassword" href="$doc.getURL('view', 'xpage=passwd')"&gt;$services.localization.render('platform.core.profile.changePassword')&lt;/a&gt;&lt;/span&gt;
      &lt;/div&gt;
     &lt;/div&gt;
   #end

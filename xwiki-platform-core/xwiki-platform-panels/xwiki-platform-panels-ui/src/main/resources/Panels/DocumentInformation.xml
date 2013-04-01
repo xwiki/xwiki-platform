@@ -405,8 +405,6 @@ $xwiki.jsx.use($paneldoc.fullName)##
   : {{html}}
     &lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
       #set ($docSyntax = $tdoc.getSyntax())
-      &lt;option value="xwiki/1.0"#if ($docSyntax.toIdString().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
-      ##
       ## Starting with XE 2.3 the $syntaxFactory binding has been removed and the new $services binding added.
       ## To make sure this Panel application still work with versions less than 2.3 we verify the availability of bindings.
       #set ($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())

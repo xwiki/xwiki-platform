@@ -698,14 +698,14 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   ## the situation has been investigated.
 
   ## A message which you sent was reported as spam and your privilege to send mail has been suspended...
-  (%id="invitation-permission-error"%)((({{error}}$msg.get('xe.invitation.userIsReportedSpammer'){{/error}})))
+  (%id="invitation-permission-error"%)((({{error}}$services.localization.render('xe.invitation.userIsReportedSpammer'){{/error}})))
   ##
 #elseif(!$isAdmin
         &amp;&amp; $config.get('allowUsersOfOtherWikis') != '1'
         &amp;&amp; $doc.getWiki() != $xwiki.getDocument($xcontext.getUser()).getWiki())
   ## Users of other subwikis are not allowed to send mail.
-  (%id="invitation-permission-error"%)((({{error}}$msg.get('xe.invitation.onlyMembersCanSendMail')
-  $msg.get('xe.invitation.youAreAMemberOfOtherWiki', [$xwiki.getDocument($xcontext.getUser()).getWiki()]){{/error}})))
+  (%id="invitation-permission-error"%)((({{error}}$services.localization.render('xe.invitation.onlyMembersCanSendMail')
+  $services.localization.render('xe.invitation.youAreAMemberOfOtherWiki', [$xwiki.getDocument($xcontext.getUser()).getWiki()]){{/error}})))
 #else
   ## The user is authorized to send mail &lt;-------------------------------------------------------
   ## Get the list of email addresses to send to.
@@ -800,10 +800,10 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       (%id="invitation-action-message"%)(((##
       #if($errors.size() &gt; 0)
         ## An error has occured while sending the message.
-        {{error}}$msg.get('xe.invitation.errorWhileSending'){{/error}}##
+        {{error}}$services.localization.render('xe.invitation.errorWhileSending'){{/error}}##
       #else
         ## Your message has been sent.
-        {{info}}$msg.get('xe.invitation.successSending'){{/info}}##
+        {{info}}$services.localization.render('xe.invitation.successSending'){{/info}}##
       #end
       )))
 
@@ -813,7 +813,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   #else
 
 
-    (%id="invitation-action-message"%)((({{error}}$msg.get('xe.invitation.noValidMessagesToSend'){{/error}})))
+    (%id="invitation-action-message"%)((({{error}}$services.localization.render('xe.invitation.noValidMessagesToSend'){{/error}})))
 
   #end
 #end
@@ -872,10 +872,10 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #if("$sender.sendMail($mailObj, $senderConfig)" != 0)
       #setMessageStatus($message, 'sendingFailed')##
     #else
-      #setMessageStatus($message, 'pending', $msg.get('xe.invitation.messageSentLogEntry'))##
+      #setMessageStatus($message, 'pending', $services.localization.render('xe.invitation.messageSentLogEntry'))##
     #end
     ## Comment = "Added Email Message."
-    $emailContainer.saveAsAuthor($msg.get('xe.invitation.sendMail.addMessageSaveComment'))
+    $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.sendMail.addMessageSaveComment'))
   #end
 #end
 ##
@@ -993,7 +993,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
    &lt;div class="hidden"&gt;&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;&lt;/div&gt;
    &lt;dl&gt;
     ## Who you are inviting:
-    &lt;dt&gt;&lt;label for="recipients"&gt;$msg.get('xe.invitation.toLabel')&lt;/label&gt;&lt;/dt&gt;
+    &lt;dt&gt;&lt;label for="recipients"&gt;$services.localization.render('xe.invitation.toLabel')&lt;/label&gt;&lt;/dt&gt;
     ## If the user has edit access on this document, then we should allow them to send to multiple email addresses.
     #if($userMaySendToMultiple)
       &lt;dd&gt;
@@ -1006,12 +1006,12 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #end
     #if($userMayPersonalizeMessage)
        ## Subject line:
-       &lt;dt&gt;&lt;label for="subjectLine"&gt;$msg.get('xe.invitation.subjectLabel')&lt;/label&gt;&lt;/dt&gt;
+       &lt;dt&gt;&lt;label for="subjectLine"&gt;$services.localization.render('xe.invitation.subjectLabel')&lt;/label&gt;&lt;/dt&gt;
        &lt;dd&gt;
         &lt;input type="text" size="54" name="subjectLine" id="subjectLine" value="$!escapetool.xml($!subjectLine)" /&gt;
        &lt;/dd&gt;
        ## Invitation message:
-       &lt;dt&gt;&lt;label for="messageBody"&gt;$msg.get('xe.invitation.contentLabel')&lt;/label&gt;&lt;/dt&gt;
+       &lt;dt&gt;&lt;label for="messageBody"&gt;$services.localization.render('xe.invitation.contentLabel')&lt;/label&gt;&lt;/dt&gt;
        &lt;dd&gt;
         &lt;textarea cols="75" name="messageBody" rows="10" id="messageBody"&gt;##
          $!escapetool.xml($!messageBody)##
@@ -1023,11 +1023,11 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     &lt;div class="buttons"&gt;
      &lt;span class="buttonwrapper"&gt;
       ## Preview
-      &lt;input type="submit" class="button" name="preview" value="$msg.get('xe.invitation.displayForm.preview')" /&gt;
+      &lt;input type="submit" class="button" name="preview" value="$services.localization.render('xe.invitation.displayForm.preview')" /&gt;
      &lt;/span&gt;
      &lt;span class="buttonwrapper"&gt;
       ## Send Mail
-      &lt;input type="submit" class="button" name="sendMail" value="$msg.get('xe.invitation.displayForm.sendMail')" /&gt;
+      &lt;input type="submit" class="button" name="sendMail" value="$services.localization.render('xe.invitation.displayForm.sendMail')" /&gt;
      &lt;/span&gt;
     &lt;/div&gt;
    &lt;/div&gt;

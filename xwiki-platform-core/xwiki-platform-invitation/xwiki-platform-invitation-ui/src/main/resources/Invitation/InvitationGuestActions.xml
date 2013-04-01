@@ -159,7 +159,7 @@
             $mail,
             $emailContainer)
 #else
-  {{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}
+  {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##
 ##---------------------------------------------------------------------
@@ -201,37 +201,37 @@
   ## 3. Do action.
   #if($action == 'accept')
     ## Accept invitation. &lt;------------------------------------------------------------------------
-    = $msg.get('xe.invitation.doAction.accept.heading') =
+    = $services.localization.render('xe.invitation.doAction.accept.heading') =
     #if("$!message" == '')
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.accept.noMessageFound'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.accept.noMessageFound'){{/error}}
     #elseif($status == 'accepted')
       ## already accepted
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.accept.alreadyAccepted'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.accept.alreadyAccepted'){{/error}}
     #elseif($status == 'declined')
       ## already declined
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.accept.alreadyDeclined'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.accept.alreadyDeclined'){{/error}}
     #elseif($status == 'canceled')
       ## invitation canceled.
-      (%id="invitation-action-message"%)((({{error}}$msg.get('xe.invitation.doAction.accept.invitationCanceled')
+      (%id="invitation-action-message"%)((({{error}}$services.localization.render('xe.invitation.doAction.accept.invitationCanceled')
       #if("$!oldMemo" != '')
-        $msg.get('xe.invitation.doAction.invitationCanceledMemo',
+        $services.localization.render('xe.invitation.doAction.invitationCanceledMemo',
                  [$xwiki.getUserName($message.getProperty('sendingUser').getValue(), false)])
         $oldMemo
       #end
       {{/error}}
     #elseif($status == 'reported' || $status == 'notSpam')
       ## reported as spam, nolonger valid.
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.accept.alreadyReportedAsSpam'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.accept.alreadyReportedAsSpam'){{/error}}
     #elseif($status != 'pending')
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.invalidStatus', ["#messageStatusForCode($status)"]){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.invalidStatus', ["#messageStatusForCode($status)"]){{/error}}
     #else
       #if("#canGuestAcceptInvitation($doc)" != 'true')
       ##
-        {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.accept.improperConfiguration'){{/error}}
+        {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.accept.improperConfiguration'){{/error}}
       #else
         #define($doAfterRegistration)
           #setMessageStatus($message, 'accepted')
-          $emailContainer.saveAsAuthor($msg.get('xe.invitation.doAction.accept.saveComment'))
+          $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doAction.accept.saveComment'))
         #end
         #set($invited = true)
         {{include document="XWiki.Registration"/}}
@@ -239,60 +239,60 @@
     #end
   #elseif($action == 'decline')
     ## Decline Invitation &lt;------------------------------------------------------------------------
-    = $msg.get('xe.invitation.doAction.decline.heading') =
+    = $services.localization.render('xe.invitation.doAction.decline.heading') =
     #if("$!message" == '')
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.decline.noMessageFound'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.decline.noMessageFound'){{/error}}
     #elseif($status == 'accepted')
       ## already accepted
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.decline.alreadyAccepted'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.decline.alreadyAccepted'){{/error}}
     #elseif($status == 'declined')
       ## already declined
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.decline.alreadyDeclined'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.decline.alreadyDeclined'){{/error}}
     #elseif($status == 'canceled')
       ## invitation canceled.
-      (%id="invitation-action-message"%)((({{error}}$msg.get('xe.invitation.doAction.decline.invitationCanceled')
+      (%id="invitation-action-message"%)((({{error}}$services.localization.render('xe.invitation.doAction.decline.invitationCanceled')
        #if("$!oldMemo" != '')
-         $msg.get('xe.invitation.doAction.invitationCanceledMemo', 
+         $services.localization.render('xe.invitation.doAction.invitationCanceledMemo', 
                   [$xwiki.getUserName($message.getProperty('sendingUser').getValue(), false)])
          $oldMemo
        #end
       {{/error}})))
     #elseif($status == 'reported' || $status == 'notSpam')
       ## reported as spam, nolonger valid.
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.decline.alreadyReportedAsSpam'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.decline.alreadyReportedAsSpam'){{/error}}
     #elseif($status != 'pending')
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.invalidStatus', ["#messageStatusForCode($status)"]){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.invalidStatus', ["#messageStatusForCode($status)"]){{/error}}
     #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #setMessageStatus($message, 'declined', $memo)##
-      $emailContainer.saveAsAuthor($msg.get('xe.invitation.doAction.decline.saveComment'))
-      {{info}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.decline.success'){{/info}}
+      $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doAction.decline.saveComment'))
+      {{info}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.decline.success'){{/info}}
     #else
       ## Are you sure?...
       #displayActionConfirmationForm([$messageID],
                                      $action,
-                                     $msg.get('xe.invitation.doAction.decline.memoLabel', 
+                                     $services.localization.render('xe.invitation.doAction.decline.memoLabel',
                                          [$xwiki.getUserName($message.getProperty('sendingUser').getValue(), false)]),
-                                     $msg.get('xe.invitation.doAction.decline.confirmLabel'),
+                                     $services.localization.render('xe.invitation.doAction.decline.confirmLabel'),
                                      {})
     #end
   #elseif($action == 'report')
     ## Report Abuse &lt;------------------------------------------------------------------------------
-    = $msg.get('xe.invitation.doAction.reportSpam.heading') =
+    = $services.localization.render('xe.invitation.doAction.reportSpam.heading') =
     #if("$!message" == '')
       ## No message found by that id.
-      {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.reportSpam.noMessageFound'){{/error}}
+      {{error}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.reportSpam.noMessageFound'){{/error}}
     #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #setMessageStatus($message, 'reported', $memo)##
-      $emailContainer.saveAsAuthor($msg.get('xe.invitation.doAction.reportSpam.reportSaveComment'))
+      $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doAction.reportSpam.reportSaveComment'))
       ## Your report has been logged, sorry for the inconvienence.
-      {{info}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.reportSpam.success'){{/info}}
+      {{info}}(%id="invitation-action-message"%)$services.localization.render('xe.invitation.doAction.reportSpam.success'){{/info}}
     #else
       ## Are you sure?...
-      == $msg.get('xe.invitation.doAction.reportSpam.areYouSure') ==
+      == $services.localization.render('xe.invitation.doAction.reportSpam.areYouSure') ==
       #displayActionConfirmationForm([$messageID],
                                      $action,
-                                     $msg.get('xe.invitation.doAction.reportSpam.memoLabel'),
-                                     $msg.get('xe.invitation.doAction.confirmLabel'),
+                                     $services.localization.render('xe.invitation.doAction.reportSpam.memoLabel'),
+                                     $services.localization.render('xe.invitation.doAction.confirmLabel'),
                                      {})
       #displayMessage($message)
     #end

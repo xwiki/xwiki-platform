@@ -34,7 +34,7 @@ import org.xwiki.officeimporter.server.OfficeServerConfiguration;
  */
 @Role
 @Deprecated
-public interface OpenOfficeConfiguration extends OfficeServerConfiguration
+public interface OpenOfficeConfiguration
 {
     /**
      * Indicates an internally managed office server instance.
@@ -50,4 +50,48 @@ public interface OpenOfficeConfiguration extends OfficeServerConfiguration
      * Indicates an externally managed remotely deployed office server instance.
      */
     int SERVER_TYPE_EXTERNAL_REMOTE = 2;
+
+    /**
+     * Returns the type of the office server instance consumed by office importer module:
+     * <ul>
+     * <li>0 - Internally managed server instance</li>
+     * <li>1 - Externally managed (local) server instance</li>
+     * </ul>
+     * .
+     * 
+     * @return type of the office server used by the office importer module
+     */
+    int getServerType();
+
+    /**
+     * @return the port number used for connecting to the office server instance
+     */
+    int getServerPort();
+
+    /**
+     * @return whether office server should be started / connected automatically with XWiki Enterprise
+     */
+    boolean isAutoStart();
+
+    /**
+     * @return the path to the office server installation, or {@code null} if the home path is not configured and the
+     *         office installation is not detected (which means the office server is either not installed or it is
+     *         installed at a custom path)
+     */
+    String getHomePath();
+
+    /**
+     * @return the path to office server execution profile, {@code null} by default
+     */
+    String getProfilePath();
+
+    /**
+     * @return the maximum number of simultaneous conversion tasks to be handled by a single office process instance
+     */
+    int getMaxTasksPerProcess();
+
+    /**
+     * @return the timeout for document conversion tasks
+     */
+    long getTaskExecutionTimeout();
 }

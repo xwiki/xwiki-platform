@@ -46,7 +46,7 @@
   <content>{{velocity}}
 #set($userObj = $doc.getObject("XWiki.XWikiUsers"))
 #if(!$userObj)
-  {{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
+  {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
 #else
   #set($dashboardPrefs = $doc.getObject("Dashboard.UserDashboardPreferencesClass"))
   #if(!$dashboardPrefs)
@@ -68,11 +68,11 @@
   &lt;div class="full column"&gt;
     &lt;div class="userDashboard"&gt;
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=dashboard')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.dashboard.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=dashboard')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.dashboard.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end  
-      &lt;h1&gt;$msg.get('platform.dashboard.user.preferences')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.dashboard.user.displayOnMainPage')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.dashboard.user.displayOnMainPage')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('displayOnMainPage', $dashboardPrefs)&lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/div&gt;

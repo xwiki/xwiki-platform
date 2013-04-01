@@ -107,7 +107,7 @@
     <property>
       <content>{{velocity}}
 #if ($hasEdit || $showEmptyPanels)
-#panelheader($msg.get('core.create.pageTitle'))
+#panelheader($services.localization.render('core.create.pageTitle'))
 #set ($panelId = $util.generateRandomString(4))
 {{html clean="false"}}
 &lt;form method="post" action="$doc.getURL('create')" onsubmit="cancelCancelEdit()"&gt;
@@ -123,13 +123,13 @@
     #set ($spaceInputId = "space$!{panelId}")
     #set ($space = $doc.documentReference.lastSpaceReference.name)
     #set ($pageInputId = "page$!{panelId}")
-    #set ($pageText = $msg.get('core.create.pageText'))
-    ; {{html}}&lt;label for="$spaceInputId"&gt;$msg.get('core.create.space')&lt;/label&gt;{{/html}}
+    #set ($pageText = $services.localization.render('core.create.pageText'))
+    ; {{html}}&lt;label for="$spaceInputId"&gt;$services.localization.render('core.create.space')&lt;/label&gt;{{/html}}
     : {{html}}&lt;input type="text" id="$spaceInputId" name="space" value="$!space" class="suggestSpaces" /&gt;{{/html}}
-    ; {{html}}&lt;label for="$pageInputId"&gt;$msg.get('core.create.page')&lt;/label&gt;{{/html}}
+    ; {{html}}&lt;label for="$pageInputId"&gt;$services.localization.render('core.create.page')&lt;/label&gt;{{/html}}
     : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="page" value="$pageText" /&gt;{{/html}}
 
-    {{html}}&lt;input type="submit" class="button" value="$msg.get('create')" /&gt;{{/html}}
+    {{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
   )))
 {{html clean="false"}}
 &lt;/form&gt;

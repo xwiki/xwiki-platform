@@ -108,36 +108,36 @@
       <content>{{velocity}}
 (% id="xwikirightshelppanel" %)
 (((
-#largepanelheader($msg.get('xe.panels.rights.help'))
+#largepanelheader($services.localization.render('xe.panels.rights.help'))
 (% id="xwikirightshelp" %)
 (((
   (% id="xwikihelpusers" %)
   (((
     (% id="xwikihelpusersHeader" class="accordionTabTitleBar" %)
-    (((= $msg.get('xe.panels.rights.users') =)))
+    (((= $services.localization.render('xe.panels.rights.users') =)))
     (% id="xwikihelpusersContent" class="accordionTabContentBox" %)
-    ((({{html}}$msg.get('xe.panels.rights.usersexplanation'){{/html}})))
+    ((({{html}}$services.localization.render('xe.panels.rights.usersexplanation'){{/html}})))
   )))
   (% id="xwikihelpgroups" %)
   (((
     (% id="xwikihelpgroupsHeader" class="accordionTabTitleBar" %)
-    (((= $msg.get('xe.panels.rights.groups') =)))
+    (((= $services.localization.render('xe.panels.rights.groups') =)))
     (% id="xwikihelpgroupsContent" class="accordionTabContentBox" %)
-    ((({{html}}$msg.get('xe.panels.rights.groupsexplanation') $msg.get('xe.panels.rights.groupsvirtualexplanation'){{/html}})))
+    ((({{html}}$services.localization.render('xe.panels.rights.groupsexplanation') $services.localization.render('xe.panels.rights.groupsvirtualexplanation'){{/html}})))
   )))
   (% id="xwikihelplevels" %)
   (((
     (% id="xwikihelplevelsHeader" class="accordionTabTitleBar" %)
-    (((= $msg.get('xe.panels.rights.accesslevels') =)))
+    (((= $services.localization.render('xe.panels.rights.accesslevels') =)))
     (% id="xwikihelplevelsContent" class="accordionTabContentBox" %)
-    ((({{html}}$msg.get('xe.panels.rights.accesslevelsexplanation'){{/html}})))
+    ((({{html}}$services.localization.render('xe.panels.rights.accesslevelsexplanation'){{/html}})))
   )))
   (% id="xwikihelpallow" %)
   (((
     (% id="xwikihelpallowHeader" class="accordionTabTitleBar" %)
-    (((= $msg.get('xe.panels.rights.allowdeny') =)))
+    (((= $services.localization.render('xe.panels.rights.allowdeny') =)))
     (% id="xwikihelpallowContent" class="accordionTabContentBox" %)
-    ((({{html}}$msg.get('xe.panels.rights.allowdenyexplanation'){{/html}})))
+    ((({{html}}$services.localization.render('xe.panels.rights.allowdenyexplanation'){{/html}})))
   )))
 )))## xwikirightshelp
 #panelfooter()

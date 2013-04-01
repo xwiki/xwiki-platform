@@ -106,7 +106,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('xe.panels.spaces'))
+#panelheader($services.localization.render('xe.panels.spaces'))
 #set ($spaces = $xwiki.spaces)
 #foreach ($space in $spaces)
   #if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$blacklistedSpaces.contains($space)))

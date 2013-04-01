@@ -106,11 +106,11 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('xe.panels.quicklinks'))
-* [[$msg.get('xe.panels.quicklinks.sandbox')&gt;&gt;Sandbox.WebHome]]
+#panelheader($services.localization.render('xe.panels.quicklinks'))
+* [[$services.localization.render('xe.panels.quicklinks.sandbox')&gt;&gt;Sandbox.WebHome]]
 #if ($xwiki.hasAdminRights())
 
-[[$msg.get('xe.panels.edit')&gt;&gt;path:${xwiki.getURL('Panels.QuickLinks', 'inline')}]]
+[[$services.localization.render('xe.panels.edit')&gt;&gt;path:${xwiki.getURL('Panels.QuickLinks', 'inline')}]]
 #end
 #panelfooter()
 {{/velocity}}</content>

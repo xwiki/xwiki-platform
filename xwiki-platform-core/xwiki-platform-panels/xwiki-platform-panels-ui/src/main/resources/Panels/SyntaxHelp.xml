@@ -132,14 +132,14 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
     </property>
     <property>
       <content>{{velocity}}
-#largepanelheader($msg.get('xe.panels.syntax.help'))
+#largepanelheader($services.localization.render('xe.panels.syntax.help'))
 #set ($syntaxDoc = $xwiki.getDocument('XWiki.XWikiSyntax'))
 #if ($syntaxDoc.isNew())
   #set ($url = 'http://platform.xwiki.org/xwiki/bin/Main/XWikiSyntax?xpage=print')
 #else
   #set ($url = $xwiki.getURL('XWiki.XWikiSyntax', 'view', 'xpage=print'))
 #end
-$msg.get('helponsyntax') {{html clean="false"}}&lt;a href="$url" onclick="openURL('$url', '_blank'); return false;"&gt;&lt;span class="nobr"&gt;$msg.get('xwikisyntax')&lt;/span&gt;&lt;/a&gt;{{/html}}
+$services.localization.render('helponsyntax') {{html clean="false"}}&lt;a href="$url" onclick="openURL('$url', '_blank'); return false;"&gt;&lt;span class="nobr"&gt;$services.localization.render('xwikisyntax')&lt;/span&gt;&lt;/a&gt;{{/html}}
 #panelfooter()
 {{/velocity}}</content>
     </property>

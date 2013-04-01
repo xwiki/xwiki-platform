@@ -108,7 +108,7 @@
       <content>{{velocity}}
 #set($discard = $xwiki.ssx.use('Panels.Applications'))
 #set($discard = $xwiki.jsx.use('Panels.Applications'))
-#panelheader($msg.get('panels.applications.title'))
+#panelheader($services.localization.render('panels.applications.title'))
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
   #set($params = $uix.getParameters())
   #if($"$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $context.user, $params.target))
@@ -122,7 +122,7 @@
 
 
 (% class="applicationsPanel" %)
-* [[image:icon:add $msg.get('panels.applications.more')&gt;&gt;XWiki.XWikiPreferences||class="applicationPanelMoreButton" queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]]
+* [[image:icon:add $services.localization.render('panels.applications.more')&gt;&gt;XWiki.XWikiPreferences||class="applicationPanelMoreButton" queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]]
 
 (% class="applicationPanelMoreContainer hidden" %)(((
 (% class="applicationsPanel" %)

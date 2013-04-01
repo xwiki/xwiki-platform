@@ -441,7 +441,7 @@ src='cid:arrowup.gif'
       <language>en</language>
     </property>
     <property>
-      <subject>#set($date=$xwiki.formatDate($previousFireTime))#set($nb=$modifiedDocuments.size())#if($nb==1)$services.localization.render('watchlist.notification.email.singleUpdate.subject', [$date])#else$services.localization.render('watchlist.notification.email.multipleUpdates.subject', [$nb, $date])#end</subject>
+      <subject>$services.localization.render('watchlist.notification.email.subject', [$modifiedDocuments.size(), $xwiki.formatDate($previousFireTime)])</subject>
     </property>
     <property>
       <text>## Note: usage of indentation in this template is prohibited since we're doing

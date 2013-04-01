@@ -35,7 +35,7 @@
   <date>1288198373000</date>
   <contentUpdateDate>1288198373000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('xe.wikimacrobridge.wikiMacros')</title>
+  <title>$services.localization.render('xe.wikimacrobridge.wikiMacros')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -46,14 +46,14 @@
   <content>{{velocity}}
 #set($wikiMacroDocuments = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
 #if($wikiMacroDocuments.size() &gt; 0)
-|=$msg.get('xe.wikimacrobridge.macroName') {{html}}&lt;tt&gt;($msg.get('xe.wikimacrobridge.macroId'))&lt;/tt&gt;{{/html}}|=$msg.get('xe.wikimacrobridge.macroDescription')|=$msg.get('xe.wikimacrobridge.macroVisibility')|=$msg.get('xe.wikimacrobridge.macroPage')
+|=$services.localization.render('xe.wikimacrobridge.macroName') {{html}}&lt;tt&gt;($services.localization.render('xe.wikimacrobridge.macroId'))&lt;/tt&gt;{{/html}}|=$services.localization.render('xe.wikimacrobridge.macroDescription')|=$services.localization.render('xe.wikimacrobridge.macroVisibility')|=$services.localization.render('xe.wikimacrobridge.macroPage')
   #foreach($macroDocumentName in $wikiMacroDocuments)
     #set($macroDocument = $xwiki.getDocument($macroDocumentName))
     #set($macroObject = $macroDocument.getObject("XWiki.WikiMacroClass"))
 |$macroObject.get('name') {{html}}&lt;tt&gt;($macroObject.id)&lt;/tt&gt;{{/html}}|$macroObject.description|$macroObject.visibility|[[$macroDocument.getDisplayTitle()&gt;&gt;$macroDocument.fullName]]
   #end
 #else
-{{warning}}$msg.get('xe.wikimacrobridge.noWikiMacro'){{/warning}}
+{{warning}}$services.localization.render('xe.wikimacrobridge.noWikiMacro'){{/warning}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

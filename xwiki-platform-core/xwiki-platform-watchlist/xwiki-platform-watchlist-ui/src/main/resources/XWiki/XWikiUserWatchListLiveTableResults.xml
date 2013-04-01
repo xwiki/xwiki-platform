@@ -43,7 +43,7 @@
   #if("$!wiki" != '')
     #set($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
     #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
-    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiHomeDoc.getURL(), $msg.get('watchlist.table.allspaces'), '', $msg.get('watchlist.table.alldocuments'), '', $wikiHomeDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
+    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiHomeDoc.getURL(), $services.localization.render('watchlist.table.allspaces'), '', $services.localization.render('watchlist.table.alldocuments'), '', $wikiHomeDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
   #end
 #end
 ## Spaces
@@ -55,7 +55,7 @@
     #set($spaceHomeDocRef = $services.model.createDocumentReference($wiki, $spaceRef.name, '', 'default'))
     #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
     #set($spaceHomeDoc = $xwiki.getDocument($spaceHomeDocRef))
-    #set($discard = $elements.add([$spaceRef.name, $spaceType, $wiki, $wikiHomeDoc.getURL(), $spaceRef.name, $spaceHomeDoc.getURL(), $msg.get('watchlist.table.alldocuments'), '', $spaceHomeDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
+    #set($discard = $elements.add([$spaceRef.name, $spaceType, $wiki, $wikiHomeDoc.getURL(), $spaceRef.name, $spaceHomeDoc.getURL(), $services.localization.render('watchlist.table.alldocuments'), '', $spaceHomeDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
   #end
 #end
 ## Pages

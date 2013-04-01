@@ -26,9 +26,9 @@
   <content>{{velocity}}
 #set($obj = $doc.getObject("XWiki.XWikiUsers"))
 #if(!$obj)
-= $msg.get('xe.admin.users.sheet') =
+= $services.localization.render('xe.admin.users.sheet') =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
+{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
 #else
 #set($watchOject = $doc.getObject('XWiki.WatchListClass'))
 {{html clean="false" wiki="true"}}
@@ -36,11 +36,11 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
   &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
     &lt;div class="watchlistManagement"&gt;
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end
-      &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
         #set($notifierDocs = $xwiki.watchlist.getNotifiers())
         #set($currentNotifier = $watchOject.getProperty('interval').getValue())
         &lt;dd&gt;
@@ -61,7 +61,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
             &lt;/select&gt;
           #end
         &lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label#if($context.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$msg.get('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label#if($context.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$services.localization.render('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;
           $watchOject.automaticwatch
         &lt;/dd&gt;
@@ -74,13 +74,13 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
     ## displayed below the previous one when the page width is reduced.
     &lt;div class="min-half column"&gt;
       &lt;div class="watchlistRss"&gt;
-        &lt;h1&gt;$msg.get('watchlist.staytuned.rss')&lt;/h1&gt;
-        &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;
+        &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
+        &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
       &lt;/div&gt;
     #end
     #if ($xcontext.action == 'view')
       &lt;div class="watchlistElements"&gt;
-        &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
         #set($collist = ["type", "wiki","space", "document", "actions"])
         #set($colprops = { 
                   "type": { "sortable":false },
@@ -107,10 +107,10 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
                                   }
                                   var deleteLink = new Element('a', {
                                     href : row.deleteUrl,
-                                    title : '$escapetool.javascript($msg.get('platform.core.profile.watchlist.unwatch'))'
+                                    title : "$escapetool.javascript($services.localization.render('platform.core.profile.watchlist.unwatch'))"
                                   });
                                   deleteLink.insert(new Element('img', {
-                                    'src' : '${xwiki.getSkinFile('icons/silk/cross.png')}'
+                                    'src' : "${xwiki.getSkinFile('icons/silk/cross.png')}"
                                   }));
                                   deleteLink.observe('click', function(event) {
                                     Event.stop(event);

@@ -304,7 +304,7 @@
 
 &lt;div style="$containerStyle"&gt;
 &lt;div style="$rightColumnStyle"&gt;
-&lt;h2 style="$rightColumnTitleStyle"&gt;$msg.get("watchlist.notification.email.contents")&lt;a name="nav"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;h2 style="$rightColumnTitleStyle"&gt;$services.localization.render('watchlist.notification.email.contents')&lt;a name="nav"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
 #set($firstEntry = true)
 #set($previousEvent = "")
 #set($previousDoc = "")
@@ -341,12 +341,12 @@
 &lt;/ul&gt;
 &lt;/div&gt;
 
-$msg.get("watchlist.notification.email.greeting", [$first_name])&lt;br&gt;&lt;br&gt;
+$services.localization.render('watchlist.notification.email.greeting', [$first_name])&lt;br&gt;&lt;br&gt;
 
 #if($modifiedDocuments.size() == 1)
-$msg.get("watchlist.notification.email.singleUpdate.intro")
+$services.localization.render('watchlist.notification.email.singleUpdate.intro')
 #else
-$msg.get("watchlist.notification.email.multipleUpdates.intro")
+$services.localization.render('watchlist.notification.email.multipleUpdates.intro')
 #end
 
 #set($firstEntry = true)
@@ -382,7 +382,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   #end
   &lt;div style="$eventStyle"&gt;
     #if(!$event.isComposite())
-      &lt;h4 style="$h4Style"&gt;$msg.get("watchlist.event.${event.getType()}", [$xwiki.formatDate($event.getDate()), $xwiki.getLocalUserName($event.getAuthor(), false)])&lt;/h4&gt;
+      &lt;h4 style="$h4Style"&gt;$services.localization.render("watchlist.event.${event.getType()}", [$xwiki.formatDate($event.getDate()), $xwiki.getLocalUserName($event.getAuthor(), false)])&lt;/h4&gt;
     #else
       #set($authors = "")
       #foreach($author in $event.getAuthors())
@@ -393,7 +393,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
       #end
       #set($firstDateIndex = $event.getDates().size() - 1)
       #set($firstDate = $xwiki.formatDate($event.getDates().get($firstDateIndex)))
-      &lt;h4 style="$h4Style"&gt;$msg.get("watchlist.event.update.multiple", [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])&lt;/h4&gt;
+      &lt;h4 style="$h4Style"&gt;$services.localization.render('watchlist.event.update.multiple', [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])&lt;/h4&gt;
     #end
     #if ($event.getType() == "update" || $event.getType() == "create")
       #set ($htmlDiff = $event.getHTMLDiff())
@@ -441,18 +441,18 @@ src='cid:arrowup.gif'
       <language>en</language>
     </property>
     <property>
-      <subject>#set($date=$xwiki.formatDate($previousFireTime))#set($nb=$modifiedDocuments.size())#if($nb==1)$msg.get("watchlist.notification.email.singleUpdate.subject", [$date])#else$msg.get("watchlist.notification.email.multipleUpdates.subject", [$nb, $date])#end</subject>
+      <subject>#set($date=$xwiki.formatDate($previousFireTime))#set($nb=$modifiedDocuments.size())#if($nb==1)$services.localization.render('watchlist.notification.email.singleUpdate.subject', [$date])#else$services.localization.render('watchlist.notification.email.multipleUpdates.subject', [$nb, $date])#end</subject>
     </property>
     <property>
       <text>## Note: usage of indentation in this template is prohibited since we're doing
 ##       ASCII formatting.
 
-$msg.get("watchlist.notification.email.greeting", [$first_name])
+$services.localization.render('watchlist.notification.email.greeting', [$first_name])
 
 #if($modifiedDocuments.size() == 1)
-$msg.get("watchlist.notification.email.singleUpdate.intro")
+$services.localization.render('watchlist.notification.email.singleUpdate.intro')
 #else
-$msg.get("watchlist.notification.email.multipleUpdates.intro")
+$services.localization.render('watchlist.notification.email.multipleUpdates.intro')
 #end
 
 #set($previousEvent = "")
@@ -490,7 +490,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
 | | |
 #end
 #if(!$event.isComposite())
-| | | - $msg.get("watchlist.event.${event.getType()}", [$xwiki.formatDate($event.getDate()), $xwiki.getLocalUserName($event.getAuthor(), false)])
+| | | - $services.localization.render("watchlist.event.${event.getType()}", [$xwiki.formatDate($event.getDate()), $xwiki.getLocalUserName($event.getAuthor(), false)])
 #else
 #set($authors = "")
 #foreach($author in $event.getAuthors())
@@ -501,7 +501,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
 #end
 #set($firstDateIndex = $event.getDates().size() - 1)
 #set($firstDate = $xwiki.formatDate($event.getDates().get($firstDateIndex)))
-| | | - $msg.get("watchlist.event.update.multiple", [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])
+| | | - $services.localization.render('watchlist.event.update.multiple', [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])
 #end
 #set($previousEvent = $event)
 #set($previousDoc = $currentDoc)

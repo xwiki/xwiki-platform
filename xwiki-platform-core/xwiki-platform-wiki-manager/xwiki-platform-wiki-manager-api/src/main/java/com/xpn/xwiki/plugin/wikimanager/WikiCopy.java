@@ -245,7 +245,7 @@ public final class WikiCopy
 
             // Import package
             try {
-                importer.Import(packFile.getContent(context));
+                importer.Import(packFile.getContentInputStream(context));
             } catch (IOException e) {
                 throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT,
                     this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_PACKAGEIMPORT,

@@ -38,7 +38,7 @@
 
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Manager API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>7.19</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>9.48</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

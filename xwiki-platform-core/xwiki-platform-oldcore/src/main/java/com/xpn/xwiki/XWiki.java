@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -86,6 +85,8 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.bridge.event.DocumentRolledBackEvent;
+import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.bridge.event.WikiCopiedEvent;
@@ -6449,10 +6450,32 @@ public class XWiki implements EventListener
         rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
         rolledbackDoc.setVersion(tdoc.getVersion());
         rolledbackDoc.setContentDirty(true);
-        List<Object> params = new ArrayList<Object>();
-        params.add(rev);
 
-        saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", params), context);
+        ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
+        if (om != null) {
+            // Notify listeners about the document that is going to be rolled back.
+            // Note that for the moment the event being send is a bridge event, as we are still passing around
+            // an XWikiDocument as source and an XWikiContext as data.
+            om.notify(new DocumentRollingBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc, context);
+        }
+
+        saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", Arrays.asList(rev)), context);
+
+        // Since the the store resets the original document, we need to temporarily put it back to send notifications.
+        XWikiDocument newOriginalDocument = rolledbackDoc.getOriginalDocument();
+        rolledbackDoc.setOriginalDocument(tdoc);
+
+        try {
+            if (om != null) {
+                // Notify listeners about the document that was rolled back.
+                // Note that for the moment the event being send is a bridge event, as we are still passing around an
+                // XWikiDocument as source and an XWikiContext as data.
+                om.notify(new DocumentRolledBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc,
+                    context);
+            }
+        } finally {
+            rolledbackDoc.setOriginalDocument(newOriginalDocument);
+        }
 
         return rolledbackDoc;
     }

@@ -95,10 +95,10 @@ $xwiki.jsx.use("Blog.ManageCategories")##
     #end
   #end
 #elseif($doc.fullName == $blogCategorySheet)
-= $msg.get('xe.blog.categories.sheet') =
-  $msg.get('xe.blog.categories.sheetmessage')
+= $services.localization.render('xe.blog.categories.sheet') =
+  $services.localization.render('xe.blog.categories.sheetmessage')
 #else
-  #warning($msg.get('xe.blog.categories.notcategory'))
+  #warning($services.localization.render('xe.blog.categories.notcategory'))
 #end
 {{/html}}
 {{/velocity}}</content>

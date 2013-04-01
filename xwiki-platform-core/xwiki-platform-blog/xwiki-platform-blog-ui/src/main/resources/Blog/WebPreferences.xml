@@ -1025,7 +1025,7 @@
         {{html}}
           #if($xwiki.jodatime)
             &lt;select id='$prefix$name' name='$prefix$name'&gt;
-              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$msg.get('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
+              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$services.localization.render('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
               #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
                 &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
               #end

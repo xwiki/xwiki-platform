@@ -75,10 +75,10 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       $blogDoc.display('description')
     #end
   #elseif($doc.fullName == $blogSheet)
-= $msg.get('xe.blog.code.blogsheet') =
-    $msg.get('xe.blog.code.sheetexplanation')
+= $services.localization.render('xe.blog.code.blogsheet') =
+    $services.localization.render('xe.blog.code.sheetexplanation')
   #else
-    #warning($msg.get('xe.blog.code.notblog'))
+    #warning($services.localization.render('xe.blog.code.notblog'))
   #end
 #end
 ##
@@ -479,9 +479,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #end
   #if($doc.fullName == $entryDoc.fullName)
     #if(!$isPublished)
-      #warning($msg.get('xe.blog.code.published'))
+      #warning($services.localization.render('xe.blog.code.published'))
     #elseif($isHidden)
-      #warning($msg.get('xe.blog.code.hidden'))
+      #warning($services.localization.render('xe.blog.code.hidden'))
     #end
   #end
   #displayEntryContent($entryDoc $entryObj $onlyExtract)
@@ -560,7 +560,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
-    &lt;a href="$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($msg.get('xe.blog.code.notpublished'))}"&gt;#toolImage('page_white_world' 'publish ')&lt;/a&gt;##
+    &lt;a href="$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($services.localization.render('xe.blog.code.notpublished'))}"&gt;#toolImage('page_white_world' 'publish ')&lt;/a&gt;##
   #end
 #end
 ##
@@ -578,9 +578,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   ## Only published articles can be hidden. Unpublished articles are considered already hidden.
   #if($isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
     #if ($isHidden)
-      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=${escapetool.url($msg.get('xe.blog.code.madevisible'))}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($msg.get('xe.blog.code.makevisible'))}"&gt;#toolImage('lock_open', 'show ')&lt;/a&gt;##
+      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=${escapetool.url($services.localization.render('xe.blog.code.madevisible'))}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($services.localization.render('xe.blog.code.makevisible'))}"&gt;#toolImage('lock_open', 'show ')&lt;/a&gt;##
     #else
-      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=${escapetool.url($msg.get('xe.blog.code.hid'))}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($msg.get('xe.blog.code.hide'))}"&gt;#toolImage('lock' 'hide ')&lt;/a&gt;##
+      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=${escapetool.url($services.localization.render('xe.blog.code.hid'))}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($services.localization.render('xe.blog.code.hide'))}"&gt;#toolImage('lock' 'hide ')&lt;/a&gt;##
     #end
   #end
 #end
@@ -596,7 +596,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEditButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
     ## Call getDefaultEditMode() for backward compatibility with older blog posts.
-    &lt;a href="$entryDoc.getURL($entryDoc.getDefaultEditMode())" title="${escapetool.xml($msg.get('xe.blog.code.editpost'))}"&gt;#toolImage('pencil' 'edit ')&lt;/a&gt;##
+    &lt;a href="$entryDoc.getURL($entryDoc.getDefaultEditMode())" title="${escapetool.xml($services.localization.render('xe.blog.code.editpost'))}"&gt;#toolImage('pencil' 'edit ')&lt;/a&gt;##
   #end
 #end
 ##
@@ -611,7 +611,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(displayDeleteButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel('delete', $xcontext.user, $entryDoc.fullName))
-    &lt;a href="$entryDoc.getURL('delete')" title="${escapetool.xml($msg.get('xe.blog.code.deletepost'))}"&gt;#toolImage('cross' 'delete ')&lt;/a&gt;##
+    &lt;a href="$entryDoc.getURL('delete')" title="${escapetool.xml($services.localization.render('xe.blog.code.deletepost'))}"&gt;#toolImage('cross' 'delete ')&lt;/a&gt;##
   #end
 #end
 ##
@@ -675,9 +675,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 ## *###
   #else
     #if($entryDoc.syntax.toIdString() == 'xwiki/1.0')
-      #set($result = "${result} &lt;a href='${entryDoc.getURL()}' title='$msg.get('xe.blog.code.readpost')'&gt;...&lt;/a&gt;")
+      #set($result = "${result} &lt;a href='${entryDoc.getURL()}' title='$services.localization.render('xe.blog.code.readpost')'&gt;...&lt;/a&gt;")
     #else
-      #set($result = "${result} [[...&gt;&gt;${entryDoc}||title='$msg.get('xe.blog.code.readpost')']]")
+      #set($result = "${result} [[...&gt;&gt;${entryDoc}||title='$services.localization.render('xe.blog.code.readpost')']]")
     #end
   #end
   #set ($entryContent = $NULL)
@@ -697,17 +697,17 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   &lt;div class="entry-footer"&gt;
   #isPublished($entryObj $isPublished)
   #if($isPublished)
-    $msg.get('xe.blog.code.postedby') ##
+    $services.localization.render('xe.blog.code.postedby') ##
   #else
-    $msg.get('xe.blog.code.createdby') ##
+    $services.localization.render('xe.blog.code.createdby') ##
   #end
   &lt;address class="author vcard"&gt;#userfn($entryDoc.creator)&lt;/address&gt; ##
   #getEntryDate($entryDoc $entryObj $entryDate)
   #listCategories($entryObj) ##
   ## Since the publish date and update date are not set at the exact same time, there could be a small difference that
   ## we assume cannot be more than 3 seconds.
-  &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; &lt;a href="$entryDoc.getURL('view')" rel="bookmark"&gt;$msg.get('xe.blog.code.permalink')&lt;/a&gt; ##
-  &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; &lt;a href="$entryDoc.getURL('view', '#Comments')"&gt;$!msg.get('xe.blog.code.comments')&lt;/a&gt; &lt;span class="itemCount"&gt;($entryDoc.comments.size())&lt;/span&gt; ##
+  &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; &lt;a href="$entryDoc.getURL('view')" rel="bookmark"&gt;$services.localization.render('xe.blog.code.permalink')&lt;/a&gt; ##
+  &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; &lt;a href="$entryDoc.getURL('view', '#Comments')"&gt;$!services.localization.render('xe.blog.code.comments')&lt;/a&gt; &lt;span class="itemCount"&gt;($entryDoc.comments.size())&lt;/span&gt; ##
   &lt;/div&gt; ## entry-footer
   {{/html}}
 #end
@@ -729,7 +729,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #set($categoryDoc = $!xwiki.getDocument($category))
 #if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
 #if($first)
- &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; $msg.get('xe.blog.code.categories')
+ &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; $services.localization.render('xe.blog.code.categories')
 #set($first = false)
 #else, #end## if first
 &lt;a rel="tag" href="$xwiki.getURL(${category})"&gt;$!{escapetool.xml($!xwiki.getDocument($category).getObject($blogCategoryClassname).getProperty('name').value)}&lt;/a&gt;##
@@ -753,19 +753,19 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     &lt;div class="pagingLinks"&gt;
     #getRequestedWeek($weekDate)
     $weekDate.addWeeks(-1)##
-    (% class="prevPage" %)**[[&amp;#171; $msg.get('xe.blog.code.previousweek')&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
+    (% class="prevPage" %)**[[&amp;#171; $services.localization.render('xe.blog.code.previousweek')&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
     #sep()
     $weekDate.addWeeks(2)## 2 because we already subtracted 1 above
-    (% class="nextPage" %)**[[$msg.get('xe.blog.code.nextweek') &amp;#187;&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
+    (% class="nextPage" %)**[[$services.localization.render('xe.blog.code.nextweek') &amp;#187;&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
     &lt;/div&gt;
   #elseif($displayType == 'monthly')
     &lt;div class="pagingLinks"&gt;
     #getRequestedMonth($monthDate)
     $monthDate.addMonths(-1)##
-    (% class="prevPage" %)**[[&amp;#171; $msg.get('xe.blog.code.previousmonth')&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
+    (% class="prevPage" %)**[[&amp;#171; $services.localization.render('xe.blog.code.previousmonth')&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
     #sep()
     $monthDate.addMonths(2)## 2 because we already subtracted 1 above
-    (% class="nextPage" %)**[[$msg.get('xe.blog.code.nextmonth') &amp;#187;&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
+    (% class="nextPage" %)**[[$services.localization.render('xe.blog.code.nextmonth') &amp;#187;&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
     &lt;/div&gt;
   #elseif($displayType == 'all')
   #else
@@ -782,7 +782,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       &lt;div class="pagingLinks"&gt;
       #if ($currentPageNumber &lt; $totalPages)
         #set($currentPageNumber = $currentPageNumber + 1)
-        (% class="prevPage" %)**[[&amp;#171; $msg.get('xe.blog.code.olderposts')&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
+        (% class="prevPage" %)**[[&amp;#171; $services.localization.render('xe.blog.code.olderposts')&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
         #set($currentPageNumber = $currentPageNumber - 1)
       #end
       #if ($currentPageNumber &gt; 1)
@@ -790,7 +790,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
           #sep()
         #end
         #set($currentPageNumber = $currentPageNumber - 1)
-        (% class="nextPage" %)**[[$msg.get('xe.blog.code.newerposts') &amp;#187;&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
+        (% class="nextPage" %)**[[$services.localization.render('xe.blog.code.newerposts') &amp;#187;&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
         #set($currentPageNumber = $currentPageNumber + 1)
       #end
       &lt;span class="clear"&gt;&lt;/span&gt;
@@ -885,9 +885,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(blog__actionResponseError $status $text $parameters)
   $response.setStatus($status)
   #if($request.ajax)
-    $msg.get($text, $!parameters)
+    $services.localization.render($text, $!parameters)
   #else
-    {{error}}$msg.get($text, $!parameters){{/error}}
+    {{error}}$services.localization.render($text, $!parameters){{/error}}
   #end
 #end
 {{/velocity}}</content>

@@ -34,7 +34,7 @@
 ## TODO: Display the number of articles in each blog
 ## TODO: Provide some management links: delete, edit title, configure...
 ##
-= $msg.get('xe.blog.manage.existing') =
+= $services.localization.render('xe.blog.manage.existing') =
 
 #foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
   #getBlogTitle($item $title)
@@ -50,13 +50,13 @@
 ## New blog
 ##
 
-= $msg.get('xe.blog.manage.createnew') =
+= $services.localization.render('xe.blog.manage.createnew') =
 
 #set($title = "$!request.blogTitle")
 #if($title != '')
   #set($space = "$!request.blogSpace")
   #if($space == '')
-    #warning($msg.get('xe.blog.manage.nospace'))
+    #warning($services.localization.render('xe.blog.manage.nospace'))
   #else
     #if("$!request.blogType" == 'main')
       #set($blogDocName = "${space}.WebHome")
@@ -74,21 +74,21 @@
 &lt;div&gt;
   &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;dl&gt;
-  &lt;dt&gt;&lt;label for="blogSpace"&gt;$msg.get('xe.blog.manage.space')&lt;/label&gt;&lt;/dt&gt;
+  &lt;dt&gt;&lt;label for="blogSpace"&gt;$services.localization.render('xe.blog.manage.space')&lt;/label&gt;&lt;/dt&gt;
   &lt;dd&gt;&lt;input type="text" name="blogSpace" id="blogSpace" value=""/&gt;&lt;/dd&gt;
-  &lt;dt&gt;&lt;label for="blogTitle"&gt;$msg.get('xe.blog.manage.title')&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;&lt;input type="text" name="blogTitle" id="blogTitle" value="$msg.get('xe.blog.manage.blogtitle')"/&gt;&lt;/dd&gt;
-  &lt;dt&gt;&lt;label for="blogType"&gt;$msg.get('xe.blog.manage.blogtype')&lt;/label&gt;&lt;/dt&gt;
+  &lt;dt&gt;&lt;label for="blogTitle"&gt;$services.localization.render('xe.blog.manage.title')&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogTitle" id="blogTitle" value="$services.localization.render('xe.blog.manage.blogtitle')"/&gt;&lt;/dd&gt;
+  &lt;dt&gt;&lt;label for="blogType"&gt;$services.localization.render('xe.blog.manage.blogtype')&lt;/label&gt;&lt;/dt&gt;
   &lt;dd&gt;&lt;select name="blogType" id="blogType"&gt;
-    &lt;option value="inner" selected="selected"&gt;$msg.get('xe.blog.manage.inside')&lt;/option&gt;
-    &lt;option value="main"&gt;$msg.get('xe.blog.manage.main')&lt;/option&gt;
+    &lt;option value="inner" selected="selected"&gt;$services.localization.render('xe.blog.manage.inside')&lt;/option&gt;
+    &lt;option value="main"&gt;$services.localization.render('xe.blog.manage.main')&lt;/option&gt;
   &lt;/select&gt;&lt;/dd&gt;
 &lt;/dl&gt;
-  &lt;input type="submit" value="${escapetool.xml($msg.get('xe.blog.manage.create'))}"/&gt;
+  &lt;input type="submit" value="${escapetool.xml($services.localization.render('xe.blog.manage.create'))}"/&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 #else ## !hasAdmin
-  #xwikimessageboxstart($msg.get('error') $msg.get('notallowed'))
+  #xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
   #xwikimessageboxend()
 #end
 

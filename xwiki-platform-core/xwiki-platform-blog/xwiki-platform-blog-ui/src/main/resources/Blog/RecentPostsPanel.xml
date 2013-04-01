@@ -112,7 +112,7 @@
 #set($query = "$!{query} and isPublished.value = 1 and hidden.value &lt;&gt; 1")
 #set($recentEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 10, 0))
 #if($recentEntries.size() &gt; 0 || $showEmptyPanels)
-  #panelheader($msg.get('xe.blog.recentposts.paneltitle'))
+  #panelheader($services.localization.render('xe.blog.recentposts.paneltitle'))
   #foreach($entryDoc in $xwiki.wrapDocs($recentEntries))
     #getEntryObject($entryDoc $entryObj)
     * [[$!{entryDoc.display('title', 'view', $entryObj).replaceAll('(\[|\]|\||&gt;)', '~~$1')}&gt;&gt;$!{services.model.serialize($entryDoc.documentReference).replaceAll('(\[|\]|\||&gt;)', '~$1')}]]

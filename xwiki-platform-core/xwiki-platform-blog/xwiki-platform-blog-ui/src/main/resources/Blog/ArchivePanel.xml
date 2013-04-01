@@ -114,7 +114,7 @@
 #end
 #getBlogDocument($space $blogDoc)
 #if ($space == $blogDoc.space || $showEmptyPanels)
-  #panelheader($msg.get('xe.blog.archive.paneltitle'))
+  #panelheader($services.localization.render('xe.blog.archive.paneltitle'))
   #getBlogEntriesBaseQuery($query)
   #set ($query = "${query} and (doc.space = ? or doc.parent = ?)")
   #set ($queryParams = [$blogDoc.space, $blogDoc.fullName])
@@ -154,7 +154,7 @@
       #end
     #end
   #else
-    #info($msg.get('xe.blog.archive.noarticle'))
+    #info($services.localization.render('xe.blog.archive.noarticle'))
   #end
   #panelfooter()
 #end

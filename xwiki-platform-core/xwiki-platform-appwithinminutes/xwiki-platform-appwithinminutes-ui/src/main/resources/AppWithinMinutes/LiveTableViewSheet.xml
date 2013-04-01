@@ -134,7 +134,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
     this.urlTemplate = trigger.up().next('input[type=hidden]').value;
 
     this.input = new Element('input', {type: 'text'});
-    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.appHomePageAddEntryLabel'))'});
+    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryLabel'))'});
 
     var container = new Element('div', {id: 'entryNamePopup'});
     container.insert(this.input);
@@ -144,7 +144,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
       show: {method: this.showDialog, keys: []},
       add: {method: this._onAdd, keys: ['Enter']}
     }, {
-      title: '$escapetool.javascript($msg.get('platform.appwithinminutes.appHomePageEntryNameLabel'))',
+      title: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageEntryNameLabel'))',
       verticalPosition: 'top'
     });
   },
@@ -343,29 +343,29 @@ return XWiki;
     #set($className = $stringtool.removeEnd($liveTableObj.getProperty('class').value, 'Class'))
     (% id="actionBox" class="floatinginfobox" %)
     (((
-      = $msg.get('platform.appwithinminutes.appHomePageActionsHeading') =
+      = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
       #if($hasCreatePage)
-        * [[$msg.get('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
           #set($templateName = $escapetool.url("${className}Template"))
           #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
           {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
       #end
       #if($hasEdit &amp;&amp; !$isReadOnly)
-        * [[$msg.get('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="appName=$escapetool.url($doc.space)" class="action edit"]]
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="appName=$escapetool.url($doc.space)" class="action edit"]]
       #end
       #set($translationsDoc = $xwiki.getDocument("${className}Translations"))
       #if($xwiki.isMultiLingual() &amp;&amp; !$translationsDoc.isNew() &amp;&amp; $translationsDoc.hasAccessLevel('edit'))
-        * [[$msg.get('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$translationsDoc.getURL('edit', 'editor=wiki')||class="action translate"]]
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$translationsDoc.getURL('edit', 'editor=wiki')||class="action translate"]]
       #end
       #if($hasSpaceAdmin)
-        * [[$msg.get('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$doc.getURL('deletespace')||class="action delete"]]
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$doc.getURL('deletespace')||class="action delete"]]
       #end
     )))
   #end
   $doc.display('description')
   ## Display the live table only if it was generated.
   #if($doc.content.length() &gt; 0)
-    = $msg.get('platform.appwithinminutes.appLiveTableHeading') =
+    = $services.localization.render('platform.appwithinminutes.appLiveTableHeading') =
     ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
     {{html}}$doc.getRenderedContent($doc.content, $doc.syntax.toIdString()).replace('{{', '&amp;#123;&amp;#123;'){{/html}}
   #end

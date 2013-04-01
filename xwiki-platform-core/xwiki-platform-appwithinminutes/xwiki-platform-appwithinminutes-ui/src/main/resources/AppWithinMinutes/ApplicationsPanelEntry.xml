@@ -102,7 +102,7 @@
       <name>platform.panels.createApplication</name>
     </property>
     <property>
-      <parameters>label=$msg.get('platform.appwithinminutes.appPanelCreateEntry')
+      <parameters>label=$services.localization.render('platform.appwithinminutes.appPanelCreateEntry')
 target=AppWithinMinutes.WebHome
 icon=icon:bullet_go</parameters>
     </property>

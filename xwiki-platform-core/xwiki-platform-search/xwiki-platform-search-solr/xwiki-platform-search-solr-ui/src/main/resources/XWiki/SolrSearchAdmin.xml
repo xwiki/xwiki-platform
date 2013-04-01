@@ -102,7 +102,7 @@
       <name>solr</name>
     </property>
     <property>
-      <parameters>label=$msg.get('search.extension.title.solr')
+      <parameters>label=$services.localization.render('search.extension.title.solr')
 admin=XWiki.SolrSearchAdmin
 search=Main.SolrSearch</parameters>
     </property>

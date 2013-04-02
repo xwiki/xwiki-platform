@@ -1453,9 +1453,9 @@ $xwiki.ssx.use('Main.Activity')##
       &lt;span class="activityAction"&gt;
         #isAttachmentEvent($event)
         #if ($isPageEntryExpandable)## display entry summary
-          $!msg.get('xe.activity.action.summary', [$events.size(), $eventUsers.size()])
+          $!services.localization.render('xe.activity.action.summary', [$events.size(), $eventUsers.size()])
         #else
-          $!msg.get("xe.activity.action.${event.type}", [$relatedEventsNo])
+          $!services.localization.render("xe.activity.action.${event.type}", [$relatedEventsNo])
           #if ($event.type == 'update' &amp;&amp; $event.version != '1.1')
             #set ($pageFullName = "$!{event.wiki}:$!{pageName}")
             &amp;#183; &lt;a href="$xwiki.getDocument($pageFullName).getURL('view', "viewer=changes&amp;rev2=${event.version}")"&gt;$services.localization.render('xe.activity.action.seechanges')&lt;/a&gt;

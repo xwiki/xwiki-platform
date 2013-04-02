@@ -50,7 +50,10 @@
   ##
   ## "Compute" the title
   ##
-  #set($title = $xwiki.parseContent($services.localization.render('editpageTitle')))
+  #set ($title = $services.localization.render("platform.web.editors.${editor}.pageTitle", [$tdoc.plainTitle]))
+  #if ($title == "platform.web.editors.${editor}.pageTitle")
+    #set ($title = $services.localization.render('platform.web.editors.unknown.pageTitle', [$tdoc.plainTitle]))
+  #end
   ##
   ## Header
   ##

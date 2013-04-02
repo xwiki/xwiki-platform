@@ -76,7 +76,7 @@ public class TestUtils
     public static final UsernamePasswordCredentials ADMIN_CREDENTIALS = new UsernamePasswordCredentials("Admin",
         "admin");
 
-    private static final String URL = System.getProperty("xe.url", "http://localhost");
+    public static final String URL = System.getProperty("xe.url", "http://localhost");
 
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 

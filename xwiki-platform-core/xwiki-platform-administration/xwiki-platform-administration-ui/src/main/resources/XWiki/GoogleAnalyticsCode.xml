@@ -583,7 +583,7 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 	&lt;p&gt;
 		&lt;input type="hidden" name="action" value="save"/&gt;
 		&lt;span class="buttonwrapper"&gt;
-			&lt;input type="submit" value="${msg.get('save')}" class="button" /&gt;
+			&lt;input type="submit" value="${services.localization.render('save')}" class="button" /&gt;
 		&lt;/span&gt;
 	&lt;/p&gt;
 &lt;/form&gt;

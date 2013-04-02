@@ -61,6 +61,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Xwiki;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -82,15 +83,17 @@ public class TestUtils
     /**
      * @since 5.0M2
      */
-    public static final String URL = System.getProperty("xe.url", "http://localhost");
+    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT + "/xwiki/";
 
-    public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
+    /**
+     * @since 5.0M2
+     */
+    public static final String BASE_BIN_URL = BASE_URL + "bin/";
 
-    private static final String BASE_URL = URL + ":" + DEFAULT_PORT + "/xwiki/";
-
-    private static final String BASE_BIN_URL = BASE_URL + "bin/";
-
-    private static final String BASE_REST_URL = BASE_URL + "rest/";
+    /**
+     * @since 5.0M2
+     */
+    public static final String BASE_REST_URL = BASE_URL + "rest/";
 
     private static PersistentTestContext context;
 

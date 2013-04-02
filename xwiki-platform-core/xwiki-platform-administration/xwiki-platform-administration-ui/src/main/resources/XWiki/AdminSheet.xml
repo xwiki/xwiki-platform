@@ -3777,7 +3777,7 @@ document.observe('xwiki:dom:loaded', function() {
   #end
 #admin_spaceSwitch()
 (% id="hierarchy" %)(((
-#if ($crtCategory){{html}}&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;{{translation key="admin.main.title"/}}&lt;/a&gt;{{/html}}#{else}(% class="current" %){{translation key="admin.main.title"/}}(%%)#{end}#if ($crtCategory) (% class="separator" %)»(%%) #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}(%%)#{end}#if ($crtSection) (% class="separator" %)»(%%) (% class="current" %)${crtSection.name}(%%)#end#end
+#if ($crtCategory){{html}}&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;$services.localization.render('admin.main.title')&lt;/a&gt;{{/html}}#{else}(% class="current" %){{translation key="admin.main.title"/}}(%%)#{end}#if ($crtCategory) (% class="separator" %)»(%%) #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}(%%)#{end}#if ($crtSection) (% class="separator" %)»(%%) (% class="current" %)${crtSection.name}(%%)#end#end
 )))
 (% id="document-title" %)(((
   = $services.localization.render('admin.section.title', [$sectionName]) =

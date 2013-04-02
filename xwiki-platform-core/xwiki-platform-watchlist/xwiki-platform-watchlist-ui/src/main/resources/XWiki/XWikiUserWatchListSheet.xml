@@ -107,10 +107,10 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
                                   }
                                   var deleteLink = new Element('a', {
                                     href : row.deleteUrl,
-                                    title : "$escapetool.javascript($services.localization.render('platform.core.profile.watchlist.unwatch'))"
+                                    title : '$escapetool.javascript($services.localization.render('platform.core.profile.watchlist.unwatch'))'
                                   });
                                   deleteLink.insert(new Element('img', {
-                                    'src' : "${xwiki.getSkinFile('icons/silk/cross.png')}"
+                                    'src' : '${xwiki.getSkinFile('icons/silk/cross.png')}'
                                   }));
                                   deleteLink.observe('click', function(event) {
                                     Event.stop(event);

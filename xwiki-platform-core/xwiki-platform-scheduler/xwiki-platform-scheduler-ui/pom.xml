@@ -50,7 +50,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-include</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

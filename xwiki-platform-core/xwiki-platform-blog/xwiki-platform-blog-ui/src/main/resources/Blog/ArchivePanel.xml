@@ -154,7 +154,7 @@
       #end
     #end
   #else
-    #info($services.localization.render('xe.blog.archive.noarticle'))
+    {{info}}{{translation key="xe.blog.archive.noarticle"/}}{{/info}}
   #end
   #panelfooter()
 #end

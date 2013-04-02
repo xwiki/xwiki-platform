@@ -21,11 +21,11 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include document="Blog.BlogCode"/}}
 
-{{velocity filter="none"}}
+{{velocity}}
 {{html clean="false" wiki="true"}}
 ##
 ##

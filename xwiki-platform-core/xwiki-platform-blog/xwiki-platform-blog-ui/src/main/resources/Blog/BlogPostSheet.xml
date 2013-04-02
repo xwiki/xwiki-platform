@@ -21,19 +21,19 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include document="Blog.BlogCode"/}}
 
 {{include document="Blog.CategoriesCode"/}}
 
-{{velocity filter="none"}}
+{{velocity}}
 {{html clean="false" wiki="true"}}
 $xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##
 $xwiki.ssx.use('Blog.ManageCategories')##
 #getEntryObject($doc $entryObj)
 #if("$!entryObj" == '')
-  #warning($services.localization.render('xe.blog.sheet.notpost'))
+  {{warning}}{{translation key='xe.blog.sheet.notpost'/}}{{/warning}}
 ## Keep testing the inline action for backward compatibility with older blog posts.
 #elseif($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
   ## View mode
@@ -42,19 +42,14 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
   #displayBlog([$tdoc] 'single' false false)
 #else
-  &lt;dl&gt;
-  &lt;dt&gt;$services.localization.render('xe.blog.sheet.title')&lt;/dt&gt;
-  &lt;dd&gt;$doc.display('title', 'edit', $entryObj)&lt;/dd&gt;
-  &lt;dt&gt;$services.localization.render('xe.blog.sheet.content')&lt;/dt&gt;
-  &lt;dd&gt;$doc.display('content', 'edit', $entryObj)&lt;/dd&gt;
-  &lt;dt&gt;$services.localization.render('xe.blog.sheet.summary')&lt;/dt&gt;
-  &lt;dd&gt;$doc.display('extract', 'edit', $entryObj)&lt;/dd&gt;
-  &lt;dt&gt;$services.localization.render('xe.blog.sheet.category')&lt;/dt&gt;
-  &lt;dd&gt;
-  #displayCategoryManagementTree('' 'selectable')
-  &lt;div class="clearfloats"&gt;&lt;/div&gt;
-  &lt;/dd&gt;
-  &lt;/dl&gt;
+  ; {{translation key='xe.blog.sheet.title'/}}
+  : $doc.display('title', 'edit', $entryObj)
+  ; {{translation key='xe.blog.sheet.content'/}}
+  : $doc.display('content', 'edit', $entryObj)
+  ; {{translation key='xe.blog.sheet.summary'/}}
+  : $doc.display('extract', 'edit', $entryObj)
+  ; {{translation key='xe.blog.sheet.category'/}}
+  : #displayCategoryManagementTree('' 'selectable') (% class="clearfloats" %)((()))
   #isPublished($entryObj $isPublished)
   #if($isPublished)
     #if($doc.creator == $xcontext.user)

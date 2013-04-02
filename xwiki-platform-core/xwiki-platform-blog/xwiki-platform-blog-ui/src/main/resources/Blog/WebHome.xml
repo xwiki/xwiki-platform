@@ -36,6 +36,7 @@
       <blogType>
         <cache>0</cache>
         <customDisplay/>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>blogType</name>
@@ -57,6 +58,7 @@
       <description>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
+        <disabled>0</disabled>
         <editor>---</editor>
         <name>description</name>
         <number>2</number>
@@ -73,6 +75,7 @@
       <displayType>
         <cache>0</cache>
         <customDisplay/>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>displayType</name>
@@ -93,6 +96,7 @@
       </displayType>
       <itemsPerPage>
         <customDisplay/>
+        <disabled>0</disabled>
         <name>itemsPerPage</name>
         <number>4</number>
         <numberType>integer</numberType>
@@ -106,6 +110,7 @@
       </itemsPerPage>
       <title>
         <customDisplay/>
+        <disabled>0</disabled>
         <name>title</name>
         <number>1</number>
         <picker>0</picker>

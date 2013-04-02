@@ -4116,11 +4116,11 @@ public class XWiki implements EventListener
                         tdoc.setCreationDate(now);
                         tdoc.setContentUpdateDate(now);
                         tdoc.setDate(now);
-                        tdoc.setCreator(context.getUser());
-                        tdoc.setAuthor(context.getUser());
+                        tdoc.setCreatorReference(context.getUserReference());
+                        tdoc.setAuthorReference(context.getUserReference());
                     }
 
-                    // We don't want to trigger a new version otherwise the version number will be wrong
+                    // We don't want to trigger a new version otherwise the version number will be wrong.
                     tdoc.setMetaDataDirty(false);
                     tdoc.setContentDirty(false);
 
@@ -4184,8 +4184,8 @@ public class XWiki implements EventListener
                             ttdoc.setCreationDate(now);
                             ttdoc.setContentUpdateDate(now);
                             ttdoc.setDate(now);
-                            ttdoc.setCreator(context.getUser());
-                            ttdoc.setAuthor(context.getUser());
+                            ttdoc.setCreatorReference(context.getUserReference());
+                            ttdoc.setAuthorReference(context.getUserReference());
                         }
 
                         // we don't want to trigger a new version
@@ -4224,8 +4224,8 @@ public class XWiki implements EventListener
                         tdoc.setCreationDate(now);
                         tdoc.setContentUpdateDate(now);
                         tdoc.setDate(now);
-                        tdoc.setCreator(context.getUser());
-                        tdoc.setAuthor(context.getUser());
+                        tdoc.setCreatorReference(context.getUserReference());
+                        tdoc.setAuthorReference(context.getUserReference());
                     }
 
                     // we don't want to trigger a new version

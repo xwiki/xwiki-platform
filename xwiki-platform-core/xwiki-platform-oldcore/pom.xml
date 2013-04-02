@@ -38,7 +38,7 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>28.81</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>28.82</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

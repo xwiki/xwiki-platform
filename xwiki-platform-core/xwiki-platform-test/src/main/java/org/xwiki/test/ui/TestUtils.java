@@ -73,7 +73,8 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
  */
 public class TestUtils
 {
-    private static PersistentTestContext context;
+    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS = new UsernamePasswordCredentials("Admin",
+        "admin");
 
     private static final String URL = System.getProperty("xe.url", "http://localhost");
 
@@ -84,6 +85,8 @@ public class TestUtils
     private static final String BASE_BIN_URL = BASE_URL + "bin/";
 
     private static final String BASE_REST_URL = BASE_URL + "rest/";
+
+    private static PersistentTestContext context;
 
     /**
      * Used to convert Java object into its REST XML representation.
@@ -129,8 +132,7 @@ public class TestUtils
     public TestUtils()
     {
         this.adminHTTPClient = new HttpClient();
-        this.adminHTTPClient.getState()
-            .setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("Admin", "admin"));
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, ADMIN_CREDENTIALS);
         this.adminHTTPClient.getParams().setAuthenticationPreemptive(true);
     }
 
@@ -176,7 +178,7 @@ public class TestUtils
 
     public String getURLToLoginAsAdmin()
     {
-        return getURLToLoginAs("Admin", "admin");
+        return getURLToLoginAs(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
     }
 
     public String getURLToLoginAs(final String username, final String password)
@@ -190,7 +192,7 @@ public class TestUtils
      */
     public String getURLToLoginAsAdminAndGotoPage(final String pageURL)
     {
-        return getURLToLoginAndGotoPage("Admin", "admin", pageURL);
+        return getURLToLoginAndGotoPage(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), pageURL);
     }
 
     /**

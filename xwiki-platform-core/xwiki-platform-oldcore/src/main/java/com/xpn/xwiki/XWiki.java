@@ -4124,6 +4124,19 @@ public class XWiki implements EventListener
                     tdoc.setMetaDataDirty(false);
                     tdoc.setContentDirty(false);
 
+                    // XWikiDocument#copyAttachments() marks the copied attachments as dirty which leads to their
+                    // versions being incremented in the target document. We want to prevent this so that the
+                    // attachments have the same version in the target document as in the source. We cannot change
+                    // XWikiDocument#copyAttachments() because it's a public API and we would break its behavior so we
+                    // reset the dirty flags here. Note that the packager plugin does the same thing in order to prevent
+                    // attachment versions from being incremented when importing a document with history.
+                    // We force the attachment content save with the XWikiDocument#saveAllAttachments() call below.
+                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
+                        attachment.setMetaDataDirty(false);
+                        attachment.getAttachment_content().setContentDirty(false);
+                    }
+
                     saveDocument(tdoc, "Copied from " + sourceStringReference, context);
 
                     if (!reset) {
@@ -4136,10 +4149,7 @@ public class XWiki implements EventListener
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 
-                    context.setDatabase(targetWiki);
-                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
-                        getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
-                    }
+                    tdoc.saveAllAttachments(false, true, context);
 
                     // Now we need to copy the translations
                     context.setDatabase(sourceWiki);

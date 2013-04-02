@@ -126,7 +126,7 @@
       </dt>
       <dd>
         <select id="targetWikiName" name="targetWikiName">
-          #set ($wikis = $xwiki.allWikiNames)
+          #set ($wikis = $xwiki.wikiNames)
           #foreach ($wiki in $wikis)
             <option #if ($wiki == $doc.wiki) selected="selected" #end>$!{escapetool.xml($wiki)}</option>
           #end

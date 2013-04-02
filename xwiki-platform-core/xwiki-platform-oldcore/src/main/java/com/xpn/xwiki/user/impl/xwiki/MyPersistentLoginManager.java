@@ -29,7 +29,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 import javax.crypto.Cipher;
@@ -37,7 +36,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -232,7 +230,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     @Override
     public void rememberLogin(HttpServletRequest request, HttpServletResponse response, String username, String password)
     {
-        //Crapy hack to make sure that same password username don't have the same encryption 
         String ivUsername = "";
         String protectedUsername = username;
         String ivPassword = "";
@@ -240,8 +237,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
             String[] encryptedUsername = encryptText(protectedUsername);
             String[] encryptedPassword = encryptText(protectedPassword);
-            //protectedUsername = encryptText(protectedUsername);
-            //protectedPassword = encryptText(protectedPassword);
             ivUsername = encryptedUsername[0];
             protectedUsername = encryptedUsername[1];
             ivPassword = encryptedPassword[0];
@@ -265,6 +260,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie usernameCookie = new Cookie(getCookiePrefix() + COOKIE_USERNAME, protectedUsername);
         setupCookie(usernameCookie, sessionCookie, cookieDomain, response);
         
+        //Username initation vector
         Cookie usernameIVCookie = new Cookie(getCookiePrefix() + COOKIE_USERNAME_IV, ivUsername);
         setupCookie(usernameIVCookie, sessionCookie, cookieDomain, response);
 
@@ -272,6 +268,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie passwdCookie = new Cookie(getCookiePrefix() + COOKIE_PASSWORD, protectedPassword);
         setupCookie(passwdCookie, sessionCookie, cookieDomain, response);
         
+        //Password initiation vector
         Cookie passwordIVCookie = new Cookie(getCookiePrefix() + COOKIE_PASSWORD_IV, ivPassword);
         setupCookie(passwordIVCookie, sessionCookie, cookieDomain, response);
 
@@ -459,9 +456,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public String[] encryptText(String clearText)
     {
         try {
-            //Cipher c1 = Cipher.getInstance(this.cipherParameters);
             Cipher c1 = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            //Cipher c1 = Cipher.getInstance("AES");
             SecretKeySpec encryptionKey = getEncryptionKey();
             if (encryptionKey != null) {
                 c1.init(Cipher.ENCRYPT_MODE, encryptionKey);
@@ -478,11 +473,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 // See XWIKI-2211
                 String[] couple = {ivParameters.replaceAll("=", "_"), encryptedEncodedText.replaceAll("=", "_")};
                 return couple;
-                //return encryptedEncodedText.replaceAll("=", "_");
             }
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("ERROR! >> SecretKey not generated...");
-                //LOGGER.error("you are REQUIRED to specify the encryptionKey in xwiki.cfg");
             }
         } catch (Exception e) {
             if (LOGGER.isErrorEnabled()) {
@@ -690,8 +683,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             // See XWIKI-2211
             byte[] decodedEncryptedText =
                 Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
-            //Cipher c1 = Cipher.getInstance(this.cipherParameters);
-            //Cipher c1 = Cipher.getInstance("AES");
             Cipher c1 = Cipher.getInstance("AES/CBC/PKCS5Padding");
             byte[] ivBytes = Base64.decodeBase64(ivString.replaceAll("_", "=").getBytes("ISO-8859-1"));
             IvParameterSpec iv = new IvParameterSpec(ivBytes);

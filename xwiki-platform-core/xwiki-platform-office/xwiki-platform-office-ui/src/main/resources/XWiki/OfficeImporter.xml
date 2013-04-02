@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1217261143000</creationDate>
-  <date>1288979323000</date>
-  <contentUpdateDate>1288979323000</contentUpdateDate>
+  <creationDate>1364889339000</creationDate>
+  <date>1364920930000</date>
+  <contentUpdateDate>1364920930000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.officeimporter.import.title')</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -421,7 +420,7 @@ select#childPagesNamingMethod {
 #set ($discard = $xwiki.jsx.use('XWiki.OfficeImporter'))
 #if ($isguest)
   {{error}}$services.localization.render('xe.officeimporter.notallowed'){{/error}}
-#elseif ("$!oomanager.serverState" != 'Connected')
+#elseif ("$!services.officemanager.serverState" != 'Connected')
   #if ($hasAdmin)
     {{error}}$services.localization.render('xe.officeimporter.error.adminuser', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/Extension/Office%20Importer%20Application]]']){{/error}}
   #else

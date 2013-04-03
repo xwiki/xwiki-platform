@@ -297,7 +297,7 @@ public class WatchListJobManager
 
             if (StringUtils.isBlank(doc.getTitle()) || StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
-                doc.setTitle("$msg.get(\"" + nameResource + "\")");
+                doc.setTitle("$services.localization.render('" + nameResource + "')");
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
             }

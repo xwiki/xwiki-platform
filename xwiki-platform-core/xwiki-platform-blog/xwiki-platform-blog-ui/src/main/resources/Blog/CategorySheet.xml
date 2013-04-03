@@ -11,17 +11,16 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1220437371000</creationDate>
-  <date>1226817939000</date>
-  <contentUpdateDate>1226817939000</contentUpdateDate>
+  <creationDate>1364935598000</creationDate>
+  <date>1364974947000</date>
+  <contentUpdateDate>1364974938000</contentUpdateDate>
   <version>1.1</version>
-  <title>Sheet for displaying blog categories</title>
-  <template/>
+  <title>#if ($doc.fullName == $blogCategorySheet)$services.localization.render('xe.blog.categories.sheet')#else$doc.name#end</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <object>
     <class>
@@ -57,36 +56,34 @@
   </object>
   <content>{{include document="Blog.CategoriesCode"/}}
 
-{{velocity filter="none"}}
-{{html clean="false" wiki="true"}}
-$xwiki.ssx.use("Blog.ManageCategories")##
-$xwiki.jsx.use("Blog.ManageCategories")##
-##
-##
-##
-#if($doc.getObject($blogCategoryClassname))
+{{velocity}}
+{{html wiki=true}}
+#set ($discard = $xwiki.ssx.use("Blog.ManageCategories"))
+#set ($discard = $xwiki.jsx.use("Blog.ManageCategories"))
+#if ($doc.getObject($blogCategoryClassname))
   #getEntriesForCategory($doc.fullName $discard $totalEntries)
-
-&lt;h1&gt;Category: #getCategoryName($doc) ($totalEntries posts) &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=${escapetool.url($doc.fullName)}")" title="RSS"&gt;#toolImage('feed' '[RSS]')&lt;/a&gt;&lt;/h1&gt;
+  = Category: #getCategoryName($doc) ($totalEntries posts) [[#toolImage('feed' '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$escapetool.url($doc.fullName)" title="RSS"]] =
   ## Keep testing the inline action for backward compatibility with older categories.
-  #if($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
+  #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
     {{include document="Blog.CreatePost"/}}
+
     #getCategoriesHierarchy($doc.space $tree)
-    #if("$!{tree.get(${doc.fullName})}" != '')
-      &lt;div class="blog-categories-list subcategories"&gt;
-        &lt;div&gt;
+    #if ("$!tree.get($doc.fullName)" != '')
+      (% class="blog-categories-list subcategories" %)
+      (((
+        (((
           **Subcategories**
-        &lt;/div&gt;
-        &lt;div&gt;
+        )))
+        (((
           #displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'simple')
-        &lt;/div&gt;
-      &lt;/div&gt;
+        )))
+      )))
     #end
-    &lt;div class="clearfloats"&gt;&lt;/div&gt;
+    (% class="clearfloats" %)((()))
 
     #getEntriesForCategory($doc.fullName $entries $totalEntries)
-    #if($totalEntries == 0)
-      #info('No entries in this category')
+    #if ($totalEntries == 0)
+      {{info}}No entries in this category{{/info}}
     #else
       #displayBlog($entries 'category' true true)
       ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this
@@ -94,11 +91,10 @@ $xwiki.jsx.use("Blog.ManageCategories")##
       #displayNavigationLinks($doc)
     #end
   #end
-#elseif($doc.fullName == $blogCategorySheet)
-= $services.localization.render('xe.blog.categories.sheet') =
-  $services.localization.render('xe.blog.categories.sheetmessage')
+#elseif ($doc.fullName == $blogCategorySheet)
+  {{translation key="xe.blog.categories.sheetmessage"/}}
 #else
-  #warning($services.localization.render('xe.blog.categories.notcategory'))
+  {{warning}}{{translation key="xe.blog.categories.notcategory"/}}{{/warning}}
 #end
 {{/html}}
 {{/velocity}}</content>

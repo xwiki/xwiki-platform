@@ -180,6 +180,18 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 if (xwiki.Param("xwiki.authentication.validationKey") != null) {
                     persistent.setValidationKey(xwiki.Param("xwiki.authentication.validationKey"));
                 }
+                
+                if (xwiki.Param("xwiki.authentication.encryptionFileName") != null) {
+                    persistent.setEncryptionFile(xwiki.Param("xwiki.authentication.encryptionFileName"));
+                }
+                
+                if (xwiki.Param("xwiki.authentication.keyStorePassword") != null) {
+                    persistent.setKeyStorePassword(xwiki.Param("xwiki.authentication.keyStorePassword"));
+                }
+                
+                if (xwiki.Param("xwiki.authentication.encryptionKeyProtection") != null) {
+                    persistent.setEncryptionKeyProtection(xwiki.Param("xwiki.authentication.encryptionKeyProtection"));
+                }
 
                 sconfig.setPersistentLoginManager(persistent);
 

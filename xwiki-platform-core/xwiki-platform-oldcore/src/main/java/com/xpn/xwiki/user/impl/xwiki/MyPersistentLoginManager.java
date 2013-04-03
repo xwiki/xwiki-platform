@@ -22,7 +22,6 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.text.DateFormat;
@@ -83,19 +82,14 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private Environment environment = Utils.getComponent(Environment.class);
     
     /**
-     * Name of the file where the encryption keys are stored.
+     * Name of the cookie containing the initiation vector for the username.
      */
-    private static final String ENCRYPTION_KEY_FILE_NAME = "AuthenticationEncryptionKey.txt";
+    private static final String COOKIE_USERNAME_IV = "usernameiv";
     
     /**
-     * Password protecting the keystore.
+     * Name of the cookie containing the initiation vector for the password. 
      */
-    private static final String KEYSTORE_PASSWORD = "asinvESdl9csw";
-    
-    /**
-     * Password protecting the encryption key.
-     */
-    private static final String ENCRYPTION_KEY_PROTECTION = "ad6TdolIkx9I";
+    private static final String COOKIE_PASSWORD_IV = "passwordiv";
     
     /**
      * The string used to separate the fields in the hashed validation message.
@@ -143,17 +137,20 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     protected String cookiePrefix = "";
     
     /**
-     * Use SHA-512 instead of MD5
+     * Name of the file where the encryption keys are stored.
      */
-    protected String valueBeforeSHA = "";
+    protected String encryptionKeyFileName = "AuthenticationEncryptionKey.txt";
     
     /**
-     * Use SHA-512 instead of MD5
+     * Password protecting the keystore.
      */
-    protected String valueAfterSHA = "";
+    protected String keystorePassword = "";
     
-    protected static final String COOKIE_USERNAME_IV = "usernameiv";
-    protected static final String COOKIE_PASSWORD_IV = "passwordiv";
+    /**
+     * Password protecting the encryption key.
+     */
+    protected String encryptionKeyProtection = "";
+
     
     /**
      * Default constructor. The configuration is done outside, in
@@ -217,6 +214,36 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             cookie.setDomain(cookieDomain);
         }
         addCookie(response, cookie);
+    }
+    
+    /**
+     * Set the password protecting the key store
+     * 
+     * @param keyStorePassword Value of the password
+     */
+    public void setKeyStorePassword(String keyStorePassword)
+    {
+        this.keystorePassword = keyStorePassword;
+    }
+    
+    /**
+     * Set the name of the file where the encryption key is stored
+     * 
+     * @param encryptionFileName Name of the file where the key is stored
+     */
+    public void setEncryptionFile(String encryptionFileName)
+    {
+        this.encryptionKeyFileName = encryptionFileName;
+    }
+    
+    /**
+     * Set the password protecting the encryption key
+     * 
+     * @param encryptionKeyProtection Password protecting the encryptionKey
+     */
+    public void setEncryptionKeyProtection(String encryptionKeyProtection)
+    {
+        this.encryptionKeyProtection = encryptionKeyProtection;
     }
 
     /**
@@ -409,11 +436,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             }
             return null;
         }
-        MessageDigest SHA = null;
-        StringBuffer sbValueBeforeSHA = new StringBuffer();
+        MessageDigest sha = null;
+        String valueBeforeSHA = "";
+        String valueAfterSHA = "";
+        StringBuilder sbValueBeforeSHA = new StringBuilder();
 
         try {
-            SHA = MessageDigest.getInstance("SHA-512");
+            sha = MessageDigest.getInstance("SHA-512");
 
             sbValueBeforeSHA.append(username);
             sbValueBeforeSHA.append(FIELD_SEPARATOR);
@@ -425,11 +454,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             }
             sbValueBeforeSHA.append(this.validationKey.toString());
 
-            this.valueBeforeSHA = sbValueBeforeSHA.toString();
-            SHA.update(this.valueBeforeSHA.getBytes());
+            valueBeforeSHA = sbValueBeforeSHA.toString();
+            sha.update(valueBeforeSHA.getBytes());
 
-            byte[] array = SHA.digest();
-            StringBuffer sb = new StringBuffer();
+            byte[] array = sha.digest();
+            StringBuilder sb = new StringBuilder();
             for (int j = 0; j < array.length; ++j) {
                 int b = array[j] & 0xFF;
                 if (b < 0x10) {
@@ -437,12 +466,12 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 }
                 sb.append(Integer.toHexString(b));
             }
-            this.valueAfterSHA = sb.toString();
+            valueAfterSHA = sb.toString();
         } catch (Exception e) {
             LOGGER.error("Failed to get [" + MessageDigest.class.getName() + "] instance", e);
         }
 
-        return this.valueAfterSHA;
+        return valueAfterSHA;
     }
 
     /**
@@ -742,13 +771,12 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         try
         {
             KeyStore ks = KeyStore.getInstance("JCEKS");
-            char[] password = KEYSTORE_PASSWORD.toCharArray();
+            char[] password = this.keystorePassword.toCharArray();
             File file = this.getEncryptionFile();
+            //If the file doesn't exist yet let's create it and generate and store there the encryption key
             if(!file.exists())
             {
-                LOGGER.debug("The encryption file doesn't exist yet");
-                ks.load(null, password);
-                storeEncryptionKey(ks);
+                ks = initiateStore(ks, password, file);
             }
             else
                 ks.load(new FileInputStream(file), password);
@@ -761,6 +789,20 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         }
     }
     
+    private synchronized KeyStore initiateStore(KeyStore ks, char[] password, File file) throws Exception
+    {
+        if(file.exists())
+        {
+            //If the file already exists, it means another thread created it in the meanwhile
+            ks.load(new FileInputStream(file), password);
+            return ks;
+        }
+        LOGGER.debug("The encryption file doesn't exist yet");
+        ks.load(null, password);
+        storeEncryptionKey(ks);
+        return ks;
+    }
+    
     /**
      *  Get the file where the encryption key is supposed to be stored. 
      *  
@@ -769,7 +811,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private File getEncryptionFile()
     {
         File permDir = environment.getPermanentDirectory();
-        String path = permDir.getAbsolutePath() + permDir.pathSeparator + ENCRYPTION_KEY_FILE_NAME;
+        String path = permDir.getAbsolutePath() + File.separator + this.encryptionKeyFileName;
         File encryptionFile = new File(path) ;
         return encryptionFile ;
     }
@@ -780,15 +822,14 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * 
      * @param ks Keystore where the key should be kept
      */
-    public void storeEncryptionKey(KeyStore ks)
+    private void storeEncryptionKey(KeyStore ks)
     {
         try
         {
-            String encryptionKey = generateRandomKey();
-            String storePassword = KEYSTORE_PASSWORD;
-            String protection = ENCRYPTION_KEY_PROTECTION;
-            byte[] keyData = new BigInteger(encryptionKey, 16).toByteArray();
-            SecretKeySpec key = new SecretKeySpec(keyData, "AES");
+            SecretKeySpec encryptionKey = generateRandomKey();
+            String storePassword = this.keystorePassword;
+            String protection = this.encryptionKeyProtection;
+            SecretKeySpec key = encryptionKey;
             KeyStore.SecretKeyEntry skEntry =
                 new KeyStore.SecretKeyEntry(key);
             ks.setEntry("encryptionKey", skEntry, 
@@ -813,9 +854,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param ks Keystore where the key is stored
      * @return encryption key
      */
-    public SecretKeySpec retrieveEncryptionKey(KeyStore ks)
+    private SecretKeySpec retrieveEncryptionKey(KeyStore ks)
     {
-        String protection = ENCRYPTION_KEY_PROTECTION;
+        String protection = this.encryptionKeyProtection;
         try
         {
             KeyStore.SecretKeyEntry pkEntry = (KeyStore.SecretKeyEntry)
@@ -835,15 +876,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * 
      * @return the encryption key as a string
      */
-    private String generateRandomKey()
+    private SecretKeySpec generateRandomKey()
     {
         try{
             KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
             keyGenerator.init(128);
             SecretKey key = keyGenerator.generateKey();
-            byte[] encoded = key.getEncoded(); 
-            String data = new BigInteger(encoded).toString(16);
-            return data;
+            return (SecretKeySpec) key;
         }
         catch(Exception e)
         {

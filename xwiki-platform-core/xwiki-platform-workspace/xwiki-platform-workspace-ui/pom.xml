@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-workspace</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-workspace-ui</artifactId>
   <packaging>xar</packaging>

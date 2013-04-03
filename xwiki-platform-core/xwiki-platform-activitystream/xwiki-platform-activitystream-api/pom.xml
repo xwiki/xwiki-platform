@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activitystream</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-activitystream-api</artifactId>
   <name>XWiki Platform - Activity Stream - API</name>

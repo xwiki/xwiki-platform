@@ -1,7 +1,9 @@
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
 ## * skipCurrentUser: don't take into account context use (XAR extension documents will keep their author for example)
-#set ($extensionConfig = {})
+#if (!$extensionConfig)
+  #set ($extensionConfig = {})
+#end
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
@@ -758,6 +760,7 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (handleExtensionRequest)
+request.form_token $request.form_token
   #if ($request.form_token)
     #if ($services.csrf.isTokenValid($request.form_token))
       #handleExtensionAction(true)
@@ -807,7 +810,14 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (computeInstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #set ($discard = $extensionManager.createInstallPlan($extensionId, $extensionVersion, $extensionNamespace))
+  #set ($installRequest = $extensionManager.createInstallRequest($extensionId, $extensionVersion, $extensionNamespace))
+  #if ($extensionConfig.skipCheckRight)
+    #set ($discard = $installRequest.removeProperty('checkrights'))
+  #end
+  #if ($extensionConfig.skipCurrentUser)
+    #set ($discard = $installRequest.removeProperty('user.reference'))
+  #end
+  #set ($discard = $extensionManager.createInstallPlan($installRequest))
   #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
 #end
 

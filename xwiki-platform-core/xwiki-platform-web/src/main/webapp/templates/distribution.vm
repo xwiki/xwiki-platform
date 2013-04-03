@@ -114,10 +114,6 @@
 #end
 
 #macro(displayMainUIStep)
-  #if (!$xcontext.userReference)
-    #set ($extensionConfig.skipCheckRight = true)
-    #set ($extensionConfig.skipCurrentUser = true)
-  #end
   #set ($distributionState = $services.distribution.state)
   #if (!$distributionState || $distributionState == 'NONE')
     <div class="errormessage">$services.localization.render('platform.extension.distributionWizard.uiStepNoStateError')</div>
@@ -376,6 +372,13 @@
       </span>
     </div>
   </form>
+#end
+
+## Make sure to skip all right checking for guest user
+#if (!$xcontext.userReference)
+  #set ($extensionConfig = {})
+  #set ($discard = $extensionConfig.put('skipCheckRight', true))
+  #set ($discard = $extensionConfig.put('skipCurrentUser', true))
 #end
 
 ## Keep displaying the wizard after the distribution job is done if the request targets a specific extension (e.g. if you

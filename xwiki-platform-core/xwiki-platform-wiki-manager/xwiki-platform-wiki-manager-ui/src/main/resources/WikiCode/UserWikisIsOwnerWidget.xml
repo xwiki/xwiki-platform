@@ -105,13 +105,13 @@
       <category>Information</category>
     </property>
     <property>
-      <content>#panelheader($msg.get("wikimanager.widget.userwikisowner.title"))
+      <content>#panelheader($services.localization.render('wikimanager.widget.userwikisowner.title'))
   ##
   #includeMacros("WikiCode.Macros")
   ##
   #set($WikiManager = $services.wikimanager)
   #if(!$WikiManager)
-    #error($msg.get("wikimanager.pluginnotenabled"))
+    #error($services.localization.render('wikimanager.pluginnotenabled'))
   #end
   #set($Exception = $WikiManager.DefaultException)
   ##

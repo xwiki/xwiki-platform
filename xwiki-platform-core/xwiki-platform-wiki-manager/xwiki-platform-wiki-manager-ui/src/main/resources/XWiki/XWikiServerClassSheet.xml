@@ -40,7 +40,7 @@
   #if ($action &amp;&amp; ($action == "create") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
     #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 
-      {{error}}$msg.get("notallowed"){{/error}}
+      {{error}}{{translation key="notallowed"/}}{{/error}}
     #elseif (!$wiki.containsWikiAlias($domain))
       #set ($alias = $wiki.newObject("XWiki.XWikiServerClass"))
       $alias.set("server", $domain)
@@ -48,20 +48,20 @@
       $wiki.save()
     #else
 
-      {{error}}$msg.get("wikimanager.erroraliasalreadynotexists", [$domain]){{/error}}
+      {{error}}{{translation key="wikimanager.erroraliasalreadynotexists" parameters="$domain"/}}{{/error}}
     #end
   #end
   ##
   #if ($action &amp;&amp; ($action == "delete") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
     #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 
-      {{error}}$msg.get("notallowed"){{/error}}
+      {{error}}{{translation key="notallowed"/}}{{/error}}
     #elseif ($wiki.containsWikiAlias($domain))
       #set ($alias = $wiki.getWikiAlias($domain))
       #set ($removed = $wiki.removeObject($alias.objectApi))
       $wiki.save()
     #else
-      {{error}}$msg.get("wikimanager.erroraliasdoesnotexists", [$domain]){{/error}}
+      {{error}}{{translation key="wikimanager.erroraliasdoesnotexists" parameters="$domain"/}}{{/error}}
     #end
   #end
   ##
@@ -75,61 +75,61 @@
     ##
     #set ($firstalias = $wikiAliasList.get(0))
     #if ($xcontext.action == "view")
-      == $msg.get("wikimanager.title.wikisettings") ==
+      == {{translation key="wikimanager.title.wikisettings"/}} ==
 
     #else
       &lt;fieldset&gt;
-        &lt;legend&gt;$msg.get("wikimanager.title.wikisettings")&lt;/legend&gt;
+        &lt;legend&gt;{{translation key="wikimanager.title.wikisettings"/}}&lt;/legend&gt;
     #end
     ##
       &lt;dl&gt;
-        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname"):&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.wikiprettyname"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("wikiprettyname", $firstalias.objectApi)&lt;br/&gt;
-              $msg.get("wikimanager.doc.createwiki.desc.wikiprettyname")
+              {{translation key="wikimanager.doc.createwiki.desc.wikiprettyname"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.owner"):&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.owner"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             $doc.display("owner", $firstalias.objectApi)
             &lt;p&gt;
-              $msg.get("wikimanager.doc.createwiki.desc.owner")
+              {{translation key="wikimanager.doc.createwiki.desc.owner"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.secure"):&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.secure"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("secure", $firstalias.objectApi)&lt;br/&gt;
-              $msg.get("wikimanager.doc.createwiki.desc.secure")
+              {{translation key="wikimanager.doc.createwiki.desc.secure"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.iswikitemplate"):&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.iswikitemplate"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("iswikitemplate", $firstalias.objectApi)&lt;br/&gt;
-              $msg.get("wikimanager.doc.createwiki.desc.iswikitemplate")
+              {{translation key="wikimanager.doc.createwiki.desc.iswikitemplate"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.server"):&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.server"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("server", $firstalias.objectApi)&lt;br/&gt;
-              $msg.get("wikimanager.doc.createwiki.desc.server")
+              {{translation key="wikimanager.doc.createwiki.desc.server"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.description"):&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.description"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("description", $firstalias.objectApi)&lt;br/&gt;
-              $msg.get("wikimanager.doc.createwiki.desc.description")
+              {{translation key="wikimanager.doc.createwiki.desc.description"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.homepage"):&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.homepage"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("homepage", $firstalias.objectApi)&lt;br/&gt;
-              $msg.get("wikimanager.doc.createwiki.desc.homepage")
+              {{translation key="wikimanager.doc.createwiki.desc.homepage"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
       &lt;/dl&gt;
@@ -138,7 +138,7 @@
     #end
     ##
     #if ($xcontext.action == "view")
-      == $msg.get("wikimanager.title.createnewalias") ==
+      == {{translation key="wikimanager.title.createnewalias"/}} ==
 
       ##
       &lt;form method="get" action=""&gt;
@@ -146,15 +146,15 @@
           &lt;legend&gt;Create new alias&lt;/legend&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
-          &lt;label for="inputdomain"&gt;$msg.get("wikimanager.prop.alias.server")&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
-          &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
+          &lt;label for="inputdomain"&gt;{{translation key="wikimanager.prop.alias.server"/}}&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
+          &lt;input type="submit" class="button" value="$services.localization.render('create')"/&gt;
           &lt;/fieldset&gt;
       &lt;/form&gt;
     #end
     ##
     #if ($wikiAliasList.size() &gt; 1)
       #if ($xcontext.action == "view")
-        == $msg.get("wikimanager.title.viewaliases") ==
+        == {{translation key="wikimanager.title.viewaliases"/}} ==
 
       #end
       ##
@@ -167,18 +167,18 @@
               ##
               &lt;br /&gt;
               &lt;dl&gt;
-                &lt;dt&gt;$msg.get("wikimanager.prop.alias.description"):&lt;/dt&gt;
+                &lt;dt&gt;{{translation key="wikimanager.prop.alias.description"/}}:&lt;/dt&gt;
                   &lt;dd&gt;
                     &lt;p&gt;
                       $doc.display("description", $wikiAlias.objectApi)&lt;br/&gt;
-                      $msg.get("wikimanager.doc.createwiki.desc.description")
+                      {{translation key="wikimanager.doc.createwiki.desc.description"/}}
                     &lt;/p&gt;
                   &lt;/dd&gt;
-                &lt;dt&gt;$msg.get("wikimanager.prop.alias.homepage"):&lt;/dt&gt;
+                &lt;dt&gt;{{translation key="wikimanager.prop.alias.homepage"/}}:&lt;/dt&gt;
                   &lt;dd&gt;
                     &lt;p&gt;
                       $doc.display("homepage", $wikiAlias.objectApi)&lt;br/&gt;
-                      $msg.get("wikimanager.doc.createwiki.desc.homepage")
+                      {{translation key="wikimanager.doc.createwiki.desc.homepage"/}}
                     &lt;/p&gt;
                   &lt;/dd&gt;
               &lt;/dl&gt;
@@ -187,7 +187,7 @@
               &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
               &lt;input type="hidden" name="action" value="delete"/&gt;
               &lt;input type="hidden" name="domain" value="$wikiAlias.server"/&gt;
-              &lt;input type="submit" class="button" value="$msg.get("delete")"/&gt;
+              &lt;input type="submit" class="button" value="$services.localization.render('delete')"/&gt;
         #end
             &lt;/fieldset&gt;
         #if ($xcontext.action == "view")

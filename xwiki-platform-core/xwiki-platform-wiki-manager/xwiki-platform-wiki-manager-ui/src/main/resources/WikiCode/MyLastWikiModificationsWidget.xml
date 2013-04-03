@@ -105,7 +105,7 @@
       <category>Information</category>
     </property>
     <property>
-      <content>#panelheader($msg.get("wikimanager.widget.mylastmodifications.title"))
+      <content>#panelheader($services.localization.render('wikimanager.widget.mylastmodifications.title'))
   #set($usermodifications = "${xcontext.user}")
   #set($usermodificationswiki = "${xcontext.database}")
   #includeInContext("WikiCode.LastWikiModificationsCode")

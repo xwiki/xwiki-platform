@@ -86,7 +86,7 @@
       <name>platform.panels.wikiManagerApplication</name>
     </property>
     <property>
-      <parameters>label=$msg.get('wikimanager.panels.applicationsPanelEntryLabel')
+      <parameters>label=$services.localization.render('wikimanager.panels.applicationsPanelEntryLabel')
 target=WikiManager.WebHome
 icon=icon:database_table</parameters>
     </property>

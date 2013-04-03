@@ -21,6 +21,7 @@ package org.xwiki.extension.distribution.internal;
 
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -47,7 +48,7 @@ public class DistributionAction extends XWikiAction
     /**
      * The reference of the superadmin user document.
      */
-    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki",
+    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", XWiki.SYSTEM_SPACE,
         XWikiRightService.SUPERADMIN_USER);
 
     @Override
@@ -75,7 +76,7 @@ public class DistributionAction extends XWikiAction
         // Make sure to have programming rights
         // TODO: find something nicer
         XWikiDocument document =
-            new XWikiDocument(new DocumentReference(context.getDatabase(), "XWiki", "Distribution"));
+            new XWikiDocument(new DocumentReference(context.getDatabase(), XWiki.SYSTEM_SPACE, "Distribution"));
         document.setContentAuthorReference(SUPERADMIN_REFERENCE);
         document.setAuthorReference(SUPERADMIN_REFERENCE);
         document.setCreatorReference(SUPERADMIN_REFERENCE);

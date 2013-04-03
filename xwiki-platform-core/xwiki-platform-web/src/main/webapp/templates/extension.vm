@@ -760,7 +760,6 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (handleExtensionRequest)
-request.form_token $request.form_token
   #if ($request.form_token)
     #if ($services.csrf.isTokenValid($request.form_token))
       #handleExtensionAction(true)

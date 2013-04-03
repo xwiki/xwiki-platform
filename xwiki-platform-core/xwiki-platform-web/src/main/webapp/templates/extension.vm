@@ -809,14 +809,14 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (computeInstallPlan $extensionId $extensionVersion $extensionNamespace)
-  #set ($installRequest = $extensionManager.createInstallRequest($extensionId, $extensionVersion, $extensionNamespace))
+  #set ($installPlanRequest = $extensionManager.createInstallPlanRequest($extensionId, $extensionVersion, $extensionNamespace))
   #if ($extensionConfig.skipCheckRight)
-    #set ($discard = $installRequest.removeProperty('checkrights'))
+    #set ($discard = $installPlanRequest.removeProperty('checkrights'))
   #end
   #if ($extensionConfig.skipCurrentUser)
-    #set ($discard = $installRequest.removeProperty('user.reference'))
+    #set ($discard = $installPlanRequest.removeProperty('user.reference'))
   #end
-  #set ($discard = $extensionManager.createInstallPlan($installRequest))
+  #set ($discard = $extensionManager.createInstallPlan($installPlanRequest))
   #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
 #end
 

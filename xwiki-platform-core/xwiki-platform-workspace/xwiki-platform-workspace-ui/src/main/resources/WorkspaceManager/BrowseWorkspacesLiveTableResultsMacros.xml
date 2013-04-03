@@ -15,7 +15,7 @@
   <date>1307188675000</date>
   <contentUpdateDate>1307188675000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.livetable.resultsMacros")</title>
+  <title>$services.localization.render('platform.livetable.resultsMacros')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -341,7 +341,7 @@
         #foreach($colname in $collist)
           #if($colname.startsWith('doc.'))
           #elseif($colname == '_action') ,
-            #set($text = $msg.get("${request.transprefix}actiontext"))
+            #set($text = $services.localization.render("${request.transprefix}actiontext"))
            "$escapetool.javascript(${colname})" : "$escapetool.javascript(${text})"
           #elseif($colname == '_attachments') ,
             #livetable_getAttachmentsList($itemDoc)
@@ -368,7 +368,7 @@
             #set($fieldValue = "$!itemDoc.getValue($colname)")
             #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
             #if($fieldDisplayValue == '')
-              #set($fieldDisplayValue = $msg.get("${request.transprefix}emptyvalue"))
+              #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
             #end
             #set($fieldUrl = '')
             ## only retrieve an URL for a DBListClass item

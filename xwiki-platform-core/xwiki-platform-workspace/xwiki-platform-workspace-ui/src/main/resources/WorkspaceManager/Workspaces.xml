@@ -283,7 +283,7 @@ $xwiki.ssx.use('WorkspaceManager.Workspaces')
 #set ($discard = $workspaces.removeAll($WorkspaceManager.getWorkspaceTemplates()))
 ##
 #if (!$workspaces || $workspaces.size() == 0 )
-$msg.get('platform.workspace.macroNoWorkspaces')
+{{translation key="platform.workspace.macroNoWorkspaces"/}}
 
 #end
 {{html wiki='true'}}
@@ -307,7 +307,7 @@ $msg.get('platform.workspace.macroNoWorkspaces')
     &lt;li id='spWorkspaceCreateItem' class='xitem workspace'&gt;
       &lt;div class='xitemcontainer'&gt;
         #set ($createWorkspaceDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'CreateNewWorkspace'))
-        &lt;div id='spWorkspaceCreateLabel' class='spWorkspaceName'&gt;&lt;a href="$xwiki.getURL($createWorkspaceDocumentReference)"&gt;$msg.get('workspacemanager.createworkspace')&lt;/a&gt;&lt;/div&gt;
+        &lt;div id='spWorkspaceCreateLabel' class='spWorkspaceName'&gt;&lt;a href="$xwiki.getURL($createWorkspaceDocumentReference)"&gt;{{translation key="workspacemanager.createworkspace"/}}&lt;/a&gt;&lt;/div&gt;
         &lt;div class='spacer'&gt;&amp;nbsp;&lt;/div&gt;
       &lt;/div&gt;
     &lt;/li&gt;

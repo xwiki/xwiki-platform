@@ -66,6 +66,8 @@ public class IntegrationTests
         // Document Access Bridge Mock
         final DocumentAccessBridge dab = componentManager.registerMockComponent(mockery, DocumentAccessBridge.class);
         final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        final DocumentReference currentDocumentReference =
+            new DocumentReference("currentwiki", "currentspace", "currentpage");
         final DocumentModelBridge document = mockery.mock(DocumentModelBridge.class);
         final DocumentDisplayer displayer = componentManager.registerMockComponent(mockery, DocumentDisplayer.class);
 
@@ -81,7 +83,7 @@ public class IntegrationTests
                 will(returnValue("temppath"));
 
             allowing(dab).getCurrentDocumentReference();
-                will(returnValue(documentReference));
+                will(returnValue(currentDocumentReference));
             allowing(dab).exists(documentReference);
                 will(returnValue(true));
             allowing(dab).getDocument(documentReference);

@@ -77,7 +77,7 @@ public class IntegrationTests
             componentManager.registerMockComponent(mockery,  AuthorizationManager.class);
 
         mockery.checking(new Expectations() {{
-            allowing(dab).getDocumentURL(new DocumentReference("unused", "space", "page"), "temp", null, null);
+            allowing(dab).getDocumentURL(new DocumentReference("currentWiki", "space", "page"), "temp", null, null);
                 will(returnValue("temppath"));
 
             allowing(dab).getCurrentDocumentReference();

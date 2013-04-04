@@ -23,5 +23,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Main.Dashboard"/}}</content>
+  <content>This is the space for the Extension Repository scripts.</content>
 </xwikidoc>

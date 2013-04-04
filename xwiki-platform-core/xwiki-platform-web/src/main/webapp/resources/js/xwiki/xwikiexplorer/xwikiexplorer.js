@@ -1038,7 +1038,7 @@ isc.XWETreeGrid.addMethods({
     /**
      * Create a text input that will be used as a suggest for the tree.
      * The modifications on this input will be observed and the resource entered in the input,
-     * like Main.Dashboard for example, will be opened in the tree.
+     * like Dashboard.WebHome for example, will be opened in the tree.
      */
     drawInput : function() {
         var widthWithoutBorders = this.width - 6;

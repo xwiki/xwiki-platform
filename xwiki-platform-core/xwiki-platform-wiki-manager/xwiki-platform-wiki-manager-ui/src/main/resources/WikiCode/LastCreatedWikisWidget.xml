@@ -110,10 +110,10 @@
 #panelfooter()</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Prints the list of last created wikis with their respective owner.</description>
     </property>
     <property>
-      <name>LastCreatedWikisWidget</name>
+      <name>Last created wikis</name>
     </property>
     <property>
       <type>view</type>

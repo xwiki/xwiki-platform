@@ -112,10 +112,10 @@
 #panelfooter()</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Lists the last modifications made by the current user on all wikis.</description>
     </property>
     <property>
-      <name>MyLastWikiModificationsWidget</name>
+      <name>My recent modifications</name>
     </property>
     <property>
       <type>view</type>

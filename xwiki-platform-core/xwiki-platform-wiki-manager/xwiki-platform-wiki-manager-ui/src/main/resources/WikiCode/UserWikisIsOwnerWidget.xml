@@ -134,10 +134,10 @@
 #panelfooter()</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Lists the wikis that have the current user as their owner.</description>
     </property>
     <property>
-      <name>UserWikisIsOwnerWidget</name>
+      <name>Wikis you own</name>
     </property>
     <property>
       <type>view</type>

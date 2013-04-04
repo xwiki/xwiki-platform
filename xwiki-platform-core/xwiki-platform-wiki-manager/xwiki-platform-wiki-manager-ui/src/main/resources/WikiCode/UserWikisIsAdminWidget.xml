@@ -140,10 +140,10 @@
 #panelfooter()</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Lists the wikis the current user has the right to administrate.</description>
     </property>
     <property>
-      <name>UserWikisIsAdminWidget</name>
+      <name>Wikis you administrate</name>
     </property>
     <property>
       <type>view</type>

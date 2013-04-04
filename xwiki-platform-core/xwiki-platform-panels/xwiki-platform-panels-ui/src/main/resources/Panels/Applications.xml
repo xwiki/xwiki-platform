@@ -139,7 +139,7 @@
 {{/velocity}}</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Lists the available applications and provides shortcuts to install new ones or to create your own.</description>
     </property>
     <property>
       <name>Applications</name>

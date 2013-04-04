@@ -139,10 +139,10 @@
 #panelfooter()</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Lists the wikis the current user has access to.</description>
     </property>
     <property>
-      <name>UserWikisIsUserWidget</name>
+      <name>Wikis you view</name>
     </property>
     <property>
       <type>view</type>

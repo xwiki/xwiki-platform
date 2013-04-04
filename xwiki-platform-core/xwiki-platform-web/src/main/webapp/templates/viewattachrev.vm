@@ -1,7 +1,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-<h3>$xwiki.parseMessage("availableversionsattachment")</h3>
+<h3>$services.localization.render("core.viewers.attachments.revisions", [$attachment.filename])</h3>
 #if ($tdoc.realLanguage!="")
 #set($lang = "&language=${tdoc.realLanguage}")
 #else

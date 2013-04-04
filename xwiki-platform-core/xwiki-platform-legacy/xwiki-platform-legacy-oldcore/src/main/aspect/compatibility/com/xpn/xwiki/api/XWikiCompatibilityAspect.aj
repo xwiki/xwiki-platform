@@ -600,22 +600,6 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * API to parse a message. A message can be an error message or an information message either as text or as a message
-     * ID pointing to ApplicationResources. The message is also parse for velocity scripts
-     * 
-     * @return Final message
-     * @param id
-     * @return the result of the parsed message
-     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. From velocity you can access XWikiMessageTool
-     *             with $msg binding.
-     */
-    @Deprecated
-    public String XWiki.parseMessage(String id)
-    {
-        return this.xwiki.parseMessage(id, getXWikiContext());
-    }
-
-    /**
      * API to get a message. A message can be an error message or an information message either as text or as a message
      * ID pointing to ApplicationResources. The message is also parsed for velocity scripts
      * 

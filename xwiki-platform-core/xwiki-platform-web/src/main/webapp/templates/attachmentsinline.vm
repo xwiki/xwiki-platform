@@ -7,14 +7,6 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 ###
 ### TODO: web service?
 ###
-#set($redirect = "$!{request.xredirect}")
-#if($redirect == '')
-  #if ("$!{request.viewer}" == 'attachments')
-    #set($redirect = "${doc.getURL('view', 'viewer=attachments')}")
-  #else
-    #set($redirect = "${doc.getURL()}#Attachments")
-  #end
-#end
 #set($showactions = 0)
 <div id="attachmentscontent" class="xwikiintracontent">
 <div id="attw">
@@ -26,6 +18,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
   <div>
   ## CSRF prevention
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+  ## $redirect is defined in attachmentslist.vm
   <input type="hidden" name="xredirect" value="$escapetool.xml($redirect)" />
   <fieldset id="attachform">
     <legend>$services.localization.render('core.viewers.attachments.upload.title')</legend>

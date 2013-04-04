@@ -14,6 +14,15 @@
   ### Sort everthing else ascending
   #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
 #end
+## Determine the redirect.
+#set ($redirect = "$!request.xredirect")
+#if ($redirect == '')
+  #if ("$!request.viewer" == 'attachments')
+    #set ($redirect = $doc.getURL('view', 'viewer=attachments'))
+  #else
+    #set ($redirect = "$doc.getURL()#Attachments")
+  #end
+#end
 #set($attachments = $sorttool.sort($doc.attachmentList, "$sortAttachmentsBy"))
 #if($attachments.size() > 0)
   #foreach ($attach in $attachments)
@@ -25,7 +34,7 @@
     <span class="xwikibuttonlinks">
     #if($hasEdit || $hasAdmin)
       ## Delete attachment link
-      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url(${redirect})")"
+      <a class="deletelink" href="$doc.getAttachmentURL($attach.filename, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url($redirect)")"
         title="$services.localization.render('core.viewers.attachments.delete.title', [$escapetool.xml($attach.filename)])">$services.localization.render('core.viewers.attachments.delete')</a>
       ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
       ## the browser supports Dav Edit.

@@ -234,6 +234,11 @@ public class ExportAction extends XWikiAction
         }
 
         PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+        if (export == null) {
+            // No Packaging plugin configured
+            return "exception";
+        }
+
         if ("true".equals(history)) {
             export.setWithVersions(true);
         } else {

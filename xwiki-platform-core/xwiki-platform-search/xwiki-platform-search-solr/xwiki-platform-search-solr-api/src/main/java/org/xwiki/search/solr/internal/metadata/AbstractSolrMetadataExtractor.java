@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -142,15 +141,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     {
         try {
             XWikiDocument document = getDocument(documentReference);
-
-            // TODO: replace with getLanguage(documentReference) ?
-            String doclang = "";
-            Locale locale = documentReference.getLocale();
-            if (locale != null && !StringUtils.isEmpty(locale.toString())) {
-                doclang = documentReference.getLocale().toString();
-            }
-
-            XWikiDocument translatedDocument = document.getTranslatedDocument(doclang, getXWikiContext());
+            XWikiDocument translatedDocument =
+                document.getTranslatedDocument(documentReference.getLocale(), getXWikiContext());
             return translatedDocument;
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Failed to get translated document for '%s'",

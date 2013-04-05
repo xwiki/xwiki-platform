@@ -141,4 +141,31 @@ public class XWikiMockitoTest
         // Attachments must be saved separately to avoid incrementing their version.
         verify(target).saveAllAttachments(false, true, context);
     }
+
+    /**
+     * Verify that {@link XWiki#copyDocument(DocumentReference, DocumentReference, XWikiContext)} doesn't fail if the
+     * document to copy has a broken attachment.
+     */
+    @Test
+    public void copyDocumentWithBrokenAttachment() throws Exception
+    {
+        DocumentReference targetReference = new DocumentReference("bar", "Space", "Target");
+        XWikiDocument target = mock(XWikiDocument.class);
+        when(target.isNew()).thenReturn(true);
+        when(target.getDocumentReference()).thenReturn(targetReference);
+
+        // After the source is copied into the target document, the target document has an attachment.
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(target.getAttachmentList()).thenReturn(Collections.singletonList(attachment));
+        // The attachment is broken (suppose we couldn't load its content).
+        when(attachment.getAttachment_content()).thenReturn(null);
+
+        DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
+        XWikiDocument source = mock(XWikiDocument.class);
+        when(source.copyDocument(targetReference, context)).thenReturn(target);
+
+        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(source, target);
+
+        Assert.assertTrue(xwiki.copyDocument(sourceReference, targetReference, context));
+    }
 }

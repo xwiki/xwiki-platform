@@ -4134,7 +4134,11 @@ public class XWiki implements EventListener
                     // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
                     for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
                         attachment.setMetaDataDirty(false);
-                        attachment.getAttachment_content().setContentDirty(false);
+                        // In case the attachment is broken (no content) the XWikiDocument#copyDocument() call above has
+                        // already logged a warning. We just need to play safe.
+                        if (attachment.getAttachment_content() != null) {
+                            attachment.getAttachment_content().setContentDirty(false);
+                        }
                     }
 
                     saveDocument(tdoc, "Copied from " + sourceStringReference, context);

@@ -71,12 +71,12 @@
   #set ($WikiManager = $services.wikimanager)
   #if (!$WikiManager)
 
-    {{error}}{{translation key="workspacemanager.dependencies.wikimanager.missing"/}}{{/error}}
+    {{error}}$services.localization.render('workspacemanager.dependencies.wikimanager.missing'){{/error}}
   #end
 #end
 #if (!$services.applicationmanager)
 
-  {{error}}{{translation key="workspacemanager.dependencies.applicationmanager.missing"/}}{{/error}}
+  {{error}}$services.localization.render('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
 #end
 ##
 ## Constants

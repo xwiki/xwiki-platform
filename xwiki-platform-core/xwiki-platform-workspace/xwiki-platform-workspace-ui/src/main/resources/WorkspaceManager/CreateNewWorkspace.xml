@@ -287,18 +287,18 @@ function prettyNameChanged()
 #end
 #set ($WikiManager = $services.wikimanager)
 #if (!$WikiManager)
-  {{error}}{{translation key="workspacemanager.dependencies.wikimanager.missing"/}}{{/error}}
+  {{error}}$services.localization.render('workspacemanager.dependencies.wikimanager.missing'){{/error}}
 
 #end
 #if (!$services.applicationmanager)
-  {{error}}{{translation key="workspacemanager.dependencies.applicationmanager.missing"/}}{{/error}}
+  {{error}}$services.localization.render('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
 
 #end
 ############################################################################################
 ## WORKSPACE INSTALLATION STATUS CHECK
 #set ($isInstallComplete = ($WorkspaceManager.getWorkspaceTemplates().size() &gt; 0))
 #if (!$isInstallComplete)
-  {{warning}}{{translation key="workspacemanager.template.install.notYetComplete" parameters="WorkspaceManager.Install"/}}{{/warning}}
+  {{warning}}$services.localization.render('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
 
 #end
 ############################################################################################

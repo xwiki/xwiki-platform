@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides configuration for Solr.
@@ -31,6 +32,7 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @since 4.5M1
  */
+@Unstable
 @Role
 public interface SolrConfiguration
 {

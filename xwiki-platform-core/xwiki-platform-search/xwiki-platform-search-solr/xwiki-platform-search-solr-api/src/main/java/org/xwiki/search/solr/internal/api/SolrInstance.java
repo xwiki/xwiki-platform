@@ -29,6 +29,7 @@ import org.apache.solr.common.params.SolrParams;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component in charge of communicating with the actual Solr server. This is direct access and consistency is not
@@ -40,6 +41,7 @@ import org.xwiki.component.phase.InitializationException;
  * @version $Id$
  * @since 4.3M2
  */
+@Unstable
 @Role
 public interface SolrInstance extends Initializable
 {
@@ -48,6 +50,7 @@ public interface SolrInstance extends Initializable
      * 
      * @throws InitializationException if problems occur.
      */
+    @Override
     void initialize() throws InitializationException;
 
     /**

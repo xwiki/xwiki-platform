@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component that accepts XWiki {@link EntityReference}s to be indexed or deleted from the index if they exist. The
@@ -32,6 +33,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 4.3M2
  */
+@Unstable
 @Role
 public interface SolrIndex
 {

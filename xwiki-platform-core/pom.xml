@@ -83,7 +83,7 @@
                require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
           <exclusion>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
+            <artifactId>bcprov-jdk15</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

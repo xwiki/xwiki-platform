@@ -38,6 +38,11 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-api</artifactId>
       <version>${commons.version}</version>

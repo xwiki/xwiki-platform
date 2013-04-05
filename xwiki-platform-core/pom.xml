@@ -74,12 +74,24 @@
         <artifactId>tika-parsers</artifactId>
         <version>1.3</version>
         <exclusions>
+          <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
           <exclusion>
-            <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
             <groupId>de.l3s.boilerpipe</groupId>
             <artifactId>boilerpipe</artifactId>
           </exclusion>
+          <!-- Tika Parsers 1.3 depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
+               require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+          </exclusion>
         </exclusions>
+      </dependency>
+      <!-- See the explanation in the tika-parsers exclusion above -->
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk16</artifactId>
+        <version>1.46</version>
       </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
       <dependency>

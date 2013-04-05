@@ -186,7 +186,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             if (documentReference.getLocale() != null
                 && !StringUtils.isEmpty(documentReference.getLocale().getDisplayLanguage())) {
                 language = documentReference.getLocale().toString();
-            } else if (!StringUtils.isEmpty(this.documentAccessBridge.getDocument(documentReference).getRealLanguage())) {
+            } else if (StringUtils.isNotEmpty(this.documentAccessBridge.getDocument(documentReference)
+                .getRealLanguage())) {
                 language = this.documentAccessBridge.getDocument(documentReference).getRealLanguage();
             } else {
                 // Multilingual and Default placeholder

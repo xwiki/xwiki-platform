@@ -47,7 +47,7 @@ If an Extension already exists with the provided id in the current wiki then the
 #else
   {{html}}
     #if ($isGuest)
-      You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+      You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
     #else
     &lt;form action="" id="importextension"&gt;
       &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;

@@ -77,7 +77,8 @@ public class DependencyPane extends BaseElement
      */
     public WebElement getLink()
     {
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, By.tagName("A"));
+        By linkLocator = By.cssSelector("a.extension-link");
+        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, linkLocator);
         return found.isEmpty() ? null : found.get(0);
     }
 

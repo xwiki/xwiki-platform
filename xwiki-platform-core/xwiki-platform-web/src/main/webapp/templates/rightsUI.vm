@@ -65,15 +65,15 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 <div id="xwikieditcontent">
   #if ("$!editor" == 'rights')
     ## Display a title if we're editing access rights for a particular page
-    <div id="document-title"><h1>$msg.get('core.editors.rights.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
+    <div id="document-title"><h1>$services.localization.render('core.editors.rights.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
   #end
   <table id="usersandgroupstable" class="xwiki-livetable#if("$!editor" != '') $editor#end">
     <tr>
       <td class="xwiki-livetable-pagination" colspan="2">
         <span id="usersandgroupstable-limits" class="xwiki-livetable-limits"></span>
-        <span id="usersandgroupstable-ajax-loader" class="xwiki-livetable-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('platform.livetable.loading')" title="" />$msg.get('platform.livetable.loading')</span>
+        <span id="usersandgroupstable-ajax-loader" class="xwiki-livetable-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" />$services.localization.render('platform.livetable.loading')</span>
         <span class="pagination">
-          <span id="usersandgroupstable-pagination-text" class="xwiki-livetable-pagination-text">$msg.get('platform.livetable.paginationPage')</span>
+          <span id="usersandgroupstable-pagination-text" class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
           <span id="usersandgroupstable-pagination" class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
@@ -86,7 +86,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               ## Groups/Users switch
               <th scope="col" class="usersorgroupsnames">
                 #set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
-                <label for="uorgg" class="hidden">$msg.get('rightsmanager.groups')</label>
+                <label for="uorgg" class="hidden">$services.localization.render('rightsmanager.groups')</label>
                 <input type="radio" id="uorgg" name="uorg" value="groups"
                   onclick="if(!$('unregistered').hasClassName('hidden'))
                              $('unregistered').addClassName('hidden');
@@ -96,8 +96,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                              $('usersandgroupstable-filters-scope').removeClassName('hidden');
                              $('wiki').options[groupScopeIndex].selected=true;
                            }
-                         #end" checked="checked" />$msg.get('rightsmanager.groups')&nbsp;&nbsp;
-                <label for="uorgu" class="hidden">$msg.get('rightsmanager.users')</label>
+                         #end" checked="checked" />$services.localization.render('rightsmanager.groups')&nbsp;&nbsp;
+                <label for="uorgu" class="hidden">$services.localization.render('rightsmanager.users')</label>
                 <input type="radio" id="uorgu" name="uorg" value="users" 
                   onclick="if($('unregistered').hasClassName('hidden'))
                              $('unregistered').removeClassName('hidden');
@@ -108,31 +108,31 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                              groupScopeIndex = $('wiki').selectedIndex;
                              $('wiki').options[1].selected=true;
                            }
-                         #end" />$msg.get('rightsmanager.users')
+                         #end" />$services.localization.render('rightsmanager.users')
               </th>
               ## Column headers for each configurable access right
               #foreach ($i in [0..$maxlevel])
-                <th scope="col" class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</th>
+                <th scope="col" class="rights">$services.localization.render("rightsmanager.${levelsRights.get($i)}")</th>
               #end
             </tr>
             <tr id="unregistered">
               ## Rights for guests, statically displayed outside the livetable
-              <td id="unreguser">$msg.get('rightsmanager.unregisteredusers')</td>
+              <td id="unreguser">$services.localization.render('rightsmanager.unregisteredusers')</td>
               #foreach ($i in [0..$maxlevel])
                 <td class="rights" id="td${levelsRights.get($i)}"></td>
               #end
             </tr>
             <tr id="usersandgroupstable-filters">
               ## Users/groups filter
-              <td><label for="name">$msg.get('rightsmanager.searchfilter')</label><input id="name" name="name" type="text"/>
+              <td><label for="name">$services.localization.render('rightsmanager.searchfilter')</label><input id="name" name="name" type="text"/>
                 #if(!$xcontext.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
                 #if(!$mainwk) ## display the combobox only in a local wiki
                   <div id="usersandgroupstable-filters-scope">
-                    <label for="wiki">$msg.get('rightsmanager.searchscope')</label>
+                    <label for="wiki">$services.localization.render('rightsmanager.searchscope')</label>
                     <select id="wiki" name="wiki" style="margin-left:10px;">
-                      <option value="local" selected="selected">$msg.get('rightsmanager.local')</option>
-                      <option value="global">$msg.get('rightsmanager.global')</option>
-                      <option value="both">$msg.get('rightsmanager.both')</option>
+                      <option value="local" selected="selected">$services.localization.render('rightsmanager.local')</option>
+                      <option value="global">$services.localization.render('rightsmanager.global')</option>
+                      <option value="both">$services.localization.render('rightsmanager.both')</option>
                     </select>
                   </div>
                 #else
@@ -163,7 +163,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
               #set ($view_alt = 'no')
             #end
-            <tr><td>$msg.get('authenticate_view')</td><td><img id="authenticate_view" alt="$view_alt" src="${view_icon}" /></td></tr>
+            <tr><td>$services.localization.render('authenticate_view')</td><td><img id="authenticate_view" alt="$view_alt" src="${view_icon}" /></td></tr>
             #set ($auth_edit = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
             #if ("$!auth_edit" == '1')
               #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
@@ -172,7 +172,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
               #set ($edit_alt = 'no')
             #end
-            <tr><td>$msg.get('authenticate_edit')</td><td><img id="authenticate_edit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
+            <tr><td>$services.localization.render('authenticate_edit')</td><td><img id="authenticate_edit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
           #end
           #if ($guest_comment_captcha_prop)
             ## If we are in globaladmin, we don't want to get the setting from XWiki.WebPreferences...
@@ -188,7 +188,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
               #set ($guest_comment_requires_captcha_alt = 'no')
             #end
-            <tr><td>$msg.get('rightsmanager.guestcommentrequirescaptcha')</td><td><img id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt" src="$guest_comment_requires_captcha_icon" /></td></tr>
+            <tr><td>$services.localization.render('rightsmanager.guestcommentrequirescaptcha')</td><td><img id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt" src="$guest_comment_requires_captcha_icon" /></td></tr>
           #end
           </table>
         </td>

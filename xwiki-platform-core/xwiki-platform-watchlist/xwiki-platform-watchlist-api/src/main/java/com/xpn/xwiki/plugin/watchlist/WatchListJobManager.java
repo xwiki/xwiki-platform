@@ -101,14 +101,15 @@ public class WatchListJobManager
     {
         boolean needsUpdate = false;
 
-        if (StringUtils.isBlank(doc.getCreator())) {
+        if (doc.getCreatorReference() == null) {
             needsUpdate = true;
             doc.setCreator(WatchListPlugin.DEFAULT_DOC_AUTHOR);
         }
-        if (StringUtils.isBlank(doc.getAuthor())) {
+        if (doc.getAuthorReference() == null) {
             needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
+            doc.setAuthorReference(doc.getCreatorReference());
         }
+
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.WatchListClass");
@@ -296,7 +297,7 @@ public class WatchListJobManager
 
             if (StringUtils.isBlank(doc.getTitle()) || StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
-                doc.setTitle("$msg.get(\"" + nameResource + "\")");
+                doc.setTitle("$services.localization.render('" + nameResource + "')");
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
             }

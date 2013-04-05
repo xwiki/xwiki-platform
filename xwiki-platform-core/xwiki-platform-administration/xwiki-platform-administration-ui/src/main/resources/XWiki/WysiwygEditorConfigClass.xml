@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1292332239000</creationDate>
-  <date>1300205761000</date>
-  <contentUpdateDate>1300205761000</contentUpdateDate>
+  <creationDate>1364502205000</creationDate>
+  <date>1364567289000</date>
+  <contentUpdateDate>1364567289000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('wysiwyg.config.class.title')</title>
-  <template/>
+  <title>$services.localization.render('wysiwyg.config.class.title')</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -66,6 +65,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </attachmentSelectionLimited>
+    <cleanPaste>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <name>cleanPaste</name>
+      <number>13</number>
+      <prettyName>Clean paste content automatically</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </cleanPaste>
     <colorPalette>
       <customDisplay/>
       <disabled>0</disabled>

@@ -68,8 +68,8 @@
     (((
     {{html}}
     #if ($isGuest)
-      #set($login = ${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))})
-      #set($register = ${escapetool.xml($xwiki.getURL("xwiki:Main.WebHome", "register", "xredirect=$doc.externalURL"))})
+      #set($login = ${escapetool.xml($doc.getURL("login", "xredirect=$doc.externalURL"))})
+      #set($register = ${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))})
       $services.localization.render('platform.faq.need', ["&lt;a href=$login&gt;","&lt;/a&gt;","&lt;a href=$register&gt;","&lt;/a&gt;"])
     #else
       &lt;form action="" id="newfaq"&gt;

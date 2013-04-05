@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1192218584000</creationDate>
-  <date>1278346254000</date>
-  <contentUpdateDate>1278346254000</contentUpdateDate>
+  <date>1357298547000</date>
+  <contentUpdateDate>1357298544000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -24,5 +24,34 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
+xapp.action.exportnonrecurse=Eksportér (ikke-rekursivt)
+xapp.action.exportrecurse=Eksportér
+xapp.action.reloadapp=Genindlæs
+xapp.answer.deleteapp.msg=Er du sikker på at du vil slette værktøj "{0}"?
+xapp.answer.deleteapp.title=Slet værktøj "{0}"
+xapp.answer.exportapp.recursive=Rekursivt
+xapp.answer.exportapp.title=Eksportér værktøj "{0}"
+xapp.answer.exportapp.withdetails=Med historik
+xapp.appmanager=Værktøjskontrol
+xapp.appname=Værktøjsnavn
+xapp.availablefilestoimport=Filer, der kan importeres
+xapp.createapplication=Opret nyt værktøj
+xapp.description=Beskrivelse
+xapp.docname=Dokumentnavn
+xapp.errorcreateapp=En fejl opstod under oprettelse af værktøj "{0}" (kode "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Værktøj "{0}" findes allerede. Vælg et andet navn.
+xapp.errordeleteapp=En fejl opstod under sletning af værktøj "{0}" (kode "{1}").
+xapp.errorexportapp=En fejl opstod under eksport af værktøj "{0}" (kode "{1}").
+xapp.errorimportapp=En fejl opstod under import af værktøjspakke "{0}" (kode "{1}").
+xapp.errorreloadapp=En fejl opstod under genindlæsning af værktøj "{0}" (kode "{1}")
+xapp.legend.application=Værktøj
+xapp.legend.validate=Validér
+xapp.pluginnotenabled=Værktøjskontrol er ikke aktiv. Denne side vil derfor ikke virke korrekt. Check at "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" findes i parameteren xwiki.plugins i xwiki.cfg-filen. 
+xapp.successcreateapp=Værktøj "{0}" er oprettet. Du kan tilgå den på [{1}].
+xapp.successdeleteapp=Slettede værktøjet "{0}" OK.
+xapp.successexportapp=Eksporterede værtøjet "{0}" OK.
+xapp.successimportapp=Importerede værktøjspakke "{0}" OK.
+xapp.successreloadapp=Genindlæste  værktøj "{0}" OK.
+xapp.totalnumberofapp=Totalt antal værktøj
 </content>
 </xwikidoc>

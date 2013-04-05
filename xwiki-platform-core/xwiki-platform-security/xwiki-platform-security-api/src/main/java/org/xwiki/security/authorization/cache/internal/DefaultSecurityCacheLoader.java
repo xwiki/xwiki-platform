@@ -19,10 +19,11 @@
  */
 package org.xwiki.security.authorization.cache.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Formatter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -41,7 +42,6 @@ import org.xwiki.security.authorization.SecurityEntryReader;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
-import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.internal.UserBridge;
@@ -113,8 +113,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             } finally {
                 rulesInvalidator.resume();
             }
-            String message = new Formatter().format("Failed to load the cache in %d attempts.  Giving up.",
-                                                    retries).toString();
+            String message = String.format("Failed to load the cache in %d attempts.  Giving up.", retries);
             this.logger.error(message);
             throw new AuthorizationException(user.getOriginalDocumentReference(),
                                              entity.getOriginalReference(), message);
@@ -122,114 +121,189 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     }
 
     /**
-     * Load entity entries, group entries, and user entries required, than
-     * call the settler and store and return the result.
+     * Load entity entries, group entries, and user entries required to settle the access, settle it,
+     * add this decision into the cache and return the access.
      * 
      * @param user The user to check access for.
      * @param entity The entity to check access to.
-     * @return The resulting access for the user at the entity.
-     * @throws ParentEntryEvictedException If one of the parent
-     * entries are evicted before the load is completed.
-     * @throws ConflictingInsertionException When different threads
-     * have inserted conflicting entries into the cache.
+     * @return The resulting access for the user on the entity.
+     * @throws ParentEntryEvictedException If one of the parent entries are evicted before the load is completed.
+     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException On error.
      */
     private SecurityAccessEntry loadRequiredEntries(UserSecurityReference user, SecurityReference entity)
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
+        // No entity, return default rights for user in its wiki
         if (entity == null) {
-            return authorizationSettlerProvider.get().settle(user, loadGroupEntries(user), null);
+            return authorizationSettlerProvider.get().settle(user,
+                loadUserEntry(user, user.getWikiReference(), null), null);
         }
 
-        SecurityRuleEntry entry = securityCache.get(entity);
-        Deque<SecurityRuleEntry> ruleEntries = null;
+        // Retrieve rules for the entity from the cache
+        Deque<SecurityRuleEntry> ruleEntries = getRules(entity);
 
-        if (entry == null) {
-            ruleEntries = getRules(entity);
-            do {
-                entry = ruleEntries.getFirst();
-            } while (entry.isEmpty()
-                && entry.getReference().getType() != EntityType.WIKI && (ruleEntries.pop() != null));
-        } else {
-            while (entry.isEmpty() && entry.getReference().getType() != EntityType.WIKI) {
-                entry = securityCache.get(entry.getReference().getParentSecurityReference());
-            }
-        }
-        return loadAccessEntries(user, entry.getReference(), ruleEntries);
+        // Evaluate, store and return the access right
+        return loadAccessEntries(user, entity, ruleEntries);
     }
 
     /**
-     * Load missing user and group entries, call the settler, than store and return the result.
-     * Entity entries should have been loaded, and the entity request should have rules.
+     * Load group entries, and user entries required, to settle the access, settle it,
+     * add this decision into the cache and return the access.
      * 
      * @param user The user to check access for.
-     * @param entity The entity to check access to.
-     * @param ruleEntries The rule entries loaded from the cache, may be null if not yet available.
-     * @return The resulting access for the user at the entity.
-     * @throws ParentEntryEvictedException If one of the parent
-     * entries are evicted before the load is completed.
-     * @throws ConflictingInsertionException When different threads
-     * have inserted conflicting entries into the cache.
+     * @param entity The lowest entity providing security rules on the path of the entity to check access for.
+     * @param ruleEntries The rule entries associated with the above entity.
+     * @return The access for the user at the entity (equivalent to the one of the entity to check access for).
+     * @throws ParentEntryEvictedException If one of the parent entries are evicted before the load is completed.
+     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException On error.
      */
     private SecurityAccessEntry loadAccessEntries(UserSecurityReference user, SecurityReference entity,
         Deque<SecurityRuleEntry> ruleEntries)
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
-        // Make sure the group entries are loaded
-        Collection<GroupSecurityReference> groups = loadGroupEntries(user);
-
-        // Make sure the user entry is loaded
-        if (securityCache.get(user) == null) {
-            // Make sure the parent of the user document is loaded.
-            Deque<SecurityReference> chain = user.getReversedSecurityReferenceChain();
-            chain.removeLast();
-            for (SecurityReference ref : chain) {
-                SecurityRuleEntry entry = securityCache.get(ref);
-                if (entry == null) {
-                    entry = securityEntryReader.read(ref);
-                    securityCache.add(entry);
-                }
-            }
-
-            SecurityRuleEntry entry = securityEntryReader.read(user);
-            securityCache.add(entry, groups);
+        // userWiki is the wiki of the user
+        SecurityReference userWiki = user.getWikiReference();
+        // entityWiki is the wiki of the entity when the user is global and the entity is local
+        SecurityReference entityWiki = user.isGlobal() ? entity.getWikiReference() : null;
+        if (entityWiki != null && userWiki.equals(entityWiki)) {
+            entityWiki = null;
         }
 
-        Deque<SecurityRuleEntry> entries = (ruleEntries == null) ? getRules(entity) : ruleEntries;
+        // Load user and related groups into the cache (global and shadowed locals) as needed
+        Collection<GroupSecurityReference> groups = loadUserEntry(user, userWiki, entityWiki);
 
-        SecurityAccessEntry accessEntry = authorizationSettlerProvider.get().settle(user, groups, entries);
+        // Settle the access
+        SecurityAccessEntry accessEntry = authorizationSettlerProvider.get().settle(user, groups, ruleEntries);
 
-        securityCache.add(accessEntry);
+        // Store the result into the cache
+        securityCache.add(accessEntry, entityWiki);
+
+        // Return the result
         return accessEntry;
     }
 
     /**
-     * Load group entries and return the list of groups associated with the given user.
-     * 
-     * @param user The user.
-     * @return The collection of groups.
-     * @throws ParentEntryEvictedException if any of the parent entries of the group
-     * were evicted.
-     * @throws ConflictingInsertionException When different threads
-     * have inserted conflicting entries into the cache.
+     * Load user/group entry in the cache as needed, load related group entries and return the list of all groups
+     * associated with the given user/group in both the user wiki and the given entity wiki. Groups containing
+     * (recursively) groups containing the user/group are also listed.
+     *
+     * @param user The user/group to load.
+     * @param userWiki The user wiki. Should correspond to the wiki of the user/group provided above.
+     * @param entityWiki Only for global user, the wiki of the entity currently evaluated if it differ from the user
+     * wiki, null otherwise. Local group information of the entity wiki will be evaluated for the user/group to load
+     * and a shadow user will be made available in that wiki to support access entries.
+     * @return A collection of groups associated to the requested user/group (both user wiki and entity wiki)
+     * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
+     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
      */
-    private Collection<GroupSecurityReference> loadGroupEntries(UserSecurityReference user)
+    private Collection<GroupSecurityReference> loadUserEntry(UserSecurityReference user, SecurityReference userWiki,
+        SecurityReference entityWiki)
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
-        Collection<GroupSecurityReference> groups = userBridge.getAllGroupsFor(user);
+        Collection<GroupSecurityReference> groups = new HashSet<GroupSecurityReference>();
 
-        for (GroupSecurityReference group : groups) {
-            getRules(group);
+        // Load the user and related groups into the cache
+        Collection<GroupSecurityReference> globalGroups = new HashSet<GroupSecurityReference>();
+        loadUserEntry(user, userWiki, null, globalGroups);
+        groups.addAll(globalGroups);
+        if (entityWiki != null) {
+            // Entity is in a local wiki for a global user
+            Collection<GroupSecurityReference> localGroups;
+            // Load shadows of user's global group into the cache
+            for (GroupSecurityReference group : globalGroups) {
+                localGroups = new HashSet<GroupSecurityReference>();
+                loadUserEntry(group, userWiki, entityWiki, localGroups);
+                groups.addAll(localGroups);
+            }
+            // Load shadow of the user into the cache
+            localGroups = new HashSet<GroupSecurityReference>();
+            loadUserEntry(user, userWiki, entityWiki, localGroups);
+            groups.addAll(localGroups);
         }
 
+        // Returns all collected groups for access evaluation
         return groups;
     }
 
     /**
+     * Load a user/group entry in the cache as need, load related group entries, in the context of a single wiki.
+     *
+     * @param user The user/group to be loaded.
+     * @param userWiki The user wiki. Should correspond to the wiki of the user provided above.
+     * @param entityWiki Only for global user, the wiki to be evaluated, null otherwise to evaluate the user wiki.
+     * @param allGroups For the initial call, this collection should normally be empty, and will receive all the
+     *                  group associated with the given user (either directly or indirectly).
+     *                  (During recursive calls, it contains the result so far, and allow limiting the recursion.)
+     * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
+     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
+     * @throws org.xwiki.security.authorization.AuthorizationException on error.
+     */
+    private void loadUserEntry(UserSecurityReference user, SecurityReference userWiki,
+        SecurityReference entityWiki, Collection<GroupSecurityReference> allGroups)
+        throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
+    {
+        // Retrieve the list of immediate group for the user/group in either the entity wiki or the user/group wiki
+        Collection<GroupSecurityReference> groups = (entityWiki != null)
+            ? userBridge.getAllGroupsFor(user, entityWiki.getOriginalWikiReference())
+            : userBridge.getAllGroupsFor(user, userWiki.getOriginalWikiReference());
+
+        Collection<GroupSecurityReference> userGroups = new ArrayList<GroupSecurityReference>();
+
+        // Loads all immediate groups recursively, collecting indirect groups along the way
+        for (GroupSecurityReference group : groups) {
+            if (allGroups.add(group)) {
+                // Call in recursion only if the group has never been seen before, avoid infinite recursion
+                loadUserEntry(group, (entityWiki != null) ? entityWiki : userWiki, null, allGroups);
+                userGroups.add(group);
+            }
+        }
+
+        // Store the user/group in the cache
+        if (entityWiki != null) {
+            // Store a shadow entry for a global user/group involved in a local wiki
+            securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), userGroups);
+        } else {
+            // If not yet in the cache, retrieve associated rules store the user/group in the cache
+            if (securityCache.get(user) == null) {
+                loadUserEntry(user, userGroups);
+            }
+        }
+    }
+
+    /**
+     * Load rules for a user/group into the cache with relations to immediate groups. Groups should be already loaded,
+     * else a ParentEntryEvictedException will be thrown. The parent chain of the loaded user will be loaded as needed.
+     *
+     * @param user The user/group to load.
+     * @param groups The collection of groups associated with the user/group
+     * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
+     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
+     * @throws org.xwiki.security.authorization.AuthorizationException on error.
+     */
+    private void loadUserEntry(UserSecurityReference user, Collection<GroupSecurityReference> groups)
+        throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
+    {
+        // Make sure the parent of the user document is loaded.
+        Deque<SecurityReference> chain = user.getReversedSecurityReferenceChain();
+        chain.removeLast();
+        for (SecurityReference ref : chain) {
+            SecurityRuleEntry entry = securityCache.get(ref);
+            if (entry == null) {
+                entry = securityEntryReader.read(ref);
+                securityCache.add(entry);
+            }
+        }
+
+        SecurityRuleEntry entry = securityEntryReader.read(user);
+        securityCache.add(entry, groups);
+    }
+
+    /**
      * Retrieve rules for all hierarchy levels of the provided reference.
-     * Rules may be read from the cache, or from the documents and fill the cache.
+     * Rules may be read from the cache, or from the entities and fill the cache.
      *
      * @param entity The entity for which rules should be loaded and retrieve.
      * @return A collection of security rule entry, once for each level of the hierarchy.
@@ -253,5 +327,18 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             rules.push(entry);
         }
         return rules;
+    }
+
+    /**
+     * Extract the SecurityReference of EntityType.WIKI from the given SecurityReference.
+     * @param entity The entity to be parsed.
+     * @return the a SecurityReference representing a WikiReference.
+     */
+    private SecurityReference getWikiReference(SecurityReference entity) {
+        SecurityReference result = entity;
+        while (result != null && result.getType() != EntityType.WIKI) {
+            result = result.getParentSecurityReference();
+        }
+        return result;
     }
 }

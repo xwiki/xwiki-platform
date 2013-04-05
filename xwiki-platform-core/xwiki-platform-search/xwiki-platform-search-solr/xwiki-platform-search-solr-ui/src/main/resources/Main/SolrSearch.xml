@@ -972,8 +972,8 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 ## Space macros
 ## ---------------
 #macro(spaceselect $selectedSpace $spaces)
-&lt;select id='space' name='space' title="$msg.get('search.page.bar.spaces.title')"&gt;
-  &lt;option value='' #if($selectedSpace == '')selected='selected'#end&gt;$msg.get('search.page.bar.spaces.all')&lt;/option&gt;
+&lt;select id='space' name='space' title="$services.localization.render('search.page.bar.spaces.title')"&gt;
+  &lt;option value='' #if($selectedSpace == '')selected='selected'#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
   #foreach ($space in $spaces)
     #if (!$blacklistedSpaces.contains($space) &amp;&amp; $xwiki.hasAccessLevel('view', "${space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
       &lt;option value="$!{escapetool.xml($space)}" #if($selectedSpace == $space)selected='selected'#end&gt;$!{escapetool.xml($space)}&lt;/option&gt;
@@ -1002,10 +1002,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
 ##
 ## Get the sorted list of existing wikis
 ##
-#set ($wikis = $xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context))
-#if (!$wikis.contains($xcontext.database))
-  #set ($discard = $wikis.add($xcontext.database))
-#end
+#set ($wikis = $xwiki.wikiNames)
 #set ($wikis = $sorttool.sort($wikis))
 {{/velocity}}
 
@@ -1020,8 +1017,8 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
   &lt;form id='search-form' action=''&gt;
     &lt;div class='xformInline'&gt;
       &lt;div&gt;
-        &lt;label class='hidden' for='text'&gt;$msg.get('search.page.query.label')&lt;/label&gt;
-        &lt;input type='text' id='text' name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
+        &lt;label class='hidden' for='text'&gt;$services.localization.render('search.page.query.label')&lt;/label&gt;
+        &lt;input type='text' id='text' name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$services.localization.render('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$services.localization.render('search.page.bar.query.title')"/&gt;
         &lt;input type='hidden' id='sort-hidden-field' value="$!{escapetool.xml($sort)}" name='sort'/&gt;
         &lt;input type='hidden' id='sort-order-hidden-field' value="$!{escapetool.xml($sortOrder)}" name='sortOrder'/&gt;
         &lt;span class='buttonwrapper'&gt;
@@ -1038,10 +1035,10 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;dl id='filteredSearch' class="xform#if ($filter == '') hidden#end"&gt;
-      &lt;dt #if (!$xwiki.isVirtualMode())class='hidden'#end&gt;
+      &lt;dt&gt;
         &lt;label for='wiki'&gt;Wiki&lt;/label&gt;
       &lt;/dt&gt;
-      &lt;dd #if (!$xwiki.isVirtualMode())class='hidden'#end&gt;
+      &lt;dd&gt;
         &lt;select id='wiki' name='wiki'&gt;
           ## The main wiki searches by default in all wikis.
           &lt;option value=''&gt;All wikis&lt;/option&gt;
@@ -1320,7 +1317,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
               #end
             &lt;/h2&gt;
             &lt;div class='search-item-location'&gt;
-              $msg.get('search.item.location', [
+              $services.localization.render('search.item.location', [
               $escapetool.xml($searchResult.wiki), $xwiki.getURL("${searchResult.wiki}:Main.WebHome"),
               $escapetool.xml($searchResult.space), $xwiki.getURL("${searchResult.wiki}:${searchResult.space}.WebHome"),
               $escapetool.xml($searchResult.name), $xwiki.getURL($resultDocumentReference)])
@@ -1352,7 +1349,7 @@ float:right;position:relative;padding:5px 10px;margin-right:-10px;
             ## FIXME: Use the maxScore to compute a better relevancePercentage, instead of just multiplying with 100.
             ## NOTE: It seems that this practice is descouraged because it has a high potential of confusing users since scores are not upper bounded: http://wiki.apache.org/lucene-java/ScoresAsPercentages
             #set ($relevancePercentage = $mathtool.min($mathtool.mul($searchResult.score, 100), 100))
-            &lt;span class='item-relevance' title="$msg.get('search.item.relevance.title')"&gt;
+            &lt;span class='item-relevance' title="$services.localization.render('search.item.relevance.title')"&gt;
               &lt;span class='current-relevance' style="width:${relevancePercentage}%;"&gt;&lt;/span&gt;
             &lt;/span&gt;
             &lt;span class='relevance-text'&gt;$relevancePercentage.intValue()%&lt;/span&gt;

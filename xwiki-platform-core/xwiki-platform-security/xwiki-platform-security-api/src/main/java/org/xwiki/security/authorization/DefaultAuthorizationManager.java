@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authorization;
 
-import java.util.Formatter;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -35,7 +33,6 @@ import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
-import org.xwiki.security.authorization.internal.XWikiSecurityAccess;
 import org.xwiki.security.internal.XWikiBridge;
 
 /**
@@ -85,7 +82,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      */
     private boolean isSuperAdmin(DocumentReference user)
     {
-        return StringUtils.equalsIgnoreCase(user.getName(), AuthorizationManager.SUPERADMIN_USER);
+        return user != null && StringUtils.equalsIgnoreCase(user.getName(), AuthorizationManager.SUPERADMIN_USER);
     }
 
     @Override
@@ -94,10 +91,14 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     {
         try {
             if (!hasSecurityAccess(right, userReference, entityReference, true)) {
-                throw new AccessDeniedException(userReference, entityReference);
+                throw new AccessDeniedException(right, userReference, entityReference);
             }
         } catch (Exception e) {
-            throw new AccessDeniedException(userReference, entityReference, e);
+            if (e instanceof AccessDeniedException) {
+                throw (AccessDeniedException) e;
+            } else {
+                throw new AccessDeniedException(right, userReference, entityReference, e);
+            }
         }
     }
 
@@ -107,7 +108,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         try {
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
-            this.logger.error("Failed to load rights for user {}.", userReference, e);
+            this.logger.error(String.format("Failed to load rights for user [%s] on [%s].",
+                (userReference == null) ? AuthorizationException.NULL_USER : userReference,
+                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference), e);
             return false;
         }
     }
@@ -130,17 +133,14 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         boolean check)
         throws AuthorizationException
     {
-        if (userReference == null) {
-            logDeny(userReference, entityReference, right, "missing user");
-            return false;
-        }
-
         if (isSuperAdmin(userReference)) {
             return true;
         }
 
         if (right == null || right == Right.ILLEGAL) {
-            logDeny(userReference, entityReference, right, "no such right");
+            if (check) {
+                logDeny(userReference, entityReference, right, "no such right");
+            }
             return false;
         }
 
@@ -197,42 +197,45 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             if (entry == null) {
                 SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
                 if (logger.isDebugEnabled()) {
-                    Formatter f = new Formatter();
-                    this.logger.debug(f.format("1. Loaded a new entry for %s@%s into cache: %s",
-                                               entityReferenceSerializer.serialize(user),
-                                               entityReferenceSerializer.serialize(entity),
-                        access).toString());
+                    this.logger.debug("1. Loaded a new entry for user {} on {} into cache: [{}]",
+                        entityReferenceSerializer.serialize(user),
+                        entityReferenceSerializer.serialize(entity),
+                        access);
                 }
                 return access;
             }
-            if (!entry.isEmpty() || ref.getParentSecurityReference() == null) {
+            if (!entry.isEmpty()) {
                 SecurityAccessEntry accessEntry = securityCache.get(user, ref);
                 if (accessEntry == null) {
                     SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
                     if (logger.isDebugEnabled()) {
-                        Formatter f = new Formatter();
-                        logger.debug(f.format("2. Loaded a new entry for %s@%s into cache: %s",
+                        logger.debug("2. Loaded a new entry for user {} on {} into cache: [{}]",
                             entityReferenceSerializer.serialize(user),
                             entityReferenceSerializer.serialize(entity),
-                            access).toString());
+                            access);
                     }
                     return access;
                 } else {
                     SecurityAccess access = accessEntry.getAccess();
                     if (logger.isDebugEnabled()) {
-                        Formatter f = new Formatter();
-                        logger.debug(f.format("3. Got entry for %s@%s from cache: %s",
+                        logger.debug("3. Got entry for user {} on {} from cache: [{}]",
                             entityReferenceSerializer.serialize(user),
                             entityReferenceSerializer.serialize(entity),
-                            access).toString());
+                            access);
                     }
                     return access;
                 }
             } 
         }
 
-        logger.debug("4. Returning default access level.  (This should never be reached!)");
-        return XWikiSecurityAccess.getDefaultAccess();
+        SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
+        if (logger.isDebugEnabled()) {
+            logger.debug("4. Loaded a new default entry for user {} on {} into cache: [{}]",
+                entityReferenceSerializer.serialize(user),
+                entityReferenceSerializer.serialize(entity),
+                access);
+        }
+        return access;
     }
 
     /**
@@ -248,16 +251,17 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         boolean debugLevel)
     {
         if ((debugLevel && logger.isDebugEnabled()) || (!debugLevel && logger.isInfoEnabled())) {
-            String userName = (user != null) ? entityReferenceSerializer.serialize(user) : "no user";
-            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : "no entity";
+            String userName = (user != null) ? entityReferenceSerializer.serialize(user)
+                                             : AuthorizationException.NULL_USER;
+            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity)
+                                              : AuthorizationException.NULL_USER;
             String rightName = (right != null) ? right.getName() : "no right";
             String accessName = (access == RuleState.ALLOW) ? "granted" : "denied";
-            String message = "Access has been %s for (%s,%s,%s): %s";
-            Formatter f = new Formatter();
+            String message = "[{}] access has been {} for user [{}] on [{}]: {}";
             if (debugLevel) {
-                logger.debug(f.format(message, accessName, userName, docName, rightName, info).toString());
+                logger.debug(message, rightName, accessName, userName, docName, info);
             } else {
-                logger.info(f.format(message, accessName, userName, docName, rightName, info).toString());
+                logger.info(message, rightName, accessName, userName, docName, info);
             }
         }
     }

@@ -31,10 +31,10 @@ import org.junit.Before;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentBuilder}.
@@ -73,7 +73,7 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
     @org.junit.Test
     public void testXDOMOfficeDocumentBuilding()
     {
-        // Create & register a mock document converter to by-pass openoffice server.
+        // Create & register a mock document converter to by-pass the office server.
         final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
         final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
         mockInput.put(INPUT_FILE_NAME, mockOfficeFileStream);
@@ -81,19 +81,19 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
         mockOutput.put(OUTPUT_FILE_NAME,
             "<html><head><title></tile></head><body><p><strong>Hello There</strong></p></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
+        final OfficeConverter mockDocumentConverter = getMockery().mock(OfficeConverter.class);
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
 
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockOpenOfficeManager).getConverter();
+                oneOf(mockOfficeServer).getConverter();
                 will(returnValue(mockDocumentConverter));
 
                 try {
                     allowing(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
                     will(returnValue(mockOutput));
-                } catch (OpenOfficeConverterException e) {
+                } catch (OfficeConverterException e) {
                     Assert.fail(e.getMessage());
                 }
 

@@ -242,11 +242,11 @@ $xwiki.jsx.use('Panels.ClassSwitcher')##
   &lt;/optgroup&gt;
 #end
 &lt;/select&gt;
-&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="$msg.get("changeclass")"/&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="$services.localization.render('changeclass')"/&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
 
-{{warning}}$msg.get('xe.panels.classedit.unsavedchanges'){{/warning}}
+{{warning}}$services.localization.render('xe.panels.classedit.unsavedchanges'){{/warning}}
 )))
 #panelfooter()
 {{/velocity}}</content>

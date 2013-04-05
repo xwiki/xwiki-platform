@@ -22,9 +22,12 @@ package org.xwiki.gwt.wysiwyg.client.plugin.importer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.internal.ie.BeforePasteEvent;
 import org.xwiki.gwt.dom.client.internal.ie.BeforePasteHandler;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
@@ -51,5 +54,35 @@ public class IEPasteManager extends PasteManager implements BeforePasteHandler
     public void onBeforePaste(BeforePasteEvent event)
     {
         onPaste(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * {@link Document#getScrollTop()} and {@link Document#getScrollLeft()} are broken for nested documents in IE9.
+     * 
+     * @see <a href="http://code.google.com/p/google-web-toolkit/issues/detail?id=6256">getAbsoluteTop/getScrollTop
+     *      returns wrong values for IE9 when body has been scrolled</a>
+     * @see <a href="https://gwt-review.googlesource.com/#/c/2260/">Document#getScrollTop() and Document#getScrollLeft()
+     *      are broken for nested documents in IE9</a>
+     */
+    @Override
+    protected void centerPasteContainer(Element pasteContainer)
+    {
+        Document document = pasteContainer.getOwnerDocument();
+        Element viewport = Element.as(document.isCSS1Compat() ? document.getDocumentElement() : document.getBody());
+        pasteContainer.getStyle().setLeft(viewport.getScrollLeft() + document.getClientWidth() / 2, Unit.PX);
+        pasteContainer.getStyle().setTop(viewport.getScrollTop() + document.getClientHeight() / 2, Unit.PX);
+    }
+
+    @Override
+    protected void selectPasteContainer(Element pasteContainer)
+    {
+        // This is for IE9 where we cannot move the selection inside an element with absolute position without focusing
+        // the element first. IE9 simply throws "Unspecified Error". This happens only if the standard DOM Range API is
+        // used, so IE8 is not affected.
+        pasteContainer.focus();
+
+        super.selectPasteContainer(pasteContainer);
     }
 }

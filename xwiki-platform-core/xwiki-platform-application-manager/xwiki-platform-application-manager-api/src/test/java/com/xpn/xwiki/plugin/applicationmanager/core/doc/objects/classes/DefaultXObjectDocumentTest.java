@@ -176,7 +176,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentEmpty() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
@@ -194,7 +194,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentDocName() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
@@ -213,12 +213,12 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentDocNameExists() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
-        XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
-        xwiki.saveDocument(doc, getContext());
+        XWikiDocument doc = this.xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
+        this.xwiki.saveDocument(doc, getContext());
 
         XClassManager sclass = XClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc =

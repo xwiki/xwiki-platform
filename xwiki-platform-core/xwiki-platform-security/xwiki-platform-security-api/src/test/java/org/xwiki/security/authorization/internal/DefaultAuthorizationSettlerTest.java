@@ -25,18 +25,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
-import java.util.Set;
 
 import org.hamcrest.Matcher;
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AbstractAuthorizationTestCase;
+import org.xwiki.security.authorization.AbstractAdditionalRightsTestCase;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
@@ -44,14 +41,16 @@ import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
-import org.xwiki.security.internal.EntityBridge;
-import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
 import static org.xwiki.security.authorization.RuleState.DENY;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
@@ -62,106 +61,64 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * @version $Id$
  * @since 4.0M2
  */
-@MockingRequirement(DefaultAuthorizationSettler.class)
-public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCase
+public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 {
+    @Rule
+    public final MockitoComponentMockingRule<AuthorizationSettler> authorizationSettlerMocker =
+        new MockitoComponentMockingRule<AuthorizationSettler>(DefaultAuthorizationSettler.class);
+
     private AuthorizationSettler authorizationSettler;
 
     private XWikiSecurityAccess defaultAccess;
     private XWikiSecurityAccess denyAllAccess;
-    private XWikiSecurityAccess initialImportAccess;
 
     @Before
     public void configure() throws Exception
     {
-        final EntityBridge entityBridge= getComponentManager().getInstance(EntityBridge.class);
-        final XWikiBridge xwikiBridge = getComponentManager().getInstance(XWikiBridge.class);
-
-        getMockery().checking(new Expectations() {{
-            allowing (entityBridge).isDocumentCreator(with(creatorRef),
-                with(any(SecurityReference.class))); will(returnValue(true));
-            allowing (entityBridge).isDocumentCreator(with(any(UserSecurityReference.class)), 
-                with(any(SecurityReference.class))); will(returnValue(false));
-
-            allowing (xwikiBridge).isWikiOwner(with(ownerRef),
-                with(any(WikiReference.class))); will(returnValue(true));
-            allowing (xwikiBridge).isWikiOwner(with(any(UserSecurityReference.class)),
-                with(any(WikiReference.class))); will(returnValue(false));
-        }});
-
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
         denyAllAccess = new XWikiSecurityAccess();
         for (Right right : Right.values()) {
             denyAllAccess.deny(right);
         }
-        initialImportAccess = new XWikiSecurityAccess();
-        for (Right right : Right.values()) {
-            if (Right.ADMIN.getImpliedRights().contains(right)) {
-                initialImportAccess.allow(right);
-            } else {
-                initialImportAccess.set(right, right.getDefaultState());
-            }
-        }
-        initialImportAccess.allow(Right.ADMIN);
 
-        this.authorizationSettler = getComponentManager().getInstance(AuthorizationSettler.class);
+        this.authorizationSettler = authorizationSettlerMocker.getComponentUnderTest();
     }
 
     private Deque<SecurityRuleEntry> getMockedSecurityRuleEntries(String name, final SecurityReference reference,
                                                                   final List<List<SecurityRule>> ruleEntries)
     {
-        return getMockedSecurityRuleEntries(name, reference, ruleEntries, true);
-    }
-
-    private Deque<SecurityRuleEntry> getMockedSecurityRuleEntries(final String name, final SecurityReference reference,
-                                                                  final List<List<SecurityRule>> ruleEntries,
-                                                                  final boolean addMainWikiDefaultRules)
-    {
         final Deque<SecurityReference> refs = reference.getReversedSecurityReferenceChain();
         final Deque<SecurityRuleEntry> entries = new ArrayDeque<SecurityRuleEntry>(refs.size());
 
         for (SecurityReference ref : refs) {
-            entries.push(getMockery().mock(SecurityRuleEntry.class, name + ref));
+            entries.push(mock(SecurityRuleEntry.class, name + ref));
         }
 
-        getMockery().checking(new Expectations() {{
-            int i = 0;
-            SecurityReference ref = reference;
-            for (SecurityRuleEntry entry : entries) {
-                List<SecurityRule> rules;
+        int i = 0;
+        SecurityReference ref = reference;
+        for (SecurityRuleEntry entry : entries) {
+            List<SecurityRule> rules;
 
-                if (i < ruleEntries.size()) {
-                    rules = ruleEntries.get(i);
-                } else {
-                    rules = Collections.emptyList();
-                }
-
-                if (ref.getParentSecurityReference() == null && rules.size() == 0 && addMainWikiDefaultRules) {
-                    // Add some rule at the main wiki level to avoid that the wiki is determined to be in its initial
-                    // import state.  By setting DENY on all, this rule will not have any other side effects than
-                    // indicating that the initial import have been made.
-                    rules = Arrays.asList(getMockedSecurityRule(name + " non-initial import state indicator security rule",
-                                                                Arrays.asList(defaultUserRef),
-                                                                Collections.<GroupSecurityReference>emptyList(),
-                                                                allTestRights, DENY));
-                    
-                }
-
-                allowing (entry).getReference(); will(returnValue(ref));
-                allowing (entry).getRules(); will(returnValue(rules));
-
-                ref = ref.getParentSecurityReference();
-                i++;
+            if (i < ruleEntries.size()) {
+                rules = ruleEntries.get(i);
+            } else {
+                rules = Collections.emptyList();
             }
 
-        }});
+            when(entry.getReference()).thenReturn(ref);
+            when(entry.getRules()).thenReturn(rules);
+            when(entry.isEmpty()).thenReturn(rules.size() == 0);
+
+            ref = ref.getParentSecurityReference();
+            i++;
+        }
 
         return entries;
     }
 
     private SecurityRule getMockedSecurityRule(String name, Iterable<UserSecurityReference> users,
         Iterable<GroupSecurityReference> groups, Iterable<Right> rights, final RuleState state) {
-        final SecurityRule rule = getMockery().mock(SecurityRule.class, name);
+        final SecurityRule rule = mock(SecurityRule.class, name);
 
         final List<Matcher<? super UserSecurityReference>> userMatchers
             = new ArrayList<Matcher<? super UserSecurityReference>>();
@@ -169,7 +126,6 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             = new ArrayList<Matcher<? super GroupSecurityReference>>();
         final List<Matcher<? super Right>> rightMatchers = new ArrayList<Matcher<? super Right>>();
 
-//        Matcher<? extends UserSecurityReference>[] userMatchers = new Matcher<? extends UserSecurityReference>[users.
         for (UserSecurityReference user : users) {
             userMatchers.add(is(user));
         }
@@ -180,15 +136,13 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             rightMatchers.add(is(right));
         }
 
-        getMockery().checking(new Expectations() {{
-            allowing(rule).match(with(anyOf(userMatchers))); will(returnValue(true));
-            allowing(rule).match(with(anyOf(groupMatchers))); will(returnValue(true));
-            allowing(rule).match(with(anyOf(rightMatchers))); will(returnValue(true));
-            allowing(rule).match(with(any(UserSecurityReference.class))); will(returnValue(false));
-            allowing(rule).match(with(any(GroupSecurityReference.class))); will(returnValue(false));
-            allowing(rule).match(with(any(Right.class))); will(returnValue(false));
-            allowing(rule).getState(); will(returnValue(state));
-        }});
+        when(rule.match(argThat(anyOf(userMatchers)))).thenReturn(true);
+        when(rule.match(argThat(anyOf(groupMatchers)))).thenReturn(true);
+        when(rule.match(argThat(anyOf(rightMatchers)))).thenReturn(true);
+        when(rule.match(argThat(not(anyOf(userMatchers))))).thenReturn(false);
+        when(rule.match(argThat(not(anyOf(groupMatchers))))).thenReturn(false);
+        when(rule.match(argThat(not(anyOf(rightMatchers))))).thenReturn(false);
+        when(rule.getState()).thenReturn(state);
 
         return rule;
     }
@@ -211,19 +165,19 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
     public void testSettleNoRulesOnMainWiki() throws Exception
     {
         Deque<SecurityRuleEntry> emptyXdocRules
-            = getMockedSecurityRuleEntries("emptyXdocRules", xdocRef, Collections.<List<SecurityRule>>emptyList(), false);
+            = getMockedSecurityRuleEntries("emptyXdocRules", xdocRef, Collections.<List<SecurityRule>>emptyList());
 
-        assertAccess("When no rules are defined, return initial import access for main wiki user on main wiki doc",
-            xuserRef, xdocRef, initialImportAccess,
+        assertAccess("When no rules are defined, return default access for main wiki user on main wiki doc",
+            xuserRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
             authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptyXdocRules));
 
         assertAccess("When no rules are defined, deny all access for local wiki user on main wiki doc",
-            userRef, xdocRef, denyAllAccess,
+            userRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,
             authorizationSettler.settle(userRef, Collections.<GroupSecurityReference>emptyList(),
                 emptyXdocRules));
 
         assertAccess("When no rules are defined, deny all access for another wiki user on main wiki doc",
-            anotherWikiUserRef, xdocRef, denyAllAccess,
+            anotherWikiUserRef, xdocRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,
             authorizationSettler.settle(anotherWikiUserRef, Collections.<GroupSecurityReference>emptyList(),
                 emptyXdocRules));
     }
@@ -235,15 +189,15 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
             = getMockedSecurityRuleEntries("emptydocRules", docRef, Collections.<List<SecurityRule>>emptyList());
 
         assertAccess("When no rules are defined, return default access for local wiki user on local wiki doc",
-            userRef, docRef, defaultAccess,
+            userRef, docRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
             authorizationSettler.settle(userRef, Collections.<GroupSecurityReference>emptyList(), emptydocRules));
 
-        assertAccess("When no rules are defined, deny all access for main wiki user on local wiki doc",
-            xuserRef, docRef, denyAllAccess,
+        assertAccess("When no rules are defined, return default access for main wiki on local wiki doc",
+            xuserRef, docRef.getParentSecurityReference().getParentSecurityReference(), defaultAccess,
             authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(), emptydocRules));
 
         assertAccess("When no rules are defined, deny all access for another wiki user on local wiki doc",
-            anotherWikiUserRef, docRef, denyAllAccess,
+            anotherWikiUserRef, docRef.getParentSecurityReference().getParentSecurityReference(), denyAllAccess,
             authorizationSettler.settle(anotherWikiUserRef, Collections.<GroupSecurityReference>emptyList(),
                 emptydocRules));
     }
@@ -267,67 +221,67 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForXdocSpace
             = getMockedSecurityRuleEntries("allowThenDenyRulesForXdocSpace", xdocRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
-                allowAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
-                denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
+                    allowAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
+                    denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForXdocSpace
             = getMockedSecurityRuleEntries("denyThenAllowRulesForXdocSpace", xdocRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForDocSpace
             = getMockedSecurityRuleEntries("allowThenDenyRulesForDocSpace", docRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
-                allowAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
+                    allowAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForDocSpace
             = getMockedSecurityRuleEntries("denyThenAllowRulesForDocSpace", docRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
-                denyAllTestRightsRulesToAnotherWikiUser),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
+                    denyAllTestRightsRulesToAnotherWikiUser),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForXDocWiki
             = getMockedSecurityRuleEntries("allowThenDenyRulesForXDocWiki", xdocRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
-                allowAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
-                denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser,
+                    allowAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser,
+                    denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForXdocWiki
             = getMockedSecurityRuleEntries("denyThenAllowRulesForXdocWiki", xdocRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForDocWiki
             = getMockedSecurityRuleEntries("allowThenDenyRulesForDocWiki", docRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForDocWiki
             = getMockedSecurityRuleEntries("denyThenAllowRulesForDocWiki", docRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> allowThenDenyRulesForDocXWiki
             = getMockedSecurityRuleEntries("allowThenDenyRulesForDocXWiki", docRef, Arrays.asList(
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser)));
 
         Deque<SecurityRuleEntry> denyThenAllowRulesForDocXWiki
             = getMockedSecurityRuleEntries("denyThenAllowRulesForDocXWiki", docRef, Arrays.asList(
-            Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
-            Collections.<SecurityRule>emptyList(),
-            Collections.<SecurityRule>emptyList(),
-            Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
+                Arrays.asList(denyAllTestRightsRulesToXuser, denyAllTestRightsRulesToUser, denyAllTestRightsRulesToAnotherWikiUser),
+                Collections.<SecurityRule>emptyList(),
+                Collections.<SecurityRule>emptyList(),
+                Arrays.asList(allowAllTestRightsRulesToXuser, allowAllTestRightsRulesToUser, allowAllTestRightsRulesToAnotherWikiUser)));
 
         XWikiSecurityAccess allowDenyAccess = new XWikiSecurityAccess();
         for (Right right : allTestRights) {
@@ -669,7 +623,7 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
                 getMockedSecurityRuleEntries("denyAccessADT", docRef,
                     Arrays.asList(Arrays.asList(denyImpliedADT)))));
 
-        assertAccess("When a right implying others rights is denied, do not denied implied rights (ADT)",
+        assertAccess("When a right implying others rights is denied, do not denied implied rights (DAF)",
             userRef, docRef, denyDAFAccess,
             authorizationSettler.settle(userRef, Arrays.asList(groupRef),
                 getMockedSecurityRuleEntries("denyAccessDAF", docRef,
@@ -731,36 +685,6 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
     }
 
     @Test
-    public void testSettleAllowDeleteToCreator() throws Exception
-    {
-        XWikiSecurityAccess allowDelete = defaultAccess.clone();
-        allowDelete.allow(Right.DELETE);
-
-        assertAccess("Allow delete right to creator",
-            creatorRef, docRef, allowDelete,
-            authorizationSettler.settle(creatorRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("emptydocRules", docRef, Collections.<List<SecurityRule>>emptyList())));
-    }
-
-    @Test
-    public void testSettleAllowAdminToWikiOwner() throws Exception
-    {
-        XWikiSecurityAccess allowAdmin = defaultAccess.clone();
-        Set<Right> implied = Right.ADMIN.getImpliedRights();
-        allowAdmin.allow(Right.ADMIN);
-        for (Right right : Right.getEnabledRights(EntityType.DOCUMENT)) {
-            if (implied.contains(right)) {
-                allowAdmin.allow(right);
-            }
-        }
-
-        assertAccess("Allow admin right to wiki owner",
-            ownerRef, xdocRef, allowAdmin,
-            authorizationSettler.settle(ownerRef, Arrays.asList(groupRef),
-                getMockedSecurityRuleEntries("emptydocRules", xdocRef, Collections.<List<SecurityRule>>emptyList())));
-    }
-
-    @Test
     public void testSettleNewRightJustAdded() throws Exception
     {
         Right newRight = getNewTestRight("RightAddedLater",DENY,DENY,true);
@@ -779,95 +703,4 @@ public class DefaultAuthorizationSettlerTest extends AbstractAuthorizationTestCa
                         Arrays.asList(newRight),
                         RuleState.ALLOW))))));
     }
-
-    @Test
-    public void testSettleEditOnWebPreferencesDocument() throws Exception
-    {
-
-        SecurityRule allowEdit
-            = getMockedSecurityRule("allowEditOnPreferences",
-                                    Arrays.asList(userRef), Arrays.asList(groupRef),
-                                    Arrays.asList(Right.VIEW, Right.EDIT), ALLOW);
-
-        SecurityRule allowAdmin
-            = getMockedSecurityRule("allowAdminOnSpace",
-                                    Arrays.asList(anotherUserRef), Arrays.asList(anotherGroupRef),
-                                    Arrays.asList(Right.ADMIN), ALLOW);
-
-
-        Deque<SecurityRuleEntry> entries
-            = getMockedSecurityRuleEntries("allowEditOnWebPreferences", webPreferencesDocRef,
-                                           Arrays.asList(Arrays.asList(allowEdit), Arrays.asList(allowAdmin)));
-
-
-        XWikiSecurityAccess expectedForUser = defaultAccess.clone();
-        expectedForUser.deny(Right.EDIT);
-
-        XWikiSecurityAccess expectedForAnotherUser = defaultAccess.clone();
-        for (Right right : Right.values()) {
-            if (Right.ADMIN.getImpliedRights().contains(right)) {
-                expectedForAnotherUser.allow(right);
-            }
-        }
-        expectedForAnotherUser.allow(Right.ADMIN);
-        expectedForAnotherUser.allow(Right.EDIT);
-        expectedForAnotherUser.deny(Right.PROGRAM);
-
-        assertAccess("Edit rights must not be enough to edit web preferences document.",
-                     userRef, webPreferencesDocRef, expectedForUser,
-                     authorizationSettler.settle(userRef, Collections.<GroupSecurityReference>emptyList(), entries));
-
-
-        assertAccess("Admin rights must allow edit web preferences document.",
-                     anotherUserRef, webPreferencesDocRef, expectedForAnotherUser,
-                     authorizationSettler.settle(anotherUserRef, Collections.<GroupSecurityReference>emptyList(), entries));
-
-    }
-
-    @Test
-    public void testSettleEditOnXWikiPreferencesDocument() throws Exception
-    {
-
-        SecurityRule allowEdit
-            = getMockedSecurityRule("allowEditOnXWikiPreferences",
-                                    Arrays.asList(userRef), Arrays.asList(groupRef),
-                                    Arrays.asList(Right.VIEW, Right.EDIT), ALLOW);
-
-        SecurityRule allowAdmin
-            = getMockedSecurityRule("allowAdminOnWiki",
-                                    Arrays.asList(anotherUserRef), Arrays.asList(anotherGroupRef),
-                                    Arrays.asList(Right.ADMIN), ALLOW);
-
-
-        Deque<SecurityRuleEntry> entries
-            = getMockedSecurityRuleEntries("allowEditOnXWikiPreferences", xwikiPreferencesDocRef,
-                                           Arrays.asList(Arrays.asList(allowEdit),
-                                                         Collections.<SecurityRule>emptyList(),
-                                                         Arrays.asList(allowAdmin)));
-
-
-        XWikiSecurityAccess expectedForUser = defaultAccess.clone();
-        expectedForUser.deny(Right.EDIT);
-
-        XWikiSecurityAccess expectedForAnotherUser = defaultAccess.clone();
-        for (Right right : Right.values()) {
-            if (Right.ADMIN.getImpliedRights().contains(right)) {
-                expectedForAnotherUser.allow(right);
-            }
-        }
-        expectedForAnotherUser.allow(Right.ADMIN);
-        expectedForAnotherUser.allow(Right.EDIT);
-        expectedForAnotherUser.deny(Right.PROGRAM);
-
-        assertAccess("Edit rights must not be enough to edit xwiki preferences document.",
-                     userRef, xwikiPreferencesDocRef, expectedForUser,
-                     authorizationSettler.settle(userRef, Collections.<GroupSecurityReference>emptyList(), entries));
-
-
-        assertAccess("Admin rights must allow edit xwiki preferences document.",
-                     anotherUserRef, xwikiPreferencesDocRef, expectedForAnotherUser,
-                     authorizationSettler.settle(anotherUserRef, Collections.<GroupSecurityReference>emptyList(), entries));
-
-    }
-
 }

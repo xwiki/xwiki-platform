@@ -1,6 +1,6 @@
 <div class="gradientfilterIE"></div>
 <div class="componentcontainer">
-<strong id="xwikicontentmenutitle" class="hidden">$msg.get('core.menu.content.title')</strong>
+<strong id="xwikicontentmenutitle" class="hidden">$services.localization.render('core.menu.content.title')</strong>
 <div class="rightmenu">
 </div>
 <div class="leftmenu">
@@ -11,32 +11,32 @@
   ## Edit menu
   ##
   #if($isAdvancedUser)
-    #xwikitopmenuentrystart($doc.getURL($editaction, $!languageparams) $msg.get('core.menu.edit') 'tmEdit' 'hasIcon')
-    #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $msg.get('core.menu.edit.wiki') 'tmEditWiki', '')
+    #xwikitopmenuentrystart($doc.getURL($editaction, $!languageparams) $services.localization.render('core.menu.edit') 'tmEdit' 'hasIcon')
+    #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '')
     #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) || $tdoc.syntax.toIdString() == 'xwiki/1.0')
-      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $msg.get('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '')
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '')
     #end
-    #submenuitem($doc.getURL($editaction, "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $msg.get('core.menu.edit.inline') 'tmEditInline', '')
+    #submenuitem($doc.getURL($editaction, "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '')
     #submenuseparator()
-    #submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.edit.rights') 'tmEditRights', '')
-    #submenuitem($doc.getURL('edit', 'editor=object') $msg.get('core.menu.edit.object') 'tmEditObject', '')
-    #submenuitem($doc.getURL('edit', 'editor=class') $msg.get('core.menu.edit.class') 'tmEditClass', '')
+    #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '')
+    #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '')
+    #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '')
     #xwikitopmenuentryend()
   #else ## !isAdvanced
-    #xwikitopmenuentry($doc.getURL($editaction, $!languageparams) $msg.get('core.menu.edit') 'tmEdit', 'hasIcon')
+    #xwikitopmenuentry($doc.getURL($editaction, $!languageparams) $services.localization.render('core.menu.edit') 'tmEdit', 'hasIcon')
   #end
   #if($keyboardShortcutsEnabled)
     <script type="text/javascript">
     //<![CDATA[
-      shortcut.add("$msg.get('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
       #if($isAdvancedUser)
-        shortcut.add("$msg.get('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$msg.get('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$msg.get('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$msg.get('core.shortcuts.view.rights')",function() { location.href=$('tmEditRights').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$msg.get('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.rights')",function() { location.href=$('tmEditRights').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         #if($hasAdmin)
-          shortcut.add("$msg.get('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+          shortcut.add("$services.localization.render('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         #end
       #end
     //]]>
@@ -47,16 +47,16 @@
 ## Export menu
 ##
 #if(!$doc.isNew())
-  #xwikitopmenuentrystart('' $msg.get('core.menu.export') 'tmExport' '')
+  #xwikitopmenuentrystart('' $services.localization.render('core.menu.export') 'tmExport' '')
   ## Preserve the document query string.
-  #submenuitem($doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())") $msg.get('core.menu.export.pdf') 'tmExportPdf', '')
-  #if("$!{oomanager.serverState}" == "Connected")
-    #submenuitem($doc.getURL('export', "format=odt&amp;$!request.getQueryString()") $msg.get('core.menu.export.odt') 'tmExportOdt', '')
+  #submenuitem($doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())") $services.localization.render('core.menu.export.pdf') 'tmExportPdf', '')
+  #if("$!{services.officemanager.serverState}" == "Connected")
+    #submenuitem($doc.getURL('export', "format=odt&amp;$!request.getQueryString()") $services.localization.render('core.menu.export.odt') 'tmExportOdt', '')
   #end
-  #submenuitem($doc.getURL('export', "format=rtf&amp;$!request.getQueryString()") $msg.get('core.menu.export.rtf') 'tmExportRtf', '')
-  #submenuitem($doc.getURL('export', "format=html&amp;$!request.getQueryString()") $msg.get('core.menu.export.html') 'tmExportHtml', '')
-  #if($hasAdmin)
-    #submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant") $msg.get('core.menu.export.xar') 'tmExportXar', '')
+  #submenuitem($doc.getURL('export', "format=rtf&amp;$!request.getQueryString()") $services.localization.render('core.menu.export.rtf') 'tmExportRtf', '')
+  #submenuitem($doc.getURL('export', "format=html&amp;$!request.getQueryString()") $services.localization.render('core.menu.export.html') 'tmExportHtml', '')
+  #if($hasAdmin && "$!xwiki.getPlugin('package')" != '')
+    #submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant") $services.localization.render('core.menu.export.xar') 'tmExportXar', '')
   #end
   #xwikitopmenuentryend()
 #end
@@ -64,9 +64,9 @@
 ## Actions menu
 ##
 #if(!$doc.isNew())
-  #xwikitopmenuentrystart('' $msg.get('core.menu.moreactions') 'tmMoreActions' '')
-  #submenuitem($doc.getURL('view', "xpage=print&amp;$!request.getQueryString()") $msg.get('core.menu.preview') 'tmPrintPreview', '')
-  #submenuitem($doc.getURL('view', "viewer=code") $msg.get('core.menu.view.source') 'tmViewSource', '')
+  #xwikitopmenuentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' '')
+  #submenuitem($doc.getURL('view', "xpage=print&amp;$!request.getQueryString()") $services.localization.render('core.menu.preview') 'tmPrintPreview', '')
+  #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '')
   #xwikitopmenuentryend()
 #end
 </div>

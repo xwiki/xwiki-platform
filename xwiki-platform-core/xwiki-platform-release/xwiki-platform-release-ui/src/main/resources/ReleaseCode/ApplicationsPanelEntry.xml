@@ -102,7 +102,7 @@
       <name>platform.release.releaseApplication</name>
     </property>
     <property>
-      <parameters>label=$msg.get('release.applicationsPanelEntryLabel')
+      <parameters>label=$services.localization.render('release.applicationsPanelEntryLabel')
 target=Release.WebHome
 icon=icon:tick</parameters>
     </property>

@@ -1485,7 +1485,19 @@ public class DOMUtils
             node = node.getParentElement();
         }
         // At this point, we should have an element to scroll into view.
-        ((Element) node).scrollIntoView();
+        scrollIntoView((Element) node);
+    }
+
+    /**
+     * Makes sure that the given DOM element is visible by scrolling it into view.
+     * 
+     * @param element the element to scroll into view
+     */
+    public void scrollIntoView(Element element)
+    {
+        if (element != null) {
+            element.scrollIntoView();
+        }
     }
 
     /**

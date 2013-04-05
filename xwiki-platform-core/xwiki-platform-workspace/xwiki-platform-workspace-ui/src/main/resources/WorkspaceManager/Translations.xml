@@ -23,6 +23,41 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>WorkspaceManager.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>31bb7dd5-7ccc-43e8-bed3-bd1a16eb355e</guid>
+    <property>
+      <scope>GLOBAL</scope>
+    </property>
+  </object>
   <content># Workspace Manager translation page
 
 # MESSAGES
@@ -30,7 +65,7 @@ workspacemanager.pluginnotenabled=The Workspace Manager java component is not in
 workspacemanager.template.install.success=Workspace template has been successfully installed.
 workspacemanager.template.install.error=Error installing workspace template. {0}
 workspacemanager.template.install.error.missingattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please re-import the [[{1}&gt;&gt;{1}]] document from the Workspaces Application XAR.
-workspacemanager.template.install.error.missingtemplateattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please attach a base template that will be used for all newly created workspaces. You can download one from [[here&gt;&gt;{2}]] and rename it to "{0}" before attaching it.
+workspacemanager.template.install.error.missingtemplateattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please attach a base template that will be used for all newly created workspaces. You can download the most recent "*.xar" file from [[here&gt;&gt;{2}]] and rename it to "{0}" before attaching it.
 workspacemanager.template.install.notYetComplete=The installation process is not yet complete.\n\
 \n\
 In order to finish the installation process, please log in as Admin and go to the page [[{0}&gt;&gt;{0}]].
@@ -52,7 +87,6 @@ workspacemanager.wikiname.error.wikialreadyexists=A wiki with this identifier al
 workspacemanager.wikiname.error.workspacealreadyexists=A workspace with this identifier already exists
 workspacemanager.wikiname.error.empty=Identifier can't be empty
 workspacemanager.wikiname.error.alreadyused=This identifier is already used
-workspacemanager.error.notinvirtualmode=The current XWiki installation is not in virtual mode. This means you can only access the main wiki. Make sure you have &lt;tt&gt;xwiki.virtual=1&lt;/tt&gt; in the &lt;tt&gt;xwiki.cfg&lt;/tt&gt; file.
 platform.workspace.templateNotInstalledInstallNow=Workspace template is not yet installed. Install the workspace template now?
 platform.workspace.templateMigrateSuccess=The existing default workspace template has been successfully migrated to the new format.
 platform.workspace.templateInstallConfirm=Install
@@ -169,6 +203,7 @@ platform.workspace.newWorkspaceTemplateLabel=Template
 WorkspaceManager.WorkspaceClass_membershipType_open=Open for any user to join
 WorkspaceManager.WorkspaceClass_membershipType_request=Any user can request to join but an admin must accept
 WorkspaceManager.WorkspaceClass_membershipType_invite=Only an admin can invite a user
+platform.workspace.searchSuggestSourceWorkspaces=Workspaces
 
 # PROPERTIES
 workspacemanager.prop.wiki.wikiname=Workspace Identifier

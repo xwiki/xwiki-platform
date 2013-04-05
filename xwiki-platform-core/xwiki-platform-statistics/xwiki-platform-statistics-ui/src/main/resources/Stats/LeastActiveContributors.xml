@@ -100,7 +100,7 @@
     </property>
     <property>
       <content>{{include document="Stats.Macros" /}}((({{velocity}}
-#panelheader($msg.get('xe.statistics.contributors.leastactive'))
+#panelheader($services.localization.render('xe.statistics.contributors.leastactive'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($period = $xwiki.criteriaService.periodFactory.ALL_TIME)

@@ -158,7 +158,7 @@ $xwiki.jsx.use('Blog.ManageCategories')##
 #getCategoriesHierarchy($doc.space $tree)
 #displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'editable')
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName))
-* (% class="blog-add-category-label" %)[[$msg.get('xe.blog.categories.addcategory')&gt;&gt;Blog.ManageCategories?xaction=showAddCategory&amp;parentCategory=${escapetool.url(${doc.fullName})}]](%%)
+* (% class="blog-add-category-label" %)[[$services.localization.render('xe.blog.categories.addcategory')&gt;&gt;Blog.ManageCategories?xaction=showAddCategory&amp;parentCategory=${escapetool.url(${doc.fullName})}]](%%)
 ##
 #if("$!{request.xaction}" == 'showAddCategory' &amp;&amp; "$!{request.parentCategory}" == ${doc.fullName}) #addCategoryForm() #end
 ##

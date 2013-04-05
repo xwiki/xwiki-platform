@@ -180,9 +180,9 @@
 #set ($obj = $doc.getObject($xwikiUsersClassName))
 ##
 #if (!$obj)
-= $msg.get('xe.admin.users.sheet') =
+= $services.localization.render('xe.admin.users.sheet') =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
+{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
 
 #else
 ## Make sure we only care about properties of the user object and don't get polluted by other objects that might be in the user's profile page.
@@ -197,7 +197,7 @@
 ##
 {{html clean='false' wiki='true'}}
 #set($username = $xwiki.getUserName($doc.fullName, false))
-= $msg.get('platform.core.profile.title', [$username]) =
+= $services.localization.render('platform.core.profile.title', [$username]) =
 
 #if (!$inEditMode)
   &lt;div class="vcard"&gt;
@@ -206,7 +206,7 @@
   &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
     &lt;div class='userInfo'&gt;
     #if($context.action == 'view' &amp;&amp; $hasEdit)
-      &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$msg.get('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
     #end
     ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
     #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
@@ -219,7 +219,7 @@
       #set ($sectionName = "#evaluate($!sectionName)")
       ## If there is no section name specified, use the default translations prefix for the user profile, maybe we get lucky.
       #if ("$!sectionName" == '')
-        #set ($sectionName = $msg.get("platform.core.profile.section.${sectionId}"))
+        #set ($sectionName = $services.localization.render("platform.core.profile.section.${sectionId}"))
       #end
       ## If that does not work either, just display the sectionID.
       #if ("$!sectionName" == "platform.core.profile.section.${sectionId}")
@@ -253,7 +253,7 @@
     &lt;div class='half column'&gt;
       #if (!$isGuest)
       &lt;div class='userMessage profile-section'&gt;
-        &lt;h1&gt;$msg.get('platform.core.profile.section.sendMessage')&lt;/h1&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.sendMessage')&lt;/h1&gt;
 
           {{messageSender /}}
 
@@ -261,18 +261,18 @@
       #end
       &lt;div class='userRecentChanges'&gt;
       #if ($context.user == $doc.fullName)
-        &lt;h1&gt;$msg.get('platform.core.profile.section.activity')&lt;/h1&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h1&gt;
       #else
-        &lt;h1&gt;$msg.get('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
         &lt;div class='activity-follow'&gt;
           #set ($xredirect = $doc.getURL($context.action, $request.queryString))
           #if ($xwiki.watchlist.isUserWatched(${doc.prefixedFullName}))
-          &lt;span class='following'&gt;$msg.get('xe.activity.messages.following')&lt;/span&gt;
-          &lt;a class='action unfollow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.unfollow')&lt;/a&gt;
+          &lt;span class='following'&gt;$services.localization.render('xe.activity.messages.following')&lt;/span&gt;
+          &lt;a class='action unfollow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
           #else
-          &lt;a class='action follow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.follow')&lt;/a&gt;
+          &lt;a class='action follow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.follow')&lt;/a&gt;
           #end
         &lt;/div&gt;
         #end

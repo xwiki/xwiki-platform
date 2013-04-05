@@ -21,12 +21,13 @@ package org.xwiki.extension.distribution.internal;
 
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.XWikiAction;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiAction;
 
 /**
  * Action used to apply various distribution related actions. We create a special action to make sure to execute the
@@ -47,7 +48,7 @@ public class DistributionAction extends XWikiAction
     /**
      * The reference of the superadmin user document.
      */
-    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", "XWiki",
+    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", XWiki.SYSTEM_SPACE,
         XWikiRightService.SUPERADMIN_USER);
 
     @Override
@@ -58,15 +59,24 @@ public class DistributionAction extends XWikiAction
         // Disallow template override with xpage parameter.
         if (!DISTRIBUTION_ACTION.equals(Utils.getPage(context.getRequest(), DISTRIBUTION_ACTION))) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                                     String.format("Template may not be overriden with 'xpage' in [%s] action.",
-                                                   DISTRIBUTION_ACTION));
+                String.format("Template may not be overriden with 'xpage' in [%s] action.", DISTRIBUTION_ACTION));
+        }
+
+        DistributionManager distributionManager = Utils.getComponent(DistributionManager.class);
+        if (!distributionManager.canDisplayDistributionWizard()) {
+            if (context.getUserReference() == null) {
+                context.getWiki().getAuthService().showLogin(context);
+                return false;
+            } else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    String.format("Current user need proper rights to access action [%].", DISTRIBUTION_ACTION));
+            }
         }
 
         // Make sure to have programming rights
         // TODO: find something nicer
         XWikiDocument document =
-            new XWikiDocument(new DocumentReference(context.getDatabase(), SUPERADMIN_REFERENCE.getLastSpaceReference()
-                .getName(), "Distribution"));
+            new XWikiDocument(new DocumentReference(context.getDatabase(), XWiki.SYSTEM_SPACE, "Distribution"));
         document.setContentAuthorReference(SUPERADMIN_REFERENCE);
         document.setAuthorReference(SUPERADMIN_REFERENCE);
         document.setCreatorReference(SUPERADMIN_REFERENCE);

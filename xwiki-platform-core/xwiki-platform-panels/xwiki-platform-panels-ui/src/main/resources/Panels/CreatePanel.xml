@@ -15,7 +15,7 @@
   <date>1252454400000</date>
   <contentUpdateDate>1252454400000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.panels.create")</title>
+  <title>$services.localization.render('xe.panels.create')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -30,9 +30,9 @@
     &lt;div&gt;
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="create" value="1"/&gt;
-      &lt;label for="panelTitle" class="hidden"&gt;$msg.get('xe.panels.create.title')&lt;/label&gt;
-      &lt;input type="text" id="panelTitle" name="panelTitle" value="$msg.get('xe.panels.create.title')" class="panelinput withTip" /&gt;
-      &lt;input type="submit" class="button" value="$msg.get('create')"/&gt;
+      &lt;label for="panelTitle" class="hidden"&gt;$services.localization.render('xe.panels.create.title')&lt;/label&gt;
+      &lt;input type="text" id="panelTitle" name="panelTitle" value="$services.localization.render('xe.panels.create.title')" class="panelinput withTip" /&gt;
+      &lt;input type="submit" class="button" value="$services.localization.render('create')"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}##

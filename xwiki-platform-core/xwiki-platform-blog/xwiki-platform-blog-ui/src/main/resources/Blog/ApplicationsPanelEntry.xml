@@ -96,7 +96,7 @@
       <content/>
     </property>
     <property>
-      <parameters>label=$msg.get('xe.panels.quicklinks.blog')
+      <parameters>label=$services.localization.render('xe.panels.quicklinks.blog')
 target=Blog.WebHome
 icon=icon:transmit</parameters>
     </property>

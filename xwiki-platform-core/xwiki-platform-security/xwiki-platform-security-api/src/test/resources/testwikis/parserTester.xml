@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<!-- Used by TestDefinitionTestParser#testDefinitionTestParser() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin">
+    <user name="userA" />
+    <user name="userB" />
+    <group name="groupA">
+      <user name="userA" />
+      <user name="userB" />
+    </group>
+    <group name="groupB" />
+    <allowUser name="userA" />
+    <denyUser name="userA" />
+    <allowUser name="userB" type="view" />
+    <denyUser name="userB" type="view" />
+    <allowUser name="groupA" type="view" />
+    <denyUser name="groupB" type="view" />
+    <space name="space1" alt="space 1">
+      <denyUser name="userA" />
+      <denyUser name="userB" type="view" />
+      <denyUser name="groupB" type="view" />
+      <document name="document1" alt="Document 1">
+        <allowUser name="userA" />
+        <allowUser name="userB" type="view" />
+        <allowUser name="groupA" type="view" />
+      </document>
+      <document name="document2" alt="Document 1" />
+    </space>
+    <space name="space2" alt="space 2"/>
+  </wiki>
+  <wiki name="wiki1" alt="subwiki 1">
+    <group name="groupA">
+      <user name="wiki:XWiki.userA" />
+    </group>
+  </wiki>
+  <wiki name="wiki2" alt="subwiki 2" />
+</wikis>

@@ -53,9 +53,9 @@ public class AnchorFilter extends AbstractHTMLFilter
         List<Element> anchorsTofix = new ArrayList<Element>();
         for (Element link : links) {
             if (isAnchor(link)) {
-                // OO server generates html content like:
+                // The office server generates HTML content like:
                 // <body><a name="table1"><h1>Sheet 1: <em>Hello</em></h1></a><body>
-                // And the html cleaner converts this invalid xhtml into following xhtml:
+                // And the HTML cleaner converts this invalid XHTML into following XHTML:
                 // <p><a name="table1"/></p><h1><a name=\"table1\">Sheet 1: <em>Hello</em></a></h1>
                 // We need to make sure that the duplicate anchor inside the <h1> tag is removed
                 Node heading = link.getParentNode();
@@ -63,7 +63,7 @@ public class AnchorFilter extends AbstractHTMLFilter
                 Node originalAnchor =
                     (paragraph instanceof Element) ? ((Element) paragraph).getElementsByTagName(TAG_A).item(0) : null;
                 if (isSameAnchor(link, originalAnchor)) {
-                    // Means this anchor was a result of close-before-copy-inside operation of default html cleaner.
+                    // Means this anchor was a result of close-before-copy-inside operation of default HTML cleaner.
                     anchorsToRemove.add(link);
                 } else {
                     anchorsTofix.add(link);

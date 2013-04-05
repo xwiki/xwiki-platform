@@ -46,10 +46,11 @@ public abstract class AbstractTest
     public final TestName testName = new TestName();
 
     /**
-     * Used for ignoring tests that use {@link IgnoreBrowser} and {@link IgnoreBrowsers} annotations.
+     * Used for ignoring tests that use {@link org.xwiki.test.ui.browser.IgnoreBrowser} and
+     * {@link org.xwiki.test.ui.browser.IgnoreBrowsers} annotations.
      */
     @Rule
-    public BrowserTestRule browseMethodRule = new BrowserTestRule(getDriver());
+    public BrowserTestRule browserRule = new BrowserTestRule(getDriver());
 
     /**
      * Generates debugging information on test failure.

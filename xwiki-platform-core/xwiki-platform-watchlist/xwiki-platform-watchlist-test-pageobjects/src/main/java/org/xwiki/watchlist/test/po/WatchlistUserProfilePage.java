@@ -22,8 +22,8 @@ package org.xwiki.watchlist.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.administration.test.po.AbstractUserProfilePage;
 import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.user.test.po.AbstractUserProfilePage;
 import org.xwiki.watchlist.test.po.editor.WatchlistPreferencesEditPage;
 
 /**

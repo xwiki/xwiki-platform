@@ -30,7 +30,7 @@ $response.setContentType('application/x-json')
     #end
     #set($wikiname = $xwiki.getDocument($m).getWiki())
     #if($wikiname != 'xwiki' || $wikiname == $xcontext.database) #set($wikiname = 'local') #end
-    #set($emptyValue = $msg.get('xe.admin.groups.emptyvalue'))
+    #set($emptyValue = $services.localization.render('xe.admin.groups.emptyvalue'))
     #if( $velocityCount > 1 ) , #end
    {
     "fullname"     : "$m",

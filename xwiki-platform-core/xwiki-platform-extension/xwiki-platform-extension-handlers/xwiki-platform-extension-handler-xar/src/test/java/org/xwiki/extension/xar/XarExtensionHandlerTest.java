@@ -262,9 +262,6 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                     }
                 });
 
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(true));
-
                 allowing(mockXWiki).getStore();
                 will(returnValue(mockStore));
 

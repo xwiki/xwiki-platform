@@ -35,8 +35,8 @@ import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
- * XWiki.XWikiServerClass class.
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager XClassManager} implementation
+ * for XWiki.XWikiServerClass class.
  * 
  * @version $Id$
  * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
@@ -293,7 +293,13 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         try {
             context.setDatabase(context.getMainXWiki());
 
-            super.check(context);
+            // Ensure that the baseClass private variable of the AbstractXClassManager extended class is properly
+            // initialized. Here we are assuming that the new XWikiServerClassDocumentInitializer already took care of
+            // initializing the class document in the database.
+            super.checkClassDocument(context);
+
+            // Ensure that the template document exists.
+            super.checkClassTemplateDocument(context);
         } finally {
             context.setDatabase(database);
         }
@@ -302,24 +308,9 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     @Override
     protected boolean updateBaseClass(BaseClass baseClass)
     {
-        boolean needsUpdate = super.updateBaseClass(baseClass);
-
-        baseClass.setName(getClassFullName());
-
-        needsUpdate |= baseClass.addTextField(FIELD_WIKIPRETTYNAME, FIELDPN_WIKIPRETTYNAME, 30);
-        needsUpdate |= baseClass.addUsersField(FIELD_OWNER, FIELDPN_OWNER, false);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
-        needsUpdate |= baseClass.addTextField(FIELD_SERVER, FIELDPN_SERVER, 30);
-        needsUpdate |= baseClass.addStaticListField(FIELD_VISIBILITY, FIELDPN_VISIBILITY, FIELDL_VISIBILITY);
-        needsUpdate |= baseClass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
-        needsUpdate |= baseClass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
-        needsUpdate |= baseClass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE);
-        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_SECURE, DEFAULT_SECURE);
-        needsUpdate |= baseClass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
-        needsUpdate |= baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE);
-        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
-
-        return needsUpdate;
+        // We make sure that the default implementation is not called and that we always use the database version of the
+        // class, as initialized by super.checkClassDocument(context) above.
+        return false;
     }
 
     @Override

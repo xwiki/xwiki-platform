@@ -18,9 +18,9 @@
   #getFieldSummary($obj $firstField $firstFieldSummary)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
     <h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstField): $firstFieldSummary#end
-        <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$msg.get('core.editors.object.removeObject.tooltip')">$msg.get('core.editors.object.removeObject')</a>
+        <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
         #if (!$hasCustomObject)
-          <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$msg.get('core.editors.object.editSingleObject.tooltip')">$msg.get('core.editors.object.editSingleObject')</a>
+          <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
         #end
     </h3>
   </div>
@@ -42,7 +42,7 @@
     #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
     #if ($deprecatedProperties.size() > 0)
     <div class="box warningmessage deprecatedProperties">
-      <strong>$msg.get('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
+      <strong>$services.localization.render('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
       <dl>
       #foreach ($prop in $deprecatedProperties)
         <dt class="label disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
@@ -51,7 +51,7 @@
       </dl>
       <div>
         <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
-           title="$msg.get('core.editors.object.removeDeprecatedProperties.link.tooltip')">$msg.get('core.editors.object.removeDeprecatedProperties.link')</a>
+           title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.link')</a>
       </div>
     </div>
     #end
@@ -116,12 +116,12 @@
         #displayObject($object $class $props $titleField)
         </div></div>
       #else
-        #warning($msg.get('core.editors.object.noObject'))
+        #warning($services.localization.render('core.editors.object.noObject'))
       #end
     #else
       #set ($objects = $doc.getObjects($class.name))
       #set ($objectCount = $listtool.size($objects))
-      <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>$msg.get('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) <span id="xclass_${escapetool.xml($class.name)}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span></h2></div>
+      <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>$services.localization.render('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) <span id="xclass_${escapetool.xml($class.name)}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span></h2></div>
       <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
       #foreach ($object in $objects)
         #displayObject($object $class $props $titleField)
@@ -139,7 +139,7 @@
 #macro(displayAddObject $class)
   <div id="add_xobject_${escapetool.xml($class.name)}" class="add_xobject">
     <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
-      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$msg.get('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$msg.get('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
     </div>
   </div>
 #end
@@ -149,9 +149,9 @@
  * Display a control for adding an object from a chosen class
  *#
 #macro(displayAddObjectChooseClass)
-  <div id="add_xobject" class="add_xobject"> <label for="classname" class="add_xobject-title">$msg.get('core.editors.object.add.label'):</label>
+  <div id="add_xobject" class="add_xobject"> <label for="classname" class="add_xobject-title">$services.localization.render('core.editors.object.add.label'):</label>
   <select id="classname" name="classname" size="1">
-    <option value="-">$msg.get('core.editors.object.add.selectClass')</option>
+    <option value="-">$services.localization.render('core.editors.object.add.selectClass')</option>
     ## Existing classes are enumerated, grouped by space name.
     ## The list is already sorted alphabetically
 #set($prevSpace = '')
@@ -172,7 +172,7 @@
   </optgroup>
 #end
 </select>
-<span class="buttonwrapper"><input type="submit" name="action_objectadd" value="$msg.get('core.editors.object.add.submit')" class="button xobject-add-control"/></span>
+<span class="buttonwrapper"><input type="submit" name="action_objectadd" value="$services.localization.render('core.editors.object.add.submit')" class="button xobject-add-control"/></span>
   </div> ## add_object
 #end
 ##
@@ -196,8 +196,8 @@
   #end
   #if ($mustSync)
     <div class="box warningmessage deprecatedProperties">
-      $msg.get('core.editors.object.removeDeprecatedProperties.all.info')
-      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$msg.get('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">$msg.get('core.editors.object.removeDeprecatedProperties.all.link')</a></div>
+      $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
+      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')</a></div>
     </div>
   #end
 #end ## checkPropertyDeprecation
@@ -212,7 +212,7 @@
   #set ($props = $class.getProperties())
   #if ($listtool.isEmpty($props))
     $response.setStatus(404)
-    #error($msg.get('core.editors.object.add.invalidClassName', [$request.className]))
+    #error($services.localization.render('core.editors.object.add.invalidClassName', [$request.className]))
   #else
     #set ($isNewClass = $listtool.isEmpty($doc.getObjects(${request.className})))
     #set ($newobj = $doc.newObject(${request.className}))
@@ -262,13 +262,13 @@
   #if ($hasCustomClass || $hasCustomObject || $hasCustomField)
     #set ($fullEditorURL = "$doc.getURL('edit', 'editor=object')")
     <div class="more-actions">
-      <a href='$fullEditorURL' class='edit-all' title="$msg.get('core.editors.object.editAllObjects')">$msg.get('core.editors.object.editAllObjects')</a>
+      <a href='$fullEditorURL' class='edit-all' title="$services.localization.render('core.editors.object.editAllObjects')">$services.localization.render('core.editors.object.editAllObjects')</a>
     </div>
   #end
   #set ($redirect = $xwiki.relativeRequestURL)
   <form id="update" method="post" action="$doc.getURL("save")" class="withLock">
   <div id="xwikieditcontent" class="clear">
-  <div id="document-title"><h1>$msg.get('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
+  <div id="document-title"><h1>$services.localization.render('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
 
   #checkPropertyDeprecation()
 

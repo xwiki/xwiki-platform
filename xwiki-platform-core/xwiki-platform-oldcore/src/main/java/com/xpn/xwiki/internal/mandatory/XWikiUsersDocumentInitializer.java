@@ -130,7 +130,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
             builder.append("    #if($xwiki.jodatime)\n");
             builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
             builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
+                + "$services.localization.render('XWiki.XWikiPreferences_timezone_default')</option>\n");
             builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
             builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
                 + "$tz</option>\n");

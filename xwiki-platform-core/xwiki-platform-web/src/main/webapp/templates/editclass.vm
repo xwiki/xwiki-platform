@@ -22,7 +22,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 <form id="switch-xclass" method="post" action="$doc.getURL('redirect')">
   <div>
     <select id="classname" name="xredirect" size="1">
-      <option value="-" selected='selected'>$msg.get('core.editors.class.switchClass')</option>
+      <option value="-" selected='selected'>$services.localization.render('core.editors.class.switchClass')</option>
       ##
       ## Existing classes are enumerated, grouped by space name.
       ## The list is already sorted alphabetically
@@ -45,9 +45,9 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
         </optgroup>
       #end
     </select>
-    <span class="buttonwrapper"><input class="button" type="submit" value="$msg.get('core.editors.class.switchClass.submit')"/></span>
+    <span class="buttonwrapper"><input class="button" type="submit" value="$services.localization.render('core.editors.class.switchClass.submit')"/></span>
   </div>
-  #warning($msg.get('core.editors.class.switchClass.warning'))
+  #warning($services.localization.render('core.editors.class.switchClass.warning'))
 </form>
 #end
 ##
@@ -63,7 +63,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
     <div id="xproperty_${field.name}_title" class="xproperty-title ${field.type}">
       <h2>$!{escapetool.xml($doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field))}
       ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field): $xwiki.metaclass.get($field.classType).prettyName)</h2>
-      <div class="tools propertyTools"><a href='$doc.getURL('propdelete', "propname=${field.name}&amp;form_token=$!{services.csrf.getToken()}")' title="$msg.get('core.editors.class.deleteProperty.tooltip', [${field.name}])" class="tool delete">$msg.get('core.editors.class.deleteProperty.text')</a></div>
+      <div class="tools propertyTools"><a href='$doc.getURL('propdelete', "propname=${field.name}&amp;form_token=$!{services.csrf.getToken()}")' title="$services.localization.render('core.editors.class.deleteProperty.tooltip', [${field.name}])" class="tool delete">$services.localization.render('core.editors.class.deleteProperty.text')</a></div>
     </div>
     <div id="xproperty_${field.name}_content" class="xproperty-content"><div>
       <div class="disabletool">
@@ -93,16 +93,16 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
  *#
 #macro(addPropertyForm)
   <div id="add_xproperty">
-    <label for="propname" class="property-name-label">$msg.get('core.editors.class.addProperty.name.label')</label>
+    <label for="propname" class="property-name-label">$services.localization.render('core.editors.class.addProperty.name.label')</label>
     <input type="text" id="propname" name="propname" value="name" size="20" class='withTip'/>
-    <label for="proptype" class="property-type-label">$msg.get('core.editors.class.addProperty.type.label'):</label>
+    <label for="proptype" class="property-type-label">$services.localization.render('core.editors.class.addProperty.type.label'):</label>
     <select id="proptype" name="proptype" size="1">
       #foreach($prop in $xwiki.metaclass.properties)
         <option value="${prop.name}">${escapetool.xml($prop.prettyName)}</option>
       #end
     </select>
     <span class="buttonwrapper">
-      <input type="submit" class="button" value="$msg.get('core.editors.class.addProperty.submit')" name="action_propadd"/>
+      <input type="submit" class="button" value="$services.localization.render('core.editors.class.addProperty.submit')" name="action_propadd"/>
     </span>
   </div>
 #end
@@ -124,7 +124,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #set($redirect = $xwiki.relativeRequestURL)
 ##
 ##
-<div id="document-title"><h1>$msg.get('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])</h1></div>
+<div id="document-title"><h1>$services.localization.render('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])</h1></div>
 #classSwitcher()
 ##
 ##

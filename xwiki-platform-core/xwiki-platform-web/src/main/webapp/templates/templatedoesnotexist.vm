@@ -5,7 +5,7 @@ $response.setStatus(400)
 #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
 #else
-#xwikimessageboxstart($msg.get("error") $msg.get("thistemplatedoesnotexist"))
+#xwikimessageboxstart($services.localization.render('error') $services.localization.render('thistemplatedoesnotexist'))
 $!exception
 #xwikimessageboxend()
 #end

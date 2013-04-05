@@ -17,117 +17,274 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.xwiki.security.authorization;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.io.File;
 
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.xwiki.model.EntityType;
-import org.xwiki.security.AbstractSecurityTestCase;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.testwikis.TestDefinition;
+import org.xwiki.security.authorization.testwikis.TestDefinitionParser;
+import org.xwiki.security.authorization.testwikis.TestDocument;
+import org.xwiki.security.authorization.testwikis.TestEntity;
+import org.xwiki.security.authorization.testwikis.TestSpace;
+import org.xwiki.security.authorization.testwikis.TestWiki;
+import org.xwiki.security.authorization.testwikis.internal.parser.DefaultTestDefinitionParser;
+import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-import static org.xwiki.security.authorization.RuleState.ALLOW;
-import static org.xwiki.security.authorization.RuleState.DENY;
+import static org.xwiki.security.authorization.Right.ADMIN;
+import static org.xwiki.security.authorization.Right.CREATOR;
+import static org.xwiki.security.authorization.Right.DELETE;
+import static org.xwiki.security.authorization.Right.ILLEGAL;
+import static org.xwiki.security.authorization.Right.LOGIN;
+import static org.xwiki.security.authorization.Right.PROGRAM;
+import static org.xwiki.security.authorization.Right.REGISTER;
+
 
 /**
- * A base class for authorization tests, defining some additional Rights.
+ * Abstract class that should be inherited when writing tests case based on XML based mocked wikis for testing
+ * authorization.
  *
  * @version $Id$
- * @since 4.0M2
+ * @since 5.0M2
  */
-public class AbstractAuthorizationTestCase extends AbstractSecurityTestCase
+@ComponentList({DefaultStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class,
+    DefaultEntityReferenceValueProvider.class, DefaultModelConfiguration.class})
+public abstract class AbstractAuthorizationTestCase
 {
-    private static class TestRightDescription implements RightDescription
-    {
-        String name;
-        RuleState defaultState;
-        RuleState tieResolution;
-        boolean override;
-        Set<Right> impliedRights;
-        
-        TestRightDescription(String name, RuleState defaultState, RuleState tieResolution, boolean override)
-        {
-            this.name = name;
-            this.defaultState = defaultState;
-            this.tieResolution = tieResolution;
-            this.override = override;
-        }
+    /** SuperAdmin user. */
+    protected static final DocumentReference SUPERADMIN = new DocumentReference("anyWiki", "anySpace", "SuperAdmin");
 
-        TestRightDescription(String name, RuleState defaultState, RuleState tieResolution, boolean override, 
-            Set<Right> impliedRights)
-        {
-            this(name, defaultState, tieResolution, override);
-            this.impliedRights = impliedRights;
-        }
-        
-        @Override
-        public String getName()
-        {
-            return name;
-        }
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM. */
+    protected static final RightSet ALL_RIGHTS = new RightSet();
 
-        @Override
-        public RuleState getDefaultState()
-        {
-            return defaultState;
-        }
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN. */
+    protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING = new RightSet();
 
-        @Override
-        public RuleState getTieResolutionPolicy()
-        {
-            return tieResolution;
-        }
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN. */
+    protected static final RightSet ALL_RIGHTS_EXCEPT_ADMIN = new RightSet();
 
-        @Override
-        public boolean getInheritanceOverridePolicy()
-        {
-            return override;
-        }
+    /** VIEW, EDIT, COMMENT, DELETE, ADMIN. */
+    protected static final RightSet ALL_SPACE_RIGHTS = new RightSet();
 
-        @Override
-        public Set<Right> getImpliedRights()
-        {
-            return impliedRights;
-        }
+    /** VIEW, EDIT, COMMENT, REGISTER, LOGIN. */
+    protected static final RightSet DEFAULT_DOCUMENT_RIGHTS = new RightSet();
 
-        @Override
-        public Set<EntityType> getTargetedEntityType()
-        {
-            return Right.WIKI_SPACE_DOCUMENT;
-        }
+    /** VIEW, EDIT, COMMENT, DELETE. */
+    protected static final RightSet ALL_DOCUMENT_RIGHTS = new RightSet();
 
-        @Override
-        public boolean isReadOnly()
-        {
-            return false;
+    static {
+        for(Right right : Right.values()) {
+            if (right != ILLEGAL && right != CREATOR) {
+                ALL_RIGHTS.add(right);
+                if (right != PROGRAM) {
+                    ALL_RIGHTS_EXCEPT_PROGRAMING.add(right);
+                    if (right != ADMIN) {
+                        ALL_RIGHTS_EXCEPT_ADMIN.add(right);
+                        if (right != LOGIN && right != REGISTER) {
+                            ALL_DOCUMENT_RIGHTS.add(right);
+                        }
+                        if (right != DELETE) {
+                            DEFAULT_DOCUMENT_RIGHTS.add(right);
+                        }
+                    }
+                    if (right != LOGIN && right != REGISTER) {
+                        ALL_SPACE_RIGHTS.add(right);
+                    }
+                }
+            }
         }
     }
-    
-    protected static List<Right> allTestRights = new ArrayList<Right>();
 
-    protected static Right impliedTestRightsADT;
-    protected static Right impliedTestRightsDAF;
+    @Rule
+    public final MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
-    @BeforeClass
-    public static void oneTimeSetUp()
+    /** Current wiki mock. */
+    protected TestDefinition testDefinition;
+
+    /**
+     * Initialize the test by loading wikis form XML.
+     * @param filename the filename without extension
+     * @return the test wikis, also available using {@link #testDefinition}
+     * @throws Exception on error.
+     */
+    protected TestDefinition initialiseWikiMock(String filename) throws Exception
     {
-        allTestRights.add(getNewTestRight("AllowAllowTrue", ALLOW, ALLOW, true));
-        allTestRights.add(getNewTestRight("AllowAllowFalse", ALLOW, ALLOW, false));
-        allTestRights.add(getNewTestRight("AllowDenyTrue", ALLOW, DENY, true));
-        allTestRights.add(getNewTestRight("AllowDenyFalse", ALLOW, DENY, false));
-        allTestRights.add(getNewTestRight("DenyAllowTrue", DENY, ALLOW, true));
-        allTestRights.add(getNewTestRight("DenyAllowFalse", DENY, ALLOW, false));
-        allTestRights.add(getNewTestRight("DenyDenyTrue", DENY, DENY, true));
-        allTestRights.add(getNewTestRight("DenyDenyFalse", DENY, DENY, false));
+        TestDefinitionParser parser = new DefaultTestDefinitionParser();
 
-        Set<Right> allTestRightSet = new RightSet(allTestRights);
-        
-        impliedTestRightsADT = new Right(new TestRightDescription("impliedTestRightsADT", ALLOW, DENY, true, allTestRightSet));
-        impliedTestRightsDAF = new Right(new TestRightDescription("impliedTestRightsDAF", DENY, ALLOW, false, allTestRightSet));
+        EntityReferenceResolver<String> resolver =
+            componentManager.getInstance(EntityReferenceResolver.TYPE_STRING);
+        EntityReferenceSerializer<String> serializer =
+            componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+
+        testDefinition = parser.parse("testwikis" + File.separator + filename + ".xml", resolver, serializer);
+        return testDefinition;
     }
-    
-    public static Right getNewTestRight(String name, RuleState defaultValue, RuleState tieResolution, boolean overridePolicy) {
-        return new Right(new TestRightDescription(name, defaultValue, tieResolution, overridePolicy));
+
+    /**
+     * @param name user name.
+     * @return a reference to a user in the main wiki.
+     */
+    protected DocumentReference getXUser(String name)
+    {
+        return new DocumentReference(name, getXSpace(XWikiConstants.XWIKI_SPACE));
+    }
+
+    /**
+     * @param name user name.
+     * @param wiki subwiki name.
+     * @return a reference to a user in a sub wiki.
+     */
+    protected DocumentReference getUser(String name, String wiki)
+    {
+        return new DocumentReference(name,
+            new SpaceReference(XWikiConstants.XWIKI_SPACE, testDefinition.getWiki(wiki).getWikiReference()));
+    }
+
+    /**
+     * @return a reference to the main wiki.
+     */
+    protected WikiReference getXWiki()
+    {
+        return testDefinition.getMainWiki().getWikiReference();
+    }
+
+    /**
+     * @param name subwiki name.
+     * @return a reference to a subwiki.
+     */
+    protected WikiReference getWiki(String name)
+    {
+        return new WikiReference(name);
+    }
+
+    /**
+     * @param space space name.
+     * @return a reference to a space in the main wiki.
+     */
+    protected SpaceReference getXSpace(String space)
+    {
+        return new SpaceReference(space, testDefinition.getMainWiki().getWikiReference());
+    }
+
+    /**
+     * @param space space name.
+     * @param wiki subwiki name.
+     * @return a reference to a space in a subwiki.
+     */
+    protected SpaceReference getSpace(String space, String wiki)
+    {
+        return new SpaceReference(space, new WikiReference(wiki));
+    }
+
+    /**
+     * @param name document name.
+     * @param space space name.
+     * @return a reference to a document in a space of the main wiki.
+     */
+    protected DocumentReference getXDoc(String name, String space)
+    {
+        return new DocumentReference(name, new SpaceReference(space, testDefinition.getMainWiki().getWikiReference()));
+    }
+
+    /**
+     * @param name document name.
+     * @param space space name.
+     * @param wiki subwiki name.
+     * @return a reference to a document in a space of a subwiki.
+     */
+    protected DocumentReference getDoc(String name, String space, String wiki)
+    {
+        return new DocumentReference(name, new SpaceReference(space, new WikiReference(wiki)));
+    }
+
+    /**
+     * @param user user reference.
+     * @return a pretty name for the user based on entities "alt" attributes or their names.
+     */
+    protected String getUserReadableName(DocumentReference user) {
+        if (user == null) {
+            return "Public";
+        }
+
+        TestEntity userEntity = testDefinition.searchEntity(user);
+        String result = (userEntity != null && userEntity instanceof TestDocument)
+            ? ((TestDocument) userEntity).getDescription() : null;
+        result = (result != null) ? result : user.getName();
+
+        TestWiki wiki = testDefinition.getWiki(user.getWikiReference());
+        String name = (wiki != null) ? wiki.getDescription() : null;
+        name = (name != null) ? name : user.getWikiReference().getName();
+        if (!name.startsWith("any")) {
+            result += " from " + name;
+        }
+
+        return result;
+    }
+
+    /**
+     * @param entity user reference.
+     * @return a pretty name for the user based on entities "alt" attributes or their names.
+     */
+    protected String getEntityReadableName(EntityReference entity) {
+        if (entity == null) {
+            return "Main Wiki";
+        }
+
+        StringBuilder result = null;
+
+        if (entity.getType() == EntityType.DOCUMENT) {
+            TestEntity docEntity = testDefinition.searchEntity(entity);
+            String name = (docEntity != null && docEntity instanceof TestDocument)
+                ? ((TestDocument)docEntity).getDescription() : null;
+            name = (name != null) ? name : entity.getName();
+            result = new StringBuilder(name);
+            entity = entity.getParent();
+        }
+
+        if (entity.getType() == EntityType.SPACE) {
+            TestEntity spaceEntity = testDefinition.searchEntity(entity);
+            String name = (spaceEntity != null && spaceEntity instanceof TestSpace)
+                ? ((TestSpace) spaceEntity).getDescription() : null;
+            name = (name != null) ? name : entity.getName();
+            if (result == null || !name.startsWith("any")) {
+                if (result != null) {
+                    result.append(" in ");
+                    result.append(name);
+                } else {
+                    result = new StringBuilder(name);
+                }
+            }
+            entity = entity.getParent();
+        }
+
+        if (entity.getType() == EntityType.WIKI) {
+            TestEntity wikiEntity = testDefinition.getWiki(new WikiReference(entity));
+            String name = (wikiEntity != null) ? ((TestWiki) wikiEntity).getDescription() : null;
+            name = (name != null) ? name : entity.getName();
+            if (result == null || !name.startsWith("any")) {
+                if (result != null) {
+                    result.append(" from ");
+                    result.append(name);
+                } else {
+                    result = new StringBuilder(name);
+                }
+            }
+        }
+
+        return result.toString();
     }
 }

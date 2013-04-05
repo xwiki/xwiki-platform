@@ -15,7 +15,7 @@
   <date>1307113397000</date>
   <contentUpdateDate>1307113397000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("workspacemanager.browse")</title>
+  <title>$services.localization.render('workspacemanager.browse')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -151,7 +151,7 @@
   #set($discard = $columns.add('_actions'))
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'delete'] }))
 #end
-[[$msg.get('platform.workspace.createNewWorkspaceLabel')&gt;&gt;CreateNewWorkspace]]
+[[{{translation key="platform.workspace.createNewWorkspaceLabel"/}}&gt;&gt;CreateNewWorkspace]]
 #livetable('workspaces', $columns, $columnsProperties, $options)
 {{/velocity}}</content>
 </xwikidoc>

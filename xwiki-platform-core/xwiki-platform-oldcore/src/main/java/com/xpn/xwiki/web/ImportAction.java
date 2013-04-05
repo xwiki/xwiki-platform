@@ -50,7 +50,7 @@ public class ImportAction extends XWikiAction
             String action = request.get("action");
             String[] pages = request.getParameterValues("pages");
 
-            if (!context.getWiki().getRightService().hasAdminRights(context)) {
+            if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
                 context.put("message", "needadminrights");
                 return "exception";
             }

@@ -108,10 +108,10 @@
       <content>{{velocity}}
 #set ($pages = $tdoc.includedPages)
 #if ($pages.size() &gt; 0 || $showEmptyPanels)
-#largepanelheader($msg.get('xe.panels.includedDocs.title'))
-$msg.get('xe.panels.includedDocs.count', [$pages.size()])
+#largepanelheader($services.localization.render('xe.panels.includedDocs.title'))
+$services.localization.render('xe.panels.includedDocs.count', [$pages.size()])
 #foreach ($page in $pages)
-  * [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$msg.get('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
+  * [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$services.localization.render('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
 #end
 #panelfooter()
 #end

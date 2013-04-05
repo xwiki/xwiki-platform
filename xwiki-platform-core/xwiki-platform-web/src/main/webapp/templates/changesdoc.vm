@@ -77,22 +77,22 @@ $escapedChunk##
 <div id="changes-info">
   <div id="changes-info-boxes">
     <div id="changes-info-box-from" class="changes-info-box">
-      <div class="changes-info-title">$msg.get('core.viewers.diff.from', [$rev1])</div>
+      <div class="changes-info-title">$services.localization.render('core.viewers.diff.from', [$rev1])</div>
       <div class="changes-info-content">
       #if($origdoc)
-        $msg.get('core.viewers.diff.editedBy', [$xwiki.getUserName($origdoc.author)])
+        $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($origdoc.author)])
         <br />
-        $msg.get('core.viewers.diff.editedOn', [$xwiki.formatDate($origdoc.date)])
+        $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($origdoc.date)])
       #end
       </div> ## changes-info-content
     </div> ## changes-info-box-from
     <div id="changes-info-box-to" class="changes-info-box">
-      <div class="changes-info-title">$msg.get('core.viewers.diff.to', [$rev2])</div>
+      <div class="changes-info-title">$services.localization.render('core.viewers.diff.to', [$rev2])</div>
       <div class="changes-info-content">
       #if($newdoc)
-        $msg.get('core.viewers.diff.editedBy', [$xwiki.getUserName($newdoc.author)])
+        $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($newdoc.author)])
         <br />
-        $msg.get('core.viewers.diff.editedOn', [$xwiki.formatDate($newdoc.date)])
+        $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($newdoc.date)])
       #end
       </div> ## changes-info-content
     </div> ## changes-info-box-to
@@ -100,7 +100,7 @@ $escapedChunk##
   </div> ## changes-info-boxes
   <div class="clearfloats"></div>
   <div id="changes-info-comment">
-    $msg.get('core.viewers.diff.editComment') #if("$!newdoc.comment" == '') $msg.get('core.viewers.diff.noEditComment') #else $newdoc.comment #end
+    $services.localization.render('core.viewers.diff.editComment') #if("$!newdoc.comment" == '') $services.localization.render('core.viewers.diff.noEditComment') #else $newdoc.comment #end
   </div> ## changes-info-comment
 </div> ## changes-info
 <div class="clearfloats"></div>
@@ -117,15 +117,15 @@ $escapedChunk##
 #set($metadataChanges = $doc.getMetaDataDiff($origdoc, $newdoc))
 #if($metadataChanges.size() > 0 || $tagsChanges)
   #set($hasChanges = true)
-  <h$headingLevel>$msg.get('changes.metadatachanges')</h$headingLevel>
+  <h$headingLevel>$services.localization.render('changes.metadatachanges')</h$headingLevel>
   <dl>
     #foreach($propertyChange in $doc.getMetaDataDiff($origdoc, $newdoc))
-      #displayPropertyChange($propertyChange $msg.get("core.viewers.diff.metadata.${propertyChange.field}"))
+      #displayPropertyChange($propertyChange $services.localization.render("core.viewers.diff.metadata.${propertyChange.field}"))
     #end
     #if($tagsChanges)
       #foreach($propertyChange in $tagsChanges)
         #if($propertyChange.action != 'object-added' && $propertyChange.action != 'object-removed')
-          #displayPropertyChange($propertyChange $msg.get("core.viewers.diff.tag.${propertyChange.propName}"))
+          #displayPropertyChange($propertyChange $services.localization.render("core.viewers.diff.tag.${propertyChange.propName}"))
         #end
       #end
     #end
@@ -136,7 +136,7 @@ $escapedChunk##
 ##
 #if($origdoc && $newdoc && $origdoc.content != $newdoc.content)
   #set($hasChanges = true)
-  <h$headingLevel>$msg.get('core.viewers.diff.contentChanges')</h$headingLevel>
+  <h$headingLevel>$services.localization.render('core.viewers.diff.contentChanges')</h$headingLevel>
   #unifiedDiff($origdoc.content $newdoc.content)
 #end
 ##
@@ -145,16 +145,16 @@ $escapedChunk##
 #set($attachmentsChanges = $doc.getAttachmentDiff($origdoc, $newdoc))
 #if($attachmentsChanges.size() > 0)
   #set($hasChanges = true)
-  <h$headingLevel>$msg.get('core.viewers.diff.attachmentChanges')</h$headingLevel>
+  <h$headingLevel>$services.localization.render('core.viewers.diff.attachmentChanges')</h$headingLevel>
   <ul>
     #foreach($attachChange in $doc.getAttachmentDiff($origdoc, $newdoc))
       <li>${attachChange.fileName}:
         #if(!$attachChange.origVersion)
-          <a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)">$msg.get('core.viewers.diff.attachment.added')</a>
+          <a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)">$services.localization.render('core.viewers.diff.attachment.added')</a>
         #elseif(!$attachChange.newVersion)
-          $msg.get('core.viewers.diff.attachment.deleted')
+          $services.localization.render('core.viewers.diff.attachment.deleted')
         #else
-          $msg.get('core.viewers.diff.attachment.updated', [$attachChange.origVersion, $newdoc.getAttachmentRevisionURL($attachChange.fileName, $attachChange.origVersion), $attachChange.newVersion, $newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)])
+          $services.localization.render('core.viewers.diff.attachment.updated', [$attachChange.origVersion, $newdoc.getAttachmentRevisionURL($attachChange.fileName, $attachChange.origVersion), $attachChange.newVersion, $newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)])
         #end
       </li>
     #end
@@ -165,18 +165,18 @@ $escapedChunk##
 ##
 #if($commentsChanges.size() > 0)
   #set($hasChanges = true)
-  <h$headingLevel>$msg.get('core.viewers.diff.commentChanges')</h$headingLevel>
+  <h$headingLevel>$services.localization.render('core.viewers.diff.commentChanges')</h$headingLevel>
   #foreach($comment in $commentsChanges)
     #set($actionMap = {'object-added': 'added', 'object-removed': 'deleted'})
     #set($action = $actionMap.get($comment.get(0).action))
     #if(!$action)
       #set($action = 'updated')
     #end
-    <h$mathtool.add($headingLevel, 1)>$msg.get("core.viewers.diff.comment.$action", [$comment.get(0).number])</h$mathtool.add($headingLevel, 1)>
+    <h$mathtool.add($headingLevel, 1)>$services.localization.render("core.viewers.diff.comment.$action", [$comment.get(0).number])</h$mathtool.add($headingLevel, 1)>
     <dl>
       #foreach($propertyChange in $comment)
         #if($propertyChange.action != 'object-added' && $propertyChange.action != 'object-removed')
-          #displayPropertyChange($propertyChange $msg.get("core.viewers.diff.comment.${propertyChange.propName}"))
+          #displayPropertyChange($propertyChange $services.localization.render("core.viewers.diff.comment.${propertyChange.propName}"))
         #end
       #end
     </dl>
@@ -187,14 +187,14 @@ $escapedChunk##
 ##
 #if($objectsChanges.size() > 0)
   #set($hasChanges = true)
-  <h$headingLevel>$msg.get('core.viewers.diff.objectChanges')</h$headingLevel>
+  <h$headingLevel>$services.localization.render('core.viewers.diff.objectChanges')</h$headingLevel>
   #foreach($object in $objectsChanges)
     #set($actionMap = {'object-added': 'added', 'object-removed': 'deleted'})
     #set($action = $actionMap.get($object.get(0).action))
     #if(!$action)
       #set($action = 'updated')
     #end
-    <h$mathtool.add($headingLevel, 1)>$msg.get("core.viewers.diff.object.$action", [$object.get(0).number, $object.get(0).className])</h$mathtool.add($headingLevel, 1)>
+    <h$mathtool.add($headingLevel, 1)>$services.localization.render("core.viewers.diff.object.$action", [$object.get(0).number, $object.get(0).className])</h$mathtool.add($headingLevel, 1)>
     <dl>
       #foreach($propertyChange in $object)
         #if ($propertyChange.action != 'object-added' && $propertyChange.action != 'object-removed')
@@ -215,11 +215,11 @@ $escapedChunk##
 #set($classChanges = $doc.getClassDiff($origdoc, $newdoc))
 #if(($classChanges.size() > 0) && ($classChanges.get(0).size() > 0))
   #set($hasChanges = true)
-  <h$headingLevel>$msg.get('core.viewers.diff.classChanges')</h$headingLevel>
+  <h$headingLevel>$services.localization.render('core.viewers.diff.classChanges')</h$headingLevel>
   <ul>
     #foreach($classChange in $classChanges)
       #foreach($propertyChange in $classChange)
-        <li>$msg.get("core.viewers.diff.class.${propertyChange.action}", [$propertyChange.propName])</li>
+        <li>$services.localization.render("core.viewers.diff.class.${propertyChange.action}", [$propertyChange.propName])</li>
       #end
     #end
   </ul>

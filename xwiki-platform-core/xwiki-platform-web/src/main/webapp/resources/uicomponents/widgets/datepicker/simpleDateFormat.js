@@ -41,8 +41,8 @@ var Externals = (function (Externals) {
   }
 
   var regex = /('[^']*')|(G+|y+|M+|w+|W+|D+|d+|F+|E+|a+|H+|k+|K+|h+|m+|s+|S+|Z+)|([a-zA-Z]+)|([^a-zA-Z']+)/;
-  var monthNames = "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerMonthNames'))".split(/\s*,\s*/);
-  var dayNames = "$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))".split(/\s*,\s*/);
+  var monthNames = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerMonthNames'))".split(/\s*,\s*/);
+  var dayNames = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))".split(/\s*,\s*/);
   var TEXT2 = 0, TEXT3 = 1, NUMBER = 2, YEAR = 3, MONTH = 4, TIMEZONE = 5;
   var types = {
     G : TEXT2,

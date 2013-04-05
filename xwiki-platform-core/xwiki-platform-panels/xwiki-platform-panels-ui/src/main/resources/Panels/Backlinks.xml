@@ -119,7 +119,7 @@
   #set ($previousDoc = $docname)
 #end
 #if ($backlinkDocs.size() &gt; 0 || $showEmptyPanels)
-  #panelheader($msg.get('docextra.backlinks'))
+  #panelheader($services.localization.render('docextra.backlinks'))
   #foreach ($backlinkDoc in $backlinkDocs)
     #if (!$foreach.first)
       (% class="pitemseparator" %) ~| (%%)##

@@ -34,8 +34,8 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.5.0</gwt.version>
-    <gwt.maven.plugin.version>2.5.0</gwt.maven.plugin.version>
+    <gwt.version>2.5.1</gwt.version>
+    <gwt.maven.plugin.version>2.5.1</gwt.maven.plugin.version>
     <smartgwt.version>3.1</smartgwt.version>
     <!-- JS/CSS minification is on by default -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
@@ -74,12 +74,50 @@
         <artifactId>tika-parsers</artifactId>
         <version>1.3</version>
         <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
-            <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <!-- TODO: Remove once http://jira.xwiki.org/browse/XWIKI-8656 is fixed -->
+          <exclusion>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+          </exclusion>
+          <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
+          <exclusion>
+            <groupId>org.gagravarr</groupId>
+            <artifactId>vorbis-java-core</artifactId>
+          </exclusion>
+          <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
+          <exclusion>
             <groupId>de.l3s.boilerpipe</groupId>
             <artifactId>boilerpipe</artifactId>
           </exclusion>
+          <!-- Tika Parsers 1.3 depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
+               require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+          </exclusion>
+          <!-- Tika Parsers 1.3 depends on bcmail-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
+               require bcmail-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15</artifactId>
+          </exclusion>
         </exclusions>
+      </dependency>
+      <!-- See the explanation in the tika-parsers exclusion above -->
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk16</artifactId>
+        <version>1.46</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcmail-jdk16</artifactId>
+        <version>1.46</version>
       </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
       <dependency>
@@ -303,9 +341,9 @@
           <!-- List of specific CLIRR excludes. Example:
 
             <difference>
+              <differenceType>7012</differenceType>
               <className>org/xwiki/ircbot/IRCBot</className>
               <method>void initialize(java.lang.String)</method>
-              <differenceType>7012</differenceType>
               <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
                 IRC Bot application in a subwiki</justification>
             </difference>
@@ -356,14 +394,69 @@
                <to>org/xwiki/localization/internal/message/TranslationMessageElement</to>
                <justification>YOUNG API. Forgot to move it out of internal when TranslationMessage has been</justification>
              </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/wysiwyg/server/WysiwygEditorConfiguration</className>
+              <method>java.lang.Boolean isPasteContentCleanedAutomatically()</method>
+              <justification>Added a new configuration property for the WYSIWYG Editor.</justification>
+            </difference>
             <!-- The following difference breaks CLIRR for some reason so I'm excluding the entire class below.
             <difference>
-              <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>
               <differenceType>7005</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/importer/IEPasteFilter</className>
               <method>void filter(com.google.gwt.dom.client.Document)</method>
               <to>void filter(com.google.gwt.dom.client.Element)</to>
               <justification>Nothing is broken because the method with a Document argument is still present but it is now inherited from PasteFilter.</justification>
             </difference>-->
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/security/authorization/cache/SecurityCache</className>
+              <method>void add(org.xwiki.security.authorization.SecurityRuleEntry)</method>
+              <justification>Moved to the org.xwiki.security.authorization.cache.internal.SecurityCache</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/security/authorization/cache/SecurityCache</className>
+              <method>void add(org.xwiki.security.authorization.SecurityAccessEntry)</method>
+              <justification>Moved to the org.xwiki.security.authorization.cache.internal.SecurityCache</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/security/authorization/cache/SecurityCache</className>
+              <method>void add(org.xwiki.security.authorization.SecurityRuleEntry, java.util.Collection)</method>
+              <justification>Moved to the org.xwiki.security.authorization.cache.internal.SecurityCache</justification>
+            </difference>
+
+            <!-- Special 4.5.2 fix -->
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>org/xwiki/workspace/WorkspaceWikiManagerMessageTool</className>
+              <justification>This class is percieved as removed due to a class added as a special workspaces fix applied only for the 4.5.2 release.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/workspace/WorkspaceManagerMessageTool</className>
+              <method>WorkspaceManagerMessageTool(javax.inject.Provider)</method>
+              <justification>This constructor is percieved as removed as a result of the constructor added as a special workspace fix applied only for the 4.5.2 release</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+              <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, com.xpn.xwiki.XWikiContext)</method>
+              <justification>This constructor is percieved as removed as a result of the constructor added as a special fix applied only for the 4.5.2 release</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+              <method>XWikiMessageTool(org.xwiki.localization.LocalizationManager, org.xwiki.component.manager.ComponentManager, javax.inject.Provider)</method>
+              <justification>This constructor is percieved as removed as a result of the constructor added as a special fix applied only for the 4.5.2 release</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/web/XWikiMessageTool</className>
+              <field>xcontextProvider</field>
+              <justification>This field is percieved as removed as a result of protected field added as a special fix applied only for the 4.5.2 release</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -409,6 +502,7 @@
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application-manager</module>
     <module>xwiki-platform-appwithinminutes</module>
+    <module>xwiki-platform-attachment</module>
     <module>xwiki-platform-autotag</module>
     <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
@@ -456,6 +550,7 @@
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-repository</module>
     <module>xwiki-platform-rest</module>
+    <module>xwiki-platform-sandbox</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
     <module>xwiki-platform-security</module>

@@ -1,0 +1,2319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>AttachmentSelector</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1296400624000</creationDate>
+  <date>1300321645000</date>
+  <contentUpdateDate>1300321645000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#if ($request.docname)$xwiki.getDocument($request.docname).plainTitle ($request.docname): #end$services.localization.render('xe.attachmentSelector.gallery.title')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>caa5337b-fad4-4c21-8ef4-9e7e1c44dbfe</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>var XWiki = (function(XWiki) {
+  /** Handles the gallery buttons directly in the current page without reloading the window. */
+  XWiki.AttachmentPicker = Class.create({
+    /**
+     * Constructor.
+     *
+     * @param property the property being edited, as the containing div with class="attachment-picker"
+     * @param dialog the modal dialog where the gallery was loaded
+     */
+    initialize : function(property, dialog) {
+      this.property = property;
+      this.dialog = dialog;
+      this.gallery = dialog.dialogBox;
+      if (!this.property.down('input')) {
+        this.directSave = true;
+      }
+      this.defaultValue = '';
+      var defaultValueElement = this.gallery.down('.gallery_emptyChoice .gallery_attachmenttitle');
+      if (defaultValueElement) {
+        this.defaultValue = defaultValueElement.title;
+      }
+      this.defaultImageSource = '';
+      var defaultImage = this.gallery.down('.gallery_emptyChoice.gallery_image img');
+      if (defaultImage) {
+        this.defaultImageSource = defaultImage.src.replace(/\?.*$/, '');
+      }
+      this.filterFormUpload();
+      this.addDeleteListeners();
+      this.addSelectListeners();
+      this.updateCurrentSelection();
+      this.addCloseListener();
+      var img = this.property.down('img');
+      if (img) {
+        img.observe('load', function() {img.up('div').removeClassName('hidden');});
+        img.observe('error', function() {img.up('div').addClassName('hidden');});
+      }
+    },
+    /**
+     * Catches the upload form submission and stops it if the selected file is not of the accepted types (or not selected at all),
+     * and saves the underlying form (if any) so that any unsaved changes won't be lost.
+     */
+    filterFormUpload : function() {
+      this.gallery.select('.uploadAttachment input.attachment').each(function(fileInput) {
+        fileInput.__allowedExtensions = fileInput.title.toLowerCase().replace(/\s*[,|; ]\s*/g, " ").strip();
+        if (fileInput.__allowedExtensions != '') {
+          fileInput.__allowedExtensions = fileInput.__allowedExtensions.split(" ");
+        } else {
+          fileInput.__allowedExtensions = false;
+        }
+      });
+      this.gallery.select(".uploadAttachment").invoke('observe', 'submit', function(event) {
+        event.stop();
+        var uploadForm = event.element();
+        var hasErrors = false;
+        uploadForm.select('input.attachment').each(function(fileInput) {
+          if (fileInput.value == '') {
+            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.noFile')", 'error');
+            hasErrors = true;
+          } else if (fileInput.__allowedExtensions &amp;&amp; fileInput.__allowedExtensions.indexOf(this.getFileExtension(fileInput.value)) == -1) {
+            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
+            hasErrors = true;
+          }
+        }.bind(this));
+        // No form submission by AJAX right now, because file uploads can't be done this way without HTML5, this is future work
+        // Save the document before submitting, since the current form data will be lost otherwise
+        if (!hasErrors) {
+          if (this.directSave) {
+            uploadForm.submit();
+          } else {
+            // FIXME This fails in HTML5, will deal with it later:
+            // this.property.down('input').value = uploadForm.down('.attachment').value;
+            // uploadForm.xredirect.value = window.location.pathname;
+            document.observe('xwiki:document:saved', function() {
+              new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
+              uploadForm.submit();
+            })
+            document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
+          }
+        }
+      }.bindAsEventListener(this));
+    },
+    getFileExtension : function(filename) {
+      var fpath = filename.replace('\\', '/');
+      var pieces = fpath.split('/');
+      if (pieces.length == 0) {
+        return null;
+      }
+      var basename = pieces[pieces.length-1];
+      pieces = basename.split('.');
+      return pieces[pieces.length-1].toLowerCase();
+    },
+
+    /** Catch attachment delete requests. */
+    addDeleteListeners : function() {
+      this.gallery.select('.gallery_actions .tool.delete').invoke('observe', 'click', this.onDelete.bindAsEventListener(this));
+    },
+
+    /** Catch attachment selection requests. */
+    addSelectListeners : function() {
+      this.gallery.select('.gallery_actions .tool.select').invoke('observe', 'click', this.onSelect.bindAsEventListener(this));
+    },
+
+    /** AJAX deletion of attachments. */
+    onDelete : function(event) {
+      event.stop();
+      deleteTool = event.element();
+      if (!deleteTool.disabled) {
+        new XWiki.widgets.ConfirmedAjaxRequest(
+          deleteTool.readAttribute('href'),
+          {
+            onCreate : function() { deleteTool.disabled = true },
+            onSuccess : function() {
+              var attachmentBox = deleteTool.up('.gallery_attachmentbox');
+              if (attachmentBox) {
+                if (attachmentBox.hasClassName('current')) {
+                   this.updateAttachment(this.defaultValue, this.defaultImageSource);
+                   if (this.gallery.down('.gallery_emptyChoice')) {
+                     this.gallery.down('.gallery_emptyChoice').addClassName('current');
+                   }
+                   if (!this.directSave) {
+                     this.property.down('input').value = this.defaultValue;
+                   }
+                }
+                attachmentBox.remove();
+              }
+            }.bind(this),
+            onComplete : function() {
+              deleteTool.disabled = false;
+            }
+          },
+          {
+            confirmationText: "$services.localization.render('core.viewers.attachments.delete.confirm')",
+            progressMessageText : "$services.localization.render('core.viewers.attachments.delete.inProgress')",
+            successMessageText : "$services.localization.render('core.viewers.attachments.delete.done')",
+            failureMessageText : "$services.localization.render('core.viewers.attachments.delete.failed')"
+          }
+        );
+      }
+    },
+
+    /** Update the property with the selected value without reloading the page. */
+    onSelect : function(event) {
+      event.stop();
+      var targetElement = event.element();
+      var attachmentName = targetElement.up('.gallery_attachmentbox').down('.gallery_attachmenttitle').title;
+      var imageSource = targetElement.up('.gallery_attachmentbox.gallery_image');
+      if (imageSource) {
+        imageSource = imageSource.down('.gallery_attachmentframe img');
+        if (imageSource) {
+          imageSource = imageSource.src.replace(/\?.*$/, '');
+        }
+      }
+      if (!imageSource) {
+        imageSource = '';
+      }
+      if (this.directSave) {
+        // save via ajax
+        if (!targetElement.disabled) {
+          new Ajax.Request(event.element().href, {
+            onCreate : function() {
+              targetElement.disabled = true;
+              targetElement._x_notif = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');
+            },
+            onSuccess : function () {
+              targetElement._x_notif.hide();
+              // on success, update image
+              this.updateAttachment(attachmentName, imageSource);
+              this.dialog.closeDialog();
+            }.bindAsEventListener(this),
+            onFailure : function(response) {
+              var failureReason = response.statusText;
+              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                failureReason = 'Server not responding';
+              }
+              if (targetElement._x_notif) {
+                targetElement._x_notif.replace(new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
+              } else {
+                new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
+              }
+            },
+            on1223 : function(response) {
+              response.request.options.onSuccess(response);
+            },
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            },
+            onComplete : function() {
+              targetElement.disabled = false;
+            }
+          });
+        }
+      } else {
+        this.updateAttachment(attachmentName, imageSource);
+        this.property.down('input').value = attachmentName;
+        this.dialog.closeDialog();
+      }
+    },
+
+    /** Update the property display. */
+    updateAttachment : function(attachmentName, imageSource) {
+      var img = this.property.down('img');
+      if (img) {
+        img.src = img.src.replace(/^[^\?]+($|\?)/, imageSource + "$1");
+        var link = img.up('a');
+        if (link) {
+          link.href = link.href.replace(/^[^\?]+($|\?)/, imageSource + "$1");
+        }
+      } else {
+        var displayed = this.property.down('.displayed');
+        if (displayed) {
+          displayed.update(attachmentName);
+          var link = displayed.up('a');
+          if (link) {
+            link.href = link.href.replace(/^[^\?]+($|\?)/, attachmentName + "$1");
+          }
+        }
+      }
+    },
+
+    /** Update the gallery to reflect the currently selected value. */
+    updateCurrentSelection : function() {
+      if (!this.directSave) {
+        var selectedName =  this.property.down('input').value;
+        var selectedElement = this.gallery.down('.gallery_attachmenttitle[title="' + selectedName.replace('"', '\\22 ') + '"]');
+        if (selectedElement) {
+          selectedElement = selectedElement.up('.gallery_attachmentbox');
+        } else {
+          selectedElement = this.gallery.down('.gallery_emptyChoice');
+        }
+        if (!selectedElement.hasClassName('current')) {
+          this.gallery.select('.gallery_attachmentbox.current .tool.select').invoke('removeClassName', 'hidden');
+          this.gallery.select('.gallery_attachmentbox.current').invoke('removeClassName', 'current');
+          selectedElement.addClassName('current');
+        }
+        selectedElement.down('.tool.select').addClassName('hidden');
+      } else {
+        this.gallery.down('.current .tool.select').addClassName('hidden');
+      }
+    },
+    addCloseListener : function () {
+      var closeButton = $('attachment-picker-close');
+      if (closeButton) {
+        closeButton.observe('click', function(event) {
+          event.stop();
+          this.dialog.closeDialog();
+        }.bindAsEventListener(this));
+      }
+    }
+  });
+
+  var loading = new Element('div', {'class' : 'imgcenter'}).update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\"/&gt;");
+  var dialog;
+
+  /* Hook onto the picker buttons so that the gallery is loaded via AJAX in a modal dialog. */
+  document.observe('xwiki:dom:loaded', function() {
+    $$('.attachment-picker-start').invoke('observe', 'click', function(event) {
+      event.stop();
+      var targetElement = event.element();
+      var url = targetElement.href;
+      if (url.indexOf('?') &lt; 0) {
+        url += '?';
+      }
+      url += "&amp;xpage=plain";
+      dialog = new XWiki.widgets.ModalPopup(
+        loading, {}, {
+          'verticalPosition' : 'top',
+          'removeOnClose' : true,
+          'title' : "$services.localization.render('xe.attachmentSelector.gallery.title')"
+        }
+      );
+      dialog.shortcuts.close.keys = [];
+      dialog.showDialog();
+      if (window.browser.isIE6x) {
+        dialog.dialog.down().setStyle({position: "absolute"});
+      } else {
+        dialog.dialog.down().setStyle({position: "fixed"});
+      }
+      dialog.dialog.setStyle({top: document.viewport.getScrollOffsets().top + "px", position: "absolute"});
+      dialog.dialogBox.setStyle({overflow: "hidden", width: "80%", margin: "0 10%"});
+      new Ajax.Updater(loading.up(), url, {
+        onComplete : function() {
+          // Play nice with the Lightbox widget
+          if (window.gallery_lb) {
+            window.gallery_lb.updateImageList();
+          }
+          // Manually convert the special rel values into target attributes for the newly inserted content (rel="_something" =&gt; target="something")
+          if (typeof (XWiki.fixLinksTargetAttribute) == 'function') {
+            // Trick the function into updating link targets in edit mode; normally the conversion only takes place in view mode
+            var __tmp = XWiki.contextaction;
+            XWiki.contextaction = 'view';
+            XWiki.fixLinksTargetAttribute(dialog.dialog);
+            XWiki.contextaction = __tmp;
+          }
+          new XWiki.AttachmentPicker(targetElement.up('.attachment-picker'), dialog);
+        }
+      });
+    });
+  });
+  return XWiki;
+}(XWiki || {}));</code>
+    </property>
+    <property>
+      <name>Loads the image picker in a modal dialog</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>2aa565e6-b9bd-4095-a7a9-bbf47d75d079</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>XWiki.widgets.ModalPopup.prototype.showDialog = function(event) {
+  if (event) {
+    Event.stop(event);
+  }
+  // Only do this if the dialog is not already active.
+  if (!this.active) {
+    this.active = true;
+    if (!this.dialog) {
+      // The dialog wasn't loaded, create it.
+      this.createDialog();
+    }
+    // Start listening to keyboard events
+    this.attachKeyListeners();
+    // Display the dialog
+    this.dialog.show();
+  }
+};
+XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
+  if (event) {
+    Event.stop(event);
+  }
+  // Call optional callback
+  this.options.onClose.call(this);
+  // Hide the dialog, without removing it from the DOM.
+  this.dialog.hide();
+  if (this.options.removeOnClose) {
+    this.dialog.remove();
+  }
+  // Stop the UI shortcuts (except the initial Show Dialog one).
+  this.detachKeyListeners();
+  // Re-enable the 'show' behavior.
+  this.active = false;
+}
+</code>
+    </property>
+    <property>
+      <name>Patch for modalPopup.js, allowing to display several widgets on the same screen and removing position:fixed in IE</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>2a28ce9c-ab00-4847-936d-53e4f2acbfe0</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template("colorThemeInit.vm")
+#set ($boxSize = 170)
+#set ($boxPadding = 5)
+#set ($boxMargin = 5)
+## Make the upload box two times as wide, so that the input fits nicely.
+## |                                                     |
+## |                         |  |                        |
+## | 1 width + 1 border + 2 margins + 1 border + 1 width |
+#set ($uploadBoxSize = $mathtool.add(2, $mathtool.add($mathtool.mul($boxSize, 2), $mathtool.mul($boxMargin, 2))))
+#set ($imgSize = $mathtool.sub($boxSize, $mathtool.mul($boxPadding, 2)))
+#set ($actionsHeight = 20)
+#set ($actionsWidth = 16)
+#macro (__css3 $rule)
+  ${rule};
+  -moz-${rule};
+  -webkit-${rule};
+#end
+/*--------------------------------------------------------*/
+/* Attachment picker layout fixes                              */
+.attachment-picker p {
+  margin: 0;
+  padding : 0;
+}
+.attachment-picker picture {
+  max-width: 100%;
+}
+/*--------------------------------------------------------*/
+/* Gallery attachmentboxes                                     */
+.gallery p {
+  margin: 0;
+}
+.gallery_attachmentbox {
+  background: $theme.pageContentBackgroundColor;
+  border: 1px solid $theme.borderColor;
+  #__css3('border-radius: 5px')
+  float: left;
+  margin: ${boxMargin}px;
+  overflow: hidden;
+  position: relative;
+  width: ${boxSize}px;
+}
+/* Broken IE6 box model, add the border width to the total width. */
+* html .gallery_attachmentbox {
+  width: ${mathtool.add($boxSize, 2)}px;
+}
+.gallery .current {
+  background-color: $theme.highlightColor;
+  border-width: 3px;
+  margin: 3px;
+}
+/* Broken IE6 box model, add the border width to the total width. */
+* html .gallery .current {
+  width: ${mathtool.add($boxSize, 6)}px;
+}
+.gallery .current .gallery_attachmenttitle {
+  font-weight: bold;
+}
+.gallery_attachmentbox:hover {
+  background-color: $theme.highlightColor;
+}
+
+.gallery_attachmenttitle {
+  background: $theme.backgroundSecondaryColor;
+  border-bottom: 1px dotted $theme.borderColor;
+  #__css3('border-radius: 5px 5px 0px 0px')
+  font-size: 85%;
+  padding: 3px ${boxPadding}px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gallery_attachmenttitle p {
+  text-align: center;
+  overflow: hidden;
+}
+
+.gallery_attachmentframe {
+  padding: ${boxPadding}px;
+  height: ${imgSize}px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gallery_attachmentframe a {
+  display: block;
+  text-align: center;
+}
+
+.gallery_attachmentbox img {
+  max-height: ${imgSize}px;
+  max-width: ${imgSize}px;
+  width: auto;
+}
+.gallery_attachmentframe ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.gallery_attachmentframe li {
+  margin: 0.5em 0 0.5em 20px;
+  font-size: 0.8em;
+}
+.gallery_attachmentframe .mime {
+  margin: 0 2px 0 -20px;
+}
+.gallery_attachmentframe .mime img {
+  vertical-align: top;
+}
+.gallery_attachmentframe li .filename {
+  display: inline-block;
+  font-weight: bold;
+  width: $mathtool.sub($imgSize, 22)px;
+  word-wrap: break-word;
+}
+
+/* Actions */
+.gallery_actions {
+  width: auto;
+  position: absolute;
+  bottom: 0px;
+  right: ${boxPadding}px;
+}
+.gallery_actions .tool {
+  background: none no-repeat 50% transparent;
+  cursor: pointer;
+  display: block;
+  float: left;
+  height: ${actionsHeight}px;
+  padding: 0 !important;
+  overflow: hidden;
+  text-indent: -1000em;
+  opacity: 0.6;
+  width: ${actionsWidth}px;
+}
+.gallery_actions .tool:hover {
+  opacity: 1;
+}
+.gallery_actions .select {
+  background-image: url("$xwiki.getSkinFile('icons/silk/tick.png')");
+}
+.gallery_actions .delete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+}
+.gallery_actions .view {
+  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
+}
+.gallery_actions .download {
+  background-image: url("$xwiki.getSkinFile('icons/silk/arrow_down.png')");
+}
+/*--------------------------------------------------*/
+/* Upload form                                      */
+.gallery_upload {
+  ## Make this box twice as large as the others
+  width: ${uploadBoxSize}px;
+}
+* html .gallery_upload {
+  width: ${mathtool.add($uploadBoxSize, 2)}px;
+}
+.gallery_upload, .gallery_upload:hover {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.gallery_upload .gallery_attachmenttitle {
+  background-position: 1px center;
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_add.png')");
+  background-repeat: no-repeat;
+  padding-left: 16px;
+}
+.gallery_upload form {
+  height: ${imgSize}px;
+}
+.gallery_upload .xHint {
+  text-transform: none !important;
+}
+.gallery_upload input.attachment {
+  font-size: 83.3%;
+  margin: 0; /* Overrides viewers/attachments.css */
+  padding: 0; /* Overrides viewers/attachments.css */
+  width: ${mathtool.sub($uploadBoxSize, $mathtool.mul($boxPadding, 2))}px;
+}
+.gallery_upload .buttonwrapper {
+  margin: 0;
+}
+.gallery_upload .button {
+  font-size: .65em;
+}
+
+/* ------------------------------------ */
+/* Buttons on top:                      */
+.gallery_actions {
+  top: 1px;
+  right: 3px;
+}
+.gallery_attachmenttitle p {
+  text-align: left;
+  margin-right: ${mathtool.add($mathtool.mul(2, $actionsWidth), $boxPadding)}px;
+}
+/* ------------------------------------ */
+/* Cancel button                        */
+.gallery_buttons {
+  clear: both;
+  margin: ${boxMargin}px;
+}</code>
+    </property>
+    <property>
+      <name>Attachment galery styling</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>9</number>
+        <prettyName>Macro code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentDescription>
+        <disabled>0</disabled>
+        <name>contentDescription</name>
+        <number>8</number>
+        <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </contentDescription>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>7</number>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Optional|Mandatory|No content</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <defaultCategory>
+        <disabled>0</disabled>
+        <name>defaultCategory</name>
+        <number>4</number>
+        <prettyName>Default category</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultCategory>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Macro description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Macro id</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Macro name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <supportsInlineMode>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>supportsInlineMode</name>
+        <number>5</number>
+        <prettyName>Supports inline mode</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </supportsInlineMode>
+      <visibility>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>visibility</name>
+        <number>6</number>
+        <prettyName>Macro visibility</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Current User|Current Wiki|Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>7f67fdfc-a67a-4166-b7c1-6d572ee54719</guid>
+    <property>
+      <code>{{velocity output="false"}}
+$xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
+$xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)##
+$xwiki.jsx.use($xcontext.macro.doc.fullName)##
+$xwiki.ssx.use($xcontext.macro.doc.fullName)##
+$xwiki.jsfx.use('js/scriptaculous/builder.js')##
+## Integrates the optional Lightbox widget (from http://extensions.xwiki.org/xwiki/bin/view/Extension/Lightbox+Application )
+#if ($xwiki.exists('XWiki.Lightbox'))
+  $xwiki.jsx.use('XWiki.Lightbox')
+  $xwiki.ssx.use('XWiki.Lightbox')
+#end
+
+##
+## Prepare parameters
+##
+## Keep track for when we have a target document
+#set ($hasTargetDoc = false)
+#set ($targetdoc = "$!{xcontext.macro.params.targetdocname}")
+###
+## Set the targetdoc we want to save to (default to current doc if not set)
+#if ("$!{targetdoc}" != '')
+  ## Check access on targetdocname
+  #set ($targetPermView = $xwiki.hasAccessLevel('view',$xcontext.user,${targetdoc}))
+  #set ($targetPermEdit = $xwiki.hasAccessLevel('edit',$xcontext.user,${targetdoc}))
+  #set ($targetdoc = $xwiki.getDocument($targetdoc) )
+  #set ($hasTargetDoc = true)
+#else
+  ## The user should have edit and view permissions for the current doc
+  #set ($targetPermView = true)
+  #set ($targetPermEdit = true)
+  #set($targetdoc = $doc)
+#end
+#set ($classname = "$!{xcontext.macro.params.classname}")
+#set ($property = "$!{xcontext.macro.params.property}")
+#set ($object = $mathtool.toInteger("$!{xcontext.macro.params.object}"))
+#if ("$!{object}" != $!{xcontext.macro.params.object})
+  #set ($object = ${doc.getObject($classname).number})
+  #if ("$!{object}" == '')
+    #set ($object = 0)
+  #end
+#end
+
+#if ("$!{xcontext.macro.params.displayImage}" == 'true' &amp;&amp; $targetPermView)
+  #set ($displayImage = true)
+#else
+  #set ($displayImage = false)
+#end
+#if ($displayImage)
+  #set ($alt = "$!{xcontext.macro.params.alternateText}")
+  #set ($width = "$!{xcontext.macro.params.width}")
+  #set ($height = "$!{xcontext.macro.params.height}")
+  #set ($imageParams = '')
+  #if ("${width}" != '')
+    #set($imageParams = "$!{imageParams} width=${width}")
+  #end
+  #if ("${height}" != '')
+    #set ($imageParams = "$!{imageParams} height=${height}")
+  #end
+  #set ($imageParams = "$!{imageParams} alt='${alt}'")
+  #if ("$!{imageParams}" != '')
+    #set ($imageParams = "||${imageParams.trim()}")
+  #end
+#end
+#if ("$!{xcontext.macro.params.link}" == 'true')
+  #set ($link = true)
+#else
+  #set ($link = false)
+#end
+
+#set ($cssClass = "displayed x-attachment $!{xcontext.macro.params.cssClass}")
+#set ($defaultValue = "$!{xcontext.macro.params.defaultValue}")
+#if ($defaultValue != '')
+  #set ($defaultReference = $services.model.resolveAttachment($defaultValue))
+#else
+  #set ($defaultReference = false)
+#end
+#set ($filter = ${xcontext.macro.params.filter})
+
+#set ($buttontext = "$!{xcontext.macro.params.buttontext}")
+#if ($buttontext == '')
+  #set ($buttontext = $services.localization.render('xe.attachmentSelector.selectFile'))
+#end
+
+#set ($savemode = "$!{xcontext.macro.params.savemode}")
+#if ($savemode != 'direct')
+  #set ($savemode = 'form')
+#end
+
+#set ($propValue = "$!{doc.getObject($classname, $object).getProperty($property).value}")
+##
+
+#macro (attachmentPicker_displayAttachment $name $displayImage $withLink $forceElement)
+  #set ($attachment = $targetdoc.getAttachment("$!{name}"))
+  #if ("$!{name}" != '' &amp;&amp; "$!{attachment}" != '')
+    #set ($attachmentRef = $services.model.createAttachmentReference(${targetdoc.documentReference}, ${name}))
+    #set ($attachmentName = $name)
+  #else
+    #set ($attachmentRef = $defaultReference)
+    #if ($attachmentRef)
+      #set ($docReference = $attachmentRef.documentReference)
+    #else
+      #set ($docReference = $targetdoc.documentReference)
+    #end
+    #set ($attachmentName = $attachmentRef.name)
+    #set ($attachment = $xwiki.getDocument($docReference).getAttachment($attachmentName))
+    #if (!$attachment)
+      #set ($withLink = false)
+    #end
+  #end
+  #if ($attachmentRef)
+    #set ($attachmentResource = $services.model.serialize($attachmentRef, 'local'))
+  #else
+    #set ($attachmentResource = '')
+  #end
+  #if ($displayImage)
+    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:${attachmentResource}$!{imageParams}]]#if($withLink)&gt;&gt;attach:${attachmentResource}||rel=lightbox]]#{end}#end)))##
+  #else
+    (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{attachmentName}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
+  #end
+#end
+
+## Display the "Choose an attachment" button if they can:
+##  1. Edit the current page
+##  2. View the target attachment page. (can be the same page)
+#macro (attachmentPicker_displayButton)
+  #if ($hasEdit &amp;&amp; $targetPermView)(% class="buttonwrapper" %)[[${buttontext}&gt;&gt;${xcontext.macro.doc.fullName}||queryString="#if ($hasTargetDoc)targetdocname=${escapetool.url($targetdoc.fullName)}&amp;#{end}docname=${escapetool.url($doc.fullName)}&amp;classname=${classname}&amp;property=${property}&amp;object=${object}&amp;savemode=${savemode}&amp;defaultValue=$escapetool.url($defaultValue)&amp;filter=$!{filter}&amp;displayImage=${displayImage}" class="attachment-picker-start button" title="${buttontext}"]](%%)#end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ("${savemode}" == 'direct')
+  (% class="attachment-picker" %)(((#attachmentPicker_displayAttachment($propValue $displayImage $link true) #attachmentPicker_displayButton())))
+#elseif ($context.action == 'inline' || $context.action == 'edit')
+  (% class="attachment-picker" %)(((##
+    #attachmentPicker_displayAttachment($propValue $displayImage false true) #attachmentPicker_displayButton()##
+    {{html}}&lt;input type="hidden" name="${classname}_${object}_${property}" value="${propValue}"/&gt;{{/html}}##
+  )))
+#else
+  #attachmentPicker_displayAttachment($propValue $displayImage $link false)
+#end
+{{/velocity}}</code>
+    </property>
+    <property>
+      <contentDescription/>
+    </property>
+    <property>
+      <contentType>No content</contentType>
+    </property>
+    <property>
+      <defaultCategory/>
+    </property>
+    <property>
+      <description>A control to be used for object properties of the current document that are supposed to contain the name of an attachment from the current (or target) document. Allows uploading new attachments, and deleting attachments from the target document.  If no target document is specified, the current document will be used. Object properties are only saved to the current document.</description>
+    </property>
+    <property>
+      <id>attachmentSelector</id>
+    </property>
+    <property>
+      <name>Attachment Selector</name>
+    </property>
+    <property>
+      <supportsInlineMode>1</supportsInlineMode>
+    </property>
+    <property>
+      <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>bb1b9208-3b4a-43e4-8a69-603281ca1412</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The full name of the document holding the XClass that contains the property associated with this picker. </description>
+    </property>
+    <property>
+      <mandatory>1</mandatory>
+    </property>
+    <property>
+      <name>classname</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>c51517fc-93e9-4594-8b10-b014a8907452</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The name of the property associated with the picker.</description>
+    </property>
+    <property>
+      <mandatory>1</mandatory>
+    </property>
+    <property>
+      <name>property</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>b43c2df7-9941-4941-834b-0236424cfaa9</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The identifier (number) of the object for which the property is displayed by this picker. If missing, the first instance of the class given by the parameter classname found in the document will be considered.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>object</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>a35e6fcc-b5e9-4c49-a601-cead93cba813</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>A CSS class for the element surrounding the property value.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>cssClass</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>6</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>2dcec651-66b9-4d7c-9ac6-2578a426a5f4</guid>
+    <property>
+      <defaultValue>form</defaultValue>
+    </property>
+    <property>
+      <description>States how the property is updated. Accepted values: "form" (default)  meaning that the selected value is stored in an input that will be saved via an external form; "direct" meas that the picker is responsible with updating the property value.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>savemode</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>7</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>a932ece6-3c6d-48c7-a717-536317705f71</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Text of the button that triggers the picker. Defaults to $services.localization.render('xe.attachmentSelector.selectFile').</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>buttontext</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>10</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>5c3f5b0d-1d0d-4820-8985-13d779972acb</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>What attachment is displayed in view mode if the property is empty. Should either be empty or in the form of a wiki attachment reference (e.g. "attachment.txt", "Another.Document@attachment.txt").</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>defaultValue</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>12</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>aa252c40-59a0-4e82-a94b-e133862fe082</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Comma separated list of file extensions accepted by the property (to become a comma separated list of mimetypes when XWiki will use HTML5). All files are accepted if this parameter is empty.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>filter</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>13</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>e31c42de-47d7-4a73-a236-b99c2231dca7</guid>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>States whether images are displayed or just their name is printed like for other attachments. Possible values: true, false (default).</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>displayImage</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>14</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>0b2cea67-1942-4ce2-9f5e-90907033c92c</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The width of the displayed image, only taken into account if displayImage=true.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>width</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>15</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>003ab606-5c72-465d-bfd6-bd21262be502</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The height of the displayed image, only taken into account if displayImage=true</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>height</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>16</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>9ca8402c-6df8-4068-b00f-1f9bb18f38a9</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The alternate text of the displayed image, only taken into account if displayImage=true</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>alternateText</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>17</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>54e733cd-f755-4dee-8629-b713f685790a</guid>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>States whether a link to the attachment is associated in view mode with the displayed attachment name/image. Possible values: true, false (default).</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>link</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>XWiki.AttachmentSelector</name>
+    <number>18</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>99b73453-120c-481a-8889-1a7efc7b73f2</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The target document name to save/list attachments from</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>targetdocname</name>
+    </property>
+  </object>
+  <content>{{velocity output="false"}}
+#if ($request.xaction == 'postUpload')
+  #set ($targetDocument = $xwiki.getDocument($request.get('docname')))
+  #set ($targetAttachDocument = $xwiki.getDocument($request.get('targetdocname')))
+
+  #set ($fieldname = $request.get('fieldname'))
+  #set ($docAction = $request.get('docAction'))
+  #set ($attachmentList = $targetAttachDocument.getAttachmentList())
+  #if ($attachmentList &amp;&amp; $attachmentList.size() &gt; 0)
+    #set ($sortedAttachments = $sorttool.sort($attachmentList, 'date:desc'))
+    #set ($lastAttachment = $sortedAttachments.get(0))
+  #end
+  $response.sendRedirect($targetDocument.getURL($docAction, "$!{fieldname}=$!{lastAttachment.filename}&amp;form_token=$!{escapetool.url($request.get('form_token'))}"))
+  #stop
+#end
+{{/velocity}}
+
+{{velocity output="false"}}
+##
+## Macros
+##
+#set ($translationPrefix = 'xe.attachmentSelector')
+#set ($attachmentPickerDocName = 'XWiki.AttachmentSelector')
+
+$xwiki.ssx.use($attachmentPickerDocName)
+$xwiki.jsx.use($attachmentPickerDocName)
+
+#**
+ * Displays the attachment gallery as a list of attachment boxes, starting with special boxes for uploading a new attachment and for setting a default value.
+ *
+ * @param $targetDocument the document to recieve the field value being modified
+ * @param $targetAttachDocument the document to list/save attachments to
+ * @param $options generic picker options
+ *#
+#macro (attachmentPicker_displayAttachmentGallery $targetDocument, $targetAttachDocument, $options)
+  #set ($currentValue = $targetDocument.getValue($options.property))
+  #if ("$!{targetAttachDocument.getAttachment($currentValue)}" == '')
+    #set ($currentValue = "$!{options.defaultValue}")
+  #end
+  (% class="gallery" %)(((
+  ## Only display the upload form if they have edit permission on targetAttachDocument
+  #if ($xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
+    #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
+  #end
+  #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
+  #set ($sortedAttachments = $sorttool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #foreach ($attachment in $sortedAttachments)
+    #set ($extension = $attachment.getFilename())
+    #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
+    #if ($options.filter.size() == 0 || $options.filter.contains($extension))
+      #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
+    #end
+  #end
+  )))
+#end
+
+#**
+ * Displays an attachment box.
+ *
+ * @param $attachment the target attachment to display
+ * @param $targetDocument the document being modified
+ * @param $options generic picker options
+ * @param $currentValue the currently selected file, used for determining if the box should be highlighted as the current value
+ *#
+#macro (attachmentPicker_displayAttachmentBox $attachment $targetDocument $targetAttachDocument, $options $currentValue)
+  #if ($options.displayImage &amp;&amp; $attachment.isImage())
+    #set ($cssClass = 'gallery_image')
+  #else
+    #set ($cssClass = '')
+  #end
+  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "$!{cssClass}"} $currentValue)
+  #attachmentPicker_displayAttachmentDetails($attachment $options)
+  #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
+  #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
+  #set ($viewURL = $targetAttachDocument.getAttachmentURL($attachment.filename) )##{'name' : 'download', 'url' : $viewURL, 'rel' : '__blank'}
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=${attachment.filename}&amp;form_token=$!{services.csrf.getToken()}"))
+  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}, {'name' : 'delete', 'url' : $deleteURL}])
+#end
+
+#**
+ * Writes the wiki code used at the start of an attachment box. Outputs the attachment title bar, and opens the inner frame div.
+ *
+ * @param $boxOptions a map of parameters/options for the current attachment, holding, for example, the attachment name (boxOptions.value),
+ *        the title to display (boxOptions.text), optional extra CSS classnames to put on the box (boxOptions.cssClass)
+ * @param $currentValue the currently selected file, used for determining if this attachment should be highlighted as the current value
+ *#
+#macro (attachmentPicker_displayStartFrame $boxOptions $currentValue)
+  (% class="gallery_attachmentbox $!{boxOptions.cssClass} #if ("$!{boxOptions.value}" == $currentValue) current#{end}" %)(((
+    (% class="gallery_attachmenttitle" title="$!{boxOptions.value}" %)((($boxOptions.text)))
+    (% class="gallery_attachmentframe" %)(((
+#end
+
+#**
+ * Displays details about an attachment inside the attachment box. If the attachment is an image and the "displayImage" option is on,
+ * then the image is displayed. Otherwise, some basic information is displayed: the version, the size, the date and the author.
+ *
+ * @param $attachment the target attachment to display
+ * @param $options generic picker options
+ *#
+#macro (attachmentPicker_displayAttachmentDetails $attachment $options)
+  #if ($attachment)
+    #if ($attachment.isImage() &amp;&amp; $options.displayImage)
+      #set ($attachmentDocument = $attachment.getDocument())
+[[[[image:${attachmentDocument.fullName}@${attachment.filename}||width=160]]&gt;&gt;attach:${attachmentDocument.fullName}@${attachment.filename}||rel="lightbox[attachments]"]]
+    #else
+      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
+      * v$attachment.getVersion() (#dynamicsize($attachment.filesize))
+      * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
+      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachment.getDocument()}@${attachment.filename}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
+    #end
+  #end
+#end
+
+#**
+ * Writes the wiki code used at the end of an attachment box. Closes the inner frame div, and outputs the attachment actions.
+ *
+ * @param $actions a list of maps defining action buttons, where each entry contains a subset of the following:
+ *        &lt;dl&gt;
+ *          &lt;dt&gt;name&lt;/dt&gt;
+ *          &lt;dd&gt;identifies the action; the name is used as a CSS classname, and in the translation key for the display text, as "xe.attachmentSelector.actions.&lt;name&gt;"&lt;/dd&gt;
+ *          &lt;dt&gt;url&lt;/dt&gt;
+ *          &lt;dd&gt;the destination of the button&lt;/dd&gt;
+ *          &lt;dt&gt;rel&lt;/dt&gt;
+ *          &lt;dd&gt;an optional parameter to be used in the "rel" HTML attribute; for example "__blank" can be used to open the link in a new tab/window&lt;/dd&gt;
+ *        &lt;/dl&gt;
+ *#
+#macro (attachmentPicker_displayEndFrame $actions)
+    )))## attachmentframe
+    (% class="gallery_actions" %)(((
+      #foreach ($action in $actions)
+        #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
+        [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
+      #end
+    )))## actions
+  )))## attachmentbox
+#end
+
+#**
+ * Displays the upload box used for adding and selecting a new attachment.
+ *
+ * @param $targetDocument the document with the property being modified
+ * @param $targetAttachDocument the document to upload the attachment to
+ * @param $options generic picker options
+ *#
+#macro (attachmentPicker_displayUploadForm $targetDocument, $targetAttachDocument, $options)
+#attachmentPicker_displayStartFrame({
+   'value' : $services.localization.render("${translationPrefix}.upload.title"),
+   'text' : $services.localization.render("${translationPrefix}.upload.title"),
+   'cssClass' : 'gallery_upload'
+  } $NULL)
+{{html clean="false"}}
+&lt;form action="$targetAttachDocument.getURL('upload')" enctype="multipart/form-data" method="post" id="uploadAttachment" class="uploadAttachment xform"&gt;
+  &lt;div class="gallery_upload_input"&gt;
+    #if (${options.rawfilter} != '')
+      &lt;span class="xHint"&gt;$services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}])&lt;/span&gt;
+    #end
+    &lt;input type="file" name="filepath" id="attachfile" class="attachment" size="30" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
+    &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;
+    &lt;input type="hidden" name="docname" value="$!{escapetool.xml($targetDocument.fullName)}" /&gt;
+    &lt;input type="hidden" name="classname" value="$!{escapetool.xml($options.get('classname'))}" /&gt;
+    &lt;input type="hidden" name="object" value="$!{escapetool.xml($options.get('object'))}" /&gt;
+    &lt;input type="hidden" name="property" value="$!{escapetool.xml($options.get('property'))}" /&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+  &lt;/div&gt;
+  &lt;div class="buttons"&gt;
+    &lt;span class="buttonwrapper"&gt;
+    &lt;input type="submit" name="action_upload" class="button " value='$services.localization.render("${translationPrefix}.upload.submit")'  title='$services.localization.render("${translationPrefix}.upload.submit")'/&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}
+#attachmentPicker_displayEndFrame ([])
+#end
+
+#**
+ * Displays the "empty value" box, used for unsetting the field value.
+ *
+ * @param $targetDocument the document being modified
+ * @param $targetAttachDocument the document that the attachments will the loaded from/saved to
+ * @param $options generic picker options
+ * @param $currentValue the currently selected file, used for determining if the empty box should be highlighted as the current value
+ *#
+#macro (attachmentPicker_displayAttachmentGalleryEmptyValue $targetDocument, $targetAttachDocument, $options, $currentValue)
+  #if ("$!{options.get('defaultValue')}" != '')
+    #set ($reference = ${options.get('defaultValue')})
+    #set ($docNameLimit = $reference.indexOf('@'))
+    #if ($docNameLimit &gt; 0)
+      #set ($docName = $reference.substring(0, $docNameLimit))
+    #else
+      #set ($docName = $targetAttachDocument.fullName)
+    #end
+    #set ($attachmentName = $reference.substring($mathtool.add($docNameLimit, 1)))
+    #set ($defaultAttachment = $xwiki.getDocument($docName).getAttachment($attachmentName))
+    #if ($defaultAttachment.isImage())
+      #set($dcssClass = 'gallery_image')
+    #end
+  #end
+  #attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
+  #attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
+  #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=&amp;form_token=$!{services.csrf.getToken()}"))
+  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}])
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($request.docname)
+  ###if ($request.xpage == 'plain')
+  ##  ## IE6 + XHR + gzip compression = BOOM!
+  ##  ## This disables the automatic gzip compression
+  ##  $response.setContentType('multipart/formdata')
+  ###end
+  #set ($targetDocument = $xwiki.getDocument($request.docname))
+  #if ($request.targetdocname)
+    ## Use the target document if it exists.
+    #set ($targetAttachDocument = $xwiki.getDocument($request.targetdocname))
+  #else
+    ## Otherwise, just use the current document as the target to save/load attachments
+    #set ($targetAttachDocument = $targetDocument)
+  #end
+  #if ("$!{request.savemode}" == 'direct')
+    #set($docAction = 'save')
+  #else
+    #set($docAction = $targetAttachDocument.getDefaultEditMode())
+  #end
+  #set ($filter = [])
+  #set ($rawfilter = '')
+  #if ("$!{request.filter}" != '')
+    #foreach ($value in $request.filter.trim().split('\s*+[,|; ]\s*+'))
+      #if ("$!value" != '')
+        #set ($discard = $filter.add($value.toLowerCase()))
+        #set ($rawfilter = "${rawfilter}, ${value}")
+      #end
+    #end
+    #if ($rawfilter != '')
+      #set ($rawfilter = $rawfilter.substring(2))
+    #end
+  #end
+  #if ("$!{request.displayImage}" == 'true')
+    #set ($displayImage = true)
+  #else
+    #set ($displayImage = false)
+  #end
+  ### Determine attachment sorting
+  #set($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
+  #set ($validAttachmentProperties = ['filename', 'date', 'filesize', 'author', 'version', 'mimeType'])
+  #if($sortAttachmentsBy == '' || $validAttachmentProperties.indexOf($sortAttachmentsBy) == -1)
+    ### Default to sorting by filename, sort not requested.
+    #set($sortAttachmentsBy = "filename")
+  #end
+  ### Set attachment sorting direction
+  #if($sortAttachmentsBy == 'date')
+    ### Sort the date descending
+    #set($sortAttachmentsBy = "date:desc")
+  #else
+    ### Sort everything else ascending
+    #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
+  #end
+  #set ($options = {
+    'classname' : ${request.get('classname')},
+    'object' : $!{mathtool.toInteger($request.object)},
+    'property' : ${request.property},
+    'displayImage' : ${displayImage},
+    'docAction' : ${docAction},
+    'defaultValue' : "$!{request.defaultValue}",
+    'rawfilter': "$!{rawfilter}",
+    'filter': ${filter},
+    'sortAttachmentsBy': ${sortAttachmentsBy}
+  })
+  $!targetDocument.use($targetDocument.getObject($options.classname, $options.object))##
+  #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
+
+  (% class="gallery_buttons buttons" %)(((
+  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;$targetDocument||class="button secondary" id="attachment-picker-close"]]
+  )))
+#end
+{{/velocity}}</content>
+</xwikidoc>

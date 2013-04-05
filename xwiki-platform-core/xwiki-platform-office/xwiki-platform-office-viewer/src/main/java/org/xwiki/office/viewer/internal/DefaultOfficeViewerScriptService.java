@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -35,8 +36,8 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.office.viewer.OfficeViewerScriptService;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -73,7 +74,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
      * @see #isMimeTypeSupported(String)
      */
     @Inject
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     /**
      * Used to lookup various {@link BlockRenderer} implementations based on the output syntax.
@@ -145,8 +146,29 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
     @Override
     public boolean isMimeTypeSupported(String mimeType)
     {
-        OpenOfficeConverter converter = this.officeManager.getConverter();
-        return converter != null && converter.isMediaTypeSupported(mimeType);
+        return isConversionSupported(mimeType, "text/html");
+    }
+
+    /**
+     * Use this method to check if the unidirectional conversion from a document format (input media type) to another
+     * document format (output media type) is supported by this converter.
+     * 
+     * @param inputMediaType the media type of the input document
+     * @param outputMediaType the media type of the output document
+     * @return {@code true} if a document can be converted from the input media type to the output media type,
+     *         {@code false} otherwise
+     */
+    private boolean isConversionSupported(String inputMediaType, String outputMediaType)
+    {
+        OfficeConverter converter = this.officeServer.getConverter();
+        if (converter != null) {
+            DocumentFormat inputFormat = converter.getFormatRegistry().getFormatByMediaType(inputMediaType);
+            DocumentFormat outputFormat = converter.getFormatRegistry().getFormatByMediaType(outputMediaType);
+            return inputFormat != null && outputFormat != null
+                && outputFormat.getStoreProperties(inputFormat.getInputFamily()) != null;
+        } else {
+            return false;
+        }
     }
 
     /**

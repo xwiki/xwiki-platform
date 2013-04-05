@@ -15,7 +15,7 @@
   <date>1299711367000</date>
   <contentUpdateDate>1299711367000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("admin.ooserver")</title>
+  <title>$services.localization.render('admin.ooserver')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -263,47 +263,47 @@ QJ7NUQem750OyGyv7ApgPugUvKoAh3QDvYXwwkc23ATjw7lsozAQ+eoAdGG6IPMB2vrNlTZWA94F
 lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content>
   </attachment>
   <content>{{velocity}}
-#set($msgParameter=$msg.get("xe.officeimporter.openoffice.parameter"))
-#set($msgValue=$msg.get("xe.officeimporter.openoffice.value"))
-#set($msgYes=$msg.get("xe.officeimporter.openoffice.yes"))
-#set($msgNo=$msg.get("xe.officeimporter.openoffice.no"))
-#set($msgServerType=$msg.get("xe.officeimporter.openoffice.servertype"))
-#set($msgServerPort=$msg.get("xe.officeimporter.openoffice.serverport"))
-#set($msgAutoConnect=$msg.get("xe.officeimporter.openoffice.autoconnect"))
-#set($msgAutoStart=$msg.get("xe.officeimporter.openoffice.autostart"))
-#set($msgServerTypeInternal=$msg.get("xe.officeimporter.openoffice.servertype.internal"))
-#set($msgServerTypeExternalLocal=$msg.get("xe.officeimporter.openoffice.servertype.external"))
-#set($msgServerTypeExternalRemote=$msg.get("xe.officeimporter.openoffice.servertype.remote"))
-#set($msgServerPath=$msg.get("xe.officeimporter.openoffice.serverpath"))
-#set($msgServerProfile=$msg.get("xe.officeimporter.openoffice.serverprofile"))
-#set($msgServerProfileDefault=$msg.get("xe.officeimporter.openoffice.serverprofile.default"))
-#set($msgServerState=$msg.get("xe.officeimporter.openoffice.serverstate"))
-#set($msgActions=$msg.get("xe.officeimporter.openoffice.actions"))
-#set($msgStart=$msg.get("xe.officeimporter.openoffice.actions.start"))
-#set($msgConnect=$msg.get("xe.officeimporter.openoffice.actions.connect"))
-#set($msgStop=$msg.get("xe.officeimporter.openoffice.actions.stop"))
-#set($msgDisconnect=$msg.get("xe.officeimporter.openoffice.actions.disconnect"))
-#set($msgRestart=$msg.get("xe.officeimporter.openoffice.actions.restart"))
-#set($msgUpdate=$msg.get("xe.officeimporter.openoffice.update"))
-#set($msgLimitedControl=$msg.get("xe.officeimporter.openoffice.limitedcontrol"))
+#set($msgParameter=$services.localization.render('xe.officeimporter.openoffice.parameter'))
+#set($msgValue=$services.localization.render('xe.officeimporter.openoffice.value'))
+#set($msgYes=$services.localization.render('xe.officeimporter.openoffice.yes'))
+#set($msgNo=$services.localization.render('xe.officeimporter.openoffice.no'))
+#set($msgServerType=$services.localization.render('xe.officeimporter.openoffice.servertype'))
+#set($msgServerPort=$services.localization.render('xe.officeimporter.openoffice.serverport'))
+#set($msgAutoConnect=$services.localization.render('xe.officeimporter.openoffice.autoconnect'))
+#set($msgAutoStart=$services.localization.render('xe.officeimporter.openoffice.autostart'))
+#set($msgServerTypeInternal=$services.localization.render('xe.officeimporter.openoffice.servertype.internal'))
+#set($msgServerTypeExternalLocal=$services.localization.render('xe.officeimporter.openoffice.servertype.external'))
+#set($msgServerTypeExternalRemote=$services.localization.render('xe.officeimporter.openoffice.servertype.remote'))
+#set($msgServerPath=$services.localization.render('xe.officeimporter.openoffice.serverpath'))
+#set($msgServerProfile=$services.localization.render('xe.officeimporter.openoffice.serverprofile'))
+#set($msgServerProfileDefault=$services.localization.render('xe.officeimporter.openoffice.serverprofile.default'))
+#set($msgServerState=$services.localization.render('xe.officeimporter.openoffice.serverstate'))
+#set($msgActions=$services.localization.render('xe.officeimporter.openoffice.actions'))
+#set($msgStart=$services.localization.render('xe.officeimporter.openoffice.actions.start'))
+#set($msgConnect=$services.localization.render('xe.officeimporter.openoffice.actions.connect'))
+#set($msgStop=$services.localization.render('xe.officeimporter.openoffice.actions.stop'))
+#set($msgDisconnect=$services.localization.render('xe.officeimporter.openoffice.actions.disconnect'))
+#set($msgRestart=$services.localization.render('xe.officeimporter.openoffice.actions.restart'))
+#set($msgUpdate=$services.localization.render('xe.officeimporter.openoffice.update'))
+#set($msgLimitedControl=$services.localization.render('xe.officeimporter.openoffice.limitedcontrol'))
 #if($hasAdmin)
   #set($currentAction = "$!{request.action}")
   #if($currentAction == "stop" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #if(!$oomanager.stopServer())
-      {{error}}$oomanager.lastErrorMessage{{/error}}
+    #if(!$services.officemanager.stopServer())
+      {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
     #end
   #elseif($currentAction == "start" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #if(!$oomanager.startServer())
-      {{error}}$oomanager.lastErrorMessage{{/error}}
+    #if(!$services.officemanager.startServer())
+      {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
     #end
   #elseif($currentAction == "restart" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #if(!$oomanager.stopServer())
-      {{error}}$oomanager.lastErrorMessage{{/error}}
+    #if(!$services.officemanager.stopServer())
+      {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
-    #elseif(!$oomanager.startServer())
-      {{error}}$oomanager.lastErrorMessage{{/error}}
+    #elseif(!$services.officemanager.startServer())
+      {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
     #end
   #end
@@ -311,39 +311,39 @@ lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content>
 #set($actionStart=$msgConnect)
 #set($actionStop=$msgDisconnect)
 #set($autoStart=$msgAutoConnect)
-#if($ooconfig.serverType == 0)
+#if($services.officemanager.config.serverType == 0)
   #set($serverType=$msgServerTypeInternal)
   #set($actionStart=$msgStart)
   #set($actionStop=$msgStop)
   #set($actionRestart=$msgRestart)
   #set($autoStart=$msgAutoStart)
-#elseif($ooconfig.serverType == 1)
+#elseif($services.officemanager.config.serverType == 1)
   #set($serverType=$msgServerTypeExternalLocal)
-#elseif($ooconfig.serverType == 2)
+#elseif($services.officemanager.config.serverType == 2)
   #set($serverType=$msgServerTypeExternalRemote)
 #end
 {{html wiki="true" clean="false"}}
 &lt;form action="" enctype="multipart/form-data" method="post" class="xform"&gt;
 &lt;fieldset&gt;
-&lt;legend&gt;$msg.get('admin.ooserver.options')&lt;/legend&gt;
+&lt;legend&gt;$services.localization.render('admin.ooserver.options')&lt;/legend&gt;
 
-{{info}}$msg.get('admin.ooserver.options.source', ['##xwiki.properties##']){{/info}}
+{{info}}$services.localization.render('admin.ooserver.options.source', ['##xwiki.properties##']){{/info}}
 
 &lt;dl&gt;
 &lt;dt&gt;&lt;label&gt;$msgServerType&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;$serverType&lt;/dd&gt;
 &lt;dt&gt;&lt;label&gt;$msgServerPort&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;$ooconfig.serverPort&lt;/dd&gt;
+&lt;dd&gt;$services.officemanager.config.serverPort&lt;/dd&gt;
 &lt;dt&gt;&lt;label&gt;$autoStart&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;#if($ooconfig.autoStart)$msgYes#else$msgNo#end&lt;/dd&gt;
-#if($ooconfig.serverType == 0)
+&lt;dd&gt;#if($services.officemanager.config.autoStart)$msgYes#else$msgNo#end&lt;/dd&gt;
+#if($services.officemanager.config.serverType == 0)
   &lt;dt&gt;&lt;label&gt;$msgServerPath&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;$ooconfig.homePath&lt;/dd&gt;
+  &lt;dd&gt;$services.officemanager.config.homePath&lt;/dd&gt;
   &lt;dt&gt;&lt;label&gt;$msgServerProfile&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;#if("$!ooconfig.profilePath" == '' &amp;&amp; $ooconfig.profilePath != '')$msgServerProfileDefault#{else}$ooconfig.profilePath#end&lt;/dd&gt;
+  &lt;dd&gt;#if("$!services.officemanager.config.profilePath" == '' &amp;&amp; $services.officemanager.config.profilePath != '')$msgServerProfileDefault#{else}$services.officemanager.config.profilePath#end&lt;/dd&gt;
 #end
 &lt;dt&gt;&lt;label&gt;$msgServerState&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;$oomanager.serverState&lt;/dd&gt;
+&lt;dd&gt;$services.officemanager.serverState&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;/fieldset&gt;
 #if($hasAdmin &amp;&amp; $xcontext.isMainWiki())

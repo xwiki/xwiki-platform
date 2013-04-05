@@ -463,9 +463,9 @@ public class ExtensionManagerScriptService implements ScriptService
     {
         setError(null);
 
-        if (installRequest.getProperty(PROPERTY_CHECKRIGHTS) != Boolean.TRUE
-            && !this.documentAccessBridge.hasProgrammingRights()) {
-            installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            // Make sure only PR user can remove the right checking or change the users
+            setRightsProperties(installRequest);
         }
 
         Job job = null;
@@ -496,16 +496,21 @@ public class ExtensionManagerScriptService implements ScriptService
             installRequest.addNamespace(namespace);
         }
 
+        setRightsProperties(installRequest);
+
+        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
+
+        return installRequest;
+    }
+
+    private void setRightsProperties(InstallRequest installRequest)
+    {
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
         installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
             installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
-
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
-
-        return installRequest;
     }
 
     /**
@@ -519,9 +524,9 @@ public class ExtensionManagerScriptService implements ScriptService
     {
         setError(null);
 
-        if (installRequest.getProperty(PROPERTY_CHECKRIGHTS) != Boolean.TRUE
-            && !this.documentAccessBridge.hasProgrammingRights()) {
-            installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            // Make sure only PR user can remove the right checking or change the users
+            setRightsProperties(installRequest);
         }
 
         Job job = null;

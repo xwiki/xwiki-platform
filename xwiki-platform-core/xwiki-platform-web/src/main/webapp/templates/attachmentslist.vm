@@ -14,40 +14,50 @@
   ### Sort everthing else ascending
   #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
 #end
+## Determine the redirect.
+#set ($redirect = "$!request.xredirect")
+#if ($redirect == '')
+  #if ("$!request.viewer" == 'attachments')
+    #set ($redirect = $doc.getURL('view', 'viewer=attachments'))
+  #else
+    #set ($redirect = "$doc.getURL()#Attachments")
+  #end
+#end
 #set($attachments = $sorttool.sort($doc.attachmentList, "$sortAttachmentsBy"))
 #if($attachments.size() > 0)
   #foreach ($attach in $attachments)
     <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
     <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
     <div class="information">
-    <span class="name"><a href="$doc.getAttachmentURL(${attach.filename}, 'download')" title="$msg.get('core.viewers.attachments.download')">$escapetool.xml($attach.filename)</a></span>
+    <span class="name"><a href="$doc.getAttachmentURL(${attach.filename})"
+      title="$services.localization.render('core.viewers.attachments.download')">$escapetool.xml($attach.filename)</a></span>
     <span class="xwikibuttonlinks">
     #if($hasEdit || $hasAdmin)
       ## Delete attachment link
-      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url(${redirect})")"  title="$msg.get('core.viewers.attachments.delete.title', [$escapetool.xml($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
+      <a class="deletelink" href="$doc.getAttachmentURL($attach.filename, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url($redirect)")"
+        title="$services.localization.render('core.viewers.attachments.delete.title', [$escapetool.xml($attach.filename)])">$services.localization.render('core.viewers.attachments.delete')</a>
       ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
-      ## the browser supports Dav Edit 
-      #set($documentUrl=$doc.getExternalURL("download"))
-      #set($attachmentUrl="$documentUrl/$attach.filename")
-      #set($attachmentSignature="${request.contextPath}${request.servletPath}/download/")
-      #set($webdavSignature="${request.contextPath}/webdav/spaces/")
-      #set($fragments=$attachmentUrl.split($attachmentSignature))
-      #if($listtool.size($fragments) == 2)
-        #set($prefix=$listtool.get($fragments, 0))
-        #set($suffix=$listtool.get($fragments, 1))
-        #set($davUrl="$prefix$webdavSignature$suffix")
-        #set ($davUrl = $davUrl.replace('+', '%20'))
-        <a title="$msg.get('core.viewers.attachments.webdavEdit.title')" class="editlink hidden" href="$davUrl" onclick="if(XWiki && XWiki.WebDAV){XWiki.WebDAV.davEdit('$davUrl')}; return false;">$msg.get('core.viewers.attachments.webdavEdit')</a>
-      #end
+      ## the browser supports Dav Edit.
+      ## TODO: We need an API (script service) to create WebDAV URLs.
+      #set ($davURL = "$request.contextPath/webdav/spaces/$escapetool.url($doc.space)/$escapetool.url($doc.name)/$escapetool.url($attach.filename)")
+      ## The WebDAV servlet doesn't like when spaces are encoded using + in the URL. We need to investigate why.
+      #set ($davURL = $davURL.replace('+', '%20'))
+      <a title="$services.localization.render('core.viewers.attachments.webdavEdit.title')" class="editlink hidden" href="$davURL"
+        onclick="if (XWiki && XWiki.WebDAV) {XWiki.WebDAV.davEdit('$davURL')}; return false;">
+        $services.localization.render('core.viewers.attachments.webdavEdit')
+      </a>
     #end ## hasEdit
-    #if("$!{oomanager.serverState}" == "Connected" && $services.officeviewer.isMimeTypeSupported($attach.getMimeType().toLowerCase()))
-      <a class="viewlink" title="$msg.get('core.viewers.attachments.officeView.title')" href="${doc.getURL('view', "xpage=office&attachment=$escapetool.url($attach.filename)")}" target="_blank">$msg.get('core.viewers.attachments.officeView')</a>
+    #if("$!{services.officemanager.serverState}" == "Connected" && $services.officeviewer.isMimeTypeSupported($attach.getMimeType().toLowerCase()))
+      <a class="viewlink" title="$services.localization.render('core.viewers.attachments.officeView.title')"
+        href="${doc.getURL('view', "xpage=office&attachment=$escapetool.url($attach.filename)")}"
+        target="_blank">$services.localization.render('core.viewers.attachments.officeView')</a>
     #end
     </span> ## xwikibuttonlinks
-    <span class="version"><a href="$doc.getAttachmentURL(${attach.filename}, 'viewattachrev')" title="$msg.get('core.viewers.attachments.showHistory')">$attach.version</a></span>
+    <span class="version"><a href="$doc.getAttachmentURL(${attach.filename}, 'viewattachrev')"
+      title="$services.localization.render('core.viewers.attachments.showHistory')">$attach.version</a></span>
     <div class="meta">
-    <span class="publisher">$msg.get('core.viewers.attachments.author', [$!{xwiki.getUserName($attach.author)}])</span>
-    <span class="date">$msg.get('core.viewers.attachments.date', [$!{xwiki.formatDate($attach.date)}])</span>
+    <span class="publisher">$services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attach.author)}])</span>
+    <span class="date">$services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attach.date)}])</span>
     <span class="size">(#dynamicsize($attach.filesize))</span>
     </div>
     </div>
@@ -60,5 +70,5 @@ if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
 // ]]>
 </script>
 #else ## No attachments
-  <p class="noitems">$msg.get('core.viewers.attachments.noAttachments')</p>
+  <p class="noitems">$services.localization.render('core.viewers.attachments.noAttachments')</p>
 #end

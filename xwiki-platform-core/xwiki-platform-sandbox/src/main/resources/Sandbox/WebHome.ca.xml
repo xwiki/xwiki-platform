@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>ca</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>El calaix és una part de la vostra wiki que podeu modificar lliurement. Es tracta de deixar-vos practicar l'edició. Podreu descobrir com treballa l'edició de pàgines i crear-n'hi de noves. Per a començar simplement cliqueu al damunt d' **Editar**!
+
+{{info}}No us preocupeu de sobreescriure o de perdre coses quant editeu la pàgina, sempre podreu retrocedir a la primera versió de la pàgina des de la pestanya "Històric" que es troba en la part inferior de la pàgina.{{/info}}
+
+Si voleu podeu donar un cop d'ull a la base de la [[sintaxi d'XWiki&gt;&gt;XWiki.XWikiSyntax]], també podeu clicar a "Codi Wiki" del menú "Mostrar" o bé quan esteu editant la pàgina podeu clicar a la pertanya "Codi".
+
+Aguí hi han un grapat de pàgines de proves amb les quals podeu jugar-hi:
+
+* [[Pàgina de proves 1&gt;&gt;Sandbox.TestPage1]]
+* [[Pàgina de proves 2&gt;&gt;Sandbox.TestPage2]]
+* [[Pàgina de proves 3&gt;&gt;Sandbox.TestPage3]]
+
+A continuació hi ha una demostració de la [[sintaxi d'XWiki&gt;&gt;XWiki.XWikiSyntax]] que podeu utilitzar en pàgines de la wiki (encapçalaments, imatges, taules).
+
+= Encapçalaments =
+
+XWiki ofereix 6 nivells d'encapçalaments. Els podeu utilitzar per a estructurar les vostres pàgines.
+
+== Encapçalament de nivell 2 ==
+
+=== Encapçalament de nivell 3 ===
+
+==== Encapçalament de nivell 4 ====
+
+===== Encapçalament de nivell 5 =====
+
+====== Encapçalament de nivell 6 ======
+
+= Estils =
+
+Estils bàsics que estan suportats en la XWiki:
+
+* **Text en negreta**
+* //Text en cursiva//
+* __Text subratllat__
+* --Text tatxat--
+* Text en ,,sub-índex,,
+* Text en ^^super-índex^^
+
+= Llistes =
+
+Podeu crear diversos tipus de llistes en les vostres pàgines wiki:
+
+== Llista desordenada ==
+
+* Nivell 1
+** Nivell 2
+*** Nivell 3
+** Nivell 2
+* Nivell 1
+
+== Llista ordenada ==
+
+1. Ítem
+11. Subítem
+111. Ítem
+1. Subítem
+
+== Llista mesclada ==
+
+1. Ítem 1
+11. Ítem 2
+11*. Ítem 3
+11*. Ítem 4
+1. Ítem 5
+
+= Taules =
+
+Podeu crear taules senzilles a l'interior de les pàgines de la wiki:
+
+== Taula senzilla ==
+
+| cel·la 1 | cel·la 2 | cel·la 3
+| cel·la 4 | cel·la 5 | cel·la 6
+| cel·la 7 | cel·la 8 | cel·la 9
+
+== Taula amb 1 fila de capçaleres ==
+
+|= capçalera de la taula |= capçalera de la taula |= capçalera de la taula
+| cel·la | cel·la | cel·la
+| cel·la | cel·la | cel·la
+
+== Taula amb 2 files de capçaleres ==
+
+|= capçalera de la taula |= capçalera de la taula |= capçalera de la taula
+|= capçalera de la taula | cel·la | cel·la
+|= capçalera de la taula | cel·la | cel·la
+
+= Enllaços =
+
+XWiki us permet crear enllaços a altres pàgines de la wiki i d'altres webs:
+
+* [[WebHome]] -&gt; Enllaça a la pàgina inicial de l'espai actual
+* [[Inici del calaix de proves&gt;&gt;WebHome]] -&gt; els enllaços poden tenir etiquetes
+* [[Pàgina d'inici de Wiki&gt;&gt;Main.WebHome]] -&gt; un enllaç pot utilitzar el format NomEspai.NomPàgina per a enllaçar pàgines situades en altres espais
+* [[http://www.xwiki.org]] -&gt; podeu enllaçar a pàgines de la wiki, o bé a llocs web externs
+* [[Lloc web XWiki.org&gt;&gt;http://www.xwiki.org]] -&gt; Les etiquetes d'enllaç també funcionen amb enllaços externs
+
+= Imatges =
+
+també podeu inserir imatges en les vostres pàgines de la wiki:
+
+[[image:XWikiLogo.png]]
+
+= Macros =
+
+Les macros us permeten que es vegi millor el contingut de la wiki, i afegir característiques addicionals a la vostra wiki. Aquí hi han 2 exemples de com es poden utilitzar les macros en pàgines de la wiki:
+
+== Macro d'advertència ==
+
+Aquesta macro us permet cridar l'atenció als usuaris amb trossos d'informació:
+
+{{warning}}Hola Mon!{{/warning}}
+
+== Taula de continguts ==
+
+Aquesta macro genera automàticament la taula de continguts basada amb encapçalaments de la vostra pàgina wiki:
+
+{{toc/}}</content>
+</xwikidoc>

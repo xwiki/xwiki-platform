@@ -41,7 +41,7 @@
         #set($discard = $entryObj.set('published', 1))
         ## Uncomment if you want to always set the publication date to the date when the post was actually published.
         ## #set($discard = $entryObj.set('publishDate', $util.date))
-        $entryDoc.save($msg.get('xe.blog.publisher.published'))
+        $entryDoc.save($services.localization.render('xe.blog.publisher.published'))
       #end
     #end
   #end

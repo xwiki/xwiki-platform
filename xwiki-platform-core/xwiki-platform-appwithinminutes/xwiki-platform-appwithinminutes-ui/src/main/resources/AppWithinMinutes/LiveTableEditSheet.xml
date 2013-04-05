@@ -131,7 +131,7 @@ XWiki.LiveTableEditor = Class.create({
     }
     var deprecated = !prettyName;
     prettyName = prettyName || name;
-    var item = new Element('li').update('&lt;span title="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorMoveColumnHint'))"&gt;' + prettyName.escapeHTML() + '&lt;/span&gt;&lt;span title="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorDeleteColumnHint'))" class="delete"&gt;X&lt;/span&gt;');
+    var item = new Element('li').update('&lt;span title="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorMoveColumnHint'))"&gt;' + prettyName.escapeHTML() + '&lt;/span&gt;&lt;span title="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorDeleteColumnHint'))" class="delete"&gt;X&lt;/span&gt;');
     if (deprecated) {
       item.addClassName('deprecated');
       this.deprecationMessage.show();
@@ -166,7 +166,7 @@ XWiki.LiveTableEditor = Class.create({
     this.columnsSelect = $('availableColumns');
     this.columnsSelect.selectedIndex = -1;
 
-    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorAddColumnHint'))'});
+    var addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.liveTableEditorAddColumnHint'))'});
     addButton.observe('click', this._onAddColumn.bindAsEventListener(this));
 
     var picker = new Element('div', {'class': 'columnPicker'}).insert(this.columnsSelect).insert(addButton);
@@ -199,7 +199,7 @@ XWiki.LiveTableEditor = Class.create({
     }.bind(this));
   },
   _createDeprecationMessage : function() {
-    this.deprecationMessage = new Element('div', {'class': 'warningmessage'}).update('$escapetool.javascript($msg.get('platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning'))');
+    this.deprecationMessage = new Element('div', {'class': 'warningmessage'}).update('$escapetool.javascript($services.localization.render('platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning'))');
     this.columnsInput.up().insert(this.deprecationMessage);
     this.deprecationMessage.hide();
     var yes = this.deprecationMessage.down('a');
@@ -543,13 +543,13 @@ return XWiki;
     #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
     #set($discard = $services.localization.use('document', "$stringtool.removeEnd($className, 'Class')Translations"))
     #if($classFields.size() &gt; 0)
-      &lt;optgroup label="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
+      &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
         #foreach($field in $classFields)
           &lt;option value="$field.name"&gt;$escapetool.xml($field.translatedPrettyName)&lt;/option&gt;
         #end
       &lt;/optgroup&gt;
     #end
-    &lt;optgroup label="$escapetool.xml($msg.get('platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
+    &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
       #foreach($entry in $genericColumns.entrySet())
         &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;$escapetool.xml($entry.value.get(0))&lt;/option&gt;
       #end
@@ -560,19 +560,19 @@ return XWiki;
 
 #macro(displayHelpPanel)
   #set($genericColumns = {
-    'doc.title': [$msg.get('platform.appwithinminutes.liveTableEditorDocTitleColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')],
-    'doc.name': [$msg.get('platform.appwithinminutes.liveTableEditorDocNameColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')],
-    'doc.author': [$msg.get('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')],
-    'doc.creator': [$msg.get('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')],
-    'doc.date': [$msg.get('platform.appwithinminutes.liveTableEditorDocDateColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')],
-    'doc.creationDate': [$msg.get('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')],
-    '_actions': [$msg.get('platform.appwithinminutes.liveTableEditorActionsColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorActionsColumnDescription')],
-    '_attachments': [$msg.get('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')],
-    '_images': [$msg.get('platform.appwithinminutes.liveTableEditorImagesColumnName'), $msg.get('platform.appwithinminutes.liveTableEditorImagesColumnDescription')]
+    'doc.title': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')],
+    'doc.name': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')],
+    'doc.author': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')],
+    'doc.creator': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')],
+    'doc.date': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')],
+    'doc.creationDate': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')],
+    '_actions': [$services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnDescription')],
+    '_attachments': [$services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')],
+    '_images': [$services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnDescription')]
   })
   (% class="wizard-help" %)
   (((
-    **$msg.get('platform.appwithinminutes.liveTableEditorHelpTitle')** $msg.get('platform.appwithinminutes.liveTableEditorHelpDescription')
+    **$services.localization.render('platform.appwithinminutes.liveTableEditorHelpTitle')** $services.localization.render('platform.appwithinminutes.liveTableEditorHelpDescription')
 
     #foreach($columnId in ['doc.name', 'doc.date', 'doc.author', '_actions'])
       ; {{{$genericColumns.get($columnId).get(0)}}}
@@ -593,10 +593,10 @@ return XWiki;
     #listAvailableColumns()
   )))
   ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
-    (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorDescriptionHint')
+    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorDescriptionHint')
   : $doc.display('description')
   ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;##
-    (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorColumnsHint')
+    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')
   : $doc.display('columns')
   {{/html}}
 #end
@@ -613,8 +613,8 @@ return XWiki;
     #end
     {{html wiki="true"}}
       ## The icon
-      ; &lt;label for="applicationIcon"&gt;$msg.get('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
-        (% class="xHint" %)$msg.get('platform.appwithinminutes.liveTableEditorIconHint', $xwiki.getSkinFile('icons/silk/index_abc.png'))  
+      ; &lt;label for="applicationIcon"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
+        (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorIconHint', $xwiki.getSkinFile('icons/silk/index_abc.png'))  
       : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!icon" /&gt;
       {{/html}}
   #end
@@ -659,7 +659,7 @@ return XWiki;
       #set($discard = $spacePrefsDoc.set('users', $services.model.serialize($xcontext.userReference, 'default')))
       #set($discard = $spacePrefsDoc.setParent($services.model.serialize($spaceHomeRef, 'default')))
       #set($discard = $spacePrefsDoc.setHidden(true))
-      #set($discard = $spacePrefsDoc.saveWithProgrammingRights($msg.get('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
+      #set($discard = $spacePrefsDoc.saveWithProgrammingRights($services.localization.render('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
     #end
   #end
 #end
@@ -671,7 +671,7 @@ return XWiki;
   #set($minorEdit = "$!request.minorEdit" != '')
   #set($comment = $request.comment)
   #if("$!comment" == '')
-    #set($comment = $msg.get('platform.appwithinminutes.liveTableEditorSaveComment'))
+    #set($comment = $services.localization.render('platform.appwithinminutes.liveTableEditorSaveComment'))
   #end
   #set($discard = $doc.save($comment, $minorEdit))
 #end
@@ -684,7 +684,7 @@ return XWiki;
     #set ($discard = $liveTableResultsDoc.setParent($doc.name))
     #set ($discard = $liveTableResultsDoc.setHidden(true))
     #set ($discard = $liveTableResultsDoc.setContent($doc.getRenderedContent($liveTableResultsGeneratorDoc.content, $liveTableResultsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
-    #set ($discard = $liveTableResultsDoc.save($msg.get('platform.appwithinminutes.liveTableEditorCreateLiveTableResultsComment')))
+    #set ($discard = $liveTableResultsDoc.save($services.localization.render('platform.appwithinminutes.liveTableEditorCreateLiveTableResultsComment')))
   #end
 #end
 

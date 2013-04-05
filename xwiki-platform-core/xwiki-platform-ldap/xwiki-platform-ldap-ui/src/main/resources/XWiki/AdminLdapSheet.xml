@@ -504,13 +504,13 @@ document.observe("xwiki:dom:loaded", function(){
    var groupMapping = $('XWiki.XWikiPreferences_0_ldap_group_mapping'),
        fieldMapping = $('XWiki.XWikiPreferences_0_ldap_fields_mapping');
 
-  groupMapping.setAttribute("data-key-tip", "${escapetool.javascript($msg.get('platform.ldap.xwikiGroupTip'))}")
-  groupMapping.setAttribute("data-value-tip", "${escapetool.javascript($msg.get('platform.ldap.ldapGroupTip'))}")
+  groupMapping.setAttribute("data-key-tip", "${escapetool.javascript($services.localization.render('platform.ldap.xwikiGroupTip'))}")
+  groupMapping.setAttribute("data-value-tip", "${escapetool.javascript($services.localization.render('platform.ldap.ldapGroupTip'))}")
   groupMapping.setAttribute("data-separator", "|")
   groupMapping.addClassName("properties-editor");
 
-  fieldMapping.setAttribute("data-key-tip", "${escapetool.javascript($msg.get('platform.ldap.xwikiUserField'))}")
-  fieldMapping.setAttribute("data-value-tip", "${escapetool.javascript($msg.get('platform.ldap.ldapUserField'))}")
+  fieldMapping.setAttribute("data-key-tip", "${escapetool.javascript($services.localization.render('platform.ldap.xwikiUserField'))}")
+  fieldMapping.setAttribute("data-value-tip", "${escapetool.javascript($services.localization.render('platform.ldap.ldapUserField'))}")
   fieldMapping.addClassName("properties-editor");
 
 });</code>
@@ -656,25 +656,25 @@ Note : 'ldap_validate_password' has been voluntary left out, has it's xwiki.cfg 
 {{velocity}}
 #if(!$services.ldap)
 {{error}}
-$msg.get('platform.ldap.missingLdapService')
+$services.localization.render('platform.ldap.missingLdapService')
 {{/error}}
 #elseif(!$services.ldap.isXWikiLDAPAuthenticator())
 {{warning}}
-$msg.get('platform.ldap.ldapAuthenticationIsNotEnabledWarning')
+$services.localization.render('platform.ldap.ldapAuthenticationIsNotEnabledWarning')
 {{/warning}}
 #end
 {{/velocity}}
 
-= {{velocity}}$msg.get('platform.ldap.adminHeadingConfiguration'){{/velocity}} =
+= {{velocity}}$services.localization.render('platform.ldap.adminHeadingConfiguration'){{/velocity}} =
 
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}
 
-= {{velocity}}$msg.get('platform.ldap.adminHeadingMiscellaneous'){{/velocity}} =
+= {{velocity}}$services.localization.render('platform.ldap.adminHeadingMiscellaneous'){{/velocity}} =
 
 {{velocity}}
 #if ($request.action_resetgroupcache)
  #set($void = $services.ldap.resetGroupCache())
- {{success}}$msg.get('platform.ldap.resetGroupCacheSuccess'){{/success}}
+ {{success}}$services.localization.render('platform.ldap.resetGroupCacheSuccess'){{/success}}
 #end
 {{/velocity}}
 
@@ -682,7 +682,7 @@ $msg.get('platform.ldap.ldapAuthenticationIsNotEnabledWarning')
 {{html wiki="false"}}
 &lt;form method="post" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
 &lt;fieldset&gt;
-&lt;span class="buttonwrapper"&gt;&lt;input name="action_resetgroupcache" value="$msg.get('platform.ldap.resetGroupCacheButton')" class="button" type="submit"&gt;&lt;/span&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input name="action_resetgroupcache" value="$services.localization.render('platform.ldap.resetGroupCacheButton')" class="button" type="submit"&gt;&lt;/span&gt;
 &lt;/fieldset&gt;
 &lt;/form&gt;
 {{/html}}

@@ -5,7 +5,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-#xwikimessagebox($msg.get("resetversions") $msg.get("confirmresetversions") $doc.getURL("reset", "confirm=1&amp;form_token=$!{services.csrf.getToken()}") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
+#xwikimessagebox($services.localization.render('resetversions') $services.localization.render('confirmresetversions') $doc.getURL("reset", "confirm=1&amp;form_token=$!{services.csrf.getToken()}") $doc.getURL("view") $services.localization.render('yes') $services.localization.render('no'))
 <div class="clearfloats"></div>
 </div>## mainContentArea
 </div>## main

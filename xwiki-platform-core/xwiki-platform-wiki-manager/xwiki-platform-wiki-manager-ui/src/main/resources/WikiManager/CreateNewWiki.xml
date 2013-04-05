@@ -15,7 +15,7 @@
   <date>1319464582000</date>
   <contentUpdateDate>1319464582000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("wikimanager.createwiki")</title>
+  <title>$services.localization.render('wikimanager.createwiki')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -77,13 +77,10 @@
 ## PLUGINS DEPENDANCIES
 #set ($WikiManager = $services.wikimanager)
 #if (!$WikiManager)
-  #error($msg.get("wikimanager.pluginnotenabled"))
+  #error($services.localization.render('wikimanager.pluginnotenabled'))
 #end
 #if (!$services.applicationmanager)
-  #error($msg.get("xapp.pluginnotenabled"))
-#end
-#if(!$xwiki.isVirtualMode())
-  #error($msg.get("wikimanager.notinvirtualmode"))
+  #error($services.localization.render('xapp.pluginnotenabled'))
 #end
 ############################################################################################
 ## MACROS
@@ -101,13 +98,13 @@
 #macro(printUsersAndGroups $users $groups $rightlevel $userlist $grouplist $hidden)
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
     #foreach ($user in $users)
-      #if ($xcontext.database == $xcontext.mainWikiName) #set ($user = "${xcontext.mainWikiName}:${user}") #end
+      #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
       &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
     #end
   &lt;/select&gt;
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;
     #foreach ($group in $groups)
-      #if ($xcontext.database == $xcontext.mainWikiName) #set ($group = "${xcontext.mainWikiName}:${group}") #end
+      #if ($xcontext.isMainWiki()) #set ($group = "${xcontext.mainWikiName}:${group}") #end
       #set ($pointindex = $group.indexOf(".") + 1)
       &lt;option value="$group" #if ($grouplist &amp;&amp; $grouplist.contains($group)) selected="selected" #end&gt;$group.substring($pointindex)&lt;/option&gt;
     #end
@@ -161,12 +158,12 @@
 #set ($WSTEPNAME_SUMMARY = "wstep_summary")
 #set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
 #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiOrDatabaseAvailableService").URL)
-#set ($MSG_ERROR_WIKIALREADYEXISTS = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.wikialreadyexists')&lt;/span&gt;")
-#set ($MSG_WARNING_DATABASEALREADYEXISTS = "&lt;span class='warningmessage'&gt;&lt;span class='messagetype'&gt;$msg.get('warning'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
-#set ($MSG_ERROR_DATABASEALREADYEXISTS = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
-#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;/span&gt;")
-#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;/span&gt;")
-#set ($MSG_INFO_WIKINAMEVALID = "&lt;span class='infomessage'&gt;&lt;span class='messagetype'&gt;$msg.get('info'): &lt;/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKIALREADYEXISTS = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$services.localization.render('error'): &lt;/span&gt;$services.localization.render('wikimanager.wikiname.error.wikialreadyexists')&lt;/span&gt;")
+#set ($MSG_WARNING_DATABASEALREADYEXISTS = "&lt;span class='warningmessage'&gt;&lt;span class='messagetype'&gt;$services.localization.render('warning'): &lt;/span&gt;$services.localization.render('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
+#set ($MSG_ERROR_DATABASEALREADYEXISTS = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$services.localization.render('error'): &lt;/span&gt;$services.localization.render('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$services.localization.render('error'): &lt;/span&gt;$services.localization.render('wikimanager.wikiname.error.alreadyused')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$services.localization.render('error'): &lt;/span&gt;$services.localization.render('wikimanager.wikiname.error.empty')&lt;/span&gt;")
+#set ($MSG_INFO_WIKINAMEVALID = "&lt;span class='infomessage'&gt;&lt;span class='messagetype'&gt;$services.localization.render('info'): &lt;/span&gt;$services.localization.render('wikimanager.wikiname.info.valid')&lt;/span&gt;")
 ##
 ############################################################################################
 ## REQUEST PARAMETERS
@@ -216,11 +213,11 @@
 ##
 #############################################################################
 ##
-1 $msg.get("wikimanager.createwiki")
+1 $services.localization.render('wikimanager.createwiki')
 #if ($wstepbystep)
-  [$msg.get("wikimanager.action.createwiki.nonstepbystep")&gt;CreateNewWiki#if($documentation)?doc=1#end]
+  [$services.localization.render('wikimanager.action.createwiki.nonstepbystep')&gt;CreateNewWiki#if($documentation)?doc=1#end]
 #else
-  [$msg.get("wikimanager.action.createwiki.stepbystep")&gt;CreateNewWiki?stepbystep=0&amp;amp;#if($documentation)doc=1#end]
+  [$services.localization.render('wikimanager.action.createwiki.stepbystep')&gt;CreateNewWiki?stepbystep=0&amp;amp;#if($documentation)doc=1#end]
 #end
 ##
 #if ($action &amp;&amp; $action == "create")
@@ -245,12 +242,12 @@
     ##
     #set ($ok = $xcontext.setDatabase($currentwiki))
     ##
-    #info($msg.get("wikimanager.successcreatewiki", [$wikiname, $wikidocument.getHomePageUrl()]))
+    #info($services.localization.render('wikimanager.successcreatewiki', [$wikiname, $wikidocument.getHomePageUrl()]))
   #else
     #if ($result == $Exception.ERROR_WM_WIKIALREADYEXISTS)
-      #error($msg.get("wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS", [$wikiname, $result]))
+      #error($services.localization.render('wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS', [$wikiname, $result]))
     #else
-      #error($msg.get("wikimanager.errorcreatewiki", [$wikiname, $xcontext.lastexception]))
+      #error($services.localization.render('wikimanager.errorcreatewiki', [$wikiname, $xcontext.lastexception]))
     #end
   #end
 #end
@@ -450,23 +447,23 @@
 &lt;form method="get" action="" id="wikicreationform"&gt;
   #if ($wstepbystep)
   &lt;div id="$WSTEPNAME_INTRO"&gt;
-    ##1.1 $msg.get("wikimanager.title.createwiki.intro")
-    &lt;p&gt;$msg.get("wikimanager.doc.createwiki.intro")&lt;/p&gt;
+    ##1.1 $services.localization.render('wikimanager.title.createwiki.intro')
+    &lt;p&gt;$services.localization.render('wikimanager.doc.createwiki.intro')&lt;/p&gt;
   &lt;/div&gt;
   #end
   ##
   #############################################################################
   ##
   &lt;div id="$WSTEPNAME_WIKINAME"&gt;
-    1.1 $msg.get("wikimanager.title.createwiki.wikiname")
+    1.1 $services.localization.render('wikimanager.title.createwiki.wikiname')
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label  for="wikiname"&gt;$msg.get("wikimanager.prop.wiki.wikiname")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.wikiname")&lt;/dd&gt; #end
+      &lt;dt&gt;&lt;label  for="wikiname"&gt;$services.localization.render('wikimanager.prop.wiki.wikiname')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$services.localization.render('wikimanager.doc.createwiki.wikiname')&lt;/dd&gt; #end
       &lt;dd&gt;
         &lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
         &lt;span id="wikinamevalidation"&gt;&lt;/span&gt;
-        &lt;div id="forcewikinamediv"&gt;&lt;input id="forcewikiname" name="forcewikiname" type="checkbox" #if ($failonexist == false)checked="true"#end onchange="forceWikiNameChanged();"/&gt;&lt;label for="forcewikiname"&gt;$msg.get("wikimanager.wikiname.force")&lt;/label&gt;&lt;/div&gt;
+        &lt;div id="forcewikinamediv"&gt;&lt;input id="forcewikiname" name="forcewikiname" type="checkbox" #if ($failonexist == false)checked="true"#end onchange="forceWikiNameChanged();"/&gt;&lt;label for="forcewikiname"&gt;$services.localization.render('wikimanager.wikiname.force')&lt;/label&gt;&lt;/div&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
@@ -474,30 +471,30 @@
   #############################################################################
   ##
   &lt;div id="$WSTEPNAME_WIKIDESC"&gt;
-    1.1 $msg.get("wikimanager.title.createwiki.desc")
-    #if ($documentation) $msg.get("wikimanager.doc.createwiki.desc") #end
+    1.1 $services.localization.render('wikimanager.title.createwiki.desc')
+    #if ($documentation) $services.localization.render('wikimanager.doc.createwiki.desc') #end
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_wikiprettyname"&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.desc.wikiprettyname")&lt;/dd&gt; #end
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_wikiprettyname"&gt;$services.localization.render('wikimanager.prop.wiki.wikiprettyname')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$services.localization.render('wikimanager.doc.createwiki.desc.wikiprettyname')&lt;/dd&gt; #end
       &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_wikiprettyname" name="XWiki.XWikiServerClass_0_wikiprettyname" type="text" onchange="prettyNameChanged();" /&gt;&lt;/dd&gt;
     &lt;/dl&gt;
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_description"&gt;$msg.get("wikimanager.prop.wiki.description")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.description")&lt;/td&gt; #end
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_description"&gt;$services.localization.render('wikimanager.prop.wiki.description')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$services.localization.render('wikimanager.doc.createwiki.desc.description')&lt;/td&gt; #end
       &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
     &lt;/dl&gt;
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_server"&gt;$msg.get("wikimanager.prop.wiki.server")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.desc.server.creation", [$ALIASSUFFIX])&lt;/dd&gt; #end
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_server"&gt;$services.localization.render('wikimanager.prop.wiki.server')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$services.localization.render('wikimanager.doc.createwiki.desc.server.creation', [$ALIASSUFFIX])&lt;/dd&gt; #end
       &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_server" name="XWiki.XWikiServerClass_0_server" type="text" onchange="domainNameChanged();" /&gt;&lt;/dd&gt;
     &lt;/dl&gt;
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_owner"&gt;$msg.get("wikimanager.prop.wiki.owner")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.desc.owner")&lt;/dd&gt; #end
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_owner"&gt;$services.localization.render('wikimanager.prop.wiki.owner')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$services.localization.render('wikimanager.doc.createwiki.desc.owner')&lt;/dd&gt; #end
       &lt;dd&gt;$wikidocument.display("owner", "edit")&lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
@@ -505,12 +502,12 @@
   #############################################################################
   ##
   &lt;div id="$WSTEPNAME_DATAFROM"&gt;
-    1.1 $msg.get("wikimanager.title.createwiki.datafrom")
-    #if ($documentation) $msg.get("wikimanager.doc.createwiki.datafrom") #end
+    1.1 $services.localization.render('wikimanager.title.createwiki.datafrom')
+    #if ($documentation) $services.localization.render('wikimanager.doc.createwiki.datafrom') #end
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="wikitemplate"&gt;$msg.get("wikimanager.wikitemplate")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.datafrom.template")&lt;/dd&gt; #end
+      &lt;dt&gt;&lt;label for="wikitemplate"&gt;$services.localization.render('wikimanager.wikitemplate')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$services.localization.render('wikimanager.doc.createwiki.datafrom.template')&lt;/dd&gt; #end
       &lt;dd&gt;
         #set ($listtemplate=$WikiManager.getWikiTemplateList())
         &lt;select #if($listtemplate.size() == 0)disabled="disabled"#end name="wikitemplate" id="wikitemplate"&gt;
@@ -523,8 +520,8 @@
     &lt;/dl&gt;
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="wikipackage"&gt;$msg.get("wikimanager.wikipackage")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.datafrom.package")&lt;/dd&gt; #end
+      &lt;dt&gt;&lt;label for="wikipackage"&gt;$services.localization.render('wikimanager.wikipackage')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$services.localization.render('wikimanager.doc.createwiki.datafrom.package')&lt;/dd&gt; #end
       &lt;dd&gt;
         #set ($listpackage=$doc.getAttachmentList())
         &lt;select #if($listpackage.size() == 0)disabled="disabled"#end name="wikipackage" id="wikipackage"&gt;
@@ -543,24 +540,24 @@
   #set ($users = $rightsmanager.usersApi.allGlobalUsersNames)
   #set ($groups = $rightsmanager.groupsApi.allGlobalGroupsNames)
   &lt;div id="$WSTEPNAME_USERS"&gt;
-    1.1 $msg.get("wikimanager.title.createwiki.members")
-    #if ($documentation) $msg.get("wikimanager.doc.createwiki.members") #end
+    1.1 $services.localization.render('wikimanager.title.createwiki.members')
+    #if ($documentation) $services.localization.render('wikimanager.doc.createwiki.members') #end
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="readersusers"&gt;$msg.get("wikimanager.readers")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.readers")&lt;/td&gt; #end
+      &lt;dt&gt;&lt;label for="readersusers"&gt;$services.localization.render('wikimanager.readers')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$services.localization.render('wikimanager.doc.createwiki.members.readers')&lt;/td&gt; #end
       &lt;dd&gt;#printUsersAndGroups($users $groups "readers" $readeruserlist $readergrouplist false)&lt;/dd&gt;
     &lt;/dl&gt;
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="writersusers"&gt;$msg.get("wikimanager.writers")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.writers")&lt;/td&gt; #end
+      &lt;dt&gt;&lt;label for="writersusers"&gt;$services.localization.render('wikimanager.writers')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$services.localization.render('wikimanager.doc.createwiki.members.writers')&lt;/td&gt; #end
       &lt;dd&gt;#printUsersAndGroups($users $groups "writers" $writeruserlist $writergrouplist false)&lt;/dd&gt;
     &lt;/dl&gt;
 
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="adminsusers"&gt;$msg.get("wikimanager.admins")&lt;/label&gt;&lt;/dt&gt;
-      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.administrators")&lt;/td&gt; #end
+      &lt;dt&gt;&lt;label for="adminsusers"&gt;$services.localization.render('wikimanager.admins')&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$services.localization.render('wikimanager.doc.createwiki.members.administrators')&lt;/td&gt; #end
       &lt;dd&gt;#printUsersAndGroups($users $groups "admins" $adminuserlist $admingrouplist false)&lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
@@ -569,21 +566,21 @@
   ##
   #if ($wstepbystep)
   &lt;div id="$WSTEPNAME_SUMMARY"&gt;
-    1.1 $msg.get("wikimanager.title.createwiki.summary")
-    #if ($documentation) $msg.get("wikimanager.doc.createwiki.summary") #end
+    1.1 $services.localization.render('wikimanager.title.createwiki.summary')
+    #if ($documentation) $services.localization.render('wikimanager.doc.createwiki.summary') #end
     &lt;table class="wiki-table" border="0" cellpadding="0" cellspacing="0"&gt;
       &lt;tbody&gt;
         &lt;tr&gt;&lt;th&gt;Properties&lt;/th&gt;&lt;th&gt;Values&lt;/th&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.wikiname")*&lt;/td&gt;&lt;td id="summarywikiname"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.wikiprettyname")*&lt;/td&gt;&lt;td id="summarywikiprettyname"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.description")*&lt;/td&gt;&lt;td id="summarywikidesc"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-even"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.server")*&lt;/td&gt;&lt;td id="summarywikidomain"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.owner")*&lt;/td&gt;&lt;td id="summarywikiadmin"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.wikitemplate")*&lt;/td&gt;&lt;td id="summarywikitemplate"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.wikipackage")*&lt;/td&gt;&lt;td id="summarywikipackage"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.readers")*&lt;/td&gt;&lt;td id="summaryreaders"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.writers")*&lt;/td&gt;&lt;td id="summarywriters"&gt;---&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.admins")*&lt;/td&gt;&lt;td id="summaryadmins"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.prop.wiki.wikiname')*&lt;/td&gt;&lt;td id="summarywikiname"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.prop.wiki.wikiprettyname')*&lt;/td&gt;&lt;td id="summarywikiprettyname"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.prop.wiki.description')*&lt;/td&gt;&lt;td id="summarywikidesc"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-even"&gt;&lt;td&gt;*$services.localization.render('wikimanager.prop.wiki.server')*&lt;/td&gt;&lt;td id="summarywikidomain"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.prop.wiki.owner')*&lt;/td&gt;&lt;td id="summarywikiadmin"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.wikitemplate')*&lt;/td&gt;&lt;td id="summarywikitemplate"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.wikipackage')*&lt;/td&gt;&lt;td id="summarywikipackage"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.readers')*&lt;/td&gt;&lt;td id="summaryreaders"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.writers')*&lt;/td&gt;&lt;td id="summarywriters"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$services.localization.render('wikimanager.admins')*&lt;/td&gt;&lt;td id="summaryadmins"&gt;---&lt;/td&gt;&lt;/tr&gt;
       &lt;/tbody&gt;
     &lt;/table&gt;
   &lt;/div&gt;

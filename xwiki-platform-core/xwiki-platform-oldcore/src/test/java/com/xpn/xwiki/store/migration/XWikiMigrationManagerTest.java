@@ -20,6 +20,7 @@
 package com.xpn.xwiki.store.migration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,6 +33,8 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
@@ -128,7 +131,13 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     {
         super.setUp();
         XWikiConfig config = new XWikiConfig();
-        getContext().setWiki(new XWiki());
+        getContext().setWiki(new XWiki() {
+            @Override
+            public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
+            {
+                return Arrays.asList("xwiki");
+            }
+        });
         getContext().getWiki().setConfig(config);
 
         registerComponent(TestDataMigrationManager.class);

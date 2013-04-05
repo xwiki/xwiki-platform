@@ -31,9 +31,11 @@
   </parent>
   <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
   <name>XWiki Platform - Rendering - Macro - Velocity</name>
-  <description>XWiki Platform - Rendering - Macro - Velocity</description>
+  <description>Executes a Velocity script and apply current page parser on the result</description>
   <properties>
     <xwiki.jacoco.instructionRatio>89.71</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Velocity Macro</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
@@ -46,7 +48,6 @@
       <artifactId>xwiki-commons-velocity</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

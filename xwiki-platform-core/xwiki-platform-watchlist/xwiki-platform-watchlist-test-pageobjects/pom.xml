@@ -43,10 +43,9 @@
       <artifactId>xwiki-platform-test</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-user-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

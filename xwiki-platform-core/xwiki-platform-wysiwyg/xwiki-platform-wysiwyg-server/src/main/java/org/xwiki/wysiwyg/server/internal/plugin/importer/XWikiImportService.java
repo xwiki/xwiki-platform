@@ -21,14 +21,14 @@ package org.xwiki.wysiwyg.server.internal.plugin.importer;
 
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.artofsolving.jodconverter.document.DocumentFamily;
+import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -41,6 +41,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
@@ -55,11 +56,6 @@ import org.xwiki.xml.html.HTMLUtils;
 @Singleton
 public class XWikiImportService implements ImportService
 {
-    /**
-     * File extensions corresponding to slide presentations.
-     */
-    private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "pptx", "odp");
-
     /**
      * Logger.
      */
@@ -89,6 +85,12 @@ public class XWikiImportService implements ImportService
      */
     @Inject
     private XDOMOfficeDocumentBuilder documentBuilder;
+
+    /**
+     * Used to access the document converter.
+     */
+    @Inject
+    private OfficeServer officeServer;
 
     /**
      * The object used to convert between client and server entity reference.
@@ -195,7 +197,11 @@ public class XWikiImportService implements ImportService
      */
     private boolean isPresentation(String fileName)
     {
-        String fileExtension = StringUtils.substringAfterLast(fileName, ".");
-        return PRESENTATION_FORMAT_EXTENSIONS.contains(fileExtension);
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        if (officeServer.getConverter() != null) {
+            DocumentFormat format = officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
+            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+        }
+        return false;
     }
 }

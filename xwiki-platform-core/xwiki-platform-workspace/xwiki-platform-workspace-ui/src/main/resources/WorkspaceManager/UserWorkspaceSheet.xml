@@ -301,9 +301,9 @@ if (XWiki.isInitialized) {
   <content>{{velocity}}
 #set ($obj = $doc.getObject('XWiki.XWikiUsers'))
 #if (!$obj)
-= $msg.get('xe.admin.users.sheet') =
+= {{translation key="xe.admin.users.sheet"/}} =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
+{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
 #else
   #set($temp = $xwiki.ssx.use('WorkspaceManager.UserWorkspaceSheet'))
   #set($temp = $xwiki.jsx.use('WorkspaceManager.UserWorkspaceSheet', {'minify' : false}))
@@ -317,7 +317,7 @@ if (XWiki.isInitialized) {
   {{html clean='false'}}
   &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
-      &lt;h1&gt;$msg.get('platform.workspace.profileJoinedWorkspacesLabel')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.workspace.profileJoinedWorkspacesLabel')&lt;/h1&gt;
       #set ($joinedWorkspacesDescriptors = [])
       #set ($workspaces = $services.workspace.getWorkspaces())
       #foreach ($workspace in $workspaces)
@@ -331,13 +331,13 @@ if (XWiki.isInitialized) {
         #end
       #end
       #if ($joinedWorkspacesDescriptors.size() == 0)
-        &lt;span&gt;#if ($isMyProfile)$msg.get('platform.workspace.profileNotMemberOfAnyWorkspace')#{else}$msg.get('platform.workspace.profileUserNotMemberOfAnyWorkspace')#end&lt;/span&gt;
+        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.workspace.profileNotMemberOfAnyWorkspace')#{else}$services.localization.render('platform.workspace.profileUserNotMemberOfAnyWorkspace')#end&lt;/span&gt;
       #else
         &lt;ul id='workspaces'&gt;
         #foreach ($workspaceWikiDescriptor in $joinedWorkspacesDescriptors)
           &lt;li id='$workspaceWikiDescriptor.wikiName'&gt;
             &lt;span class='workspaceHomepage'&gt;&lt;a href='$workspaceWikiDescriptor.homePageUrl'&gt;$workspaceWikiDescriptor.getValue('wikiprettyname')&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='workspaceActivity'&gt;&lt;a href='javascript:void(0)'&gt;$msg.get('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='workspaceActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;

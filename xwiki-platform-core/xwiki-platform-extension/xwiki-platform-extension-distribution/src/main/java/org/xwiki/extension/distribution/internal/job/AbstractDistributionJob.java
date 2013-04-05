@@ -83,11 +83,11 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                 && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
                     this.distributionManager.getDistributionExtension())) {
                 status.setDistributionExtension(previousStatus.getDistributionExtension());
-                status.setDistributionExtensionUi(previousStatus.getDistributionExtensionUi());
+                status.setDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
             }
 
             status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
-            status.setDistributionExtensionUi(this.distributionManager.getMainUIExtensionId());
+            status.setDistributionExtensionUI(this.distributionManager.getMainUIExtensionId());
         }
 
         return status;

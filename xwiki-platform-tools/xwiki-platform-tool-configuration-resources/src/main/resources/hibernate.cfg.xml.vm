@@ -107,11 +107,15 @@
 #foreach($mapping in $!xwikiDbHbmDefaultExtraMappings.split(","))
     <mapping resource="$mapping"/>
 #end
+## Note: This is starting the line in order not to put extra spaces when generated
+#if ($xwikiDbVirtualMode)
+    <property name="xwiki.virtual_mode">$xwikiDbVirtualMode</property>
+#end
 #end
 
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
-    <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</property>
+    <property name="connection.url">jdbc:mysql://localhost/xwiki</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
@@ -162,7 +166,6 @@
     <property name="connection.driver_class">org.postgresql.Driver</property>
     <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
     <property name="jdbc.use_streams_for_binary">false</property>
-    <property name="xwiki.virtual_mode">schema</property>
     <mapping resource="xwiki.postgresql.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -173,6 +176,7 @@
 #foreach($mapping in $!xwikiDbHbmPostgreSQLExtraMappings.split(","))
     <mapping resource="$mapping"/>
 #end
+    <property name="xwiki.virtual_mode">schema</property>
     -->
 
     <!-- Oracle configuration.

@@ -169,7 +169,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(2L));
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
         this.mockXWiki.stubs().method("evaluateTemplate").will(returnValue(""));
 

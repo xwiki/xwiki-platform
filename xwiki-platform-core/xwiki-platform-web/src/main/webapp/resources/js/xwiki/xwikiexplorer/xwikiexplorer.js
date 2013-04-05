@@ -61,14 +61,14 @@ isc.ClassFactory.defineClass("XWEResultTree", isc.ResultTree);
 isc.XWEResultTree.addClassProperties({
     constants : {
         addNodeSuffix : "..new",
-        pageHint : "$msg.get('xwikiexplorer.page.hint')",
-        attachmentsTitle : "$msg.get('xwikiexplorer.attachments.title')",
-        attachmentsHint : "$msg.get('xwikiexplorer.attachments.hint')",
-        attachmentHint : "$msg.get('xwikiexplorer.attachment.hint')",
-        addPageTitle : "$msg.get('xwikiexplorer.addpage.title')",
-        addPageHint : "$msg.get('xwikiexplorer.addpage.hint')",
-        addAttachmentTitle : "$msg.get('xwikiexplorer.addattachment.title')",
-        addAttachmentHint : "$msg.get('xwikiexplorer.addattachment.hint')"
+        pageHint : "$services.localization.render('xwikiexplorer.page.hint')",
+        attachmentsTitle : "$services.localization.render('xwikiexplorer.attachments.title')",
+        attachmentsHint : "$services.localization.render('xwikiexplorer.attachments.hint')",
+        attachmentHint : "$services.localization.render('xwikiexplorer.attachment.hint')",
+        addPageTitle : "$services.localization.render('xwikiexplorer.addpage.title')",
+        addPageHint : "$services.localization.render('xwikiexplorer.addpage.hint')",
+        addAttachmentTitle : "$services.localization.render('xwikiexplorer.addattachment.title')",
+        addAttachmentHint : "$services.localization.render('xwikiexplorer.addattachment.hint')"
     }
 });
 
@@ -1038,7 +1038,7 @@ isc.XWETreeGrid.addMethods({
     /**
      * Create a text input that will be used as a suggest for the tree.
      * The modifications on this input will be observed and the resource entered in the input,
-     * like Main.Dashboard for example, will be opened in the tree.
+     * like Dashboard.WebHome for example, will be opened in the tree.
      */
     drawInput : function() {
         var widthWithoutBorders = this.width - 6;

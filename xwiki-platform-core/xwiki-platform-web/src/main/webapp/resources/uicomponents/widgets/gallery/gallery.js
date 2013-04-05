@@ -4,7 +4,7 @@ XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
 
-    this.container = container.update('<input type="text" tabindex="-1" class="focusCatcher"/><div class="currentImageWrapper"><img class="currentImage" alt="${escapetool.xml($msg.get("core.widgets.gallery.currentImage"))}"/><span class="currentImagePinPoint"></span></div><div class="previous" title="${escapetool.xml($msg.get("core.widgets.gallery.previousImage"))}">&lt;</div><div class="next" title="${escapetool.xml($msg.get("core.widgets.gallery.nextImage"))}">&gt;</div><div class="index">0 / 0</div><div class="maximize" title="${escapetool.xml($msg.get("core.widgets.gallery.maximize"))}"></div>');
+    this.container = container.update('<input type="text" tabindex="-1" class="focusCatcher"/><div class="currentImageWrapper"><img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/><span class="currentImagePinPoint"></span></div><div class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</div><div class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</div><div class="index">0 / 0</div><div class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></div>');
     this.container.addClassName('xGallery');
 
     this.focusCatcher = this.container.down('.focusCatcher');
@@ -105,7 +105,7 @@ XWiki.Gallery = Class.create({
   _onToggleMaximize : function() {
     this.maximizeToggle.toggleClassName('maximize');
     this.maximizeToggle.toggleClassName('minimize');
-    this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ? '${escapetool.javascript($msg.get("core.widgets.gallery.maximize"))}' : '${escapetool.javascript($msg.get("core.widgets.gallery.minimize"))}';
+    this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ? "${escapetool.javascript($services.localization.render('core.widgets.gallery.maximize'))}" : "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
     if (this.container.hasClassName('maximized')) {

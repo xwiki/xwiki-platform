@@ -15,7 +15,7 @@
   <date>1320310690000</date>
   <contentUpdateDate>1320310690000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.index.documents")</title>
+  <title>$services.localization.render('platform.index.documents')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -62,7 +62,7 @@
 &lt;div class="floatcontainer"&gt;
   &lt;ul class="xwikitabbar"&gt;
 #foreach ($tab in $tabs)
-  &lt;li id="xwiki$tab['idSuffix']"#if($view == $tab['tabName']) class="active"#end&gt;&lt;a href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"&gt;$msg.get($tab['translationKey'])&lt;/a&gt;&lt;/li&gt;
+  &lt;li id="xwiki$tab['idSuffix']"#if($view == $tab['tabName']) class="active"#end&gt;&lt;a href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"&gt;$services.localization.render($tab['translationKey'])&lt;/a&gt;&lt;/li&gt;
 #end
   &lt;/ul&gt;
 &lt;/div&gt;

@@ -36,7 +36,7 @@ public class ObjectDiff
     public static final String ACTION_OBJECTADDED = "object-added";
 
     public static final String ACTION_OBJECTREMOVED = "object-removed";
-    
+
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "current");
 
@@ -196,7 +196,7 @@ public class ObjectDiff
         buffer.append(getPropName());
         buffer.append(": ");
         buffer.append(getPrevValue().toString());
-        buffer.append(" &gt; ");
+        buffer.append(" \u21E8 ");
         buffer.append(getNewValue().toString());
 
         return buffer.toString();

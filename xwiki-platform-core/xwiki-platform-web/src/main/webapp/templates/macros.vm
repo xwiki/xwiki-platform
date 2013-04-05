@@ -414,7 +414,7 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($text = 'attachment')
     #end
   #end
-  <img src="${xwiki.getSkinFile("icons/silk/${image}.png")}" alt="${msg.get("core.viewers.attachments.mime.${text}")}" title="${msg.get("core.viewers.attachments.mime.${text}")}"/>
+  <img src="${xwiki.getSkinFile("icons/silk/${image}.png")}" alt="${services.localization.render("core.viewers.attachments.mime.${text}")}" title="${services.localization.render("core.viewers.attachments.mime.${text}")}"/>
 #end
 ###
 ###    packName
@@ -485,7 +485,7 @@ $fn
 #set($discard = $page_footnotes.add($text))
 #set($processedText = $text.replaceAll('[*~<>_-]', ''))
 #set($footnote_id = $page_footnotes.size())
-<sup class="footnoteRef" id="footnoteref_${footnote_group_id}_${footnote_id}"><a href="#footnote_${footnote_group_id}_${footnote_id}" title="$msg.get('core.footnotes.gotofootnote', [${footnote_id}]): {pre}$processedText{/pre}">$footnote_id</a></sup>#end
+<sup class="footnoteRef" id="footnoteref_${footnote_group_id}_${footnote_id}"><a href="#footnote_${footnote_group_id}_${footnote_id}" title="$services.localization.render('core.footnotes.gotofootnote', [${footnote_id}]): {pre}$processedText{/pre}">$footnote_id</a></sup>#end
 ##
 ##
 ##
@@ -494,7 +494,7 @@ $fn
 <ol class="footnotes">
 #foreach($footnote in $page_footnotes)
 <li id="footnote_${footnote_group_id}_${velocityCount}">
- <a class="footnoteBackRef" title="$msg.get("core.footnotes.backtoref")" href="#footnoteref_${footnote_group_id}_${velocityCount}">^</a>
+ <a class="footnoteBackRef" title="$services.localization.render('core.footnotes.backtoref')" href="#footnoteref_${footnote_group_id}_${velocityCount}">^</a>
   $footnote</li>
 #end
 </ol>
@@ -521,22 +521,22 @@ $fn
     <div class="pagedNavigation">
     #if($currentPageNumber > 1)
       #set($currentPageNumber = $currentPageNumber - 1)
-      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=1&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.firstPage")</a></span>
-      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.previousPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=1&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.firstPage')</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.previousPage')</a></span>
       #set($currentPageNumber = $currentPageNumber + 1)
     #else
-      <span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
-      <span class="pagedLink inactive">$msg.get("web.paging.previousPage")</span>
+      <span class="pagedLink inactive">$services.localization.render('web.paging.firstPage')</span>
+      <span class="pagedLink inactive">$services.localization.render('web.paging.previousPage')</span>
     #end
-    <span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$currentPageNumber, $totalPages])</span>
+    <span class="pagedStatus">$services.localization.render('web.paging.pageNumberOf', [$currentPageNumber, $totalPages])</span>
     #if($currentPageNumber < $totalPages)
       #set($currentPageNumber = $currentPageNumber + 1)
-      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.nextPage")</a></span>
-      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.lastPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.nextPage')</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.lastPage')</a></span>
       #set($currentPageNumber = $currentPageNumber - 1)
     #else
-      <span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
-      <span class="pagedLink inactive">$msg.get("web.paging.lastPage")</span>
+      <span class="pagedLink inactive">$services.localization.render('web.paging.nextPage')</span>
+      <span class="pagedLink inactive">$services.localization.render('web.paging.lastPage')</span>
     #end
     </div>
   #end
@@ -750,9 +750,9 @@ $fn
 #end
 
 #macro(displayPropName $prop)
-#if($msg.get("$class.getName()_$prop.name") == "$class.getName()_$prop.name")
+#if($services.localization.render("${class.getName()}_${prop.name}") == "${class.getName()}_${prop.name}")
 $prop.prettyName#else
-$msg.get($prop.name)#end
+$services.localization.render($prop.name)#end
 #end
 
 ###
@@ -893,11 +893,11 @@ $html
 ###
 
 #macro(warning $text)
-<div class="warningmessage"><span class="messagetype">$msg.get("warning"): </span>$text</div>
+<div class="warningmessage"><span class="messagetype">$services.localization.render('warning'): </span>$text</div>
 #end
 
 #macro(error $text)
-<div class="errormessage"><span class="messagetype">$msg.get("error"): </span>$text</div>
+<div class="errormessage"><span class="messagetype">$services.localization.render('error'): </span>$text</div>
 #end
 
 #macro(info $text)
@@ -1191,7 +1191,7 @@ $html
  * @param resourceIdentifier The key used to identify the localized resources.
  *#
 #macro(editActionButton $action $resourceIdentifier)
-#submitButton("action_${action}", $msg.get("core.shortcuts.edit.${resourceIdentifier}"), $msg.get($resourceIdentifier))
+#submitButton("action_${action}", $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"), $services.localization.render($resourceIdentifier))
 #end
 
 #**
@@ -1322,8 +1322,8 @@ ${Msz}Mb##
     <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
       <div>
         <div class="xwiki-livetable-tagcloud-container">
-          <h2>$msg.get('platform.livetable.tagsHelp')
-	        <span>$msg.get('platform.livetable.tagsHelpCancel')</span>
+          <h2>$services.localization.render('platform.livetable.tagsHelp')
+	        <span>$services.localization.render('platform.livetable.tagsHelpCancel')</span>
           </h2>
           <div class="xwiki-livetable-tagcloud"></div>
         </div>
@@ -1342,19 +1342,19 @@ ${Msz}Mb##
         <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
   #if($hasPageSize)
         <span id="${divid}-pagesize" class="xwiki-livetable-pagesize">
-            <span>$msg.get('platform.livetable.pagesizeLabel')</span>
+            <span>$services.localization.render('platform.livetable.pagesizeLabel')</span>
             <span class="xwiki-livetable-pagesize-content" ></span>
         </span>
   #end
         <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
-          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('platform.livetable.loading')" title="" />
+          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" />
         </span>
         <span class="controlPagination">
-          <a title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPagePrevTitle')</span></a>
-          <a title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPageNextTitle')</span></a>
+          <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
-          <span class="xwiki-livetable-pagination-text">$msg.get("platform.livetable.paginationPage")</span>
+          <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
           <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
@@ -1384,7 +1384,7 @@ ${Msz}Mb##
               #if("$!colprop.displayName" != '')
                 #set($displayName = $colprop.displayName)
               #elseif($transprefix != '')
-                #set($displayName = $msg.get("${transprefix}${colname}"))
+                #set($displayName = $services.localization.render("${transprefix}${colname}"))
               #else
                 #set($displayName = $colname)
               #end
@@ -1416,11 +1416,11 @@ ${Msz}Mb##
                 #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
                 #set($list = '')
                 #set($list = $class.get($colname).getListValues())
-                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$msg.get('platform.livetable.selectAll')</option>
+                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)
                   #set ($l10n_key = "${propClassName}_${colname}_${listitem}")
-                  #set ($l10n_value = $msg.get($l10n_key))
+                  #set ($l10n_value = $services.localization.render($l10n_key))
                   #if ($l10n_value == $l10n_key)
                     #set ($l10n_value = $map.get($listitem).getValue())
                   #end
@@ -1429,7 +1429,7 @@ ${Msz}Mb##
                 </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$msg.get('platform.livetable.filtersTitle', [$msg.get("${transprefix}${colname}")])"#end /></td>
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")])"#end /></td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>
@@ -1438,7 +1438,7 @@ ${Msz}Mb##
             </tr>
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
-                <div class="warningmessage">$msg.get('platform.livetable.environmentCannotLoadTableMessage')</div>
+                <div class="warningmessage">$services.localization.render('platform.livetable.environmentCannotLoadTableMessage')</div>
               </td>
             </tr>
           </thead>
@@ -1449,18 +1449,18 @@ ${Msz}Mb##
     <tr>
       <td class="xwiki-livetable-pagination">
         <span class="controlPagination">
-          <a title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPagePrevTitle')</span></a>
-          <a title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$msg.get('platform.livetable.paginationPageNextTitle')</span></a>
+          <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
-          <span class="xwiki-livetable-pagination-text">$msg.get('platform.livetable.paginationPage')</span>
+          <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
           <span class="xwiki-livetable-pagination-content" ></span>
         </span>
       </td>
     </tr>
   </table>
   <div id="${divid}-inaccessible-docs" class="hidden">
-    #info($msg.get('rightsmanager.documentrequireviewrights'))
+    #info($services.localization.render('rightsmanager.documentrequireviewrights'))
   </div>
   <script type="text/javascript">
   //<![CDATA[
@@ -1579,10 +1579,10 @@ function (row, i, table) {
             #if($velocityCount > 1)
               td.insert(" ");
             #end
-            #if($transprefix != '' && $msg.get("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
-              #set($text = $msg.get("${transprefix}_actions.${action}"))
-            #elseif($msg.get("platform.livetable._actions.${action}") != "platform.livetable._actions.${action}")
-              #set($text = $msg.get("platform.livetable._actions.${action}"))
+            #if($transprefix != '' && $services.localization.render("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
+              #set($text = $services.localization.render("${transprefix}_actions.${action}"))
+            #elseif($services.localization.render("platform.livetable._actions.${action}") != "platform.livetable._actions.${action}")
+              #set($text = $services.localization.render("platform.livetable._actions.${action}"))
             #else
               #set($text = "$action")
             #end
@@ -1801,7 +1801,7 @@ function (row, i, table) {
       #set($contextFirstPage = $parameters.pageCount - $contextWidth)
     #end
   #end
-  <span class="pagination">$msg.get('platform.livetable.paginationPage')
+  <span class="pagination">$services.localization.render('platform.livetable.paginationPage')
   #if($contextFirstPage != 0)
     #paginationPageLink(0 $parameters)
   #end
@@ -1829,7 +1829,7 @@ function (row, i, table) {
   #if($pageNumber == $parameters.crtPage)
   <span class="currentPage">$displayedPageNumber</span>
   #else
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPageTitle', [$displayedPageNumber])">$displayedPageNumber</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPageTitle', [$displayedPageNumber])">$displayedPageNumber</a>
   #end
 #end
 #**
@@ -1858,7 +1858,7 @@ function (row, i, table) {
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPagePrevTitle')" class="prevPagination">$msg.get('platform.livetable.paginationPagePrevious')</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination">$services.localization.render('platform.livetable.paginationPagePrevious')</a>
   #else
     <span class="noPrevPagination"> </span>
   #end
@@ -1875,7 +1875,7 @@ function (row, i, table) {
   #if($parameters.crtPage < $parameters.lastPage)
     #set($nextPage = $parameters.crtPage + 1)
     #set($firstItem = $nextPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$msg.get('platform.livetable.paginationPageNextTitle')" class="nextPagination">$msg.get('platform.livetable.paginationPageNext')</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination">$services.localization.render('platform.livetable.paginationPageNext')</a>
   #else
     <span class="noNextPagination"> </span>
   #end
@@ -1896,13 +1896,13 @@ function (row, i, table) {
   #end
   <span class="resultsNo">
   #if($parameters.totalItems == 0)
-    <span class='currentResultsNo'>$msg.get('platform.livetable.paginationResultsNone')</span>
+    <span class='currentResultsNo'>$services.localization.render('platform.livetable.paginationResultsNone')</span>
   #elseif($parameters.totalItems == 1)
-    <span class='currentResultsNo'>$msg.get('platform.livetable.paginationResultsOne')</span>
+    <span class='currentResultsNo'>$services.localization.render('platform.livetable.paginationResultsOne')</span>
   #elseif($from == $parameters.totalItems)
-    $msg.get('platform.livetable.paginationResultsSingle', [$from, $parameters.totalItems])
+    $services.localization.render('platform.livetable.paginationResultsSingle', [$from, $parameters.totalItems])
   #else
-    $msg.get('platform.livetable.paginationResultsMany', [$from, $to, $parameters.totalItems])
+    $services.localization.render('platform.livetable.paginationResultsMany', [$from, $to, $parameters.totalItems])
   #end
   </span>
 #end
@@ -2055,6 +2055,9 @@ var $jsVarName = {
 #set($ok = $parameters.put('plugins', $services.wysiwyg.config.getPlugins()))
 #set($ok = $parameters.put('menu', $services.wysiwyg.config.getMenuBar()))
 #set($ok = $parameters.put('toolbar', $services.wysiwyg.config.getToolBar()))
+#if ("$!services.wysiwyg.config.isPasteContentCleanedAutomatically()" == 'false')
+  #set ($ok = $parameters.put('cleanPaste', 'false'))
+#end
 #if("$!services.wysiwyg.config.isAttachmentSelectionLimited()" == 'true')
   #set($ok = $parameters.put('linkfiles', 'currentpage'))
 #end
@@ -2071,7 +2074,7 @@ var $jsVarName = {
 #set($ok = $parameters.put('wiki', $editedDocument.wiki))
 #set($ok = $parameters.put('space', $editedDocument.space))
 #set($ok = $parameters.put('page', $editedDocument.name))
-#if("$!{oomanager.serverState}" == 'Connected')
+#if("$!{services.officemanager.serverState}" == 'Connected')
   #set($ok = $parameters.put('openofficeServerConnected', 'true'))
 #end
 #if($full && $request.sync)
@@ -2182,7 +2185,7 @@ var $jsVarName = {
  *        'id'       : mandatory
  *        'name'     : the text displayed for the corresponding menu item;
  *                     optional, defaults to
- *                     $msg.get("$!{translationPrefix}${item.id}")
+ *                     $services.localization.render("$!{translationPrefix}${item.id}")
  *        'url'      : the "action" of the menu item; optional, defaults to #
  *        'cssClass' : a specific css class for the menu item for custom
  *                     styling; optional, defaults to ''
@@ -2212,7 +2215,7 @@ var $jsVarName = {
  *        'id'       : mandatory
  *        'name'     : the text displayed for the corresponding menu item;
  *                     optional, defaults to
- *                     $msg.get("$!{translationPrefix}${item.id}")
+ *                     $services.localization.render("$!{translationPrefix}${item.id}")
  *        'url'      : the "action" of the menu item; optional
  *        'cssClass' : a specific css class for the menu item for custom
  *                     styling; optional, defaults to ''
@@ -2242,7 +2245,7 @@ var $jsVarName = {
   #set ($class = $class.trim())
   #set ($name = "$!{item.name}")
   #if ($name == '')
-    #set ($name = $msg.get("$!{options.translationPrefix}${item.id}"))
+    #set ($name = $services.localization.render("$!{options.translationPrefix}${item.id}"))
   #end
   $level (% class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
   #if ($hasChildren)

@@ -108,7 +108,7 @@
       <content>{{velocity}}
 #set ($recentlyCreated = $services.query.xwql('order by doc.creationDate desc').addFilter('hidden').setLimit(5).setOffset(0).execute())
 #if ($recentlyCreated.size() &gt; 0 || $showEmptyPanels)
-  #panelheader($msg.get('panels.recentlyCreated.title'))
+  #panelheader($services.localization.render('panels.recentlyCreated.title'))
   #foreach ($docname in $recentlyCreated)
     #if ($xwiki.hasAccessLevel('view', $xcontext.getUser(), $docname))
       #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())

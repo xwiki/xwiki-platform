@@ -99,7 +99,7 @@ XWiki.ExtensionBehaviour = Class.create({
           window.location.reload(true);
         }
       }, {
-        confirmationText: "$escapetool.javascript($msg.get('extensions.info.fetch.unauthorized'))"
+        confirmationText: "$escapetool.javascript($services.localization.render('extensions.info.fetch.unauthorized'))"
       });
       return false;
     } else {
@@ -107,7 +107,7 @@ XWiki.ExtensionBehaviour = Class.create({
       if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
         failureReason = 'Server not responding';
       }
-      new XWiki.widgets.Notification("$escapetool.javascript($msg.get('extensions.info.fetch.failed'))" + failureReason, "error");
+      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('extensions.info.fetch.failed'))" + failureReason, "error");
       return true;
     }
   },
@@ -281,7 +281,7 @@ XWiki.ExtensionBehaviour = Class.create({
       var progressSectionAnchor = 'extension-body-progress' + lastSection.previous().id.substr($w(lastSection.className)[0].length);
       lastSection.insert({after: new Element('div', {id: progressSectionAnchor})});
       // Add the progress menu.
-      var progressMenuLabel = "$escapetool.javascript($msg.get('extensions.info.category.progress'))";
+      var progressMenuLabel = "$escapetool.javascript($services.localization.render('extensions.info.category.progress'))";
       var progressMenu = new Element('a', {href: '#' + progressSectionAnchor}).update(progressMenuLabel);
       this._enhanceMenuItemBehaviour(progressMenu);
       this.container.down('.innerMenu').insert(new Element('li').insert(progressMenu));

@@ -243,10 +243,9 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * This method determine if events must be store in the local wiki. If the wiki is not running in virtual mode this
-     * method will always return true. If it is running in virtual and if the activitystream is set not to store events
-     * in the main wiki the method will always return true. It the configuration does not match those 2 conditions, the
-     * method retrieves the platform.plugin.activitystream.uselocalstore configuration option. If the option is not
+     * This method determine if events must be store in the local wiki. If the activitystream is set not to store
+     * events in the main wiki, the method will return true. If events are stored in the main wiki, the method
+     * retrieves the 'platform.plugin.activitystream.uselocalstore' configuration option. If the option is not
      * found the method returns true (default behavior).
      * 
      * @param context the XWiki context
@@ -254,11 +253,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      */
     private boolean useLocalStore(XWikiContext context)
     {
-        if (!context.getWiki().isVirtualMode()) {
-            // If we aren't in virtual mode, force local store.
-            return true;
-        } else if (!useMainStore(context)) {
-            // If we are in virtual mode but the main store is disabled, force local store.
+        if (!useMainStore(context)) {
+            // If the main store is disabled, force local store.
             return true;
         }
 
@@ -268,22 +264,16 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * This method determine if events must be store in the main wiki. If the wiki is not running in virtual mode this
-     * method will always return false. If it is running in virtual mode this method retrieves the
-     * platform.plugin.activitystream.usemainstore configuration option. If the option is not found the method returns
-     * true (default behavior).
+     * This method determine if events must be store in the main wiki. If the current wiki is the main wiki, this
+     * method returns false, otherwise if retrieves the 'platform.plugin.activitystream.usemainstore' configuration
+     * option. If the option is not found the method returns true (default behavior).
      * 
      * @param context the XWiki context
      * @return true if the activity stream is configured to store events in the main wiki, false otherwise
      */
     private boolean useMainStore(XWikiContext context)
     {
-        if (!context.getWiki().isVirtualMode()) {
-            // If we aren't in virtual mode, local store is forced.
-            return false;
-        }
-
-        if (context.getWiki().isVirtualMode() && context.getDatabase().equals(context.getMainXWiki())) {
+        if (context.isMainWiki()) {
             // We're in the main database, we don't have to store the data twice.
             return false;
         }
@@ -292,8 +282,6 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             (ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context);
         return Integer.parseInt(plugin.getActivityStreamPreference("usemainstore", "1", context)) == 1;
     }
-
-    
     
     /**
      * @param event event to add to the stream

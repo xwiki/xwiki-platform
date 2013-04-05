@@ -15,7 +15,7 @@
   <date>1262108187000</date>
   <contentUpdateDate>1262108187000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('xe.themes.colors.webColors.title')</title>
+  <title>$services.localization.render('xe.themes.colors.webColors.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -24,7 +24,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#set($webColors = 
+#set($webColors =
   [
     "#000000","#444444","#666666","#999999","#CCCCCC","#EEEEEE","#FFFFFF",
     "#EA9999","#F9CB9C","#FFE599","#B6D7A8","#A2C4C9","#9FC5E8","#B4A7D6",

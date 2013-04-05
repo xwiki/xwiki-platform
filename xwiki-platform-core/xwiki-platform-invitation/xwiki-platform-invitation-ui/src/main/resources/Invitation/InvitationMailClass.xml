@@ -128,5 +128,5 @@
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </messageBodyPlain>
   </class>
-  <content>{{velocity}}{{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}{{/velocity}}</content>
+  <content>{{velocity}}{{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}{{/velocity}}</content>
 </xwikidoc>

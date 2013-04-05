@@ -86,7 +86,7 @@
       <name>platform.ircbot.ircbotApplication</name>
     </property>
     <property>
-      <parameters>label=$msg.get('ircbot.panels.applicationsPanelEntryLabel')
+      <parameters>label=$services.localization.render('ircbot.panels.applicationsPanelEntryLabel')
 target=IRC.WebHome
 icon=icon:group_edit</parameters>
     </property>

@@ -15,7 +15,7 @@
   <date>1288213047000</date>
   <contentUpdateDate>1288213047000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.scheduler")</title>
+  <title>$services.localization.render('xe.scheduler')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -48,7 +48,7 @@
 
     #else
       #set ($jobName = "$jobObj.get('jobName')")
-      {{info}}$msg.get('xe.scheduler.jobscheduled', [$jobName, $scheduler.getNextFireTime($jobObj)]){{/info}}
+      {{info}}$services.localization.render('xe.scheduler.jobscheduled', [$jobName, $scheduler.getNextFireTime($jobObj)]){{/info}}
 
     #end
   #elseif ($request.do == 'pause')
@@ -60,7 +60,7 @@
       {{error}}$xcontext.get('error'){{/error}}
 
     #else
-      {{info}}$msg.get('xe.scheduler.paused', [$jobObj.get('jobName')]){{/info}}
+      {{info}}$services.localization.render('xe.scheduler.paused', [$jobObj.get('jobName')]){{/info}}
 
     #end
   #elseif ($request.do == 'resume')
@@ -72,7 +72,7 @@
       {{error}}$xcontext.get('error'){{/error}}
 
     #else
-      {{info}}$msg.get('xe.scheduler.resumed', [$jobObj.get('jobName'), $scheduler.getNextFireTime($jobObj)]){{/info}}
+      {{info}}$services.localization.render('xe.scheduler.resumed', [$jobObj.get('jobName'), $scheduler.getNextFireTime($jobObj)]){{/info}}
 
     #end
   #elseif ($request.do == 'unschedule')
@@ -84,7 +84,7 @@
       {{error}}$xcontext.get('error'){{/error}}
 
     #else
-      {{info}}$msg.get('xe.scheduler.unscheduled', [$jobObj.get('jobName')]){{/info}}
+      {{info}}$services.localization.render('xe.scheduler.unscheduled', [$jobObj.get('jobName')]){{/info}}
 
     #end
   #elseif ($request.do == 'delete')
@@ -115,20 +115,20 @@
       {{error}}$xcontext.get('error'){{/error}}
 
     #else
-      {{info}}$msg.get('xe.scheduler.triggered', [$jobObj.get('jobName')]){{/info}}
+      {{info}}$services.localization.render('xe.scheduler.triggered', [$jobObj.get('jobName')]){{/info}}
 
     #end
   #end
 #end
-$msg.get('xe.scheduler.welcome')
+$services.localization.render('xe.scheduler.welcome')
 
-= $msg.get('xe.scheduler.jobs.list') =
+= $services.localization.render('xe.scheduler.jobs.list') =
 
 ##
 ## Retrieve all scheduler jobs
 ## Display their name, status, possible next fire time, and available actions
 ##
-|=(%scope="col"%)$msg.get('xe.scheduler.jobs.name')|=(%scope="col"%)$msg.get('xe.scheduler.jobs.status')|=(%scope="col"%)$msg.get('xe.scheduler.jobs.next')|=(%scope="col"%)$msg.get('xe.scheduler.jobs.actions')
+|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.name')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.status')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.next')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.actions')
 #foreach ($docName in $services.query.xwql('from doc.object(XWiki.SchedulerJobClass) as jobs where doc.fullName &lt;&gt; ''XWiki.SchedulerJobTemplate''').execute())
   #set ($actions = {})
   #set ($jobHolder = $xwiki.getDocument($docName))
@@ -141,7 +141,7 @@ $msg.get('xe.scheduler.welcome')
   #if ($status != 'None')
     #set ($firetime = $scheduler.getNextFireTime($job))
   #else
-    #set ($firetime = $msg.get('xe.scheduler.jobs.next.undefined'))
+    #set ($firetime = $services.localization.render('xe.scheduler.jobs.next.undefined'))
   #end
   #set ($ok = $!actions.put('trigger', $doc.getExternalURL('view', "do=trigger&amp;which=${jobHolder.fullName}")))
   #if ($status == 'None')
@@ -154,7 +154,7 @@ $msg.get('xe.scheduler.welcome')
     #set ($ok = $!actions.put('unschedule', $doc.getExternalURL('view', "do=unschedule&amp;which=${jobHolder.fullName}")))
   #end
   #set ($ok = $!actions.put('delete', $doc.getExternalURL('view', "do=delete&amp;which=${jobHolder.fullName}")))
-|$job.get('jobName')|$status|$firetime|**$msg.get('xe.scheduler.jobs.actions.access')** [[$msg.get('xe.scheduler.jobs.actions.view')&gt;&gt;$jobHolder.fullName]]#if($jobHolder.hasAccessLevel('programming')) [[$msg.get('xe.scheduler.jobs.actions.edit')&gt;&gt;${jobHolder.getExternalURL('inline')}]]#end **$msg.get('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions.entrySet()) [[$msg.get("xe.scheduler.jobs.actions.${action.key}")&gt;&gt;${action.value}]]#end
+|$job.get('jobName')|$status|$firetime|**$services.localization.render('xe.scheduler.jobs.actions.access')** [[$services.localization.render('xe.scheduler.jobs.actions.view')&gt;&gt;$jobHolder.fullName]]#if($jobHolder.hasAccessLevel('programming')) [[$services.localization.render('xe.scheduler.jobs.actions.edit')&gt;&gt;${jobHolder.getExternalURL('inline')}]]#end **$services.localization.render('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions.entrySet()) [[$services.localization.render("xe.scheduler.jobs.actions.${action.key}")&gt;&gt;${action.value}]]#end
 
 #end
 #if ($doc.hasAccessLevel('programming'))
@@ -165,12 +165,12 @@ $msg.get('xe.scheduler.welcome')
 ## schedule, pause, etc.
 ##
 
-= $msg.get('xe.scheduler.jobs.create') =
+= $services.localization.render('xe.scheduler.jobs.create') =
 
 ##
 ## Form to create a new Job
 ##
-{{info}}$msg.get('xe.scheduler.jobs.explaincreate'){{/info}}
+{{info}}$services.localization.render('xe.scheduler.jobs.explaincreate'){{/info}}
 
 {{html}}
 &lt;form action="$doc.getURL('create')" id="newdoc"&gt;&lt;div&gt;
@@ -179,15 +179,15 @@ $msg.get('xe.scheduler.welcome')
   &lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
   &lt;input type="hidden" name="sheet" value="1" /&gt;
   &lt;input type="hidden" name="space" value="Scheduler"/&gt;
-  &lt;label class="hidden" for="page"&gt;$msg.get('xe.scheduler.jobs.create.nameTip')&lt;/label&gt;
-  &lt;input id="page" name="page" size="30" type="text" class="withTip" value="$msg.get('xe.scheduler.jobs.create.nameTip')" /&gt;
-  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$msg.get('xe.scheduler.jobs.create.submit')"/&gt;&lt;/span&gt;
+  &lt;label class="hidden" for="page"&gt;$services.localization.render('xe.scheduler.jobs.create.nameTip')&lt;/label&gt;
+  &lt;input id="page" name="page" size="30" type="text" class="withTip" value="$services.localization.render('xe.scheduler.jobs.create.nameTip')" /&gt;
+  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$services.localization.render('xe.scheduler.jobs.create.submit')"/&gt;&lt;/span&gt;
 &lt;/div&gt;&lt;/form&gt;
 {{/html}}
 
 #else
 
-  {{warning}}$msg.get('xe.scheduler.jobs.warning')){{/warning}}
+  {{warning}}$services.localization.render('xe.scheduler.jobs.warning')){{/warning}}
 
 #end
 {{/velocity}}</content>

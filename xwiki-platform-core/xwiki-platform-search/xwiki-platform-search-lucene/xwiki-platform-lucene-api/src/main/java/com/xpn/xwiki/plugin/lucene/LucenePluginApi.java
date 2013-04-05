@@ -39,9 +39,7 @@ import com.xpn.xwiki.plugin.PluginApi;
  * </p>
  * 
  * @version $Id$
- * @deprecated the plugin technology is deprecated
  */
-@Deprecated
 public class LucenePluginApi extends PluginApi<LucenePlugin>
 {
     /** Logging helper. */

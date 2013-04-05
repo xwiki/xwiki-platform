@@ -106,23 +106,23 @@
     </property>
     <property>
       <content>{{velocity}}
-#largepanelheader($msg.get('addproperty'))
+#largepanelheader($services.localization.render('addproperty'))
 {{html}}
 &lt;form id="propadd" method="post" action="$doc.getURL('propadd')" onsubmit="cancelCancelEdit()"&gt;
 &lt;div class="padded"&gt;
 &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="xredirect" value="$doc.getURL('edit', 'editor=class')"/&gt;
-&lt;label for="propname"&gt;$msg.get('propname'):&lt;/label&gt;&lt;br /&gt;
+&lt;label for="propname"&gt;$services.localization.render('propname'):&lt;/label&gt;&lt;br /&gt;
 &lt;input type="text" id="propname" name="propname" value="" size="20" /&gt;&lt;br /&gt;
-&lt;label for="proptype"&gt;$msg.get('proptype'):&lt;/label&gt;&lt;br /&gt;
+&lt;label for="proptype"&gt;$services.localization.render('proptype'):&lt;/label&gt;&lt;br /&gt;
 &lt;select id="proptype" name="proptype" size="1"&gt;
-&lt;option value="---"&gt;$msg.get('selectproptype')&lt;/option&gt;
+&lt;option value="---"&gt;$services.localization.render('selectproptype')&lt;/option&gt;
 #foreach($prop in $xwiki.metaclass.properties)
 &lt;option value="$prop.name"&gt;$prop.prettyName&lt;/option&gt;
 #end
 &lt;/select&gt;
 &lt;span class="buttonwrapper"&gt;
-&lt;input type="submit" class="button" value="$msg.get('addproperty')"/&gt;&lt;/span&gt;
+&lt;input type="submit" class="button" value="$services.localization.render('addproperty')"/&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}

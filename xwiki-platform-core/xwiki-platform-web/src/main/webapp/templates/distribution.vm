@@ -51,12 +51,12 @@
 #macro(displayStepHeader $currentStepId)
   <div class="wizard-header">
     #set ($stepNames = {
-      'welcome': $msg.get('platform.extension.distributionWizard.welcomeStepTitle'),
-      'extension.defaultui': $msg.get('platform.extension.distributionWizard.uiStepTitle'),
-      'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepTitle')
+      'welcome': $services.localization.render('platform.extension.distributionWizard.welcomeStepTitle'),
+      'extension.mainui': $services.localization.render('platform.extension.distributionWizard.uiStepTitle'),
+      'extension.outdatedextensions': $services.localization.render('platform.extension.distributionWizard.extensionsStepTitle')
     })
     #set ($currentStepIndex = $services.distribution.jobStatus.currentStateIndex)
-    <h1>$msg.get('platform.extension.distributionWizard.stepHeading', [$currentStepIndex, $stepNames.get($currentStepId)])</h1>
+    <h1>$services.localization.render('platform.extension.distributionWizard.stepHeading', [$currentStepIndex, $stepNames.get($currentStepId)])</h1>
     #set ($steps = $services.distribution.jobStatus.steps)
     ## Ignore the welcome step.
     #set ($steps = $steps.subList(1, $steps.size()))
@@ -81,7 +81,7 @@
 #end
 
 #macro(displayStepContent)
-  <div class="warningmessage">$msg.get('platform.extension.distributionWizard.experimentalWarning', ['<a href="http://jira.xwiki.org/browse/XWIKI/component/10987">', '</a>'])</div>
+  <div class="warningmessage">$services.localization.render('platform.extension.distributionWizard.experimentalWarning', ['<a href="http://jira.xwiki.org/browse/XWIKI/component/10987">', '</a>'])</div>
   $services.distribution.renderCurrentStepToXHTML()
 #end
 
@@ -94,18 +94,25 @@
       ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
       ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
       <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
-        <button type="submit" name="action" value="COMPLETE_STEP">$msg.get('platform.extension.distributionWizard.continueLabel')</button>
+        <button type="submit" name="action" value="COMPLETE_STEP">$services.localization.render('platform.extension.distributionWizard.continueLabel')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
         <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($msg.get('platform.extension.distributionWizard.skipHint'))">$msg.get('platform.extension.distributionWizard.skipLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))">$services.localization.render('platform.extension.distributionWizard.skipLabel')</button>
       </span>
       <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
         <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($msg.get('platform.extension.distributionWizard.cancelHint'))">$msg.get('platform.extension.distributionWizard.cancelLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))">$services.localization.render('platform.extension.distributionWizard.cancelLabel')</button>
       </span>
     </div>
   </form>
+#end
+
+## Make sure to skip all right checking for guest user
+#if (!$xcontext.userReference)
+  #set ($extensionConfig = {})
+  #set ($discard = $extensionConfig.put('skipCheckRight', true))
+  #set ($discard = $extensionConfig.put('skipCurrentUser', true))
 #end
 
 ## Keep displaying the wizard after the distribution job is done if the request targets a specific extension (e.g. if you

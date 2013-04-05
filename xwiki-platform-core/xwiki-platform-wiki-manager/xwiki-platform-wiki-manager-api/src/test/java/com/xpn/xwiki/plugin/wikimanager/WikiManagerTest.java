@@ -28,6 +28,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.junit.Assert;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -55,6 +56,10 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
     private Map<String, Map<String, XWikiDocument>> databases = new HashMap<String, Map<String, XWikiDocument>>();
 
     private WikiManager wikiManager;
+
+    private Mock mockXWiki;
+
+    private Mock mockXWikiRightService;
 
     private Map<String, XWikiDocument> getDocuments(String database, boolean create) throws XWikiException
     {
@@ -124,14 +129,14 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
 
-        Mock mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         mockXWiki.stubs().method("Param").will(returnValue(""));
 
         Mock mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {mockXWiki.proxy(), getContext()});
 
-        Mock mockXWikiRightService = mock(XWikiRightServiceImpl.class, new Class[] {}, new Object[] {});
+        mockXWikiRightService = mock(XWikiRightServiceImpl.class, new Class[] {}, new Object[] {});
 
         mockXWiki.stubs().method("getDocument").with(isA(DocumentReference.class), ANYTHING)
             .will(new CustomStub("Implements XWiki.getDocument")
@@ -292,5 +297,59 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
             // getWikiAlias should throw XObjectDocumentDoesNotExistException when alias document does not exists
             assertEquals(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, expected.getCode());
         }
+    }
+
+    public void testCanCreateWiki()
+    {
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
+        Assert.assertTrue(this.wikiManager.canCreateWiki(getContext()));
+
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(false));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
+        Assert.assertFalse(this.wikiManager.canCreateWiki(getContext()));
+
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(false));
+
+        Assert.assertFalse(this.wikiManager.canCreateWiki(getContext()));
+    }
+
+    public void testCanEditWiki()
+    {
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
+        Assert.assertTrue(this.wikiManager.canEditWiki(getContext()));
+
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(false));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
+        Assert.assertFalse(this.wikiManager.canEditWiki(getContext()));
+
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(false));
+
+        Assert.assertFalse(this.wikiManager.canEditWiki(getContext()));
+    }
+
+    public void testCanDeleteWiki()
+    {
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
+        Assert.assertTrue(this.wikiManager.canDeleteWiki(getContext()));
+
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(false));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
+        Assert.assertFalse(this.wikiManager.canDeleteWiki(getContext()));
+
+        this.mockXWikiRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(false));
+
+        Assert.assertFalse(this.wikiManager.canDeleteWiki(getContext()));
     }
 }

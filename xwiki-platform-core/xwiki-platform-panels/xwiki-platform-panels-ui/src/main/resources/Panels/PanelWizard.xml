@@ -15,7 +15,7 @@
   <date>1157375356000</date>
   <contentUpdateDate>1157375356000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("panelwizard.panelwizard")</title>
+  <title>$services.localization.render('panelwizard.panelwizard')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -537,8 +537,8 @@ div.pagelayoutoption:hover .lmleftcolumn,
   (% class="floatcontainer" %)
   ((({{html}}
     &lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
-      &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$escapetool.xml($msg.get('panelwizard.panellist'))&lt;/a&gt;&lt;/li&gt;
-      &lt;li id="secondwtab"&gt;&lt;a href="#PageLayoutSection"&gt;$escapetool.xml($msg.get('panelwizard.pagelayout'))&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$escapetool.xml($services.localization.render('panelwizard.panellist'))&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="secondwtab"&gt;&lt;a href="#PageLayoutSection"&gt;$escapetool.xml($services.localization.render('panelwizard.pagelayout'))&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   {{/html}})))
 
@@ -546,7 +546,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
   (((
     (% id="PanelListSection" %)
     (((
-      (% id="draganddroptooltip" class="hastooltip" title="${msg.get('panelwizard.tip')}"%)$msg.get('panelwizard.draganddrop')(%%)
+      (% id="draganddroptooltip" class="hastooltip" title="${services.localization.render('panelwizard.tip')}"%)$services.localization.render('panelwizard.draganddrop')(%%)
       #set ($panelClass = $xwiki.getDocument('Panels.PanelClass').xWikiClass)
       #set ($categoryList = $panelClass.category.getProperty('values').value.split('[|]'))
       #set ($panelsList = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName &lt;&gt; ''Panels.PanelTemplate''').execute())
@@ -583,8 +583,8 @@ div.pagelayoutoption:hover .lmleftcolumn,
       //&lt;![CDATA[
       window.ajaxurl = "$ajaxurl";
       window.allPanelsPlace = new Object();
-      window.panelsavesuccess = "$escapetool.javascript($msg.get('panelsavesuccess'))";
-      window.panelsaveerror = "$escapetool.javascript($msg.get('panelsaveerror'))";
+      window.panelsavesuccess = "$escapetool.javascript($services.localization.render('panelsavesuccess'))";
+      window.panelsaveerror = "$escapetool.javascript($services.localization.render('panelsaveerror'))";
       #set ($counter = 0)
       #set ($panelsStatus = {})
       #foreach ($category in $categoryList)
@@ -648,7 +648,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
             (((
               #set ($categPanels = $categoryMap.get($category))
               #if ($categPanels.size() == 0)
-                $msg.get('panelwizard.nopanels')
+                $services.localization.render('panelwizard.nopanels')
               #else
                 #foreach ($item in $categPanels)
                   #set ($panelDoc = $xwiki.getDocument($item))
@@ -657,7 +657,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
                   (((
                     (% class="label" %)((($doc.display('name', $obj))))
                     (% id="panelContainer${panelCount}" class="panelcontainer" title="${doc.display('description', 'view', $obj, 'xwiki/2.0').replaceAll('^\{\{html(.*?)\}\}', '').replaceAll('\{\{/html\}\}$', '')}" %)(((#if($panelsStatus.get($item) == 'false')#displaypanel($item)#else(% class="panel" %)((()))#end)))
-                    (% class="xwikibuttonlink" %)((([[$msg.get('edit')&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$msg.get('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
+                    (% class="xwikibuttonlink" %)((([[$services.localization.render('edit')&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$services.localization.render('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
                   )))
                   #set ($panelCount = $panelCount + 1)
                 #end## foreach panel
@@ -671,7 +671,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
 
     (% id="PageLayoutSection" %)
     (((
-      $msg.get('panelwizard.choosepagelayout')
+      $services.localization.render('panelwizard.choosepagelayout')
 
       #set($crtlayout = 0)
       #if($showLeftPanels and $showLeftPanels == "1")
@@ -683,24 +683,24 @@ div.pagelayoutoption:hover .lmleftcolumn,
       (% class="pagelayoutoptions" %)
       (((
       |(% #if ($crtlayout == 0)id="selectedoption" #end class="pagelayoutoption pagelayoutoption0" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($msg.get('panelwizard.nosidecolumn'))&lt;/label&gt;{{/html}}
+          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.nosidecolumn'))&lt;/label&gt;{{/html}}
           (% id="nosidecolumn" class="layoutmaquette" %)(((
             (% class="lmcontentcolumn" %)((()))
           )))
         )))|(% #if ($crtlayout == 1)id="selectedoption" #end class="pagelayoutoption pagelayoutoption1" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($msg.get('panelwizard.leftcolumn'))&lt;/label&gt;{{/html}}
+          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.leftcolumn'))&lt;/label&gt;{{/html}}
           (% id="leftcolumn" class="layoutmaquette" %)(((
             (% class="lmleftcolumn" %)((()))
             (% class="lmcontentcolumn" %)((()))
           )))
         )))|(% #if ($crtlayout == 2)id="selectedoption" #end class="pagelayoutoption pagelayoutoption2" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($msg.get('panelwizard.rightcolumn'))&lt;/label&gt;{{/html}}
+          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.rightcolumn'))&lt;/label&gt;{{/html}}
           (% id="rightcolumn" class="layoutmaquette" %)(((
             (% class="lmrightcolumn" %)((()))
             (% class="lmcontentcolumn" %)((()))
           )))
         )))|(% #if ($crtlayout == 3)id="selectedoption" #end class="pagelayoutoption pagelayoutoption3" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($msg.get('panelwizard.bothcolumns'))&lt;/label&gt;{{/html}}
+          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.bothcolumns'))&lt;/label&gt;{{/html}}
           (% id="bothcolumns" class="layoutmaquette" %)(((
             (% class="lmleftcolumn" %)((()))
             (% class="lmrightcolumn" %)((()))
@@ -714,9 +714,9 @@ div.pagelayoutoption:hover .lmleftcolumn,
   (% id="panelwizardbuttons" class="floatcontainer" %)
   (((
     (% class="xwikibuttonlink" %)
-      (% class="buttonwrapper" %)[[$msg.get('xe.panels.wizard.savenew')&gt;&gt;path:#||id="saveLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$msg.get('xe.panels.wizard.revert')&gt;&gt;$doc.fullName||id="revertLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$msg.get('xe.panels.wizard.homepage')&gt;&gt;Panels.WebHome]](%%) ##
+      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.savenew')&gt;&gt;path:#||id="saveLayout"]](%%) ##
+      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.revert')&gt;&gt;$doc.fullName||id="revertLayout"]](%%) ##
+      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.homepage')&gt;&gt;Panels.WebHome]](%%) ##
     (%%)
   )))
 #end

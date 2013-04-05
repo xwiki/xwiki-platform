@@ -46,10 +46,24 @@ public interface DistributionManager
         /** No distribution information can be found. */
         NONE,
 
-        /** Probably something to do. */
+        /**
+         * No previous state.
+         */
         NEW,
+
+        /**
+         * Previous state is an older version of the same distribution.
+         */
         UPGRADE,
+
+        /**
+         * Previous state is a newer version of the same distribution.
+         */
         DOWNGRADE,
+
+        /**
+         * Previous state is a different distribution.
+         */
         DIFFERENT
     }
 
@@ -121,4 +135,9 @@ public interface DistributionManager
      * @return the current distribution job
      */
     DistributionJob getCurrentDitributionJob();
+
+    /**
+     * @return true it's allowed to display the Distribution Wizard in the current context
+     */
+    boolean canDisplayDistributionWizard();
 }

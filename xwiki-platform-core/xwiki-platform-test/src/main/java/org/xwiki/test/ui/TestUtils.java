@@ -61,6 +61,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Xwiki;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -73,17 +74,28 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
  */
 public class TestUtils
 {
+    /**
+     * @since 5.0M2
+     */
+    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS = new UsernamePasswordCredentials("Admin",
+        "admin");
+
+    /**
+     * @since 5.0M2
+     */
+    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT + "/xwiki/";
+
+    /**
+     * @since 5.0M2
+     */
+    public static final String BASE_BIN_URL = BASE_URL + "bin/";
+
+    /**
+     * @since 5.0M2
+     */
+    public static final String BASE_REST_URL = BASE_URL + "rest/";
+
     private static PersistentTestContext context;
-
-    private static final String URL = System.getProperty("xe.url", "http://localhost");
-
-    public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
-
-    private static final String BASE_URL = URL + ":" + DEFAULT_PORT + "/xwiki/";
-
-    private static final String BASE_BIN_URL = BASE_URL + "bin/";
-
-    private static final String BASE_REST_URL = BASE_URL + "rest/";
 
     /**
      * Used to convert Java object into its REST XML representation.
@@ -129,8 +141,7 @@ public class TestUtils
     public TestUtils()
     {
         this.adminHTTPClient = new HttpClient();
-        this.adminHTTPClient.getState()
-            .setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("Admin", "admin"));
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, ADMIN_CREDENTIALS);
         this.adminHTTPClient.getParams().setAuthenticationPreemptive(true);
     }
 
@@ -176,7 +187,7 @@ public class TestUtils
 
     public String getURLToLoginAsAdmin()
     {
-        return getURLToLoginAs("Admin", "admin");
+        return getURLToLoginAs(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
     }
 
     public String getURLToLoginAs(final String username, final String password)
@@ -190,7 +201,7 @@ public class TestUtils
      */
     public String getURLToLoginAsAdminAndGotoPage(final String pageURL)
     {
-        return getURLToLoginAndGotoPage("Admin", "admin", pageURL);
+        return getURLToLoginAndGotoPage(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), pageURL);
     }
 
     /**
@@ -267,22 +278,30 @@ public class TestUtils
         return loggedInUserName;
     }
 
+    public void createUser(final String username, final String password, Object... properties)
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("register", "1");
+        parameters.put("xwikiname", username);
+        parameters.put("register_password", password);
+        parameters.put("register2_password", password);
+        parameters.put("register_email", "");
+        parameters.put("xredirect", getURLToLoginAndGotoPage(username, password, getURLToNonExistentPage()));
+        parameters.put("form_token", getSecretToken());
+        getDriver().get(getURL("XWiki", "Register", "register", parameters));
+        recacheSecretToken();
+        if (properties.length > 0) {
+            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
+        }
+    }
+
+    /**
+     * @deprecated starting with 5.0M2 use {@link #createUser(String, String, Object...)} instead
+     */
+    @Deprecated
     public void registerLoginAndGotoPage(final String username, final String password, final String pageURL)
     {
-        String registerURL = getURL("XWiki", "Register", "register", new HashMap<String, String>()
-        {
-            {
-                put("register", "1");
-                put("xwikiname", username);
-                put("register_password", password);
-                put("register2_password", password);
-                put("register_email", "");
-                put("xredirect", getURLToLoginAndGotoPage(username, password, getURLToNonExistentPage()));
-                put("form_token", getSecretToken());
-            }
-        });
-        getDriver().get(registerURL);
-        recacheSecretToken();
+        createUser(username, password);
         getDriver().get(pageURL);
     }
 

@@ -38,12 +38,24 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
      */
     private static final long serialVersionUID = 2L;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId previousDistributionExtension;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId previousDistributionExtensionUi;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId distributionExtension;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId distributionExtensionUi;
 
     private List<DistributionStep> stepList;
@@ -101,14 +113,14 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
         this.previousDistributionExtension = previousDistributionExtension;
     }
 
-    public ExtensionId getPreviousDistributionExtensionUi()
+    public ExtensionId getPreviousDistributionExtensionUI()
     {
         return this.previousDistributionExtensionUi;
     }
 
-    public void setPreviousDistributionExtensionUi(ExtensionId previousDistributionExtensionUi)
+    public void setPreviousDistributionExtensionUI(ExtensionId previousDistributionExtensionUI)
     {
-        this.previousDistributionExtensionUi = previousDistributionExtensionUi;
+        this.previousDistributionExtensionUi = previousDistributionExtensionUI;
     }
 
     public ExtensionId getDistributionExtension()
@@ -121,13 +133,13 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
         this.distributionExtension = distributionExtension;
     }
 
-    public ExtensionId getDistributionExtensionUi()
+    public ExtensionId getDistributionExtensionUI()
     {
         return this.distributionExtensionUi;
     }
 
-    public void setDistributionExtensionUi(ExtensionId distributionExtensionUi)
+    public void setDistributionExtensionUI(ExtensionId distributionExtensionUI)
     {
-        this.distributionExtensionUi = distributionExtensionUi;
+        this.distributionExtensionUi = distributionExtensionUI;
     }
 }

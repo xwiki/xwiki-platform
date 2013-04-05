@@ -106,8 +106,8 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('welcome'))
-$msg.get('xe.panels.welcome.xwiki')
+#panelheader($services.localization.render('welcome'))
+$services.localization.render('xe.panels.welcome.xwiki')
 #panelfooter()
 {{/velocity}}</content>
     </property>

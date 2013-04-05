@@ -179,6 +179,13 @@ public class PackageMojo extends AbstractMojo
     private String importUser;
 
     /**
+     * The platform version to be used by the packager plugin.
+     * 
+     * @parameter expression="${platform.version}" default-value="${platform.version}"
+     */
+    private String platformVersion;
+
+    /**
      * List of skin artifacts to include in the packaging.
      * 
      * @parameter
@@ -188,6 +195,12 @@ public class PackageMojo extends AbstractMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        // If ${platform.version} is not defined, use project version as default
+        if (this.platformVersion == null || "".equals(this.platformVersion)) {
+            this.platformVersion = this.project.getVersion();
+        }
+        getLog().info("Using platform version: " + this.platformVersion);
+
         // Step 1: Expand Jetty resources into the package output directory.
         getLog().info("Expanding Jetty Resources ...");
         expandJettyDistribution();
@@ -240,7 +253,7 @@ public class PackageMojo extends AbstractMojo
             }
         } else {
             Artifact colibriArtifact =
-                resolveArtifact("org.xwiki.platform", "xwiki-platform-colibri", this.project.getVersion(), "zip");
+                resolveArtifact("org.xwiki.platform", "xwiki-platform-colibri", this.platformVersion, "zip");
             unzip(colibriArtifact.getFile(), skinsDirectory);
         }
 
@@ -298,9 +311,9 @@ public class PackageMojo extends AbstractMojo
                     type = artifacts.get(key).getType();
                 }
             } else {
-                // Default to the project's version
+                // Default to the platform version
                 if (version == null) {
-                    version = this.project.getVersion();
+                    version = this.platformVersion;
                 }
                 // Default to JAR
                 if (type == null) {
@@ -321,7 +334,7 @@ public class PackageMojo extends AbstractMojo
         VelocityContext context = createVelocityContext();
         Artifact configurationResourcesArtifact =
             this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
-                this.project.getVersion(), "", "jar");
+                this.platformVersion, "", "jar");
         resolveArtifact(configurationResourcesArtifact);
 
         configurationFileTargetDirectory.mkdirs();
@@ -467,7 +480,7 @@ public class PackageMojo extends AbstractMojo
         if (jettyArtifact == null) {
             jettyArtifact =
                 this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-tool-jetty-resources",
-                    this.project.getVersion(), "", "zip");
+                    this.platformVersion, "", "zip");
         }
 
         if (jettyArtifact != null) {
@@ -505,11 +518,9 @@ public class PackageMojo extends AbstractMojo
         // If the WAR artifacts weren't defined, try to resolve the default Web artifacts.
         if (warArtifacts.isEmpty()) {
             warArtifacts.put("xwiki", this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-web",
-                this.project.getVersion(), "", "war"));
-            warArtifacts.put(
-                "root",
-                this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-tool-rootwebapp",
-                    this.project.getVersion(), "", "war"));
+                this.platformVersion, "", "war"));
+            warArtifacts.put("root", this.factory.createArtifact("org.xwiki.platform",
+                "xwiki-platform-tool-rootwebapp", this.platformVersion, "", "war"));
         }
 
         if (!warArtifacts.isEmpty()) {
@@ -527,25 +538,34 @@ public class PackageMojo extends AbstractMojo
 
     private Collection<Artifact> resolveJarArtifacts() throws MojoExecutionException
     {
-        Set<Artifact> jarArtifacts = new HashSet<Artifact>();
+        Set<Artifact> artifactsToResolve = new HashSet<Artifact>();
 
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
-                if (artifact.getType().equals("jar")) {
-                    jarArtifacts.add(artifact);
-                    // Note that we don't need to resolve transitively since getArtifacts() above will already
-                    // contain all transitive dependencies.
-                    resolveArtifact(artifact);
-                }
+                artifactsToResolve.add(artifact);
+                // Note that we don't need to resolve transitively here since getArtifacts() above will already
+                // contain all transitive dependencies.
+                resolveArtifact(artifact);
             }
         }
 
         // Add mandatory dependencies if they're not explicitly specified.
-        jarArtifacts.addAll(getMandatoryJarArtifacts());
+        artifactsToResolve.addAll(getMandatoryJarArtifacts());
 
         // Resolve all artifacts transitively in one go.
-        return resolveTransitively(jarArtifacts);
+        Set<Artifact> resolvedArtifacts = resolveTransitively(artifactsToResolve);
+
+        // Remove the non JAR artifacts. Note that we need to include non JAR artifacts before the transitive resolve
+        // because for example some XARs mayb depend on JARs and we need those JARs to be packaged!
+        Set<Artifact> jarArtifacts = new HashSet<Artifact>();
+        for (Artifact artifact : resolvedArtifacts) {
+            if (artifact.getType().equals("jar")) {
+                jarArtifacts.add(artifact);
+            }
+        }
+
+        return jarArtifacts;
     }
 
     private Set<Artifact> getMandatoryJarArtifacts() throws MojoExecutionException
@@ -553,36 +573,36 @@ public class PackageMojo extends AbstractMojo
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<Artifact>();
 
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-oldcore",
-            this.project.getVersion(), null, "jar"));
+            this.platformVersion, null, "jar"));
 
         // Required Plugins
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-skin-skinx",
-            this.project.getVersion(), null, "jar"));
+            this.platformVersion, null, "jar"));
 
         // We shouldn't need those but right now it's mandatory since they are defined in the default web.xml file we
         // provide. We'll be able to remove them when we start using Servlet 3.0 -->
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-wysiwyg-server", this.project.getVersion(), null, "jar"));
+            "xwiki-platform-wysiwyg-server", this.platformVersion, null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-wysiwyg-client", this.project.getVersion(), null, "jar"));
+            "xwiki-platform-wysiwyg-client", this.platformVersion, null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-webdav-server", this.project.getVersion(), null, "jar"));
+            "xwiki-platform-webdav-server", this.platformVersion, null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-rest-server",
-            this.project.getVersion(), null, "jar"));
+            this.platformVersion, null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform", "xwiki-platform-gwt-api",
-            this.project.getVersion(), null, "jar"));
+            this.platformVersion, null, "jar"));
 
         // Needed by platform-web but since we don't have any dep in platform-web's pom.xml at the moment (duplication
         // issue with XE/XEM and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
         // with proper merge feature and then remove this...
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-uiextension-api", this.project.getVersion(), null, "jar"));
+            "xwiki-platform-uiextension-api", this.platformVersion, null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-localization-script", this.project.getVersion(), null, "jar"));
+            "xwiki-platform-localization-script", this.platformVersion, null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-localization-source-legacy", this.project.getVersion(), null, "jar"));
+            "xwiki-platform-localization-source-legacy", this.platformVersion, null, "jar"));
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.platform",
-            "xwiki-platform-security-bridge", this.project.getVersion(), null, "jar"));
+            "xwiki-platform-security-bridge", this.platformVersion, null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.factory.createArtifact("org.xwiki.commons",
@@ -641,7 +661,7 @@ public class PackageMojo extends AbstractMojo
      */
     private String getXWikiCommonsVersion()
     {
-        return this.project.getProperties().getProperty("commons.version", this.project.getVersion());
+        return this.project.getProperties().getProperty("commons.version", this.platformVersion);
     }
 
     private String getDependencyManagementVersion(MavenProject project, String groupId, String artifactId)
@@ -772,8 +792,7 @@ public class PackageMojo extends AbstractMojo
             + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
             + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
             + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
-        props.setProperty("xwikiCfgVirtual", "0");
-        props.setProperty("xwikiCfgVirtualUsepath", "0");
+        props.setProperty("xwikiCfgVirtualUsepath", "1");
         props.setProperty("xwikiCfgEditCommentMandatory", "0");
         props.setProperty("xwikiCfgDefaultSkin", "colibri");
         props.setProperty("xwikiCfgDefaultBaseSkin", "colibri");

@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.panels.test.po.NewPagePanel;
 import org.xwiki.test.ui.AbstractGuestTest;
+import org.xwiki.test.ui.AbstractStandardUserAuthenticatedTest;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
@@ -33,15 +34,15 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  * @version $Id$
  * @since 2.5RC1
  */
-public class NewPagePanelTest extends AbstractGuestTest
+public class NewPagePanelTest extends AbstractStandardUserAuthenticatedTest
 {
     /**
      * Tests if a new page can be created using the create page panel.
      */
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
+        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
     })
     public void testCreatePageFromPanel()
     {

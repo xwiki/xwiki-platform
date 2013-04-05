@@ -85,8 +85,8 @@ XWiki.MainUIStep = Class.create({
       type: 'image',
       'class': 'icon',
       src: '$xwiki.getSkinFile("icons/silk/pencil.png")',
-      alt: '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint"))',
-      title: '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint"))'
+      alt: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))",
+      title: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))"
     });
     var idInput = $('previousUiId');
     var versionInput = $('previousUiVersion');
@@ -205,22 +205,22 @@ XWiki.MainUIStep = Class.create({
       },
       onFailure: function() {
         form.enable();
-        new XWiki.widgets.Notification('$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRequestFailed"))', 'error');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
       }
     });
   },
 
   _displayPreviousUiExtension : function(previousUiExtension) {
     var form = $('previousUi');
-    var hint = new Element('div', {'class': 'xHint'}).update('$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIHint"))'.escapeHTML());
+    var hint = new Element('div', {'class': 'xHint'}).update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIHint'))".escapeHTML());
     var container = new Element('div').insert(hint).insert(previousUiExtension);
     form.hide().insert({after: container});
     // Enhance the extension display.
     document.fire('xwiki:dom:updated', {elements: [container]});
     // Hack the install button to perform a fake install (only mark the extension as installed).
     var installButton = previousUiExtension.down('button[name="extensionAction"][value="install"]');
-    installButton.update('$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairLabel"))'.escapeHTML());
-    installButton.title = '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairHint"))';
+    installButton.update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairLabel'))".escapeHTML());
+    installButton.title = "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairHint'))";
     installButton.value = 'repairXAR';
     installButton.activate();
     // Add the form token (for CSRF protection) to execute the job without confirmation (without a job plan).

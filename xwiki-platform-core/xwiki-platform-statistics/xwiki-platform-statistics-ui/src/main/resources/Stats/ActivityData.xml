@@ -25,7 +25,7 @@
   <hidden>true</hidden>
   <content>{{include document="Stats.Macros" /}}
 {{velocity}}#if($xwiki.statsService.enabledForCurrentWiki)
-= $msg.get('xe.statistics.current.week') =
+= $services.localization.render('xe.statistics.current.week') =
 
 #set ($scope = $xwiki.criteriaService.scopeFactory.ALL)
 #set ($period = $xwiki.criteriaService.periodFactory.currentWeek)
@@ -35,7 +35,7 @@
 #set ($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM.dd'))
 
 (% id="table_statistics_current_week" %)
-|= |=$msg.get('xe.statistics.views')|=$msg.get('xe.statistics.edits')
+|= |=$services.localization.render('xe.statistics.views')|=$services.localization.render('xe.statistics.edits')
 #if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 |$!dtf.print($item.key)|$item.value|$myedits.get($item.key)
@@ -44,7 +44,7 @@
 |1900.01.01|0|0
 #end
 
-= $msg.get('xe.statistics.current.month') =
+= $services.localization.render('xe.statistics.current.month') =
 
 #set ($period = $xwiki.criteriaService.periodFactory.currentMonth)
 #set ($step = $xwiki.criteriaService.durationFactory.DAY)
@@ -52,7 +52,7 @@
 #set ($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))
 #set ($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM.dd'))
 (% id="table_statistics_current_month" %)
-|= |=$msg.get('xe.statistics.views')|=$msg.get('xe.statistics.edits')
+|= |=$services.localization.render('xe.statistics.views')|=$services.localization.render('xe.statistics.edits')
 #if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 |$!dtf.print($item.key)|$item.value|$myedits.get($item.key)
@@ -61,7 +61,7 @@
 |1900.01.01|0|0
 #end
 
-= $msg.get('xe.statistics.current.year') =
+= $services.localization.render('xe.statistics.current.year') =
 
 #set ($period = $xwiki.criteriaService.periodFactory.currentYear)
 #set ($step = $xwiki.criteriaService.durationFactory.MONTH)
@@ -69,7 +69,7 @@
 #set ($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))
 #set ($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM'))
 (% id="table_statistics_current_year" %)
-|= |=$msg.get('xe.statistics.views')|=$msg.get('xe.statistics.edits')
+|= |=$services.localization.render('xe.statistics.views')|=$services.localization.render('xe.statistics.edits')
 #if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 |$!dtf.print($item.key)|$item.value|$myedits.get($item.key)
@@ -78,7 +78,7 @@
 |1900.01|0|0
 #end
 
-= $msg.get('xe.statistics.alltime') =
+= $services.localization.render('xe.statistics.alltime') =
 
 #set($period = $xwiki.criteriaService.periodFactory.createPeriod('20060101', '20130101'))
 #set($step = $xwiki.criteriaService.durationFactory.YEAR)
@@ -86,7 +86,7 @@
 #set($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy'))
 (% id="table_statistics_alltime" %)
-|= |=$msg.get('xe.statistics.views')|=$msg.get('xe.statistics.edits')
+|= |=$services.localization.render('xe.statistics.views')|=$services.localization.render('xe.statistics.edits')
 #if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 |$!dtf.print($item.key)|$item.value|$myedits.get($item.key)

@@ -1,5 +1,0 @@
-#if($isInServletMode)## Visible only in a page
-<div id="maineditmenu" class="actionmenu layoutsubsection">
-  #xwikitopmenuentry($doc.getURL() "$msg.get('core.menu.editing')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmEditing' '')
-</div>
-#end

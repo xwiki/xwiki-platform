@@ -36,5 +36,13 @@
   <modules>
     <module>xwiki-platform-user-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-user-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
        

@@ -1,0 +1,19 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+Inline {{translation key="some.translation"/}} macro
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Inline]
+onSpace
+beginMacroMarkerInline [translation] [key=some.translation]
+onWord [entranslationmessage]
+endMacroMarkerInline [translation] [key=some.translation]
+onSpace
+onWord [macro]
+endParagraph
+endDocument

@@ -36,7 +36,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
     <solr.version>4.0.0</solr.version>
-    <xwiki.jacoco.instructionRatio>60.87</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>62.22</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Solr -->

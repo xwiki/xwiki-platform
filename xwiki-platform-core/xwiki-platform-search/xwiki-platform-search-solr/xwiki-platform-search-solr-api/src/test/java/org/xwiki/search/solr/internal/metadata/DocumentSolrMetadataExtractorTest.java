@@ -61,11 +61,13 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.SolrIndexException;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -170,8 +172,8 @@ public class DocumentSolrMetadataExtractorTest
         when(this.mockContext.getWiki()).thenReturn(this.mockXWiki);
         when(this.mockXWiki.getDocument(this.documentReference, this.mockContext)).thenReturn(this.mockDocument);
 
-        when(this.mockDocument.getTranslatedDocument(any(Locale.class), eq(this.mockContext))).thenReturn(
-            this.mockDocument);
+        when(this.mockDocument.getTranslatedDocument(org.mockito.Matchers.isNull(Locale.class), eq(this.mockContext)))
+            .thenReturn(this.mockDocument);
 
         this.mockDab = this.mocker.getInstance(DocumentAccessBridge.class);
         when(this.mockDab.getDocument(this.documentReference)).thenReturn(this.mockDocument);
@@ -305,6 +307,30 @@ public class DocumentSolrMetadataExtractorTest
     }
 
     @Test
+    public void getDocumentThrowingException() throws Exception
+    {
+        DocumentReference reference = new DocumentReference(this.documentReference, Locale.FRENCH);
+        XWikiException thrown =
+            new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Unreadable document");
+        when(this.mockXWiki.getDocument(org.mockito.Matchers.eq(reference), eq(this.mockContext))).thenThrow(thrown);
+
+        // Call
+        DocumentSolrMetadataExtractor extractor = (DocumentSolrMetadataExtractor) this.mocker.getComponentUnderTest();
+        try {
+            extractor.getSolrDocument(reference);
+        } catch (SolrIndexException ex) {
+            Assert.assertEquals("Failed to get input document for '" + this.documentReferenceString + "'",
+                ex.getMessage());
+            Assert.assertEquals("Failed to get translated document for '" + this.documentReferenceString + "'", ex
+                .getCause().getMessage());
+            Assert.assertEquals(thrown, ex.getCause().getCause());
+            return;
+        }
+        Assert.assertFalse("Shouldn't have gotten here", true);
+    }
+
+    @Test
     public void getDocumentWithObjects() throws Exception
     {
         DocumentReference commentsClassReference = new DocumentReference("wiki", "space", "commentsClass");
@@ -351,6 +377,7 @@ public class DocumentSolrMetadataExtractorTest
         // When handled as a comment
         Vector<BaseObject> comments = new Vector<BaseObject>();
         comments.add(mockComment);
+        comments.add(null);
         when(this.mockDocument.getComments()).thenReturn(comments);
 
         when(mockComment.getStringValue("comment")).thenReturn(commentContent);

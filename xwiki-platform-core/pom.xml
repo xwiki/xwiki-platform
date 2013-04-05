@@ -74,11 +74,6 @@
         <artifactId>tika-parsers</artifactId>
         <version>1.3</version>
         <exclusions>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
           <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
           <exclusion>
             <groupId>de.l3s.boilerpipe</groupId>

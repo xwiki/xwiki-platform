@@ -93,7 +93,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Override
     public String getId(EntityReference reference) throws SolrIndexException
     {
-        String result = serializer.serialize(reference);
+        String result = this.serializer.serialize(reference);
 
         // TODO: Include language all the other entities once object/attachment translation is implemented.
 
@@ -146,7 +146,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             return translatedDocument;
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Failed to get translated document for '%s'",
-                serializer.serialize(documentReference)), e);
+                this.serializer.serialize(documentReference)), e);
         }
     }
 
@@ -186,15 +186,15 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             if (documentReference.getLocale() != null
                 && !StringUtils.isEmpty(documentReference.getLocale().getDisplayLanguage())) {
                 language = documentReference.getLocale().toString();
-            } else if (!StringUtils.isEmpty(documentAccessBridge.getDocument(documentReference).getRealLanguage())) {
-                language = documentAccessBridge.getDocument(documentReference).getRealLanguage();
+            } else if (!StringUtils.isEmpty(this.documentAccessBridge.getDocument(documentReference).getRealLanguage())) {
+                language = this.documentAccessBridge.getDocument(documentReference).getRealLanguage();
             } else {
                 // Multilingual and Default placeholder
                 language = "en";
             }
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Exception while fetching the language of the document '%s'",
-                serializer.serialize(documentReference)), e);
+                this.serializer.serialize(documentReference)), e);
         }
 
         return language;

@@ -115,11 +115,6 @@
           <groupId>org.gagravarr</groupId>
           <artifactId>vorbis-java-core</artifactId>
         </exclusion>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
@@ -128,8 +123,13 @@
       <artifactId>vorbis-java-core</artifactId>
       <version>0.1</version>
     </dependency>
+    <!-- Replace a runtime transitive dependency of tika-parsers because it includes old bcprov classes. -->
     <dependency>
-      <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk16</artifactId>
+    </dependency>
+    <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
+    <dependency>
       <groupId>de.l3s.boilerpipe</groupId>
       <artifactId>boilerpipe</artifactId>
     </dependency>

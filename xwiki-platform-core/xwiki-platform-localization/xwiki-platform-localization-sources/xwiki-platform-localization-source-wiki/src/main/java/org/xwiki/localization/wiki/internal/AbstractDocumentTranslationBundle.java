@@ -127,7 +127,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
         XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
 
-        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
+        if (locale != null && !locale.equals(Locale.ROOT)) {
             XWikiDocument tdocument = document.getTranslatedDocument(locale, context);
 
             if (tdocument == document) {

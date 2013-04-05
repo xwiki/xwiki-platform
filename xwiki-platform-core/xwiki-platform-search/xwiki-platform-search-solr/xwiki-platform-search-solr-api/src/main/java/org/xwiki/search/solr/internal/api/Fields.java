@@ -67,7 +67,7 @@ public interface Fields
     String NAME = "name";
 
     /**
-     * FullName of the document (example : Main.WebHome).
+     * FullName of the document (example: {@code Main.WebHome}).
      */
     String FULLNAME = "fullname";
 
@@ -84,7 +84,7 @@ public interface Fields
     String TITLE_SORT = "title_sort";
 
     /**
-     * Version of the document.
+     * Version of the document (example: {@code 4.2}).
      */
     String VERSION = "version";
 

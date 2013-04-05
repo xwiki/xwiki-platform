@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
 public interface SolrIndex
 {
     /**
-     * Index and entity recursively.
+     * Index an entity recursively.
      * 
      * @param reference the entity's reference.
      * @throws SolrIndexException if problems occur.

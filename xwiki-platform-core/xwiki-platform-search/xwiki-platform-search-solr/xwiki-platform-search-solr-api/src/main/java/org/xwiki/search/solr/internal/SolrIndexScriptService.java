@@ -32,7 +32,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndex;
@@ -94,7 +93,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(reference);
 
-            solrIndex.index(reference);
+            this.solrIndex.index(reference);
         } catch (Exception e) {
             error(e);
         }
@@ -112,7 +111,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(references);
 
-            solrIndex.index(references);
+            this.solrIndex.index(references);
         } catch (Exception e) {
             error(e);
         }
@@ -130,7 +129,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(reference);
 
-            solrIndex.delete(reference);
+            this.solrIndex.delete(reference);
         } catch (Exception e) {
             error(e);
         }
@@ -148,7 +147,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(references);
 
-            solrIndex.delete(references);
+            this.solrIndex.delete(references);
         } catch (Exception e) {
             error(e);
         }
@@ -190,7 +189,7 @@ public class SolrIndexScriptService implements ScriptService
             errorMessageToLog = e.getMessage();
         }
 
-        logger.error(errorMessageToLog, e);
+        this.logger.error(errorMessageToLog, e);
 
         getXWikiContext().put(CONTEXT_LASTEXCEPTION, e);
     }
@@ -233,7 +232,7 @@ public class SolrIndexScriptService implements ScriptService
      */
     private void checkAccessToWikiIndex(EntityReference reference) throws IllegalAccessException
     {
-        EntityReference wikiReference = (WikiReference) reference.extractReference(EntityType.WIKI);
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
         String wikiName = wikiReference.getName();
 
         XWikiContext context = getXWikiContext();

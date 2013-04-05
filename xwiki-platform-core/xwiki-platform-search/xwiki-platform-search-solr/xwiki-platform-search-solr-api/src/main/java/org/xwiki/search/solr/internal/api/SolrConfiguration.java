@@ -56,8 +56,8 @@ public interface SolrConfiguration
      * 
      * @return the list of supported language codes for which optimized indexing can be performed (using
      *         language-code-suffixed fields that are analyzed and queries with the analysis chain specific to the
-     *         language).
-     * @see #getOptimizedLanguages() for the selected languages.
+     *         language)
+     * @see #getOptimizedLanguages() for the selected languages
      */
     List<String> getOptimizableLanguages();
 
@@ -66,8 +66,8 @@ public interface SolrConfiguration
      * results.
      * 
      * @return the list of language codes for which to perform optimized indexing (using language-code-suffixed fields
-     *         that are analyzed and queries with the analysis chain specific to the language).
-     * @see #getOptimizableLanguages() for the full list of supported languages.
+     *         that are analyzed and queries with the analysis chain specific to the language)
+     * @see #getOptimizableLanguages() for the full list of supported languages
      */
     List<String> getOptimizedLanguages();
 
@@ -77,7 +77,7 @@ public interface SolrConfiguration
     List<String> getMultilingualFields();
 
     /**
-     * Retrieves the the configuration files required by the Solr instance's home directory in order to initialize.
+     * Retrieves the configuration files required by the Solr instance's home directory in order to initialize.
      * 
      * @return a map of (fileName, fileURL) to be used to initialize the Solr instance.
      */

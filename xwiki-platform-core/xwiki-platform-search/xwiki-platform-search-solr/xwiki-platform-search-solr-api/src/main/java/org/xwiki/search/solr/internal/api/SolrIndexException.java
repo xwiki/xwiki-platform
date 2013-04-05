@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.solr.internal.api;
 
+import java.io.Serializable;
+
 /**
  * Index component exception.
  * 
@@ -27,11 +29,14 @@ package org.xwiki.search.solr.internal.api;
  */
 public class SolrIndexException extends Exception
 {
+    /** Needed for correctly implementing {@link Serializable}. */
+    private static final long serialVersionUID = -4795008341521444886L;
+
     /**
      * Constructor.
      * 
      * @param message the exception message
-     * @param cause the exception that caused this exception.
+     * @param cause the exception that caused this exception
      */
     public SolrIndexException(String message, Exception cause)
     {

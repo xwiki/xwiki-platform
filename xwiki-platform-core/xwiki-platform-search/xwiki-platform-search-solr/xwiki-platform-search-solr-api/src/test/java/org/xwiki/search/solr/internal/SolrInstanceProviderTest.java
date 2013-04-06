@@ -66,14 +66,14 @@ public class SolrInstanceProviderTest extends AbstractComponentTestCase
     @Test
     public void testProviderLookup() throws Exception
     {
-        Assert.assertNotNull(provider);
+        Assert.assertNotNull(this.provider);
         Assert.assertTrue(this.provider instanceof SolrInstanceProvider);
     }
 
     @Test
     public void testInstanceRetrieval() throws Exception
     {
-        SolrInstance instance = provider.get();
+        SolrInstance instance = this.provider.get();
         Assert.assertNotNull(instance);
         Assert.assertTrue(instance instanceof EmbeddedSolrInstance);
     }

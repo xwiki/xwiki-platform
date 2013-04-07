@@ -62,6 +62,7 @@ public class DistributionAction extends XWikiAction
                 String.format("Template may not be overriden with 'xpage' in [%s] action.", DISTRIBUTION_ACTION));
         }
 
+        // Make sure the user has the right to access the distribution action
         DistributionManager distributionManager = Utils.getComponent(DistributionManager.class);
         if (!distributionManager.canDisplayDistributionWizard()) {
             if (context.getUserReference() == null) {

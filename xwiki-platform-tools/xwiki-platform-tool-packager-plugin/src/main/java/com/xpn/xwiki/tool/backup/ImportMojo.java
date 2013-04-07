@@ -29,8 +29,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
@@ -38,9 +36,14 @@ import org.apache.maven.model.Model;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
+import org.apache.maven.repository.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.DefaultExtensionAuthor;
@@ -61,7 +64,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Maven 2 plugin to import aset of XWiki documents into an existing database.
- * 
+ *
  * @version $Id$
  * @goal import
  * @requiresDependencyResolution compile
@@ -81,31 +84,31 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * @parameter default-value = "xwiki"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private String databaseName;
 
     /**
      * @parameter default-value = "${basedir}/src/main/packager/hibernate.cfg.xml"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private File hibernateConfig;
 
     /**
      * @parameter
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private File sourceDirectory;
 
     /**
      * @parameter default-value = "${project.build.directory}/data/"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private File xwikiDataDir;
 
     /**
      * The maven project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -114,38 +117,28 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * Project builder -- builds a model from a pom.xml.
-     * 
-     * @component role="org.apache.maven.project.MavenProjectBuilder"
+     *
+     * @component role="org.apache.maven.project.ProjectBuilder"
      * @required
      * @readonly
      */
-    protected MavenProjectBuilder mavenProjectBuilder;
+    protected ProjectBuilder projectBuilder;
 
     /**
      * Used to look up Artifacts in the remote repository.
-     * 
+     *
      * @component
      * @required
      */
-    protected ArtifactFactory factory;
+    protected RepositorySystem repositorySystem;
 
     /**
-     * List of Remote Repositories used by the resolver.
-     * 
-     * @parameter expression="${project.remoteArtifactRepositories}"
+     * The current repository/network configuration of Maven.
+     *
+     * @parameter default-value="${repositorySystemSession}"
      * @readonly
-     * @required
      */
-    protected List<ArtifactRepository> remoteRepos;
-
-    /**
-     * Location of the local repository.
-     * 
-     * @parameter expression="${localRepository}"
-     * @readonly
-     * @required
-     */
-    private ArtifactRepository local;
+    private RepositorySystemSession repositorySystemSession;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -173,7 +166,7 @@ public class ImportMojo extends AbstractMojo
      * @param importer the importer
      * @param databaseName some database name (TODO: find out what this name is really)
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
-     *            password, etc)
+     *        password, etc)
      * @throws Exception failed to import dependencies
      */
     private void importDependencies(Importer importer, String databaseName, File hibernateConfig) throws Exception
@@ -243,7 +236,7 @@ public class ImportMojo extends AbstractMojo
         extension.setWebsite(getPropertyString(model, MPNAME_WEBSITE, model.getUrl()));
 
         // authors
-        for (Developer developer : (List<Developer>) model.getDevelopers()) {
+        for (Developer developer : model.getDevelopers()) {
             URL authorURL = null;
             if (developer.getUrl() != null) {
                 try {
@@ -260,7 +253,7 @@ public class ImportMojo extends AbstractMojo
         // licenses
         if (!model.getLicenses().isEmpty()) {
             ExtensionLicenseManager licenseManager = componentManager.getInstance(ExtensionLicenseManager.class);
-            for (License license : (List<License>) model.getLicenses()) {
+            for (License license : model.getLicenses()) {
                 extension.addLicense(getExtensionLicense(license, licenseManager));
             }
         }
@@ -270,13 +263,14 @@ public class ImportMojo extends AbstractMojo
         if (StringUtils.isNotBlank(featuresString)) {
             featuresString = featuresString.replaceAll("[\r\n]", "");
             ConverterManager converter = componentManager.getInstance(ConverterManager.class);
-            extension.setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+            extension.setFeatures(converter.<Collection<String>>convert(List.class, featuresString));
         }
 
         // dependencies
-        for (Dependency mavenDependency : (List<Dependency>) model.getDependencies()) {
+        for (Dependency mavenDependency : model.getDependencies()) {
             if (!mavenDependency.isOptional()
-                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
+                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime")))
+            {
                 extension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ':'
                     + mavenDependency.getArtifactId(), new DefaultVersionConstraint(mavenDependency.getVersion())));
             }
@@ -286,12 +280,13 @@ public class ImportMojo extends AbstractMojo
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
     {
         MavenProject pomProject;
-        Artifact pomArtifact =
-            this.factory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
         try {
-            pomProject = this.mavenProjectBuilder.buildFromRepository(pomArtifact, this.remoteRepos, this.local);
+            ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+            request.setRepositorySession(this.repositorySystemSession);
+            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
+            pomProject = result.getProject();
         } catch (ProjectBuildingException e) {
-            throw new MojoExecutionException(String.format("Failed to build project for [%s]", pomArtifact), e);
+            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
         }
 
         return pomProject;

@@ -53,6 +53,7 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -348,13 +349,14 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     {
         XWikiContext xcontext = xcontextProvider.get();
 
+        DocumentReference currentUser = xcontext.getUserReference();
+
+        if (currentUser != null) {
+            return this.authorizationManager.hasAccess(Right.ADMIN, currentUser,
+                new WikiReference(xcontext.getDatabase()));
+        }
+
         if (xcontext.isMainWiki()) {
-            DocumentReference currentUser = xcontext.getUserReference();
-
-            if (currentUser != null) {
-                return this.authorizationManager.hasAccess(Right.ADMIN, currentUser, null);
-            }
-
             // If there is no user on main wiki let guest access distribution wizard
             try {
                 return RightsManager.getInstance().countAllGlobalUsersOrGroups(true, null, xcontext) == 0;

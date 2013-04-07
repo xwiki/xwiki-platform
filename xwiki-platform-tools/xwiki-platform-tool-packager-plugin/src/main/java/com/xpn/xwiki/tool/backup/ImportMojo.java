@@ -175,7 +175,6 @@ public class ImportMojo extends AbstractMojo
 
         // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an ordered
         // LinkedHashSet behind the scene)
-        // TODO: upgrade to Maven 3.x APIS and use AETHER
         List<Artifact> dependenciesFirstArtifacts = new ArrayList<Artifact>(this.project.getArtifacts());
         Collections.reverse(dependenciesFirstArtifacts);
 

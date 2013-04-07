@@ -69,6 +69,6 @@ public class FarmDistributionJobStatus extends DistributionJobStatus<Distributio
 
     public UpgradeMode getUpgradeMode()
     {
-        return this.upgradeModeStep != null ? this.upgradeModeStep.getUpgradeMode() : null;
+        return this.upgradeModeStep != null ? this.upgradeModeStep.getUpgradeMode() : UpgradeMode.WIKI;
     }
 }

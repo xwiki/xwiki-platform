@@ -29,9 +29,10 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
-import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
@@ -83,32 +84,44 @@ public class DistributionInitializerListener implements EventListener
 
         // Is install already done (allow to cancel stuff for example)
         if (distributionState == DistributionState.SAME) {
-            if (event instanceof ApplicationStartedEvent) {
-                DistributionJobStatus< ? > status = this.distributionManager.getPreviousFarmJobStatus();
+            FarmDistributionJobStatus farmStatus = this.distributionManager.getPreviousFarmJobStatus();
 
-                for (DistributionStep step : status.getSteps()) {
+            if (event instanceof ApplicationStartedEvent) {
+                for (DistributionStep step : farmStatus.getSteps()) {
                     if (step.getState() == null) {
                         this.distributionManager.startFarmJob();
                         break;
                     }
                 }
             } else {
-                String wiki = ((WikiReadyEvent) event).getWikiId();
+                if (farmStatus.getUpgradeMode() == UpgradeMode.WIKI) {
+                    String wiki = ((WikiReadyEvent) event).getWikiId();
 
-                if (!((XWikiContext) arg2).isMainWiki()) {
-                    WikiDistributionJobStatus status = this.distributionManager.getPreviousWikiJobStatus(wiki);
+                    if (!((XWikiContext) arg2).isMainWiki()) {
+                        WikiDistributionJobStatus status = this.distributionManager.getPreviousWikiJobStatus(wiki);
 
-                    for (DistributionStep step : status.getSteps()) {
-                        if (step.getState() == null) {
-                            this.distributionManager.startWikiJob(wiki);
-                            break;
+                        for (DistributionStep step : status.getSteps()) {
+                            if (step.getState() == null) {
+                                this.distributionManager.startWikiJob(wiki);
+                                break;
+                            }
                         }
                     }
                 }
             }
         } else {
             this.logger.info("Distribution state: {}", distributionState);
-            this.distributionManager.startFarmJob();
+
+            if (event instanceof ApplicationStartedEvent) {
+                this.distributionManager.startFarmJob();
+            } else {
+                FarmDistributionJobStatus status = this.distributionManager.getPreviousFarmJobStatus();
+
+                if (status.getUpgradeMode() == UpgradeMode.WIKI) {
+                    String wiki = ((WikiReadyEvent) event).getWikiId();
+                    this.distributionManager.startWikiJob(wiki);
+                }
+            }
         }
     }
 }

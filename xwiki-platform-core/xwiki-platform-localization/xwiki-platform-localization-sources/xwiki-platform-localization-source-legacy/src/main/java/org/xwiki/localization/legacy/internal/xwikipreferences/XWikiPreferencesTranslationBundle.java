@@ -149,6 +149,22 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     {
         XWikiPreferencesWikiTranslationBundle bundle = this.wikiBundlesCache.get(wiki);
         if (bundle == null) {
+            bundle = getBundleSynchronized(wiki);
+        }
+
+        return bundle;
+    }
+
+    /**
+     * Synchronized version of {@link #getBundle()} so that we synchronize only when necessary.
+     * 
+     * @param wiki the wiki
+     * @return the {@link XWikiPreferencesWikiTranslationBundle} for the provided wiki
+     */
+    private synchronized XWikiPreferencesWikiTranslationBundle getBundleSynchronized(String wiki)
+    {
+        XWikiPreferencesWikiTranslationBundle bundle = this.wikiBundlesCache.get(wiki);
+        if (bundle == null) {
             try {
                 bundle = createWikiBundle(wiki);
                 this.wikiBundlesCache.put(wiki, bundle);
@@ -163,7 +179,7 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     /**
      * @param wiki the wiki
      * @return the XWikiPreferencesWikiBundle for the provided wiki
-     * @throws ComponentLookupException faleid to create the bundle
+     * @throws ComponentLookupException failed to create the bundle
      */
     private XWikiPreferencesWikiTranslationBundle createWikiBundle(String wiki) throws ComponentLookupException
     {

@@ -164,7 +164,7 @@ XWiki.ExtensionBehaviour = Class.create({
     // Restore the state of the extension display.
     extensionBodyHidden && this._onToggleShowHideDetails({
       stop : function() {},
-      element : function() {return this.container.down('input[name="hideDetails"]')}.bind(this)
+      element : function() {return this.container.down('button[value="hideDetails"]')}.bind(this)
     });
     // Fire an event when the extension status changes.
     if (oldStatus != this.getStatus()) {

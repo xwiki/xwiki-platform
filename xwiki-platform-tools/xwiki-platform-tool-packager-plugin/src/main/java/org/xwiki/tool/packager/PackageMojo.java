@@ -27,6 +27,7 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -191,11 +192,7 @@ public class PackageMojo extends AbstractMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        // If ${platform.version} is not defined, use project version as default
-        if (this.platformVersion == null || "".equals(this.platformVersion)) {
-            this.platformVersion = this.project.getVersion();
-        }
-        getLog().info("Using platform version: " + this.platformVersion);
+        getLog().info("Using platform version: " + getXWikiPlatformVersion());
 
         // Step 1: Expand Jetty resources into the package output directory.
         getLog().info("Expanding Jetty Resources ...");
@@ -249,7 +246,7 @@ public class PackageMojo extends AbstractMojo
             }
         } else {
             Artifact colibriArtifact =
-                resolveArtifact("org.xwiki.platform", "xwiki-platform-colibri", this.platformVersion, "zip");
+                resolveArtifact("org.xwiki.platform", "xwiki-platform-colibri", getXWikiPlatformVersion(), "zip");
             unzip(colibriArtifact.getFile(), skinsDirectory);
         }
 
@@ -309,7 +306,7 @@ public class PackageMojo extends AbstractMojo
             } else {
                 // Default to the platform version
                 if (version == null) {
-                    version = this.platformVersion;
+                    version = getXWikiPlatformVersion();
                 }
                 // Default to JAR
                 if (type == null) {
@@ -329,7 +326,7 @@ public class PackageMojo extends AbstractMojo
     {
         VelocityContext context = createVelocityContext();
         Artifact configurationResourcesArtifact = this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-tool-configuration-resources", this.platformVersion, "", "jar");
+            "org.xwiki.platform", "xwiki-platform-tool-configuration-resources", getXWikiPlatformVersion(), "", "jar");
         resolveArtifact(configurationResourcesArtifact);
 
         configurationFileTargetDirectory.mkdirs();
@@ -474,7 +471,7 @@ public class PackageMojo extends AbstractMojo
         // If the Jetty artifact wasn't defined, try to resolve the default Jetty artifact
         if (jettyArtifact == null) {
             jettyArtifact = this.repositorySystem.createArtifact(
-                "org.xwiki.platform", "xwiki-platform-tool-jetty-resources", this.platformVersion, "", "zip");
+                "org.xwiki.platform", "xwiki-platform-tool-jetty-resources", getXWikiPlatformVersion(), "", "zip");
         }
 
         if (jettyArtifact != null) {
@@ -512,9 +509,9 @@ public class PackageMojo extends AbstractMojo
         // If the WAR artifacts weren't defined, try to resolve the default Web artifacts.
         if (warArtifacts.isEmpty()) {
             warArtifacts.put("xwiki", this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-web",
-                this.platformVersion, "", "war"));
+                getXWikiPlatformVersion(), "", "war"));
             warArtifacts.put("root", this.repositorySystem.createArtifact("org.xwiki.platform",
-                "xwiki-platform-tool-rootwebapp", this.platformVersion, "", "war"));
+                "xwiki-platform-tool-rootwebapp", getXWikiPlatformVersion(), "", "war"));
         }
 
         if (!warArtifacts.isEmpty()) {
@@ -532,6 +529,8 @@ public class PackageMojo extends AbstractMojo
 
     private Collection<Artifact> resolveJarArtifacts() throws MojoExecutionException
     {
+        Set<Artifact> mys = resolveTransitively(Collections.singleton(this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-chart-renderer", "5.0-SNAPSHOT", "jar")));
+
         Set<Artifact> artifactsToResolve = this.project.getArtifacts();
 
         // Add mandatory dependencies if they're not explicitly specified.
@@ -557,36 +556,36 @@ public class PackageMojo extends AbstractMojo
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<Artifact>();
 
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-oldcore", this.platformVersion, null, "jar"));
+            "org.xwiki.platform", "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
         // Required Plugins
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-skin-skinx", this.platformVersion, null, "jar"));
+            "org.xwiki.platform", "xwiki-platform-skin-skinx", getXWikiPlatformVersion(), null, "jar"));
 
         // We shouldn't need those but right now it's mandatory since they are defined in the default web.xml file we
         // provide. We'll be able to remove them when we start using Servlet 3.0 -->
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-wysiwyg-server", this.platformVersion, null, "jar"));
+            "xwiki-platform-wysiwyg-server", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-wysiwyg-client", this.platformVersion, null, "jar"));
+            "xwiki-platform-wysiwyg-client", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-webdav-server", this.platformVersion, null, "jar"));
+            "xwiki-platform-webdav-server", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-rest-server", this.platformVersion, null, "jar"));
+            "org.xwiki.platform", "xwiki-platform-rest-server", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-gwt-api", this.platformVersion, null, "jar"));
+            "org.xwiki.platform", "xwiki-platform-gwt-api", getXWikiPlatformVersion(), null, "jar"));
 
         // Needed by platform-web but since we don't have any dep in platform-web's pom.xml at the moment (duplication
         // issue with XE/XEM and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
         // with proper merge feature and then remove this...
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-uiextension-api", this.platformVersion, null, "jar"));
+            "xwiki-platform-uiextension-api", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-localization-script", this.platformVersion, null, "jar"));
+            "xwiki-platform-localization-script", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-localization-source-legacy", this.platformVersion, null, "jar"));
+            "xwiki-platform-localization-source-legacy", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-security-bridge", this.platformVersion, null, "jar"));
+            "xwiki-platform-security-bridge", getXWikiPlatformVersion(), null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",
@@ -618,7 +617,7 @@ public class PackageMojo extends AbstractMojo
             .setCollectionFilter(filter)
             .setRemoteRepositories(this.remoteRepositories)
             .setLocalRepository(this.localRepository)
-            .setManagedVersionMap(this.project.getManagedVersionMap())
+            .setManagedVersionMap(getManagedVersionMap())
             .setResolveRoot(false);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if(resolutionResult.hasExceptions()){
@@ -629,26 +628,49 @@ public class PackageMojo extends AbstractMojo
         return resolutionResult.getArtifacts();
     }
 
+    private Map<String, Artifact> getManagedVersionMap() throws MojoExecutionException
+    {
+        Map<String, Artifact> dependencyManagementMap = new HashMap<String, Artifact>();
+
+        // Add Platform Core's <dependencyManagement> since this is where we keep all our dependencies management
+        // information. We absolutely need to include those because Maven 3.x's artifact seems to have a big hole in
+        // not handling artifact's parent dependency management information by itself!
+        // See http://jira.codehaus.org/browse/MNG-5462
+        dependencyManagementMap.putAll(getPlatformPOMProject().getManagedVersionMap());
+
+        // We add the project's dependency management in a second step so that it can override the platform dep mgmt map
+        dependencyManagementMap.putAll(this.project.getManagedVersionMap());
+
+        return dependencyManagementMap;
+    }
+
     private MavenProject getTopLevelPOMProject() throws MojoExecutionException
     {
-        MavenProject pomProject;
-        Artifact pomArtifact = this.repositorySystem.createProjectArtifact(
-            "org.xwiki.commons", "xwiki-commons", this.getXWikiCommonsVersion());
+        return getMavenProject(this.repositorySystem.createProjectArtifact(
+            "org.xwiki.commons", "xwiki-commons", getXWikiCommonsVersion()));
+    }
+
+    private MavenProject getPlatformPOMProject() throws MojoExecutionException
+    {
+        return getMavenProject(this.repositorySystem.createProjectArtifact(
+            "org.xwiki.platform", "xwiki-platform-core", getXWikiPlatformVersion()));
+    }
+
+    private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
+    {
         try {
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest()
-                .setRepositorySession(this.repositorySystemSession);
-
-            // We don't want to execute any plugin here
-            request.setProcessPlugins(false);
-            // It's not this plugin job to validate this pom.xml
-            request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
-
-            ProjectBuildingResult result = this.projectBuilder.build(pomArtifact, request);
-            pomProject = result.getProject();
+                .setRepositorySession(this.repositorySystemSession)
+                    // We don't want to execute any plugin here
+                .setProcessPlugins(false)
+                    // It's not this plugin job to validate this pom.xml
+                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+            // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
+            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
+            return result.getProject();
         } catch (ProjectBuildingException e) {
-            throw new MojoExecutionException(String.format("Failed to build project for [%s]", pomArtifact), e);
+            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
         }
-        return pomProject;
     }
 
     /**
@@ -657,7 +679,21 @@ public class PackageMojo extends AbstractMojo
      */
     private String getXWikiCommonsVersion()
     {
-        return this.project.getProperties().getProperty("commons.version", this.platformVersion);
+        return this.project.getProperties().getProperty("commons.version", this.project.getVersion());
+    }
+
+    /**
+     * @return the version of the XWiki Platform project, either configured in the project using this plugin or taken
+     *         from the {@code platform.version} property if defined, defaulting to the current project version if not
+     *         defined
+     */
+    private String getXWikiPlatformVersion()
+    {
+        String version = this.platformVersion;
+        if (version == null) {
+            version = this.project.getVersion();
+        }
+        return version;
     }
 
     private String getDependencyManagementVersion(MavenProject project, String groupId, String artifactId)

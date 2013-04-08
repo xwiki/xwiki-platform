@@ -278,24 +278,18 @@ public class ImportMojo extends AbstractMojo
 
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
     {
-        Artifact pomArtifact =
-            this.repositorySystem.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(),
-                artifact.getVersion());
-
         try {
-            ProjectBuildingRequest request =
-                new DefaultProjectBuildingRequest().setRepositorySession(this.repositorySystemSession);
-
-            // We don't want to execute any plugin here
-            request.setProcessPlugins(false);
-            // It's not this plugin job to validate this pom.xml
-            request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
-
-            ProjectBuildingResult result = this.projectBuilder.build(pomArtifact, request);
-
+            ProjectBuildingRequest request = new DefaultProjectBuildingRequest()
+                .setRepositorySession(this.repositorySystemSession)
+                // We don't want to execute any plugin here
+                .setProcessPlugins(false)
+                // It's not this plugin job to validate this pom.xml
+                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+            // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
+            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
             return result.getProject();
         } catch (ProjectBuildingException e) {
-            throw new MojoExecutionException(String.format("Failed to build project for [%s]", pomArtifact), e);
+            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
         }
     }
 

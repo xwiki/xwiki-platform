@@ -228,6 +228,19 @@
         <artifactId>jta</artifactId>
         <version>1.1</version>
       </dependency>
+      <!-- Make sure we exclude iText which we don't need and which incidentally would bring a bad dependency version
+           on bcprov and bcmail for jdk14. -->
+      <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.0.14</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

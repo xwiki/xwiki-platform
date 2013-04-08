@@ -84,6 +84,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+        <version>${project.version}</version>
         <executions>
           <execution>
             <phase>process-resources</phase>
@@ -110,6 +111,7 @@
           <plugin>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+            <version>${project.version}</version>
             <dependencies>
               <dependency>
                 <groupId>com.cenqua.clover</groupId>

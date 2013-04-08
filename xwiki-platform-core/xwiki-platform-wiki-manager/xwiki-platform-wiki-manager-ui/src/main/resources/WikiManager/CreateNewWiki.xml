@@ -590,16 +590,16 @@
   ##
   &lt;div&gt;
     #if ($wstepbystep)
-      &lt;a href="javascript:void(0)" id="actionprevious" class="button" onclick="goPrevious();"&gt;${msg.get("wikimanager.action.previous")}&lt;/a&gt;
+      &lt;a href="javascript:void(0)" id="actionprevious" class="button" onclick="goPrevious();"&gt;${services.localization.render("wikimanager.action.previous")}&lt;/a&gt;
       |
-      &lt;a href="javascript:void(0)" id="actionnext" class="button" onclick="goNext();"&gt;${msg.services.localization.render("wikimanager.action.next")}&lt;/a&gt;
+      &lt;a href="javascript:void(0)" id="actionnext" class="button" onclick="goNext();"&gt;${services.localization.render("wikimanager.action.next")}&lt;/a&gt;
     #end
     &lt;div id="actioncreate"&gt;
       &lt;br /&gt;
       #if ($request.stepbystep) &lt;input type="hidden" name="stepbystep" value="$request.stepbystep" /&gt; #end
       #if ($request.doc) &lt;input type="hidden" name="doc" value="$request.doc" /&gt; #end
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-      &lt;input class="button" type="submit" id="actioncreatebutton" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
+      &lt;input class="button" type="submit" id="actioncreatebutton" name="actioncreate" value="${services.localization.render("create")}" onclick="return validate();" /&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/form&gt;

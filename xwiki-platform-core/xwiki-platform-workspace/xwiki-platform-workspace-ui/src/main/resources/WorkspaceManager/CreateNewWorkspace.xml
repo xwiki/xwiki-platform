@@ -499,7 +499,7 @@ function prettyNameChanged()
     &lt;div id='actioncreate'&gt;
       &lt;br/&gt;
       &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
-      &lt;input class='button' type='submit' id='actioncreatebutton' name='actioncreate' value="${msg.get('create')}" #if($isInstallComplete)onclick='return validate();'#{else}disabled='disabled'#{end} /&gt;
+      &lt;input class='button' type='submit' id='actioncreatebutton' name='actioncreate' value="${services.localization.render('create')}" #if($isInstallComplete)onclick='return validate();'#{else}disabled='disabled'#{end} /&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/form&gt;

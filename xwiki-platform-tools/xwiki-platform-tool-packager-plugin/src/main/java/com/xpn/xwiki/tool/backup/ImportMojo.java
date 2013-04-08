@@ -33,6 +33,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -64,7 +65,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Maven 2 plugin to import aset of XWiki documents into an existing database.
- *
+ * 
  * @version $Id$
  * @goal import
  * @requiresDependencyResolution compile
@@ -108,7 +109,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * The maven project.
-     *
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -117,7 +118,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * Project builder -- builds a model from a pom.xml.
-     *
+     * 
      * @component role="org.apache.maven.project.ProjectBuilder"
      * @required
      * @readonly
@@ -126,7 +127,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * Used to look up Artifacts in the remote repository.
-     *
+     * 
      * @component
      * @required
      */
@@ -134,7 +135,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * The current repository/network configuration of Maven.
-     *
+     * 
      * @parameter default-value="${repositorySystemSession}"
      * @readonly
      */
@@ -166,7 +167,7 @@ public class ImportMojo extends AbstractMojo
      * @param importer the importer
      * @param databaseName some database name (TODO: find out what this name is really)
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
-     *        password, etc)
+     *            password, etc)
      * @throws Exception failed to import dependencies
      */
     private void importDependencies(Importer importer, String databaseName, File hibernateConfig) throws Exception
@@ -262,14 +263,13 @@ public class ImportMojo extends AbstractMojo
         if (StringUtils.isNotBlank(featuresString)) {
             featuresString = featuresString.replaceAll("[\r\n]", "");
             ConverterManager converter = componentManager.getInstance(ConverterManager.class);
-            extension.setFeatures(converter.<Collection<String>>convert(List.class, featuresString));
+            extension.setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
         }
 
         // dependencies
         for (Dependency mavenDependency : model.getDependencies()) {
             if (!mavenDependency.isOptional()
-                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime")))
-            {
+                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
                 extension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ':'
                     + mavenDependency.getArtifactId(), new DefaultVersionConstraint(mavenDependency.getVersion())));
             }
@@ -278,17 +278,22 @@ public class ImportMojo extends AbstractMojo
 
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
     {
-        MavenProject pomProject;
-        try {
-            ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
-            request.setRepositorySession(this.repositorySystemSession);
-            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
-            pomProject = result.getProject();
-        } catch (ProjectBuildingException e) {
-            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
-        }
+        Artifact pomArtifact =
+            this.repositorySystem.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(),
+                artifact.getVersion());
 
-        return pomProject;
+        try {
+            ProjectBuildingRequest request =
+                new DefaultProjectBuildingRequest().setRepositorySession(this.repositorySystemSession);
+            request.setProcessPlugins(false);
+            request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+
+            ProjectBuildingResult result = this.projectBuilder.build(pomArtifact, request);
+
+            return result.getProject();
+        } catch (ProjectBuildingException e) {
+            throw new MojoExecutionException(String.format("Failed to build project for [%s]", pomArtifact), e);
+        }
     }
 
     private String getProperty(Model model, String propertyName)

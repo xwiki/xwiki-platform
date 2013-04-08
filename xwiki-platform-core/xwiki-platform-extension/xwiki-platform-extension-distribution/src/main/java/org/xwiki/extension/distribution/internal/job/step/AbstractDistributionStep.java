@@ -113,7 +113,7 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
     protected String getTemplate()
     {
-        return "templates/distribution/" + getId() + ".wiki";
+        return "/templates/distribution/" + getId() + ".wiki";
     }
 
     protected StringContent getStringContent() throws IOException, ParseException

@@ -48,6 +48,7 @@ import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -636,6 +637,12 @@ public class PackageMojo extends AbstractMojo
         try {
             ProjectBuildingRequest request = new DefaultProjectBuildingRequest()
                 .setRepositorySession(this.repositorySystemSession);
+
+            // We don't want to execute any plugin here
+            request.setProcessPlugins(false);
+            // It's not this plugin job to validate this pom.xml
+            request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+
             ProjectBuildingResult result = this.projectBuilder.build(pomArtifact, request);
             pomProject = result.getProject();
         } catch (ProjectBuildingException e) {

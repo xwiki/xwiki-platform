@@ -592,7 +592,7 @@
     #if ($wstepbystep)
       &lt;a href="javascript:void(0)" id="actionprevious" class="button" onclick="goPrevious();"&gt;${msg.get("wikimanager.action.previous")}&lt;/a&gt;
       |
-      &lt;a href="javascript:void(0)" id="actionnext" class="button" onclick="goNext();"&gt;${msg.get("wikimanager.action.next")}&lt;/a&gt;
+      &lt;a href="javascript:void(0)" id="actionnext" class="button" onclick="goNext();"&gt;${msg.services.localization.render("wikimanager.action.next")}&lt;/a&gt;
     #end
     &lt;div id="actioncreate"&gt;
       &lt;br /&gt;

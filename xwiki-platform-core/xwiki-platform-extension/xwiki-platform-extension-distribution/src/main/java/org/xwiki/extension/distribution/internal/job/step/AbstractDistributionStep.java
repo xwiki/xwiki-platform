@@ -67,16 +67,16 @@ public abstract class AbstractDistributionStep implements DistributionStep
     private static final Pattern FIRSTLINE = Pattern.compile("^.#syntax=(.*)$", Pattern.MULTILINE);
 
     @Inject
-    private ComponentManager componentManager;
+    private transient ComponentManager componentManager;
 
     @Inject
-    private TransformationManager transformationManager;
+    private transient TransformationManager transformationManager;
 
     @Inject
-    private Environment environment;
+    private transient Environment environment;
 
     @Inject
-    private SyntaxFactory syntaxFactory;
+    private transient SyntaxFactory syntaxFactory;
 
     private String stepId;
 

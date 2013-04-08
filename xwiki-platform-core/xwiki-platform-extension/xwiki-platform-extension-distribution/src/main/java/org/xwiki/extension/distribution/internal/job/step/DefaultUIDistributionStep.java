@@ -38,10 +38,10 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
     public static final String ID = "extension.defaultui";
 
     @Inject
-    protected DistributionManager distributionManager;
+    protected transient DistributionManager distributionManager;
 
     @Inject
-    private InstalledExtensionRepository installedRepository;
+    private transient InstalledExtensionRepository installedRepository;
 
     private String wiki;
 

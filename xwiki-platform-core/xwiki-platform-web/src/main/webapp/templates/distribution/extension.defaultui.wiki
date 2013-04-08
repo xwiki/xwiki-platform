@@ -1,6 +1,7 @@
 ##syntax=xwiki/2.1
 {{velocity output="false"}}
 #macro(displayDefaultUIStep_unknownPreviousUI)
+  {{html}}
   #if ($request.previousUiId && $request.previousUiVersion)
     #set ($previousUi = $services.extension.resolve($request.previousUiId, $request.previousUiVersion))
   #end
@@ -73,62 +74,69 @@
     ## Wrap the extension in a DIV so that its bottom border is displayed.
     <div>#displayExtension($previousUi)</div>
   #end
+  {{/html}}
 #end
 {{/velocity}}
 
 {{velocity}}
-{{html}}
-  #set ($distributionState = $services.distribution.state)
-  #if (!$distributionState || $distributionState == 'NONE')
-    <div class="errormessage">$msg.get('platform.extension.distributionWizard.uiStepNoStateError')</div>
+#set ($distributionState = $services.distribution.state)
+#if (!$distributionState || $distributionState == 'NONE')
+  {{error}}{{translation key="platform.extension.distributionWizard.uiStepNoStateError"/}}{{/error}}
+#else
+  {{translation key="platform.extension.distributionWizard.uiStepDescription"/}}
+
+  (% class="xLabel" %)
+  {{translation key="platform.extension.distributionWizard.uiStepDistributionLabel"/}}
+
+  (% class="xHint" %)
+  {{translation key="platform.extension.distributionWizard.uiStepDistributionHint"/}}
+
+  #set ($distributionExtension = $services.distribution.distributionExtension)
+  #if ($distributionExtension)
+    ## Wrap the extension in a DIV so that its bottom border is displayed.
+    ((({{html}}#displayExtension($distributionExtension){{/html}})))
   #else
-    <p>$msg.get('platform.extension.distributionWizard.uiStepDescription')</p>
-    <div class="xLabel">$msg.get('platform.extension.distributionWizard.uiStepDistributionLabel')</div>
-    <div class="xHint">$msg.get('platform.extension.distributionWizard.uiStepDistributionHint')</div>
-    #set ($distributionExtension = $services.distribution.distributionExtension)
-    #if ($distributionExtension)
-      ## Wrap the extension in a DIV so that its bottom border is displayed.
-      <div>#displayExtension($distributionExtension)</div>
-    #else
-      <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
-        ["<strong>$!escapetool.xml($distributionExtension.id.id)</strong>",
-        "<strong>$!escapetool.xml($distributionExtension.id.version)</strong>"])</div>
-    #end
-
-    #set ($distributionUIId = $services.distribution.getUIExtensionId())
-    #if ($distributionUIId)
-      #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
-      #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
-
-      <div class="xLabel">$msg.get('platform.extension.distributionWizard.uiStepUILabel')</div>
-
-      #getExtensionJobStatus($distributionUIId.id $distributionUIId.version.value $distributionUIJobStatus)
-      #if (!$showCompleteStepButton && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
-        ## The user hasn't start the distribution UI job yet.
-        #set ($documentCount = $xwiki.countDocuments(''))
-        #if ($distributionState == 'NEW' && $documentCount > 30)
-          ## Upgrade from a version that doesn't have the distribution module.
-          #displayDefaultUIStep_unknownPreviousUI()
-        #elseif ($distributionState == 'DIFFERENT')
-          ## TODO: Display the previous distribution UI extension to let the user uninstall it.
-        #end
-      #end
-
-      <div class="xHint">$msg.get('platform.extension.distributionWizard.uiStepUIHint')</div>
-      #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
-      #if ($distributionUIExtension)
-        <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepInternetAccessWarning')</div>
-        ## Allow the user to install, upgrade or downgrade the UI.
-        #displayExtension($distributionUIExtension)
-      #else
-        <div class="infomessage">$msg.get('extensions.advancedSearch.noResults',
-          ["<strong>$!escapetool.xml($distributionUIId.id)</strong>",
-          "<strong>$!escapetool.xml($distributionUIId.version)</strong>"])</div>
-      #end
-    #else
-      <div class="warningmessage">$msg.get('platform.extension.distributionWizard.uiStepUIUnspecifiedError')</div>
-      ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the main UI.
-    #end
+    {{info}}$services.localization.render('extensions.advancedSearch.noResults',
+      ["**$!escapetool.xml($distributionExtension.id.id)**",
+      "**$!escapetool.xml($distributionExtension.id.version)**"]){{/info}}
   #end
-{{/html}}
+
+  #set ($distributionUIId = $services.distribution.getUIExtensionId())
+  #if ($distributionUIId)
+    #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
+    #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
+    (% class="xLabel" %)
+    {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
+    #set ($discard = "#getExtensionJobStatus($distributionUIId.id $distributionUIId.version.value $distributionUIJobStatus)")
+    #if (!$showCompleteStepButton && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
+      ## The user hasn't start the distribution UI job yet.
+      #set ($documentCount = $xwiki.countDocuments(''))
+      #if ($distributionState == 'NEW' && $documentCount > 30)
+
+        ## Upgrade from a version that doesn't have the distribution module.
+        #displayDefaultUIStep_unknownPreviousUI()
+      #elseif ($distributionState == 'DIFFERENT')
+        ## TODO: Display the previous distribution UI extension to let the user uninstall it.
+      #end
+    #end
+
+    (% class="xHint" %)
+    {{translation key="platform.extension.distributionWizard.uiStepUIHint"/}}
+
+    #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
+    #if ($distributionUIExtension)
+      {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
+
+      ## Allow the user to install, upgrade or downgrade the UI.
+      ## Wrap the extension in a DIV so that its bottom border is displayed.
+      ((({{html}}#displayExtension($distributionUIExtension){{/html}})))
+    #else
+      {{info}}$services.localization.render('extensions.advancedSearch.noResults',
+        ["**$!escapetool.xml($distributionUIId.id)**", "**$!escapetool.xml($distributionUIId.version)**"]){{/info}}
+    #end
+  #else
+    {{warning}}{{translation key="platform.extension.distributionWizard.uiStepUIUnspecifiedError"/}}{{/warning}}
+    ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the main UI.
+  #end
+#end
 {{/velocity}}

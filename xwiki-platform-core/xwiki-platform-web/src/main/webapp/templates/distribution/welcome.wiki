@@ -1,24 +1,27 @@
 ##syntax=xwiki/2.1
 {{velocity}}
-{{html}}
-<p>$msg.get('platform.extension.distributionWizard.welcomeStepDescription', ['</p><ul><li>', '</li><li>'])</li></ul>
-  <p class="steps-hint">$msg.get('platform.extension.distributionWizard.welcomeStepStepsHint')</p>
-  #set ($stepGoals = {
-    'extension.mainui': $msg.get('platform.extension.distributionWizard.uiStepSummary'),
-    'extension.outdatedextensions': $msg.get('platform.extension.distributionWizard.extensionsStepSummary')
-  })
-  <ul class="steps vertical">
-    #foreach ($step in $steps)
-    <li>
-      <span class="number">$velocityCount</span>
-      <span class="name">$stepNames.get($step.id)</span>
-      <span class="description">$stepGoals.get($step.id)</span>
-    </li>
-    #end
-  </ul>
-  <p class="xHint">$msg.get('platform.extension.distributionWizard.welcomeStepActionsHint')</p>
-{{/html}}
+## We use a hack to insert the new line in the translation parameters.
+$services.localization.render('platform.extension.distributionWizard.welcomeStepDescription', ['
+* ', '
+* '])
+
+(% class="steps-hint" %)
+{{translation key="platform.extension.distributionWizard.welcomeStepStepsHint"/}}
+
+#set ($stepGoals = {
+  'extension.defaultui': $services.localization.render('platform.extension.distributionWizard.uiStepSummary'),
+  'extension.outdatedextensions': $services.localization.render('platform.extension.distributionWizard.extensionsStepSummary')
+})
+(% class="steps vertical" %)
+#foreach ($step in $steps)
+  * (% class="number" %)$velocityCount(%%)##
+    (% class="name" %)$stepNames.get($step.id)(%%)##
+    (% class="description" %)$stepGoals.get($step.id)
+#end
+
+(% class="xHint" %)
+{{translation key="platform.extension.distributionWizard.welcomeStepActionsHint"/}}
+
 #set ($showCompleteStepButton = true)
 #set ($canCloseWizard = true)
-#set ($void = $currentStep.setState('COMPLETED'))
 {{/velocity}}

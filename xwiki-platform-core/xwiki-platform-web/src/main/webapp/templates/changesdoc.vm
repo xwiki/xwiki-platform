@@ -52,7 +52,7 @@ $escapedChunk##
   <dt>$propertyDisplay</dt>
   #if ("$!diff.propType" == 'TextArea')
     <dd>#unifiedDiff($diff.prevValue $diff.newValue)</dd>
-  #elseif($diff.propType == 'Password' || ($diff.getClassName() == 'XWiki.XWikiUsers' && $propertyDisplay == 'e-Mail'))
+  #elseif($diff.propType == 'Password' || ($diff.getClassName() == 'XWiki.XWikiUsers' && $diff.propType == 'Email'))
      <dd>*************</dd>
   #else
     <dd>#inlineDiff($diff.prevValue $diff.newValue)</dd>

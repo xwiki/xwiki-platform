@@ -35,6 +35,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 /**
@@ -83,7 +84,15 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
 
         // Step 2: Wiki distribution mode
 
-        // TODO: add a step to decide if distribution wyzard is farm based or wiki based
+        try {
+            // TODO: add a step to decide if distribution wyzard is farm based or wiki based
+            DistributionStep step2 =
+                this.componentManager.getInstance(DistributionStep.class, UpgradeModeDistributionStep.ID);
+
+            steps.add(step2);
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to get step instance for id [{}]", UpgradeModeDistributionStep.ID);
+        }
 
         // Step 3: Upgrade outdated extensions
 
@@ -115,6 +124,12 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
         }
 
         return steps;
+    }
+
+    @Override
+    protected DistributionJobStatus< ? > getPreviousStatus()
+    {
+        return this.distributionManager.getPreviousFarmJobStatus();
     }
 
     @Override

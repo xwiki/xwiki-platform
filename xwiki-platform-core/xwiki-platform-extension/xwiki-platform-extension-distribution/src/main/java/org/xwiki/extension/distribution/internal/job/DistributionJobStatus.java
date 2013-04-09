@@ -62,7 +62,8 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     private int currentStateIndex;
 
-    public DistributionJobStatus(DistributionJobStatus<R> status, ObservationManager observationManager, LoggerManager loggerManager)
+    public DistributionJobStatus(DistributionJobStatus<R> status, ObservationManager observationManager,
+        LoggerManager loggerManager)
     {
         super(status.getRequest(), observationManager, loggerManager, false);
 
@@ -72,7 +73,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
         this.distributionExtensionUi = status.distributionExtensionUi;
         this.stepList = status.stepList;
     }
-    
+
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
         List<DistributionStep> steps)
     {
@@ -84,6 +85,17 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
     public List<DistributionStep> getSteps()
     {
         return this.stepList;
+    }
+
+    public DistributionStep getStep(String stepId)
+    {
+        for (DistributionStep step : getSteps()) {
+            if (step.getId().equals(stepId)) {
+                return step;
+            }
+        }
+
+        return null;
     }
 
     public int getCurrentStateIndex()

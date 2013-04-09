@@ -61,9 +61,11 @@
 
 #macro(displayStepHeader $currentStepId)
   <div class="wizard-header">
+    ## FIXME: distribution.vm is not supposed to know any step
     #set ($stepNames = {
       'welcome': $services.localization.render('platform.extension.distributionWizard.welcomeStepTitle'),
       'extension.defaultui': $services.localization.render('platform.extension.distributionWizard.uiStepTitle'),
+      'upgrademode': $services.localization.render('platform.extension.distributionWizard.upgrademodeStepTitle'),
       'extension.outdatedextensions': $services.localization.render('platform.extension.distributionWizard.extensionsStepTitle')
     })
     #set ($currentStepIndex = $services.distribution.jobStatus.currentStateIndex)

@@ -53,21 +53,33 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
 
     protected abstract List<DistributionStep> createSteps();
 
+    protected abstract DistributionJobStatus< ? > getPreviousStatus();
+
     @Override
     protected S createNewStatus(R request)
     {
         List<DistributionStep> steps = createSteps();
 
+        DistributionJobStatus< ? > previousStatus = getPreviousStatus();
+
         // Step 0: A welcome message. Only if there is actually something to do
         for (DistributionStep step : steps) {
             if (step.getState() == null) {
-                try {
-                    steps.add(0, this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                        WelcomeDistributionStep.ID));
-                } catch (ComponentLookupException e) {
-                    this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
+                DistributionStep previousStep = previousStatus.getStep(step.getId());
+
+                if (previousStep != null) {
+                    step.setState(previousStep.getState());
                 }
-                break;
+
+                if (step.getState() == null) {
+                    try {
+                        steps.add(0, this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                            WelcomeDistributionStep.ID));
+                    } catch (ComponentLookupException e) {
+                        this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
+                    }
+                    break;
+                }
             }
         }
 
@@ -76,8 +88,6 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         S status = createNewDistributionStatus(request, steps);
 
         if (this.distributionManager.getDistributionExtension() != null) {
-            DistributionJobStatus< ? > previousStatus = this.distributionManager.getPreviousFarmJobStatus();
-
             if (previousStatus != null
                 && previousStatus.getDistributionExtension() != null
                 && !ObjectUtils.equals(previousStatus.getDistributionExtension(),

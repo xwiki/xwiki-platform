@@ -10,6 +10,7 @@ $services.localization.render('platform.extension.distributionWizard.welcomeStep
 
 #set ($stepGoals = {
   'extension.defaultui': $services.localization.render('platform.extension.distributionWizard.uiStepSummary'),
+  'upgrademode': $services.localization.render('platform.extension.distributionWizard.upgrademodeStepSummary'),
   'extension.outdatedextensions': $services.localization.render('platform.extension.distributionWizard.extensionsStepSummary')
 })
 (% class="steps vertical" %)

@@ -31,8 +31,8 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
@@ -98,6 +98,12 @@ public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributio
         }
 
         return steps;
+    }
+
+    @Override
+    protected DistributionJobStatus< ? > getPreviousStatus()
+    {
+        return this.distributionManager.getPreviousWikiJobStatus(getRequest().getWiki());
     }
 
     @Override

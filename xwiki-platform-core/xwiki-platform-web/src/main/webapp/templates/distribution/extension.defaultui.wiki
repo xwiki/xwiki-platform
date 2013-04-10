@@ -136,12 +136,13 @@
     (% class="xLabel" %)
     {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
     #set ($discard = "#getExtensionJobStatus($distributionUIId.id $distributionUIId.version.value $distributionUIJobStatus)")
-    #if (!$showCompleteStepButton && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
-      ## The user hasn't start the distribution UI job yet.
+    #if (!$installedVersion && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
+      ## There is no previous version of the default UI installed on the current wiki and there is no job running for
+      ## the default UI either.
       #set ($documentCount = $xwiki.countDocuments(''))
       #if ($distributionState == 'NEW' && $documentCount > 30)
 
-        ## Upgrade from a version that doesn't have the distribution module.
+        ## There are documents in the database but there is no info about the default UI that was previously installed.
         #displayDefaultUIStep_unknownPreviousUI()
       #elseif ($distributionState == 'DIFFERENT')
         ## TODO: Display the previous distribution UI extension to let the user uninstall it.

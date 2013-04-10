@@ -46,6 +46,7 @@ import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
 import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.internal.core.MavenCoreExtension;
 import org.xwiki.job.Job;
@@ -323,6 +324,20 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     public WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki)
     {
         return (WikiDistributionJobStatus) this.jobManager.getJobStatus(Arrays.asList(JOBID, wiki));
+    }
+
+    @Override
+    public UpgradeMode getUpgradeMode()
+    {
+        if (this.farmDistributionJob != null) {
+            FarmDistributionJobStatus status = this.farmDistributionJob.getStatus();
+
+            if (status != null) {
+                return status.getUpgradeMode();
+            }
+        }
+
+        return UpgradeMode.WIKI;
     }
 
     @Override

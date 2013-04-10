@@ -30,6 +30,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
@@ -165,5 +166,10 @@ public class DistributionScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    public UpgradeMode getUpgradeMode()
+    {
+        return this.distributionManager.getUpgradeMode();
     }
 }

@@ -65,10 +65,12 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         // Step 0: A welcome message. Only if there is actually something to do
         for (DistributionStep step : steps) {
             if (step.getState() == null) {
-                DistributionStep previousStep = previousStatus.getStep(step.getId());
+                if (previousStatus != null) {
+                    DistributionStep previousStep = previousStatus.getStep(step.getId());
 
-                if (previousStep != null) {
-                    step.setState(previousStep.getState());
+                    if (previousStep != null) {
+                        step.setState(previousStep.getState());
+                    }
                 }
 
                 if (step.getState() == null) {

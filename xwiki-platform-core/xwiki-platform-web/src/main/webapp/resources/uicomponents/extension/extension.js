@@ -9,6 +9,7 @@ XWiki.ExtensionBehaviour = Class.create({
     this.finalize();
 
     this.container = container;
+    this.container._extensionBehaviour = this;
 
     // The extension links (links to extension dependencies, links inside log messages) use the 'get' action when
     // extension details are loaded asynchronously so we need to replace it with 'view' or 'admin' action, depending
@@ -38,8 +39,19 @@ XWiki.ExtensionBehaviour = Class.create({
    * Releases the event listeners and detaches the extension.
    */
   finalize : function() {
-    this.container && this.container.remove();
+    if (this.container) {
+      delete this.container._extensionBehaviour;
+      this.container.remove();
+    }
     this.container = undefined;
+  },
+
+  /**
+   * Returns the extension namespace.
+   */
+  getNamespace : function() {
+    var namespaceHiddenInput = this.container.down('input[name="extensionNamespace"]');
+    return namespaceHiddenInput ? namespaceHiddenInput.value : null;
   },
 
   /**
@@ -151,8 +163,8 @@ XWiki.ExtensionBehaviour = Class.create({
 
   _update : function(html) {
     // Save the current state of the extension display so that it can be restored afterwards.
-    var extensionBody = this.container.down('.extension-body');
-    var extensionBodyHidden = !extensionBody || extensionBody.hasClassName('hidden');
+    var oldExtensionBody = this.container.down('.extension-body');
+    var oldExtensionBodyHidden = !oldExtensionBody || oldExtensionBody.hasClassName('hidden');
     var currentMenuItem = this.container.down('.innerMenu li a.current');
     currentMenuItem && (this._previouslySelectedMenuItem = currentMenuItem.getAttribute('href'));
     var oldStatus = this.getStatus();
@@ -162,7 +174,9 @@ XWiki.ExtensionBehaviour = Class.create({
     // Attach behaviour to the new element.
     this.initialize(this.container.next());
     // Restore the state of the extension display.
-    extensionBodyHidden && this._onToggleShowHideDetails({
+    var newExtensionBody = this.container.down('.extension-body');
+    var newExtensionBodyHidden = !newExtensionBody || newExtensionBody.hasClassName('hidden');
+    oldExtensionBodyHidden && !newExtensionBodyHidden && this._onToggleShowHideDetails({
       stop : function() {},
       element : function() {return this.container.down('button[value="hideDetails"]')}.bind(this)
     });
@@ -336,6 +350,18 @@ XWiki.ExtensionBehaviour = Class.create({
       }.bind(this),
       onComplete : this._onAfterStartJob.bind(this)
     });
+  },
+
+  /**
+   * Marks the extension as loading and redisplays it using updated information from the server.
+   *
+   * @param extraParams additional submit parameters
+   */
+  refresh : function(extraParams) {
+    this.container.addClassName('extension-item-loading');
+    this._refresh(extraParams);
+    // Disable the action buttons while the extension display is reloaded.
+    this.container.disable();
   },
 
   /**
@@ -590,7 +616,7 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
 var enhanceExtensions = function(event) {
   ((event && event.memo.elements) || [$('body')]).each(function(element) {
     element.select('.extension-item').each(function(extension) {
-      new XWiki.ExtensionBehaviour(extension);
+      !extension._extensionBehaviour && new XWiki.ExtensionBehaviour(extension);
     });
   });
 };

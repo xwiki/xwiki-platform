@@ -172,7 +172,8 @@ XWiki.DefaultUIStep = Class.create({
     new Ajax.Request(form.action, {
       parameters: {
         extensionId: formData.previousUiId,
-        extensionVersion: formData.previousUiVersion
+        extensionVersion: formData.previousUiVersion,
+        hideExtensionDetails: true
       },
       onCreate: function() {
         form.disable();
@@ -236,8 +237,11 @@ XWiki.DefaultUIStep = Class.create({
       var form = $('previousUi');
       // Remove the previous UI extension display.
       form.next().remove();
-      // Display the recommended UI extension.
+      // Display the default UI extension.
       for (var next = form.next(); next; next = next.show().next());
+      // Refresh the display of the default UI extension so that we get the upgrade button.
+      var defaultUiExtension = form.next('.xform').previous().down('.extension-item');
+      defaultUiExtension && defaultUiExtension._extensionBehaviour.refresh({hideExtensionDetails: true});
     }
   }
 });

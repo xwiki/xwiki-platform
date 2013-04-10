@@ -45,15 +45,15 @@ public class UpgradeModeDistributionStep extends AbstractDistributionStep
         super(ID);
     }
 
-    public UpgradeMode getUpgradeMode()
-    {
-        return this.upgradeMode;
-    }
-
     @Override
     public void prepare()
     {
 
+    }
+
+    public UpgradeMode getUpgradeMode()
+    {
+        return this.upgradeMode;
     }
 
     public void setUpgradeMode(UpgradeMode upgradeMode)

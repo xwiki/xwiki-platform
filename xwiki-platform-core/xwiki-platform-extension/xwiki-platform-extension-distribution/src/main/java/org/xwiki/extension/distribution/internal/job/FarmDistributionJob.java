@@ -55,6 +55,8 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
     {
         List<DistributionStep> steps = new ArrayList<DistributionStep>(3);
 
+        DistributionJobStatus< ? > previousStatus = getPreviousStatus();
+
         ExtensionId extensionUI = this.distributionManager.getMainUIExtensionId();
 
         // FIXME: using "xwiki" directly is cheating but there is no way to get the official main wiki at this
@@ -82,14 +84,22 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
             this.logger.error("Failed to get step instance for id [{}]", DefaultUIDistributionStep.ID);
         }
 
-        // Step 2: Wiki distribution mode
+        // Step 2: Upgrade mode
 
         try {
-            // TODO: add a step to decide if distribution wyzard is farm based or wiki based
-            DistributionStep step2 =
+            UpgradeModeDistributionStep step2 =
                 this.componentManager.getInstance(DistributionStep.class, UpgradeModeDistributionStep.ID);
 
             steps.add(step2);
+
+            if (previousStatus != null) {
+                UpgradeModeDistributionStep previousStep =
+                    (UpgradeModeDistributionStep) previousStatus.getStep(UpgradeModeDistributionStep.ID);
+
+                if (previousStep != null) {
+                    step2.setUpgradeMode(previousStep.getUpgradeMode());
+                }
+            }
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get step instance for id [{}]", UpgradeModeDistributionStep.ID);
         }

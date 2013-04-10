@@ -34,7 +34,6 @@ import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.ObjectDiff;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.diff.DiffPluginApi;
@@ -81,6 +80,11 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Value to display in diffs for hidden properties (email, password, etc).
      */
     private static final String HIDDEN_PROPERTIES_OBFUSCATED_VALUE = "******************";
+    
+    /**
+     * Name of the password class.
+     */
+    private static final String PASSWORD_CLASS_NAME = "Password";
     
     /**
      * Name of email property.
@@ -448,7 +452,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 false);
         
         // We hide PasswordClass properties and properties named "email" from notifications for security reasons.
-        if ((objectDiff.getPropType().equals(StringUtils.substringAfterLast(PasswordClass.class.getName(), ".")) 
+        if ((objectDiff.getPropType().equals(PASSWORD_CLASS_NAME) 
             || objectDiff.getPropName().equals(EMAIL_PROPERTY_NAME)) && !StringUtils.isBlank(propDiff)) {
             propDiff = HIDDEN_PROPERTIES_OBFUSCATED_VALUE;
         }

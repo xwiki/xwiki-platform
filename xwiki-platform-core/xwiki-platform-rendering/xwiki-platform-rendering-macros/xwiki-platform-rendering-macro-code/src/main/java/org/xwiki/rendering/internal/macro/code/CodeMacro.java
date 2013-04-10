@@ -133,16 +133,20 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         HighlightParser parser;
 
         if (parameters.getLanguage() != null) {
-            try {
-                parser = this.componentManager.getInstance(HighlightParser.class, parameters.getLanguage());
-                return parser.highlight(parameters.getLanguage(), new StringReader(content));
-            } catch (ComponentLookupException e) {
-                this.logger.debug(
-                    "Can't find specific highlighting parser for language [" + parameters.getLanguage() + "]", e);
+            if (this.componentManager.hasComponent(HighlightParser.class, parameters.getLanguage())) {
+                try {
+                    parser = this.componentManager.getInstance(HighlightParser.class, parameters.getLanguage());
+                    return parser.highlight(parameters.getLanguage(), new StringReader(content));
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Faild to load highlighting parser for language [{}]", parameters.getLanguage(),
+                        e);
+                }
             }
         }
 
-        this.logger.debug("Trying the default highlighting parser");
+        this.logger.debug(
+            "Can't find any specific highlighting parser for language [{}]. Trying the default highlighting parser.",
+            parameters.getLanguage());
 
         parser = this.componentManager.getInstance(HighlightParser.class, "default");
 

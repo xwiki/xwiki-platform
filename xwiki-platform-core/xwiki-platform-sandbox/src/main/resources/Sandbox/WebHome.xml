@@ -155,11 +155,15 @@ XWiki allows you to create links to other pages in your wiki or on the web:
 * [[http://www.xwiki.org]] -&gt; you can link to wiki pages or to external websites
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; link labels work for exernal links too
 
+You can also create links to attachments:
+
+attach:XWikiLogo.png
+
 = Images =
 
 You can insert images in your wiki pages:
 
-[[image:XWikiLogo.png]]
+image:XWikiLogo.png
 
 = Macros =
 

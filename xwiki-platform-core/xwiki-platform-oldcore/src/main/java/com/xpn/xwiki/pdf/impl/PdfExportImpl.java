@@ -389,7 +389,7 @@ public class PdfExportImpl implements PdfExport
             LOGGER.debug("XSL-FO source: " + xmlfo);
         }
 
-        renderXSLFO(xmlfo, out, type);
+        renderXSLFO(xmlfo, out, type, context);
     }
 
     /**
@@ -419,12 +419,17 @@ public class PdfExportImpl implements PdfExport
      * @param xmlfo the source FO to render
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
+     * @param context the XWiki Context used by the custom URI Resolver we use to locate image attachment data
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type) throws XWikiException
+    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type, final XWikiContext context)
+        throws XWikiException
     {
         try {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+
+            // Use a custom URI Resolver to handle embedding images in the exported PDF.
+            foUserAgent.setURIResolver(new PDFURIResolver(context));
 
             // Construct fop with desired output format
             Fop fop = fopFactory.newFop(type.getMimeType(), foUserAgent, out);

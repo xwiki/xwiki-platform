@@ -766,6 +766,7 @@
               **/objects/PropertyInterface.java,
               **/objects/StringListProperty.java,
               **/pdf/impl/PdfExportImpl.java,
+              **/pdf/impl/PdfURLFactory.java,
               **/plugin/image/ImagePlugin.java,
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/diff/DiffPluginApi.java,

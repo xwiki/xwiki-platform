@@ -125,6 +125,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
 
                 DistributionStep step = steps.get(index);
 
+                step.prepare();
+
                 if (step.getState() == null) {
                     DistributionQuestion question = new DistributionQuestion(step);
 

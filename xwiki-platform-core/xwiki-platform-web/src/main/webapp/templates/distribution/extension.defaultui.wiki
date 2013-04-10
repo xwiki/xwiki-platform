@@ -91,7 +91,7 @@
       #end
     </form>
     {{/html}}
-  #elseif (!$previousUi.isInstalled('wiki:xwiki'))
+  #elseif (!$previousUi.isInstalled($extensionNamespace))
     ## Allow the user to repair the previous UI extension.
     ## NOTE: We shouldn't get here unless the JavaScript is disabled. The following code was added explicitly to support
     ## this use case.
@@ -131,8 +131,8 @@
 
   #set ($distributionUIId = $services.distribution.getUIExtensionId())
   #if ($distributionUIId)
-    #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, 'wiki:xwiki'))
-    #set ($showCompleteStepButton = $installedVersion.isValid('wiki:xwiki'))
+    #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, $extensionNamespace))
+    #set ($showCompleteStepButton = $installedVersion.isValid($extensionNamespace))
     (% class="xLabel" %)
     {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
     #set ($discard = "#getExtensionJobStatus($distributionUIId.id $distributionUIId.version.value $distributionUIJobStatus)")

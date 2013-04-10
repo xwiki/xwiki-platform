@@ -38,7 +38,7 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
     public static final String ID = "extension.outdatedextensions";
 
     @Inject
-    private InstalledExtensionRepository installedRepository;
+    private transient InstalledExtensionRepository installedRepository;
 
     public OutdatedExtensionsDistributionStep()
     {

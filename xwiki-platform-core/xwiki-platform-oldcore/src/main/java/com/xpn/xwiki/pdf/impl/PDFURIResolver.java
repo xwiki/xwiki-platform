@@ -66,6 +66,7 @@ public class PDFURIResolver implements URIResolver
     public PDFURIResolver(XWikiContext context)
     {
         this.attachmentMap = (Map<String, AttachmentReference>) context.get(PdfURLFactory.PDF_EXPORT_CONTEXT_KEY);
+        this.context = context;
     }
 
     @Override
@@ -75,7 +76,7 @@ public class PDFURIResolver implements URIResolver
             AttachmentReference reference = this.attachmentMap.get(href);
             if (reference != null) {
                 try {
-                    XWikiDocument xdoc = context.getWiki().getDocument(
+                    XWikiDocument xdoc = this.context.getWiki().getDocument(
                         reference.extractReference(EntityType.DOCUMENT), this.context);
                     // TODO: handle revisions
                     XWikiAttachment attachment = xdoc.getAttachment(

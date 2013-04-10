@@ -24,6 +24,8 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 
 @Component
 @Named(UpgradeModeDistributionStep.ID)
@@ -46,9 +48,27 @@ public class UpgradeModeDistributionStep extends AbstractDistributionStep
     }
 
     @Override
+    public void initialize(DistributionJob distributionJob)
+    {
+        super.initialize(distributionJob);
+
+        // Initialize upgrade mode with saved one
+        DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();
+
+        if (previousStatus != null) {
+            UpgradeModeDistributionStep previousStep =
+                (UpgradeModeDistributionStep) previousStatus.getStep(UpgradeModeDistributionStep.ID);
+
+            if (previousStep != null) {
+                setUpgradeMode(previousStep.getUpgradeMode());
+            }
+        }
+    }
+
+    @Override
     public void prepare()
     {
-
+        // Nothing to do
     }
 
     public UpgradeMode getUpgradeMode()

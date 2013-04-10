@@ -29,14 +29,14 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  * @since 5.0M1
  */
-public class WikiDistributionJobStatus extends DistributionJobStatus<WikiDistributionRequest>
+public class WikiDistributionJobStatus extends DistributionJobStatus<DistributionRequest>
 {
     /**
      * Serialization identifier.
      */
     private static final long serialVersionUID = 1L;
 
-    public WikiDistributionJobStatus(WikiDistributionRequest request, ObservationManager observationManager,
+    public WikiDistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
         LoggerManager loggerManager, List<DistributionStep> steps)
     {
         super(request, observationManager, loggerManager, steps);

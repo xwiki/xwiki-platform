@@ -19,11 +19,16 @@
  */
 package org.xwiki.extension.distribution.internal.job.step;
 
+import java.util.Collection;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 @Component
 @Named(OutdatedExtensionsDistributionStep.ID)
@@ -31,6 +36,9 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
 {
     public static final String ID = "extension.outdatedextensions";
+
+    @Inject
+    private InstalledExtensionRepository installedRepository;
 
     public OutdatedExtensionsDistributionStep()
     {
@@ -40,6 +48,24 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
     @Override
     public void prepare()
     {
+        setState(State.COMPLETED);
 
+        // Upgrade outdated extensions only when there is outdated extensions
+        for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
+            Collection<String> installedNamespaces = extension.getNamespaces();
+            if (installedNamespaces == null) {
+                if (!extension.isValid(null)) {
+                    setState(null);
+                    break;
+                }
+            } else {
+                for (String installedNamespace : installedNamespaces) {
+                    if (!extension.isValid(installedNamespace)) {
+                        setState(null);
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

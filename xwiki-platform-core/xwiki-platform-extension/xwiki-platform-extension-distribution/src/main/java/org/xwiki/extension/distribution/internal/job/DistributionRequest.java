@@ -28,4 +28,19 @@ import org.xwiki.job.AbstractRequest;
 public class DistributionRequest extends AbstractRequest
 {
     private static final long serialVersionUID = 1L;
+
+    /**
+     * @see #getExtensions()
+     */
+    public static final String PROPERTY_WIKI = "wiki";
+
+    public void setWiki(String wiki)
+    {
+        setProperty(PROPERTY_WIKI, wiki);
+    }
+
+    public String getWiki()
+    {
+        return getProperty(PROPERTY_WIKI);
+    }
 }

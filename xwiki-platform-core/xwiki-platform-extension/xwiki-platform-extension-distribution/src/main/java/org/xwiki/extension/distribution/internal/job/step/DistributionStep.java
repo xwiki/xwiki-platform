@@ -20,6 +20,7 @@
 package org.xwiki.extension.distribution.internal.job.step;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.rendering.block.Block;
 
 /**
@@ -35,7 +36,7 @@ public interface DistributionStep
         COMPLETED
     }
 
-    void initialize(DistributionStep step);
+    void initialize(DistributionJob distributionJob);
 
     void prepare();
 

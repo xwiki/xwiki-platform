@@ -46,7 +46,6 @@ import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
 import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.WikiDistributionRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.internal.core.MavenCoreExtension;
 import org.xwiki.job.Job;
@@ -199,6 +198,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
             final DistributionRequest request = new DistributionRequest();
             request.setId(JOBID);
+            // FIXME: this is sheeting but there is no API to get the main wiki name at this level
+            request.setWiki("xwiki");
 
             Thread distributionJobThread = new Thread(new Runnable()
             {
@@ -237,7 +238,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             WikiDistributionJob wikiJob = this.componentManager.getInstance(Job.class, "wikidistribution");
             this.wikiDistributionJobs.put(wiki, wikiJob);
 
-            final WikiDistributionRequest request = new WikiDistributionRequest();
+            final DistributionRequest request = new DistributionRequest();
             request.setId(JOBID);
             request.setWiki(wiki);
 

@@ -43,16 +43,9 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
     @Inject
     private transient InstalledExtensionRepository installedRepository;
 
-    private String wiki;
-
     public DefaultUIDistributionStep()
     {
         super(ID);
-    }
-
-    public void setWiki(String wiki)
-    {
-        this.wiki = wiki;
     }
 
     @Override
@@ -60,12 +53,17 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
     {
         setState(State.COMPLETED);
 
-        ExtensionId extensionUI = this.distributionManager.getMainUIExtensionId();
+        String namespace = getNamespace();
 
-        InstalledExtension installedExtension =
-            this.installedRepository.getInstalledExtension(extensionUI.getId(), "wiki:" + this.wiki);
-        if (installedExtension == null || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
-            setState(null);
+        ExtensionId extensionUI =  this.distributionJob.getStatus().getDistributionExtensionUI();
+
+        // Only if the UI is not already installed
+        if (extensionUI != null) {
+            InstalledExtension installedExtension =
+                this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
+            if (installedExtension == null || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
+                setState(null);
+            }
         }
     }
 }

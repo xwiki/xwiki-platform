@@ -22,19 +22,15 @@ package org.xwiki.extension.distribution.internal.job;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 /**
  * @version $Id$
@@ -43,37 +39,18 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 @Component
 @Named("wikidistribution")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributionRequest, WikiDistributionJobStatus>
+public class WikiDistributionJob extends AbstractDistributionJob<DistributionRequest, WikiDistributionJobStatus>
 {
-    @Inject
-    private InstalledExtensionRepository installedRepository;
-
     @Override
     protected List<DistributionStep> createSteps()
     {
         List<DistributionStep> steps = new ArrayList<DistributionStep>(3);
 
-        ExtensionId extensionUI = this.distributionManager.getMainUIExtensionId();
-
-        String namespace = "wiki:" + getRequest().getWiki();
-
         // Step 1: Install/upgrade main wiki UI
 
         try {
-            DistributionStep step1 =
-                this.componentManager.getInstance(DistributionStep.class, DefaultUIDistributionStep.ID);
-
-            steps.add(step1);
-            step1.setState(DistributionStep.State.COMPLETED);
-            // Only if the UI is not already installed
-            if (extensionUI != null) {
-                InstalledExtension installedExtension =
-                    this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
-                if (installedExtension == null
-                    || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
-                    step1.setState(null);
-                }
-            }
+            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                DefaultUIDistributionStep.ID));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get step instance for id [{}]", DefaultUIDistributionStep.ID);
         }
@@ -81,18 +58,8 @@ public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributio
         // Step 2: Upgrade outdated extensions
 
         try {
-            DistributionStep step2 =
-                this.componentManager.getInstance(DistributionStep.class, OutdatedExtensionsDistributionStep.ID);
-
-            steps.add(step2);
-            step2.setState(DistributionStep.State.COMPLETED);
-            // Upgrade outdated extensions only when there is outdated extensions
-            for (InstalledExtension extension : this.installedRepository.getInstalledExtensions(namespace)) {
-                if (!extension.isValid(namespace)) {
-                    step2.setState(null);
-                    break;
-                }
-            }
+            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                OutdatedExtensionsDistributionStep.ID));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get step instance for id [{}]", OutdatedExtensionsDistributionStep.ID);
         }
@@ -101,13 +68,13 @@ public class WikiDistributionJob extends AbstractDistributionJob<WikiDistributio
     }
 
     @Override
-    protected DistributionJobStatus< ? > getPreviousStatus()
+    public DistributionJobStatus< ? > getPreviousStatus()
     {
         return this.distributionManager.getPreviousWikiJobStatus(getRequest().getWiki());
     }
 
     @Override
-    protected WikiDistributionJobStatus createNewDistributionStatus(WikiDistributionRequest request,
+    protected WikiDistributionJobStatus createNewDistributionStatus(DistributionRequest request,
         List<DistributionStep> steps)
     {
         return new WikiDistributionJobStatus(request, this.observationManager, this.loggerManager, steps);

@@ -37,6 +37,8 @@ import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
@@ -78,6 +80,8 @@ public abstract class AbstractDistributionStep implements DistributionStep
     @Inject
     private transient SyntaxFactory syntaxFactory;
 
+    protected transient DistributionJob distributionJob;
+
     private String stepId;
 
     private State state;
@@ -88,9 +92,25 @@ public abstract class AbstractDistributionStep implements DistributionStep
     }
 
     @Override
-    public void initialize(DistributionStep step)
+    public void initialize(DistributionJob distributionJob)
     {
-        this.state = step.getState();
+        this.distributionJob = distributionJob;
+
+        // Remember previous state
+
+        DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();
+
+        if (previousStatus != null) {
+            DistributionStep previousStep = previousStatus.getStep(getId());
+
+            if (previousStep != null) {
+                setState(previousStep.getState());
+            }
+        }
+
+        // Custom preparation
+
+        prepare();
     }
 
     @Override
@@ -109,6 +129,18 @@ public abstract class AbstractDistributionStep implements DistributionStep
     public void setState(State stepState)
     {
         this.state = stepState;
+    }
+
+    protected String getWiki()
+    {
+        return this.distributionJob.getRequest().getWiki();
+    }
+
+    protected String getNamespace()
+    {
+        String wiki = getWiki();
+
+        return wiki == null ? null : "wiki:" + getWiki();
     }
 
     protected String getTemplate()

@@ -27,6 +27,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.internal.AbstractJob;
 
@@ -53,36 +54,21 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
 
     protected abstract List<DistributionStep> createSteps();
 
-    protected abstract DistributionJobStatus< ? > getPreviousStatus();
-
     @Override
     protected S createNewStatus(R request)
     {
         List<DistributionStep> steps = createSteps();
 
-        DistributionJobStatus< ? > previousStatus = getPreviousStatus();
+        // Add Welcome step
+        try {
+            DistributionStep welcomeStep =
+                this.componentManager
+                    .<DistributionStep> getInstance(DistributionStep.class, WelcomeDistributionStep.ID);
+            welcomeStep.setState(State.COMPLETED);
 
-        // Step 0: A welcome message. Only if there is actually something to do
-        for (DistributionStep step : steps) {
-            if (step.getState() == null) {
-                if (previousStatus != null) {
-                    DistributionStep previousStep = previousStatus.getStep(step.getId());
-
-                    if (previousStep != null) {
-                        step.setState(previousStep.getState());
-                    }
-                }
-
-                if (step.getState() == null) {
-                    try {
-                        steps.add(0, this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                            WelcomeDistributionStep.ID));
-                    } catch (ComponentLookupException e) {
-                        this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
-                    }
-                    break;
-                }
-            }
+            steps.add(0, welcomeStep);
+        } catch (ComponentLookupException e1) {
+            this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
         }
 
         // Create status
@@ -90,6 +76,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         S status = createNewDistributionStatus(request, steps);
 
         if (this.distributionManager.getDistributionExtension() != null) {
+            DistributionJobStatus< ? > previousStatus = getPreviousStatus();
+
             if (previousStatus != null
                 && previousStatus.getDistributionExtension() != null
                 && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
@@ -117,6 +105,20 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
 
         notifyPushLevelProgress(steps.size());
 
+        // Initialize steps
+        WelcomeDistributionStep welcomeStep =
+            steps.get(0) instanceof WelcomeDistributionStep ? (WelcomeDistributionStep) steps.get(0) : null;
+
+        for (DistributionStep step : steps) {
+            step.initialize(this);
+
+            // Enable Welcome step if one of the steps is enabled
+            if (step.getState() == null && welcomeStep != null) {
+                welcomeStep.setState(null);
+            }
+        }
+
+        // Execute steps
         try {
             for (int index = 0; index < steps.size(); ++index) {
                 getDistributionJobStatus().setCurrentStateIndex(index);

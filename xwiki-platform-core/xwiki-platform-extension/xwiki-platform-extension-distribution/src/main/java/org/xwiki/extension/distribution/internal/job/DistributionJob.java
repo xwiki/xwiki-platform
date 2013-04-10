@@ -24,5 +24,13 @@ import org.xwiki.job.Job;
 
 public interface DistributionJob extends Job
 {
+    DistributionJobStatus< ? > getPreviousStatus();
+
     DistributionStep getCurrentStep();
+
+    @Override
+    public DistributionRequest getRequest();
+
+    @Override
+    public DistributionJobStatus< ? > getStatus();
 }

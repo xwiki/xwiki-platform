@@ -71,22 +71,22 @@ public abstract class AbstractDistributionStep implements DistributionStep
     private static final Pattern FIRSTLINE = Pattern.compile("^.#syntax=(.*)$", Pattern.MULTILINE);
 
     @Inject
-    private transient ComponentManager componentManager;
+    protected transient ComponentManager componentManager;
 
     @Inject
-    private transient TransformationManager transformationManager;
+    protected transient TransformationManager transformationManager;
 
     @Inject
-    private transient Environment environment;
+    protected transient Environment environment;
 
     @Inject
-    private transient SyntaxFactory syntaxFactory;
+    protected transient SyntaxFactory syntaxFactory;
 
     /**
      * The component used to get information about the current distribution.
      */
     @Inject
-    private transient DistributionManager distributionManager;
+    protected transient DistributionManager distributionManager;
 
     protected transient DistributionJob distributionJob;
 

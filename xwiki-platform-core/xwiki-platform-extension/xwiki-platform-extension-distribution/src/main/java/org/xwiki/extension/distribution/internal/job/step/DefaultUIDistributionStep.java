@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 @Component
@@ -36,9 +35,6 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 public class DefaultUIDistributionStep extends AbstractDistributionStep
 {
     public static final String ID = "extension.defaultui";
-
-    @Inject
-    protected transient DistributionManager distributionManager;
 
     @Inject
     private transient InstalledExtensionRepository installedRepository;

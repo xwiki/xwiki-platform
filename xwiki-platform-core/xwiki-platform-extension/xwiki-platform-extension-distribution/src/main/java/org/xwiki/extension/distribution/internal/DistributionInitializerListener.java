@@ -82,26 +82,27 @@ public class DistributionInitializerListener implements EventListener
     {
         DistributionState distributionState = this.distributionManager.getDistributionState();
 
+        FarmDistributionJobStatus previousFarmStatus = this.distributionManager.getPreviousFarmJobStatus();
+        
         // Is install already done (allow to cancel stuff for example)
         if (distributionState == DistributionState.SAME) {
-            FarmDistributionJobStatus farmStatus = this.distributionManager.getPreviousFarmJobStatus();
-
             if (event instanceof ApplicationStartedEvent) {
-                for (DistributionStep step : farmStatus.getSteps()) {
-                    if (step.getState() == null) {
+                for (DistributionStep previousStep : previousFarmStatus.getSteps()) {
+                    if (previousStep.getState() == null) {
                         this.distributionManager.startFarmJob();
                         break;
                     }
                 }
             } else {
-                if (farmStatus.getUpgradeMode() == UpgradeMode.WIKI) {
+                if (previousFarmStatus.getUpgradeMode() == UpgradeMode.WIKI) {
                     String wiki = ((WikiReadyEvent) event).getWikiId();
 
                     if (!((XWikiContext) arg2).isMainWiki()) {
-                        WikiDistributionJobStatus status = this.distributionManager.getPreviousWikiJobStatus(wiki);
+                        WikiDistributionJobStatus previousWikiStatus =
+                            this.distributionManager.getPreviousWikiJobStatus(wiki);
 
-                        for (DistributionStep step : status.getSteps()) {
-                            if (step.getState() == null) {
+                        for (DistributionStep previousStep : previousWikiStatus.getSteps()) {
+                            if (previousStep.getState() == null) {
                                 this.distributionManager.startWikiJob(wiki);
                                 break;
                             }
@@ -115,9 +116,7 @@ public class DistributionInitializerListener implements EventListener
             if (event instanceof ApplicationStartedEvent) {
                 this.distributionManager.startFarmJob();
             } else {
-                FarmDistributionJobStatus status = this.distributionManager.getPreviousFarmJobStatus();
-
-                if (status.getUpgradeMode() == UpgradeMode.WIKI) {
+                if (previousFarmStatus.getUpgradeMode() == UpgradeMode.WIKI) {
                     String wiki = ((WikiReadyEvent) event).getWikiId();
                     this.distributionManager.startWikiJob(wiki);
                 }

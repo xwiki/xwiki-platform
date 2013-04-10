@@ -37,6 +37,8 @@ import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
+import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.rendering.block.Block;
@@ -80,6 +82,12 @@ public abstract class AbstractDistributionStep implements DistributionStep
     @Inject
     private transient SyntaxFactory syntaxFactory;
 
+    /**
+     * The component used to get information about the current distribution.
+     */
+    @Inject
+    private transient DistributionManager distributionManager;
+
     protected transient DistributionJob distributionJob;
 
     private String stepId;
@@ -98,13 +106,17 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
         // Remember previous state
 
-        DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();
+        DistributionState distributionState = this.distributionManager.getDistributionState();
 
-        if (previousStatus != null) {
-            DistributionStep previousStep = previousStatus.getStep(getId());
+        if (distributionState == DistributionState.SAME) {
+            DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();
 
-            if (previousStep != null) {
-                setState(previousStep.getState());
+            if (previousStatus != null) {
+                DistributionStep previousStep = previousStatus.getStep(getId());
+
+                if (previousStep != null) {
+                    setState(previousStep.getState());
+                }
             }
         }
 

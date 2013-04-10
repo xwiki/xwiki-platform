@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.extension.ExtensionId;
@@ -84,7 +85,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     public List<DistributionStep> getSteps()
     {
-        return this.stepList;
+        return this.stepList != null ? this.stepList : Collections.<DistributionStep> emptyList();
     }
 
     public DistributionStep getStep(String stepId)

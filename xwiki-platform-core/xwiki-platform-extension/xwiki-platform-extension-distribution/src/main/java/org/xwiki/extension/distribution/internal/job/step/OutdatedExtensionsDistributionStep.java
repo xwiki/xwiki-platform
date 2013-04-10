@@ -51,7 +51,7 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
     {
         setState(State.COMPLETED);
 
-        UpgradeMode upgradeMode = this.distributionManager.getFarmJob().getStatus().getUpgradeMode();
+        UpgradeMode upgradeMode = this.distributionManager.getUpgradeMode();
 
         Collection<InstalledExtension> installedExtensions;
         if (upgradeMode == UpgradeMode.ALLINONE) {

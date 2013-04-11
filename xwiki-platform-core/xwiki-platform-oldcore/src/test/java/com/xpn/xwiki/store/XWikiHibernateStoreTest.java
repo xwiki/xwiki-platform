@@ -22,10 +22,11 @@ package com.xpn.xwiki.store;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
-import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.sql.SQLException;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
@@ -34,7 +35,7 @@ import java.sql.SQLException;
  */
 public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
 {
-    @org.junit.Test
+    @Test
     public void testGetColumnsForSelectStatement()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
@@ -50,7 +51,7 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
     }
 
-    @org.junit.Test
+    @Test
     public void testCreateSQLQuery()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
@@ -62,12 +63,10 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
             "select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
     }
 
-    @org.junit.Test
+    @Test
     public void testEndTransactionWhenSQLBatchUpdateExceptionThrown() throws Exception
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-
-        final Transaction mockTransaction = getMockery().mock(Transaction.class);
 
         SQLException sqlException2 = new SQLException("sqlexception2");
         sqlException2.setNextException(new SQLException("nextexception2"));
@@ -76,11 +75,10 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
         sqlException1.initCause(sqlException2);
         sqlException1.setNextException(new SQLException("nextexception1"));
 
-        getMockery().checking(new Expectations() {{
-            oneOf(mockTransaction).commit(); will(throwException(new HibernateException("exception1", sqlException1)));
-        }});
+        Transaction transaction = mock(Transaction.class);
+        doThrow(new HibernateException("exception1", sqlException1)).when(transaction).commit();
 
-        store.setTransaction(mockTransaction, getContext());
+        store.setTransaction(transaction, getContext());
 
         try {
             store.endTransaction(getContext(), true);

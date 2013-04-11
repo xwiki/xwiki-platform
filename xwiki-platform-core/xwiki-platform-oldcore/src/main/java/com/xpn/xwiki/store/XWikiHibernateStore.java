@@ -410,7 +410,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else if (DatabaseProduct.MYSQL == databaseProduct) {
                 stmt.execute("DROP DATABASE " + escapedSchema);
             } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + escapedSchema + " CASCADE");
+                if (isInSchemaMode()) {
+                    stmt.execute("DROP SCHEMA " + escapedSchema + " CASCADE");
+                } else {
+                    LOGGER.warn("Subwiki deletion not yet supported in Database mode for PostgreSQL");
+                }
             }
 
             endTransaction(context, true);

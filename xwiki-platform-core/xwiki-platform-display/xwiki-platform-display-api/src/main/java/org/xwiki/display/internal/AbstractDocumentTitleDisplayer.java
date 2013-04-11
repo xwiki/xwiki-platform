@@ -54,6 +54,12 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * {@link #extractTitleFromContent(org.xwiki.bridge.DocumentModelBridge, DocumentDisplayerParameters)} method.
      */
     private static final String EXTRACT_TITLE_STACK_TRACE_KEY = "internal.extractTitleFromContentStackTrace";
+    
+    /**
+     * The key used to store on the XWiki context map the stack trace for the
+     * {@link #evaluateTitle(String, DocumentReference, DocumentDisplayerParameters)} method.
+     */
+    private static final String EVALUATE_TITLE_STACK_TRACE_KEY = "internal.evaluateTitleFromContentStackTrace";
 
     /**
      * The object used for logging.
@@ -153,12 +159,26 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      */
     protected String evaluateTitle(String title, DocumentReference documentReference,
         DocumentDisplayerParameters parameters)
-    {
+    {   
         StringWriter writer = new StringWriter();
         String nameSpace =
             defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference
                 : documentAccessBridge.getCurrentDocumentReference());
         Map<String, Object> backupObjects = null;
+        
+        //We do not let this method loop.
+        Map<Object, Object> xwikiContext = getXWikiContextMap();
+        @SuppressWarnings("unchecked")
+        Stack<DocumentReference> stackTrace =
+            (Stack<DocumentReference>) xwikiContext.get(EVALUATE_TITLE_STACK_TRACE_KEY);
+        if (stackTrace == null) {
+            stackTrace = new Stack<DocumentReference>();
+            xwikiContext.put(EVALUATE_TITLE_STACK_TRACE_KEY, stackTrace);
+        } else if (stackTrace.contains(documentReference)) {
+            return null;
+        }
+        stackTrace.push(documentReference);
+        
         try {
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<String, Object>();
@@ -170,6 +190,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
+            stackTrace.pop();
             if (parameters.isExecutionContextIsolated()) {
                 documentAccessBridge.popDocumentFromContext(backupObjects);
             }

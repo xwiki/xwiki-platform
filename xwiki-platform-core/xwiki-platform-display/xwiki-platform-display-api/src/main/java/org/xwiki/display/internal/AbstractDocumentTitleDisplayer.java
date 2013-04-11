@@ -159,7 +159,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      */
     protected String evaluateTitle(String title, DocumentReference documentReference,
         DocumentDisplayerParameters parameters)
-    {   
+    {
         StringWriter writer = new StringWriter();
         String nameSpace =
             defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference

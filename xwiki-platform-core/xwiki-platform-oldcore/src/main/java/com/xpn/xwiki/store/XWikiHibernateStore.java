@@ -415,6 +415,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 stmt.execute("DROP SCHEMA " + escapedSchema + " RESTRICT");
             } else if (DatabaseProduct.MYSQL == databaseProduct) {
                 stmt.execute("DROP DATABASE " + escapedSchema);
+            } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
+                stmt.execute("DROP SCHEMA " + escapedSchema + " CASCADE");
             }
 
             endTransaction(context, true);

@@ -88,9 +88,9 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         this.execution.setContext(new ExecutionContext());
 
         // 3) Bridge with old code to play well with new components. Old code relies on the
-        // XWikiContext object whereas new code uses the Container component.
+        // XWikiContext object whereas new code uses the ExecutionContext found in the Execution component.
         if (xwikiContext != null) {
-            ExecutionContext ec = execution.getContext();
+            ExecutionContext ec = this.execution.getContext();
             String key = "xwikicontext";
             if (ec.hasProperty(key)) {
                 ec.setProperty(key, xwikiContext);

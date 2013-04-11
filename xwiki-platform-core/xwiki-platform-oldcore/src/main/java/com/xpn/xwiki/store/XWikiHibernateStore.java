@@ -302,7 +302,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String schema = getSchemaFromWikiName(wikiName, context);
             String escapedSchema = escapeSchema(schema, context);
 
-            DatabaseProduct databaseProduct = getDatabaseProductName(context);
+            DatabaseProduct databaseProduct = getDatabaseProductName();
             if (DatabaseProduct.ORACLE == databaseProduct) {
                 stmt.execute("create user " + escapedSchema + " identified by " + escapedSchema);
                 stmt.execute("grant resource to " + escapedSchema);
@@ -398,7 +398,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String schema = getSchemaFromWikiName(wikiName, context);
             String escapedSchema = escapeSchema(schema, context);
 
-            DatabaseProduct databaseProduct = getDatabaseProductName(context);
+            DatabaseProduct databaseProduct = getDatabaseProductName();
             if (DatabaseProduct.ORACLE == databaseProduct) {
                 stmt.execute("DROP USER " + escapedSchema + " CASCADE");
             } else if (DatabaseProduct.DERBY == databaseProduct) {

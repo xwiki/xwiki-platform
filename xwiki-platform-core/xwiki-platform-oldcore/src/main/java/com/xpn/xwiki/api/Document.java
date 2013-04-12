@@ -1958,7 +1958,16 @@ public class Document extends Api
     {
         if (object != null) {
             try {
-                return ((BaseProperty) object.getBaseObject().safeget(fieldName)).getValue();
+                BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
+                // This is evil, any property which happens to be called 'password' will be masked. TODO fix.
+                if(bp.getName().equals("password"))
+                {
+                    if(!this.getXWikiContext().getWiki().getRightService().hasProgrammingRights(this.getXWikiContext()))
+                    {
+                        return null;
+                    }
+                }
+                return bp.getValue();
             } catch (NullPointerException e) {
                 return null;
             }

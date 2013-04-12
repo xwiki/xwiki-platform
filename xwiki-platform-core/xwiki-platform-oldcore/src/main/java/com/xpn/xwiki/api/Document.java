@@ -67,6 +67,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
@@ -1959,8 +1960,7 @@ public class Document extends Api
         if (object != null) {
             try {
                 BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
-                // This is evil, any property which happens to be called 'password' will be masked. TODO fix.
-                if(bp.getName().equals("password"))
+                if ((PasswordClass.class).equals(object.getBaseObject().getXClass(getXWikiContext()).get(fieldName).getClass()))
                 {
                     if(!this.getXWikiContext().getWiki().getRightService().hasProgrammingRights(this.getXWikiContext()))
                     {

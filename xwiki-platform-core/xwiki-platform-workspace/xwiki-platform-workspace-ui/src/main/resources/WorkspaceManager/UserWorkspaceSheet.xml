@@ -115,8 +115,8 @@ XWiki.UserWorkspaceTab = Class.create({
 
   addListeners : function() {
     var elements = $('workspaces').childElements();
-    for (var key in elements) {
-      var element = elements[key];
+    for (var i = 0; i < elements.length; ++i) {
+      var element = elements[i];
       var workspaceName = element.id;
       var link = element.down('.workspaceActivity a');
       link.observe('click', this.onWorkspaceClicked);

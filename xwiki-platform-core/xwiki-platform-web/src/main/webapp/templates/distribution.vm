@@ -1,7 +1,8 @@
 #macro(handleStepAction $action)
-  #if ($action == 'prepareUpgrade')
-    #prepareUpgrade()
-  #else
+  ## Allow the current step to handle the action or to perform something before moving to the next step.
+  #set ($discard = $services.distribution.renderCurrentStepToXHTML())
+  ## Standard step actions are in upper case (custom step actions should be in camel case).
+  #if ($action == $action.toUpperCase())
     #set ($distributionJobStatus = $services.distribution.jobStatus)
     #set ($distributionQuestion = $distributionJobStatus.question)
     #if ($distributionQuestion)
@@ -21,13 +22,6 @@
   #end
   $response.sendRedirect($xwiki.getURL('XWiki.Distribution', 'distribution',
     "xredirect=$!escapetool.url($request.xredirect)"))
-#end
-
-#macro(handleStepAjaxRequest)
-  #set ($stepId = $services.distribution.jobStatus.question.stepId)
-  #if ($stepId == 'extension.outdatedextensions')
-    #displayOutdatedExtensionsStep()
-  #end
 #end
 
 #macro(displayStep)
@@ -50,8 +44,19 @@
           #handleExtensionRequest()
         #else
           #displayStepHeader($stepId)
-          $services.distribution.renderCurrentStepToXHTML()
+          #set ($formOpenTag = '<form action="" class="xform">')
+          #set ($stepOutput = $services.distribution.renderCurrentStepToXHTML())
+          #if ($stepOutput.contains('<form'))
+            ## This step contains at least one form element so the step controls how its data is submitted.
+            $stepOutput
+            $formOpenTag
+          #else
+            ## This step doesn't contain a form element so we let the step buttons submit the step data.
+            $formOpenTag
+            $stepOutput
+          #end
           #displayStepFooter()
+          </form>
         #end
       </div>
     </div>
@@ -61,16 +66,9 @@
 
 #macro(displayStepHeader $currentStepId)
   <div class="wizard-header">
-    ## FIXME: distribution.vm is not supposed to know any step
-    #set ($stepNames = {
-      'welcome': $services.localization.render('platform.extension.distributionWizard.welcomeStepTitle'),
-      'extension.defaultui': $services.localization.render('platform.extension.distributionWizard.uiStepTitle'),
-      'upgrademode': $services.localization.render('platform.extension.distributionWizard.upgrademodeStepTitle'),
-      'extension.outdatedextensions': $services.localization.render('platform.extension.distributionWizard.extensionsStepTitle')
-    })
     #set ($currentStepIndex = $services.distribution.jobStatus.currentStateIndex)
-    <h1>$services.localization.render('platform.extension.distributionWizard.stepHeading',
-      [$currentStepIndex, $stepNames.get($currentStepId)])</h1>
+    <h1>$services.localization.render('platform.extension.distributionWizard.stepHeading', [$currentStepIndex,
+      $services.localization.render("platform.extension.distributionWizard.${currentStepId}StepTitle")])</h1>
     #set ($steps = $services.distribution.jobStatus.steps)
     ## Ignore the welcome step.
     #set ($steps = $steps.subList(1, $steps.size()))
@@ -86,7 +84,9 @@
             #set ($stepNumber = '&#10004;')
           #end
           <span class="number$stepStatus">$stepNumber</span>
-          <span class="name$stepStatus">$stepNames.get($step.id)</span>
+          <span class="name$stepStatus">
+            $services.localization.render("platform.extension.distributionWizard.${step.id}StepTitle")
+          </span>
         </li>
       #end
     </ul>
@@ -95,30 +95,28 @@
 #end
 
 #macro(displayStepFooter)
-  <form action="" class="xform">
-    <div id="stepButtons" class="wizard-footer buttons">
-      #if ($request.xredirect)
-        <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)" />
-      #end
-      ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
-      ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
-      <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
-        <button type="submit" name="action" value="COMPLETE_STEP">
-          $services.localization.render('platform.extension.distributionWizard.continueLabel')
-        </button>
-      </span>
-      <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
-        <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))">
-          $services.localization.render('platform.extension.distributionWizard.skipLabel')</button>
-      </span>
-      <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
-        <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))">
-          $services.localization.render('platform.extension.distributionWizard.cancelLabel')</button>
-      </span>
-    </div>
-  </form>
+  <div id="stepButtons" class="wizard-footer buttons">
+    #if ($request.xredirect)
+      <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)" />
+    #end
+    ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
+    ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
+    <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
+      <button type="submit" name="action" value="COMPLETE_STEP">
+        $services.localization.render('platform.extension.distributionWizard.continueLabel')
+      </button>
+    </span>
+    <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
+      <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
+        title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))">
+        $services.localization.render('platform.extension.distributionWizard.skipLabel')</button>
+    </span>
+    <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
+      <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
+        title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))">
+        $services.localization.render('platform.extension.distributionWizard.cancelLabel')</button>
+    </span>
+  </div>
 #end
 
 ## Make sure to skip all right checking for guest user
@@ -147,7 +145,8 @@
     #if ($request.extensionId)
       #handleExtensionRequest()
     #else
-      #handleStepAjaxRequest()
+      ## Let the current step handle the AJAX request.
+      $services.distribution.renderCurrentStepToXHTML()
     #end
   #else
     #displayStep()

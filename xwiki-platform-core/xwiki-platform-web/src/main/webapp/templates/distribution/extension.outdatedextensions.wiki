@@ -1,13 +1,13 @@
 ##syntax=xwiki/2.1
-{{velocity ouput="false"}}
+{{velocity output="false"}}
 #macro(displayUpgradePlanStatus $status)
   ## The status is null after the job is created, until the job is scheduled.
   #set ($isLoading = !$status || ($status.log.isEmpty() && $status.state != 'FINISHED'))
-  <div class="extension-body-progress#if($isLoading) loading#end">
+  (% class="extension-body-progress#if ($isLoading) loading#end" %)(((
     #if ($status)
-      #printStatusLog($status)
+      {{html}}#printStatusLog($status){{/html}}
     #end
-  </div>
+  )))
 #end
 
 #macro (displayUpgradePlan $plan)
@@ -48,29 +48,37 @@
     #set ($showCompleteStepButton = $invalid.isEmpty())
     ##
     #if ($outdated.isEmpty() && $invalid.isEmpty())
-      <div class="infomessage">$msg.get('platform.extension.distributionWizard.extensionsStepUpToDate')</div>
+      {{info}}{{translation key="platform.extension.distributionWizard.extensionsStepUpToDate"/}}{{/info}}
     #else
       #displayPlanActionByNamespace($invalid 'Invalid')
+
       #displayPlanActionByNamespace($outdated 'Outdated')
     #end
   #end
-  <p class="xHint">$msg.get('platform.extension.distributionWizard.extensionsStepReloadHint', ["<a id=""prepareUpgradeLink""
-    href=""?action=prepareUpgrade&xredirect=$!escapetool.url($request.xredirect)"">", '</a>'])</p>
+
+  (% class="xHint" %)
+  $services.localization.render('platform.extension.distributionWizard.extensionsStepReloadHint',
+    ['[[', ">>||id=""prepareUpgradeLink"" queryString=""action=prepareUpgrade&xredirect=$!escapetool.url($request.xredirect)""]]"])
 #end
 
 #macro(displayPlanActionByNamespace $actionByNamespace $key)
   #if (!$actionByNamespace.isEmpty())
-    <div class="xLabel">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsLabel")</div>
+    (% class="xLabel" %)
+    {{translation key="platform.extension.distributionWizard.extensionsStep${key}ExtensionsLabel"/}}
+
   #end
   #foreach ($entry in $actionByNamespace.entrySet())
-    <div class="xHint">$msg.get("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint",
-      ["#displayExtensionNamespace($entry.key)"])</div>
-    <div class="$key.toLowerCase()Extensions">
-    #foreach ($planAction in $entry.value)
-      #set ($extensionNamespace = $planAction.namespace)
-      #displayExtension($planAction.extension)
-    #end
-    </div>
+    (% class="xHint" %)
+    $services.localization.render("platform.extension.distributionWizard.extensionsStep${key}ExtensionsHint",
+      ["#displayExtensionNamespace($entry.key)"])
+
+    (% class="$key.toLowerCase()Extensions" %)(((
+      #foreach ($planAction in $entry.value)
+        #set ($extensionNamespace = $planAction.namespace)
+        {{html}}#displayExtension($planAction.extension){{/html}}
+
+      #end
+    )))
   #end
 #end
 
@@ -79,7 +87,11 @@
   #set ($upgradePlanJob = $services.extension.createUpgradePlan())
   #set ($lastError = $services.extension.lastError)
   #if ($lastError)
-    <div class="errormessage">$msg.get('platform.extension.distributionWizard.extensionsStepPrepareUpgradeFailure') #printThrowable($lastError)</div>
+    {{error}}
+      {{translation key="platform.extension.distributionWizard.extensionsStepPrepareUpgradeFailure"/}}##
+      {{html}}#printThrowable($lastError){{/html}}
+    {{/error}}
+
   #else
     #set ($distributionId = "$services.distribution.distributionExtension.id")
     #set ($discard = $upgradePlanJob.request.setProperty('distribution.id', $distributionId))
@@ -90,9 +102,16 @@
 {{/velocity}}
 
 {{velocity}}
-{{html}}
+#if ("$!request.action" == '')
+  ## Display the step.
   #if (!$isAjaxRequest)
-    <p>$msg.get('platform.extension.distributionWizard.extensionsStepDescription', ['<a href="http://platform.xwiki.org/xwiki/bin/view/Features/Applications">', '</a>', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module">', '<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices">'])</p>
+    $services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', [
+      '[[', '>>http://platform.xwiki.org/xwiki/bin/view/Features/Applications]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices]]'])
+
   #end
   #set ($distributionId = "$services.distribution.distributionExtension.id")
   ## Get the status of the upgrade plan job for the entire farm.
@@ -102,11 +121,15 @@
     #prepareUpgrade($upgradePlan)
   #end
   #if ($upgradePlan.state != 'FINISHED')
-    <p>$msg.get('platform.extension.distributionWizard.extensionsStepLoading')</p>
-    #displayJobProgressBar($upgradePlan)
+    {{translation key="platform.extension.distributionWizard.extensionsStepLoading"/}}
+
+    {{html}}#displayJobProgressBar($upgradePlan){{/html}}
+
     #displayUpgradePlanStatus($upgradePlan)
   #else
     #displayUpgradePlan($upgradePlan)
   #end
-{{/html}}
+#elseif ($request.action == 'prepareUpgrade')
+  #prepareUpgrade()
+#end
 {{/velocity}}

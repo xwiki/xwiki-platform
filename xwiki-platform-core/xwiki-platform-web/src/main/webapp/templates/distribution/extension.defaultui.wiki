@@ -15,82 +15,93 @@
   #setVariable("$versions" $return)
 #end
 
-#macro (displayDefaultUIStep_unknownPreviousUI)
+#macro (displayUpgradeQuestion)
+  {{html}}
+  <form action="" class="xform hidden">
+    <div class="xHint">$escapetool.xml($services.localization.render(
+      'platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
+    <p class="buttons">
+      <span class="buttonwrapper">
+        <input type="submit" class="button" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIUpgradeYesLabel'))" />
+      </span>
+      <span class="buttonwrapper">
+        <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIUpgradeNoLabel'))" />
+      </span>
+    </p>
+  </form>
+  {{/html}}
+#end
+
+#macro (displayPreviousUIForm)
+  {{html}}
+  <form id="previousUi" action="" method="post" class="xform">
+    <div class="xHint">$escapetool.xml($services.localization.render(
+      'platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
+    <dl>
+      <dt class="hidden">
+        <label for="previousUiVersionList">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+      </dt>
+      <dd class="hidden">
+        #getVersions($distributionUIId.id $versions)
+        <select id="previousUiVersionList">
+          <option value=""></option>
+          #foreach ($version in $versions)
+            <option value="$version"#if ($version == $request.previousUiVersion) selected="selected"#end>
+              $version
+            </option>
+          #end
+        </select>
+      </dd>
+      <dt>
+        <label for="previousUiVersion">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+        <span class="xHint">
+          $escapetool.xml($services.localization.render(
+            'platform.extension.distributionWizard.uiStepPreviousUIVersionHint'))
+          1.8<strong>,</strong> 2.7.2<strong>,</strong> 3.2-rc-1<strong>,</strong> 4.3-milestone-2
+        </span>
+      </dt>
+      <dd><input id="previousUiVersion" name="previousUiVersion" type="text"
+        value="$!escapetool.xml($request.previousUiVersion)" /></dd>
+      <dt>
+        <label for="previousUiId">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIIdLabel'))</label>
+        <span class="xHint">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIIdHint', [$distributionUIId.id]))</span>
+      </dt>
+      <dd><input id="previousUiId" name="previousUiId" type="text"
+        value="$!escapetool.xml($request.previousUiId)" /></dd>
+    </dl>
+    <p class="buttons">
+      <span class="buttonwrapper">
+        <input type="submit" class="button" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUISubmitLabel'))" />
+      </span>
+      <span class="buttonwrapper hidden">
+        <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUICancelLabel'))" />
+      </span>
+    </p>
+    #if ($request.previousUiId && $request.previousUiVersion)
+      <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
+        ["<strong>$!escapetool.xml($request.previousUiId)</strong>",
+        "<strong>$!escapetool.xml($request.previousUiVersion)</strong>"])</div>
+    #end
+  </form>
+  {{/html}}
+#end
+
+#macro (repairPreviousUI)
   #if ($request.previousUiId && $request.previousUiVersion)
     #set ($previousUi = $services.extension.resolve($request.previousUiId, $request.previousUiVersion))
   #end
   #if (!$previousUi)
-    {{html}}
-    <form action="" class="xform hidden">
-      <div class="xHint">$escapetool.xml($services.localization.render(
-        'platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
-      <p class="buttons">
-        <span class="buttonwrapper">
-          <input type="submit" class="button" value="$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUIUpgradeYesLabel'))" />
-        </span>
-        <span class="buttonwrapper">
-          <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUIUpgradeNoLabel'))" />
-        </span>
-      </p>
-    </form>
-    <form id="previousUi" action="" method="post" class="xform">
-      <div class="xHint">$escapetool.xml($services.localization.render(
-        'platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
-      <dl>
-        <dt class="hidden">
-          <label for="previousUiVersionList">$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
-        </dt>
-        <dd class="hidden">
-          #getVersions($distributionUIId.id $versions)
-          <select id="previousUiVersionList">
-            <option value=""></option>
-            #foreach ($version in $versions)
-              <option value="$version"#if ($version == $request.previousUiVersion) selected="selected"#end>
-                $version
-              </option>
-            #end
-          </select>
-        </dd>
-        <dt>
-          <label for="previousUiVersion">$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
-          <span class="xHint">
-            $escapetool.xml($services.localization.render(
-              'platform.extension.distributionWizard.uiStepPreviousUIVersionHint'))
-            1.8<strong>,</strong> 2.7.2<strong>,</strong> 3.2-rc-1<strong>,</strong> 4.3-milestone-2
-          </span>
-        </dt>
-        <dd><input id="previousUiVersion" name="previousUiVersion" type="text"
-          value="$!escapetool.xml($request.previousUiVersion)" /></dd>
-        <dt>
-          <label for="previousUiId">$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUIIdLabel'))</label>
-          <span class="xHint">$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUIIdHint', [$distributionUIId.id]))</span>
-        </dt>
-        <dd><input id="previousUiId" name="previousUiId" type="text"
-          value="$!escapetool.xml($request.previousUiId)" /></dd>
-      </dl>
-      <p class="buttons">
-        <span class="buttonwrapper">
-          <input type="submit" class="button" value="$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUISubmitLabel'))" />
-        </span>
-        <span class="buttonwrapper hidden">
-          <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render(
-            'platform.extension.distributionWizard.uiStepPreviousUICancelLabel'))" />
-        </span>
-      </p>
-      #if ($request.previousUiId && $request.previousUiVersion)
-        <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
-          ["<strong>$!escapetool.xml($request.previousUiId)</strong>",
-          "<strong>$!escapetool.xml($request.previousUiVersion)</strong>"])</div>
-      #end
-    </form>
-    {{/html}}
+    #displayUpgradeQuestion()
+
+    #displayPreviousUIForm()
   #elseif (!$previousUi.isInstalled($extensionNamespace))
     ## Allow the user to repair the previous UI extension.
     ## NOTE: We shouldn't get here unless the JavaScript is disabled. The following code was added explicitly to support
@@ -104,69 +115,79 @@
     ((({{html}}#displayExtension($previousUi){{/html}})))
   #end
 #end
+
+#macro (displayDefaultUIExtension $distributionUIId)
+  #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, $extensionNamespace))
+  #set ($showCompleteStepButton = $installedVersion.isValid($extensionNamespace))
+  (% class="xLabel" %)
+  {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
+  #set ($discard = "#getExtensionJobStatus($distributionUIId.id $distributionUIId.version.value $distributionUIJobStatus)")
+  #if (!$installedVersion && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
+    ## There is no previous version of the default UI installed on the current wiki and there is no job running for
+    ## the default UI either.
+    #set ($documentCount = $xwiki.countDocuments(''))
+    #if ($distributionState == 'NEW' && $documentCount > 30)
+
+      ## There are documents in the database but there is no info about the default UI that was previously installed.
+      #repairPreviousUI()
+    #elseif ($distributionState == 'DIFFERENT')
+      ## TODO: Display the previous distribution UI extension to let the user uninstall it.
+    #end
+  #end
+
+  (% class="xHint" %)
+  {{translation key="platform.extension.distributionWizard.uiStepUIHint"/}}
+
+  #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
+  #if ($distributionUIExtension)
+    {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
+
+    ## Allow the user to install, upgrade or downgrade the UI.
+    ## Wrap the extension in a DIV so that its bottom border is displayed.
+    ((({{html}}#displayExtension($distributionUIExtension){{/html}})))
+  #else
+    {{info}}$services.localization.render('extensions.advancedSearch.noResults',
+      ["**$!escapetool.xml($distributionUIId.id)**", "**$!escapetool.xml($distributionUIId.version)**"]){{/info}}
+  #end
+#end
+
+#macro (displayDefaultUIStep)
+  #set ($distributionState = $services.distribution.state)
+  #if (!$distributionState || $distributionState == 'NONE')
+    {{error}}{{translation key="platform.extension.distributionWizard.uiStepNoStateError"/}}{{/error}}
+  #else
+    {{translation key="platform.extension.distributionWizard.uiStepDescription"/}}
+
+    (% class="xLabel" %)
+    {{translation key="platform.extension.distributionWizard.uiStepDistributionLabel"/}}
+
+    (% class="xHint" %)
+    {{translation key="platform.extension.distributionWizard.uiStepDistributionHint"/}}
+
+    #set ($distributionExtension = $services.distribution.distributionExtension)
+    #if ($distributionExtension)
+      ## Wrap the extension in a DIV so that its bottom border is displayed.
+      ((({{html}}#displayExtension($distributionExtension){{/html}})))
+    #else
+      {{info}}$services.localization.render('extensions.advancedSearch.noResults',
+        ["**$!escapetool.xml($distributionExtension.id.id)**",
+        "**$!escapetool.xml($distributionExtension.id.version)**"]){{/info}}
+    #end
+
+    #set ($distributionUIId = $services.distribution.getUIExtensionId())
+    #if ($distributionUIId)
+      #displayDefaultUIExtension($distributionUIId)
+    #else
+      {{warning}}{{translation key="platform.extension.distributionWizard.uiStepUIUnspecifiedError"/}}{{/warning}}
+      ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the
+      ## default UI.
+    #end
+  #end
+#end
 {{/velocity}}
 
 {{velocity}}
-#set ($distributionState = $services.distribution.state)
-#if (!$distributionState || $distributionState == 'NONE')
-  {{error}}{{translation key="platform.extension.distributionWizard.uiStepNoStateError"/}}{{/error}}
-#else
-  {{translation key="platform.extension.distributionWizard.uiStepDescription"/}}
-
-  (% class="xLabel" %)
-  {{translation key="platform.extension.distributionWizard.uiStepDistributionLabel"/}}
-
-  (% class="xHint" %)
-  {{translation key="platform.extension.distributionWizard.uiStepDistributionHint"/}}
-
-  #set ($distributionExtension = $services.distribution.distributionExtension)
-  #if ($distributionExtension)
-    ## Wrap the extension in a DIV so that its bottom border is displayed.
-    ((({{html}}#displayExtension($distributionExtension){{/html}})))
-  #else
-    {{info}}$services.localization.render('extensions.advancedSearch.noResults',
-      ["**$!escapetool.xml($distributionExtension.id.id)**",
-      "**$!escapetool.xml($distributionExtension.id.version)**"]){{/info}}
-  #end
-
-  #set ($distributionUIId = $services.distribution.getUIExtensionId())
-  #if ($distributionUIId)
-    #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, $extensionNamespace))
-    #set ($showCompleteStepButton = $installedVersion.isValid($extensionNamespace))
-    (% class="xLabel" %)
-    {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
-    #set ($discard = "#getExtensionJobStatus($distributionUIId.id $distributionUIId.version.value $distributionUIJobStatus)")
-    #if (!$installedVersion && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
-      ## There is no previous version of the default UI installed on the current wiki and there is no job running for
-      ## the default UI either.
-      #set ($documentCount = $xwiki.countDocuments(''))
-      #if ($distributionState == 'NEW' && $documentCount > 30)
-
-        ## There are documents in the database but there is no info about the default UI that was previously installed.
-        #displayDefaultUIStep_unknownPreviousUI()
-      #elseif ($distributionState == 'DIFFERENT')
-        ## TODO: Display the previous distribution UI extension to let the user uninstall it.
-      #end
-    #end
-
-    (% class="xHint" %)
-    {{translation key="platform.extension.distributionWizard.uiStepUIHint"/}}
-
-    #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
-    #if ($distributionUIExtension)
-      {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
-
-      ## Allow the user to install, upgrade or downgrade the UI.
-      ## Wrap the extension in a DIV so that its bottom border is displayed.
-      ((({{html}}#displayExtension($distributionUIExtension){{/html}})))
-    #else
-      {{info}}$services.localization.render('extensions.advancedSearch.noResults',
-        ["**$!escapetool.xml($distributionUIId.id)**", "**$!escapetool.xml($distributionUIId.version)**"]){{/info}}
-    #end
-  #else
-    {{warning}}{{translation key="platform.extension.distributionWizard.uiStepUIUnspecifiedError"/}}{{/warning}}
-    ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the
-    ## default UI.
-  #end
+#if ("$!request.action" == '')
+  #displayDefaultUIStep()
 #end
 {{/velocity}}

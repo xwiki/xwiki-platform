@@ -19,28 +19,26 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
-import org.xwiki.job.AbstractRequest;
+import java.util.List;
+
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.logging.LoggerManager;
+import org.xwiki.observation.ObservationManager;
 
 /**
  * @version $Id$
- * @since 4.2M3
+ * @since 5.0M1
  */
-public class DistributionRequest extends AbstractRequest
+public class WikiDistributionJobStatus extends DistributionJobStatus<DistributionRequest>
 {
+    /**
+     * Serialization identifier.
+     */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @see #getExtensions()
-     */
-    public static final String PROPERTY_WIKI = "wiki";
-
-    public void setWiki(String wiki)
+    public WikiDistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
+        LoggerManager loggerManager, List<DistributionStep> steps)
     {
-        setProperty(PROPERTY_WIKI, wiki);
-    }
-
-    public String getWiki()
-    {
-        return getProperty(PROPERTY_WIKI);
+        super(request, observationManager, loggerManager, steps);
     }
 }

@@ -1,16 +1,16 @@
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 /**
- * Enhances the distribution step where the main UI is installed, upgraded or downgraded.
+ * Enhances the distribution step where the default UI is installed, upgraded or downgraded.
  */
-XWiki.MainUIStep = Class.create({
+XWiki.DefaultUIStep = Class.create({
   initialize : function () {
     document.observe('xwiki:extension:statusChanged', this._onExtensionStatusChanged.bindAsEventListener(this));
     this._maybeEnhancePreviousUiForm();
   },
 
   /**
-   * Reacts to the actions taken on the extensions displayed on the main UI step.
+   * Reacts to the actions taken on the extensions displayed on the default UI step.
    */
   _onExtensionStatusChanged : function(event) {
     var stepButtons = $('stepButtons') && $('stepButtons').select('button');
@@ -25,7 +25,7 @@ XWiki.MainUIStep = Class.create({
       stepButtons.invoke('enable');
       if (extension.getId() == '$services.distribution.getUIExtensionId().id'
           && extension.getVersion() == '$services.distribution.getUIExtensionId().version.value') {
-        this._onMainUiExtensionStatusChanged(stepButtons, status);
+        this._onDefaultUiExtensionStatusChanged(stepButtons, status);
       } else if (this._previousUiExtensionId && extension.getId() == this._previousUiExtensionId.id
           && extension.getVersion() == this._previousUiExtensionId.version) {
         this._onPreviousUiExtensionStatusChanged(status);
@@ -34,9 +34,9 @@ XWiki.MainUIStep = Class.create({
   },
 
   /**
-   * Enables the continue button after the main UI extension is installed.
+   * Enables the continue button after the default UI extension is installed.
    */
-  _onMainUiExtensionStatusChanged : function(stepButtons, status) {
+  _onDefaultUiExtensionStatusChanged : function(stepButtons, status) {
     if (status == 'installed') {
       // Show the Continue button.
       stepButtons[0].up().removeClassName('hidden');
@@ -172,7 +172,8 @@ XWiki.MainUIStep = Class.create({
     new Ajax.Request(form.action, {
       parameters: {
         extensionId: formData.previousUiId,
-        extensionVersion: formData.previousUiVersion
+        extensionVersion: formData.previousUiVersion,
+        hideExtensionDetails: true
       },
       onCreate: function() {
         form.disable();
@@ -236,8 +237,11 @@ XWiki.MainUIStep = Class.create({
       var form = $('previousUi');
       // Remove the previous UI extension display.
       form.next().remove();
-      // Display the recommended UI extension.
+      // Display the default UI extension.
       for (var next = form.next(); next; next = next.show().next());
+      // Refresh the display of the default UI extension so that we get the upgrade button.
+      var defaultUiExtension = form.next('.xform').previous().down('.extension-item');
+      defaultUiExtension && defaultUiExtension._extensionBehaviour.refresh({hideExtensionDetails: true});
     }
   }
 });
@@ -334,7 +338,7 @@ XWiki.OutdatedExtensionsStep = Class.create({
 });
 
 function init() {
-  $('extension.mainui') && new XWiki.MainUIStep();
+  $('extension.defaultui') && new XWiki.DefaultUIStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();
   return true;
 }

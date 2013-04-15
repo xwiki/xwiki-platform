@@ -17,30 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.distribution.internal.job;
+package org.xwiki.extension.distribution.internal.job.step;
 
-import org.xwiki.job.AbstractRequest;
+import javax.inject.Named;
 
-/**
- * @version $Id$
- * @since 4.2M3
- */
-public class DistributionRequest extends AbstractRequest
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+
+@Component
+@Named(WelcomeDistributionStep.ID)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class WelcomeDistributionStep extends AbstractDistributionStep
 {
-    private static final long serialVersionUID = 1L;
+    public static final String ID = "welcome";
 
-    /**
-     * @see #getExtensions()
-     */
-    public static final String PROPERTY_WIKI = "wiki";
-
-    public void setWiki(String wiki)
+    public WelcomeDistributionStep()
     {
-        setProperty(PROPERTY_WIKI, wiki);
+        super(ID);
     }
 
-    public String getWiki()
+    @Override
+    public void prepare()
     {
-        return getProperty(PROPERTY_WIKI);
+        // Nothing to prepare here
     }
 }

@@ -23,7 +23,11 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
-import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
+import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
+import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 
 /**
  * @version $Id$
@@ -42,8 +46,6 @@ public interface DistributionManager
 
         /** No distribution information can be found. */
         NONE,
-
-        /** Probably something to do. */
 
         /**
          * No previous state.
@@ -67,9 +69,16 @@ public interface DistributionManager
     }
 
     /**
-     * @return the current distribution state
+     * @return the current distribution state for the farm
+     * @since 5.0RC1
      */
-    DistributionState getDistributionState();
+    DistributionState getFarmDistributionState();
+
+    /**
+     * @return the current distribution state for the passed wiki
+     * @since 5.0RC1
+     */
+    DistributionState getWikiDistributionState(String wiki);
 
     /**
      * @return the extension that defines the current distribution
@@ -77,26 +86,70 @@ public interface DistributionManager
     CoreExtension getDistributionExtension();
 
     /**
-     * @return the recommended user interface for {@link #getDistributionExtension()}
+     * @return the recommended user interface for main wikis
+     * @since 5.0M1
      */
-    ExtensionId getUIExtensionId();
+    ExtensionId getMainUIExtensionId();
+
+    /**
+     * @return the recommended user interface for sub wikis
+     * @since 5.0M1
+     */
+    ExtensionId getWikiUIExtensionId();
 
     /**
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     * @since 5.0M1
      */
-    DistributionJobStatus getPreviousJobStatus();
+    FarmDistributionJobStatus getPreviousFarmJobStatus();
+
+    /**
+     * @param wiki the wiki form which to get the distribution status
+     * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     * @since 5.0M1
+     */
+    WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki);
 
     /**
      * Starts the distribution job.
      * 
      * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
      */
-    DistributionJob startJob();
+    FarmDistributionJob startFarmJob();
+
+    /**
+     * Starts the distribution job.
+     * 
+     * @param wiki the wiki associated to the distribution wyzard
+     * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
+     */
+    WikiDistributionJob startWikiJob(String wiki);
+
+    /**
+     * @return the current {@link UpgradeMode}
+     * @since 5.0M1
+     */
+    UpgradeMode getUpgradeMode();
 
     /**
      * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
      */
-    DistributionJob getJob();
+    FarmDistributionJob getFarmJob();
+
+    /**
+     * @return the distribution job object that can be used to get information like the job status
+     * @since 5.0M1
+     */
+    WikiDistributionJob getWikiJob(String wiki);
+
+    /**
+     * @return the current distribution job
+     * @since 5.0RC1
+     */
+    DistributionJob getCurrentDistributionJob();
 
     /**
      * @return true it's allowed to display the Distribution Wizard in the current context

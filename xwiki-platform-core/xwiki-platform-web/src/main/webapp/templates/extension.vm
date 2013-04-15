@@ -1,14 +1,15 @@
+#set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
+
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
 ## * skipCurrentUser: don't take into account context use (XAR extension documents will keep their author for example)
 #if (!$extensionConfig)
   #set ($extensionConfig = {})
 #end
-#set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set ($extensionManager = $services.extension)
 ## From the main wiki we can manage other namespaces.
@@ -92,8 +93,7 @@
 
 #macro (displayExtensionActionButtons_detailsToggle $extension)
   #computeXBack()
-  ## Check if the current request targets the given extension.
-  #if ($request.extensionId == $extension.id.id && $request.extensionVersion == $extension.id.version.value)
+  #if ($showExtensionDetails)
     #if ($isAjaxRequest)
       ## AJAX request to show extension details.
       #extensionActionButton('showDetails' true 'visibilityAction')
@@ -131,19 +131,21 @@
   #end
   ## Note that the Continue button doesn't exclude the following buttons, unless a job is waiting. The user should be
   ## able for instance to recompute the install plan.
-  #if ($xcontext.action == 'distribution' && $showRepairXARButton)
-    ## NOTE: This code is normally reached only when JavaScript is disabled since otherwise the button is added from JavaScript.
-    ## TODO: Find a better way to 'force' the repair XAR extension button.
-    #set ($showRepairXARButton = $NULL)
-    #extensionActionButton('repairXAR')
-    ## The repair job is executed without confirmation (i.e. without a plan).
-    <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
-  #elseif ($extensionStatus.startsWith('installed'))
+  #if ($extensionStatus.startsWith('installed'))
     ## This extension can be uninstalled.
     #extensionActionButtons($extension 'uninstall' true)
   #elseif ($extensionStatus == 'remote')
     ## Installable extension.
-    #extensionActionButtons($NULL 'install')
+    #if ($xcontext.action == 'distribution' && $showRepairXARButton)
+      ## NOTE: This code is normally reached only when JavaScript is disabled since otherwise the button is added from JavaScript.
+      ## TODO: Find a better way to 'force' the repair XAR extension button.
+      #set ($showRepairXARButton = $NULL)
+      #extensionActionButton('repairXAR')
+      ## The repair job is executed without confirmation (i.e. without a plan).
+      <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
+    #else
+      #extensionActionButtons($NULL 'install')
+    #end
   #elseif ($extensionStatus.startsWith('remote-installed'))
     ## An extension that can be either upgraded or downgraded.
     ## Compare this version with the version that is currently installed to determine which button to display.
@@ -715,6 +717,7 @@ Caused by: #printThrowable($throwable.cause true)
 #macro (displayExtension $extension)
   ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
   #set ($jobStatus = $NULL)
+  #isShowingExtensionDetails($extension $showExtensionDetails)
   #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   <form action="" method="post" class="extension-item extension-item-${extensionStatus}">
     <div class="hidden">
@@ -743,17 +746,7 @@ Caused by: #printThrowable($throwable.cause true)
       #displayProgressBar($extension)
       <div class="clearfloats"></div>
     </div>
-    ## Show the extension details if this extension has been explicitely requested or if the extension has a job waiting.
-    #set ($showDetails = $request.extensionId == $extension.id.id
-      && $request.extensionVersion == $extension.id.version.value)
-    #if (!$showDetails)
-      #if (!$jobStatus)
-        #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
-        #set ($jobState = $jobStatus.state)
-      #end
-      #set ($showDetails = $jobState == 'WAITING')
-    #end
-    #if ($showDetails)
+    #if ($showExtensionDetails)
       #displayExtensionDetails($extension)
     #end
   </form>
@@ -1152,9 +1145,11 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #if ($extraClassName)
     #set ($discard = $classNames.add($extraClassName))
   #end
+  #set ($hintKey = "extensions.actions.${action}.hint")
   <span class="buttonwrapper">
     <button type="submit" name="extensionAction" value="$escapetool.xml($action)"
-      #if ($classNames.size() > 0) class="$escapetool.xml($stringtool.join($classNames, ' '))"#end>
+      #if ($classNames.size() > 0) class="$escapetool.xml($stringtool.join($classNames, ' '))"#end
+      #if ($services.localization.get($hintKey)) title="$escapetool.xml($services.localization.render($hintKey))"#end>
       $escapetool.xml($services.localization.render("extensions.actions.${action}"))</button>
   </span>
 #end
@@ -1168,4 +1163,20 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #set ($wikiPrettyName = $wikiName)
 #end
 <a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a>##
+#end
+
+#macro (isShowingExtensionDetails $extension $showDetails)
+  ## Show the extension details if this extension has been explicitely requested.
+  #set ($return = "$!request.hideExtensionDetails" != 'true' && $request.extensionId == $extension.id.id
+    && $request.extensionVersion == $extension.id.version.value)
+  #if (!$return)
+    #if (!$jobStatus)
+      #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+      #set ($jobState = $jobStatus.state)
+    #end
+    ## Always show the extension details if the extension has a job waiting.
+    #set ($return = $jobState == 'WAITING')
+  #end
+  #set ($showDetails = $NULL)
+  #setVariable("$showDetails" $return)
 #end

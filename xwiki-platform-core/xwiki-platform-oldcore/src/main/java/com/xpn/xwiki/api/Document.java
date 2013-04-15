@@ -708,7 +708,7 @@ public class Document extends Api
      */
     public String getAttachmentURL(String filename)
     {
-        return this.doc.getAttachmentURL(filename, getXWikiContext());
+        return this.doc.getAttachmentURL(filename, "download", getXWikiContext());
     }
 
     /**

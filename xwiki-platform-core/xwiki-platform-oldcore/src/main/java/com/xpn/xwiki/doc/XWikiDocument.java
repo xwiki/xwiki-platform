@@ -1530,9 +1530,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getAttachmentURL(String filename, XWikiContext context)
     {
-        XWikiAttachment attachment = getAttachment(filename);
-        String attachmentVersion = ( attachment != null ) ? attachment.getVersion() : "1.1";        
-        return getAttachmentRevisionURL(filename, attachmentVersion, context);
+        return getAttachmentURL(filename, "download", context);
     }
 
     public String getAttachmentURL(String filename, String action, XWikiContext context)

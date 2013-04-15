@@ -29,7 +29,7 @@
     <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
     <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
     <div class="information">
-    <span class="name"><a href="$doc.getAttachmentURL(${attach.filename})"
+    <span class="name"><a href="$doc.getAttachmentURL(${attach.filename}, 'download')"
       title="$services.localization.render('core.viewers.attachments.download')">$escapetool.xml($attach.filename)</a></span>
     <span class="xwikibuttonlinks">
     #if($hasEdit || $hasAdmin)

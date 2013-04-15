@@ -4558,9 +4558,7 @@ public class XWiki implements EventListener
         throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(this.currentMixedDocumentReferenceResolver.resolve(fullname));
-        XWikiAttachment attachment = doc.getAttachment(filename);
-        String attachmentVersion = (attachment != null) ? attachment.getVersion() : "1.1";
-        return doc.getAttachmentRevisionURL(filename, attachmentVersion, queryString, context);
+        return doc.getAttachmentURL(filename, "download", queryString, context);
     }
 
     // Usefull date functions

@@ -83,7 +83,7 @@ public class DistributionInitializerListener implements EventListener
         DistributionState distributionState = this.distributionManager.getDistributionState();
 
         FarmDistributionJobStatus previousFarmStatus = this.distributionManager.getPreviousFarmJobStatus();
-        
+
         // Is install already done (allow to cancel stuff for example)
         if (distributionState == DistributionState.SAME) {
             if (event instanceof ApplicationStartedEvent) {
@@ -111,7 +111,7 @@ public class DistributionInitializerListener implements EventListener
                 }
             }
         } else {
-            this.logger.info("Distribution state: {}", distributionState);
+            this.logger.debug("Distribution state: {}", distributionState);
 
             if (event instanceof ApplicationStartedEvent) {
                 this.distributionManager.startFarmJob();

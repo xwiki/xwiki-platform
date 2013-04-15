@@ -50,6 +50,9 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 4.2M3
  */
+/**
+ * @version $Id$
+ */
 @Component
 @Named("distribution")
 @Singleton
@@ -73,9 +76,15 @@ public class DistributionScriptService implements ScriptService
     @Inject
     private DistributionManager distributionManager;
 
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    /**
+     * Used to access HTML renderer.
+     */
     @Inject
     @Named("xhtml/1.0")
     private BlockRenderer xhtmlRenderer;
@@ -152,6 +161,9 @@ public class DistributionScriptService implements ScriptService
         return job != null ? (DistributionJobStatus< ? >) job.getStatus() : null;
     }
 
+    /**
+     * @return the HTML resulting in the executing of the current step
+     */
     public String renderCurrentStepToXHTML()
     {
         DistributionJob job = this.distributionManager.getCurrentDistributionJob();
@@ -177,6 +189,9 @@ public class DistributionScriptService implements ScriptService
         return null;
     }
 
+    /**
+     * @return the upgrade mode
+     */
     public UpgradeMode getUpgradeMode()
     {
         return this.distributionManager.getUpgradeMode();

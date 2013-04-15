@@ -75,6 +75,7 @@ public interface DistributionManager
     DistributionState getFarmDistributionState();
 
     /**
+     * @param wiki the wiki for which to get the distribution state
      * @return the current distribution state for the passed wiki
      * @since 5.0RC1
      */
@@ -87,26 +88,26 @@ public interface DistributionManager
 
     /**
      * @return the recommended user interface for main wikis
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     ExtensionId getMainUIExtensionId();
 
     /**
      * @return the recommended user interface for sub wikis
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     ExtensionId getWikiUIExtensionId();
 
     /**
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     FarmDistributionJobStatus getPreviousFarmJobStatus();
 
     /**
      * @param wiki the wiki form which to get the distribution status
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki);
 
@@ -114,7 +115,7 @@ public interface DistributionManager
      * Starts the distribution job.
      * 
      * @return the distribution job object that can be used to get information like the job status
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     FarmDistributionJob startFarmJob();
 
@@ -123,25 +124,26 @@ public interface DistributionManager
      * 
      * @param wiki the wiki associated to the distribution wyzard
      * @return the distribution job object that can be used to get information like the job status
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     WikiDistributionJob startWikiJob(String wiki);
 
     /**
      * @return the current {@link UpgradeMode}
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     UpgradeMode getUpgradeMode();
 
     /**
      * @return the distribution job object that can be used to get information like the job status
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     FarmDistributionJob getFarmJob();
 
     /**
+     * @param wiki the wiki for which to get the job
      * @return the distribution job object that can be used to get information like the job status
-     * @since 5.0M1
+     * @since 5.0RC1
      */
     WikiDistributionJob getWikiJob(String wiki);
 

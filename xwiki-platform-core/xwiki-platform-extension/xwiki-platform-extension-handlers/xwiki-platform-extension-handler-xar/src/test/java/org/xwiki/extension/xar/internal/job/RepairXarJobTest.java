@@ -19,9 +19,11 @@
  */
 package org.xwiki.extension.xar.internal.job;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
@@ -42,18 +44,48 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
             getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
     }
 
-    protected Job repair(ExtensionId extensionId, String[] namespaces, LogLevel failFrom) throws Throwable
+    protected Job repair(ExtensionId extensionId, String namespace, LogLevel failFrom) throws Throwable
     {
-        return install(RepairXarJob.JOBTYPE, extensionId, namespaces, failFrom);
+        return install(RepairXarJob.JOBTYPE, extensionId, namespace, failFrom);
     }
 
     @Test
     public void testRepair() throws Throwable
     {
+        ExtensionId extensionId = new ExtensionId("test", "2.0");
+
+        repair(extensionId, null, LogLevel.WARN);
+
+        InstalledExtension extension = this.xarExtensionRepository.resolve(extensionId);
+
+        Assert.assertTrue(extension.isValid(null));
+    }
+
+    @Test
+    public void testRepairWithDependency() throws Throwable
+    {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
         repair(extensionId, null, LogLevel.WARN);
 
-        this.xarExtensionRepository.resolve(extensionId);
+        InstalledExtension extension = this.xarExtensionRepository.resolve(extensionId);
+
+        Assert.assertTrue(extension.isValid(null));
+
+        InstalledExtension dependency = this.xarExtensionRepository.resolve(new ExtensionId("dependency", "1.0"));
+
+        Assert.assertTrue(dependency.isValid(null));
+    }
+
+    @Test
+    public void testRepairInvalid() throws Throwable
+    {
+        ExtensionId extensionId = new ExtensionId("invalid", "1.0");
+
+        repair(extensionId, null, LogLevel.WARN);
+
+        InstalledExtension extension = this.xarExtensionRepository.resolve(extensionId);
+
+        Assert.assertFalse(extension.isValid(null));
     }
 }

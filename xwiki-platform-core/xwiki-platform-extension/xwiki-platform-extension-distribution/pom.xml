@@ -66,11 +66,23 @@
         <configuration>
           <excludes>
             <!-- Need time -->
+            **/AbstractDistributionJob.java,
+            **/AbstractDistributionStep.java,
+            **/DefaultUIDistributionStep.java,
             **/DistributionJob.java,
             **/DistributionJobStatus.java,
             **/DistributionQuestion.java,
+            **/DistributionRequest.java,
+            **/DistributionStep.java,
             **/DistributionStepStatus.java,
-            **/DefaultDistributionManager.java
+            **/DefaultDistributionManager.java,
+            **/FarmDistributionJob.java,
+            **/FarmDistributionJobStatus.java,
+            **/OutdatedExtensionsDistributionStep.java,
+            **/UpgradeModeDistributionStep.java,
+            **/WelcomeDistributionStep.java,
+            **/WikiDistributionJob.java,
+            **/WikiDistributionJobStatus.java
           </excludes>
         </configuration>
       </plugin>

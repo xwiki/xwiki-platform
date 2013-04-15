@@ -65,9 +65,9 @@ import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
@@ -1960,7 +1960,8 @@ public class Document extends Api
         if (object != null) {
             try {
                 BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
-                if ((PasswordClass.class).equals(object.getBaseObject().getXClass(getXWikiContext()).get(fieldName).getClass()))
+                PropertyClass p = (PropertyClass) object.getBaseObject().getXClass(getXWikiContext()).get(fieldName);
+                if ("Password".equals(p.getClassType()))
                 {
                     if(!this.getXWikiContext().getWiki().getRightService().hasProgrammingRights(this.getXWikiContext()))
                     {

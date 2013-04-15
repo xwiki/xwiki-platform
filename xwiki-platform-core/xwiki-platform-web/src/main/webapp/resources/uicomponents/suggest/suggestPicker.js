@@ -43,7 +43,7 @@ var XWiki = (function (XWiki) {
 
     // Process options
     this.options = Object.extend(Object.clone(this.options), options || { });
-    this.input = element;
+    this.input = $(element);
     this.suggest = suggest;
     this.inputName = this.input.name;
     if (!this.options.acceptFreeText) {
@@ -99,7 +99,8 @@ var XWiki = (function (XWiki) {
   loadSelectedValue: function(values, index) {
     if (index >= values.length) {
       this.input.readOnly = false;
-      this.input.clear().removeClassName('loading');
+      this.input.value = '';
+      this.input.removeClassName('loading');
       return;
     } else if (values[index].trim() == '') {
       this.loadSelectedValue(values, index + 1);

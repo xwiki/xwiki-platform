@@ -1227,7 +1227,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             } catch (Exception e) {
                 if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exeption while close transaction", e);
+                    LOGGER.error("Exception while close transaction", e);
                 }
             }
         }

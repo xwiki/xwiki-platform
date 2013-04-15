@@ -314,7 +314,8 @@ return XWiki;
 }
 
 #entryNamePopup input[type=image] {
-  margin-left: 2px;
+  margin: .3em .5em;
+  padding: 0;
   position: absolute;
 }
 

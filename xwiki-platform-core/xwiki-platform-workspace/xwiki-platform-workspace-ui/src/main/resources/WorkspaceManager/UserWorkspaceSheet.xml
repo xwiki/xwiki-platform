@@ -104,8 +104,7 @@
     </property>
     <property>
       <code>if (console == undefined) {
-  var console = {};
-  console.log = function() {};
+  var console = {log : Prototype.K};
 }
 XWiki.UserWorkspaceTab = Class.create({
 
@@ -115,11 +114,8 @@ XWiki.UserWorkspaceTab = Class.create({
 
   addListeners : function() {
     var elements = $('workspaces').childElements();
-    for (var key in elements) {
-      var element = elements[key];
-      var workspaceName = element.id;
-      var link = element.down('.workspaceActivity a');
-      link.observe('click', this.onWorkspaceClicked);
+    for (var i = 0; i &lt; elements.length; ++i) {
+      elements[i].down('.workspaceActivity a').observe('click', this.onWorkspaceClicked);
     }
   },
 

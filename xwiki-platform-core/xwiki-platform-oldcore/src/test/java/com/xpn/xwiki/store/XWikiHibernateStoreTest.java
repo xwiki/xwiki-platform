@@ -19,13 +19,21 @@
  */
 package com.xpn.xwiki.store;
 
+import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
-import org.jmock.Expectations;
+import org.hibernate.cfg.Configuration;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.test.LogRule;
 
 import java.sql.SQLException;
+import java.sql.Statement;
+
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
@@ -34,7 +42,13 @@ import java.sql.SQLException;
  */
 public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
 {
-    @org.junit.Test
+    @Rule
+    public LogRule logRule = new LogRule() {{
+        record(LogLevel.WARN);
+        recordLoggingForType(XWikiHibernateStore.class);
+     }};
+
+    @Test
     public void testGetColumnsForSelectStatement()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
@@ -50,7 +64,7 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
     }
 
-    @org.junit.Test
+    @Test
     public void testCreateSQLQuery()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
@@ -62,12 +76,10 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
             "select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
     }
 
-    @org.junit.Test
+    @Test
     public void testEndTransactionWhenSQLBatchUpdateExceptionThrown() throws Exception
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-
-        final Transaction mockTransaction = getMockery().mock(Transaction.class);
 
         SQLException sqlException2 = new SQLException("sqlexception2");
         sqlException2.setNextException(new SQLException("nextexception2"));
@@ -76,11 +88,10 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
         sqlException1.initCause(sqlException2);
         sqlException1.setNextException(new SQLException("nextexception1"));
 
-        getMockery().checking(new Expectations() {{
-            oneOf(mockTransaction).commit(); will(throwException(new HibernateException("exception1", sqlException1)));
-        }});
+        Transaction transaction = mock(Transaction.class);
+        doThrow(new HibernateException("exception1", sqlException1)).when(transaction).commit();
 
-        store.setTransaction(mockTransaction, getContext());
+        store.setTransaction(transaction, getContext());
 
         try {
             store.endTransaction(getContext(), true);
@@ -90,5 +101,49 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
                 + "SQL next exception = [java.sql.SQLException: nextexception1]\n"
                 + "SQL next exception = [java.sql.SQLException: nextexception2]]", e.getMessage());
         }
+    }
+
+    @Test
+    public void executeDeleteWikiStatementForPostgreSQLWhenInSchemaMode() throws Exception
+    {
+        XWikiHibernateStore store = new XWikiHibernateStore();
+
+        // Used to be able to say that we are in schema mode
+        HibernateSessionFactory sessionFactory = mock(HibernateSessionFactory.class);
+        ReflectionUtils.setFieldValue(store, "sessionFactory", sessionFactory);
+        Configuration configuration = mock(Configuration.class);
+        when(sessionFactory.getConfiguration()).thenReturn(configuration);
+        when(configuration.getProperty("xwiki.virtual_mode")).thenReturn("schema");
+
+        Statement statement = mock(Statement.class);
+        DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
+
+        store.executeDeleteWikiStatement(statement, databaseProduct, "schema");
+
+        verify(statement).execute("DROP SCHEMA schema CASCADE");
+
+    }
+
+    @Test
+    public void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
+    {
+        XWikiHibernateStore store = new XWikiHibernateStore();
+
+        // Used to be able to say that we are in schema mode
+        HibernateSessionFactory sessionFactory = mock(HibernateSessionFactory.class);
+        ReflectionUtils.setFieldValue(store, "sessionFactory", sessionFactory);
+        Configuration configuration = mock(Configuration.class);
+        when(sessionFactory.getConfiguration()).thenReturn(configuration);
+        when(configuration.getProperty("xwiki.virtual_mode")).thenReturn("database");
+
+        Statement statement = mock(Statement.class);
+        DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
+
+        store.executeDeleteWikiStatement(statement, databaseProduct, "schema");
+
+        Assert.assertEquals(1, this.logRule.size());
+        Assert.assertEquals("Subwiki deletion not yet supported in Database mode for PostgreSQL",
+            this.logRule.getMessage(0));
+        verify(statement, never()).execute(any(String.class));
     }
 }

@@ -302,7 +302,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String schema = getSchemaFromWikiName(wikiName, context);
             String escapedSchema = escapeSchema(schema, context);
 
-            DatabaseProduct databaseProduct = getDatabaseProductName(context);
+            DatabaseProduct databaseProduct = getDatabaseProductName();
             if (DatabaseProduct.ORACLE == databaseProduct) {
                 stmt.execute("create user " + escapedSchema + " identified by " + escapedSchema);
                 stmt.execute("grant resource to " + escapedSchema);
@@ -398,18 +398,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String schema = getSchemaFromWikiName(wikiName, context);
             String escapedSchema = escapeSchema(schema, context);
 
-            DatabaseProduct databaseProduct = getDatabaseProductName(context);
-            if (DatabaseProduct.ORACLE == databaseProduct) {
-                stmt.execute("DROP USER " + escapedSchema + " CASCADE");
-            } else if (DatabaseProduct.DERBY == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + escapedSchema);
-            } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + escapedSchema + " CASCADE");
-            } else if (DatabaseProduct.DB2 == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + escapedSchema + " RESTRICT");
-            } else if (DatabaseProduct.MYSQL == databaseProduct) {
-                stmt.execute("DROP DATABASE " + escapedSchema);
-            }
+            executeDeleteWikiStatement(stmt, getDatabaseProductName(), escapedSchema);
 
             endTransaction(context, true);
         } catch (Exception e) {
@@ -430,6 +419,36 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * Execute the SQL statement on the database to remove a wiki.
+     *
+     * @param statement the statement object on which to execute the wiki deletion
+     * @param databaseProduct the database type
+     * @param escapedSchemaName the subwiki schema name being deleted
+     * @throws SQLException in case of an error while deleting the sub wiki
+     */
+    protected void executeDeleteWikiStatement(Statement statement, DatabaseProduct databaseProduct,
+        String escapedSchemaName) throws SQLException
+    {
+        if (DatabaseProduct.ORACLE == databaseProduct) {
+            statement.execute("DROP USER " + escapedSchemaName + " CASCADE");
+        } else if (DatabaseProduct.DERBY == databaseProduct) {
+            statement.execute("DROP SCHEMA " + escapedSchemaName);
+        } else if (DatabaseProduct.HSQLDB == databaseProduct) {
+            statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");
+        } else if (DatabaseProduct.DB2 == databaseProduct) {
+            statement.execute("DROP SCHEMA " + escapedSchemaName + " RESTRICT");
+        } else if (DatabaseProduct.MYSQL == databaseProduct) {
+            statement.execute("DROP DATABASE " + escapedSchemaName);
+        } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
+            if (isInSchemaMode()) {
+                statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");
+            } else {
+                LOGGER.warn("Subwiki deletion not yet supported in Database mode for PostgreSQL");
             }
         }
     }

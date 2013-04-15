@@ -166,7 +166,7 @@
         #set($annoDoc = $xwiki.getDocument($annDocReference))
         #set($repliesList = $annoDoc.getObjects('XWiki.XWikiComments', 'replyto', $ann.id))
         #if($repliesList.size() &gt; 0)
-          &lt;a href="#xwikicomment_${ann.id}"&gt;See thread&lt;/a&gt;
+          &lt;a href="#xwikicomment_${ann.id}"&gt;$services.localization.render('annotations.action.view.thread')&lt;/a&gt;
         #end
       #end
     &lt;/div&gt;

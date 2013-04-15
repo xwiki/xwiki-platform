@@ -100,14 +100,8 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        DistributionState distributionState;
-        if (xcontext.isMainWiki()) {
-            distributionState = this.distributionManager.getFarmDistributionState();
-        } else {
-            distributionState = this.distributionManager.getWikiDistributionState(xcontext.getDatabase());
-        }
-
-        return distributionState;
+        return xcontext.isMainWiki() ? this.distributionManager.getFarmDistributionState() : this.distributionManager
+            .getWikiDistributionState(xcontext.getDatabase());
     }
 
     /**
@@ -123,7 +117,10 @@ public class DistributionScriptService implements ScriptService
      */
     public ExtensionId getUIExtensionId()
     {
-        return this.distributionManager.getMainUIExtensionId();
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki() ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
+            .getWikiUIExtensionId();
     }
 
     /**
@@ -131,7 +128,10 @@ public class DistributionScriptService implements ScriptService
      */
     public DistributionJobStatus< ? > getPreviousJobStatus()
     {
-        return this.distributionManager.getPreviousFarmJobStatus();
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki() ? this.distributionManager.getPreviousFarmJobStatus() : this.distributionManager
+            .getPreviousWikiJobStatus(xcontext.getDatabase());
     }
 
     /**

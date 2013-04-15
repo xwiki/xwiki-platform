@@ -29,8 +29,10 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -228,7 +230,11 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest>
 
             notifyStepPropress();
 
-            this.installedRepository.installExtension(localExtension, namespace, dependency);
+            InstalledExtension installedExtension =
+                this.installedRepository.installExtension(localExtension, namespace, dependency);
+
+            this.observationManager.notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace),
+                installedExtension);
         } finally {
             notifyPopLevelProgress();
         }

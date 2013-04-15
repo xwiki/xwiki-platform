@@ -42,9 +42,9 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
             getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
     }
 
-    protected Job repair(ExtensionId extensionId, String[] namespaces, LogLevel failFrom) throws Throwable
+    protected Job repair(ExtensionId extensionId, String namespace, LogLevel failFrom) throws Throwable
     {
-        return install(RepairXarJob.JOBTYPE, extensionId, namespaces, failFrom);
+        return install(RepairXarJob.JOBTYPE, extensionId, namespace, failFrom);
     }
 
     @Test

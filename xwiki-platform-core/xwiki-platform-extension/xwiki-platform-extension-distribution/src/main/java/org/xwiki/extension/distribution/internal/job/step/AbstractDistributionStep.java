@@ -38,7 +38,6 @@ import org.apache.commons.io.IOUtils;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.extension.distribution.internal.DistributionManager;
-import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.rendering.block.Block;
@@ -105,18 +104,15 @@ public abstract class AbstractDistributionStep implements DistributionStep
         this.distributionJob = distributionJob;
 
         // Remember previous state
+        DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();
 
-        DistributionState distributionState = this.distributionJob.getStatus().getDistributionState();
+        if (previousStatus != null
+            && previousStatus.getDistributionExtension().equals(
+                this.distributionJob.getStatus().getDistributionExtension())) {
+            DistributionStep previousStep = previousStatus.getStep(getId());
 
-        if (distributionState == DistributionState.SAME) {
-            DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();
-
-            if (previousStatus != null) {
-                DistributionStep previousStep = previousStatus.getStep(getId());
-
-                if (previousStep != null) {
-                    setState(previousStep.getState());
-                }
+            if (previousStep != null) {
+                setState(previousStep.getState());
             }
         }
 

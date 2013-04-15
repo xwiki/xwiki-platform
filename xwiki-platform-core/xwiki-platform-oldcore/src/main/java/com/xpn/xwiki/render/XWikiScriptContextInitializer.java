@@ -27,6 +27,7 @@ import javax.script.ScriptContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.ScriptContextInitializer;
 
@@ -36,6 +37,7 @@ import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Inject in the {@link ScriptContext} the XWiki context and the {@link XWiki} instance for backward compatibility.
@@ -83,13 +85,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
             scriptContext.setAttribute("syntaxFactory", Utils.getComponent(SyntaxFactory.class),
                 ScriptContext.ENGINE_SCOPE);
 
-            // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
-            // Script context there. However if we create a new Script context we need to populate it with
-            // the message tool. This needs to be refactored to be made clean.
-            Object msg = xcontext.get("msg");
-            if (msg != null && scriptContext.getAttribute("msg") == null) {
-                scriptContext.setAttribute("msg", msg, ScriptContext.ENGINE_SCOPE);
-            }
+            // Make deprecated XWiki message tool available from scripts
+            scriptContext.setAttribute("msg", new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class)), ScriptContext.ENGINE_SCOPE);
         }
 
         if (xcontext.getDoc() != null) {

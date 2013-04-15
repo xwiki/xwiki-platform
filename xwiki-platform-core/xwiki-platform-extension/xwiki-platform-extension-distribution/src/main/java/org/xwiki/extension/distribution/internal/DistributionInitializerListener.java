@@ -88,12 +88,12 @@ public class DistributionInitializerListener implements EventListener
             }
 
             if (this.distributionManager.getJob() != null) {
-                this.logger.info("Distribution up to date");
+                this.logger.debug("Distribution up to date");
             } else {
-                this.logger.info("Distribution partially up to date");
+                this.logger.debug("Distribution partially up to date");
             }
         } else {
-            this.logger.info("Distribution state: {}", distributionState);
+            this.logger.debug("Distribution state: {}", distributionState);
             this.distributionManager.startJob();
         }
     }

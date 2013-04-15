@@ -106,7 +106,7 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
         // Remember previous state
 
-        DistributionState distributionState = this.distributionManager.getDistributionState();
+        DistributionState distributionState = this.distributionJob.getStatus().getDistributionState();
 
         if (distributionState == DistributionState.SAME) {
             DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();

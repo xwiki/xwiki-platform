@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
@@ -154,5 +155,39 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
     public void setDistributionExtensionUI(ExtensionId distributionExtensionUI)
     {
         this.distributionExtensionUi = distributionExtensionUI;
+    }
+
+    public static DistributionState getDistributionState(ExtensionId previousExtensionId,
+        ExtensionId distributionExtensionId)
+    {
+        DistributionState distributionState;
+
+        if (distributionExtensionId != null) {
+            if (previousExtensionId == null) {
+                distributionState = DistributionState.NEW;
+            } else {
+                if (previousExtensionId.equals(distributionExtensionId)) {
+                    distributionState = DistributionState.SAME;
+                } else if (!distributionExtensionId.getId().equals(previousExtensionId.getId())) {
+                    distributionState = DistributionState.DIFFERENT;
+                } else {
+                    int diff = distributionExtensionId.getVersion().compareTo(previousExtensionId.getVersion());
+                    if (diff > 0) {
+                        distributionState = DistributionState.UPGRADE;
+                    } else {
+                        distributionState = DistributionState.DOWNGRADE;
+                    }
+                }
+            }
+        } else {
+            distributionState = DistributionState.NONE;
+        }
+
+        return distributionState;
+    }
+
+    public DistributionState getDistributionState()
+    {
+        return getDistributionState(getPreviousDistributionExtension(), getDistributionExtension());
     }
 }

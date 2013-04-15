@@ -98,7 +98,16 @@ public class DistributionScriptService implements ScriptService
      */
     public DistributionState getState()
     {
-        return this.distributionManager.getDistributionState();
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        DistributionState distributionState;
+        if (xcontext.isMainWiki()) {
+            distributionState = this.distributionManager.getFarmDistributionState();
+        } else {
+            distributionState = this.distributionManager.getWikiDistributionState(xcontext.getDatabase());
+        }
+
+        return distributionState;
     }
 
     /**
@@ -138,14 +147,14 @@ public class DistributionScriptService implements ScriptService
      */
     public DistributionJobStatus< ? > getJobStatus()
     {
-        DistributionJob job = this.distributionManager.getCurrentDitributionJob();
+        DistributionJob job = this.distributionManager.getCurrentDistributionJob();
 
         return job != null ? (DistributionJobStatus< ? >) job.getStatus() : null;
     }
 
     public String renderCurrentStepToXHTML()
     {
-        DistributionJob job = this.distributionManager.getCurrentDitributionJob();
+        DistributionJob job = this.distributionManager.getCurrentDistributionJob();
 
         if (job != null) {
             JobStatus jobStatus = job.getStatus();

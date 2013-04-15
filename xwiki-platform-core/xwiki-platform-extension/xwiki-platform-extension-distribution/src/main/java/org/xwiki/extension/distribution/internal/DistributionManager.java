@@ -69,9 +69,16 @@ public interface DistributionManager
     }
 
     /**
-     * @return the current distribution state
+     * @return the current distribution state for the farm
+     * @since 5.0RC1
      */
-    DistributionState getDistributionState();
+    DistributionState getFarmDistributionState();
+
+    /**
+     * @return the current distribution state for the passed wiki
+     * @since 5.0RC1
+     */
+    DistributionState getWikiDistributionState(String wiki);
 
     /**
      * @return the extension that defines the current distribution
@@ -140,8 +147,9 @@ public interface DistributionManager
 
     /**
      * @return the current distribution job
+     * @since 5.0RC1
      */
-    DistributionJob getCurrentDitributionJob();
+    DistributionJob getCurrentDistributionJob();
 
     /**
      * @return true it's allowed to display the Distribution Wizard in the current context

@@ -133,8 +133,6 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
     private ExtensionId wikiUIExtensionId;
 
-    private DistributionState distributionState;
-
     private FarmDistributionJob farmDistributionJob;
 
     private Map<String, WikiDistributionJob> wikiDistributionJobs =
@@ -146,32 +144,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         // Get the current distribution
         this.distributionExtension = this.coreExtensionRepository.getEnvironmentExtension();
 
-        // Get previous state
-        FarmDistributionJobStatus previousFarmStatus = getPreviousFarmJobStatus();
-
         // Determine distribution status
         if (this.distributionExtension != null) {
-            // Distribution state
-            if (previousFarmStatus == null) {
-                this.distributionState = DistributionState.NEW;
-            } else {
-                ExtensionId previousExtensionId = previousFarmStatus.getDistributionExtension();
-                ExtensionId distributionExtensionId = this.distributionExtension.getId();
-
-                if (previousExtensionId.equals(distributionExtensionId)) {
-                    this.distributionState = DistributionState.SAME;
-                } else if (!distributionExtensionId.getId().equals(previousExtensionId.getId())) {
-                    this.distributionState = DistributionState.DIFFERENT;
-                } else {
-                    int diff = distributionExtensionId.getVersion().compareTo(previousExtensionId.getVersion());
-                    if (diff > 0) {
-                        this.distributionState = DistributionState.UPGRADE;
-                    } else {
-                        this.distributionState = DistributionState.DOWNGRADE;
-                    }
-                }
-            }
-
             // Distribution UI
             Model mavenModel = (Model) this.distributionExtension.getProperty(MavenCoreExtension.PKEY_MAVEN_MODEL);
 
@@ -186,8 +160,6 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             if (wikiUIId != null) {
                 this.wikiUIExtensionId = new ExtensionId(wikiUIId, this.distributionExtension.getId().getVersion());
             }
-        } else {
-            this.distributionState = DistributionState.NONE;
         }
     }
 
@@ -240,7 +212,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             this.wikiDistributionJobs.put(wiki, wikiJob);
 
             final DistributionRequest request = new DistributionRequest();
-            request.setId(JOBID);
+            request.setId(Arrays.asList(JOBID, "wiki", wiki));
             request.setWiki(wiki);
 
             Thread distributionJobThread = new Thread(new Runnable()
@@ -273,10 +245,23 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         return null;
     }
 
-    @Override
-    public DistributionState getDistributionState()
+    private DistributionState getDistributionState(DistributionJobStatus< ? > previousStatus)
     {
-        return this.distributionState;
+        return DistributionJobStatus.getDistributionState(
+            previousStatus != null ? previousStatus.getDistributionExtension() : null,
+            this.distributionExtension != null ? this.distributionExtension.getId() : null);
+    }
+
+    @Override
+    public DistributionState getFarmDistributionState()
+    {
+        return getDistributionState(getPreviousFarmJobStatus());
+    }
+
+    @Override
+    public DistributionState getWikiDistributionState(String wiki)
+    {
+        return getDistributionState(getPreviousWikiJobStatus(wiki));
     }
 
     @Override
@@ -353,7 +338,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     }
 
     @Override
-    public DistributionJob getCurrentDitributionJob()
+    public DistributionJob getCurrentDistributionJob()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 

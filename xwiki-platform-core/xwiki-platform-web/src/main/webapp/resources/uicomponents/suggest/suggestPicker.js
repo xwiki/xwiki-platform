@@ -102,7 +102,7 @@ var XWiki = (function (XWiki) {
       this.input.value = '';
       this.input.removeClassName('loading');
       return;
-    } else if (values[index].trim() == '') {
+    } else if (values[index].strip() == '') {
       this.loadSelectedValue(values, index + 1);
       return;
     }

@@ -49,6 +49,51 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore implements XWikiRecycleBinStoreInterface
 {
     /**
+     * {@link HibernateCallback} used to retrieve from the recycle bin store the deleted versions of a document.
+     */
+    private static class DeletedDocumentsHibernateCallback implements HibernateCallback<XWikiDeletedDocument[]>
+    {
+        /**
+         * The document whose versions are retrieved from the recycle bin store.
+         */
+        private XWikiDocument document;
+
+        /**
+         * Creates a new call-back for the given document.
+         * 
+         * @param document the document whose deleted versions you want to retrieve from the recycle bin store
+         */
+        public DeletedDocumentsHibernateCallback(XWikiDocument document)
+        {
+            this.document = document;
+        }
+
+        @Override
+        public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
+        {
+            Criteria c = session.createCriteria(XWikiDeletedDocument.class);
+            c.add(Restrictions.eq("fullName", document.getFullName()));
+
+            // Note: We need to support databases who treats empty stringd as NULL like Oracle. For those checking
+            // for equality when the string is empty is not going to work and thus we need to handle the special
+            // empty case separately.
+            String language = document.getLanguage();
+            if (StringUtils.isEmpty(language)) {
+                c.add(Restrictions.or(Restrictions.eq(LANGUAGE_PROPERTY_NAME, ""),
+                    Restrictions.isNull(LANGUAGE_PROPERTY_NAME)));
+            } else {
+                c.add(Restrictions.eq(LANGUAGE_PROPERTY_NAME, language));
+            }
+
+            c.addOrder(Order.desc("date"));
+            @SuppressWarnings("unchecked")
+            List<XWikiDeletedDocument> deletedVersions = c.list();
+            XWikiDeletedDocument[] result = new XWikiDeletedDocument[deletedVersions.size()];
+            return deletedVersions.toArray(result);
+        }
+    }
+
+    /**
      * Name of the language property in the Hibernate mapping.
      */
     private static final String LANGUAGE_PROPERTY_NAME = "language";
@@ -117,35 +162,10 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public XWikiDeletedDocument[] getAllDeletedDocuments(final XWikiDocument doc, XWikiContext context,
-        boolean bTransaction) throws XWikiException
+    public XWikiDeletedDocument[] getAllDeletedDocuments(XWikiDocument doc, XWikiContext context, boolean bTransaction)
+        throws XWikiException
     {
-        return executeRead(context, bTransaction, new HibernateCallback<XWikiDeletedDocument[]>()
-        {
-            @Override
-            public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
-            {
-                Criteria c = session.createCriteria(XWikiDeletedDocument.class);
-                c.add(Restrictions.eq("fullName", doc.getFullName()));
-
-                // Note: We need to support databases who treats empty stringd as NULL like Oracle. For those checking
-                // for equality when the string is empty is not going to work and thus we need to handle the special
-                // empty case separately.
-                String language = doc.getLanguage();
-                if (StringUtils.isEmpty(language)) {
-                    c.add(Restrictions.or(
-                        Restrictions.eq(LANGUAGE_PROPERTY_NAME, ""), Restrictions.isNull(LANGUAGE_PROPERTY_NAME)));
-                } else {
-                    c.add(Restrictions.eq(LANGUAGE_PROPERTY_NAME, language));
-                }
-
-                c.addOrder(Order.desc("date"));
-                @SuppressWarnings("unchecked")
-                List<XWikiDeletedDocument> deletedVersions = c.list();
-                XWikiDeletedDocument[] result = new XWikiDeletedDocument[deletedVersions.size()];
-                return deletedVersions.toArray(result);
-            }
-        });
+        return executeRead(context, bTransaction, new DeletedDocumentsHibernateCallback(doc));
     }
 
     @Override

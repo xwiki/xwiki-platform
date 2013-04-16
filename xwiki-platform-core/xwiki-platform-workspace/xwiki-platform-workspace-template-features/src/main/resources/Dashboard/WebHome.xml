@@ -339,11 +339,11 @@
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
       #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${displayName}"))
-      {{translation key="platform.workspace.currentUserNotMember"/}} {{translation key="platform.workspace.currentUserCanJoin" parameters="$joinUrl"/}}
+      {{translation key="platform.workspace.currentUserNotMember"/}} $services.localization.render('platform.workspace.currentUserCanJoin', $joinUrl)
     #elseif (!$hasOwner)
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${displayName}"))
-      {{translation key="platform.workspace.currentUserIsMember"/}} {{translation key="platform.workspace.currentUserCanLeave" parameters="$leaveUrl"/}}
+      {{translation key="platform.workspace.currentUserIsMember"/}} $services.localization.render('platform.workspace.currentUserCanLeave', $leaveUrl)
     #end
   #end
 #end
@@ -439,7 +439,7 @@
   #end
 #end
 
-{{translation key="platform.workspace.gadgetTopActiveUsersAllMembers"/}}
+$services.localization.render('platform.workspace.gadgetTopActiveUsersAllMembers')
 {{/velocity}}</content>
     </property>
     <property>

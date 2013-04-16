@@ -391,3 +391,21 @@ dl.extension-metadata > dd > ul {
   margin: 0;
   min-width: 100px;
 }
+
+#extensionUpdater > .ui-progress {
+  margin-bottom: .5em;
+}
+#extensionUpdater > .extension-body-progress {
+  display: block;
+}
+
+.xLabel {
+  font-weight: 700;
+  margin: 1.2em 0 0.3em 0;
+  text-transform: uppercase;
+}
+.xHint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  margin: 0.3em 0;
+}

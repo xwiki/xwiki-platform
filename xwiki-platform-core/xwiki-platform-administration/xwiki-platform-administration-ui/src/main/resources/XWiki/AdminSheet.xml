@@ -3523,7 +3523,8 @@ document.observe('xwiki:dom:loaded', function() {
     'children': [
        {'id' : 'XWiki.AddExtensions'},
        {'id' : 'XWiki.InstalledExtensions'},
-       {'id' : 'XWiki.CoreExtensions'}
+       {'id' : 'XWiki.CoreExtensions'},
+       {'id' : 'XWiki.ExtensionUpdater'}
     ]
   },
   {

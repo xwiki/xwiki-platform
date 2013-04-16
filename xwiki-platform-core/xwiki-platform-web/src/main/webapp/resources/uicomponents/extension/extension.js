@@ -613,6 +613,72 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
 });
 
 
+/**
+ * Enhances the behaviour of the extension updater.
+ */
+XWiki.ExtensionUpdaterBehaviour = Class.create({
+  initialize : function(container) {
+    this.container && this.container.remove();
+    this.container = container;
+
+    var checkForUpdatesLink = this.container.down('.checkForUpdates');
+    checkForUpdatesLink && checkForUpdatesLink.observe('click', this._onCheckForUpdates.bindAsEventListener(this));
+
+    this._maybeScheduleRefresh();
+  },
+
+  _maybeScheduleRefresh : function(timeout) {
+    this.container && this.container.childElements().any(function(child) {return child.hasClassName('ui-progress')})
+      && this._refresh.bind(this).delay(timeout || 1);
+  },
+
+  _refresh : function(parameters) {
+    parameters = parameters || {};
+    new Ajax.Request(this._getRefreshURL(), {
+      parameters: parameters,
+      onSuccess: function(response) {
+        this.container.addClassName('hidden').insert({after : response.responseText});
+        this.initialize(this.container.next());
+        document.fire('xwiki:dom:updated', {elements: [this.container]});
+        // Scroll the progress log to the end if it has a loading item.
+        // TODO: Preserve the scroll position if the user scrolls through the log.
+        this.container.childElements().each(function(child) {
+          if (child.hasClassName('extension-body-progress')) {
+            var loadingLogItem = child.down('.extension-log-item-loading');
+            if (loadingLogItem) {
+              var log = loadingLogItem.up();
+              log.scrollTop = log.scrollHeight;
+            }
+          }
+        });
+      }.bind(this),
+      onFailure : this._maybeScheduleRefresh.bind(this, 10)
+    });
+  },
+
+  _getRefreshURL : function() {
+    var section = window.location.href.toQueryParams().section;
+    var document = XWiki.currentDocument;
+    var queryString;
+    if (section) {
+      var docRef = XWiki.getResource(section);
+      document = new XWiki.Document(docRef.name, docRef.space, docRef.wiki);
+      queryString = 'section=' + encodeURIComponent(section);
+    }
+    var action = XWiki.contextaction == 'view' || XWiki.contextaction == 'admin' ? 'get' : XWiki.contextaction;
+    return document.getURL(action, queryString);
+  },
+
+  _onCheckForUpdates : function(event) {
+    event.stop();
+    this._refresh({
+      'action': 'checkForUpdates',
+      'xredirect': this._getRefreshURL()
+    });
+  }
+});
+
+
 var enhanceExtensions = function(event) {
   ((event && event.memo.elements) || [$('body')]).each(function(element) {
     element.select('.extension-item').each(function(extension) {
@@ -621,6 +687,7 @@ var enhanceExtensions = function(event) {
   });
 };
 var init = function(event) {
+  $('extensionUpdater') && new XWiki.ExtensionUpdaterBehaviour($('extensionUpdater'));
   new XWiki.ExtensionSearchFormBehaviour();
   enhanceExtensions(event);
   return true;

@@ -1180,3 +1180,153 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #set ($showDetails = $NULL)
   #setVariable("$showDetails" $return)
 #end
+
+#macro (displayExtensionUpdaterPlan $plan)
+  #set($hasError = false)
+  #foreach($log in $plan.log)
+    #if ($log.level.name() == 'ERROR')
+      #set($hasError = true)
+      #break
+    #end
+  #end
+  ##
+  #if ($hasError)
+    #displayExtensionUpdaterPlanStatus($plan)
+  #else
+    ## Group extensions by status (invalid/outdated) and by namespace.
+    #set ($invalid = {})
+    #set ($outdated = {})
+    ## Iterate the first level nodes from the upgrade plan tree.
+    #foreach ($firstLevelNode in $plan.tree)
+      #set ($planAction = $firstLevelNode.action)
+      #set ($status = $NULL)
+      #set ($installedVersion = $extensionManager.getInstalledExtension($planAction.extension.id.id, $planAction.namespace))
+      #if (!$installedVersion.isValid($planAction.namespace))
+        #set ($status = $invalid)
+      ## Check if the latest version has been installed after the upgrade plan was created.
+      #elseif ($installedVersion.id.version.value != $planAction.extension.id.version.value)
+        #set ($status = $outdated)
+      #end
+      #if ($status)
+        #set ($statusForNamespace = $status.get($planAction.namespace))
+        #if (!$statusForNamespace)
+          #set ($statusForNamespace = [])
+          #set ($discard = $status.put($planAction.namespace, $statusForNamespace))
+        #end
+        #set ($discard = $statusForNamespace.add($planAction))
+      #end
+    #end
+    ##
+    #if ($outdated.isEmpty() && $invalid.isEmpty())
+      <div class="successmessage">
+        $services.localization.render('platform.extension.updater.noUpdatesAvailable')
+      </div>
+    #else
+      #displayExtensionUpdaterPlanActionByNamespace($invalid 'invalid')
+      #displayExtensionUpdaterPlanActionByNamespace($outdated 'outdated')
+    #end
+  #end
+#end
+
+#macro(displayExtensionUpdaterPlanStatus $status)
+  ## The status is null after the job is created, until the job is scheduled.
+  #set ($isLoading = !$status || ($status.log.isEmpty() && $status.state != 'FINISHED'))
+  <div class="extension-body-progress#if ($isLoading) loading#end">
+    #if ($status)
+      #printStatusLog($status)
+    #end
+  </div>
+#end
+
+#macro(displayExtensionUpdaterPlanActionByNamespace $actionByNamespace $key)
+  #if (!$actionByNamespace.isEmpty())
+    <div class="xLabel">
+      $services.localization.render("platform.extension.updater.${key}ExtensionsLabel")
+    </div>
+  #end
+  #foreach ($entry in $actionByNamespace.entrySet())
+    <div class="xHint">
+      $services.localization.render("platform.extension.updater.${key}ExtensionsHint",
+        ["#displayExtensionNamespace($entry.key)"])
+    </div>
+    <div class="${key}Extensions">
+      #foreach ($planAction in $entry.value)
+        #set ($extensionNamespace = $planAction.namespace)
+        #displayExtension($planAction.extension)
+      #end
+    </div>
+  #end
+#end
+
+#macro (getExtensionUpdaterPlan $plan)
+  ## By default we return the upgrade plan for the current wiki.
+  #set ($namespace = $extensionNamespace)
+  #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
+    ## We need the upgrade plan for the entire farm.
+    #set ($namespace = $NULL)
+  #end
+  #set ($return = $extensionManager.getExtensionPlanJobStatus($null, $namespace))
+  #set ($plan = $NULL)
+  #setVariable("$plan" $return)
+#end
+
+#macro(computeExtensionUpdaterPlan $plan)
+  #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
+    ## Create the upgrade plan for the entire farm.
+    #set ($upgradePlanJob = $extensionManager.createUpgradePlan())
+  #else
+    ## Create the upgrade plan only for the current wiki.
+    #set ($upgradePlanJob = $extensionManager.createUpgradePlan($extensionNamespace))
+  #end
+  #set ($lastError = $extensionManager.lastError)
+  #if ($lastError)
+    <div class="errormessage">
+      $services.localization.render('platform.extension.updater.createUpgradePlanFailure')
+      #printThrowable($lastError)
+    </div>
+  #else
+    #set ($plan = $NULL)
+    #setVariable ("$plan" $upgradePlanJob.status)
+  #end
+#end
+
+#macro (isExtensionUpdaterPlanOutdated $plan $outdated)
+  ## Return true (outdated) if the plan is null.
+  #set ($return = "$!plan" == '' && $plan != '')
+  #if (!$return && $plan.state == 'FINISHED')
+    #set ($endDate = $xwiki.jodatime.getDateTime($plan.endDate.getTime()))
+    #set ($currentDate = $xwiki.jodatime.getDateTime())
+    #set ($duration = $xwiki.jodatime.getDuration($endDate, $currentDate))
+    ## The plan becomes outdated after one day.
+    #set ($return = $duration.standardDays > 0)
+  #end
+  #set ($outdated = $NULL)
+  #setVariable("$outdated" $return)
+#end
+
+#macro (extensionUpdater)
+  #if ("$!request.action" == '')
+    #getExtensionUpdaterPlan($plan)
+    #isExtensionUpdaterPlanOutdated($plan $outdated)
+    #if ($outdated)
+      ## There is no upgrade plan computed or the previously computed plan is outdated.
+      #computeExtensionUpdaterPlan($plan)
+    #end
+    <div id="extensionUpdater">
+      #if ($plan.state != 'FINISHED')
+        <div>$services.localization.render('platform.extension.updater.loading')</div>
+        #displayJobProgressBar($plan)
+        #displayExtensionUpdaterPlanStatus($plan)
+      #else
+        #displayExtensionUpdaterPlan($plan)
+        <div class="xHint"> $services.localization.render('platform.extension.updater.reloadHint',
+          ["<a class=""checkForUpdates""
+            href=""?action=checkForUpdates&section=$!escapetool.url($request.section)&xredirect=$escapetool.url($xwiki.relativeRequestURL)"">",
+          '</a>'])</div>
+      #end
+    </div>
+  #elseif ($request.action == 'checkForUpdates')
+    #computeExtensionUpdaterPlan()
+    $response.sendRedirect($request.xredirect);
+  #end
+#end

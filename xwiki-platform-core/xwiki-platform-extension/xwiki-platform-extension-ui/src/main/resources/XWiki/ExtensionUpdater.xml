@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>ExtensionUpdater</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.AdminSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1366022538000</creationDate>
+  <date>1366105134000</date>
+  <contentUpdateDate>1366105134000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('admin.xwiki.extensionupdater')</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
+## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template when
+## this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
+#parse('extension.vm')
+{{/velocity}}
+
+{{velocity}}
+{{html}}
+#if ($isAjaxRequest)
+  #if ($request.extensionId)
+    #handleExtensionRequest()
+  #else
+    #extensionUpdater()
+  #end
+#else
+  &lt;div class="full column"&gt;
+    #extensionUpdater()
+  &lt;/div&gt;
+#end
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

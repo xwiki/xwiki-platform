@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 
 @Component
 @Named(UpgradeModeDistributionStep.ID)
@@ -50,6 +51,10 @@ public class UpgradeModeDistributionStep extends AbstractDistributionStep
     @Override
     public void initialize(DistributionJob distributionJob)
     {
+        // TODO: find some better rule
+        // CANCELED by default, will be enabled only if it's enabled in the status or if another step is
+        setState(State.CANCELED);
+
         super.initialize(distributionJob);
 
         // Initialize upgrade mode with saved one

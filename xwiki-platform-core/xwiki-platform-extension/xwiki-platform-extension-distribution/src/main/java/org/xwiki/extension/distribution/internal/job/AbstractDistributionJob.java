@@ -28,6 +28,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.internal.AbstractJob;
 
@@ -98,6 +99,17 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         return getStatus();
     }
 
+    protected DistributionStep getStep(List<DistributionStep> steps, String stepId)
+    {
+        for (DistributionStep step : steps) {
+            if (step.getId().equals(stepId)) {
+                return step;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     protected void start() throws Exception
     {
@@ -106,15 +118,24 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         notifyPushLevelProgress(steps.size());
 
         // Initialize steps
-        WelcomeDistributionStep welcomeStep =
-            steps.get(0) instanceof WelcomeDistributionStep ? (WelcomeDistributionStep) steps.get(0) : null;
+        WelcomeDistributionStep welcomeStep = (WelcomeDistributionStep) getStep(steps, WelcomeDistributionStep.ID);
+        UpgradeModeDistributionStep upgrademodeStep =
+            (UpgradeModeDistributionStep) getStep(steps, UpgradeModeDistributionStep.ID);
 
         for (DistributionStep step : steps) {
             step.initialize(this);
 
             // Enable Welcome step if one of the steps is enabled
-            if (step.getState() == null && welcomeStep != null) {
-                welcomeStep.setState(null);
+            if (step.getState() == null) {
+                if (welcomeStep != null) {
+                    welcomeStep.setState(null);
+                }
+
+                // TODO: find some better rule
+                // CANCELED by default, will be enabled only if it's enabled in the status or if another step is
+                if (upgrademodeStep != null && upgrademodeStep.getState() == State.CANCELED) {
+                    upgrademodeStep.setState(null);
+                }
             }
         }
 

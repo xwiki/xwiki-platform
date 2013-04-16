@@ -30,6 +30,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
 
@@ -53,16 +54,17 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
             steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
                 DefaultUIDistributionStep.ID));
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get step instance for id [{}]", DefaultUIDistributionStep.ID);
+            this.logger.error("Failed to get default UI step instance", DefaultUIDistributionStep.ID);
         }
 
         // Step 2: Upgrade mode
 
         try {
-            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                UpgradeModeDistributionStep.ID));
+            DistributionStep upgrademodeStep =
+                this.componentManager.getInstance(DistributionStep.class, UpgradeModeDistributionStep.ID);
+            steps.add(upgrademodeStep);
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get step instance for id [{}]", UpgradeModeDistributionStep.ID);
+            this.logger.error("Failed to get upgrade mode step instance", UpgradeModeDistributionStep.ID);
         }
 
         // Step 3: Upgrade outdated extensions
@@ -72,7 +74,7 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
                 OutdatedExtensionsDistributionStep.ID));
 
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get step instance for id [{}]", OutdatedExtensionsDistributionStep.ID);
+            this.logger.error("Failed to get outdated extensions step instance", OutdatedExtensionsDistributionStep.ID);
         }
 
         return steps;

@@ -70,7 +70,7 @@ public class DistributionAction extends XWikiAction
                 return false;
             } else {
                 throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                    String.format("Current user need proper rights to access action [%].", DISTRIBUTION_ACTION));
+                    String.format("Current user need proper rights to access action [%s].", DISTRIBUTION_ACTION));
             }
         }
 

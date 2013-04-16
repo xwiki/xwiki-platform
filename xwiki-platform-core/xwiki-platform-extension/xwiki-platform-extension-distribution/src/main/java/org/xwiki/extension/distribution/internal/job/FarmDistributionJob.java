@@ -50,10 +50,8 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
         // Step 1: Install/upgrade main wiki UI
 
         try {
-            DistributionStep step1 =
-                this.componentManager.getInstance(DistributionStep.class, DefaultUIDistributionStep.ID);
-
-            steps.add(step1);
+            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                DefaultUIDistributionStep.ID));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get step instance for id [{}]", DefaultUIDistributionStep.ID);
         }
@@ -61,10 +59,8 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
         // Step 2: Upgrade mode
 
         try {
-            UpgradeModeDistributionStep step2 =
-                this.componentManager.getInstance(DistributionStep.class, UpgradeModeDistributionStep.ID);
-
-            steps.add(step2);
+            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                UpgradeModeDistributionStep.ID));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get step instance for id [{}]", UpgradeModeDistributionStep.ID);
         }
@@ -72,10 +68,8 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
         // Step 3: Upgrade outdated extensions
 
         try {
-            DistributionStep step3 =
-                this.componentManager.getInstance(DistributionStep.class, OutdatedExtensionsDistributionStep.ID);
-
-            steps.add(step3);
+            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                OutdatedExtensionsDistributionStep.ID));
 
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get step instance for id [{}]", OutdatedExtensionsDistributionStep.ID);

@@ -20,6 +20,7 @@
 package org.xwiki.extension.distribution.internal;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -163,6 +164,11 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         }
     }
 
+    private List<String> getFarmJobId()
+    {
+        return Arrays.asList(JOBID);
+    }
+
     @Override
     public FarmDistributionJob startFarmJob()
     {
@@ -170,7 +176,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             this.farmDistributionJob = this.componentManager.getInstance(Job.class, "distribution");
 
             final DistributionRequest request = new DistributionRequest();
-            request.setId(JOBID);
+            request.setId(getFarmJobId());
             // FIXME: this is sheeting but there is no API to get the main wiki name at this level
             request.setWiki("xwiki");
 
@@ -204,6 +210,11 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         return null;
     }
 
+    private List<String> getWikiJobId(String wiki)
+    {
+        return Arrays.asList(JOBID, "wiki", wiki);
+    }
+
     @Override
     public WikiDistributionJob startWikiJob(String wiki)
     {
@@ -212,7 +223,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             this.wikiDistributionJobs.put(wiki, wikiJob);
 
             final DistributionRequest request = new DistributionRequest();
-            request.setId(Arrays.asList(JOBID, "wiki", wiki));
+            request.setId(getWikiJobId(wiki));
             request.setWiki(wiki);
 
             Thread distributionJobThread = new Thread(new Runnable()
@@ -286,7 +297,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     public FarmDistributionJobStatus getPreviousFarmJobStatus()
     {
         DistributionJobStatus<DistributionRequest> jobStatus =
-            (DistributionJobStatus<DistributionRequest>) this.jobManager.getJobStatus(JOBID);
+            (DistributionJobStatus<DistributionRequest>) this.jobManager.getJobStatus(getFarmJobId());
 
         FarmDistributionJobStatus farmJobStatus;
         if (jobStatus != null) {
@@ -308,7 +319,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki)
     {
-        return (WikiDistributionJobStatus) this.jobManager.getJobStatus(Arrays.asList(JOBID, wiki));
+        return (WikiDistributionJobStatus) this.jobManager.getJobStatus(getWikiJobId(wiki));
     }
 
     @Override

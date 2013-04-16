@@ -47,18 +47,21 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
     @Override
     public void prepare()
     {
-        setState(State.COMPLETED);
+        if (getState() != State.CANCELED) {
+            setState(State.COMPLETED);
 
-        String namespace = getNamespace();
+            String namespace = getNamespace();
 
-        ExtensionId extensionUI =  this.distributionJob.getStatus().getDistributionExtensionUI();
+            ExtensionId extensionUI = this.distributionJob.getStatus().getDistributionExtensionUI();
 
-        // Only if the UI is not already installed
-        if (extensionUI != null) {
-            InstalledExtension installedExtension =
-                this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
-            if (installedExtension == null || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
-                setState(null);
+            // Only if the UI is not already installed
+            if (extensionUI != null) {
+                InstalledExtension installedExtension =
+                    this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
+                if (installedExtension == null
+                    || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
+                    setState(null);
+                }
             }
         }
     }

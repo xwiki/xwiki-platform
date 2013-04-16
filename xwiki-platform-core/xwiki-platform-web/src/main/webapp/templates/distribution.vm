@@ -134,14 +134,14 @@
     #set ($redirectURL = $xwiki.getURL($services.model.resolveDocument('', 'default')))
   #end
   $response.sendRedirect($redirectURL)
-#elseif ("$!request.action" != '')
-  #handleStepAction($request.action)
 #else
   ## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
   ## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template
   ## when this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
   #parse('extension.vm')
-  #if ($isAjaxRequest)
+  #if ("$!request.action" != '')
+    #handleStepAction($request.action)
+  #elseif ($isAjaxRequest)
     #if ($request.extensionId)
       #handleExtensionRequest()
     #else

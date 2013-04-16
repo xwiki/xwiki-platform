@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -47,6 +48,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore implements XWikiRecycleBinStoreInterface
 {
+    /**
+     * Name of the language property in the Hibernate mapping.
+     */
+    private static final String LANGUAGE_PROPERTY_NAME = "language";
+
     /**
      * @param context used for environment
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiRecycleBinStoreInterface.class) instead.
@@ -121,7 +127,18 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             {
                 Criteria c = session.createCriteria(XWikiDeletedDocument.class);
                 c.add(Restrictions.eq("fullName", doc.getFullName()));
-                c.add(Restrictions.eq("language", doc.getLanguage()));
+
+                // Note: We need to support databases who treats empty stringd as NULL like Oracle. For those checking
+                // for equality when the string is empty is not going to work and thus we need to handle the special
+                // empty case separately.
+                String language = doc.getLanguage();
+                if (StringUtils.isEmpty(language)) {
+                    c.add(Restrictions.or(
+                        Restrictions.eq(LANGUAGE_PROPERTY_NAME, ""), Restrictions.isNull(LANGUAGE_PROPERTY_NAME)));
+                } else {
+                    c.add(Restrictions.eq(LANGUAGE_PROPERTY_NAME, language));
+                }
+
                 c.addOrder(Order.desc("date"));
                 @SuppressWarnings("unchecked")
                 List<XWikiDeletedDocument> deletedVersions = c.list();

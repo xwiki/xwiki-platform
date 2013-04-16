@@ -440,7 +440,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @return the database/schema name.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    protected String getSchemaFromWikiName(XWikiContext context)
+    public String getSchemaFromWikiName(XWikiContext context)
     {
         return getSchemaFromWikiName(context.getDatabase(), context);
     }

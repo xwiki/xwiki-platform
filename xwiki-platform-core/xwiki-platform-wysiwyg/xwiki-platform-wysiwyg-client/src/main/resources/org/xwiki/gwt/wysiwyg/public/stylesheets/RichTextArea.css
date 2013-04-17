@@ -11,16 +11,6 @@ html, body {
   width: auto !important;
 }
 
-* html {
-  /* Force IE6 to always display the vertical scroll bar, otherwise it remains hidden. */
-  overflow-y: scroll !important;
-}
-
-*+html {
-  /* Force IE7 to always display the vertical scroll bar, otherwise it remains hidden. */
-  overflow-y: scroll !important;
-}
-
 body {
   /* The BODY line height must match the paragraph line height. See XWIKI-3763. */
   line-height: 1.4em !important;
@@ -37,37 +27,11 @@ ul, ol {
 }
 
 /*
-  XWiki 2.0 renderer places the contents of a header inside a span, which is styled in the skin. Since this is not
-  common to all the syntaxes and the CSS rules can be applied directly to the header, the editor doesn't generate this
-  span when applying header style to the selection. In order to view headers as in view mode we have to block some of
-  the CSS rules applied to the span and add then to the header.
+  Headings with overflow:hidden are painful to edit in IE because they are treated as fixed size boxes (resize
+  handlers are present).
 */
-h1 span, h2 span, h3 span, h4 span {
-  border-bottom: 0 none !important;
-  margin: 0 !important;
-  /* IE behaves strangely when the span is displayed as block. */
-  display: inline !important;
-  /*
-    IE behaves strangely when the span doesn't have static position.
-    See XWIKI-3339: New TOC overlaps with titles in WYSIWYG edition in IE6
-  */
-  position: static !important;
-}
-
-h1, h2, h3, h4 {
-  border-bottom: 1px solid #CCCCCC !important;
-  margin: 20px 0 !important;
-  /*
-    Headings with overflow:hidden are painful to edit in IE because they are treated as fixed size boxes (resize
-    handlers are present).
-  */
+h1, h2, h3, h4, h5, h6 {
   overflow: visible !important;
-}
-
-h1 {
-  margin: 25px 0 20px 0 !important;
-  /* Letter spacing affects the behavior of the Delete and Backspace keys in IE */
-  letter-spacing: normal !important;
 }
 
 /* Fix for XWIKI-3752 by overriding path/to/firefox/res/contenteditable.css rules */
@@ -130,7 +94,7 @@ a:hover:-moz-read-write {
 .main .macro .macro-placeholder {
   color: gray;
   /* Hide the macro content place-holder by default. Display it only when the macro is collapsed. */
-  display: none !important;
+  display: none;
   font-family: monospace;
   /* Keep the macro icon and the macro name on the same line. */
   white-space: nowrap;

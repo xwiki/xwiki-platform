@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import javax.xml.transform.Source;
@@ -73,7 +75,16 @@ public class PDFURIResolver implements URIResolver
     public Source resolve(String href, String base) throws TransformerException
     {
         if (this.attachmentMap != null) {
-            AttachmentReference reference = this.attachmentMap.get(href);
+
+            // Decode the URL before comparing it since FOP will pass an encoded URL.
+            String decodedHref;
+            try {
+                decodedHref = URLDecoder.decode(href, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("Failed to locate UTF-8 encoding");
+            }
+
+            AttachmentReference reference = this.attachmentMap.get(decodedHref);
             if (reference != null) {
                 try {
                     XWikiDocument xdoc = this.context.getWiki().getDocument(

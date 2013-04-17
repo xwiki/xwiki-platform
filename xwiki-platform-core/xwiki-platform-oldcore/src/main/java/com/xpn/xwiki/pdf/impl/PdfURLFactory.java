@@ -27,6 +27,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Computes Image and Link URLs for attachments by using an absolute URLs but stores a Map in the XWiki Context to
@@ -38,6 +39,19 @@ import com.xpn.xwiki.XWikiContext;
 public class PdfURLFactory extends FileSystemURLFactory
 {
     /**
+     * We delegate to the XWiki Servlet URL Factory for the creation of attachment URLs since we want links to
+     * attachments to be absolute. Image URLs are converted by the {@link PDFURIResolver}.
+     */
+    private XWikiServletURLFactory servletURLFactory = new XWikiServletURLFactory();
+
+    @Override
+    public void init(XWikiContext context)
+    {
+        super.init(context);
+        this.servletURLFactory.init(context);
+    }
+
+    /**
      * Key used to save image attachment data.
      * @see #saveAttachmentReference(java.net.URL, String, String, String, String, com.xpn.xwiki.XWikiContext)
      */
@@ -47,7 +61,7 @@ public class PdfURLFactory extends FileSystemURLFactory
     public URL createAttachmentURL(String filename, String space, String name, String action, String querystring,
         String wiki, XWikiContext context)
     {
-        URL url = super.createAttachmentURL(filename, space, name, action, querystring, wiki, context);
+        URL url = this.servletURLFactory.createAttachmentURL(filename, space, name, action, querystring, wiki, context);
         saveAttachmentReference(url, wiki, space, name, filename, context);
         return url;
     }
@@ -56,7 +70,7 @@ public class PdfURLFactory extends FileSystemURLFactory
     public URL createAttachmentRevisionURL(String filename, String space, String name, String revision, String wiki,
         XWikiContext context)
     {
-        URL url = super.createAttachmentURL(filename, space, name, revision, wiki, context);
+        URL url = this.servletURLFactory.createAttachmentURL(filename, space, name, revision, wiki, context);
         saveAttachmentReference(url, wiki, space, name, filename, context);
         return url;
     }
@@ -65,8 +79,8 @@ public class PdfURLFactory extends FileSystemURLFactory
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
         String querystring, String xwikidb, XWikiContext context)
     {
-        URL url = super.createAttachmentRevisionURL(filename, web, name, revision, querystring, xwikidb,
-            context);
+        URL url = this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, querystring,
+            xwikidb, context);
         saveAttachmentReference(url, xwikidb, web, name, filename, context);
         return url;
     }
@@ -75,8 +89,8 @@ public class PdfURLFactory extends FileSystemURLFactory
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, long recycleId,
         String querystring, String xwikidb, XWikiContext context)
     {
-        URL url = super.createAttachmentRevisionURL(filename, web, name, revision, recycleId, querystring, xwikidb,
-            context);
+        URL url = this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, recycleId,
+            querystring, xwikidb, context);
         saveAttachmentReference(url, xwikidb, web, name, filename, context);
         return url;
     }
@@ -101,6 +115,7 @@ public class PdfURLFactory extends FileSystemURLFactory
             attachmentMap = new HashMap<String, AttachmentReference>();
             context.put(PDF_EXPORT_CONTEXT_KEY, attachmentMap);
         }
+
         attachmentMap.put(url.toString(), new AttachmentReference(fileName, new DocumentReference(wiki, space, page)));
     }
 }

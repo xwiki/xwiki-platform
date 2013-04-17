@@ -103,18 +103,16 @@
       <cache>forbid</cache>
     </property>
     <property>
-      <code>if (console == undefined) {
-  var console = {};
-  console.log = function() {};
-}
-XWiki.UserWorkspaceTab = Class.create({
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
 
+XWiki.UserWorkspaceTab = Class.create({
   initialize : function () {
     this.addListeners();
   },
 
   addListeners : function() {
-    var elements = $('workspaces').childElements();
+    var elements = $('workspaces') ? $('workspaces').childElements() : [];
     for (var i = 0; i &lt; elements.length; ++i) {
       var element = elements[i];
       var workspaceName = element.id;
@@ -158,14 +156,14 @@ XWiki.UserWorkspaceTab = Class.create({
   }
 });
 
-// FIXME: Replace with XWiki.isDomLoaded when upgrading to 3.1.1. http://jira.xwiki.org/jira/browse/XWIKI-6754
-if (XWiki.isInitialized) {
+var init = function() {
   new XWiki.UserWorkspaceTab();
-} else {
-  document.observe('xwiki:dom:loaded', function() {
-    new XWiki.UserWorkspaceTab();
-  });
-}</code>
+};
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
     </property>
     <property>
       <name/>
@@ -174,7 +172,7 @@ if (XWiki.isInitialized) {
       <parse>1</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -295,7 +293,7 @@ if (XWiki.isInitialized) {
       <parse>1</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
   <content>{{velocity}}
@@ -306,7 +304,7 @@ if (XWiki.isInitialized) {
 {{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
 #else
   #set($temp = $xwiki.ssx.use('WorkspaceManager.UserWorkspaceSheet'))
-  #set($temp = $xwiki.jsx.use('WorkspaceManager.UserWorkspaceSheet', {'minify' : false}))
+  #set($temp = $xwiki.jsx.use('WorkspaceManager.UserWorkspaceSheet'))
   #set($temp = $doc.use($obj))
   #set ($currentUser = $xcontext.user)
   #if (!$currentUser.startsWith("${xcontext.mainWikiName}:"))

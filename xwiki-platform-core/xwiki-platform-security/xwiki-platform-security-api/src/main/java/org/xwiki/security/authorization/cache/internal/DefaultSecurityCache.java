@@ -571,9 +571,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 return;
             }
             cache.set(key, newSecurityCacheEntry(entry, groups));
-            if (logger.isDebugEnabled()) {
-                logger.debug("Added rule/shadow entry [{}] into the cache.", key);
-            }
+
+            logger.debug("Added rule/shadow entry [{}] into the cache.", key);
         } finally {
             writeLock.unlock();
         }
@@ -641,9 +640,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 return;
             }
             cache.set(key, new SecurityCacheEntry(entry, wiki));
-            if (logger.isDebugEnabled()) {
-                logger.debug("Added access entry [{}] into the cache.", key);
-            }
+
+            logger.debug("Added access entry [{}] into the cache.", key);
         } finally {
             writeLock.unlock();
         }

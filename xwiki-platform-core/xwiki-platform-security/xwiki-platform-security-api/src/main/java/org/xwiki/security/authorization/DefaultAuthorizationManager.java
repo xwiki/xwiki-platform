@@ -196,45 +196,33 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             SecurityRuleEntry entry = securityCache.get(ref);
             if (entry == null) {
                 SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
-                if (logger.isDebugEnabled()) {
-                    this.logger.debug("1. Loaded a new entry for user {} on {} into cache: [{}]",
-                        entityReferenceSerializer.serialize(user),
-                        entityReferenceSerializer.serialize(entity),
-                        access);
-                }
+
+                this.logger.debug("1. Loaded a new entry for user {} on {} into cache: [{}]", user, entity, access);
+
                 return access;
             }
             if (!entry.isEmpty()) {
                 SecurityAccessEntry accessEntry = securityCache.get(user, ref);
                 if (accessEntry == null) {
                     SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("2. Loaded a new entry for user {} on {} into cache: [{}]",
-                            entityReferenceSerializer.serialize(user),
-                            entityReferenceSerializer.serialize(entity),
-                            access);
-                    }
+
+                    logger.debug("2. Loaded a new entry for user {} on {} into cache: [{}]", user, entity, access);
+
                     return access;
                 } else {
                     SecurityAccess access = accessEntry.getAccess();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("3. Got entry for user {} on {} from cache: [{}]",
-                            entityReferenceSerializer.serialize(user),
-                            entityReferenceSerializer.serialize(entity),
-                            access);
-                    }
+
+                    logger.debug("3. Got entry for user {} on {} from cache: [{}]", user, entity, access);
+
                     return access;
                 }
             } 
         }
 
         SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
-        if (logger.isDebugEnabled()) {
-            logger.debug("4. Loaded a new default entry for user {} on {} into cache: [{}]",
-                entityReferenceSerializer.serialize(user),
-                entityReferenceSerializer.serialize(entity),
-                access);
-        }
+
+        logger.debug("4. Loaded a new default entry for user {} on {} into cache: [{}]", user, entity, access);
+
         return access;
     }
 

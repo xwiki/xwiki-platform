@@ -29,7 +29,6 @@
   </parent>
   <artifactId>xwiki-platform-security-bridge</artifactId>
   <name>XWiki Platform - Security - Bridge</name>
-  <version>5.0-SNAPSHOT</version>
   <description>XWiki Platform - Security - Bridge contains stuffs that depends/bridge oldcore and that are expected to be improved later</description>
   <packaging>jar</packaging>
   <properties>

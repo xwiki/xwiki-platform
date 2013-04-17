@@ -25,15 +25,18 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
-import org.xwiki.bridge.event.WikiReadyEvent;
+import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
+ * Initialize farm distribution job.
+ * 
  * @version $Id$
  * @since 4.2M3
  */
@@ -44,20 +47,14 @@ public class DistributionInitializerListener implements EventListener
     /**
      * The list of events to listen to.
      */
-    private static final List<Event> EVENTS = Arrays
-        .<Event> asList(new ApplicationStartedEvent(), new WikiReadyEvent());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent(),
+        new ActionExecutingEvent("view"));
 
     /**
      * The component used to get information about the current distribution.
      */
     @Inject
     private DistributionManager distributionManager;
-
-    /**
-     * The object used to log messages.
-     */
-    @Inject
-    private Logger logger;
 
     @Override
     public List<Event> getEvents()
@@ -80,8 +77,10 @@ public class DistributionInitializerListener implements EventListener
             if (event instanceof ApplicationStartedEvent) {
                 this.distributionManager.startFarmJob();
             } else {
-                String wiki = ((WikiReadyEvent) event).getWikiId();
-                this.distributionManager.startWikiJob(wiki);
+                String wiki = ((XWikiContext) arg2).getDatabase();
+                if (this.distributionManager.getWikiJob(wiki) == null) {
+                    this.distributionManager.startWikiJob(wiki);
+                }
             }
         }
     }

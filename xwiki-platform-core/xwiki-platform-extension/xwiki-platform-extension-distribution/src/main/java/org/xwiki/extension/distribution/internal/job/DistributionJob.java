@@ -19,12 +19,15 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.job.Job;
 
 public interface DistributionJob extends Job
 {
     DistributionJobStatus< ? > getPreviousStatus();
+
+    ExtensionId getUIExtensionId();
 
     DistributionStep getCurrentStep();
 

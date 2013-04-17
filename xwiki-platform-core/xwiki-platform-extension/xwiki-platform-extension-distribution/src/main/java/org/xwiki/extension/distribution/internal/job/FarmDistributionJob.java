@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
@@ -83,6 +84,12 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
     public DistributionJobStatus< ? > getPreviousStatus()
     {
         return this.distributionManager.getPreviousFarmJobStatus();
+    }
+
+    @Override
+    public ExtensionId getUIExtensionId()
+    {
+        return this.distributionManager.getMainUIExtensionId();
     }
 
     @Override

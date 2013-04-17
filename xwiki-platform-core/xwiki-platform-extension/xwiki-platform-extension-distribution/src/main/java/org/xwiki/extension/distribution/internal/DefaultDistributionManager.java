@@ -191,7 +191,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                     try {
                         executionContextManager.initialize(context);
                     } catch (ExecutionContextException e) {
-                        throw new RuntimeException("Failed to initialize IRC Bot's execution context", e);
+                        throw new RuntimeException("Failed to initialize farm distribution job execution context", e);
                     }
 
                     farmDistributionJob.start(request);
@@ -237,7 +237,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                     try {
                         executionContextManager.initialize(context);
                     } catch (ExecutionContextException e) {
-                        throw new RuntimeException("Failed to initialize IRC Bot's execution context", e);
+                        throw new RuntimeException("Failed to initialize wiki distribution job execution context", e);
                     }
 
                     wikiDistributionJobs.get(request.getWiki()).start(request);

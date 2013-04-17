@@ -55,7 +55,7 @@ public class RegisterAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
-        
+
         String register = request.getParameter(REGISTER);
         if (register != null && register.equals("1")) {
             // CSRF prevention
@@ -106,6 +106,10 @@ public class RegisterAction extends XWikiAction
      */
     private boolean verifyCaptcha(XWikiContext context, XWiki xwiki) throws XWikiException
     {
+        //No verification if the current user has programming rights.
+        if (xwiki.getRightService().hasProgrammingRights(context)) {
+            return true;
+        }
         XWikiRequest request = context.getRequest();
         // The document where the "requirecaptcha" parameter is stored.
         DocumentReference configRef = new DocumentReference(context.getDatabase(), WIKI_SPACE, "RegistrationConfig");

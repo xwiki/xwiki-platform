@@ -671,32 +671,35 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                     // migrate values of list properties
                     else if (prop instanceof NumberClass) {
-                        NumberClass nc = (NumberClass) prop;
+                        NumberClass numberClass = (NumberClass) prop;
                         // @see NumberClass#newProperty()
-                        String[] classes =
+                        String[] numberPropertyTypes =
                             {IntegerProperty.class.getName(), LongProperty.class.getName(),
                             FloatProperty.class.getName(), DoubleProperty.class.getName()};
-                        for (int i = 0; i < classes.length; i++) {
-                            String oldclass = classes[i];
-                            if (!oldclass.equals(nc.newProperty().getClass().getName())) {
-                                Query q = session.createQuery("select p from " + oldclass + " as p, BaseObject as o"
-                                    + " where o.className=?" + "  and p.id=o.id and p.name=?");
-                                q.setString(0, bclass.getName()).setString(1, nc.getName());
-                                for (BaseProperty np : (List<BaseProperty>) q.list()) {
-                                    BaseProperty np1 = nc.newProperty();
-                                    np1.setId(np.getId());
-                                    np1.setName(np.getName());
-                                    if (nc.getNumberType().equals("integer")) {
-                                        np1.setValue(Integer.valueOf(((Number) np.getValue()).intValue()));
-                                    } else if (nc.getNumberType().equals("float")) {
-                                        np1.setValue(Float.valueOf(((Number) np.getValue()).floatValue()));
-                                    } else if (nc.getNumberType().equals("double")) {
-                                        np1.setValue(Double.valueOf(((Number) np.getValue()).doubleValue()));
-                                    } else if (nc.getNumberType().equals("long")) {
-                                        np1.setValue(Long.valueOf(((Number) np.getValue()).longValue()));
+                        for (String numberPropertyType : numberPropertyTypes) {
+                            if (!numberPropertyType.equals(numberClass.newProperty().getClass().getName())) {
+                                Query q = session.createQuery("select p from " + numberPropertyType
+                                    + " as p, BaseObject as o where o.className=?  and p.id=o.id and p.name=?");
+                                q.setString(0, bclass.getName()).setString(1, numberClass.getName());
+                                for (BaseProperty oldProperty : (List<BaseProperty>) q.list()) {
+                                    BaseProperty newProperty = numberClass.newProperty();
+                                    newProperty.setId(oldProperty.getId());
+                                    newProperty.setName(oldProperty.getName());
+                                    Number oldValue = (Number) oldProperty.getValue();
+                                    if (oldValue != null) {
+                                        // Convert the old value to the new number type.
+                                        if (numberClass.getNumberType().equals("integer")) {
+                                            newProperty.setValue(Integer.valueOf(oldValue.intValue()));
+                                        } else if (numberClass.getNumberType().equals("float")) {
+                                            newProperty.setValue(Float.valueOf(oldValue.floatValue()));
+                                        } else if (numberClass.getNumberType().equals("double")) {
+                                            newProperty.setValue(Double.valueOf(oldValue.doubleValue()));
+                                        } else if (numberClass.getNumberType().equals("long")) {
+                                            newProperty.setValue(Long.valueOf(oldValue.longValue()));
+                                        }
                                     }
-                                    session.delete(np);
-                                    session.save(np1);
+                                    session.delete(oldProperty);
+                                    session.save(newProperty);
                                 }
                             }
                         }

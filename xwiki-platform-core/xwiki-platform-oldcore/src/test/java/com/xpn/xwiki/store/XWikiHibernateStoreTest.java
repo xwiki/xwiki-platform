@@ -25,6 +25,9 @@ import static org.mockito.Mockito.*;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -39,6 +42,11 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.DoubleProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
 
@@ -179,5 +187,47 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         // setDatabase() is called for each transaction and that calls checkDatabase().
         DataMigrationManager dataMigrationManager = mocker.getInstance(DataMigrationManager.class, "hibernate");
         verify(dataMigrationManager).checkDatabase();
+    }
+
+    /**
+     * Save an XClass that has a Number property whose type has changed and there is an instance of this class that has
+     * no value set for that Number property.
+     * 
+     * @see <a href="http://jira.xwiki.org/browse/XWIKI-8649">XWIKI-8649: Error when changing the number type of a field
+     *      from an application</a>
+     */
+    @Test
+    public void saveXWikiDocWithXClassAndNumberPropertyTypeChange() throws Exception
+    {
+        // The number property whose type has changed from Double to Integer.
+        IntegerProperty integerProperty = mock(IntegerProperty.class);
+        NumberClass numberField = mock(NumberClass.class);
+        when(numberField.newProperty()).thenReturn(integerProperty);
+        when(numberField.getNumberType()).thenReturn("integer");
+
+        // The XClass that has only the number property.
+        List<NumberClass> fieldList = Collections.singletonList(numberField);
+        BaseClass baseClass = mock(BaseClass.class);
+        when(baseClass.getFieldList()).thenReturn(fieldList);
+
+        // The document that is being saved.
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getXClass()).thenReturn(baseClass);
+
+        // Assume there are two objects of the XClass previously defined: one that has no value set for the number
+        // property and one that has a value.
+        Query query = mock(Query.class);
+        DoubleProperty doubleProperty = mock(DoubleProperty.class);
+        when(doubleProperty.getValue()).thenReturn(3.5);
+        DoubleProperty doublePropertyUnset = mock(DoubleProperty.class, "unset");
+        List<DoubleProperty> properties = Arrays.asList(doublePropertyUnset, doubleProperty);
+        when(session.createQuery(anyString())).thenReturn(query);
+        when(query.setString(anyInt(), anyString())).thenReturn(query);
+        when(query.list()).thenReturn(properties);
+
+        store.saveXWikiDoc(document, context);
+
+        // 4 times, for each number type (Integer, Long, Double and Float).
+        verify(integerProperty, times(4)).setValue(3);
     }
 }

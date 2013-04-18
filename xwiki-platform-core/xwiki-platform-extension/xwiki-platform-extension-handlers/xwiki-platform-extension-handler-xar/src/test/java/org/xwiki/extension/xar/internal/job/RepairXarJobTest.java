@@ -55,5 +55,6 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
         repair(extensionId, null, LogLevel.WARN);
 
         this.xarExtensionRepository.resolve(extensionId);
+        this.xarExtensionRepository.resolve(new ExtensionId("dependency", "1.0"));
     }
 }

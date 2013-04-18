@@ -1276,7 +1276,12 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan())
   #else
     ## Create the upgrade plan only for the current wiki.
-    #set ($upgradePlanJob = $extensionManager.createUpgradePlan($extensionNamespace))
+    #set ($upgradePlanRequest = $extensionManager.createUpgradePlanRequest($extensionNamespace))
+    #if ($xcontext.isMainWiki())
+      ## From the main wiki we can also upgrade the extensions that are installed globally (on the root namespace).
+      #set ($discard = $upgradePlanRequest.addNamespace($NULL))
+    #end
+    #set ($upgradePlanJob = $extensionManager.createUpgradePlan($upgradePlanRequest))
   #end
   #set ($lastError = $extensionManager.lastError)
   #if ($lastError)
@@ -1327,6 +1332,6 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     </div>
   #elseif ($request.action == 'checkForUpdates')
     #computeExtensionUpdaterPlan()
-    $response.sendRedirect($request.xredirect);
+    $response.sendRedirect($request.xredirect)
   #end
 #end

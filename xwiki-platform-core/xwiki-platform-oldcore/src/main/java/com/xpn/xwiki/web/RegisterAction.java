@@ -125,7 +125,7 @@ public class RegisterAction extends XWikiAction
                     return false;
                 }
             } catch (Exception e) {
-                LOGGER.warn("Cannot verify captcha answer : " + e.getMessage());
+                LOGGER.warn("Cannot verify captcha answer: {}", e.getMessage()); 
                 return false;
             }
         }

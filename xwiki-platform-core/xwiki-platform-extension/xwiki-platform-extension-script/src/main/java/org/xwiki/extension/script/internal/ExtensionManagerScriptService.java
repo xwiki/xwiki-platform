@@ -699,7 +699,7 @@ public class ExtensionManagerScriptService implements ScriptService
         return job;
     }
 
-    private InstallRequest createUpgradePlanRequest(String namespace)
+    public InstallRequest createUpgradePlanRequest(String namespace)
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));

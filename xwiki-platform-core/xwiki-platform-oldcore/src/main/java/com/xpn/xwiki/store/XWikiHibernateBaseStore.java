@@ -82,7 +82,7 @@ public class XWikiHibernateBaseStore implements Initializable
     @Named("hibernate")
     private DataMigrationManager dataMigrationManager;
 
-    /** Need to get the xcontext to get the path tho the hibernate.cfg.xml. */
+    /** Need to get the xcontext to get the path to the hibernate.cfg.xml. */
     @Inject
     private Execution execution;
 
@@ -1351,5 +1351,17 @@ public class XWikiHibernateBaseStore implements Initializable
     protected boolean isInSchemaMode()
     {
         return StringUtils.equals(getConfiguration().getProperty("xwiki.virtual_mode"), "schema");
+    }
+
+    /**
+     * We had to add this method because the Component Manager doesn't inject a field in the base class if a derived
+     * class defines a field with the same name.
+     * 
+     * @return the execution
+     * @since 5.1M1
+     */
+    protected Execution getExecution()
+    {
+        return execution;
     }
 }

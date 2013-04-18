@@ -19,85 +19,106 @@
  */
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
-import org.hibernate.HibernateException;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.test.LogRule;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.mockito.Mockito.*;
+import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.xwiki.bridge.event.ActionExecutingEvent;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+import com.xpn.xwiki.store.migration.DataMigrationManager;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
  * 
  * @version $Id$
  */
-public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
+public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWikiStoreInterface>
 {
+    /**
+     * A special component manager that mocks automatically all the dependencies of the component under test.
+     */
     @Rule
-    public LogRule logRule = new LogRule() {{
-        record(LogLevel.WARN);
-        recordLoggingForType(XWikiHibernateStore.class);
-     }};
+    public MockitoComponentMockingRule<XWikiStoreInterface> mocker =
+        new MockitoComponentMockingRule<XWikiStoreInterface>(XWikiHibernateStore.class);
+
+    /**
+     * The component being tested.
+     */
+    private XWikiHibernateStore store;
+
+    @Override
+    protected MockitoComponentMockingRule<XWikiStoreInterface> getMocker()
+    {
+        return mocker;
+    }
+
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        store = (XWikiHibernateStore) mocker.getComponentUnderTest();
+    }
 
     @Test
-    public void testGetColumnsForSelectStatement()
+    public void testGetColumnsForSelectStatement() throws Exception
     {
-        XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-        Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
-        Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
-        Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
-        Assert.assertEquals(", description", store.getColumnsForSelectStatement("where 1=1 order by description desc"));
-        Assert.assertEquals(", ascendent", store.getColumnsForSelectStatement("where 1=1 order by ascendent asc"));
-        Assert.assertEquals(", doc.date, doc.name",
+        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
+        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
+        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
+        assertEquals(", description", store.getColumnsForSelectStatement("where 1=1 order by description desc"));
+        assertEquals(", ascendent", store.getColumnsForSelectStatement("where 1=1 order by ascendent asc"));
+        assertEquals(", doc.date, doc.name",
             store.getColumnsForSelectStatement("where 1=1 order by doc.date, doc.name"));
-        Assert.assertEquals(", doc.date, doc.name",
+        assertEquals(", doc.date, doc.name",
             store.getColumnsForSelectStatement("where 1=1 order by doc.date ASC, doc.name DESC"));
-        Assert.assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
+        assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
     }
 
     @Test
     public void testCreateSQLQuery()
     {
-        XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-        Assert.assertEquals(
-            "select distinct doc.space, doc.name from XWikiDocument as doc",
+        assertEquals("select distinct doc.space, doc.name from XWikiDocument as doc",
             store.createSQLQuery("select distinct doc.space, doc.name", ""));
-        Assert.assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
-            + "where 1=1 order by doc.date desc", store.createSQLQuery(
-            "select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
+        assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
+            + "where 1=1 order by doc.date desc",
+            store.createSQLQuery("select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
     }
 
     @Test
     public void testEndTransactionWhenSQLBatchUpdateExceptionThrown() throws Exception
     {
-        XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-
         SQLException sqlException2 = new SQLException("sqlexception2");
         sqlException2.setNextException(new SQLException("nextexception2"));
 
-        final SQLException sqlException1 = new SQLException("sqlexception1");
+        SQLException sqlException1 = new SQLException("sqlexception1");
         sqlException1.initCause(sqlException2);
         sqlException1.setNextException(new SQLException("nextexception1"));
 
-        Transaction transaction = mock(Transaction.class);
+        // Assume the transaction is already created.
+        when(context.get("hibtransaction")).thenReturn(transaction);
         doThrow(new HibernateException("exception1", sqlException1)).when(transaction).commit();
 
-        store.setTransaction(transaction, getContext());
-
         try {
-            store.endTransaction(getContext(), true);
-            Assert.fail("Should have thrown an exception here");
+            store.endTransaction(context, true);
+            fail("Should have thrown an exception here");
         } catch (HibernateException e) {
-            Assert.assertEquals("Failed to commit or rollback transaction. Root cause [\n"
+            assertEquals("Failed to commit or rollback transaction. Root cause [\n"
                 + "SQL next exception = [java.sql.SQLException: nextexception1]\n"
                 + "SQL next exception = [java.sql.SQLException: nextexception2]]", e.getMessage());
         }
@@ -106,14 +127,8 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
     @Test
     public void executeDeleteWikiStatementForPostgreSQLWhenInSchemaMode() throws Exception
     {
-        XWikiHibernateStore store = new XWikiHibernateStore();
-
-        // Used to be able to say that we are in schema mode
-        HibernateSessionFactory sessionFactory = mock(HibernateSessionFactory.class);
-        ReflectionUtils.setFieldValue(store, "sessionFactory", sessionFactory);
-        Configuration configuration = mock(Configuration.class);
-        when(sessionFactory.getConfiguration()).thenReturn(configuration);
-        when(configuration.getProperty("xwiki.virtual_mode")).thenReturn("schema");
+        HibernateSessionFactory sessionFactory = mocker.getInstance(HibernateSessionFactory.class);
+        when(sessionFactory.getConfiguration().getProperty("xwiki.virtual_mode")).thenReturn("schema");
 
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
@@ -121,29 +136,48 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
         store.executeDeleteWikiStatement(statement, databaseProduct, "schema");
 
         verify(statement).execute("DROP SCHEMA schema CASCADE");
-
     }
 
     @Test
     public void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
     {
-        XWikiHibernateStore store = new XWikiHibernateStore();
-
-        // Used to be able to say that we are in schema mode
-        HibernateSessionFactory sessionFactory = mock(HibernateSessionFactory.class);
-        ReflectionUtils.setFieldValue(store, "sessionFactory", sessionFactory);
-        Configuration configuration = mock(Configuration.class);
-        when(sessionFactory.getConfiguration()).thenReturn(configuration);
-        when(configuration.getProperty("xwiki.virtual_mode")).thenReturn("database");
+        HibernateSessionFactory sessionFactory = mocker.getInstance(HibernateSessionFactory.class);
+        when(sessionFactory.getConfiguration().getProperty("xwiki.virtual_mode")).thenReturn("database");
 
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
 
         store.executeDeleteWikiStatement(statement, databaseProduct, "schema");
 
-        Assert.assertEquals(1, this.logRule.size());
-        Assert.assertEquals("Subwiki deletion not yet supported in Database mode for PostgreSQL",
-            this.logRule.getMessage(0));
+        verify(mocker.getMockedLogger()).warn("Subwiki deletion not yet supported in Database mode for PostgreSQL");
         verify(statement, never()).execute(any(String.class));
+    }
+
+    @Test
+    public void testLocksAreReleasedOnLogout() throws Exception
+    {
+        // Capture the event listener.
+        ObservationManager observationManager = getMocker().getInstance(ObservationManager.class);
+        ArgumentCaptor<EventListener> eventListenerCaptor = ArgumentCaptor.forClass(EventListener.class);
+        verify(observationManager).addListener(eventListenerCaptor.capture());
+        assertEquals("deleteLocksOnLogoutListener", eventListenerCaptor.getValue().getName());
+
+        Query query = mock(Query.class);
+        when(session.createQuery("delete from XWikiLock as lock where lock.userName=:userName")).thenReturn(query);
+        when(context.getUserReference()).thenReturn(new DocumentReference("xwiki", "XWiki", "LoggerOutter"));
+        when(context.getUser()).thenReturn("XWiki.LoggerOutter");
+
+        // Fire the logout event.
+        eventListenerCaptor.getValue().onEvent(new ActionExecutingEvent("logout"), null, context);
+
+        verify(session, times(2)).setFlushMode(FlushMode.COMMIT);
+        verify(query).setString("userName", "XWiki.LoggerOutter");
+        verify(query).executeUpdate();
+        verify(transaction).commit();
+        verify(session).close();
+
+        // setDatabase() is called for each transaction and that calls checkDatabase().
+        DataMigrationManager dataMigrationManager = mocker.getInstance(DataMigrationManager.class, "hibernate");
+        verify(dataMigrationManager).checkDatabase();
     }
 }

@@ -49,7 +49,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   ; {{translation key='xe.blog.sheet.summary'/}}
   : $doc.display('extract', 'edit', $entryObj)
   ; {{translation key='xe.blog.sheet.category'/}}
-  : #displayCategoryManagementTree('' 'selectable') (% class="clearfloats" %)((()))
+  : (((#displayCategoryManagementTree('' 'selectable') (% class="clearfloats" %)((())))))
   #isPublished($entryObj $isPublished)
   #if($isPublished)
     #if($doc.creator == $xcontext.user)

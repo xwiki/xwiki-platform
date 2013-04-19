@@ -23,7 +23,10 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +44,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.id.SequenceGenerator;
 import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.jdbc.Work;
@@ -492,6 +496,15 @@ public class XWikiHibernateBaseStore implements Initializable
             meta = new DatabaseMetadata(connection, dialect);
             stmt = connection.createStatement();
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
+
+            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createSequence for details), we need
+            // to ensure that Hibernate will create the "hibernate_sequence" sequence.
+            // Note: We only add the sequence if there are some SQL to execute in the passed schema SQL parameter.
+            // This is to protect against several calls to update the schema (for the same schema name).
+            if (schemaSQL.length > 0) {
+                schemaSQL = addHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
+            }
+
         } catch (Exception e) {
             throw new HibernateException("Failed creating schema update script", e);
         } finally {
@@ -510,6 +523,43 @@ public class XWikiHibernateBaseStore implements Initializable
         }
 
         return schemaSQL;
+    }
+
+    /**
+     * In the Hibernate mapping file for XWiki we use a "native" generator for some tables (deleted document and
+     * deleted attachments for example - The reason we use generated ids and not custom computed ones is because
+     * we don't need to address rows from these tables). For a lot of database the Dialect uses an Identity
+     * Generator (when the DB supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to
+     * a Sequence Generate which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
+     * create such a sequence automatically when updating the schema (see #getSchemaUpdateScript).
+     * However the problem is that Hibernate maintains a cache of sequence names per catalog and will only
+     * generate the sequence creation SQL if the sequence is not in this cache. Since the main wiki is updated
+     * first the sequence named "hibernate_sequence" will be put in this cache, thus preventing subwikis to
+     * automatically create sequence with the same name (see also
+     * https://hibernate.atlassian.net/browse/HHH-1672). As a workaround, we create the required sequence here.
+     *
+     * @param schemaSQL the list of SQL commands to execute to update the schema and to which we're adding the sequence
+     *        creation if need be (only for DBs using a SequenceGenerator)
+     * @param schemaName the schema name corresponding to the subwiki being updated
+     * @param session the Hibernate session, used to get the Dialect object
+     * @since 5.0RC1
+     */
+    private String[] addHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
+    {
+        String[] result = schemaSQL;
+
+        Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
+        if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
+            List<String> sql = new ArrayList<String>();
+            Collections.addAll(sql, schemaSQL);
+            String sequenceSQL = String.format("create sequence %s.hibernate_sequence", schemaName);
+            if (!sql.contains(sequenceSQL)) {
+                sql.add(sequenceSQL);
+            }
+            result = sql.toArray(new String[sql.size()]);
+        }
+
+        return result;
     }
 
     /**

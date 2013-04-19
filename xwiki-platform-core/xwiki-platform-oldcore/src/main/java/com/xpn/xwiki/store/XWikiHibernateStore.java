@@ -336,9 +336,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 stmt.execute("create database " + escapedSchema);
             }
 
-            // Create sequence if need be
-            createSequence(session, stmt, escapedSchema);
-
             endTransaction(context, true);
         } catch (Exception e) {
             Object[] args = {wikiName};
@@ -359,33 +356,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
-        }
-    }
-
-    /**
-     * In the Hibernate mapping file for XWiki we use a "native" generator for some tables (deleted document and
-     * deleted attachments for example - The reason we use generated ids and not custom computed ones is because
-     * we don't need to address rows from these tables). For a lot of database the Dialect uses an Identity
-     * Generator (when the DB supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to
-     * a Sequence Generate which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
-     * create such a sequence automatically when updating the schema (see #getSchemaUpdateScript).
-     * However the problem is that Hibernate maintains a cache of sequence names per catalog and will only
-     * generate the sequence creation SQL if the sequence is not in this cache. Since the main wiki is updated
-     * first the sequence named "hibernate_sequence" will be put in this cache, thus preventing subwikis to
-     * automatically create sequence with the same name (see also
-     * https://hibernate.atlassian.net/browse/HHH-1672). As a workaround, we create the required sequence here.
-     *
-     * @param session the Hibernate session, used to get the Dialect object
-     * @param stmt the SQL Statement object in which to execute the sequence SQL
-     * @param escapedSchema the schema name corresponding to the subwiki being created
-     * @throws SQLException if an error happens
-     * @since 4.5.4, 5.0M2
-     */
-    private void createSequence(Session session, Statement stmt, String escapedSchema) throws SQLException
-    {
-        Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
-        if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
-            stmt.execute(String.format("create sequence %s.hibernate_sequence", escapedSchema));
         }
     }
 

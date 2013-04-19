@@ -484,7 +484,6 @@ var XWiki = (function(XWiki) {
      * Display the upload status UI and hide the target input when files are selected.
      */
     showUploadStatus : function() {
-      this.inputContainer.hide();
       this.inputContainer.insert({after: this.statusUI.CONTAINER});
       this.statusUI.HIDE.hide();
       this.statusUI.CANCEL.show();
@@ -495,7 +494,6 @@ var XWiki = (function(XWiki) {
      */
     hideUploadStatus : function(event) {
       event && event.stop();
-      this.inputContainer.show();
       this.input.value = '';
       this.statusUI.CONTAINER.up() && this.statusUI.CONTAINER.remove();
       this.statusUI.LIST.update('');

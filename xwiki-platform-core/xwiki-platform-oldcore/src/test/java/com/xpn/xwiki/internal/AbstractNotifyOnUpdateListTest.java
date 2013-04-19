@@ -92,7 +92,7 @@ public class AbstractNotifyOnUpdateListTest
         assertTrue(list.containsAll(Arrays.asList(2, 1)));
 
         assertEquals(Arrays.asList(1, 2), list);
-        assertNotEquals(Arrays.asList(2, 1), list);
+        assertFalse(Arrays.asList(2, 1).equals(list));
 
         list.remove(Integer.valueOf(3));
         assertEquals(expectedCounter, list.getCounter());

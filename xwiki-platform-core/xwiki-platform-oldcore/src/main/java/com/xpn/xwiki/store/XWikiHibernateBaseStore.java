@@ -528,7 +528,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param session the Hibernate session, used to get the Dialect object
      * @since 5.0RC1
      */
-    private String[] addHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
+    protected String[] addHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
     {
         String[] result = schemaSQL;
 

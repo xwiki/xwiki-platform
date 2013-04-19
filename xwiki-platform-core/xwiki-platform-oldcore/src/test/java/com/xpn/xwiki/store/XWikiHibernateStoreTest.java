@@ -32,6 +32,11 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.id.SequenceGenerator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -229,5 +234,35 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         // 4 times, for each number type (Integer, Long, Double and Float).
         verify(integerProperty, times(4)).setValue(3);
+    }
+
+    @Test
+    public void addHibernateSequenceIfRequired() throws Exception
+    {
+        Session session = mock(Session.class);
+        SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
+        Dialect dialect = mock(Dialect.class);
+        when(session.getSessionFactory()).thenReturn(sessionFactory);
+        when(sessionFactory.getDialect()).thenReturn(dialect);
+        when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
+
+        String[] result = this.store.addHibernateSequenceIfRequired(new String[0], "schema", session);
+        assertEquals(1, result.length);
+        assertEquals("create sequence schema.hibernate_sequence", result[0]);
+    }
+
+    @Test
+    public void addHibernateSequenceIfRequiredWhenSequenceAlreadyPresent() throws Exception
+    {
+        Session session = mock(Session.class);
+        SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
+        Dialect dialect = mock(Dialect.class);
+        when(session.getSessionFactory()).thenReturn(sessionFactory);
+        when(sessionFactory.getDialect()).thenReturn(dialect);
+        when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
+
+        String[] result = this.store.addHibernateSequenceIfRequired(
+            new String[] {"create sequence schema.hibernate_sequence"}, "schema", session);
+        assertEquals(1, result.length);
     }
 }

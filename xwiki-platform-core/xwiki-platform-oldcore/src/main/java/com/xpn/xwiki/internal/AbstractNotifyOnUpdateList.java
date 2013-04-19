@@ -21,8 +21,8 @@ package com.xpn.xwiki.internal;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Generic list implementation with method to call when updating the list.
@@ -234,6 +234,22 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     public <T> T[] toArray(T[] a)
     {
         return list.toArray(a);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * NOTE: We override the default {@link Object#toString()} implementation in order to preserve backwards
+     * compatibility with code that was using {@link List#toString()} before we introduced
+     * {@link AbstractNotifyOnUpdateList}.
+     * 
+     * @see <a href="http://jira.xwiki.org/browse/XWIKI-9013">XWIKI-9013: Multiple Select List values are not correctly
+     *      indexed by Lucene</a>
+     */
+    @Override
+    public String toString()
+    {
+        return list.toString();
     }
 
     /**

@@ -21,6 +21,7 @@ package org.xwiki.extension.xar.internal.handler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -176,25 +177,27 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     for (ExtensionPlanAction action : plan.getActions()) {
                         if (action.getExtension().getType().equals(TYPE)) {
                             // Get previous entries
-                            InstalledExtension previousExtension = action.getPreviousExtension();
-                            if (previousExtension != null) {
-                                XarInstalledExtension previousXARExtension =
-                                    (XarInstalledExtension) this.xarRepository.getInstalledExtension(previousExtension
-                                        .getId());
+                            Collection<InstalledExtension> previousExtensions = action.getPreviousExtensions();
+                            for (InstalledExtension previousExtension : previousExtensions) {
+                                if (previousExtension != null) {
+                                    XarInstalledExtension previousXARExtension =
+                                        (XarInstalledExtension) this.xarRepository
+                                            .getInstalledExtension(previousExtension.getId());
 
-                                for (XarEntry entry : previousXARExtension.getPages()) {
-                                    String wiki;
-                                    try {
-                                        wiki = getWikiFromNamespace(action.getNamespace());
-                                    } catch (UnsupportedNamespaceException e) {
-                                        throw new ExtensionException("Failed to extract wiki id from namespace", e);
+                                    for (XarEntry entry : previousXARExtension.getPages()) {
+                                        String wiki;
+                                        try {
+                                            wiki = getWikiFromNamespace(action.getNamespace());
+                                        } catch (UnsupportedNamespaceException e) {
+                                            throw new ExtensionException("Failed to extract wiki id from namespace", e);
+                                        }
+                                        Map<XarEntry, XarInstalledExtension> pages = previousXAREntries.get(wiki);
+                                        if (pages == null) {
+                                            pages = new HashMap<XarEntry, XarInstalledExtension>();
+                                            previousXAREntries.put(wiki, pages);
+                                        }
+                                        pages.put(entry, previousXARExtension);
                                     }
-                                    Map<XarEntry, XarInstalledExtension> pages = previousXAREntries.get(wiki);
-                                    if (pages == null) {
-                                        pages = new HashMap<XarEntry, XarInstalledExtension>();
-                                        previousXAREntries.put(wiki, pages);
-                                    }
-                                    pages.put(entry, previousXARExtension);
                                 }
                             }
 
@@ -272,13 +275,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 throw new InstallException("Failed to extract wiki id from namespace", e);
             }
 
-            install(null, localExtension, wiki, request);
+            installInternal(localExtension, wiki, request);
         }
     }
 
     @Override
-    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace,
-        Request request) throws InstallException
+    public void upgrade(Collection<InstalledExtension> previousLocalExtensions, LocalExtension newLocalExtension,
+        String namespace, Request request) throws InstallException
     {
         // Only import XAR when it's a local order (otherwise it will be imported several times and the wiki will
         // probably not be in an expected state)
@@ -290,22 +293,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 throw new InstallException("Failed to extract wiki id from namespace", e);
             }
 
-            XarInstalledExtension previousXarExtension =
-                (XarInstalledExtension) this.xarRepository.getInstalledExtension(previousLocalExtension.getId());
-
-            if (previousXarExtension == null) {
-                // Not supposed to be possible
-                throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
-                    + "] from xar repository");
-            }
-
             // Install new pages
-            install(previousXarExtension, newLocalExtension, wiki, request);
+            installInternal(newLocalExtension, wiki, request);
         }
     }
 
-    private void install(XarInstalledExtension previousExtension, LocalExtension newLocalExtension, String wiki,
-        Request request) throws InstallException
+    private void installInternal(LocalExtension newLocalExtension, String wiki, Request request)
+        throws InstallException
     {
         try {
             initializePagesIndex();
@@ -325,7 +319,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     }
 
     @Override
-    public void uninstall(LocalExtension localExtension, String namespace, Request request) throws UninstallException
+    public void uninstall(InstalledExtension installedExtension, String namespace, Request request)
+        throws UninstallException
     {
         try {
             initializePagesIndex();
@@ -361,12 +356,12 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 PackageConfiguration configuration = createPackageConfiguration(null, request, wiki);
                 try {
                     XarInstalledExtension xarLocalExtension =
-                        (XarInstalledExtension) this.xarRepository.resolve(localExtension.getId());
+                        (XarInstalledExtension) this.xarRepository.resolve(installedExtension.getId());
                     List<XarEntry> pages = xarLocalExtension.getPages();
                     this.packager.unimportPages(pages, configuration);
                 } catch (Exception e) {
                     // Not supposed to be possible
-                    throw new UninstallException("Failed to get xar extension [" + localExtension.getId()
+                    throw new UninstallException("Failed to get xar extension [" + installedExtension.getId()
                         + "] from xar repository", e);
                 } finally {
                     cleanPackageConfiguration(configuration);

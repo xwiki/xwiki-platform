@@ -126,7 +126,7 @@ public class JARTranslationBundleFactoryTest
         DefaultInstalledExtension newInstalledExtension = mockInstalledExtension(newExtensionId, namespace);
 
         getObservationManager().notify(new ExtensionUpgradedEvent(newExtensionId, namespace), newInstalledExtension,
-            previousInstalledExtension);
+            Arrays.asList(previousInstalledExtension));
     }
 
     private void mockUninstallExtension(ExtensionId extensionId, String namespace) throws ComponentLookupException

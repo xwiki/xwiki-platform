@@ -395,7 +395,7 @@ XWiki.editors.ColorThemeWizard = Class.create({
     // The theme property edited in this field, e.g. textColor
     var propName = this.retrievePropertyName(input.name);
     if (propName == this.logoProperty) {
-       if (input.value.trim() != '') {
+       if (input.value.strip() != '') {
          $(this.logoSelector).src = this.wrapImagePropertyValue(propName, input.value);
        } else {
          $(this.logoSelector).src = this.defaultLogoURl;

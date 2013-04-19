@@ -480,8 +480,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-captcha</artifactId>
       <version>${project.version}</version>
-      <!-- Core does not depend on this to run so it shouldn't be pulled in unless it is a dependency somewhere else. -->
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

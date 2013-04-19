@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -119,7 +120,7 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
             } else if (event instanceof ExtensionUninstalledEvent) {
                 extensionDeleted(extension, extensionEvent.getNamespace());
             } else {
-                extensionUpgraded(extension, (InstalledExtension) data, extensionEvent.getNamespace());
+                extensionUpgraded(extension, (Collection<InstalledExtension>) data, extensionEvent.getNamespace());
             }
         }
     }
@@ -184,13 +185,15 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
 
     /**
      * @param newExtension the installed extension
-     * @param previousExtension the previous version of the extension
+     * @param previousExtensions the previous version of the extensions
      * @param namespace the namespace where this upgrade took place
      */
-    private void extensionUpgraded(InstalledExtension newExtension, InstalledExtension previousExtension,
+    private void extensionUpgraded(InstalledExtension newExtension, Collection<InstalledExtension> previousExtensions,
         String namespace)
     {
-        extensionDeleted(previousExtension, namespace);
+        for (InstalledExtension previousExtension : previousExtensions) {
+            extensionDeleted(previousExtension, namespace);
+        }
         extensionAdded(newExtension, namespace);
     }
 

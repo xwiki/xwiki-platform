@@ -44,39 +44,39 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <object>
-  <class>
-  <name>XWiki.TranslationDocumentClass</name>
-  <customClass></customClass>
-  <customMapping></customMapping>
-  <defaultViewSheet></defaultViewSheet>
-  <defaultEditSheet></defaultEditSheet>
-  <defaultWeb></defaultWeb>
-  <nameField></nameField>
-  <validationScript></validationScript>
-  <scope>
-  <cache>0</cache>
-  <disabled>0</disabled>
-  <displayType>select</displayType>
-  <multiSelect>0</multiSelect>
-  <name>scope</name>
-  <number>1</number>
-  <prettyName>Scope</prettyName>
-  <relationalStorage>0</relationalStorage>
-  <separator> </separator>
-  <separators> ,|</separators>
-  <size>1</size>
-  <unmodifiable>0</unmodifiable>
-  <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
-  <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-  </scope>
-  </class>
-  <name>AnnotationCode.Translations</name>
-  <number>0</number>
-  <className>XWiki.TranslationDocumentClass</className>
-  <guid>6e5e105f-6c05-4103-80c7-c938025deb4c</guid>
-  <property>
-  <scope>WIKI</scope>
-  </property>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>AnnotationCode.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>6e5e105f-6c05-4103-80c7-c938025deb4c</guid>
+    <property>
+      <scope>WIKI</scope>
+    </property>
   </object>
   <content>annotations.title=Annotations
 annotations.menu.loading=Loading annotations settings

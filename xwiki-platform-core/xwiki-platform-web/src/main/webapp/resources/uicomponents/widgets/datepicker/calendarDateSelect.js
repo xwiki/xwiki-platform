@@ -156,7 +156,7 @@ Externals.CalendarDateSelect.prototype = {
             event.type='onChange';
             target_element.fireEvent('onChange', event);
           }
-        }; 
+        };
       }(this.target_element),
       valid_date_check: nil,
       formatter: defaultFormatter
@@ -176,7 +176,7 @@ Externals.CalendarDateSelect.prototype = {
   },
   positionCalendarDiv: function() {
     var above = false;
-    var c_pos = this.calendar_div.cumulativeOffset(), c_left = c_pos[0], c_top = c_pos[1], c_dim = this.calendar_div.getDimensions(), c_height = c_dim.height, c_width = c_dim.width; 
+    var c_pos = this.calendar_div.cumulativeOffset(), c_left = c_pos[0], c_top = c_pos[1], c_dim = this.calendar_div.getDimensions(), c_height = c_dim.height, c_width = c_dim.width;
     var w_top = window.f_scrollTop(), w_height = window.f_height();
     var e_dim = $(this.options.get("popup_by")).cumulativeOffset(), e_top = e_dim[1], e_left = e_dim[0], e_height = $(this.options.get("popup_by")).getDimensions().height, e_bottom = e_top + e_height;
 
@@ -234,7 +234,7 @@ Externals.CalendarDateSelect.prototype = {
     var days_table = body_div.build("table", { cellPadding: "0px", cellSpacing: "0px", width: "100%" })
     // make the weekdays!
     var weekdays_row = days_table.build("thead").build("tr");
-    Date.weekdays.each( function(weekday) { 
+    Date.weekdays.each( function(weekday) {
       weekdays_row.build("th", {innerHTML: weekday});
     });
 
@@ -276,7 +276,7 @@ Externals.CalendarDateSelect.prototype = {
       var that = this;
       this.minute_select = new SelectBox(buttons_div,
         blank_time.concat($R(0,59).select(function(x){return (x % that.options.get('minute_interval')==0)}).map(function(x){ return $A([ Date.padded2(x), x]); } ) ),
-        { 
+        {
           calendar_date_select: this,
           onchange: function() { this.calendar_date_select.updateSelectedDate( {minute: this.value }) },
           className: "minute"
@@ -383,7 +383,7 @@ Externals.CalendarDateSelect.prototype = {
     if (this.options.get("month_year") == "dropdowns") {
       this.month_select.setValue(m, false);
 
-      var e = this.year_select.element; 
+      var e = this.year_select.element;
       if (this.flexibleYearRange() && (!(this.year_select.setValue(y, false)) || e.selectedIndex <= 1 || e.selectedIndex >= e.options.length - 2 )) this.populateYearRange();
 
       this.year_select.setValue(y);

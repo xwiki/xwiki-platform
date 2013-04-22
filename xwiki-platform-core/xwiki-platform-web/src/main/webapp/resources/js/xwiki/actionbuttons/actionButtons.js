@@ -46,7 +46,7 @@ actionButtons.EditActions = Class.create({
       }
     }
   },
-  validators : new Array(), 
+  validators : new Array(),
   addValidators : function() {
     // Add live presence validation for inputs with classname 'required'.
     var inputs = $('body').select("input.required");

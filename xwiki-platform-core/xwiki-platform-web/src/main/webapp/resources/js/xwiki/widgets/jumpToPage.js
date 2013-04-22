@@ -82,7 +82,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
   },
   /**
    * Open the selected document in the specified mode.
-   * 
+   *
    * @param {Event} event The event that triggered this action. Either a keyboard shortcut or a button click.
    * @param {String} mode The mode that the document should be opened in. One of "view" or "edit". Note that on the
    *     server side, "edit" could be replaced with "inline" if the document is sheet-based.

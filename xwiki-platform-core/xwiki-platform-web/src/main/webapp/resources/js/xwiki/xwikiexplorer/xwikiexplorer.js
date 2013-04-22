@@ -1056,7 +1056,7 @@ isc.XWETreeGrid.addMethods({
         if (this.displaySuggest) {
             input.className = "suggestDocuments";
             if (XWiki.domIsLoaded) {
-                // Activate the suggest input manually if the page has already been loaded 
+                // Activate the suggest input manually if the page has already been loaded
                 document.fire('xwiki:dom:updated', {elements: [this.htmlElement]});
             }
             // Call inputObserver for the first time when the first set of data arrives.

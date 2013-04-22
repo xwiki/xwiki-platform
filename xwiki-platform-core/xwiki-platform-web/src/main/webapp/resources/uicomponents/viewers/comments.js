@@ -210,7 +210,7 @@ viewers.Comments = Class.create({
       });
     }
   },
-  
+
   addReplyListenerToComment : function(item) {
     // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
     // Quick fix until Prototype 1.6.1 is integrated.
@@ -234,7 +234,7 @@ viewers.Comments = Class.create({
       this.form["XWiki.XWikiComments_comment"].focus();
       // Hide the reply button
       item.hide();
-    }.bindAsEventListener(this));    
+    }.bindAsEventListener(this));
   },
   /**
    * Permalink: Display a modal popup providing the permalink.
@@ -385,7 +385,7 @@ viewers.Comments = Class.create({
   },
   /**
    * Display the comment preview instead of the comment textarea.
-   * 
+   *
    * @param content the rendered comment, as HTML text
    * @param form the form for which the preview is done
    */

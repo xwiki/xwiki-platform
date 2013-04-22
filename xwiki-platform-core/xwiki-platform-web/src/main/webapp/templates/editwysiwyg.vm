@@ -33,26 +33,25 @@ $xwiki.getTextArea($tdoc.content)
 ## </form>
 <script type="text/javascript">
 //<![CDATA[
-    if ( browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
-        wikiEditor.init({
-            language: "en",
-            elements : "content",
-            mode: "exact",
-            ## $defaultstyle is set in stylesheets.vm            
-            content_css: "$xwiki.getSkinFile($defaultstyle, true)",            
-            debug : false,
-            remove_linebreaks : false,
-            wiki_editor_toolbar: '$xwiki.getWysiwygToolbars()',
-            plugins: 'table, contextmenu, paste, searchreplace',
-            wiki_images_path : '${doc.getURL('download')}/',
-            wiki_attach_path : '${doc.URL}',
-            wiki_macro_path : '${doc.URL}',
-            wiki_plugins: 'core,attachments,macros'
-});
-     
-   } else {
-            alert("$services.localization.render('browsernoncompatible')");
-	  }
+if ( browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
+  wikiEditor.init({
+    language: "en",
+    elements : "content",
+    mode: "exact",
+    ## $defaultstyle is set in stylesheets.vm
+    content_css: "$xwiki.getSkinFile($defaultstyle, true)",
+    debug : false,
+    remove_linebreaks : false,
+    wiki_editor_toolbar: '$xwiki.getWysiwygToolbars()',
+    plugins: 'table, contextmenu, paste, searchreplace',
+    wiki_images_path : '${doc.getURL('download')}/',
+    wiki_attach_path : '${doc.URL}',
+    wiki_macro_path : '${doc.URL}',
+    wiki_plugins: 'core,attachments,macros'
+  });
+} else {
+  alert("$services.localization.render('browsernoncompatible')");
+}
 //]]>
 </script>
 ## Insert JS and CSS needed for the fullscreen edit feature

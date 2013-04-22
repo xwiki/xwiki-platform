@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.Alert;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
@@ -77,9 +76,11 @@ public class UserProfileTest extends AbstractTest
 
     private static final String ADVANCED_USER = "Advanced";
 
-    private static final String PASSWORD_1 = "p1";
+    private static final String PASSWORD_1 = "password1";
 
-    private static final String PASSWORD_2 = "p2";
+    private static final String PASSWORD_2 = "password2";
+    
+    private static final String DEFAULT_PASSWORD = "test";
 
     private ProfileUserProfilePage customProfilePage;
 
@@ -89,7 +90,7 @@ public class UserProfileTest extends AbstractTest
     public void setUp()
     {
         this.userName = getTestClassName() + getTestMethodName();
-        getUtil().createUser(this.userName, "test");
+        getUtil().createUser(this.userName, DEFAULT_PASSWORD);
 
         this.customProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
     }
@@ -174,7 +175,7 @@ public class UserProfileTest extends AbstractTest
         PreferencesUserProfilePage preferencesPage = this.customProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         String newPassword = RandomStringUtils.randomAlphanumeric(6);
-        changePasswordPage.changePassword(newPassword, newPassword);
+        changePasswordPage.changePassword(DEFAULT_PASSWORD, newPassword, newPassword);
         changePasswordPage.submit();
 
         // Logout
@@ -281,13 +282,9 @@ public class UserProfileTest extends AbstractTest
     {
         PreferencesUserProfilePage preferencesPage = this.customProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
-        changePasswordPage.changePassword(PASSWORD_1, PASSWORD_2);
+        changePasswordPage.changePassword(DEFAULT_PASSWORD, PASSWORD_1, PASSWORD_2);
         changePasswordPage.submit();
-
-        Alert alert = getDriver().switchTo().alert();
-        String alertText = alert.getText();
-        alert.accept();
-        Assert.assertEquals("The two passwords do not match.", alertText);
+        Assert.assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
     }
 
     @Test
@@ -297,11 +294,9 @@ public class UserProfileTest extends AbstractTest
     })
     public void testChangePasswordWithoutEnteringPasswords()
     {
-        this.customProfilePage.switchToPreferences().changePassword().submit();
-        Alert alert = getDriver().switchTo().alert();
-        String alertText = alert.getText();
-        alert.accept();
-        Assert.assertEquals("The password cannot be empty.", alertText);
+        ChangePasswordPage changePasswordPage = this.customProfilePage.switchToPreferences().changePassword();
+        changePasswordPage.submit();
+        Assert.assertEquals("Your new password should be at least 6 characters long.", changePasswordPage.getValidationErrorMessage());
     }
 
     @Test
@@ -317,12 +312,22 @@ public class UserProfileTest extends AbstractTest
 
         PreferencesUserProfilePage preferencesPage = this.customProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
-        changePasswordPage.changePassword(PASSWORD_1, PASSWORD_2);
+        changePasswordPage.changePasswordAsAdmin(PASSWORD_1, PASSWORD_2);
         changePasswordPage.submit();
-
-        Alert alert = getDriver().switchTo().alert();
-        String alertText = alert.getText();
-        alert.accept();
-        Assert.assertEquals("The two passwords do not match.", alertText);
+        Assert.assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
+    }
+    
+    @Test
+    @IgnoreBrowsers({
+        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
+        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    })
+    public void testChangePasswordWithWrongOriginalPassword()
+    {
+        PreferencesUserProfilePage preferencesPage = this.customProfilePage.switchToPreferences();
+        ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
+        changePasswordPage.changePassword("badPassword", PASSWORD_1, PASSWORD_1);
+        changePasswordPage.submit();
+        Assert.assertEquals("Current password is invalid.", changePasswordPage.getErrorMessage());
     }
 }

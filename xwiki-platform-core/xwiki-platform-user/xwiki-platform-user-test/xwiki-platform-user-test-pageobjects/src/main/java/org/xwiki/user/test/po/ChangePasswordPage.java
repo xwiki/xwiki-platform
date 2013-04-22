@@ -27,6 +27,9 @@ import org.xwiki.test.ui.po.editor.EditPage;
 public class ChangePasswordPage extends EditPage
 {
     private static final String DEFAULT_PASSWORD = "admin";
+    
+    @FindBy(xpath = "//input[@id='xwikioriginalpassword']")
+    private WebElement originalPassword;
 
     @FindBy(xpath = "//input[@id='xwikipassword']")
     private WebElement password1;
@@ -34,23 +37,49 @@ public class ChangePasswordPage extends EditPage
     @FindBy(xpath = "//input[@id='xwikipassword2']")
     private WebElement password2;
 
-    @FindBy(xpath = "//input[@value='Update']")
+    @FindBy(xpath = "//input[@value='Save']")
     private WebElement changePassword;
 
     @FindBy(xpath = "//a[@class='secondary button']")
     private WebElement cancelPasswordChange;
+    
+    @FindBy(xpath = "//span[@class='box errormessage']")
+    private WebElement errorMessage;
+    
+    @FindBy(xpath = "//span[@class='LV_validation_message LV_invalid']")
+    private WebElement validationErrorMessage;
 
-    public void changePassword(String password, String password2)
+    public void changePassword(String originalPassword, String password, String password2)
+    {
+        this.originalPassword.clear();
+        this.originalPassword.sendKeys(originalPassword);
+        this.password1.clear();
+        this.password1.sendKeys(password);
+        this.password2.clear();
+        this.password2.sendKeys(password2);
+    }
+    
+    public void changePasswordAsAdmin(String password, String password2)
     {
         this.password1.clear();
         this.password1.sendKeys(password);
         this.password2.clear();
         this.password2.sendKeys(password2);
     }
+    
+    public String getErrorMessage()
+    {
+        return errorMessage.getText();
+    }
+    
+    public String getValidationErrorMessage()
+    {
+        return validationErrorMessage.getText();
+    }
 
     public void changePasswordToDefault()
     {
-        changePassword(DEFAULT_PASSWORD, DEFAULT_PASSWORD);
+        changePassword(DEFAULT_PASSWORD, DEFAULT_PASSWORD, DEFAULT_PASSWORD);
     }
 
     public void submit()

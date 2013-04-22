@@ -8,7 +8,11 @@
   width: 800px;
 }
 #distributionWizard .xdialog-header {
-  background-image: url("header.png");
+  #if ("$!theme.headerBackgroundImage" != '')
+    background-image: $theme.headerBackgroundImage;
+  #else
+    background-image: url("header.png");
+  #end
   border-radius: 4px 4px 0 0;
   margin: -1px;
 }

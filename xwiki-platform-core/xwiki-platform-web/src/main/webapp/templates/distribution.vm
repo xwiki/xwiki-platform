@@ -29,7 +29,15 @@
     <div class="xdialog-screen"></div>
     <div class="xdialog-box">
       <div class="xdialog-header">
-        <img alt="XWiki Logo" src="$xwiki.getSkinFile('uicomponents/extension/logo.png')"/>
+#set($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
+#set($themeDoc = $xwiki.getDocument($themeDocFullName))
+#set($logoname = $themeDoc.getObject('ColorThemes.ColorThemeClass').getProperty('logoImage').value)
+#if("$!{logoname}" != '')
+  #set($logourl = $themeDoc.getAttachmentURL($logoname))
+#else
+  #set($logourl = $xwiki.getSkinFile('uicomponents/extension/logo.png'))
+#end
+        <img alt="XWiki Logo" src="$logourl"/>
       </div>
       #set ($stepId = $services.distribution.jobStatus.question.stepId)
       <div#if($stepId) id="$stepId"#end class="xdialog-content">

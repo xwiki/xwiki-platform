@@ -1323,7 +1323,7 @@ ${Msz}Mb##
       <div>
         <div class="xwiki-livetable-tagcloud-container">
           <h2>$services.localization.render('platform.livetable.tagsHelp')
-	        <span>$services.localization.render('platform.livetable.tagsHelpCancel')</span>
+            <span>$services.localization.render('platform.livetable.tagsHelpCancel')</span>
           </h2>
           <div class="xwiki-livetable-tagcloud"></div>
         </div>

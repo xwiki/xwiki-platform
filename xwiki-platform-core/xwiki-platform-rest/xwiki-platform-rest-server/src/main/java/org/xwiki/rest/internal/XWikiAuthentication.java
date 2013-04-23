@@ -107,11 +107,11 @@ public class XWikiAuthentication extends ChallengeAuthenticator
              * to allow applications to verify if the authentication is still valid
              * We are also adding the XWiki version at the same moment.
              */
-	    Form responseHeaders = (Form) response.getAttributes().get("org.restlet.http.headers");
-	    if (responseHeaders == null) {
-           	responseHeaders = new Form();
-    		response.getAttributes().put("org.restlet.http.headers", responseHeaders);
-	    }
+            Form responseHeaders = (Form) response.getAttributes().get("org.restlet.http.headers");
+            if (responseHeaders == null) {
+                responseHeaders = new Form();
+                response.getAttributes().put("org.restlet.http.headers", responseHeaders);
+            }
             responseHeaders.add("XWiki-User", xwikiContext.getUser());
             responseHeaders.add("XWiki-Version", xwikiContext.getWiki().getVersion());
 

@@ -103,6 +103,19 @@ public class XWikiAuthentication extends ChallengeAuthenticator
             }
 
             /*
+             * After performing the authentication we should add headers to the response
+             * to allow applications to verify if the authentication is still valid
+             * We are also adding the XWiki version at the same moment.
+             */
+	    Form responseHeaders = (Form) response.getAttributes().get("org.restlet.http.headers");
+	    if (responseHeaders == null) {
+           	responseHeaders = new Form();
+    		response.getAttributes().put("org.restlet.http.headers", responseHeaders);
+	    }
+            responseHeaders.add("XWiki-User", xwikiContext.getUser());
+            responseHeaders.add("XWiki-Version", xwikiContext.getWiki().getVersion());
+
+            /*
              * If we are here, either the xwikiContext contained good credentials for a previously authenticated user or
              * these credentials are no longer valid or an error occurred during authentication. We consider all these
              * three cases as "successful". In the first case we have an authenticated user, in the other two cases we

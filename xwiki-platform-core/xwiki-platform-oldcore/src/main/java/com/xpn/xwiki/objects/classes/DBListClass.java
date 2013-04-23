@@ -370,8 +370,11 @@ public class DBListClass extends ListClass
     public String returnCol(String hqlQuery, boolean first)
     {
         String firstCol = "-", secondCol = "-";
+        if (StringUtils.isEmpty(hqlQuery)) {
+            return firstCol;
+        }
 
-        int fromIndx = hqlQuery.indexOf("from");
+        int fromIndx = hqlQuery.toLowerCase().indexOf("from");
 
         if (fromIndx > 0) {
             String beforeFrom = hqlQuery.substring(0, fromIndx).replaceAll("\\s+", " ");
@@ -383,7 +386,7 @@ public class DBListClass extends ListClass
                 ArrayList<String> words = new ArrayList<String>();
 
                 while (st.hasMoreTokens()) {
-                    words.add(st.nextToken().toLowerCase());
+                    words.add(st.nextToken());
                 }
 
                 int comma = words.indexOf(",") - 1;

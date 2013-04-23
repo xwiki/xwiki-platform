@@ -115,7 +115,7 @@ public class XWikiAuthentication extends ChallengeAuthenticator
             }
 
             // the user has changed so we need to reset the header
-            responseHeaders.add("XWiki-User", xwikiContext.getUser());
+            responseHeaders.set("XWiki-User", xwikiContext.getUser());
 
             /*
              * If we are here, either the xwikiContext contained good credentials for a previously authenticated user or

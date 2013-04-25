@@ -664,6 +664,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    public boolean addEmailField(String fieldName, String fieldPrettyName, int size)
+    {
+        if (get(fieldName) == null) {
+            EmailClass emailClass = new EmailClass();
+            emailClass.setName(fieldName);
+            emailClass.setPrettyName(fieldPrettyName);
+            emailClass.setSize(size);
+            emailClass.setObject(this);
+            put(fieldName, emailClass);
+
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
     {
         if (get(fieldName) == null) {

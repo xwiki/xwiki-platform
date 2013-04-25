@@ -84,28 +84,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
 
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
-        needsUpdate |= bclass.addTextField("email", "e-Mail", 30);
-        // Email field custom display (email obfuscation).
-        PropertyClass emailProperty = (PropertyClass) bclass.get("email");
-        if (!emailProperty.isCustomDisplayed(xcontext)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{{velocity}}\n");
-            builder.append("#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n");
-            // Line broken in 2 because it was too long.
-            builder.append("  {{html}}<input id='$prefix$name' type='text'");
-            builder.append(" name='$prefix$name' value='$value' />{{/html}}\n");
-            builder.append("#else\n");
-            builder.append("  ## Allow $obfuscateEmail to be set in some other place.\n");
-            builder.append("  #if(\"$obfuscateEmail\" == 'false')\n");
-            builder.append("    $!value\n");
-            builder.append("  #else\n");
-            builder.append("    $!value.replaceAll('@.*', '@ xxxxxx')\n");
-            builder.append("  #end\n");
-            builder.append("#end\n");
-            builder.append("{{/velocity}}");
-            emailProperty.setCustomDisplay(builder.toString());
-            needsUpdate = true;
-        }
+        needsUpdate |= bclass.addEmailField("email", "e-Mail", 30);
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);
         needsUpdate |= bclass.addPasswordField("validkey", "Validation Key", 10);
         needsUpdate |= bclass.addBooleanField("active", "Active", "active");

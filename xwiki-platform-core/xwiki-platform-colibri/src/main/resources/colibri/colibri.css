@@ -1325,9 +1325,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 *+html .xform legend {
   margin-left: -8px;
 }
-.xform fieldset h2 {
-  margin: 0;
-}
 
 .xform fieldset {
   margin: 2em 0;

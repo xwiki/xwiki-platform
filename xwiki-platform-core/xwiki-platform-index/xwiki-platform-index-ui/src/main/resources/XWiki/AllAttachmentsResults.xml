@@ -163,7 +163,7 @@
     "spaceurl" : "$xwiki.getURL("${document.space}.WebHome")",
     "date" : "$xwiki.formatDate($attach.date, $formatDate)",
     "author" : "$!escapetool.javascript($attach.author)",
-    "authorname" : "$!escapetool.javascript($xwiki.getDocument($attach.author).name)",
+    "authorname" : "$!escapetool.javascript($xwiki.getUserName($attach.author, false))",
     "authorurl" : "$xwiki.getURL($attach.author)",
     "type" : "$!escapetool.javascript($attach.getMimeType())"
   #else

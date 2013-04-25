@@ -1,6 +1,7 @@
 ###
 ### Resubmission page
 ###
+$response.setStatus(401)##
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">

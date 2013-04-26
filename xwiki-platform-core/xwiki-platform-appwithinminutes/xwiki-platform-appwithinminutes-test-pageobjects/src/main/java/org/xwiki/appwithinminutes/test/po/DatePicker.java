@@ -133,6 +133,17 @@ public class DatePicker extends BaseElement
     public void setMinute(String minute)
     {
         Select minuteSelector = new Select(container.findElement(By.className("minute")));
+        if (minuteSelector.getFirstSelectedOption().getText().equals(minute)) {
+            // The specified minute is already selected but that doesn't mean the date text input has exactly the
+            // specified minute. The minute selector has only multiples of 5 so you can have '15' selected while the
+            // actual minutes in the date input is '17'. The date picker rounds down the actual minutes to the closest
+            // multiple of 5 before initializing the minute selector. We need to force a selection change event in order
+            // to update the date text input with the specified minute.
+            minuteSelector.selectByIndex(0);
+            if (minuteSelector.getFirstSelectedOption().getText().equals(minute)) {
+                minuteSelector.selectByIndex(1);
+            }
+        }
         minuteSelector.selectByVisibleText(minute);
     }
 

@@ -80,7 +80,7 @@ public class UserProfileTest extends AbstractTest
 
     private static final String PASSWORD_2 = "password2";
     
-    private static final String DEFAULT_PASSWORD = "test";
+    private static final String DEFAULT_PASSWORD = "testtest";
 
     private ProfileUserProfilePage customProfilePage;
 
@@ -187,6 +187,16 @@ public class UserProfileTest extends AbstractTest
         ViewPage vp = getUtil().gotoPage(getTestClassName(), getTestMethodName());
         Assert.assertTrue(vp.isAuthenticated());
         getUtil().recacheSecretToken();
+        
+        //Reset the password
+        getDriver().get(getUtil().getURLToLoginAndGotoPage("superadmin", "pass", this.customProfilePage.getURL()));
+        getUtil().recacheSecretToken();
+
+        preferencesPage = this.customProfilePage.switchToPreferences();
+        changePasswordPage = preferencesPage.changePassword();
+        changePasswordPage.changePasswordAsAdmin(DEFAULT_PASSWORD, DEFAULT_PASSWORD);
+        changePasswordPage.submit();
+        Assert.assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
     }
 
     /** Functionality check: changing the user type. */

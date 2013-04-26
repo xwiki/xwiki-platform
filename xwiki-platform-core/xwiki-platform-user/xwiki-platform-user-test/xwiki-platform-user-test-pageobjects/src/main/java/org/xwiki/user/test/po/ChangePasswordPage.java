@@ -25,9 +25,7 @@ import org.xwiki.test.ui.po.editor.EditPage;
 
 /** User profile, change password action. */
 public class ChangePasswordPage extends EditPage
-{
-    private static final String DEFAULT_PASSWORD = "admin";
-    
+{   
     @FindBy(xpath = "//input[@id='xwikioriginalpassword']")
     private WebElement originalPassword;
 
@@ -48,6 +46,9 @@ public class ChangePasswordPage extends EditPage
     
     @FindBy(xpath = "//span[@class='LV_validation_message LV_invalid']")
     private WebElement validationErrorMessage;
+    
+    @FindBy(xpath = "//span[@class='box infomessage']")
+    private WebElement successMessage;
 
     public void changePassword(String originalPassword, String password, String password2)
     {
@@ -76,10 +77,10 @@ public class ChangePasswordPage extends EditPage
     {
         return validationErrorMessage.getText();
     }
-
-    public void changePasswordToDefault()
+    
+    public String getSuccessMessage()
     {
-        changePassword(DEFAULT_PASSWORD, DEFAULT_PASSWORD, DEFAULT_PASSWORD);
+        return successMessage.getText();
     }
 
     public void submit()

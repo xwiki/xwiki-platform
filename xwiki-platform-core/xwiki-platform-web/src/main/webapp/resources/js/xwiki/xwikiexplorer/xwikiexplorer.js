@@ -484,10 +484,12 @@ isc.XWEDataSource.addProperties({
      * Properties passed to the RPCManager when request are performed.
      */
     requestProperties : {
-        promptStyle: "cursor",
+        // Don't block the entire UI when data is being fetched (e.g. when the tree is loaded or when a node is expanded).
+        // See http://www.smartclient.com/smartgwt/javadoc/com/smartgwt/client/rpc/RPCManager.html#setShowPrompt(boolean)
+        showPrompt: false,
         // Prevent the RPCManager from displaying a warning message every time a request fails. This is especially
         // annoying when we try to open the tree to a page that doesn't exist.
-        // See http://www.smartclient.com/smartgwtee/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
+        // See http://www.smartclient.com/smartgwt/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
         willHandleError: true
     },
 

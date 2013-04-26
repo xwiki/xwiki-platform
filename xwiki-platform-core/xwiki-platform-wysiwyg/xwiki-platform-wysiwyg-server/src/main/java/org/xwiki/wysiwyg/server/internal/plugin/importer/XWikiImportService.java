@@ -177,7 +177,7 @@ public class XWikiImportService implements ImportService
         InputStream officeFileStream = documentAccessBridge.getAttachmentContent(attachmentReference);
         String officeFileName = attachmentReference.getName();
         DocumentReference targetDocRef = attachmentReference.getDocumentReference();
-        XDOMOfficeDocument xdomOfficeDocument = null;
+        XDOMOfficeDocument xdomOfficeDocument;
         if (isPresentation(attachmentReference.getName())) {
             xdomOfficeDocument = presentationBuilder.build(officeFileStream, officeFileName, targetDocRef);
         } else {

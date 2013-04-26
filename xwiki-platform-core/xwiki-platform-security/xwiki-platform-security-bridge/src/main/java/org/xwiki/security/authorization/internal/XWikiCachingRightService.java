@@ -341,9 +341,11 @@ public class XWikiCachingRightService implements XWikiRightService
         if (XWikiConstants.GUEST_USER.equals(user.getName())) {
             // Public users (not logged in) should be passed as null in the new API
             user = null;
-            if(needsAuth(Right.toRight(right), context)) {
-            	return false;
-            }
+        }
+        
+        // If authentication is needed, deny guest users.
+        if (user == null && needsAuth(Right.toRight(right), context)) {
+            return false;
         }
 
         return authorizationManager.hasAccess(Right.toRight(right), user, document);

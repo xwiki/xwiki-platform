@@ -37,7 +37,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;

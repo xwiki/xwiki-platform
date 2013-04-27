@@ -27,7 +27,7 @@ import org.xwiki.panels.test.po.PanelEditPage;
 import org.xwiki.panels.test.po.PanelsHomePage;
 import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Various Panel tests.

@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.xar.internal.repository;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;

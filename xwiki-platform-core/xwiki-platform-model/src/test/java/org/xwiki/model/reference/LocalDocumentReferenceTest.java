@@ -21,7 +21,7 @@ package org.xwiki.model.reference;
 
 import org.junit.Test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link LocalDocumentReference}.

@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;

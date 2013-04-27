@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.transformation.macro;
 
 import static org.mockito.Mockito.*;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;

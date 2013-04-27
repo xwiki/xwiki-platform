@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 import java.net.URL;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Before;
 import org.junit.Rule;

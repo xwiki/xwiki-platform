@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Tests related to the Panel Wizard.

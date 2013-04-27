@@ -19,7 +19,7 @@
  */
 package org.xwiki.administration.test.ui;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrablePage;

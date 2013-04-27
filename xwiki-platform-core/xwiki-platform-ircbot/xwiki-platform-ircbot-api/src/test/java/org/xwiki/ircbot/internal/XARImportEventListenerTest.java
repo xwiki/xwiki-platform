@@ -42,7 +42,7 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link org.xwiki.ircbot.internal.XARImportEventListener}.

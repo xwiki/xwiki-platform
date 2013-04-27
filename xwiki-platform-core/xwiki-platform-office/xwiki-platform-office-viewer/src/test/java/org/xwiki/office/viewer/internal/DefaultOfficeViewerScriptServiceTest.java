@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.Collections;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.junit.Rule;

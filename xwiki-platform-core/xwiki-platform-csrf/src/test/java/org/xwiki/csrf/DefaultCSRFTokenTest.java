@@ -30,7 +30,7 @@ import java.security.SecureRandom;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;

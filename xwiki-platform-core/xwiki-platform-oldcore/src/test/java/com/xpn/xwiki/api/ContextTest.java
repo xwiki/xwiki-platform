@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link Context}.

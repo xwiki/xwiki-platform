@@ -21,7 +21,7 @@ package org.xwiki.localization.jar.internal;
 
 import java.util.Locale;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Before;
 import org.junit.Rule;

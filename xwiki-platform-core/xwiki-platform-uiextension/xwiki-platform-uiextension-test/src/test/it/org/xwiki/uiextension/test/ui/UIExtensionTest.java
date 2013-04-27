@@ -25,7 +25,7 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.uiextension.internal.HelloWorldUIExtension;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * UI tests for the UI Extension feature.

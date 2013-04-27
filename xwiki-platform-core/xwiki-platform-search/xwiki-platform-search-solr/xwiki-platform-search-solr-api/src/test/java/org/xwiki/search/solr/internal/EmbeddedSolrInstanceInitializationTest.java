@@ -22,7 +22,7 @@ package org.xwiki.search.solr.internal;
 import java.io.File;
 import java.net.URL;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.core.CoreContainer;

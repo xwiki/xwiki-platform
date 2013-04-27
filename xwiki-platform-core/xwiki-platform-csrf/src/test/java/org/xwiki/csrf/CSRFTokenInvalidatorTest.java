@@ -21,7 +21,7 @@ package org.xwiki.csrf;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;

@@ -46,7 +46,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;

@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Abstract class that should be inherited when writing tests for comparing the result of different right service

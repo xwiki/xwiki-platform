@@ -24,6 +24,7 @@ import java.text.MessageFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -33,6 +34,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Scriptable API for easy handling of users. For the moment this API is very limited, containing
@@ -50,6 +52,10 @@ public class User extends Api
     /** User class reference. */
     private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
             new EntityReference("XWiki", EntityType.SPACE));
+    
+    /** Reference resolver. */
+    private static final DocumentReferenceResolver<String> REFERENCE_RESOLVER = Utils.getComponent(
+            DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** The wrapped XWikiUser object. */
     private XWikiUser user;
@@ -158,8 +164,9 @@ public class User extends Api
         if (hasProgrammingRights()) {
             try {
                 boolean result = false;
-
-                XWikiDocument userDoc = getXWikiContext().getWiki().getDocument(user.getUser(), getXWikiContext());
+                
+                EntityReference userReference = REFERENCE_RESOLVER.resolve(user.getUser());
+                XWikiDocument userDoc = getXWikiContext().getWiki().getDocument(userReference, getXWikiContext());
                 BaseObject obj = userDoc.getXObject(USERCLASS_REFERENCE);
                 // We only allow empty password from users having a XWikiUsers object.
                 if (obj != null) {

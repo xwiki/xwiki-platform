@@ -123,7 +123,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.XWikiEntityURL;
-import org.xwiki.url.standard.XWikiURLBuilder;
+import org.xwiki.url.XWikiURL;
+import org.xwiki.url.XWikiURLManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.api.Api;
@@ -350,7 +351,7 @@ public class XWiki implements EventListener
     private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils
         .getComponent(PrivilegedTemplateRenderer.class);
 
-    private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent((Type) XWikiURLBuilder.class, "entity");
+    private XWikiURLManager urlManager = Utils.getComponent((Type) XWikiURLManager.class);
 
     /**
      * Used to get the temporary and permanent directory.
@@ -1559,41 +1560,6 @@ public class XWiki implements EventListener
         } else {
             return getDocument(space + "." + fullname, context);
         }
-    }
-
-    public XWikiDocument getDocumentFromPath(String path, XWikiContext context) throws XWikiException
-    {
-        return getDocument(getDocumentReferenceFromPath(path, context), context);
-    }
-
-    /**
-     * @since 2.3M1
-     */
-    public DocumentReference getDocumentReferenceFromPath(String path, XWikiContext context)
-    {
-        // TODO: Remove this and use XWikiURLFactory instead in XWikiAction and all entry points.
-        List<String> segments = new ArrayList<String>();
-        for (String segment : path.split("/", -1)) {
-            segments.add(Util.decodeURI(segment, context));
-        }
-        // Remove the first segment if it's empty to cater for cases when the path starts with "/"
-        if (segments.size() > 0 && segments.get(0).length() == 0) {
-            segments.remove(0);
-        }
-
-        XWikiEntityURL entityURL =
-            (XWikiEntityURL) this.entityXWikiURLBuilder.build(new WikiReference(context.getDatabase()), segments);
-
-        return new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
-    }
-
-    /**
-     * @deprecated since 2.3M1 use {@link #getDocumentReferenceFromPath(String, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getDocumentNameFromPath(String path, XWikiContext context)
-    {
-        return this.localStringEntityReferenceSerializer.serialize(getDocumentReferenceFromPath(path, context));
     }
 
     /**
@@ -4648,45 +4614,17 @@ public class XWiki implements EventListener
             if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
                 reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
             } else {
-                // TODO: Introduce a XWikiURL class in charge of getting the information relevant
-                // to XWiki from a request URL (action, space, document name, file, etc)
-
-                // Important: We cannot use getPathInfo() as the container encodes it and different
-                // containers encode it differently, depending on their internal behavior and how
-                // they are configured. Thus to make this container-proof we use the
-                // getRequestURI() which isn't modified by the container and is thus only
-                // URL-encoded.
-
-                // Note: Ideally we should modify the getDocumentNameFromPath method but in order
-                // not to introduce any new bug right now we're reconstructing a path info that we
-                // pass to it using the following algorithm:
-                // path info = requestURI - (contextPath + servletPath)
-
-                String path = request.getRequestURI();
-
-                // Remove the (eventual) context path from the URI, usually /xwiki
-                path = stripSegmentFromPath(path, request.getContextPath());
-
-                // Remove the (eventual) servlet path from the URI, usually /bin
-                String servletPath = request.getServletPath();
-                path = stripSegmentFromPath(path, servletPath);
-
-                // We need to get rid of the wiki name in case of a XEM in usepath mode
-                if ("1".equals(Param("xwiki.virtual.usepath", "1"))
-                    && servletPath.equals("/" + Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                    // Virtual mode, skip the wiki name
-                    if (path.indexOf('/', 1) < 0) {
-                        path = "";
-                    } else {
-                        path = path.substring(path.indexOf('/', 1));
-                    }
+                XWikiURL xwikiURL = this.urlManager.getXWikiURL();
+                if (xwikiURL instanceof XWikiEntityURL) {
+                    // TODO: Handle references not pointing to a document...
+                    EntityReference entityReference =
+                        ((XWikiEntityURL) xwikiURL).getEntityReference().extractReference(EntityType.DOCUMENT);
+                    reference = new DocumentReference(entityReference);
+                } else {
+                    // Big problem we don't have an Entity URL!
+                    throw new RuntimeException(String.format("URL [%s] that doesn't point to an Entity!",
+                        xwikiURL));
                 }
-
-                // Fix error in some containers, which don't hide the jsessionid parameter from the URL
-                if (path.indexOf(";jsessionid=") != -1) {
-                    path = path.substring(0, path.indexOf(";jsessionid="));
-                }
-                reference = getDocumentReferenceFromPath(path, context);
             }
         }
 
@@ -4694,20 +4632,11 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 2.3M1 use {@link #getDocumentReferenceFromPath(String, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getDocumentName(XWikiRequest request, XWikiContext context)
-    {
-        return this.localStringEntityReferenceSerializer.serialize(getDocumentReference(request, context));
-    }
-
-    /**
      * Helper method, removes a predefined path segment (the context path or the servel path) from the start of the
      * requested URI and returns the remainder. This method is needed because special characters in the path can be
      * URL-encoded, depending on whether the request is forwarded through the request dispatcher or not, and also
      * depending on the client (some browsers encode -, while some don't).
-     * 
+     *
      * @param path the path, as taken from the requested URI
      * @param segment the segment to remove, as reported by the container
      * @return the path with the specified segment trimmed from its start
@@ -6736,10 +6665,10 @@ public class XWiki implements EventListener
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
-     * @param XWikiContext The underlying context used for running the database query
+     * @param context the underlying context used for running the database query
      * @return A List of {@link XWikiAttachment} objects.
      * @throws XWikiException in case of error while performing the query
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, List)
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
      */
     @Unstable
@@ -6793,10 +6722,10 @@ public class XWiki implements EventListener
      * 
      * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
-     * @param XWikiContext The underlying context used for running the database query
+     * @param context the underlying context used for running the database query
      * @return int number of attachments found.
      * @throws XWikiException in event of an exception querying the database
-     * @see #searchAttachments(String, int, int, List, XWikiContext)
+     * @see #searchAttachments(String, boolean, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
      */
     @Unstable

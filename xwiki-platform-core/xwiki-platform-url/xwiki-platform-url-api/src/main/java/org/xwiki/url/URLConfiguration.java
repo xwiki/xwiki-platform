@@ -20,6 +20,7 @@
 package org.xwiki.url;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
@@ -28,6 +29,7 @@ import org.xwiki.component.annotation.Role;
  * @since 2.3M1
  */
 @Role
+@Unstable
 public interface URLConfiguration
 {
     /**

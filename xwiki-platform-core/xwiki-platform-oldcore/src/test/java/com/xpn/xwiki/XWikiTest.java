@@ -295,24 +295,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, getContext()));
     }
 
-    public void testGetDocumentNameFromPath()
-    {
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("", getContext()));
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/Space/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/view/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/some/ignored/paths",
-            getContext()));
-
-        // Test URL encoding and verify an encoded forward slash ("/" - encoded as %2F) works too.
-        assertEquals("My Space.My/Document",
-            this.xwiki.getDocumentNameFromPath("/My%20Space/My%2FDocument", getContext()));
-    }
-
     /**
      * We only verify here that the saveDocument API calls the Observation component.
      */

@@ -29,6 +29,7 @@ import org.xwiki.container.Request;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
+import org.xwiki.url.XWikiURLManager;
 
 /**
  * Sets the XWiki URL in the Execution Context (if found).
@@ -55,7 +56,7 @@ public class XWikiURLExecutionContextInitializer implements ExecutionContextInit
         if (request != null) {
             Object xwikiURL = request.getProperty(Request.XWIKI_URL);
             if (xwikiURL != null) {
-                context.setProperty(Request.XWIKI_URL, xwikiURL);
+                context.setProperty(XWikiURLManager.URL_CONTEXT_PROPERTY, xwikiURL);
             }
         }
     }

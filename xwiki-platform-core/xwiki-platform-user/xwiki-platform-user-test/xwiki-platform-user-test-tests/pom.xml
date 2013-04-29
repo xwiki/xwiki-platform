@@ -58,6 +58,14 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed for the Admin account, which can grant programming rights to the Change Password document -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

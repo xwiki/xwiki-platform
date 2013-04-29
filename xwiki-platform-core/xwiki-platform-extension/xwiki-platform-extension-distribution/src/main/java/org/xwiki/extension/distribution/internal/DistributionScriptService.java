@@ -191,6 +191,7 @@ public class DistributionScriptService implements ScriptService
 
     /**
      * @return the upgrade mode
+     * @since 5.0RC1
      */
     public UpgradeMode getUpgradeMode()
     {

@@ -53,7 +53,7 @@ public class WikiDistributionJob extends AbstractDistributionJob<DistributionReq
             steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
                 DefaultUIDistributionStep.ID));
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get step instance for id [{}]", DefaultUIDistributionStep.ID);
+            this.logger.error("Failed to get default UI step instance");
         }
 
         // Step 2: Upgrade outdated extensions
@@ -62,7 +62,7 @@ public class WikiDistributionJob extends AbstractDistributionJob<DistributionReq
             steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
                 OutdatedExtensionsDistributionStep.ID));
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get step instance for id [{}]", OutdatedExtensionsDistributionStep.ID);
+            this.logger.error("Failed to get outdated extensions step instance");
         }
 
         return steps;

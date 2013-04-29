@@ -54,14 +54,16 @@
           #displayStepHeader($stepId)
           #set ($formOpenTag = '<form action="" class="xform">')
           #set ($stepOutput = $services.distribution.renderCurrentStepToXHTML())
-          #if ($stepOutput.contains('<form'))
-            ## This step contains at least one form element so the step controls how its data is submitted.
-            $stepOutput
+          #if (!$stepOutput.contains('<form') && ($stepOutput.contains('<input') || $stepOutput.contains('<select')
+              || $stepOutput.contains('<textarea')))
+            ## This step has input elements without a form element so we let the step buttons submit the step data.
             $formOpenTag
+            $stepOutput
           #else
-            ## This step doesn't contain a form element so we let the step buttons submit the step data.
-            $formOpenTag
+            ## This step contains at least one form element or no input elements so the step controls how its data is
+            ## submitted.
             $stepOutput
+            $formOpenTag
           #end
           #displayStepFooter()
           </form>

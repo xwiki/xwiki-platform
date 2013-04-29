@@ -292,15 +292,16 @@ XWiki.OutdatedExtensionsStep = Class.create({
   },
 
   _noInvalidExtensions : function() {
-    var invalidExtensionsWrapper = $('invalidExtensions');
-    if (!invalidExtensionsWrapper) {
-      return true;
-    } else {
+    var invalidExtensionsCount = 0;
+    var invalidExtensionsFixedCount = 0;
+    this.container.select('.invalidExtensions').each(function(invalidExtensionsWrapper) {
       var invalidExtensions = invalidExtensionsWrapper.childElements();
-      return invalidExtensions.size() == invalidExtensions.filter(function(extension) {
+      invalidExtensionsCount += invalidExtensions.size();
+      invalidExtensionsFixedCount += invalidExtensions.filter(function(extension) {
         return extension.hasClassName('extension-item-installed');
       }).size();
-    }
+    });
+    return invalidExtensionsFixedCount == invalidExtensionsCount;
   }
 });
 

@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-extension-distribution</artifactId>
   <name>XWiki Platform - Extension - Distribution</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Distribution</description>
+  <description>Distribution Manager, allows upgrading the extensions in an entire farm after a platform upgrade.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

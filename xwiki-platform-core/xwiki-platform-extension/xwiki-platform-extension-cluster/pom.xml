@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-extension-cluster</artifactId>
   <name>XWiki Platform - Extension - Cluster</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Cluster</description>
+  <description>Makes the Extension Manager work properly in a cluster environment.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

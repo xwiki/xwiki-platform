@@ -93,6 +93,11 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     public final static String ID = "document";
 
+    /**
+     * The prefix to use in all wiki document based translations.
+     */
+    public static final String ID_PREFIX = ID + ':';
+
     private static final RegexEntityReference TRANSLATIONOBJET = new RegexEntityReference(Pattern.compile("[^:]+:"
         + TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING + "\\[\\d*\\]"), EntityType.OBJECT);
 
@@ -239,11 +244,11 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     @Override
     public TranslationBundle getBundle(String bundleId) throws TranslationBundleDoesNotExistsException
     {
-        String id = AbstractDocumentTranslationBundle.ID_PREFIX + bundleId;
+        String roleHint = ID_PREFIX + bundleId;
 
-        if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, id)) {
+        if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, roleHint)) {
             try {
-                return this.componentManagerProvider.get().getInstance(TranslationBundle.class, id);
+                return this.componentManagerProvider.get().getInstance(TranslationBundle.class, roleHint);
             } catch (ComponentLookupException e) {
                 this.logger.debug("Failed to lookup component [{}] with hint [{}].", TranslationBundle.class, bundleId,
                     e);
@@ -305,7 +310,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         DefaultDocumentTranslationBundle documentBundle;
         try {
             documentBundle =
-                new DefaultDocumentTranslationBundle(document.getDocumentReference(),
+                new DefaultDocumentTranslationBundle(ID_PREFIX, document.getDocumentReference(),
                     this.componentManagerProvider.get(), this.translationParser);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
@@ -446,8 +451,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
         descriptor.setImplementation(DefaultDocumentTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
-        descriptor.setRoleHint(AbstractDocumentTranslationBundle.ID_PREFIX
-            + this.serializer.serialize(documentReference));
+        descriptor.setRoleHint(ID_PREFIX + this.serializer.serialize(documentReference));
         descriptor.setRoleType(TranslationBundle.class);
 
         return descriptor;

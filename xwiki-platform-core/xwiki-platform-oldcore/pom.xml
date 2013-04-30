@@ -1005,6 +1005,11 @@
         <configuration>
           <includes>
             <include>**/api/**</include>
+            <!-- We also add all classes that are accessible from Velocity scripts -->
+            <include>**/XWiki</include>
+            <include>**/XWikiDocument</include>
+            <include>**/XWikiContext</include>
+            <include>**/XWikiMessageTool</include>
           </includes>
         </configuration>
       </plugin>

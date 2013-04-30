@@ -64,6 +64,13 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed for the {{error}} macro used by the ChangePassword feature -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-message</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Need for the user's activity stream -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

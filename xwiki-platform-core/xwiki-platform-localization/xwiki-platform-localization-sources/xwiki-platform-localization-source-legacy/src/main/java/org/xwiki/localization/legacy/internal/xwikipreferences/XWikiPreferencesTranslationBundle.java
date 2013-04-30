@@ -62,6 +62,11 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     protected static final String ID = "XWikiPreferences";
 
     /**
+     * The prefix to use when generating documents bundles unique ids.
+     */
+    protected static final String IDPREFIX = "XWikiPreferences:";
+
+    /**
      * Used to access current wiki.
      */
     @Inject
@@ -198,9 +203,27 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
 
         DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
         if (documentBundle == null) {
+            documentBundle = getDocumentTranslationBundleSynchronized(uid, document);
+        }
+
+        return documentBundle;
+    }
+
+    /**
+     * Get document bundle from passed reference.
+     * 
+     * @param uid the bundle uid
+     * @param document the document reference
+     * @return the document bundle
+     */
+    private synchronized DefaultDocumentTranslationBundle getDocumentTranslationBundleSynchronized(String uid,
+        DocumentReference document)
+    {
+        DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
+        if (documentBundle == null) {
             try {
                 documentBundle =
-                    new DefaultDocumentTranslationBundle(document, this.componentManager,
+                    new DefaultDocumentTranslationBundle(IDPREFIX, document, this.componentManager,
                         this.translationMessageParser);
                 this.documentBundlesCache.set(uid, documentBundle);
             } catch (ComponentLookupException e) {

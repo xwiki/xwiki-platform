@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<extension>
+  <id>invalid</id>
+  <version>1.0</version>
+  <type>xar</type>
+  <description>description</description>
+  <author>author</author>
+  <website>http://website</website>
+  <dependencies>
+    <dependency>
+      <id>unexisting</id>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</extension>

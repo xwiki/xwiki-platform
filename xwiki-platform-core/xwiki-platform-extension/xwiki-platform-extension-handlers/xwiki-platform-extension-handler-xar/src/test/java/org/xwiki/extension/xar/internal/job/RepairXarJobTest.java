@@ -19,9 +19,11 @@
  */
 package org.xwiki.extension.xar.internal.job;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
@@ -54,7 +56,24 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
 
         repair(extensionId, null, LogLevel.WARN);
 
-        this.xarExtensionRepository.resolve(extensionId);
-        this.xarExtensionRepository.resolve(new ExtensionId("dependency", "1.0"));
+        InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
+
+        Assert.assertTrue(installedExtension.isValid(null));
+
+        installedExtension = this.xarExtensionRepository.resolve(new ExtensionId("dependency", "1.0"));
+
+        Assert.assertTrue(installedExtension.isValid(null));
+    }
+
+    @Test
+    public void testRepairInvalid() throws Throwable
+    {
+        ExtensionId extensionId = new ExtensionId("invalid", "1.0");
+
+        repair(extensionId, null, LogLevel.ERROR);
+
+        InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
+
+        Assert.assertFalse(installedExtension.isValid(null));
     }
 }

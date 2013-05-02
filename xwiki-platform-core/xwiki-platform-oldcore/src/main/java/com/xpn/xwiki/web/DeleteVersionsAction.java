@@ -80,6 +80,7 @@ public class DeleteVersionsAction extends XWikiAction
                     // Reset the document reference, since the one taken from the archive might be wrong (old name from
                     // before a rename)
                     newdoc.setDocumentReference(tdoc.getDocumentReference());
+                    // Make sure we don't create a new rev!
                     newdoc.setMetaDataDirty(false);
                     newdoc.addXObjectsToRemoveFromVersion(tdoc);
                     context.getWiki().getStore().saveXWikiDoc(newdoc, context);

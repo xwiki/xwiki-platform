@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link XWikiAttachment}.
@@ -40,13 +40,13 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
     {
         final XWikiAttachment attach = new XWikiAttachment();
         attach.setVersion("1.1");
-        Assert.assertEquals("Version list was not one element long for version 1.1", 1,
+        assertEquals("Version list was not one element long for version 1.1", 1,
                             attach.getVersionList().size());
         attach.setVersion("1.2");
-        Assert.assertEquals("Version list was not two elements long for version 1.2.", 2,
+        assertEquals("Version list was not two elements long for version 1.2.", 2,
                             attach.getVersionList().size());
         attach.setVersion("1.3");
-        Assert.assertEquals("Version list was not two elements long for version 1.3.", 3,
+        assertEquals("Version list was not two elements long for version 1.3.", 3,
                             attach.getVersionList().size());
     }
 
@@ -63,10 +63,9 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
         final XWikiAttachment attach = new XWikiAttachment();
         final InputStream ris = new RandomInputStream(attachLength, seed);
         attach.setContent(ris);
-        Assert.assertEquals("Not all of the stream was read", 0, ris.available());
-        Assert.assertTrue(
-            IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
-                                  attach.getAttachment_content().getContentInputStream()));
+        assertEquals("Not all of the stream was read", 0, ris.available());
+        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
+            attach.getAttachment_content().getContentInputStream()));
     }
 
     @Test
@@ -77,9 +76,8 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
         final XWikiAttachment attach = new XWikiAttachment();
         final InputStream ris = new RandomInputStream(attachLength, seed);
         attach.setContent(ris);
-        Assert.assertTrue(
-            IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
-                                  attach.getAttachment_content().getContentInputStream()));
+        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
+            attach.getAttachment_content().getContentInputStream()));
         // Now write to the attachment via an OutputStream.
         final XWikiAttachmentContent xac = attach.getAttachment_content();
         xac.setContentDirty(false);
@@ -89,16 +87,37 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
         IOUtils.copy(new RandomInputStream(attachLength, seed + 1), os);
 
         // It should still be the old content.
-        Assert.assertTrue(
-            IOUtils.contentEquals(new RandomInputStream(attachLength, seed), xac.getContentInputStream()));
-        Assert.assertFalse(xac.isContentDirty());
+        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed), xac.getContentInputStream()));
+        assertFalse(xac.isContentDirty());
 
         os.close();
 
         // Now it should be the new content.
-        Assert.assertTrue(
-            IOUtils.contentEquals(new RandomInputStream(attachLength, seed + 1), xac.getContentInputStream()));
-        Assert.assertTrue(xac.isContentDirty());
+        assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed + 1), xac.getContentInputStream()));
+        assertTrue(xac.isContentDirty());
+    }
+
+    /**
+     * Unit test for <a href="http://jira.xwiki.org/browse/XWIKI-9075">XWIKI-9075</a> to prove that calling
+     * {@code fromXML} doesn't set the metadata dirty flag.
+     * <p/>
+     * Note: I think there's a bug in that fromXML should return a new instance of XWikiAttachment and not modify the
+     * current one as this would mean changing its identity...
+     */
+    @Test
+    public void fromXMLShouldntSetMetaDataAsDirty() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+        attachment.fromXML("<attachment>\n"
+            + "<filename>XWikiLogo.png</filename>\n"
+            + "<filesize>1390</filesize>\n"
+            + "<author>xwiki:XWiki.Admin</author>\n"
+            + "<date>1252454400000</date>\n"
+            + "<version>1.1</version>\n"
+            + "<comment/>\n"
+            + "<content>content</content>\n"
+            + "</attachment>");
+        assertFalse(attachment.isMetaDataDirty());
     }
 
     /** An InputStream which will return a stream of random bytes of length given in the constructor. */

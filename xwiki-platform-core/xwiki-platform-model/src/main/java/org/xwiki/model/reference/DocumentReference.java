@@ -157,6 +157,17 @@ public class DocumentReference extends EntityReference
     }
 
     /**
+     * Create a new Document reference from local document reference and wiki reference.
+     * 
+     * @param localDocumentReference the document reference without the wiki reference
+     * @param wikiReference the wiki reference
+     */
+    public DocumentReference(LocalDocumentReference localDocumentReference, WikiReference wikiReference)
+    {
+        super(localDocumentReference, null, wikiReference);
+    }
+
+    /**
      * Create a new Document reference from document name, parent space and locale.
      *
      * @param pageName the name of the document

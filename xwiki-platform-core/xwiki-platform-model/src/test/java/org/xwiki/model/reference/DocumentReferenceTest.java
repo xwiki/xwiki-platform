@@ -23,10 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
-
-import org.junit.Assert;
 
 /**
  * Unit tests for {@link org.xwiki.model.reference.DocumentReference}.
@@ -40,13 +39,11 @@ public class DocumentReferenceTest
     public void testConstructors()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        Assert.assertEquals(reference, new DocumentReference(
-            new EntityReference("page", EntityType.DOCUMENT,
-                new EntityReference("space", EntityType.SPACE,
-                    new EntityReference("wiki", EntityType.WIKI, null)))));
+        Assert.assertEquals(reference, new DocumentReference(new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI, null)))));
         Assert.assertEquals(reference, new DocumentReference("wiki", Arrays.asList("space"), "page"));
-        Assert.assertEquals(reference, new DocumentReference("page",
-            new SpaceReference("space", new WikiReference("wiki"))));
+        Assert.assertEquals(reference, new DocumentReference("page", new SpaceReference("space", new WikiReference(
+            "wiki"))));
     }
 
     @Test
@@ -89,8 +86,8 @@ public class DocumentReferenceTest
         EntityReference spaceReference = reference.getParent();
 
         // Verify that create a new reference based on an existing one doesn't modify the existing one in any manner.
-        new DocumentReference(
-            reference.getWikiReference().getName(), reference.getLastSpaceReference().getName(), reference.getName());
+        new DocumentReference(reference.getWikiReference().getName(), reference.getLastSpaceReference().getName(),
+            reference.getName());
     }
 
     @Test
@@ -143,5 +140,12 @@ public class DocumentReferenceTest
 
         DocumentReference reference3 = new DocumentReference("wiki", "space", "page", "en");
         Assert.assertEquals("wiki:space.page(en)", reference3.toString());
+    }
+
+    @Test
+    public void testCreateDocumentReferenceFromLocalDocumentReference()
+    {
+        Assert.assertEquals("wiki:space.page", new DocumentReference(new LocalDocumentReference("space", "page"),
+            new WikiReference("wiki")));
     }
 }

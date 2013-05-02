@@ -38,8 +38,14 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Singleton
 public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
+    /**
+     * The name of the document containing space preferences.
+     */
     private static final String DOCUMENT_NAME = "WebPreferences";
 
+    /**
+     * The local reference of the class containing space preferences.
+     */
     private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki",
         "XWikiPreferences");
 

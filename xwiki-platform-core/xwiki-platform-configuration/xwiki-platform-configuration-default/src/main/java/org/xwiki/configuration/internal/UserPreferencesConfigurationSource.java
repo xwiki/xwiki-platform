@@ -38,6 +38,9 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Singleton
 public class UserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
+    /**
+     * The local reference of the class containing user preferences.
+     */
     private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     @Override

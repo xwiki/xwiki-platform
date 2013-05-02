@@ -39,8 +39,14 @@ import org.xwiki.model.reference.SpaceReference;
 @Singleton
 public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
+    /**
+     * The name of the space where wiki preferences are located.
+     */
     private static final String SPACE_NAME = "XWiki";
 
+    /**
+     * The local reference of the class containing wiki preferences.
+     */
     private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME,
         "XWikiPreferences");
 

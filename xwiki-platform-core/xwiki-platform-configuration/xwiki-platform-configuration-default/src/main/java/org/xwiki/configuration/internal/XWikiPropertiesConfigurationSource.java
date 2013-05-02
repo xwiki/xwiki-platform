@@ -44,6 +44,9 @@ import org.xwiki.environment.Environment;
 @Singleton
 public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSource implements Initializable
 {
+    /**
+     * The file where standard filesystem properties are located.
+     */
     private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
 
     /**

@@ -421,6 +421,23 @@ rendering.transformations = $xwikiRenderingTransformations
 # csrf.enabled = true
 
 #-------------------------------------------------------------------------------------
+# Authorization management
+#-------------------------------------------------------------------------------------
+
+#-# [Since 4.3M2]
+#-# Specify which kind of content author resolver to use when obtaining the content author
+#-# from a document.  The default one will return the content author unless the document
+#-# is new or modified.
+#-#
+#-# Alternatively, you can specify "conservative" which will only return the content author
+#-# if the document have been marked as requiring programming rights.  With the conservative
+#-# content author resolver the risk of having programming rights leak to unprivileged is
+#-# significantly reduced.  It is strongly recommended to change to conservative.  It is
+#-# currently not the default as it might break some applications.
+#-#
+# security.authorization.contentAuthorResolverHint = default
+
+#-------------------------------------------------------------------------------------
 # Extension Manager
 #-------------------------------------------------------------------------------------
 

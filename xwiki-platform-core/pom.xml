@@ -366,6 +366,18 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <className>com/xpn/xwiki/XWikiConstant</className>
+              <field>DROPPED_PERMISSIONS</field>
+              <differenceType>6011</differenceType>
+              <justification>Constant naming the execution context property holding the "dropped permissions" flag is removed because the flag is no longer used.</justification>
+            </difference>
+            <difference>
+              <className>com/xpn/xwiki/XWikiContext</className>
+              <method>boolean hasDroppedPermissions()</method>
+              <differenceType>7002</differenceType>
+              <justification>The authorization settler (right service) no longer depends on this method for deciding if programming rights should be granted or not.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

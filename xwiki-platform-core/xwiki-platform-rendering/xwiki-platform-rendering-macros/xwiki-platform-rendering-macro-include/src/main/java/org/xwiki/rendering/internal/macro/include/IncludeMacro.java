@@ -174,6 +174,14 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // to be executed at this stage since they should be executed by the currently running Macro Transformation.
         DocumentDisplayerParameters displayParameters = new DocumentDisplayerParameters();
         displayParameters.setContentTransformed(parametersContext == Context.NEW);
+        DocumentModelBridge contentDocument;
+        if (parametersContext == Context.NEW) {
+            // By setting a content document, the included document may obtain programming rights from its content
+            // author.
+            contentDocument = documentBridge;
+        } else {
+            contentDocument = null;
+        }
         displayParameters.setExecutionContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
@@ -190,7 +198,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
         XDOM result;
         try {
-            result = this.documentDisplayer.display(documentBridge, displayParameters);
+            result = this.documentDisplayer.display(documentBridge, displayParameters, contentDocument);
         } catch (Exception e) {
             throw new MacroExecutionException(e.getMessage(), e);
         } finally {

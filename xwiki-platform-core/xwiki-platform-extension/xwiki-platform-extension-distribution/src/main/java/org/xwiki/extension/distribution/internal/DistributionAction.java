@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
+
 import com.xpn.xwiki.web.XWikiAction;
 
 /**

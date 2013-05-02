@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.template;
 
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
@@ -47,6 +46,7 @@ import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -55,8 +55,6 @@ import com.xpn.xwiki.web.Utils;
 import org.junit.Test;
 import org.junit.Rule;
 
-
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -69,20 +67,6 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 4.5M1
  */
-// This is the component list required for instantiating an XWikiDocument.
-@ComponentList({CurrentStringDocumentReferenceResolver.class, CurrentStringEntityReferenceResolver.class,
-        CurrentEntityReferenceValueProvider.class, DefaultModelContext.class, DefaultModelConfiguration.class,
-        ExplicitStringDocumentReferenceResolver.class, ExplicitStringEntityReferenceResolver.class,
-        ExplicitReferenceDocumentReferenceResolver.class, ExplicitReferenceEntityReferenceResolver.class,
-        XClassRelativeStringEntityReferenceResolver.class, CurrentMixedStringDocumentReferenceResolver.class,
-        CurrentMixedEntityReferenceValueProvider.class, DefaultEntityReferenceValueProvider.class,
-        CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-        RelativeStringEntityReferenceResolver.class, CompactStringEntityReferenceSerializer.class,
-        DefaultStringEntityReferenceSerializer.class, CompactWikiStringEntityReferenceSerializer.class,
-        LocalStringEntityReferenceSerializer.class, LocalUidStringEntityReferenceSerializer.class,
-        UidStringEntityReferenceSerializer.class, CurrentReferenceObjectReferenceResolver.class,
-        DefaultSyntaxFactory.class
-        })
 public class DefaultPrivilegedTemplateRendererTest
 {
 
@@ -101,6 +85,9 @@ public class DefaultPrivilegedTemplateRendererTest
 
         final ExecutionContext executionContext = new ExecutionContext();
 
+        GrantProgrammingRightController grantProgrammingRightController
+            = mocker.getInstance(GrantProgrammingRightController.class);
+
         executionContext.newProperty(XWikiContext.EXECUTIONCONTEXT_KEY).initial(context).declare();
 
         when(execution.getContext()).thenReturn(executionContext);
@@ -108,7 +95,8 @@ public class DefaultPrivilegedTemplateRendererTest
         // XWikiVelocityRenderer.evaluate is going to fail and print a stack trace to stderr.
         privilegedTemplateRenderer.evaluateTemplate("content", "template.vm");
 
-        verify(context, never()).setDoc(any(XWikiDocument.class));
+        verify(grantProgrammingRightController, never()).pushGrantProgrammingRight();
+        verify(grantProgrammingRightController, never()).popGrantProgrammingRight();
     }
 
     @Test
@@ -125,6 +113,9 @@ public class DefaultPrivilegedTemplateRendererTest
 
         final ExecutionContext executionContext = new ExecutionContext();
 
+        GrantProgrammingRightController grantProgrammingRightController
+            = mocker.getInstance(GrantProgrammingRightController.class);
+
         executionContext.newProperty(XWikiContext.EXECUTIONCONTEXT_KEY).initial(context).declare();
 
         when(execution.getContext()).thenReturn(executionContext);
@@ -133,7 +124,8 @@ public class DefaultPrivilegedTemplateRendererTest
         // XWikiVelocityRenderer.evaluate is going to fail and print a stack trace to stderr.
         privilegedTemplateRenderer.evaluateTemplate("content", "/templates/suggest.vm");
 
-        verify(context, times(2)).setDoc(any(XWikiDocument.class));
+        verify(grantProgrammingRightController, times(1)).pushGrantProgrammingRight();
+        verify(grantProgrammingRightController, times(1)).popGrantProgrammingRight();
     }
 
 }

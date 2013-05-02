@@ -53,6 +53,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.EffectiveUserController;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -162,6 +163,25 @@ public class LegacyTestWiki extends AbstractTestWiki
                         return currentDatabase;
                     }
                 });
+                allowing(context).getWiki();     will(returnValue(xwiki));
+                allowing(context).getMainXWiki();will(returnValue(mainWikiName));
+                allowing(context).get("grouplist"); will(returnValue(null));
+                allowing(context).put(with(equal("grouplist")), with(anything()));
+                allowing(context).isMainWiki(with(any(String.class)));
+                will(new CustomAction("indicate if the given string identifies the main wiki.") {
+                    @Override
+                    public Object invoke(Invocation invocation) {
+                        String name = (String) invocation.getParameter(0);
+                        return mainWikiName.equals(name);
+                    }
+                });
+                allowing(context).getUser();
+                will(new CustomAction("return the current username") {
+                    @Override
+                    public Object invoke(Invocation invocation) {
+                        return currentUsername;
+                    }
+                });
                 allowing(context).getWiki();
                 will(returnValue(xwiki));
                 allowing(context).getMainXWiki();
@@ -182,6 +202,9 @@ public class LegacyTestWiki extends AbstractTestWiki
                 allowing(context).get("sdoc");
                 will(new CustomAction("return the current sdoc")
                 {
+                allowing(context).setUserReference(with(any(DocumentReference.class)));
+                allowing(context).get("sdoc");
+                will(new CustomAction("return the current sdoc") {
                     @Override
                     public Object invoke(Invocation invocation)
                     {
@@ -203,8 +226,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                         return getDocument(docReference);
                     }
                 });
-                allowing(context).hasDroppedPermissions();
-                will(returnValue(false));
 
                 // Expectations for XWiki
 
@@ -265,8 +286,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                         return getAllGroupReferences((DocumentReference) invocation.getParameter(0));
                     }
                 });
-
-                // Expectations needed for old implementation
 
                 allowing(xwiki).getXWikiPreference(with(any(String.class)), with(equal("")),
                     with(any(XWikiContext.class)));
@@ -348,24 +367,15 @@ public class LegacyTestWiki extends AbstractTestWiki
         return mockWiki(name, owner, isReadOnly, isMainWiki, alt);
     }
 
-    public void setUser(String username)
-    {
+    public void setUser(String username) throws Exception {
+        componentManager.<EffectiveUserController>getInstance(EffectiveUserController.class)
+            .setEffectiveUser(documentReferenceResolver.resolve(username, new WikiReference(currentDatabase)));
         this.currentUsername = username;
     }
 
-    public void setSdoc(String sdocFullname)
-    {
-        if (sdocFullname != null) {
-            sdocReference = documentReferenceResolver.resolve(sdocFullname, currentDatabase);
-        } else {
-            sdocReference = null;
-        }
-    }
-
-    public void setDoc(String docFullname)
-    {
+    public void setDoc(String docFullname) {
         if (docFullname != null) {
-            docReference = documentReferenceResolver.resolve(docFullname, currentDatabase);
+            docReference = documentReferenceResolver.resolve(docFullname, new WikiReference(currentDatabase));
         } else {
             docReference = null;
         }
@@ -1162,8 +1172,19 @@ public class LegacyTestWiki extends AbstractTestWiki
                         will(returnValue(getSpace().getWiki().getName()));
                         allowing(mockedDocument).getSpace();
                         will(returnValue(getSpace().getName()));
+                        allowing(mockedDocument).getCreatorReference();
+                        will(returnValue(documentReferenceResolver.resolve(TestDocument.this.creator, documentReference)));
+                        allowing(mockedDocument).getWikiName(); will(returnValue(getSpace().getWiki().getName()));
+                        allowing(mockedDocument).getDocumentReference(); will(returnValue(documentReference));
+                        allowing(mockedDocument).getDatabase(); will(returnValue(getSpace().getWiki().getName()));
+                        allowing(mockedDocument).getSpace(); will(returnValue(getSpace().getName()));
+                        allowing(mockedDocument).isNew(); will(returnValue(isNew));
+                        allowing(mockedDocument).isMetaDataDirty(); will(returnValue(false));
+                        allowing(mockedDocument).isContentDirty(); will(returnValue(false));
+                        // Needed for debug logging.
+                        allowing(mockedDocument).getFullName(); will(returnValue(getSpace().getName() + "." + getName()));
                     }
-                });
+                }
             }
         }
 

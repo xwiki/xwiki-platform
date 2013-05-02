@@ -75,7 +75,7 @@
 &lt;div class='xwikitabpanescontainer'&gt;
 #foreach ($tab in $tabs)
   #if ($tab['tabName'] == $view)
-    {{include document="$tab['document']"/}}
+    {{include document="$tab['document']" context="new" /}}
     #break
   #end
 #end

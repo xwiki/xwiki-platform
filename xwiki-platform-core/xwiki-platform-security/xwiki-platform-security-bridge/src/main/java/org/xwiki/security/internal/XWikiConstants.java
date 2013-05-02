@@ -48,6 +48,9 @@ public interface XWikiConstants
     /** Field name for level in xwiki rights object. */
     String LEVELS_FIELD_NAME = "levels";
 
+    /** XWiki class for required rights. */
+    String REQUIRED_RIGHT_CLASSNAME = "RequiredRightClass";
+
     /** Field name for group in xwiki rights object. */
     String GROUPS_FIELD_NAME = "groups";
 
@@ -56,6 +59,12 @@ public interface XWikiConstants
 
     /** Field name for rights in xwiki rights object. */
     String ALLOW_FIELD_NAME  = "allow";
+
+    /** Field name in therequired right class. */
+    String REQUIRED_RIGHT_LEVEL_FIELD_NAME = "level";
+
+    /** Programming right value for required right. */
+    String REQUIRED_RIGHT_PROGRAMMING = "programming";
 
     /** The Guest username. */
     String GUEST_USER = "XWikiGuest";

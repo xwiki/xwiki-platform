@@ -38,6 +38,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.context.Execution;
+import org.xwiki.security.authorization.AuthorizationContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -87,6 +89,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
      */
     private EntityReferenceSerializer<String> entityReferenceSerializer = Utils
         .getComponent(EntityReferenceSerializer.TYPE_STRING);
+
+
+    /**
+     * The execution used for accessing the authorization context.
+     */
+    Execution execution = Utils.getComponent(Execution.class);
 
     protected void logAllow(String username, String page, String action, String info)
     {
@@ -791,15 +799,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
      * @return true if the username is that of the superadmin (whatever the case) or false otherwise
      */
     // TODO: this method is a candidate for the the XWikiRightService API.
-    private boolean isSuperAdmin(String username)
+    private boolean isSuperAdmin(DocumentReference userReference)
     {
-        // Note 1: we use the default document reference resolver here but it doesn't matter since we only care about
-        // the resolved page name.
-        // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
-        // to retrieve only the page name
-        DocumentReference userReference =
-            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
-                username);
         return StringUtils.equalsIgnoreCase(userReference.getName(), SUPERADMIN_USER);
     }
 
@@ -813,7 +814,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         String database = context.getDatabase();
         boolean allow;
 
-        if (isSuperAdmin(name)) {
+        if (isSuperAdmin(currentMixedDocumentReferenceResolver.resolve(name))) {
             logAllow(name, resourceKey, accessLevel, "super admin level");
             return true;
         }
@@ -922,59 +923,67 @@ public class XWikiRightServiceImpl implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
-        // Once dropPermissions has been called, the document in the
-        // context cannot have programming permission.
-        if (context.hasDroppedPermissions()) {
-            return false;
-        }
-        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
-        if (sdoc == null) {
-            sdoc = context.getDoc();
+        if (getAuth().securityStackIsEmpty()) {
+            return hasProgrammingRights(getAuth().getEffectiveUser(), context);
         }
 
-        return hasProgrammingRights(sdoc, context);
+        DocumentReference contentAuthor = getAuth().getContentAuthor();
+
+        return hasProgrammingRights(contentAuthor, context);
     }
 
     @Override
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
-        try {
-            if (doc == null) {
-                // If no context document is set, then check the rights of the current user
-                return isSuperAdminOrProgramming(this.entityReferenceSerializer.serialize(context.getUserReference()),
-                    null, "programming", true, context);
-            }
+        if (doc == null) {
+            // If no context document is set, then check the rights of the current user
+            return hasProgrammingRights(getAuth().getEffectiveUser(), context);
+        }
 
-            String username = doc.getContentAuthor();
+        final DocumentReference contentAuthor = doc.getContentAuthorReference();
 
-            if (username == null) {
-                return false;
-            }
+        return hasProgrammingRights(contentAuthor, context);
+    }
 
-            String docname;
-            if (doc.getDatabase() != null) {
-                docname = doc.getDatabase() + ":" + doc.getFullName();
-                if (username.indexOf(":") == -1) {
-                    username = doc.getDatabase() + ":" + username;
-                }
-            } else {
-                docname = doc.getFullName();
-            }
-
-            // programming rights can only been given for user of the main wiki
-            // FIXME: Isn't this wrong? The main db is context.getMainWikiName(), not context.getWiki().getDatabase()
-            // (which is the current db).
-            String maindb = context.getWiki().getDatabase();
-            if ((maindb == null) || (!username.startsWith(maindb))) {
-                return false;
-            }
-
-            return hasAccessLevel("programming", username, docname, context);
-        } catch (Exception e) {
-            LOGGER.error("Failed to check programming right for document [{}]", doc.getPrefixedFullName(), e);
-
+    private boolean hasProgrammingRights(DocumentReference user, XWikiContext context)
+    {
+        if (!getAuth().isPrivileged()) {
+            LOGGER.debug("Programming rights denied because privileged mode is disabled.");
             return false;
         }
+
+        if (getAuth().grantProgrammingRight()) {
+            LOGGER.debug("Programming rights granted because grant programming right is enabled.");
+            return true;
+        }
+
+        if (user == null) {
+            // For the guest user, the effective user will be null.
+            LOGGER.debug("Programming rights denied because there is no content author.");
+            return false;
+        }
+
+        final String username = entityReferenceSerializer.serialize(user);
+
+        // programming rights can only been given for user of the main wiki,
+        // uless the user is super admin.
+        if (!context.isMainWiki(user.getWikiReference().getName())) {
+            if (isSuperAdmin(user)) {
+                return true;
+            }
+            LOGGER.debug("Programming rights denied because user [{}] is not a member of the main wiki.",
+                         username);
+            return false;
+        }
+
+        try {
+            return isSuperAdminOrProgramming(username, null, "programming", true, context);
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to determine if the user [{}] is super admin or have programming rights.",
+                         username, e);
+            return false;
+        }
+
     }
 
     @Override
@@ -1005,4 +1014,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
     }
 
+    /** @return the authorization context. */
+    private AuthorizationContext getAuth()
+    {
+        return (AuthorizationContext) execution.getContext()
+            .getProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY);
+    }
 }

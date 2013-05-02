@@ -89,6 +89,13 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     @Override
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
+        return display(document, parameters, null);
+    }
+
+    @Override
+    public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters,
+                        DocumentModelBridge contentDocument)
+    {
         XDOM xdom = null;
         if (isSheetExpected(document, parameters)) {
             Map<String, Object> backupObjects = null;
@@ -99,7 +106,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
                 if (document != modelBridge.getCurrentDocument()) {
                     backupObjects = modelBridge.pushDocumentInContext(document);
                 }
-                xdom = maybeDisplayWithSheet(document, parameters);
+                xdom = maybeDisplayWithSheet(document, parameters, contentDocument);
             } finally {
                 if (backupObjects != null) {
                     documentAccessBridge.popDocumentFromContext(backupObjects);
@@ -110,7 +117,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
         // Fall back on the default document displayer if no sheet was applied. Note that we don't isolate the context
         // before calling the default document displayer. It is better to let the default document displayer choose if
         // isolating the execution context is needed due to the way #isSheetExpected() checks for current document.
-        return xdom != null ? xdom : documentDisplayer.display(document, parameters);
+        return xdom != null ? xdom : documentDisplayer.display(document, parameters, contentDocument);
     }
 
     /**
@@ -148,9 +155,11 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
      * 
      * @param document the document that is displayed
      * @param parameters the display parameters
+     * @param contentDocument the content document
      * @return the result of displaying the given document, with or without a sheet
      */
-    private XDOM maybeDisplayWithSheet(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    private XDOM maybeDisplayWithSheet(DocumentModelBridge document, DocumentDisplayerParameters parameters,
+                                       DocumentModelBridge contentDocument)
     {
         for (DocumentReference sheetReference : getSheetReferences(document)) {
             if (document.getDocumentReference().equals(sheetReference)) {
@@ -161,7 +170,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
                 break;
             } else if (documentAccessBridge.isDocumentViewable(sheetReference)) {
                 try {
-                    return applySheet(document, sheetReference, parameters);
+                    return applySheet(document, sheetReference, parameters, contentDocument);
                 } catch (Exception e) {
                     String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
                     logger.warn("Failed to apply sheet [{}].", sheetStringReference, e);
@@ -191,11 +200,12 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
      * @param document the document to apply the sheet to
      * @param sheetReference the sheet to apply
      * @param parameters the display parameters
+     * @param contentDocument the content document
      * @return the result of rendering the sheet in the context of the given document
      * @throws Exception if applying the sheet fails
      */
     private XDOM applySheet(DocumentModelBridge document, DocumentReference sheetReference,
-        DocumentDisplayerParameters parameters) throws Exception
+         DocumentDisplayerParameters parameters, DocumentModelBridge contentDocument) throws Exception
     {
         DocumentModelBridge sheet = documentAccessBridge.getDocument(sheetReference);
         if (parameters.isTitleDisplayed() && StringUtils.isEmpty(sheet.getTitle())) {
@@ -203,37 +213,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
             return null;
         }
 
-        if (modelBridge.hasProgrammingRights(document) ^ modelBridge.hasProgrammingRights(sheet)) {
-            // FIXME: If the displayed document and the sheet don't have the same programming rights then we preserve
-            // the programming rights of the sheet by rendering it as if the author of the displayed document is the
-            // author of the sheet.
-            return displayAsSheetAuthor(document, sheet, parameters);
-        } else {
-            return display(document, sheet, parameters);
-        }
-    }
-
-    /**
-     * Displays a document with a sheet, changing the document content author to match the sheet content author in order
-     * to preserve the programming rights of the sheet.
-     * 
-     * @param document the displayed document
-     * @param sheet the applied sheet
-     * @param parameters the display parameters
-     * @return the result of displaying the sheet in the context of the given document
-     */
-    private XDOM displayAsSheetAuthor(DocumentModelBridge document, DocumentModelBridge sheet,
-        DocumentDisplayerParameters parameters)
-    {
-        DocumentReference documentContentAuthorReference = modelBridge.getContentAuthorReference(document);
-        try {
-            // This is a hack. We need a better way to preserve the programming rights level of the sheet.
-            modelBridge.setContentAuthorReference(document, modelBridge.getContentAuthorReference(sheet));
-            return display(document, sheet, parameters);
-        } finally {
-            // Restore the content author of the target document.
-            modelBridge.setContentAuthorReference(document, documentContentAuthorReference);
-        }
+        return display(document, sheet, parameters, sheet);
     }
 
     /**
@@ -242,14 +222,15 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
      * @param document the displayed document
      * @param sheet the applied sheet
      * @param parameters the display parameters
+     * @param contentDocument the content document
      * @return the result of displaying the sheet in the context of the given document
      */
     private XDOM display(DocumentModelBridge document, DocumentModelBridge sheet,
-        DocumentDisplayerParameters parameters)
+         DocumentDisplayerParameters parameters, DocumentModelBridge contentDocument)
     {
         DocumentDisplayerParameters sheetDisplayParameters = parameters.clone();
         // The execution context was already isolated and we want to display the sheet in the context of the given doc.
         sheetDisplayParameters.setExecutionContextIsolated(false);
-        return documentDisplayer.display(sheet, sheetDisplayParameters);
+        return documentDisplayer.display(sheet, sheetDisplayParameters, contentDocument);
     }
 }

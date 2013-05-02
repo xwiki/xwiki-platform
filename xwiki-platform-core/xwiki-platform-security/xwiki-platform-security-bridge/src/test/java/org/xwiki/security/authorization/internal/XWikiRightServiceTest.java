@@ -141,8 +141,6 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         setContext(ctx);
 
-        testWiki.setSdoc(null);
-
         // XWiki.Programmer should have PR, as per the global rights.
         testWiki.setUser("XWiki.programmer");
         Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));

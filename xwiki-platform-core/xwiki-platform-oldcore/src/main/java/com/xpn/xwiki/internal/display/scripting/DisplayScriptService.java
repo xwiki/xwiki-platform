@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.internal.display.scripting;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +41,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContentDocumentController;
+import org.xwiki.security.authorization.GrantProgrammingRightController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -93,6 +94,18 @@ public class DisplayScriptService implements ScriptService
     private SyntaxFactory syntaxFactory;
 
     /**
+     * This is used for pushing the displayed document to the security stack.
+     */
+    @Inject
+    private ContentDocumentController contentDocumentController;
+
+    /**
+     *  Used for bypassing programming rights check when obtaining the xwiki document.
+     */
+    @Inject
+    private GrantProgrammingRightController grantProgrammingRightController;
+
+    /**
      * Displays a document.
      * 
      * @param document the document to display
@@ -126,12 +139,16 @@ public class DisplayScriptService implements ScriptService
         if (displayerHint == null) {
             displayerHint = "configured";
         }
+        DocumentModelBridge documentModel = getDocument(document);
+        contentDocumentController.pushContentDocument(documentModel);
         try {
             DocumentDisplayer displayer = componentManager.getInstance(DocumentDisplayer.class, displayerHint);
             return renderXDOM(displayer.display(getDocument(document), displayerParameters), outputSyntax);
         } catch (Exception e) {
             logger.error("Failed to display document [{}].", document.getPrefixedFullName(), e);
             return null;
+        } finally {
+            contentDocumentController.popContentDocument();
         }
     }
 
@@ -234,7 +251,7 @@ public class DisplayScriptService implements ScriptService
     }
 
     /**
-     * Note: This method accesses the low level XWiki document through reflection in order to bypass programming rights.
+     * Note: This method use the grant all controller to bypass programming rights requirement.
      * 
      * @param document an instance of {@link Document} received from a script
      * @return an instance of {@link DocumentModelBridge} that wraps the low level document object exposed by the given
@@ -242,14 +259,11 @@ public class DisplayScriptService implements ScriptService
      */
     private DocumentModelBridge getDocument(Document document)
     {
+        grantProgrammingRightController.pushGrantProgrammingRight();
         try {
-            // HACK: We try to access the XWikiDocument instance wrapped by the document API using reflection because we
-            // want to bypass the programming rights requirements.
-            Field docField = Document.class.getDeclaredField("doc");
-            docField.setAccessible(true);
-            return (DocumentModelBridge) docField.get(document);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to access the XWikiDocument instance wrapped by the document API.", e);
+            return document.getDocument();
+        } finally {
+            grantProgrammingRightController.popGrantProgrammingRight();
         }
     }
 

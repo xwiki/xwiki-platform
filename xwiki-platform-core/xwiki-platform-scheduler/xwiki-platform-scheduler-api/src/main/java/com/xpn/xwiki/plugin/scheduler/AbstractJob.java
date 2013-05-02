@@ -27,6 +27,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.security.authorization.EffectiveUserController;
+
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
@@ -66,10 +68,15 @@ public abstract class AbstractJob implements Job
             throw new JobExecutionException("Fail to initialize execution context", e);
         }
 
+        final EffectiveUserController effectiveUserController     = Utils.getComponent(EffectiveUserController.class);
+
+        effectiveUserController.setEffectiveUser(xwikiContext.getUserReference());
+
         try {
             // Execute the job
             executeJob(jobContext);
         } finally {
+            effectiveUserController.setEffectiveUser(null);
             // We must ensure we clean the ThreadLocal variables located in the Execution
             // component as otherwise we will have a potential memory leak.
             execution.removeContext();

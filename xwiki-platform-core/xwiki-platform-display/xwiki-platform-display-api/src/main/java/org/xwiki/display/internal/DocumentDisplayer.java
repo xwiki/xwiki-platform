@@ -22,6 +22,8 @@ package org.xwiki.display.internal;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Role;
 
+import org.xwiki.rendering.block.XDOM;
+
 /**
  * Component used to display documents.
  * 
@@ -29,6 +31,22 @@ import org.xwiki.component.annotation.Role;
  * @since 3.2M3
  */
 @Role
-public interface DocumentDisplayer extends Displayer<DocumentModelBridge, DocumentDisplayerParameters>
+public interface DocumentDisplayer
+    extends Displayer<DocumentModelBridge, DocumentDisplayerParameters>
 {
+    /**
+     * Displays the given data with a security item set, to enable privilege delegation.
+     *
+     * This method is necessary because the document the displayer is abused in XWikiDocument for displaying text
+     * strings that are not actual documents, and because the default translation version of the document will allways
+     * be passed as 'data', even when the actually displayed document is a translation.  (In this latter case, the
+     * translated document will be passed as security item.)
+     *
+     * @param data the data to be displayed
+     * @param parameters display parameters
+     * @param securityItem the security item
+     * @return the result of displaying the given data
+     * @since 4.4M1
+     */
+    XDOM display(DocumentModelBridge data, DocumentDisplayerParameters parameters, DocumentModelBridge securityItem);
 }

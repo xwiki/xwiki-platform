@@ -45,6 +45,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.EffectiveUserController;
+import org.xwiki.security.authorization.PrivilegedModeController;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -164,7 +166,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
-    /** The Execution so that we can check if permissions were dropped there. */
+    /** The Execution. */
     private final Execution execution = Utils.getComponent(Execution.class);
 
     public XWikiContext()
@@ -361,8 +363,18 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.userReference;
     }
 
+    /**
+     * @param userReference The reference to the user's profile document.
+     * @deprecated since 5.0M1  Use the EffectiveUserController instead.
+     */
+    @Deprecated
     public void setUserReference(DocumentReference userReference)
     {
+        if (userReference == this.userReference ||
+            (userReference != null && userReference.equals(this.userReference))) {
+            return;
+        }
+
         if (userReference == null) {
             this.userReference = null;
             remove(USER_KEY);
@@ -380,6 +392,12 @@ public class XWikiContext extends Hashtable<Object, Object>
             }
         }
 
+        try {
+            EffectiveUserController effectiveUserController = Utils.getComponent(EffectiveUserController.class);
+            effectiveUserController.setEffectiveUser(userReference);
+        } catch (RuntimeException e) {
+            // Allow unit tests use the XWikiContext without having to initiate the authorization context factory.
+        }
     }
 
     private void setUserInternal(String user, boolean main)
@@ -753,28 +771,9 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public void dropPermissions()
     {
-        this.put(XWikiConstant.DROPPED_PERMISSIONS, Boolean.TRUE);
-    }
-
-    /**
-     * @return true if {@link XWikiContext#dropPermissions()} has been called on this context, or if the
-     *         {@link XWikiConstant#DROPPED_PERMISSIONS} key has been set in the
-     *         {@link org.xwiki.context.ExecutionContext} for this thread. This is done by calling
-     *         {Document#dropPermissions()}
-     */
-    public boolean hasDroppedPermissions()
-    {
-        if (this.get(XWikiConstant.DROPPED_PERMISSIONS) != null) {
-            return true;
-        }
-
-        final Object dropped = this.execution.getContext().getProperty(XWikiConstant.DROPPED_PERMISSIONS);
-
-        if (dropped == null || !(dropped instanceof Integer)) {
-            return false;
-        }
-
-        return ((Integer) dropped) == System.identityHashCode(this.execution.getContext());
+        PrivilegedModeController p = ((Provider<PrivilegedModeController>)
+            Utils.getComponent(PrivilegedModeController.PROVIDER_TYPE)).get();
+        p.disablePrivilegedMode();
     }
 
     // Object

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import javax.inject.Provider;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.security.authorization.PrivilegedModeController;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -2832,10 +2834,8 @@ public class Document extends Api
      */
     public void dropPermissions()
     {
-        // Set the droppedPermissions key to the context so if the context is cloned and
-        // pushed, it will return false until it is popped again.
-        final ExecutionContext context = Utils.getComponent(Execution.class).getContext();
-        context.setProperty(XWikiConstant.DROPPED_PERMISSIONS,
-                            System.identityHashCode(context));
+        PrivilegedModeController p = ((Provider<PrivilegedModeController>)
+            Utils.getComponent(PrivilegedModeController.PROVIDER_TYPE)).get();
+        p.disablePrivilegedModeInCurrentExecutionContext();
     }
 }

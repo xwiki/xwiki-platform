@@ -21,12 +21,26 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import org.junit.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.Invocation;
+import org.jmock.core.matcher.InvokeAtLeastOnceMatcher;
+import org.jmock.core.matcher.InvokeOnceMatcher;
+import org.jmock.core.matcher.InvokedRecorder;
+import org.jmock.core.matcher.InvokedAfterMatcher;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationContext;
+import org.xwiki.security.authorization.PrivilegedModeController;
+import org.xwiki.security.authorization.EffectiveUserController;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.util.DefaultParameterizedType;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -37,9 +51,13 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
 
 public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
+
+    private Mock effectiveUserController;
+
     public void testToStringReturnsFullName()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
@@ -73,8 +91,10 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(1, lst.size());
     }
 
-    public void testRemoveObjectDoesntCauseDataLoss() throws XWikiException
+    public void testRemoveObjectDoesntCauseDataLoss() throws Exception
     {
+        registerMockComponent(PrivilegedTemplateRenderer.class);
+
         Mock mockXWiki = mock(XWiki.class);
         BaseClass c = new BaseClass();
         c.setDocumentReference(new DocumentReference("xwiki", "XWiki", "XWikiComments"));
@@ -110,15 +130,35 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         }
     }
 
-    public void testSaveAsAuthorUsesGuestIfDroppedPermissions() throws XWikiException
+    public void testSaveAsAuthorUsesGuestIfDroppedPermissions() throws Exception
     {
+        registerMockComponent(PrivilegedTemplateRenderer.class);
+
         final XWikiDocument xdoc = new XWikiDocument("Space", "Page");
 
         final Mock mockRightService = mock(XWikiRightService.class);
 
+        final Mock mockAuthorizationContext = mock(AuthorizationContext.class);
+
+        final Mock mockPrivilegedModeController = registerMockComponent(PrivilegedModeController.class);
+
+        DefaultComponentDescriptor<Provider<PrivilegedModeController>> descriptor
+            = new DefaultComponentDescriptor<Provider<PrivilegedModeController>>();
+        descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+        descriptor.setRoleType(PrivilegedModeController.PROVIDER_TYPE);
+        descriptor.setRoleHint("default");
+        final Mock mockProvider = mock(Provider.class);
+        getComponentManager().registerComponent(descriptor, (Provider<PrivilegedModeController>) mockProvider.proxy());
+
+        mockProvider.stubs().method("get").will(returnValue(mockPrivilegedModeController.proxy()));
+
+        final Execution execution = getComponentManager().getInstance(Execution.class);
+        execution.getContext().setProperty(AuthorizationContext.EXECUTION_CONTEXT_KEY,
+                                           mockAuthorizationContext.proxy());
+
         mockRightService.expects(once())
             .method("hasAccessLevel").with(eq("edit"),
-                                           eq("XWiki.Alice"),
+                                           eq("xwiki:XWiki.Alice"),
                                            ANYTHING,
                                            ANYTHING).will(returnValue(true));
 
@@ -127,6 +167,14 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
                                            eq("XWikiGuest"),
                                            ANYTHING,
                                            ANYTHING).will(returnValue(false));
+
+        InvokedRecorder isPrivilegedFirst = new InvokeOnceMatcher();
+        mockAuthorizationContext.expects(isPrivilegedFirst)
+            .method("isPrivileged").will(returnValue(true));
+        mockPrivilegedModeController.expects(once())
+            .method("disablePrivilegedMode");
+        mockAuthorizationContext.expects(new InvokedAfterMatcher(isPrivilegedFirst, "isPrivilegedFirst"))
+            .method("isPrivileged").will(returnValue(false));
 
         final Mock mockXWiki = mock(XWiki.class);
         mockXWiki.stubs().method("getRightService")
@@ -150,6 +198,8 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         // Alice is the author.
         xdoc.setContentAuthor("XWiki.Alice");
+        mockAuthorizationContext.expects(new InvokeAtLeastOnceMatcher())
+            .method("getContentAuthor").will(returnValue(xdoc.getContentAuthorReference()));
 
         // Bob is the viewer
         this.getContext().setUser("XWiki.Bob");
@@ -178,5 +228,17 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("", document.getCreator());
         assertEquals("", document.getAuthor());
         assertEquals("", document.getContentAuthor());
+    }
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        Mock authorizationContextFactory
+            = registerMockComponent(ExecutionContextInitializer.class, "defaultAuthorizationContextFactory");
+        authorizationContextFactory.expects(once()).method("initialize").with(ANYTHING);
+        effectiveUserController
+            = registerMockComponent(EffectiveUserController.class);
+        effectiveUserController.stubs().method("setEffectiveUser").with(ANYTHING);
+
     }
 }

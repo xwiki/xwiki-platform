@@ -60,7 +60,8 @@ public class DefaultDocumentDisplayer implements DocumentDisplayer
     private ComponentManager componentManager;
 
     @Override
-    public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters,
+                        DocumentModelBridge contentDocument)
     {
         String syntaxId = document.getSyntax().toIdString();
         DocumentDisplayer displayer;
@@ -77,6 +78,13 @@ public class DefaultDocumentDisplayer implements DocumentDisplayer
                 displayer = contentDisplayer;
             }
         }
-        return displayer.display(document, parameters);
+        return displayer.display(document, parameters, contentDocument);
     }
+
+    @Override
+    public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    {
+        return display(document, parameters, null);
+    }
+
 }

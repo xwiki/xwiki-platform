@@ -416,6 +416,11 @@
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other
          modules using it to the Servlet environment, which is pretty bad. To be able to remove this dependency
          we first need to be able to split DefaultVelocityManager so that the part that is related to the Servlet

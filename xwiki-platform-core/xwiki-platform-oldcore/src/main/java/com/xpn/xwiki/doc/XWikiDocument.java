@@ -918,7 +918,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             parameters.setTransformationContextIsolated(isolateVelocityMacros);
             // Render the translated content (matching the current language) using this document's syntax.
             parameters.setContentTranslated(tdoc != this);
-            XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
+            XDOM contentXDOM = getDocumentDisplayer().display(this, parameters, tdoc);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
             getRenderingCache().setRenderedContent(getDocumentReference(), content, renderedContent, context);
         }
@@ -1189,7 +1189,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setTitleDisplayed(true);
         parameters.setExecutionContextIsolated(true);
-        XDOM titleXDOM = getDocumentDisplayer().display(this, parameters);
+        XDOM titleXDOM = getDocumentDisplayer().display(this, parameters, this);
         try {
             return renderXDOM(titleXDOM, outputSyntax);
         } catch (XWikiException e) {

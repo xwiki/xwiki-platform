@@ -30,6 +30,9 @@ import org.quartz.JobExecutionException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
+
+import org.xwiki.security.authorization.ContentDocumentController;
 
 /**
  * The task that will get executed by the Scheduler when the Job is triggered. This task in turn calls a Groovy script
@@ -69,22 +72,30 @@ public class GroovyJob extends AbstractJob
             // Get the job XObject to be executed
             BaseObject object = (BaseObject) data.get("xjob");
 
+            final ContentDocumentController contentDocumentController = Utils.getComponent(ContentDocumentController.class);
+
             // Force context document
             XWikiDocument jobDocument = context.getWiki().getDocument(object.getName(), context);
             context.setDoc(jobDocument);
             context.put("sdoc", jobDocument);
+            contentDocumentController.pushContentDocument(jobDocument);
 
-            if (context.getWiki().getRightService().hasProgrammingRights(context)) {
+            try {
 
-                // Make the Job execution data available to the Groovy script
-                Binding binding = new Binding(data.getWrappedMap());
+                if (context.getWiki().getRightService().hasProgrammingRights(context)) {
 
-                // Execute the Groovy script
-                GroovyShell shell = new GroovyShell(binding);
-                shell.evaluate(object.getLargeStringValue("script"));
-            } else {
-                throw new JobExecutionException("The user [" + context.getUser() + "] didn't have "
-                    + "programming rights when the job [" + jobContext.getJobDetail().getName() + "] was scheduled.");
+                    // Make the Job execution data available to the Groovy script
+                    Binding binding = new Binding(data.getWrappedMap());
+
+                    // Execute the Groovy script
+                    GroovyShell shell = new GroovyShell(binding);
+                    shell.evaluate(object.getLargeStringValue("script"));
+                } else {
+                    throw new JobExecutionException("The user [" + context.getUser() + "] didn't have "
+                                                    + "programming rights when the job [" + jobContext.getJobDetail().getName() + "] was scheduled.");
+                }
+            } finally {
+                contentDocumentController.popContentDocument();
             }
         } catch (CompilationFailedException e) {
             throw new JobExecutionException("Failed to execute script for job [" + jobContext.getJobDetail().getName()

@@ -55,7 +55,7 @@ import org.xwiki.velocity.VelocityManager;
 @Component
 @Named("content")
 @Singleton
-public class DocumentContentDisplayer implements DocumentDisplayer
+public class DocumentContentDisplayer extends AbstractDocumentDisplayer
 {
     /**
      * The context property which indicates if the current code was called from a template (only Velocity execution) or
@@ -106,7 +106,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
     private ComponentManager componentManager;
 
     @Override
-    public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    protected XDOM doDisplay(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
         String nameSpace =
             defaultEntityReferenceSerializer.serialize(parameters.isContentTransformed()

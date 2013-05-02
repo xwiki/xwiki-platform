@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -40,6 +42,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.stability.Unstable;
+import org.xwiki.security.authorization.PrivilegedModeController;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -90,6 +93,10 @@ public class XWiki extends Api
      */
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer = Utils
         .getComponent(EntityReferenceSerializer.TYPE_STRING);
+
+    private final PrivilegedModeController privilegedModeController = ((Provider<PrivilegedModeController>) Utils
+        .getComponent(new DefaultParameterizedType(null, Provider.class, PrivilegedModeController.class)))
+        .get();
 
     /**
      * XWiki API Constructor
@@ -1703,6 +1710,16 @@ public class XWiki extends Api
      */
     public String renderText(String text, Document doc) throws XWikiException
     {
+        if (!hasProgrammingRights()) {
+            // Since no content author can be verified for the text here, we will just disable the privileged mode in
+            // the authorization context (which means that programming rights will not be granted).
+            privilegedModeController.disablePrivilegedMode();
+            try {
+                return this.xwiki.getRenderingEngine().renderText(text, doc.getDoc(), getXWikiContext());
+            } finally {
+                privilegedModeController.restorePrivilegedMode();
+            }
+        }
         return this.xwiki.getRenderingEngine().renderText(text, doc.getDoc(), getXWikiContext());
     }
 
@@ -1735,7 +1752,7 @@ public class XWiki extends Api
         }
 
         try {
-            return this.xwiki.getRenderingEngine().renderText(buf.toString(), doc.getDoc(), getXWikiContext());
+            return renderText(buf.toString(), doc);
         } catch (Exception e) {
             return buf.toString();
         }

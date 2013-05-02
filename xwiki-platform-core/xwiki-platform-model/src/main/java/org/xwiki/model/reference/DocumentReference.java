@@ -161,6 +161,7 @@ public class DocumentReference extends EntityReference
      * 
      * @param localDocumentReference the document reference without the wiki reference
      * @param wikiReference the wiki reference
+     * @since 5.1M1
      */
     public DocumentReference(LocalDocumentReference localDocumentReference, WikiReference wikiReference)
     {

@@ -146,6 +146,6 @@ public class DocumentReferenceTest
     public void testCreateDocumentReferenceFromLocalDocumentReference()
     {
         Assert.assertEquals("wiki:space.page", new DocumentReference(new LocalDocumentReference("space", "page"),
-            new WikiReference("wiki")));
+            new WikiReference("wiki")).toString());
     }
 }

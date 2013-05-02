@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Configuration source taking its data in the Space Preferences wiki document (using data from the
@@ -39,14 +40,13 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
 {
     private static final String DOCUMENT_NAME = "WebPreferences";
 
-    private static final String CLASS_SPACE_NAME = "XWiki";
-
-    private static final String CLASS_PAGE_NAME = "XWikiPreferences";
+    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki",
+        "XWikiPreferences");
 
     @Override
-    protected DocumentReference getClassReference()
+    protected LocalDocumentReference getClassReference()
     {
-        return new DocumentReference(getCurrentWikiReference().getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
+        return CLASS_REFERENCE;
     }
 
     @Override

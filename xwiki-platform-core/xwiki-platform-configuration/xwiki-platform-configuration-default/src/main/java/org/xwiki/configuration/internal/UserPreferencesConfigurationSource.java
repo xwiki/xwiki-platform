@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Configuration source taking its data in the User Preferences wiki document (the user profile page) using data from a
@@ -38,24 +38,12 @@ import org.xwiki.model.reference.WikiReference;
 @Singleton
 public class UserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    /**
-     * Space name of the user class document.
-     */
-    private static final String CLASS_SPACE_NAME = "XWiki";
-
-    /**
-     * Document name of the user class document.
-     */
-    private static final String CLASS_PAGE_NAME = "XWikiUsers";
+    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     @Override
-    protected DocumentReference getClassReference()
+    protected LocalDocumentReference getClassReference()
     {
-        // The user can be from a different wiki, we need to get the class reference from the wiki of the user.
-        // Example: the user "xwiki:XWiki.Admin" is looking at "subwiki:Main.WebHome", we need to use the class
-        // reference "xwiki:XWiki.XWikiUsers" and not "subwiki:XWiki.XWikiUsers".
-        WikiReference wikiReference = getDocumentAccessBridge().getCurrentUserReference().getWikiReference();
-        return new DocumentReference(wikiReference.getName(), CLASS_SPACE_NAME, CLASS_PAGE_NAME);
+        return CLASS_REFERENCE;
     }
 
     @Override

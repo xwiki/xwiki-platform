@@ -148,7 +148,7 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
             } catch (ResolveException e) {
                 throw new InstallException("Failed to find extension", e);
             } catch (LocalExtensionRepositoryException e) {
-                throw new InstallException("Failed save extension in local reposiory", e);
+                throw new InstallException("Failed save extension in local repository", e);
             } finally {
                 notifyPopLevelProgress();
             }

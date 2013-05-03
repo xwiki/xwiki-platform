@@ -516,4 +516,39 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # security.authorization.settler=default
 
+#-------------------------------------------------------------------------------------
+# URL
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.1M1]
+#-# The id of the URL format to use. This allows to plug in different implementations and thus allows to completely
+#-# control the format of XWiki URLs.
+#-# Note that this feature is still in development and as such should be considered experimental at the moment.
+#-#
+#-# The default is:
+# url.format=standard
+
+#-# [Since 5.1M1]
+#-# Defines where the wiki part is defined in a URL pointing to a subwiki
+#-# If true then the wiki part is located in the URL path (a.k.a path-based), for example:
+#-#   http://server/xwiki/wiki/mywiki/view/Space/Page
+#-# If false then the wiki part is located in the URL host domain (a.k.a domain-based), for example:
+#-#   http://mywiki.domain/xwiki/bin/view/Space/Page
+#-#
+#-# The default is:
+# url.standard.multiwiki.isPathBased=true
+
+#-# [Since 5.1M1]
+#-# For path-based setups, this property defines the path segment before the one identifying the subwiki in the URL.
+#-# For example if set to "thewiki", then the following URL will point to a subwiki named "mywiki":
+#-#   http://server/xwiki/thewiki/mywiki/view/Space/Page
+#-# Note that the mapping in web.xml has to be modified accordingly if you don't use the default value:
+#-#   <servlet-mapping>
+#-#     <servlet-name>action</servlet-name>
+#-#     <url-pattern>/wiki/*</url-pattern>
+#-#   </servlet-mapping>
+#-#
+#-# The default is:
+# url.standard.multiwiki.wikiPathPrefix=wiki
+
 $!xwikiPropertiesAdditionalProperties

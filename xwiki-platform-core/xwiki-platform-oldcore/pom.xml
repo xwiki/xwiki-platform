@@ -991,22 +991,6 @@
           </excludes>
         </configuration>
       </plugin>
-      <!-- Since oldcore doesn't follow the "internal" package rule (for legacy reasons) we only run CLIRR on "api"
-           packages -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/api/**</include>
-            <!-- We also add all classes that are accessible from Velocity scripts -->
-            <include>**/XWiki</include>
-            <include>**/XWikiDocument</include>
-            <include>**/XWikiContext</include>
-            <include>**/XWikiMessageTool</include>
-          </includes>
-        </configuration>
-      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>

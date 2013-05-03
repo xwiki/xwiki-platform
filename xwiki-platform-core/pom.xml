@@ -366,6 +366,13 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <className>org/xwiki/url/InvalidURLException</className>
+              <differenceType>8001</differenceType>
+              <justification>
+                Young API: The URL module has never been finished and we started working on it again
+              </justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

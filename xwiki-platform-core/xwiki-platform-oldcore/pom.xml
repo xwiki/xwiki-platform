@@ -457,7 +457,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-default</artifactId>
+      <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -628,6 +628,12 @@
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
+    <!--dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency-->
   </dependencies>
   <build>
     <plugins>

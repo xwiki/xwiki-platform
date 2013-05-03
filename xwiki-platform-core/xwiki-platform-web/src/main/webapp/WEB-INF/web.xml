@@ -161,6 +161,9 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>    
 
+  <!-- TODO: This should be fixed. It's not normal that the REST module depends on the WYSIWYG module.
+       "XWikiXmlRpcContextInitializationFilter" points to
+       org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter -->
   <filter-mapping>
     <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
     <servlet-name>RestletServlet</servlet-name>

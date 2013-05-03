@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-manager-rest</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0</version>
   </parent>
   <artifactId>xwiki-platform-wiki-manager-rest-api</artifactId>
   <name>XWiki Platform - Wiki Manager - REST - API</name>

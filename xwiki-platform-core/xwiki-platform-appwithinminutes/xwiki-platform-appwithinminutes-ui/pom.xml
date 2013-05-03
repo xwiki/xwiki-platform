@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-appwithinminutes</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0</version>
   </parent>
   <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
   <name>XWiki Platform - App Within Minutes - UI</name>

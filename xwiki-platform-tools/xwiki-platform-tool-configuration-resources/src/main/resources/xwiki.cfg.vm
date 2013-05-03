@@ -184,8 +184,6 @@ xwiki.store.migration=1
 #-# If set to 1 (the default), then the domain is common for the entire farm, but the path contains the wiki name,
 #-# in the format http://myfarm.net/xwiki/wiki/wikiname/.
 #-# Note that you can configure the "/wiki/" part with xwiki.virtual.usepath.servletpath property.
-#-# Starting with 5.1M1 this property is deprecated and xwiki.properties must be used instead. Check the "URL"
-#-# section in that file to find out how to configure it.
 #if ($xwikiCfgVirtualUsepath)
 xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #else
@@ -193,8 +191,6 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #end
 
 #-# Configure the servlet action identifier for url path based multiwiki. It has also to be modified in web.xml.
-#-# Starting with 5.1M1 this property is deprecated and xwiki.properties must be used instead. Check the "URL"
-#-# section in that file to find out how to configure it.
 # xwiki.virtual.usepath.servletpath=wiki
 
 #---------------------------------------

@@ -520,10 +520,16 @@ rendering.transformations = $xwikiRenderingTransformations
 # URL
 #-------------------------------------------------------------------------------------
 
+#-# IMPORTANT: The URL module is a feature still in development and as such should be considered experimental at the
+#-# moment. The configuration parameters below are used only in some part of the code at the moment. The idea is to
+#-# progressively refactor more and more till only the new properties are used. For the moment you should continue to
+#-# use the following old properties located in xwiki.cfg:
+#-#  xwiki.virtual.usepath
+#-#  xwiki.virtual.usepath.servletpath
+
 #-# [Since 5.1M1]
 #-# The id of the URL format to use. This allows to plug in different implementations and thus allows to completely
 #-# control the format of XWiki URLs.
-#-# Note that this feature is still in development and as such should be considered experimental at the moment.
 #-#
 #-# The default is:
 # url.format=standard

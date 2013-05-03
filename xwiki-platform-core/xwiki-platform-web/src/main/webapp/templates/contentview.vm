@@ -28,11 +28,6 @@
 ## Display the title
 ## ----------------------------
 <div id="document-title"><h1>$titleToDisplay</h1></div>
-## --------------------------------------------------------------------------
-## Drop permissions as they are no longer needed. This allows us not to have
-## to review the code below for security holes since nothing bad can happen.
-## --------------------------------------------------------------------------
-$xcontext.dropPermissions()
 ## ----------------------------
 ## Display the shortcuts
 ## ----------------------------

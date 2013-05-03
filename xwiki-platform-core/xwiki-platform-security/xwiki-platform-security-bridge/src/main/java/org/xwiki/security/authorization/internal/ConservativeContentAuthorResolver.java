@@ -23,6 +23,7 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -66,7 +67,7 @@ public class ConservativeContentAuthorResolver extends DefaultContentAuthorResol
      */
     private static boolean isMarkedForProgrammingRights(XWikiDocument xwikiDocument)
     {
-        SpaceReference wikiSpace = new SpaceReference(XWikiConstants.WIKI_SPACE,
+        SpaceReference wikiSpace = new SpaceReference(XWikiConstants.XWIKI_SPACE,
             xwikiDocument.getDocumentReference().getWikiReference());
         DocumentReference requiredRightClass = new DocumentReference(XWikiConstants.REQUIRED_RIGHT_CLASSNAME,
             wikiSpace);

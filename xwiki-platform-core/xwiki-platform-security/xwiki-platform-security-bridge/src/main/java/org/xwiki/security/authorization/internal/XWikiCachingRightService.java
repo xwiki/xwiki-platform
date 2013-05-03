@@ -395,14 +395,14 @@ public class XWikiCachingRightService implements XWikiRightService
             return true;
         }
 
-        if (user == null) {
-            return false;
-        }
-
         if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
             // Public users (not logged in) should be passed as null in the new API. It may happen that badly
             // design code, and poorly written API does not take care, so we prevent security issue here.
-            user = null;
+            return false;
+        }
+        
+        if (user == null) {
+            return false;
         }
 
         return authorizationManager.hasAccess(Right.PROGRAM, user, wiki);
@@ -411,24 +411,18 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasAdminRights(XWikiContext context)
     {
-<<<<<<< HEAD
         XWikiDocument doc = context.getDoc();
         if (doc == null) {
             return hasWikiAdminRights(context);
         }
-        DocumentReference user = context.getUserReference();
-        DocumentReference document = doc.getDocumentReference();
+        DocumentReference user = getAuth().getEffectiveUser();
+        DocumentReference document = context.getDoc().getDocumentReference();
 
         if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
             // Public users (not logged in) should be passed as null in the new API. It may happen that badly
             // design code, and poorly written API does not take care, so we prevent security issue here.
             user = null;
         }
-
-=======
-        DocumentReference user = getAuth().getEffectiveUser();
-        DocumentReference document = context.getDoc().getDocumentReference();
->>>>>>> AndreasForMerge
         return authorizationManager.hasAccess(Right.ADMIN, user, document);
     }
 

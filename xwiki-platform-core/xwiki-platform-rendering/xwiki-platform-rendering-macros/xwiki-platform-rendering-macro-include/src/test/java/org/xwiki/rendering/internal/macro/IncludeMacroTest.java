@@ -288,7 +288,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(null));
 
                 allowing(mockDocumentDisplayer).display(with(same((DocumentModelBridge) null)),
-                    with(any(DocumentDisplayerParameters.class)));
+                    with(any(DocumentDisplayerParameters.class)), with(same((DocumentModelBridge) null)));
                 will(new CustomAction("recursively call the include macro again")
                 {
                     @Override

@@ -76,6 +76,8 @@ public class LegacyTestWiki extends AbstractTestWiki
     private final XWiki xwiki;
 
     private final Mockery mockery;
+    
+    private final ComponentManager componentManager;
 
     /** State variable for supporting XWikiContext.set/getDatabase. */
     private String currentDatabase;
@@ -109,6 +111,7 @@ public class LegacyTestWiki extends AbstractTestWiki
     {
         this.legacymock = legacymock;
         this.mockery = mockery;
+        this.componentManager = componentManager;
 
         this.documentReferenceResolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
         this.entityReferenceSerializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
@@ -199,9 +202,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                             documentReferenceResolver.resolve(currentDatabase + ":Main.WebHome"));
                     }
                 });
-                allowing(context).get("sdoc");
-                will(new CustomAction("return the current sdoc")
-                {
                 allowing(context).setUserReference(with(any(DocumentReference.class)));
                 allowing(context).get("sdoc");
                 will(new CustomAction("return the current sdoc") {
@@ -1184,7 +1184,7 @@ public class LegacyTestWiki extends AbstractTestWiki
                         // Needed for debug logging.
                         allowing(mockedDocument).getFullName(); will(returnValue(getSpace().getName() + "." + getName()));
                     }
-                }
+                });
             }
         }
 

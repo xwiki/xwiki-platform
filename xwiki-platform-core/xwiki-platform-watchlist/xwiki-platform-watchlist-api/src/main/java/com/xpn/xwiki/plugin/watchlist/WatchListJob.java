@@ -33,8 +33,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -130,8 +128,8 @@ public class WatchListJob extends AbstractJob implements Job
     {
         Execution execution = Utils.getComponent(Execution.class);
 
-        // We must ensure we clean the ThreadLocal variables located in the Container and Execution components as otherwise we will
-        // have a potential memory leak.
+        // We must ensure we clean the ThreadLocal variables located in the Container and Execution components
+        // as otherwise we will have a potential memory leak.
         execution.removeContext();
 
         Container container = Utils.getComponent(Container.class);

@@ -324,7 +324,7 @@ public class DBTreeListClass extends DBListClass
                     option.setSelected(true);
                 }
                 select.addElement(option);
-                addToSelect(select, selectlist, map, treemap, item.getId(), level + "&nbsp;", context);
+                addToSelect(select, selectlist, map, treemap, item.getId(), level + "\u00A0", context);
             }
         }
     }

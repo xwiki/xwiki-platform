@@ -112,8 +112,8 @@ public class StringClass extends PropertyClass
             String secondCol = "-", firstCol = "-";
 
             String script =
-                "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
-                    + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
+                "\"" + path + "?xpage=suggest&classname=" + classname + "&fieldname=" + fieldname + "&firCol="
+                    + firstCol + "&secCol=" + secondCol + "&\"";
             String varname = "\"input\"";
             input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + "} )");
         }

@@ -59,6 +59,7 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -698,6 +699,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
         Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
+        Assert.assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
+        Assert.assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
+        Assert.assertEquals("Wrong hidden", true, modifiedpage.isHidden());
+        Assert.assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
+
         BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
         Assert.assertEquals("property", baseClass.getField("property").getName());
@@ -960,6 +966,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     public void testImportDocumentWithDifferentExistingMandatoryDocument() throws Throwable
     {
         XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        existingDocument.setSyntax(Syntax.XWIKI_2_0);
         this.mockXWiki.saveDocument(existingDocument, "", true, getContext());
 
         // register a mandatory document initializer

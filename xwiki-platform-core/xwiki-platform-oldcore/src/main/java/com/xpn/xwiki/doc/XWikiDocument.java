@@ -8046,22 +8046,28 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setContent(MergeUtils.mergeLines(previousDocument.getContent(), newDocument.getContent(), getContent(),
             mergeResult));
 
+        // Syntax
+        setSyntax(MergeUtils
+            .mergeOject(previousDocument.getSyntax(), newDocument.getSyntax(), getSyntax(), mergeResult));
+
         // Parent
-        if (ObjectUtils.notEqual(previousDocument.getAuthorReference(), newDocument.getAuthorReference())) {
-            if (ObjectUtils.equals(previousDocument.getAuthorReference(), getAuthorReference())) {
-                setParentReference(newDocument.getRelativeParentReference());
+        setParentReference(MergeUtils.mergeOject(previousDocument.getRelativeParentReference(),
+            newDocument.getRelativeParentReference(), getRelativeParentReference(), mergeResult));
 
-                mergeResult.setModified(true);
-            }
-        }
+        // DefaultTemplate
+        setDefaultTemplate(MergeUtils.mergeOject(previousDocument.getDefaultTemplate(),
+            newDocument.getDefaultTemplate(), getDefaultTemplate(), mergeResult));
 
-        // Author
-        if (ObjectUtils.notEqual(previousDocument.getAuthorReference(), newDocument.getAuthorReference())
-            && ObjectUtils.equals(previousDocument.getAuthorReference(), getAuthorReference())) {
-            setAuthorReference(newDocument.getAuthorReference());
+        // Hidden
+        setHidden(MergeUtils.mergeOject(previousDocument.isHidden(), newDocument.isHidden(), isHidden(), mergeResult));
 
-            mergeResult.setModified(true);
-        }
+        // CustomClass
+        setCustomClass(MergeUtils.mergeLines(previousDocument.getCustomClass(), newDocument.getCustomClass(),
+            getCustomClass(), mergeResult));
+
+        // ValidationScript
+        setValidationScript(MergeUtils.mergeLines(previousDocument.getValidationScript(),
+            newDocument.getValidationScript(), getValidationScript(), mergeResult));
 
         // Objects
         List<List<ObjectDiff>> objectsDiff = previousDocument.getObjectDiff(previousDocument, newDocument, context);
@@ -8230,7 +8236,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // /////////////////////////////////
         // Document
 
-        if (!StringUtils.equals(getComment(), document.getContent())) {
+        if (!StringUtils.equals(getContent(), document.getContent())) {
             setContent(document.getContent());
             modified = true;
         }
@@ -8244,22 +8250,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             modified = true;
         }
 
-        if (!StringUtils.equals(getFormat(), document.getFormat())) {
-            setFormat(document.getFormat());
-            modified = true;
-        }
-
-        if (!StringUtils.equals(getMeta(), document.getMeta())) {
-            setMeta(document.getMeta());
-            modified = true;
-        }
-
         if (!StringUtils.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
             setDefaultTemplate(document.getDefaultTemplate());
             modified = true;
         }
         if (ObjectUtils.notEqual(getRelativeParentReference(), document.getRelativeParentReference())) {
             setParentReference(document.getRelativeParentReference());
+            modified = true;
+        }
+
+        if (!StringUtils.equals(getCustomClass(), document.getCustomClass())) {
+            setCustomClass(document.getCustomClass());
             modified = true;
         }
 
@@ -8273,8 +8274,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             modified = true;
         }
 
-        if (!StringUtils.equals(getCustomClass(), document.getCustomClass())) {
-            setCustomClass(document.getCustomClass());
+        if (!StringUtils.equals(getValidationScript(), document.getValidationScript())) {
+            setValidationScript(document.getValidationScript());
             modified = true;
         }
 

@@ -701,7 +701,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
         Assert.assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
-        Assert.assertEquals("Wrong hidden", true, modifiedpage.isHidden());
+        Assert.assertTrue("Wrong hidden", modifiedpage.isHidden());
         Assert.assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
 
         BaseClass baseClass = modifiedpage.getXClass();

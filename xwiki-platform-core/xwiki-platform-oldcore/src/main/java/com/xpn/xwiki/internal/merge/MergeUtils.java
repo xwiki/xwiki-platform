@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.diff.DiffManager;
 import org.xwiki.diff.MergeException;
@@ -83,6 +84,32 @@ public final class MergeUtils
         }
 
         return currentStr;
+    }
+
+    /**
+     * Merge an Object. Use Object#equals to find conflicts.
+     * 
+     * @param previousObject previous version of the object
+     * @param newObject new version of the object
+     * @param currentObject current version of the object
+     * @param mergeResult the merge report
+     * @param <T> the type of the objects to merge
+     * @return the merged object or the provided current object if the merge fail
+     */
+    public static <T> T mergeOject(T previousObject, T newObject, T currentObject, MergeResult mergeResult)
+    {
+        if (ObjectUtils.notEqual(previousObject, newObject)) {
+            if (ObjectUtils.equals(previousObject, currentObject)) {
+                return newObject;
+            } else if (ObjectUtils.equals(newObject, currentObject)) {
+                return currentObject;
+            }
+
+            mergeResult.getLog().error("Failed to merge objects: previous=[{}] new=[{}] current=[{}]", previousObject,
+                newObject, currentObject);
+        }
+
+        return currentObject;
     }
 
     /**

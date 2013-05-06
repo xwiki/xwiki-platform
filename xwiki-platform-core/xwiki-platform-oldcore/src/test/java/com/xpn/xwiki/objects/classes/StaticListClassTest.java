@@ -23,7 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.jmock.Mock;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -186,5 +189,47 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("<input id='f&#60;o&#38;o' value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' "
             + "name='f&#60;o&#38;o' type='hidden'/>",
             new StaticListClass().displayHidden(propertyName, "", object, null));
+    }
+
+    /**
+     * Tests the suggest code generated when "use suggest" is set.
+     */
+    public void testDisplayEditWithSuggest()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
+
+        // Use special XML characters, even if they are not valid inside an XML name, just to test the XML escaping.
+        String propertyName = "b&a<r";
+        String prefix = "w>v";
+        BaseObject object = new BaseObject();
+        object.addField(propertyName, listProperty);
+
+        StaticListClass staticListClass = new StaticListClass();
+        BaseClass ownerClass = new BaseClass();
+        ownerClass.setDocumentReference(new DocumentReference("xwiki", "ClassSpace", "ClassName"));
+        staticListClass.setName(propertyName);
+        staticListClass.setObject(ownerClass);
+        staticListClass.setSize(7);
+        StringBuilder values = new StringBuilder();
+        for (String value : VALUES_WITH_HTML_SPECIAL_CHARS) {
+            if (values.length() > 0) {
+                values.append('|');
+            }
+            values.append(value).append('=').append(StringUtils.reverse(value));
+        }
+        staticListClass.setValues(values.toString());
+
+        staticListClass.setDisplayType("input");
+        staticListClass.setPicker(true);
+        Mock xwikiMock = mock(XWiki.class);
+        xwikiMock.stubs().method("getURL").will(returnValue("/xwiki/bin/view/Main/WebHome"));
+        getContext().setWiki((XWiki) xwikiMock.proxy());
+        String output = staticListClass.displayEdit(propertyName, prefix, object, getContext());
+        System.err.println(output);
+        assertTrue(output
+            .contains("new ajaxSuggest(this, &#123;script:&#34;/xwiki/bin/view/Main/WebHome?xpage=suggest&#38;"
+                + "classname=ClassSpace.ClassName&#38;fieldname=b&#38;a&#60;r&#38;firCol=-&#38;"
+                + "secCol=-&#38;&#34;, varname:&#34;input&#34;} )"));
     }
 }

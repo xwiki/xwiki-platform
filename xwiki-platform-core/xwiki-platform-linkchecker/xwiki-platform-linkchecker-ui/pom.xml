@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-linkchecker</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0.1</version>
   </parent>
   <artifactId>xwiki-platform-linkchecker-ui</artifactId>
   <name>XWiki Platform - LinkChecker - UI</name>

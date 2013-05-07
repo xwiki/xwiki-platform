@@ -109,6 +109,8 @@ XWiki.DefaultUIStep = Class.create({
     var idInput = $('previousUiId');
     idInput.up('dd').show().previous().show();
     var versionList = $('previousUiVersionList');
+    // FIXME: We should retrieve the list of previous versions for the recommended UI, by getting the available versions
+    // for each of its features (old identifiers).
     $('previousUiVersion').value = versionList.options[versionList.selectedIndex].value;
     // Auto-complete the id based on the selected version.
     if (versionList.selectedIndex == 0) {

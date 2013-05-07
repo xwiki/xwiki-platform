@@ -180,12 +180,20 @@ public final class MergeUtils
      */
     private static List<String> toLines(String str)
     {
+        List<String> result;
         try {
-            return IOUtils.readLines(new StringReader(str));
+            result = IOUtils.readLines(new StringReader(str));
+
+            // Handle special case where the string ends with a new line
+            if (str.endsWith("\n") || str.endsWith("\r") || str.endsWith("\r\n")) {
+                result.add("");
+            }
+
         } catch (IOException e) {
             // Should never happen
-            return null;
+            result = null;
         }
+        return result;
     }
 
     /**

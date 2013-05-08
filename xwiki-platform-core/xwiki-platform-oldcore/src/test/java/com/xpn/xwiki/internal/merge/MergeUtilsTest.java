@@ -51,6 +51,22 @@ public class MergeUtilsTest
     }
 
     @Test
+    public void mergeWhenDifferences()
+    {
+        MergeResult result = new MergeResult();
+        assertEquals("content\n", MergeUtils.mergeLines("content", "content\n", "content", result));
+        assertTrue(result.isModified());
+    }
+
+    @Test
+    public void mergeWhenCurrentStringDoesntEndWithNewLine()
+    {
+        MergeResult result = new MergeResult();
+        assertEquals("content", MergeUtils.mergeLines("content", "content", "content", result));
+        assertFalse(result.isModified());
+    }
+
+    @Test
     public void mergeWhenCurrentStringEndsWithNewLine()
     {
         MergeResult result = new MergeResult();

@@ -19,6 +19,7 @@
  */
 package org.xwiki.panels.test.ui;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.PageElementsAdministrationSectionPage;
@@ -26,8 +27,10 @@ import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelEditPage;
 import org.xwiki.panels.test.po.PanelsHomePage;
 import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
-
-import junit.framework.Assert;
+import org.xwiki.test.ui.po.EditRightsPane.Right;
+import org.xwiki.test.ui.po.EditRightsPane.State;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.RightsEditPage;
 
 /**
  * Various Panel tests.
@@ -60,6 +63,55 @@ public class PanelTest extends AbstractAdminAuthenticatedTest
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
         } finally {
             // Restore the right panels.
+            pageElements = PageElementsAdministrationSectionPage.gotoPage();
+            pageElements.setRightPanels(rightPanels);
+            pageElements.clickSave();
+        }
+    }
+
+    /**
+     * @see "XWIKI-9126: Show panel only if the user has the view right on the panel page"
+     */
+    @Test
+    public void limitPanelViewRight()
+    {
+        // Create a new panel.
+        String panelName = getTestMethodName();
+        getUtil().deletePage("Panels", panelName);
+        PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
+        panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, "Panel content."));
+        panelEditPage.clickSaveAndContinue();
+
+        // Add the panel to the right column from the administration.
+        PageElementsAdministrationSectionPage pageElements =
+            new AdministrablePage().clickAdministerWiki().clickPageElementsSection();
+        String rightPanels = pageElements.getRightPanels();
+        pageElements.setRightPanels(rightPanels + ",Panels." + panelName);
+        try {
+            pageElements.clickSave();
+
+            // The panel should be visible for the administrator.
+            Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
+
+            // Go to a page that doesn't exist and logout to see the panel as guest.
+            getUtil().gotoPage(getTestClassName(), getTestMethodName()).logout();
+            Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
+
+            // Login and limit the view right on the panel document.
+            loginAdminUser();
+            RightsEditPage rightsEditor = getUtil().gotoPage("Panels", panelName).editRights();
+            rightsEditor.switchToUsers();
+            // Explicit view right for the administrator.
+            rightsEditor.setRight("Admin", Right.VIEW, State.ALLOW);
+
+            // Check again the panel visibility for guest and then for administrator.
+            ViewPage page = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+            Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
+            page.logout();
+            Assert.assertFalse(new PageWithPanels().hasPanel(panelName));
+        } finally {
+            // Restore the right panels.
+            loginAdminUser();
             pageElements = PageElementsAdministrationSectionPage.gotoPage();
             pageElements.setRightPanels(rightPanels);
             pageElements.clickSave();

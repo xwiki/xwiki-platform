@@ -163,7 +163,7 @@ public class DomainObjectFactory
             Document home)
     {
         Space space = objectFactory.createSpace();
-        space.setId(String.format("%s:%s", wikiName, spaceName));
+        space.setId(Utils.getSpaceId(wikiName, spaceName));
         space.setWiki(wikiName);
         space.setName(spaceName);
         if (home != null) {

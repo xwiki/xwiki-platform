@@ -22,6 +22,9 @@ package org.xwiki.rest.internal;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -59,6 +62,19 @@ public class Utils
         Document document = new Document(xwikiDocument, null);
 
         return document.getPrefixedFullName();
+    }
+
+    /**
+     * @param wikiName the name of the wiki that contains the space
+     * @param spaceName the space name
+     * @return the space id
+     */
+    public static String getSpaceId(String wikiName, String spaceName)
+    {
+        EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+            com.xpn.xwiki.web.Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        SpaceReference spaceReference = new SpaceReference(spaceName, new WikiReference(wikiName));
+        return defaultEntityReferenceSerializer.serialize(spaceReference);
     }
 
     /**

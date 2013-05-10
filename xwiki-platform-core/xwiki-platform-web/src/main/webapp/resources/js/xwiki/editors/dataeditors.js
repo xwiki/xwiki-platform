@@ -380,8 +380,12 @@ editors.XDataEditors = Class.create({
   //  Expand/collapse classes
   expandCollapseClass : function(xclass) {
     // Classes are expanded by default
-    xclass.addClassName('collapsable');
     var xclassTitle = xclass.down('.xclass-title');
+    if (!xclassTitle) {
+      // No objects...
+      return;
+    }
+    xclass.addClassName('collapsable');
     xclassTitle.observe('click', function(event) {
       xclassTitle.up().toggleClassName('collapsed');
     }.bindAsEventListener());
@@ -389,9 +393,13 @@ editors.XDataEditors = Class.create({
   // ------------------------------------
   // Class editor: expand-collapse meta properties
   expandCollapseMetaProperty : function(property) {
+    var propertyTitle = property.down('.xproperty-title');
+    if (!propertyTitle) {
+      // No such object...
+      return;
+    }
     property.addClassName('collapsable');
     property.addClassName('collapsed');
-    var propertyTitle = property.down('.xproperty-title');
     propertyTitle.observe('click', function(event) {
       propertyTitle.up().toggleClassName('collapsed');
     }.bindAsEventListener());

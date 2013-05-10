@@ -97,12 +97,12 @@
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
-    <mapping resource="$xwikiDbHbmXwiki"/>
-    <mapping resource="$xwikiDbHbmFeeds"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDbVirtualMode)
     <property name="xwiki.virtual_mode">$xwikiDbVirtualMode</property>
 #end
+    <mapping resource="$xwikiDbHbmXwiki"/>
+    <mapping resource="$xwikiDbHbmFeeds"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
     <mapping resource="$mapping"/>

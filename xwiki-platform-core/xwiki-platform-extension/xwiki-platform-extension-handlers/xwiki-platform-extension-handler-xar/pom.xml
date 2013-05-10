@@ -34,8 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Handler - XAR</description>
   <properties>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.jacoco.instructionRatio>65</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>70.92</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -130,7 +129,9 @@
               **/XarInstalledExtension.java,
               **/XarInstalledExtensionRepository.java,
               **/DocumentScriptSafeProvider.java,
-              **/SafeConflictQuestion.java
+              **/SafeConflictQuestion.java,
+              **/DefaultDocumentMergeImporter.java,
+              **/WikiEventListener.java
           </excludes>
         </configuration>
       </plugin>

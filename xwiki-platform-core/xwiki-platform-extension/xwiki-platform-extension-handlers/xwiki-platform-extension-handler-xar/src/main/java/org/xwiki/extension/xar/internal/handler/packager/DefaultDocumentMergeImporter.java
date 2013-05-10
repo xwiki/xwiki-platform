@@ -93,7 +93,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
                     // 3 ways merge
                     mergeResult = merge(comment, currentDocument, mandatoryDocument, nextDocument, configuration);
                 } else {
-                    // already existing document in database but without previous version
+                    // Already existing document in database but without previous version
                     if (!currentDocument.equalsData(nextDocument)) {
                         XWikiDocument documentToSave;
                         if (configuration.isInteractive()) {
@@ -115,7 +115,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
                     }
                 }
             }
-        } else {
+        } else if (previousDocument == null) {
             saveDocument(nextDocument, comment, true, configuration);
         }
 

@@ -59,6 +59,12 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
     public static final String JOBTYPE = "repairxar";
 
     /**
+     * Used to resolve extensions to install.
+     */
+    @Inject
+    protected ExtensionRepositoryManager repositoryManager;
+
+    /**
      * Used to set a local extension as installed.
      */
     @Inject
@@ -69,12 +75,6 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      */
     @Inject
     private LocalExtensionRepository localRepository;
-
-    /**
-     * Used to resolve extensions to install.
-     */
-    @Inject
-    protected ExtensionRepositoryManager repositoryManager;
 
     @Override
     public String getType()
@@ -209,18 +209,7 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
                 try {
                     for (ExtensionDependency extensionDependency : dependencies) {
-                        if (extensionDependency.getVersionConstraint().getVersion() == null) {
-                            this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
-                                + " since there is no way to know what has been installed",
-                                extensionDependency.getId(), extensionDependency.getVersionConstraint());
-                        } else {
-                            try {
-                                repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency
-                                    .getVersionConstraint().getVersion()), namespace, true);
-                            } catch (InstallException e) {
-                                this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
-                            }
-                        }
+                        repairDependency(extensionDependency, namespace);
 
                         notifyStepPropress();
                     }
@@ -241,5 +230,25 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
         }
 
         this.logger.info("Successfully Repaired extension [{}] on namespace [{}]", localExtension, namespace);
+    }
+
+    /**
+     * @param extensionDependency the extension dependency to install
+     * @param namespace the namespace where to install extension
+     */
+    private void repairDependency(ExtensionDependency extensionDependency, String namespace)
+    {
+        if (extensionDependency.getVersionConstraint().getVersion() == null) {
+            this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
+                + " since there is no way to know what has been installed", extensionDependency.getId(),
+                extensionDependency.getVersionConstraint());
+        } else {
+            try {
+                repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency.getVersionConstraint()
+                    .getVersion()), namespace, true);
+            } catch (InstallException e) {
+                this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+            }
+        }
     }
 }

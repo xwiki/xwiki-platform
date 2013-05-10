@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 
 @Component
 @Named(UpgradeModeDistributionStep.ID)

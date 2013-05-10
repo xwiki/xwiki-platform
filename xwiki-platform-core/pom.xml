@@ -36,7 +36,6 @@
   <properties>
     <gwt.version>2.5.1</gwt.version>
     <gwt.maven.plugin.version>2.5.1</gwt.maven.plugin.version>
-    <smartgwt.version>3.1</smartgwt.version>
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>

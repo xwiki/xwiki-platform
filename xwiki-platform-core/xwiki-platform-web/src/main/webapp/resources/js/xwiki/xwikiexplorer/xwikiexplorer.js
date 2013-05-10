@@ -910,7 +910,8 @@ isc.XWETreeGrid.addMethods({
                 var fetchCallback = function(xmlDoc, xmlText, rpcResponse, rpcRequest) {
                     if (xmlDoc.httpResponseCode == 200) {
                         // XWiki.resource.get(reference) resolves the passed reference relative to the current document reference.
-                        var parentRes = xmlDoc.data[0].parentId ? XWiki.resource.get(xmlDoc.data[0].parentId) : { prefixedFullName: '', name: '' };
+                        var parentRes = xmlDoc.data[0].parentId ? XWiki.resource.get(xmlDoc.data[0].parentId,
+                            XWiki.EntityType.DOCUMENT) : { prefixedFullName: '', name: '' };
                         // Store the parent / child relationship in the cache to avoid the need of another request if this
                         // relationship is searched again.
                         rt.parentMap[resource.prefixedFullName] = parentRes;

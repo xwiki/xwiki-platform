@@ -118,7 +118,9 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
         // Custom preparation
 
-        prepare();
+        if (getState() == null) {
+            prepare();
+        }
     }
 
     @Override

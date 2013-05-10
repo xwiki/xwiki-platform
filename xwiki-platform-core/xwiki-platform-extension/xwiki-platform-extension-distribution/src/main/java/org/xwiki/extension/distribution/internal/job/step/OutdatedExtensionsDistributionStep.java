@@ -50,7 +50,7 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
     @Override
     public void prepare()
     {
-        if (getState() != State.CANCELED) {
+        if (getState() == null) {
             setState(State.COMPLETED);
 
             UpgradeMode upgradeMode = this.distributionManager.getUpgradeMode();

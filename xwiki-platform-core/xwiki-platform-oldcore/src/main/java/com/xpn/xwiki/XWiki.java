@@ -4619,7 +4619,12 @@ public class XWiki implements EventListener
                     // TODO: Handle references not pointing to a document...
                     EntityReference entityReference =
                         ((XWikiEntityURL) xwikiURL).getEntityReference().extractReference(EntityType.DOCUMENT);
-                    reference = new DocumentReference(entityReference);
+                    // TODO: Since the URL module doesn't yet handle wiki aliases, we currently use
+                    // context.getDatabase() as the wiki name since that was set properly beforehand in getXWiki()
+                    // which calls XWiki.getRequestWikiName() which handles correctly aliases.
+                    // Remove this once the URL module properly handles wiki aliases.
+                    reference = new DocumentReference(context.getDatabase(),
+                        entityReference.extractReference(EntityType.SPACE).getName(), entityReference.getName());
                 } else {
                     // Big problem we don't have an Entity URL!
                     throw new RuntimeException(String.format("URL [%s] that doesn't point to an Entity!",

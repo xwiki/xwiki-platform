@@ -41,4 +41,10 @@ public class WikiDistributionJobStatus extends DistributionJobStatus<Distributio
     {
         super(request, observationManager, loggerManager, steps);
     }
+
+    public WikiDistributionJobStatus(WikiDistributionJobStatus status, ObservationManager observationManager,
+        LoggerManager loggerManager)
+    {
+        super(status, observationManager, loggerManager);
+    }
 }

@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Handler - XAR</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>70.92</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>70.85</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

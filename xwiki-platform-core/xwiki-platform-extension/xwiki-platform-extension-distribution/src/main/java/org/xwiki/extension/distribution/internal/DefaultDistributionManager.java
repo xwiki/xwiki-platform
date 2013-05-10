@@ -52,6 +52,7 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.internal.core.MavenCoreExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
+import org.xwiki.job.internal.JobStatusStorage;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -124,6 +125,12 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
      */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * USed to manipulated jobs statuses.
+     */
+    @Inject
+    private JobStatusStorage jobStatusStorage;
 
     @Inject
     private Logger logger;
@@ -378,5 +385,22 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         }
 
         return false;
+    }
+
+    @Override
+    public void deletePreviousWikiJobStatus(String wiki)
+    {
+        this.jobStatusStorage.remove(getWikiJobId(wiki));
+    }
+
+    @Override
+    public void copyPreviousWikiJobStatus(String sourceWiki, String targetWiki)
+    {
+        WikiDistributionJobStatus sourceStatus = getPreviousWikiJobStatus(sourceWiki);
+        WikiDistributionJobStatus targetStatus =
+            new WikiDistributionJobStatus(sourceStatus, this.observationManagerProvider.get(),
+                this.loggerManagerProvider.get());
+
+        this.jobStatusStorage.store(targetStatus);
     }
 }

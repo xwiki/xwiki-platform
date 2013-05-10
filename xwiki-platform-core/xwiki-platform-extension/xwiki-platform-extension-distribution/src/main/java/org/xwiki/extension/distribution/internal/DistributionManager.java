@@ -112,6 +112,21 @@ public interface DistributionManager
     WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki);
 
     /**
+     * @param wiki the wiki for which to delete the status
+     * @since 5.1
+     */
+    void deletePreviousWikiJobStatus(String wiki);
+
+    /**
+     * Copy the wiki distribution status from one wiki to another.
+     * 
+     * @param sourceWiki the source wiki
+     * @param targetWiki the target wiki
+     * @since 5.1
+     */
+    void copyPreviousWikiJobStatus(String sourceWiki, String targetWiki);
+
+    /**
      * Starts the distribution job.
      * 
      * @return the distribution job object that can be used to get information like the job status

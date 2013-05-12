@@ -41,7 +41,10 @@ public interface PageResource
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") String spaceName,
             @PathParam("pageName") String pageName,
-            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
+            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
+            @QueryParam("renderedContent") @DefaultValue("false") Boolean withRenderedContent,
+            @QueryParam("attachments") @DefaultValue("false") Boolean withAttachments,
+            @QueryParam("objects") @DefaultValue("false") Boolean withObjects
     ) throws XWikiRestException;
 
     @PUT Response putPage(

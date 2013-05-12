@@ -317,6 +317,7 @@
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
+            <exclude>**/PageResource</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
           </excludes>

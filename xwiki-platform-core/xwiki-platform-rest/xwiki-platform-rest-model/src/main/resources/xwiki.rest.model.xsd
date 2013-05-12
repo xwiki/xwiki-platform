@@ -133,6 +133,20 @@
           <element name="modifier" type="string"></element>
           <element name="modifierName" type="string"></element>
           <element name="content" type="string"></element>
+          <element name="renderedContent" type="string"></element>
+          <element name="attachments" type="xwiki:Attachments"></element>
+          <element name="objects">
+    	  	<complexType>
+      			<complexContent>
+      				<extension base="xwiki:LinkCollection">
+        				<sequence>
+            				<element name="object" type="xwiki:Object"
+            					 minOccurs="0" maxOccurs="unbounded"></element>
+          				</sequence>
+          			</extension>	
+		        </complexContent>
+    		</complexType>
+  		  </element>
         </sequence>
       </extension>
     </complexContent>
@@ -178,7 +192,18 @@
       </extension>
     </complexContent>
   </complexType>
-
+  
+  <complexType name="Attachments">
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <element name="attachment" type="xwiki:Attachment"
+              minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+  </complexType>
+  
   <complexType name="Comment">
     <complexContent>
       <extension base="xwiki:LinkCollection">
@@ -342,18 +367,7 @@
     </complexType>
   </element>
 
-  <element name="attachments">
-    <complexType>
-      <complexContent>
-        <extension base="xwiki:LinkCollection">
-          <sequence>
-            <element name="attachment" type="xwiki:Attachment"
-              minOccurs="0" maxOccurs="unbounded"></element>
-          </sequence>
-        </extension>
-      </complexContent>
-    </complexType>
-  </element>
+  <element name="attachments" type="xwiki:Attachments"></element>
 
   <element name="comments">
     <complexType>

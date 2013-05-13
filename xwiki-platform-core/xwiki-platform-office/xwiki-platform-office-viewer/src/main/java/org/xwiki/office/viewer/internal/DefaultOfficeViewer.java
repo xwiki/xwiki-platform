@@ -82,6 +82,12 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
     @Inject
     private Logger logger;
 
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * Note that currently only the {@code filterStyles} parameter is supported and if "true" it means that styles will
+     * be filtered to the maximum and the focus will be put on importing only the content.
+     */
     @Override
     protected OfficeDocumentView createOfficeDocumentView(AttachmentReference attachmentReference,
         Map<String, String> parameters) throws Exception
@@ -145,7 +151,9 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
      * Creates a {@link XDOM} representation of the specified office attachment.
      * 
      * @param attachmentReference a reference to the office file to be parsed into XDOM
-     * @param parameters build parameters
+     * @param parameters the build parameters. Note that currently only {@code filterStyles} is supported and if "true"
+     *        it means that styles will be filtered to the maximum and the focus will be put on importing only the
+     *        content
      * @return the {@link XDOMOfficeDocument} corresponding to the specified office file
      * @throws Exception if building the XDOM fails
      */

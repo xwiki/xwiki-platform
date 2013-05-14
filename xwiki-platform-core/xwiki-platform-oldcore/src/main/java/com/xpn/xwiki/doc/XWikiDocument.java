@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3975,7 +3976,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         el.addText(String.valueOf(isHidden()));
         wr.write(el);
 
-        for (XWikiAttachment attach : getAttachmentList()) {
+        List<XWikiAttachment> sortedAttachments = new ArrayList<XWikiAttachment>(getAttachmentList());
+        Collections.sort(sortedAttachments, new Comparator<XWikiAttachment>()
+        {
+            @Override
+            public int compare(XWikiAttachment o1, XWikiAttachment o2)
+            {
+                if (o1 == null || o2 == null) {
+                    int result = 0;
+                    if (o1 != null) {
+                        result = -1;
+                    } else if (o2 != null) {
+                        result = 1;
+                    }
+                    return result;
+                }
+                return o1.getFilename().compareTo(o2.getFilename());
+            }
+        });
+        for (XWikiAttachment attach : sortedAttachments) {
             attach.toXML(wr, bWithAttachmentContent, bWithVersions, context);
         }
 

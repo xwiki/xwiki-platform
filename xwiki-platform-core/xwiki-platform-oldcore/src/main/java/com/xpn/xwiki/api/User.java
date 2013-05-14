@@ -154,7 +154,8 @@ public class User extends Api
     /**
      * Check if the password passed as argument is the user password. This method is used when a user
      * wants to change its password. To make sure that it wouldn't be used to perform brute force attacks,
-     * we ensure that this is only used to check the current user password on its profile page.
+     * we ensure that this is only used to check the current user password on its profile page or on a page
+     * with Programming Rights.
      * 
      * @param password Password submitted.
      * @return true if password is really the user password.
@@ -164,7 +165,13 @@ public class User extends Api
     {
         EntityReference userReference = REFERENCE_RESOLVER.resolve(user.getUser());
         EntityReference docReference = getXWikiContext().getDoc().getDocumentReference();
-        if (userReference.equals(getXWikiContext().getUserReference()) && userReference.equals(docReference)) {
+        //Make sure that the user we check the password for is the current user.
+        boolean isAuthorized = userReference.equals(getXWikiContext().getUserReference());
+        //Make sure that the page has PR or that it is the user profile page.
+        if (!hasProgrammingRights() && !userReference.equals(docReference)) {
+            isAuthorized = false;
+        }
+        if (isAuthorized) {
             try {
                 boolean result = false;
                 

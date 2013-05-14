@@ -21,6 +21,10 @@ package org.xwiki.search.solr.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,12 +34,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Assert;
-
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
@@ -49,17 +50,14 @@ import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -71,6 +69,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenc
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -89,300 +88,254 @@ CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceVa
 DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class,
 DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
 DefaultStringEntityReferenceSerializer.class})
-@MockingRequirement(DefaultIndexableReferenceExtractor.class)
-public class DefaultIndexableReferenceExtractorTest extends
-    AbstractMockingComponentTestCase<IndexableReferenceExtractor>
+public class DefaultIndexableReferenceExtractorTest
 {
-    DefaultIndexableReferenceExtractor referenceExtractor;
+    @Rule
+    public final MockitoComponentMockingRule<DefaultIndexableReferenceExtractor> mocker =
+        new MockitoComponentMockingRule<DefaultIndexableReferenceExtractor>(DefaultIndexableReferenceExtractor.class);
 
-    private XWikiContext xwikiContext;
+    private DefaultIndexableReferenceExtractor referenceExtractor;
+
+    private XWikiContext xcontext;
 
     private XWiki xwiki;
 
-    WikiReference wiki1 = new WikiReference("xwiki1");
+    private WikiReference wiki1 = new WikiReference("xwiki1");
 
-    SpaceReference space11 = new SpaceReference("Code", wiki1);
+    private SpaceReference space11 = new SpaceReference("Code", wiki1);
 
-    DocumentReference class111 = new DocumentReference("SomeClass", space11);
+    private DocumentReference class111 = new DocumentReference("SomeClass", space11);
 
-    BaseClass xwikiClass111 = null;
+    private BaseClass xwikiClass111;
 
-    DocumentReference document112 = new DocumentReference("SomeSheet", space11);
+    private DocumentReference document112 = new DocumentReference("SomeSheet", space11);
 
-    XWikiDocument xwikiDocument11x = null;
+    private XWikiDocument xwikiDocument11x;
 
-    DocumentReference document113 = new DocumentReference("SomeTranslatedDocument", space11);
+    private DocumentReference document113 = new DocumentReference("SomeTranslatedDocument", space11);
 
-    DocumentReference document113Translated =
-        new DocumentReference("SomeTranslatedDocument", space11, new Locale("ro"));
+    private DocumentReference document113Translated = new DocumentReference("SomeTranslatedDocument", space11,
+        new Locale("ro"));
 
-    XWikiDocument xwikiDocument113 = null;
+    private XWikiDocument xwikiDocument113 = null;
 
-    SpaceReference space12 = new SpaceReference("Main", wiki1);
+    private SpaceReference space12 = new SpaceReference("Main", wiki1);
 
-    DocumentReference document121 = new DocumentReference("WebHome", space12);
+    private DocumentReference document121 = new DocumentReference("WebHome", space12);
 
-    AttachmentReference attachment1211 = new AttachmentReference("picture.png", document121);
+    private AttachmentReference attachment1211 = new AttachmentReference("picture.png", document121);
 
-    AttachmentReference attachment1212 = new AttachmentReference("document.doc", document121);
+    private AttachmentReference attachment1212 = new AttachmentReference("document.doc", document121);
 
-    XWikiDocument xwikiDocument121 = null;
+    private XWikiDocument xwikiDocument121;
 
-    DocumentReference document122 = new DocumentReference("Test", space12);
+    private DocumentReference document122 = new DocumentReference("Test", space12);
 
-    ObjectReference object1221 = new ObjectReference("xwiki1:Code.SomeClass[0]", document122);
+    private BaseObjectReference object1221;
 
-    BaseObject xwikiObject1221 = null;
+    private BaseObject xwikiObject1221;
 
-    ObjectReference object1222 = new ObjectReference("xwiki1:Code.SomeClass[1]", document122);
+    private BaseObjectReference object1222;
 
-    ObjectPropertyReference property12221 = new ObjectPropertyReference("aStringProperty", object1222);
+    private ObjectPropertyReference property12221;
 
-    StringProperty xwikiProperty12221 = null;
+    private StringProperty xwikiProperty12221;
 
-    ObjectPropertyReference passwordProperty12222 = new ObjectPropertyReference("aPasswordProperty", object1222);
+    private ObjectPropertyReference passwordProperty12222;
 
-    StringProperty xwikiPasswordProperty12222 = null;
+    private StringProperty xwikiPasswordProperty12222;
 
-    ObjectPropertyReference property12223 = new ObjectPropertyReference("anIntegerProperty", object1222);
+    private ObjectPropertyReference property12223;
 
-    IntegerProperty xwikiProperty12223 = null;
+    private IntegerProperty xwikiProperty12223;
 
-    BaseObject xwikiObject1222 = null;
+    private BaseObject xwikiObject1222;
 
-    XWikiDocument xwikiDocument122 = null;
+    private XWikiDocument xwikiDocument122;
 
-    SpaceReference space13 = new SpaceReference("EmptySpaceThatShouldNotExist", wiki1);
+    private SpaceReference space13 = new SpaceReference("EmptySpaceThatShouldNotExist", wiki1);
 
-    WikiReference wiki2 = new WikiReference("xwiki2");
+    private WikiReference wiki2 = new WikiReference("xwiki2");
 
-    QueryManager queryManager;
+    private QueryManager queryManager;
 
     @Before
-    public void configure() throws Exception
+    public void setUp() throws Exception
     {
-        this.referenceExtractor = (DefaultIndexableReferenceExtractor) getMockedComponent();
+        this.referenceExtractor = this.mocker.getComponentUnderTest();
 
-        // Using ClassImposteriser to be able to mock classes like XWiki and XWikiDocument
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-
-        Utils.setComponentManager(getComponentManager());
+        Utils.setComponentManager(this.mocker);
 
         // XWikiContext and XWiki
 
-        final Execution execution = getComponentManager().getInstance(Execution.class);
+        final Execution execution = this.mocker.getInstance(Execution.class);
         final ExecutionContext executionContext = new ExecutionContext();
 
-        this.xwiki = getMockery().mock(XWiki.class);
+        this.xwiki = mock(XWiki.class);
 
-        this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setDatabase("xwiki");
-        this.xwikiContext.setWiki(this.xwiki);
+        this.xcontext = new XWikiContext();
+        this.xcontext.setDatabase("xwiki");
+        this.xcontext.setWiki(this.xwiki);
 
-        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xwikiContext);
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xcontext);
+
+        // References
+
+        this.object1221 = new BaseObjectReference(this.class111, 0, this.document122);
+        this.object1222 = new BaseObjectReference(this.class111, 1, this.document122);
+        this.property12221 = new ObjectPropertyReference("aStringProperty", object1222);
+        this.property12223 = new ObjectPropertyReference("anIntegerProperty", object1222);
+        this.passwordProperty12222 = new ObjectPropertyReference("aPasswordProperty", object1222);
 
         // XWiki model data
-        xwikiDocument11x = getMockery().mock(XWikiDocument.class, "document11x");
-        xwikiClass111 = getMockery().mock(BaseClass.class);
-        xwikiDocument113 = getMockery().mock(XWikiDocument.class, "document113");
-        xwikiDocument121 = getMockery().mock(XWikiDocument.class, "document121");
-        xwikiDocument122 = getMockery().mock(XWikiDocument.class, "document122");
-        xwikiObject1221 = getMockery().mock(BaseObject.class, "object1221");
-        xwikiProperty12221 = getMockery().mock(StringProperty.class, "property12221");
-        xwikiPasswordProperty12222 = getMockery().mock(StringProperty.class, "passwordProperty12222");
-        xwikiProperty12223 = getMockery().mock(IntegerProperty.class, "property12223");
-        xwikiObject1222 = getMockery().mock(BaseObject.class, "object1222");
-        final EntityReferenceSerializer<String> serializer =
-            getComponentManager().getInstance(
-                new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
 
-        queryManager = getComponentManager().getInstance(QueryManager.class);
-        final Query spacesWiki1Query = getMockery().mock(DefaultQuery.class, "getSpacesWiki1");
-        final Query documentsSpace11Query = getMockery().mock(DefaultQuery.class, "getSpaceDocsNameSpace11");
-        final Query documentsSpace12Query = getMockery().mock(DefaultQuery.class, "getSpaceDocsNameSpace12");
-        final Query documentsSpace13Query = getMockery().mock(DefaultQuery.class, "getSpaceDocsNameSpace13");
-        final Query spacesWiki2Query = getMockery().mock(DefaultQuery.class, "getSpacesWiki2");
+        this.xwikiDocument11x = mock(XWikiDocument.class, "document11x");
+        this.xwikiClass111 = mock(BaseClass.class);
+        this.xwikiDocument113 = mock(XWikiDocument.class, "document113");
+        this.xwikiDocument121 = mock(XWikiDocument.class, "document121");
+        this.xwikiDocument122 = mock(XWikiDocument.class, "document122");
+        this.xwikiObject1221 = mock(BaseObject.class, "object1221");
+        this.xwikiProperty12221 = mock(StringProperty.class, "property12221");
+        this.xwikiPasswordProperty12222 = mock(StringProperty.class, "passwordProperty12222");
+        this.xwikiProperty12223 = mock(IntegerProperty.class, "property12223");
+        this.xwikiObject1222 = mock(BaseObject.class, "object1222");
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(execution).getContext();
-                will(returnValue(executionContext));
+        this.queryManager = this.mocker.getInstance(QueryManager.class);
+        final Query spacesWiki1Query = mock(DefaultQuery.class, "getSpacesWiki1");
+        final Query documentsSpace11Query = mock(DefaultQuery.class, "getSpaceDocsNameSpace11");
+        final Query documentsSpace12Query = mock(DefaultQuery.class, "getSpaceDocsNameSpace12");
+        final Query documentsSpace13Query = mock(DefaultQuery.class, "getSpaceDocsNameSpace13");
+        final Query spacesWiki2Query = mock(DefaultQuery.class, "getSpacesWiki2");
 
-                // ignoring(any(Logger.class));
+        when(execution.getContext()).thenReturn(executionContext);
 
-                // Data
+        // Data
 
-                allowing(xwiki).exists(with(any(DocumentReference.class)), with(xwikiContext));
-                will(returnValue(true));
+        when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(true);
 
-                allowing(referenceExtractor.documentAccessBridge).exists(with(any(DocumentReference.class)));
-                will(returnValue(true));
+        when(referenceExtractor.documentAccessBridge.exists(any(DocumentReference.class))).thenReturn(true);
 
-                // Query manager and specific queries mocking.
+        // Query manager and specific queries mocking.
 
-                allowing(queryManager).getNamedQuery("getSpaces");
-                will(returnValue(spacesWiki1Query));
+        when(queryManager.getNamedQuery("getSpaces")).thenReturn(spacesWiki1Query);
 
-                allowing(spacesWiki1Query).setWiki(wiki1.getName());
-                will(returnValue(spacesWiki1Query));
+        when(spacesWiki1Query.setWiki(wiki1.getName())).thenReturn(spacesWiki1Query);
 
-                allowing(spacesWiki1Query).setWiki(wiki2.getName());
-                will(returnValue(spacesWiki2Query));
+        when(spacesWiki1Query.setWiki(wiki2.getName())).thenReturn(spacesWiki2Query);
 
-                allowing(queryManager).getNamedQuery("getSpaceDocsName");
-                will(returnValue(documentsSpace11Query));
+        when(queryManager.getNamedQuery("getSpaceDocsName")).thenReturn(documentsSpace11Query);
 
-                allowing(documentsSpace11Query).setWiki(with(any(String.class)));
-                will(returnValue(documentsSpace11Query));
+        when(documentsSpace11Query.setWiki(any(String.class))).thenReturn(documentsSpace11Query);
 
-                allowing(documentsSpace11Query).bindValue("space", space11.getName());
-                will(returnValue(documentsSpace11Query));
+        when(documentsSpace11Query.bindValue("space", space11.getName())).thenReturn(documentsSpace11Query);
 
-                allowing(documentsSpace11Query).bindValue("space", space12.getName());
-                will(returnValue(documentsSpace12Query));
+        when(documentsSpace11Query.bindValue("space", space12.getName())).thenReturn(documentsSpace12Query);
 
-                allowing(documentsSpace11Query).bindValue("space", space13.getName());
-                will(returnValue(documentsSpace13Query));
+        when(documentsSpace11Query.bindValue("space", space13.getName())).thenReturn(documentsSpace13Query);
 
-                // Spaces in wikis.
-                allowing(spacesWiki1Query).execute();
-                will(returnValue(Arrays.asList(space11.getName(), space12.getName(), space13.getName())));
+        // Spaces in wikis.
+        when(spacesWiki1Query.execute()).thenReturn(
+            Arrays.<Object> asList(space11.getName(), space12.getName(), space13.getName()));
 
-                allowing(spacesWiki2Query).execute();
-                will(returnValue(Collections.emptyList()));
+        when(spacesWiki2Query.execute()).thenReturn(Collections.EMPTY_LIST);
 
-                // space 11
-                allowing(documentsSpace11Query).execute();
-                will(returnValue(Arrays.asList(class111.getName(), document112.getName(), document113.getName())));
+        // space 11
+        when(documentsSpace11Query.execute()).thenReturn(
+            Arrays.<Object> asList(class111.getName(), document112.getName(), document113.getName()));
 
-                // document 111
-                allowing(xwiki).getDocument(class111, xwikiContext);
-                will(returnValue(xwikiDocument11x));
+        // document 111
+        when(xwiki.getDocument(eq(class111), any(XWikiContext.class))).thenReturn(xwikiDocument11x);
 
-                allowing(referenceExtractor.documentAccessBridge).getAttachmentReferences(class111);
-                will(returnValue(Collections.emptyList()));
+        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(class111)).thenReturn(
+            Collections.EMPTY_LIST);
 
-                allowing(xwikiDocument11x).getXClass();
-                will(returnValue(xwikiClass111));
+        when(xwikiDocument11x.getXClass()).thenReturn(xwikiClass111);
 
-                // document 112
-                allowing(xwiki).getDocument(document112, xwikiContext);
-                will(returnValue(xwikiDocument11x));
+        // document 112
+        when(xwiki.getDocument(eq(document112), any(XWikiContext.class))).thenReturn(xwikiDocument11x);
 
-                allowing(referenceExtractor.documentAccessBridge).getAttachmentReferences(document112);
-                will(returnValue(Collections.emptyList()));
+        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document112)).thenReturn(
+            Collections.EMPTY_LIST);
 
-                allowing(xwikiDocument11x).getXObjects();
-                will(returnValue(Collections.emptyMap()));
+        when(xwikiDocument11x.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
-                allowing(xwikiDocument11x).getTranslationList(xwikiContext);
-                will(returnValue(Collections.emptyList()));
+        when(xwikiDocument11x.getTranslationList(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
 
-                // document 113
-                allowing(xwiki).getDocument(document113, xwikiContext);
-                will(returnValue(xwikiDocument113));
+        // document 113
+        when(xwiki.getDocument(eq(document113), any(XWikiContext.class))).thenReturn(xwikiDocument113);
 
-                allowing(referenceExtractor.documentAccessBridge).getAttachmentReferences(document113);
-                will(returnValue(Collections.emptyList()));
+        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document113)).thenReturn(
+            Collections.EMPTY_LIST);
 
-                allowing(xwikiDocument113).getXObjects();
-                will(returnValue(Collections.emptyMap()));
+        when(xwikiDocument113.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
-                allowing(xwikiDocument113).getTranslationList(xwikiContext);
-                will(returnValue(Arrays.asList("ro")));
+        when(xwikiDocument113.getTranslationList(any(XWikiContext.class))).thenReturn(Arrays.asList("ro"));
 
-                // space 12
-                allowing(documentsSpace12Query).execute();
-                will(returnValue(Arrays.asList(document121.getName(), document122.getName())));
+        // space 12
+        when(documentsSpace12Query.execute()).thenReturn(
+            Arrays.<Object> asList(document121.getName(), document122.getName()));
 
-                // document 121
-                allowing(xwiki).getDocument(document121, xwikiContext);
-                will(returnValue(xwikiDocument121));
+        // document 121
+        when(xwiki.getDocument(eq(document121), any(XWikiContext.class))).thenReturn(xwikiDocument121);
 
-                allowing(referenceExtractor.documentAccessBridge).getAttachmentReferences(document121);
-                will(returnValue(Arrays.asList(attachment1211, attachment1212)));
+        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document121)).thenReturn(
+            Arrays.asList(attachment1211, attachment1212));
 
-                allowing(xwikiDocument121).getXObjects();
-                will(returnValue(Collections.emptyMap()));
+        when(xwikiDocument121.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
-                allowing(xwikiDocument121).getTranslationList(xwikiContext);
-                will(returnValue(Collections.emptyList()));
+        when(xwikiDocument121.getTranslationList(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
 
-                // document 122
-                allowing(xwiki).getDocument(document122, xwikiContext);
-                will(returnValue(xwikiDocument122));
+        // document 122
+        when(xwiki.getDocument(eq(document122), any(XWikiContext.class))).thenReturn(xwikiDocument122);
 
-                allowing(referenceExtractor.documentAccessBridge).getAttachmentReferences(document122);
-                will(returnValue(Collections.emptyList()));
+        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document122)).thenReturn(
+            Collections.EMPTY_LIST);
 
-                allowing(xwikiDocument122).getXObjects();
-                Map<DocumentReference, List<BaseObject>> xObjects = new HashMap<DocumentReference, List<BaseObject>>();
-                // Yes, it seems that we can have null objects for some reason.
-                xObjects.put(class111, Arrays.asList(null, xwikiObject1221, xwikiObject1222));
-                will(returnValue(xObjects));
+        Map<DocumentReference, List<BaseObject>> xObjects = new HashMap<DocumentReference, List<BaseObject>>();
+        // Yes, it seems that we can have null objects for some reason.
+        xObjects.put(class111, Arrays.asList(null, xwikiObject1221, xwikiObject1222));
+        when(xwikiDocument122.getXObjects()).thenReturn(xObjects);
 
-                allowing(xwikiDocument122).getTranslationList(xwikiContext);
-                will(returnValue(Collections.emptyList()));
+        when(xwikiDocument122.getTranslationList(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
 
-                // object 1221
-                allowing(xwikiDocument122).getXObject(object1221);
-                will(returnValue(xwikiObject1221));
+        // object 1221
+        when(xwikiDocument122.getXObject(object1221)).thenReturn(xwikiObject1221);
 
-                allowing(xwikiObject1221).getReference();
-                will(returnValue(object1221));
+        when(xwikiObject1221.getReference()).thenReturn(object1221);
 
-                allowing(xwikiObject1221).getXClass(xwikiContext);
-                will(returnValue(xwikiClass111));
+        when(xwikiObject1221.getXClass(any(XWikiContext.class))).thenReturn(xwikiClass111);
 
-                allowing(xwikiObject1221).getFieldList();
-                will(returnValue(Collections.emptyList()));
+        when(xwikiObject1221.getFieldList()).thenReturn(Collections.EMPTY_LIST);
 
-                // object 1222
-                allowing(xwikiDocument122).getXObject(object1222);
-                will(returnValue(xwikiObject1222));
+        // object 1222
+        when(xwikiDocument122.getXObject(object1222)).thenReturn(xwikiObject1222);
 
-                allowing(xwikiObject1222).getReference();
-                will(returnValue(object1222));
+        when(xwikiObject1222.getReference()).thenReturn(object1222);
 
-                allowing(xwikiObject1222).getXClass(xwikiContext);
-                will(returnValue(xwikiClass111));
+        when(xwikiObject1222.getXClass(any(XWikiContext.class))).thenReturn(xwikiClass111);
 
-                allowing(xwikiObject1222).getFieldList();
-                will(returnValue(Arrays.asList(xwikiProperty12221, xwikiPasswordProperty12222, xwikiProperty12223)));
+        when(xwikiObject1222.getFieldList()).thenReturn(
+            Arrays.asList(xwikiProperty12221, xwikiPasswordProperty12222, xwikiProperty12223));
 
-                // object 1222 fields
-                allowing(xwikiProperty12221).getReference();
-                will(returnValue(property12221));
-                allowing(xwikiProperty12221).getName();
-                will(returnValue(property12221.getName()));
+        // object 1222 fields
+        when(xwikiProperty12221.getReference()).thenReturn(property12221);
+        when(xwikiProperty12221.getName()).thenReturn(property12221.getName());
 
-                allowing(xwikiPasswordProperty12222).getReference();
-                will(returnValue(passwordProperty12222));
-                allowing(xwikiPasswordProperty12222).getName();
-                will(returnValue(passwordProperty12222.getName()));
+        when(xwikiPasswordProperty12222.getReference()).thenReturn(passwordProperty12222);
+        when(xwikiPasswordProperty12222.getName()).thenReturn(passwordProperty12222.getName());
 
-                allowing(xwikiProperty12223).getReference();
-                will(returnValue(property12223));
-                allowing(xwikiProperty12223).getName();
-                will(returnValue(property12223.getName()));
+        when(xwikiProperty12223.getReference()).thenReturn(property12223);
+        when(xwikiProperty12223.getName()).thenReturn(property12223.getName());
 
-                // class 111 fields
-                allowing(xwikiClass111).get(property12221.getName());
-                will(returnValue(null));
+        // class 111 fields
+        when(xwikiClass111.get(property12221.getName())).thenReturn(null);
 
-                allowing(xwikiClass111).get(passwordProperty12222.getName());
-                PasswordClass passWordClass = new PasswordClass();
-                will(returnValue(passWordClass));
+        when(xwikiClass111.get(passwordProperty12222.getName())).thenReturn(new PasswordClass());
 
-                allowing(xwikiClass111).get(property12223.getName());
-                will(returnValue(null));
+        when(xwikiClass111.get(property12223.getName())).thenReturn(null);
 
-                // space 13
-                allowing(documentsSpace13Query).execute();
-                will(returnValue(Collections.emptyList()));
-            }
-        });
+        // space 13
+        when(documentsSpace13Query.execute()).thenReturn(Collections.EMPTY_LIST);
     }
 
     @Test

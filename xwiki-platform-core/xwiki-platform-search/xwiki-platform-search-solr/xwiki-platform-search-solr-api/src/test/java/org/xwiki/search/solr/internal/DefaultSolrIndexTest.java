@@ -19,13 +19,14 @@
  */
 package org.xwiki.search.solr.internal;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.net.URL;
 
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
@@ -36,8 +37,7 @@ import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.SolrIndex;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -59,10 +59,11 @@ RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceRe
 CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvider.class,
 CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
 DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class})
-@MockingRequirement(DefaultSolrIndex.class)
-public class DefaultSolrIndexTest extends AbstractMockingComponentTestCase<SolrIndex>
+public class DefaultSolrIndexTest
 {
-    private DefaultSolrIndex index;
+    @Rule
+    public final MockitoComponentMockingRule<SolrIndex> mocker = new MockitoComponentMockingRule<SolrIndex>(
+        DefaultSolrIndex.class);
 
     private XWikiContext xwikiContext;
 
@@ -71,14 +72,12 @@ public class DefaultSolrIndexTest extends AbstractMockingComponentTestCase<SolrI
     @Before
     public void configure() throws Exception
     {
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
+        Utils.setComponentManager(mocker);
 
-        Utils.setComponentManager(getComponentManager());
-
-        final Execution execution = getComponentManager().getInstance(Execution.class);
+        final Execution execution = this.mocker.getInstance(Execution.class);
         final ExecutionContext executionContext = new ExecutionContext();
 
-        this.xwiki = getMockery().mock(XWiki.class);
+        this.xwiki = mock(XWiki.class);
 
         this.xwikiContext = new XWikiContext();
         this.xwikiContext.setDatabase("xwiki");
@@ -86,21 +85,10 @@ public class DefaultSolrIndexTest extends AbstractMockingComponentTestCase<SolrI
 
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xwikiContext);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(execution).getContext();
-                will(returnValue(executionContext));
-
-                ignoring(any(Logger.class));
-            }
-        });
+        when(execution.getContext()).thenReturn(executionContext);
 
         URL url = this.getClass().getClassLoader().getResource("solrhome");
         System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
-
-        // this.instance = (EmbeddedSolrInstance) getComponentUnderTest();
-        this.index = (DefaultSolrIndex) getMockedComponent();
     }
 
     @Test

@@ -153,6 +153,7 @@
           <element name="modifier" type="string"></element>
           <element name="modifierName" type="string"></element>
           <element name="language" type="string"></element>
+          <element name="comment" type="string"></element>
         </sequence>
       </extension>
     </complexContent>

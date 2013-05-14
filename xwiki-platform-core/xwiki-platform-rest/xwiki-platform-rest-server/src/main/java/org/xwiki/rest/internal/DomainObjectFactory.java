@@ -438,7 +438,7 @@ public class DomainObjectFactory
 
     public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
         String spaceName, String pageName, String language, Version version, String modifier, Date modified,
-        XWiki xwikiApi, Boolean withPrettyNames)
+        String comment, XWiki xwikiApi, Boolean withPrettyNames)
     {
         HistorySummary historySummary = objectFactory.createHistorySummary();
 
@@ -451,6 +451,7 @@ public class DomainObjectFactory
         historySummary.setVersion(version.toString());
         historySummary.setMajorVersion(version.at(0));
         historySummary.setMinorVersion(version.at(1));
+        historySummary.setComment(comment);
         historySummary.setModifier(modifier);
         if (withPrettyNames) {
             historySummary.setModifierName(xwikiApi.getUserName(modifier, false));

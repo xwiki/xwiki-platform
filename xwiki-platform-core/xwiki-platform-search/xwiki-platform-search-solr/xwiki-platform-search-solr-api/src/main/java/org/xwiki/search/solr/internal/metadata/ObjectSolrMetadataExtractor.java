@@ -68,8 +68,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'",
-                serializer.serialize(objectReference)), e);
+            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'", objectReference), e);
         }
     }
 

@@ -209,8 +209,6 @@ public class DefaultIndexableReferenceExtractorTest extends
                 allowing(execution).getContext();
                 will(returnValue(executionContext));
 
-                ignoring(serializer);
-
                 // ignoring(any(Logger.class));
 
                 // Data

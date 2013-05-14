@@ -20,30 +20,32 @@
 package org.xwiki.query.solr;
 
 import org.junit.Assert;
-
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQueryExecutorManager;
 import org.xwiki.query.internal.DefaultQueryManager;
 import org.xwiki.query.solr.internal.SolrQueryExecutor;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
-import org.xwiki.test.jmock.annotation.MockingRequirements;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Basic test for the {@link SolrQueryExecutor}.
  * 
  * @version $Id$
  */
-@MockingRequirements({@MockingRequirement(SolrQueryExecutor.class), @MockingRequirement(DefaultQueryManager.class),
-@MockingRequirement(DefaultQueryExecutorManager.class)})
-public class SolrQueryExecutorTest extends AbstractMockingComponentTestCase<QueryExecutor>
+@ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class})
+public class SolrQueryExecutorTest
 {
+    @Rule
+    public final MockitoComponentMockingRule<QueryExecutor> componentManager =
+        new MockitoComponentMockingRule<QueryExecutor>(SolrQueryExecutor.class);
+
     @Test
     public void testExecutorRegistration() throws Exception
     {
-        QueryManager queryManager = getComponentManager().getInstance(QueryManager.class);
+        QueryManager queryManager = this.componentManager.getInstance(QueryManager.class);
 
         Assert.assertTrue(queryManager.getLanguages().contains(SolrQueryExecutor.SOLR));
     }

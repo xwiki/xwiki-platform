@@ -49,8 +49,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public class SolrIndexScriptServiceTest
 {
     @Rule
-    public final MockitoComponentMockingRule<SolrIndexScriptService> mocker = new MockitoComponentMockingRule(
-        SolrIndexScriptService.class);
+    public final MockitoComponentMockingRule<SolrIndexScriptService> mocker =
+        new MockitoComponentMockingRule<SolrIndexScriptService>(SolrIndexScriptService.class);
 
     private XWikiContext mockContext;
 

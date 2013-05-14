@@ -35,7 +35,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -61,12 +60,6 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
 public class DefaultIndexableReferenceExtractor implements IndexableReferenceExtractor
 {
-    /**
-     * Reference to String serializer.
-     */
-    @Inject
-    protected EntityReferenceSerializer<String> serializer;
-
     /**
      * Execution component.
      */
@@ -135,7 +128,7 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
             }
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Failed to compute the list of entities to index for '%s'",
-                serializer.serialize(startReference)), e);
+                startReference), e);
         }
 
         return references;

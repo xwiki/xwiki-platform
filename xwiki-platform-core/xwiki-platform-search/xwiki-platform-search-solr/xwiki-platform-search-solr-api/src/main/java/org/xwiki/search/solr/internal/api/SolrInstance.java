@@ -28,7 +28,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -45,19 +44,6 @@ import org.xwiki.stability.Unstable;
 @Role
 public interface SolrInstance extends Initializable
 {
-    /**
-     * Initialize the instance.
-     * 
-     * @throws InitializationException if problems occur.
-     */
-    @Override
-    void initialize() throws InitializationException;
-
-    /**
-     * Shutdown the instance.
-     */
-    void shutDown();
-
     /**
      * Add a {@link SolrInputDocument} to the Solr index.
      * <p/>

@@ -34,6 +34,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -47,7 +49,7 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 @Component
 @Named(EmbeddedSolrInstance.TYPE)
 @Singleton
-public class EmbeddedSolrInstance extends AbstractSolrInstance
+public class EmbeddedSolrInstance extends AbstractSolrInstance implements Disposable
 {
     /**
      * Solr instance type for this implementation.
@@ -76,6 +78,11 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
     @Inject
     private Environment environment;
 
+    /**
+     * Solr CoreContainer.
+     */
+    private CoreContainer container;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -85,9 +92,9 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
             validateAndInitializeHomeDirectory(solrHome);
 
             // Start embedded Solr server.
-            logger.info("Starting embedded Solr server...");
+            this.logger.info("Starting embedded Solr server...");
             System.setProperty(SOLR_HOME_SYSTEM_PROPERTY, solrHome);
-            logger.info("Using Solr home directory: {}", solrHome);
+            this.logger.info("Using Solr home directory: {}", solrHome);
 
             // Initialize the SOLR back-end using an embedded server.
             CoreContainer.Initializer initializer = new CoreContainer.Initializer();
@@ -97,14 +104,36 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
                     "Failed to initialize the Solr core. Please check the configuration and log messages");
             }
 
-            container = initializedContainer;
-            server = new EmbeddedSolrServer(container, "");
+            this.container = initializedContainer;
+            this.server = new EmbeddedSolrServer(container, "");
 
-            logger.info("Started embedded Solr server.");
+            this.logger.info("Started embedded Solr server.");
         } catch (Exception e) {
             throw new InitializationException(String.format(
                 "Failed to initialize the solr embedded server with home directory set to '%s'", solrHome), e);
         }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        if (this.server != null) {
+            this.server.shutdown();
+        }
+
+        if (this.container != null) {
+            this.container.shutdown();
+        }
+    }
+
+    /**
+     * Useful when testing.
+     * 
+     * @return the container
+     */
+    protected CoreContainer getContainer()
+    {
+        return this.container;
     }
 
     /**
@@ -155,7 +184,7 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
 
         String defaultValue = getDefaultHomeDirectory();
 
-        return solrConfiguration.getInstanceConfiguration(TYPE, "home", defaultValue);
+        return this.solrConfiguration.getInstanceConfiguration(TYPE, "home", defaultValue);
     }
 
     /**
@@ -163,7 +192,7 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance
      */
     String getDefaultHomeDirectory()
     {
-        String result = new File(environment.getPermanentDirectory(), DEFAULT_SOLR_DIRECTORY_NAME).getPath();
+        String result = new File(this.environment.getPermanentDirectory(), DEFAULT_SOLR_DIRECTORY_NAME).getPath();
 
         return result;
     }

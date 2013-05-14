@@ -143,16 +143,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <suppressionsLocation>${basedir}/src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

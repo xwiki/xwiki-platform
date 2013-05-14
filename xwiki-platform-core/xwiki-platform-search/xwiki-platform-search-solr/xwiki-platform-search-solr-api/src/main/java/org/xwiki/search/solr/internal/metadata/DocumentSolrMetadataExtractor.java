@@ -114,8 +114,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get input document for '%s'",
-                serializer.serialize(documentReference)), e);
+            throw new SolrIndexException(String.format("Failed to get input document for '%s'", documentReference), e);
         }
     }
 

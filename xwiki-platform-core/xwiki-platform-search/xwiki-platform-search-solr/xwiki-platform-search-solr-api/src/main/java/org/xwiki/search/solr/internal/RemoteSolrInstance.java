@@ -34,7 +34,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -83,12 +82,6 @@ public class RemoteSolrInstance extends AbstractSolrInstance
      */
     @Inject
     private SolrConfiguration configuration;
-
-    /**
-     * Logging framework.
-     */
-    @Inject
-    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException

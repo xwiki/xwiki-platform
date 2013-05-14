@@ -68,8 +68,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'",
-                serializer.serialize(attachmentReference)), e);
+            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'", attachmentReference), e);
         }
     }
 
@@ -138,8 +137,8 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
 
             return result;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to retrieve attachment content for '%s'",
-                serializer.serialize(attachment)), e);
+            throw new SolrIndexException(String.format("Failed to retrieve attachment content for '%s'", attachment),
+                e);
         }
     }
 

@@ -145,8 +145,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 document.getTranslatedDocument(documentReference.getLocale(), getXWikiContext());
             return translatedDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get translated document for '%s'",
-                this.serializer.serialize(documentReference)), e);
+            throw new SolrIndexException(
+                String.format("Failed to get translated document for '%s'", documentReference), e);
         }
     }
 
@@ -195,7 +195,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             }
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Exception while fetching the language of the document '%s'",
-                this.serializer.serialize(documentReference)), e);
+                documentReference), e);
         }
 
         return language;
@@ -235,7 +235,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                     continue;
                 } else if (propertyValue instanceof List) {
                     // Handle list property values, by adding each list entry.
-                    List propertyListValues = (List) propertyValue;
+                    List< ? > propertyListValues = (List< ? >) propertyValue;
                     for (Object propertyListValue : propertyListValues) {
                         solrDocument.addField(fieldName,
                             String.format(OBJCONTENT_FORMAT, property.getName(), propertyListValue));

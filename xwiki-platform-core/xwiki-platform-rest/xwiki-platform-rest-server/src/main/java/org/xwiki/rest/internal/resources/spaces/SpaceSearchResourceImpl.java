@@ -21,8 +21,6 @@ package org.xwiki.rest.internal.resources.spaces;
 
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -40,9 +38,8 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
     {
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
-            searchResults.setTemplate(String.format("%s?%s",
-                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(SpaceSearchResource.class).build(wikiName, spaceName)
-                            .toString(), SEARCH_TEMPLATE_INFO));
+            searchResults.setTemplate(String.format("%s?%s", Utils.createURI(uriInfo.getBaseUri(),
+                SpaceSearchResource.class, wikiName, spaceName).toString(), SEARCH_TEMPLATE_INFO));
 
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 

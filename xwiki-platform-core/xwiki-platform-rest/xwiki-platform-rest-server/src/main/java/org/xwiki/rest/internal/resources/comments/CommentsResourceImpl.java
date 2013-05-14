@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.Vector;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
@@ -110,8 +109,8 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
                         .createComment(objectFactory, uriInfo.getBaseUri(), doc, commentObject,
                                 Utils.getXWikiApi(componentManager), false);
 
-                return Response.created(UriBuilder.fromUri(uriInfo.getBaseUri()).path(CommentResource.class)
-                        .build(wikiName, spaceName, pageName, id)).entity(createdComment).build();
+                return Response.created(Utils.createURI(uriInfo.getBaseUri(), CommentResource.class, wikiName,
+                    spaceName, pageName, id)).entity(createdComment).build();
             }
 
             return null;

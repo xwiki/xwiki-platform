@@ -21,8 +21,6 @@ package org.xwiki.rest.internal.resources.wikis;
 
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -40,7 +38,7 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s",
-                UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString(),
+                Utils.createURI(uriInfo.getBaseUri(), WikiSearchResource.class, wikiName).toString(),
                 SEARCH_TEMPLATE_INFO));
 
             if (wikiName != null) {

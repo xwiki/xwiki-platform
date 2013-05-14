@@ -129,15 +129,17 @@ public class AllDocsTest extends AbstractTest
         String spaceRef = getTestMethodName() + "\\.0";
         getUtil().createPage(spaceName, "WebHome", null, null);
         getUtil().createPage(spaceName, "Level.1", null, null, null, spaceRef + ".WebHome");
-        getUtil().createPage(spaceName, "Level(2)", null, null, null, spaceRef + ".Level\\.1");
-        getUtil().createPage(spaceName, "Level@3", null, null, null, spaceRef + ".Level(2)");
+        getUtil().createPage(spaceName, "Level{[(2)]}", null, null, null, spaceRef + ".Level\\.1");
+        getUtil().createPage(spaceName, "Level@3", null, null, null, spaceRef + ".Level{[(2)]}");
         getUtil().createPage(spaceName, "End", null, null, null, spaceRef + ".Level@3");
 
         EntityTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
         tree.lookupEntity(spaceRef + ".End");
         tree.waitForPage(spaceName, "End", true);
         assertTrue(tree.hasPage(spaceName, "Level.1"));
-        assertTrue(tree.hasPage(spaceName, "Level(2)"));
+        // The curly open bracket '{' is encoded in the rendered title (for security reasons?..).
+        // See http://jira.xwiki.org/browse/XWIKI-7815
+        assertTrue(tree.hasPage(spaceName, "Level{[(2)]}", "Level&#123;[(2)]}"));
         assertTrue(tree.hasPage(spaceName, "Level@3"));
     }
 }

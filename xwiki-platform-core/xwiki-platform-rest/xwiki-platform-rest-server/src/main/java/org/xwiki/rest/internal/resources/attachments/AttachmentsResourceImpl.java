@@ -29,7 +29,6 @@ import javax.mail.Multipart;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
@@ -152,9 +151,8 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
             if (attachmentInfo.isAlreadyExisting()) {
                 return Response.status(Status.ACCEPTED).entity(attachmentInfo.getAttachment()).build();
             } else {
-                return Response
-                        .created(UriBuilder.fromUri(uriInfo.getBaseUri()).path(AttachmentResource.class).build(wikiName,
-                                spaceName, pageName, attachmentName)).entity(attachmentInfo.getAttachment()).build();
+                return Response.created(Utils.createURI(uriInfo.getBaseUri(), AttachmentResource.class, wikiName,
+                    spaceName, pageName, attachmentName)).entity(attachmentInfo.getAttachment()).build();
             }
         } catch (Exception e) {
             throw new XWikiRestException(e);

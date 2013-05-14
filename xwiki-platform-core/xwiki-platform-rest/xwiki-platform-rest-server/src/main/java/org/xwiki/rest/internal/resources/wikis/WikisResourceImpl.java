@@ -21,8 +21,6 @@ package org.xwiki.rest.internal.resources.wikis;
 
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
@@ -63,7 +61,7 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
                 wikis.getWikis().add(DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), databaseName));
             }
 
-            String queryUri = UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikisSearchQueryResource.class).toString();
+            String queryUri = Utils.createURI(uriInfo.getBaseUri(), WikisSearchQueryResource.class).toString();
             Link queryLink = objectFactory.createLink();
             queryLink.setHref(queryUri);
             queryLink.setRel(Relations.QUERY);

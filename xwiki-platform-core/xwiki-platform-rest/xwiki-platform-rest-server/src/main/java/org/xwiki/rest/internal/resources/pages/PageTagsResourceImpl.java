@@ -25,7 +25,6 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
@@ -62,8 +61,8 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
                 Tag tag = objectFactory.createTag();
                 tag.setName(tagName);
 
-                String tagUri = UriBuilder.fromUri(uriInfo.getBaseUri()).path(PagesForTagsResource.class)
-                        .build(wikiName, tagName).toString();
+                String tagUri =
+                    Utils.createURI(uriInfo.getBaseUri(), PagesForTagsResource.class, wikiName, tagName).toString();
                 Link tagLink = objectFactory.createLink();
                 tagLink.setHref(tagUri);
                 tagLink.setRel(Relations.TAG);

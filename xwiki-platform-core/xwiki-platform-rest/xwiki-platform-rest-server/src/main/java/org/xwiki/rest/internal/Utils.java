@@ -19,6 +19,12 @@
  */
 package org.xwiki.rest.internal;
 
+import java.net.URI;
+
+import javax.ws.rs.core.UriBuilder;
+
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -34,18 +40,14 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
- * <p>
  * A class containing utility methods used in the REST subsystem.
- * </p>
  * 
  * @version $Id$
  */
 public class Utils
 {
     /**
-     * <p>
      * Get the page id given its components.
-     * </p>
      * 
      * @param wikiName
      * @param spaceName
@@ -78,9 +80,7 @@ public class Utils
     }
 
     /**
-     * <p>
      * Get the page full name given its components.
-     * </p>
      * 
      * @param wikiName
      * @param spaceName
@@ -100,9 +100,7 @@ public class Utils
     }
 
     /**
-     * <p>
      * Get the object id given its components.
-     * </p>
      * 
      * @param wikiName
      * @param spaceName
@@ -125,9 +123,8 @@ public class Utils
     }
 
     /**
-     * <p>
      * Get the page id given its components.
-     * </p>
+     * 
      * @return The page id.
      */
     public static String getPageId(String wikiName, String pageFullName)
@@ -142,9 +139,7 @@ public class Utils
     }
 
     /**
-     * <p>
      * Get parent document for a given document.
-     * </p>
      * 
      * @param doc document to get the parent from.
      * @param xwikiApi the xwiki api.
@@ -168,9 +163,7 @@ public class Utils
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki context from the current execution context
-     * </p>
+     * Retrieve the XWiki context from the current execution context.
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki context.
@@ -190,9 +183,7 @@ public class Utils
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki private API object
-     * </p>
+     * Retrieve the XWiki private API object.
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki private API object.
@@ -203,9 +194,7 @@ public class Utils
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki public API object
-     * </p>
+     * Retrieve the XWiki public API object.
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki public API object.
@@ -217,9 +206,7 @@ public class Utils
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki user associated to the current XWiki context
-     * </p>
+     * Retrieve the XWiki user associated to the current XWiki context.
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The user associated to the current XWiki context.
@@ -233,31 +220,30 @@ public class Utils
 
         return user.getUser();
     }
-    
+
     /**
-     * <p>
-     * Retrieve the XWiki private API object
-     * </p>
+     * Retrieve the XWiki private API object.
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki private API object.
      */
     public static String getAuthorName(String author, ComponentManager componentManager)
     {
-        return getXWikiContext(componentManager).getWiki().getUserName(author, null, false, getXWikiContext(componentManager));
+        return getXWikiContext(componentManager).getWiki().getUserName(author, null, false,
+            getXWikiContext(componentManager));
     }
 
     /**
-     * <p>
-     * Retrieve the BaseObject from the Document
-     * </p>
+     * Retrieve the BaseObject from the Document.
+     * 
      * @param doc Public API document
      * @param className Classname
      * @param objectNumber Object Number
      * @return The BaseObject field
      * @throws XWikiException
      */
-    public static BaseObject getBaseObject(Document doc, String className, int objectNumber, ComponentManager componentManager) throws XWikiException
+    public static BaseObject getBaseObject(Document doc, String className, int objectNumber,
+        ComponentManager componentManager) throws XWikiException
     {
         XWikiDocument xwikiDocument =
             Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
@@ -266,5 +252,32 @@ public class Utils
         return xwikiDocument.getObject(className, objectNumber);
     }
 
-
+    /**
+     * Creates an URI to access the specified resource. The given path elements are encoded before being inserted into
+     * the resource path.
+     * <p>
+     * NOTE: We added this method because {@link UriBuilder#build(Object...)} doesn't encode all special characters. See
+     * https://github.com/restlet/restlet-framework-java/issues/601 .
+     * 
+     * @param baseURI the base URI
+     * @param resourceClass the resource class, used to get the URI path
+     * @param pathElements the path elements to insert in the resource path
+     * @return an URI that can be used to access the specified resource
+     */
+    public static URI createURI(URI baseURI, java.lang.Class< ? > resourceClass, java.lang.Object... pathElements)
+    {
+        String[] encodedPathElements = new String[pathElements.length];
+        for (int i = 0; i < pathElements.length; i++) {
+            if (pathElements[i] != null) {
+                try {
+                    encodedPathElements[i] = URIUtil.encodePath(pathElements[i].toString());
+                } catch (URIException e) {
+                    throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);
+                }
+            } else {
+                encodedPathElements[i] = null;
+            }
+        }
+        return UriBuilder.fromUri(baseURI).path(resourceClass).buildFromEncoded(encodedPathElements);
+    }
 }

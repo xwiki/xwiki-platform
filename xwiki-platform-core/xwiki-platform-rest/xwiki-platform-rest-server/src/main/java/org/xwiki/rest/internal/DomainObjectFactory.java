@@ -393,7 +393,6 @@ public class DomainObjectFactory
         Page page = objectFactory.createPage();
         fillPageSummary(page, objectFactory, baseUri, doc, useVersion, xwikiApi, withPrettyNames);
 
-        page.setVersion(doc.getVersion());
         page.setMajorVersion(doc.getRCSVersion().at(0));
         page.setMinorVersion(doc.getRCSVersion().at(1));
         page.setLanguage(doc.getLanguage());
@@ -415,6 +414,7 @@ public class DomainObjectFactory
         calendar.setTime(doc.getContentUpdateDate());
         page.setModified(calendar);
 
+        page.setComment(doc.getComment());
         page.setContent(doc.getContent());
 
         if (self != null) {

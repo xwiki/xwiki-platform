@@ -188,13 +188,23 @@ XWiki.HSortableList = Class.create({
 XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
   initialize : function($super, values, duplicatesAllowed, possibleValues, inputTip) {
     $super(values, duplicatesAllowed);
-    this.container = new Element('div', {'class': 'hSortableWrapper'}).update('&lt;div&gt;&lt;input type="text" class="withTip"/&gt;&lt;input type="image" class="icon" title="$escapetool.xml($services.localization.render('wysiwyg.admin.widgets.sortableList.add'))" src="$xwiki.getSkinFile('icons/silk/add.png')" alt="$escapetool.xml($services.localization.render('wysiwyg.admin.widgets.sortableList.add'))"/&gt;&lt;/div&gt;');
-    this.container.firstChild.firstChild.value = this.container.firstChild.firstChild.defaultValue = inputTip;
-    this.container.appendChild(this.list);
-    Event.observe(this.container.firstChild.firstChild, 'keydown', this.onKeyDown.bindAsEventListener(this));
-    Event.observe(this.container.firstChild.lastChild, 'click', this.onClickAdd.bindAsEventListener(this));
+    this.textInput = new Element('input', {type: 'text', 'class': 'withTip'});
+    this.textInput.value = this.textInput.defaultValue = inputTip;
+    this.addButton = new Element('input', {
+      type: 'image',
+      'class': 'icon',
+      title: "$escapetool.javascript($services.localization.render('wysiwyg.admin.widgets.sortableList.add'))",
+      src: "$xwiki.getSkinFile('icons/silk/add.png')",
+      alt: "$escapetool.javascript($services.localization.render('wysiwyg.admin.widgets.sortableList.add'))"
+    });
+    this.container = new Element('div', {'class': 'hSortableWrapper'});
+    this.container.insert(new Element('div').insert(this.textInput).insert(this.addButton)).insert(this.list);
+    Event.observe(this.textInput, 'keydown', this.onKeyDown.bindAsEventListener(this));
+    Event.observe(this.addButton, 'click', this.onClickAdd.bindAsEventListener(this));
     if (possibleValues) {
-      new Autocompleter.Local(this.container.firstChild.firstChild, 'suggestions', possibleValues, {minChars: 0, choices: possibleValues.length});
+      this.suggestions = new Element('div', {'class': 'suggestions'}).hide();
+      this.addButton.insert({'after': this.suggestions});
+      new Autocompleter.Local(this.textInput, this.suggestions, possibleValues, {minChars: 0, choices: possibleValues.length});
     }
   },
   attachTo : function(parent) {
@@ -202,17 +212,16 @@ XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
     Sortable.create(this.list, this.sortableOptions);
   },
   onKeyDown : function(event) {
-    if (event.keyCode == Event.KEY_RETURN &amp;&amp; $('suggestions').style.display == 'none') {
+    if (event.keyCode == Event.KEY_RETURN &amp;&amp; !this.suggestions.visible()) {
       this.onClickAdd(event);
     }
   },
   onClickAdd : function(event) {
     Event.stop(event);
-    var input = this.container.firstChild.firstChild;
-    if (input.value != input.defaultValue) {
-      this.addListItem(input.value);
+    if (this.textInput.value != this.textInput.defaultValue) {
+      this.addListItem(this.textInput.value);
     }
-    Form.Element.activate(input);
+    Form.Element.activate(this.textInput);
   }
 });
 XWiki.SpaceSeparatedList = Class.create(XWiki.HSortableListWithInput, {
@@ -853,9 +862,6 @@ return XWiki;
     element.style.display = 'none';
   });
 
-  // Insert the element that will hold the suggestions for all text input fields with autocomplete on.
-  $('body').appendChild(new Element('div', {id: 'suggestions', style: 'display:none'}));
-
   // Initialize all sortable lists.
   [{
     field: 'XWiki.WysiwygEditorConfigClass_0_plugins',
@@ -1386,19 +1392,20 @@ ul.hSortable li .separator {
 /**
  * Input Suggest.
  */
-#suggestions {
+.suggestions {
   background-color: white;
   border: 1px solid $theme.borderColor;
   max-height: 9.7em;
   overflow: auto;
+  z-index: 100;
 }
 
-#suggestions ul {
+.suggestions ul {
   font-size: 90%;
   margin: 0;
 }
 
-#suggestions li {
+.suggestions li {
   list-style-type: none;
 }
 

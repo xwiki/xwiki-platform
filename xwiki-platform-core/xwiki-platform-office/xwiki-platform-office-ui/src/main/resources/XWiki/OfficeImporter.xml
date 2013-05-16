@@ -117,7 +117,7 @@
     targetPageInput.value = fileName;
     // Save the default value to be able to distinguish it from the value set by the user.
     targetPageInput.__defaultValue = fileName;
-  }
+  };
 
   var onSubmit = function(event) {
     if ($('appendContentInputId').checked || $('targetPageInputId').value == '' || $('targetSpaceInputId').value == '') {
@@ -150,9 +150,9 @@
         $('targetPageInputId').form.enable().submit();
       }
     });
-  }
+  };
 
-  function init() {
+  var init = function() {
     var filePath = $('filepath');
     if (filePath) {
       filePath.observe('change', onFilePathChange);
@@ -160,7 +160,7 @@
       return true;
     }
     return false;
-  }
+  };
 
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 })()</code>

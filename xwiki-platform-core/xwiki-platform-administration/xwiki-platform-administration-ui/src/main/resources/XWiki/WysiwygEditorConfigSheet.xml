@@ -865,7 +865,7 @@ return XWiki;
   {
     field: 'XWiki.WysiwygEditorConfigClass_0_toolBar',
     duplicatesAllowed: true,
-    values: '| / bold italic underline strikethrough teletype subscript superscript justifyleft justifycenter justifyright justifyfull unorderedlist orderedlist outdent indent undo redo format fontname fontsize forecolor backcolor hr removeformat symbol paste macro:',
+    values: '| / bold italic underline strikethrough teletype subscript superscript justifyleft justifycenter justifyright justifyfull unorderedlist orderedlist outdent indent undo redo format fontname fontsize forecolor backcolor hr removeformat symbol paste macro: stylename',
     tip: '$escapetool.javascript($services.localization.render('wysiwyg.admin.toolBar.add.hint'))'
   },
   {

@@ -7020,7 +7020,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         XWikiContext context = null;
         if (ec != null) {
-            context = (XWikiContext) ec.getProperty("xwikicontext");
+            context = (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         }
 
         return context;
@@ -7581,7 +7581,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         // Bridge with old XWiki Context, required for legacy code.
-        execution.getContext().setProperty("xwikicontext", context);
+        execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
 
         // Trigger the initialization of the new Velocity and Script Context. This will also ensure that the Execution
         // Context and the XWiki Context point to the same Velocity Context instance. There is old code that accesses

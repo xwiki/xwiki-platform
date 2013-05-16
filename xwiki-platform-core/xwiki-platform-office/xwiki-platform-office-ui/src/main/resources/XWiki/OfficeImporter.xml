@@ -155,8 +155,8 @@
   function init() {
     var filePath = $('filepath');
     if (filePath) {
-      filepath.observe('change', onFilePathChange);
-      filepath.form.observe('submit', onSubmit);
+      filePath.observe('change', onFilePathChange);
+      filePath.form.observe('submit', onSubmit);
       return true;
     }
     return false;

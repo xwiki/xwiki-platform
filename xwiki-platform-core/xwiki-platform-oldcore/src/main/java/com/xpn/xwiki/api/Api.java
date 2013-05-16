@@ -27,7 +27,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
+import org.xwiki.context.Execution;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -57,16 +59,25 @@ public class Api
     }
 
     /**
-     * Get the current context. For the moment, this is a crucial part of the request lifecycle, as it is the only
-     * access point to all the components needed for handling a request. Note: This method is protected so that users of
-     * this API do not get to see the XWikiContext object which should not be exposed.
+     * Note 1: This method is protected so that users of this API do not get to see the XWikiContext object which
+     * should not be exposed.
+     * <p/>
+     * Note 2: This is not longer the canonical way of retrieving the XWiki Context. The new way is to get it from the
+     * {@link org.xwiki.context.ExecutionContext}.
      * 
-     * @return The XWiki Context object containing all information about the current XWiki instance, including
-     *         information on the current request and response.
+     * @return the current context containing all state information about the current request
      */
     protected XWikiContext getXWikiContext()
     {
-        return this.context;
+        XWikiContext xcontext =
+            (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
+
+        // TODO: We need to get rid of this.context but since it's been protected for a long time, a lot of code
+        // wrongly use it instead of calling this getXWikiContext() method. Thus the best we can do ATM is to sync
+        // the saved context with the dynamic one we just retrieved...
+        this.context = xcontext;
+
+        return context;
     }
 
     /**

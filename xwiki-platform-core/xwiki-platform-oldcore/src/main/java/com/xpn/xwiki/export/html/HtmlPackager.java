@@ -251,7 +251,7 @@ public class HtmlPackager
 
             ExecutionContext executionContext = ecim.clone(execution.getContext());
 
-            // Bridge with old XWiki Context, required for old code.
+            // Bridge with old XWiki Context, required for legacy code.
             executionContext.setProperty("xwikicontext", renderContext);
 
             // Push a clean new Execution Context since we don't want the main Execution Context to be used for

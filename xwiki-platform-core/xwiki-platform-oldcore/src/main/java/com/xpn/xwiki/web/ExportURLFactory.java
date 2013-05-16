@@ -170,9 +170,20 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     @Override
+    public URL createSkinURL(String filename, String web, String name, XWikiContext context)
+    {
+        return createSkinURL(filename, web, name, null, context);
+    }
+
+    @Override
     public URL createSkinURL(String fileName, String web, String name, String wikiId, XWikiContext context)
     {
-        URL skinURL = super.createSkinURL(fileName, web, name, wikiId, context);
+        URL skinURL;
+        if (wikiId == null) {
+            skinURL = super.createSkinURL(fileName, web, name, context);
+        } else {
+            skinURL = super.createSkinURL(fileName, web, name, wikiId, context);
+        }
 
         if (!"skins".equals(web)) {
             return skinURL;
@@ -206,12 +217,16 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     XWikiServletResponseStub response = new XWikiServletResponseStub();
                     response.setOutpuStream(fos);
                     context.setResponse(response);
-                    context.setDatabase(wikiId);
+                    if (wikiId != null) {
+                        context.setDatabase(wikiId);
+                    }
 
                     SKINACTION.render(skinURL.getPath(), context);
                 } finally {
                     fos.close();
-                    context.setDatabase(database);
+                    if (wikiId != null) {
+                        context.setDatabase(database);
+                    }
                 }
 
                 followCssImports(file, web, name, wikiId, context);
@@ -249,7 +264,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 while (matcher.find()) {
                     String fileName = matcher.group(1);
 
-                    createSkinURL(fileName, web, name, wikiId, context);
+                    if (wikiId == null) {
+                        createSkinURL(fileName, web, name, context);
+                    } else {
+                        createSkinURL(fileName, web, name, wikiId, context);
+                    }
                 }
             } finally {
                 fis.close();

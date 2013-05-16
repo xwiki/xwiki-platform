@@ -7580,6 +7580,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             throw new RuntimeException("Failed to clone the Execution Context", e);
         }
 
+        // Bridge with old XWiki Context, required for legacy code.
+        execution.getContext().setProperty("xwikicontext", context);
+
         // Trigger the initialization of the new Velocity and Script Context. This will also ensure that the Execution
         // Context and the XWiki Context point to the same Velocity Context instance. There is old code that accesses
         // the Velocity Context from the XWiki Context.

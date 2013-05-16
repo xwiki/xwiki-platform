@@ -221,6 +221,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
 
             // Perform internal macro transformations.
             TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
+            txContext.setId(context.getId());
             macroTransformation.transform(wikiMacroMarker, txContext);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);

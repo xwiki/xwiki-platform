@@ -612,6 +612,15 @@ public class XWiki implements EventListener
 
             // Use the name from the subdomain
             wikiName = servername;
+
+            if (!context.isMainWiki(wikiName)
+                && !"1".equals(context.getWiki().Param("xwiki.virtual.failOnWikiDoesNotExist", "0"))) {
+                // Check if the wiki really exists
+                if (!exists(getServerWikiPage(wikiName), context)) {
+                    // Fallback on main wiki
+                    wikiName = context.getMainXWiki();
+                }
+            }
         } else {
             // Use the name from the located wiki descriptor
             wikiName = StringUtils.removeStart(wikiDefinition.getName(), "XWikiServer").toLowerCase();

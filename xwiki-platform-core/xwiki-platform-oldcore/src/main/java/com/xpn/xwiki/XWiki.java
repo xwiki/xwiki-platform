@@ -613,6 +613,15 @@ public class XWiki implements EventListener
 
             // Use the name from the subdomain
             wikiName = servername;
+
+            if (!context.isMainWiki(wikiName)
+                && !"1".equals(context.getWiki().Param("xwiki.virtual.failOnWikiDoesNotExist", "0"))) {
+                // Check if the wiki really exists
+                if (!exists(getServerWikiPage(wikiName), context)) {
+                    // Fallback on main wiki
+                    wikiName = context.getMainXWiki();
+                }
+            }
         } else {
             // Use the name from the located wiki descriptor
             wikiName = StringUtils.removeStart(wikiDefinition.getName(), "XWikiServer").toLowerCase();
@@ -4623,12 +4632,12 @@ public class XWiki implements EventListener
                     // context.getDatabase() as the wiki name since that was set properly beforehand in getXWiki()
                     // which calls XWiki.getRequestWikiName() which handles correctly aliases.
                     // Remove this once the URL module properly handles wiki aliases.
-                    reference = new DocumentReference(context.getDatabase(),
-                        entityReference.extractReference(EntityType.SPACE).getName(), entityReference.getName());
+                    reference =
+                        new DocumentReference(context.getDatabase(), entityReference.extractReference(EntityType.SPACE)
+                            .getName(), entityReference.getName());
                 } else {
                     // Big problem we don't have an Entity URL!
-                    throw new RuntimeException(String.format("URL [%s] that doesn't point to an Entity!",
-                        xwikiURL));
+                    throw new RuntimeException(String.format("URL [%s] that doesn't point to an Entity!", xwikiURL));
                 }
             }
         }
@@ -4641,7 +4650,7 @@ public class XWiki implements EventListener
      * requested URI and returns the remainder. This method is needed because special characters in the path can be
      * URL-encoded, depending on whether the request is forwarded through the request dispatcher or not, and also
      * depending on the client (some browsers encode -, while some don't).
-     *
+     * 
      * @param path the path, as taken from the requested URI
      * @param segment the segment to remove, as reported by the container
      * @return the path with the specified segment trimmed from its start

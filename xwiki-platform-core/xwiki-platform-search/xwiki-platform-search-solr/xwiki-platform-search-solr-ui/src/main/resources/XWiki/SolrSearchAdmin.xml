@@ -153,7 +153,7 @@ search=Main.SolrSearch</parameters>
         &lt;span class="xHint"&gt;Optional HQL query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;textarea id="solrAdminCustomQuery" name="customQuery" rows="7"&gt;&lt;/textarea&gt;
+        &lt;textarea id="solrAdminCustomQuery" name="customQuery" rows="7" cols="45"&gt;&lt;/textarea&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
     &lt;p class="buttons"&gt;

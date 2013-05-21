@@ -71,6 +71,11 @@ public class XWikiHibernateBaseStore implements Initializable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateBaseStore.class);
 
+    /**
+     * @see #isInSchemaMode()
+     */
+    private static final String VIRTUAL_MODE_SCHEMA = "schema";
+
     private Map<String, String> connections = new ConcurrentHashMap<String, String>();
 
     private int nbConnections = 0;
@@ -1400,7 +1405,11 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     protected boolean isInSchemaMode()
     {
-        return StringUtils.equals(getConfiguration().getProperty("xwiki.virtual_mode"), "schema");
+        String virtualModePropertyValue = getConfiguration().getProperty("xwiki.virtual_mode");
+        if (virtualModePropertyValue == null) {
+            virtualModePropertyValue = VIRTUAL_MODE_SCHEMA;
+        }
+        return StringUtils.equals(virtualModePropertyValue, VIRTUAL_MODE_SCHEMA);
     }
 
     /**

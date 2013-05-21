@@ -623,10 +623,9 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# [Since 2.0RC1]
 #-# Activity Stream plugin. 
-#-# The Activity Stream plugin stores data in a dedicated table in the database. In virtual mode each wiki has its own 
-#-# database. The plugin can be configured to store its data into the database corresponding to the wiki, into the main 
-#-# database (default: xwiki) or both. If the wiki is not running in virtual mode these options will not have any 
-#-# effect. These options should not be both set to 0 (in this case the local store will be forced).
+#-# The Activity Stream plugin stores data in a dedicated table in the database. Each wiki has its own database.
+#-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
+#-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
 #-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
 #-#
 #-# Default: 1 

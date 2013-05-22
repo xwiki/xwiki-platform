@@ -595,16 +595,17 @@ public class XWikiContext extends Hashtable<Object, Object>
         // Cannot do anything
     }
 
-    /**
-     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
-     */
-    @Deprecated
     public XWikiDocument getWikiServer()
     {
+        String currentWiki = getDatabase();
         try {
-            return getWiki().getDocument(XWiki.getServerWikiPage(getDatabase()), this);
+            setDatabase(getMainXWiki());
+
+            return getWiki().getDocument(XWiki.getServerWikiPage(currentWiki), this);
         } catch (XWikiException e) {
             LOGGER.error("Failed to get wiki descriptor for wiki [{}]", getDatabase(), e);
+        } finally {
+            setDatabase(currentWiki);
         }
 
         return null;

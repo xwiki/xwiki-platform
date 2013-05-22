@@ -331,24 +331,19 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         // We don't update the schema if the XWiki hibernate config parameter says not to update
         if ((!force) && (context.getWiki() != null)
-            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Schema update deactivated for wiki [" + context.getDatabase() + "]");
-            }
+            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
+        {
+            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getDatabase());
             return;
         }
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Updating schema update for wiki [" + context.getDatabase() + "]...");
-        }
+        LOGGER.info("Updating schema for wiki [{}]...", context.getDatabase());
 
         try {
             String[] sql = getSchemaUpdateScript(getConfiguration(), context);
             updateSchema(sql, context);
         } finally {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Schema update for wiki [" + context.getDatabase() + "] done");
-            }
+            LOGGER.info("Schema update for wiki [{}] done", context.getDatabase());
         }
     }
 
@@ -471,7 +466,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 || databaseProduct == DatabaseProduct.HSQLDB
                 || databaseProduct == DatabaseProduct.DERBY
                 || databaseProduct == DatabaseProduct.DB2
-                || databaseProduct == DatabaseProduct.POSTGRESQL)
+                || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()))
             {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
@@ -537,15 +532,18 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         String[] result = schemaSQL;
 
-        Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
-        if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
-            List<String> sql = new ArrayList<String>();
-            Collections.addAll(sql, schemaSQL);
-            String sequenceSQL = String.format("create sequence %s.hibernate_sequence", schemaName);
-            if (!sql.contains(sequenceSQL)) {
-                sql.add(sequenceSQL);
+        // There's no issue when in database mode, only in schema mode.
+        if (isInSchemaMode()) {
+            Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
+            if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
+                List<String> sql = new ArrayList<String>();
+                Collections.addAll(sql, schemaSQL);
+                String sequenceSQL = String.format("create sequence %s.hibernate_sequence", schemaName);
+                if (!sql.contains(sequenceSQL)) {
+                    sql.add(sequenceSQL);
+                }
+                result = sql.toArray(new String[sql.size()]);
             }
-            result = sql.toArray(new String[sql.size()]);
         }
 
         return result;

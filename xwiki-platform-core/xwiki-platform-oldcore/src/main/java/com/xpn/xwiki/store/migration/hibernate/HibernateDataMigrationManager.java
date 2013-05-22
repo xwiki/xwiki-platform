@@ -178,7 +178,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             hibernateShemaUpdate();
             liquibaseUpdate(migrations, false);
         } catch (Exception e) {
-            throw new DataMigrationException(String.format("Unable to update schema of database %s",
+            throw new DataMigrationException(String.format("Unable to update schema of wiki [%s]",
                 getXWikiContext().getDatabase()), e);
         }
     }
@@ -190,7 +190,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     private void hibernateShemaUpdate() throws DataMigrationException
     {
         if (logger.isInfoEnabled()) {
-            logger.info("Checking Hibernate mapping and updating schema if needed for database [{}]",
+            logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
                 getXWikiContext().getDatabase());
         }
         getStore().updateSchema(getXWikiContext(), true);

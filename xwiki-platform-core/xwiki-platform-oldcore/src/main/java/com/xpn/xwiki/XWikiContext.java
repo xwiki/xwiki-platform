@@ -603,7 +603,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
             return getWiki().getDocument(XWiki.getServerWikiPage(currentWiki), this);
         } catch (XWikiException e) {
-            LOGGER.error("Failed to get wiki descriptor for wiki [{}]", getDatabase(), e);
+            LOGGER.error("Failed to get wiki descriptor for wiki [{}]", currentWiki, e);
         } finally {
             setDatabase(currentWiki);
         }

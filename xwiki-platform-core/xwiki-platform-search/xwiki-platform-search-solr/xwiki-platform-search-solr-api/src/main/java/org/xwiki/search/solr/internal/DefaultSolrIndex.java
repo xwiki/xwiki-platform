@@ -24,25 +24,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
 import org.xwiki.search.solr.internal.api.SolrIndex;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation of the index.
@@ -52,19 +46,18 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Singleton
-public class DefaultSolrIndex implements SolrIndex
+public class DefaultSolrIndex implements SolrIndex, EventListener
 {
+    /**
+     * The events to listen to.
+     */
+    private static List<Event> EVENTS = Arrays.asList((Event) new ApplicationReadyEvent());
+
     /**
      * Logging framework.
      */
     @Inject
     protected Logger logger;
-
-    /**
-     * Reference to String serializer.
-     */
-    @Inject
-    protected EntityReferenceSerializer<String> serializer;
 
     /**
      * Communication with the Solr instance.
@@ -73,28 +66,32 @@ public class DefaultSolrIndex implements SolrIndex
     protected Provider<SolrInstance> solrInstanceProvider;
 
     /**
-     * Execution component.
-     */
-    @Inject
-    protected Execution execution;
-
-    // /**
-    // * XWikiStubContextProvider component.
-    // */
-    // @Inject
-    // protected XWikiStubContextProvider contextProvider;
-
-    /**
-     * Component manager used to get metadata extractors.
-     */
-    @Inject
-    protected ComponentManager componentManager;
-
-    /**
      * Extract contained indexable references.
      */
     @Inject
     protected IndexableReferenceExtractor indexableReferenceExtractor;
+
+    /**
+     * Thread in which the indexUpdater will be executed.
+     */
+    private Thread indexThread;
+
+    /**
+     * Component in charge with updating the index.
+     */
+    @Inject
+    @Named("queued")
+    private SolrIndex indexUpdater;
+
+    /**
+     * TODO DOCUMENT ME!
+     */
+    public void startThread()
+    {
+        // Launch the index thread that runs the indexUpdater.
+        this.indexThread = new Thread((QueuedSolrIndex) indexUpdater);
+        this.indexThread.start();
+    }
 
     @Override
     public void index(EntityReference reference) throws SolrIndexException
@@ -108,27 +105,22 @@ public class DefaultSolrIndex implements SolrIndex
         // Build the list of references to index directly
         List<EntityReference> indexableReferences = getUniqueIndexableEntityReferences(references);
 
-        // Build the list of Solr input documents to be indexed.
-        List<SolrInputDocument> solrDocuments = getSolrDocuments(indexableReferences);
+        indexUpdater.index(indexableReferences);
+    }
 
-        // Push and commit the new index data to the server.
-        SolrInstance solrInstance = solrInstanceProvider.get();
-        try {
-            solrInstance.add(solrDocuments);
-            solrInstance.commit();
-        } catch (Exception e) {
-            String message = "Failed to push index changes to the Solr server. Rolling back.";
-            logger.error(message, e);
-            try {
-                solrInstance.rollback();
-            } catch (Exception ex) {
-                // Just log the failure.
-                logger.error("Failed to rollback index changes.", ex);
-            }
+    @Override
+    public void delete(EntityReference reference) throws SolrIndexException
+    {
+        delete(Arrays.asList(reference));
+    }
 
-            // Throw the main exception onwards.
-            throw new SolrIndexException(message, e);
-        }
+    @Override
+    public void delete(List<EntityReference> references) throws SolrIndexException
+    {
+        // Preserve consistency by deleting all the indexable entities contained by each input reference.
+        List<EntityReference> indexableReferences = getUniqueIndexableEntityReferences(references);
+
+        indexUpdater.delete(indexableReferences);
     }
 
     /**
@@ -161,111 +153,22 @@ public class DefaultSolrIndex implements SolrIndex
         return result;
     }
 
-    /**
-     * @param references the references to extract metadata from. Unsupported references are skipped.
-     * @return the list of {@link SolrInputDocument}s containing extracted metadata from each of the passed references.
-     * @throws SolrIndexException if problems occur.
-     * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
-     */
-    private List<SolrInputDocument> getSolrDocuments(List<EntityReference> references) throws SolrIndexException,
-        IllegalArgumentException
+    @Override
+    public List<Event> getEvents()
     {
-        List<SolrInputDocument> solrDocuments = new ArrayList<SolrInputDocument>();
-        for (EntityReference reference : references) {
-            SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
-            // If the entity type is supported, use the extractor to get the SolrInputDocuent.
-            if (metadataExtractor != null) {
-                SolrInputDocument entitySolrDocument = metadataExtractor.getSolrDocument(reference);
-                if (entitySolrDocument != null) {
-                    solrDocuments.add(entitySolrDocument);
-                }
-            }
-        }
-        return solrDocuments;
-    }
-
-    /**
-     * @param entityType the entity type
-     * @return the metadata extractor that is registered for the specified type or {@code null} if none exists.
-     */
-    protected SolrMetadataExtractor getMetadataExtractor(EntityType entityType)
-    {
-        SolrMetadataExtractor result = null;
-        try {
-            result = componentManager.getInstance(SolrMetadataExtractor.class, entityType.name().toLowerCase());
-        } catch (ComponentLookupException e) {
-            // Entity type not supported.
-        }
-
-        return result;
+        return EVENTS;
     }
 
     @Override
-    public void delete(EntityReference reference) throws SolrIndexException
+    public String getName()
     {
-        delete(Arrays.asList(reference));
+        return this.getClass().getName();
     }
 
     @Override
-    public void delete(List<EntityReference> references) throws SolrIndexException
+    public void onEvent(Event event, Object source, Object data)
     {
-        // Preserve consistency by deleting all the indexable entities contained by each input reference.
-        List<EntityReference> indexableReferences = getUniqueIndexableEntityReferences(references);
-
-        // Get the IDs of all the references to delete.
-        List<String> ids = getIds(indexableReferences);
-
-        // Push and commit the index IDs to delete from the Solr server.
-        SolrInstance solrInstance = solrInstanceProvider.get();
-        try {
-            solrInstance.delete(ids);
-            solrInstance.commit();
-        } catch (Exception e) {
-            String message = "Failed to push index deletions to the Solr server. Rolling back.";
-            logger.error(message, e);
-            try {
-                solrInstance.rollback();
-            } catch (Exception re) {
-                // Just log the failure.
-                logger.error("Failed to rollback index deletions.", re);
-            }
-
-            // Throw the main exception onwards.
-            throw new SolrIndexException(message, e);
-        }
-    }
-
-    /**
-     * @return the XWikiContext
-     */
-    protected XWikiContext getXWikiContext()
-    {
-        ExecutionContext executionContext = this.execution.getContext();
-        XWikiContext context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        // FIXME: Do we need this? Maybe when running an index Thread?
-        // if (context == null) {
-        // context = this.contextProvider.createStubContext();
-        // executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
-        // }
-        return context;
-    }
-
-    /**
-     * @param references the references.
-     * @return the IDs of the entities, as they are used in the index.
-     * @throws SolrIndexException if problems occur.
-     */
-    protected List<String> getIds(List<EntityReference> references) throws SolrIndexException
-    {
-        List<String> result = new ArrayList<String>();
-        for (EntityReference reference : references) {
-            SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
-            if (metadataExtractor != null) {
-                String id = metadataExtractor.getId(reference);
-                result.add(id);
-            }
-        }
-
-        return result;
+        // Launch the index thread when XWiki has started.
+        startThread();
     }
 }

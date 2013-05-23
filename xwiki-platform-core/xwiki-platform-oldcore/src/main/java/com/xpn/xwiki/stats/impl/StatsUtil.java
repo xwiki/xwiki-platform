@@ -443,7 +443,7 @@ public final class StatsUtil
             try {
                 String ip = request.getRemoteAddr();
                 String ua = request.getHeader(REQPROP_USERAGENT);
-                visitStats = findVisitByIPUA(ip + ua, context);
+                visitStats = findVisitByIPUA(computeUniqueID(ip, ua), context);
             } catch (XWikiException e) {
                 LOGGER.error("Failed to find visit by unique id", e);
             }
@@ -524,7 +524,7 @@ public final class StatsUtil
         if (newcookie) {
             // We cannot yet ID the user using the cookie
             // we need to use the IP and UA
-            uniqueID = ip + ua;
+            uniqueID = computeUniqueID(ip, ua);
         } else {
             // In this case we got the cookie from the request
             // so we id the user using the cookie
@@ -535,6 +535,21 @@ public final class StatsUtil
         visitStats.setEndDate(nowDate);
 
         return visitStats;
+    }
+
+    /**
+     * Compute the unique id for stat visits.
+     * <p/>
+     * TODO: In the future, replace this with a unique random number since this algorithm is not good enough; for
+     * example users in the same company behind a company firewall may get the same IP and same user agent...
+     *
+     * @param ip the IP address of the user
+     * @param ua the user agent of the user
+     * @return the unique ID, limited to 255 characters since that's the max size of the field in the DB
+     */
+    private static String computeUniqueID(String ip, String ua)
+    {
+        return StringUtils.substring(ip + ua, 0, 255);
     }
 
     /**

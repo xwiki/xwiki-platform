@@ -361,10 +361,13 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc = new XWikiDocument();
                 doc.setSpace(getClassSpace());
                 doc.setName(getClassName());
-                doc.setParent(DEFAULT_XWIKICLASS_PARENT);
                 doc.setCreator(XWikiRightService.SUPERADMIN_USER);
                 doc.setAuthor(doc.getCreator());
                 needsUpdate = true;
+            }
+
+            if (doc.isNew()) {
+                doc.setParent(DEFAULT_XWIKICLASS_PARENT);
             }
 
             this.baseClass = doc.getXClass();
@@ -444,7 +447,6 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc = new XWikiDocument();
                 doc.setSpace(getClassSheetSpace());
                 doc.setName(getClassSheetName());
-                doc.setParent(getClassFullName());
                 needsUpdate = true;
             }
 
@@ -454,6 +456,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 String content = getResourceDocumentContent(documentContentPath);
                 doc.setContent(content != null ? content : getClassSheetDefaultContent());
                 doc.setSyntax(Syntax.XWIKI_1_0);
+                doc.setParent(getClassFullName());
             }
 
             if (doc.isNew() || needsUpdate) {

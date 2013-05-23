@@ -1303,7 +1303,9 @@ document.observe('xwiki:dom:loading', function() {
   } else {
     // For browsers that don't support the 'placeholder' attribute, we simulate it with 'focus' and 'blur' event handlers.
     var onFocus = function() {
-      if (this.value == this.defaultValue) {
+      var empty = this.hasClassName('empty');
+      this.removeClassName('empty');
+      if (empty) {
         this.value = '';
       } else {
         this.select();
@@ -1312,12 +1314,20 @@ document.observe('xwiki:dom:loading', function() {
     var onBlur = function() {
       if (this.value == '') {
         this.value = this.defaultValue;
+        this.addClassName('empty');
       }
     }
     placeholderPolyfill = function(event) {
       var item = event.memo.element;
       if (item.readAttribute('placeholder')) {
         item.defaultValue = item.readAttribute('placeholder');
+      }
+      if (item.value == item.defaultValue) {
+        // The 'empty' CSS class has two functions:
+        // * display the placeholder value with a different color
+        // * distinguish between the case when the user has left the input empty and the case when he typed exactly the
+        //   default value (which should be valid).
+        item.addClassName('empty');
       }
       item.observe('focus', onFocus.bindAsEventListener(item));
       item.observe('blur', onBlur.bindAsEventListener(item));

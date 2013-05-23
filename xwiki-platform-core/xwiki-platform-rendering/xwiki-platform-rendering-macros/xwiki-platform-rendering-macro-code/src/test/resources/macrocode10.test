@@ -1,7 +1,7 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Validate that unsupported syntax not fail and instead generate a verbatim
+.# Validate that unsupported syntax has the same behavior than none
 .#-----------------------------------------------------
 {{code language="notsupportedsyntax"}}Text{{/code}}
 
@@ -12,7 +12,7 @@
 beginDocument
 beginMacroMarkerStandalone [code] [language=notsupportedsyntax] [Text]
 beginGroup [[class]=[box code]]
-onVerbatim [Text] [true]
+onWord [Text]
 endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=notsupportedsyntax] [Text]
 beginMacroMarkerStandalone [code] [language=none] [Text]

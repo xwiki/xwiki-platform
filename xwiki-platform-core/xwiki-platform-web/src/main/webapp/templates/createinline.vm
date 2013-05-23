@@ -88,16 +88,22 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
      * Create Page Field Validator.
      */
     initPageValidator : function() {
-      this.pageValidator = new LiveValidation($$('.main [name=page]')[0], { validMessage: "$services.localization.render('core.validation.valid.message')" });
-      this.pageValidator.add(Validate.Presence, {
-        failureMessage: "$services.localization.render('core.validation.required.message')"
+      var pageInput = $('page');
+      this.pageValidator = new LiveValidation(pageInput, { validMessage: "$services.localization.render('core.validation.valid.message')" });
+      // We use a custom validation in order to handle the default value on browsers that don't support the placeholder attribute.
+      this.pageValidator.displayMessageWhenEmpty = true;
+      this.pageValidator.add(Validate.Custom, {
+        failureMessage: "$services.localization.render('core.validation.required.message')",
+        against: function(value) {
+          return !pageInput.hasClassName('empty') && typeof value == 'string' && value.strip().length > 0;
+        }
       });
     },
     /**
      * Create Space Field Validator.
      */
     initSpaceValidator : function() {
-      this.spaceValidator = new LiveValidation($$('.main [name=space]')[0], { validMessage: "$services.localization.render('core.validation.valid.message')" });
+      this.spaceValidator = new LiveValidation($('space'), { validMessage: "$services.localization.render('core.validation.valid.message')" });
       this.spaceValidator.add(Validate.Presence, {
          failureMessage: "$services.localization.render('core.validation.required.message')"
       });

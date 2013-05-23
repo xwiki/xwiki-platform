@@ -167,6 +167,10 @@ input[type="text"], input[type="password"] {
 :-ms-placeholder {
   color: $theme.textSecondaryColor !important;
 }
+/* For browsers that don't support the placeholder attribute. */
+input[type="text"].empty {
+  color: $theme.textSecondaryColor !important;
+}
 /* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
 textarea, select {
   background-color: $theme.pageContentBackgroundColor;

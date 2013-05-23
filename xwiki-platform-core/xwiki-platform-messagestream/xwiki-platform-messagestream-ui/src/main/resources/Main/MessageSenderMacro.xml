@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1336486989000</creationDate>
-  <date>1337871176000</date>
-  <contentUpdateDate>1337871176000</contentUpdateDate>
+  <creationDate>1367516430000</creationDate>
+  <date>1369320919000</date>
+  <contentUpdateDate>1337867576000</contentUpdateDate>
   <version>1.1</version>
   <title>Message Sender Macro</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -146,14 +145,8 @@ XWiki.MessageStream = Class.create({
     this.enhanceSelect();
   },
   prepareTargetInput : function(event, element) {
-    if (event) {
-      element.blur();
-    }
-    $w(element.className).each(function(classname) {
-      element.removeClassName(classname)
-    });
     var targetType = element.options[element.selectedIndex].value;
-    element.addClassName(targetType);
+    element.className = targetType;
     if (!element.__targetNameInput) {return;}
     if (this.targetsWithName.indexOf(targetType) &lt; 0) {
       element.__targetNameInput.addClassName('hidden');
@@ -161,10 +154,14 @@ XWiki.MessageStream = Class.create({
         element.__targetNameInput.__x_suggest.detach();
       }
     } else {
-      element.__targetNameInput.removeClassName('hidden');
-      if (this.suggestParameters[targetType]) {
+      // Focus the text input so that the place-holder value is cleared if present. Otherwise the user picker will treat
+      // the place-holder value as if it was typed by the user and will automatically select the corresponding suggestion.
+      element.__targetNameInput.removeClassName('hidden').activate();
+      // Defer the creation of the user picker to allow the focus listeners to be called first (in order to clear the
+      // place-holder value).
+      this.suggestParameters[targetType] &amp;&amp; function() {
         new CustomUserPicker(element.__targetNameInput, this.suggestParameters[targetType]);
-      }
+      }.bind(this).defer();
     }
   },
   enhanceSelect: function () {
@@ -614,8 +611,6 @@ return XWiki;
           &lt;textarea name='messagestream_message' rows='3' cols='40'#if($inEditMode) disabled='disabled'#end&gt;&lt;/textarea&gt;
         &lt;/div&gt;
         &lt;div class='messagestream-tools'&gt;
-          #set ($targetClassName = '')
-          ##
           #set ($possibleTargets = $context.macro.params.get('visibilityOptions').split('\s*,\s*'))
           #if (!$possibleTargets)
             #set ($possibleTargets = $configClass.get('visibilityLevel').getListValues())
@@ -639,10 +634,6 @@ return XWiki;
               #set ($defaultTarget = 'everyone')
             #end
           #end
-          #if (!$targetName)
-            #set ($targetName = ${services.localization.render('xe.activity.messages.visibility.targetName.tip')})
-            #set ($targetClassName = 'withTip')
-          #end
           &lt;label&gt;$services.localization.render('xe.activity.messages.visibility')
             &lt;select name='visibilityLevel'#if($inEditMode) disabled='disabled'#end&gt;
             #foreach ($target in $possibleTargets)
@@ -652,7 +643,8 @@ return XWiki;
           &lt;/label&gt;
           &lt;label for="targetName$!{targetNameCounter}"&gt;
             &lt;span class='hidden'&gt;Name:&lt;/span&gt;
-            &lt;input type='text' name='targetName' id="targetName$!{targetNameCounter}" class="targetName $!{targetClassName}" value="$!{targetName}" size='15'#if($inEditMode) disabled='disabled'#end/&gt;
+            &lt;input type="text" name="targetName" id="targetName$!targetNameCounter" class="targetName" value="$!targetName" size="15"
+              placeholder="$services.localization.render('xe.activity.messages.visibility.targetName.tip')" #if ($inEditMode) disabled="disabled"#end/&gt;
           &lt;/label&gt;
           #if (!$targetNameCounter)
             #set ($targetNameCounter = 1)

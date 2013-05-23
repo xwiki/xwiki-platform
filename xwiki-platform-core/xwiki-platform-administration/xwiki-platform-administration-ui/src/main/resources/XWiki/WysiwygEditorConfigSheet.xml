@@ -920,24 +920,6 @@ return XWiki;
   Event.observe(document, 'xwiki:actions:save', function() {
     styleNamesField.value = styleNames.getValue();
   });
-});
-
-Event.observe(document, 'xwiki:dom:loaded', function() {
-  var onFocus = function() {
-    this.removeClassName('blurred');
-  }
-  var onBlur = function() {
-    if (this.value.length == 0 || this.value == this.defaultValue) {
-      this.addClassName('blurred');
-    }
-  }
-  $$('input.withTip').each(function(item) {
-    item.observe('focus', onFocus.bind(item));
-    item.observe('blur', onBlur.bind(item));
-    if (item.value == item.defaultValue) {
-      item.addClassName('blurred');
-    }
-  });
 });</code>
     </property>
     <property>
@@ -1201,10 +1183,6 @@ return XWiki;
 
 .listBoxWrapper.floatLeft {
   margin-right: 3em;
-}
-
-input.blurred {
-  color: $theme.textSecondaryColor;
 }
 
 /**

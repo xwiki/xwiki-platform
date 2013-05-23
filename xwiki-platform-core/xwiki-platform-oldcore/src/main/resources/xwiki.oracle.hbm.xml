@@ -262,7 +262,7 @@
             <property name="value" type="materialized_clob" column="XWL_VALUE" length="60000" />
         </joined-subclass>
 
-        <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikistringlists">
+        <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikilargestrings">
             <key>
                 <column name="XWL_ID" />
                 <column name="XWL_NAME" />

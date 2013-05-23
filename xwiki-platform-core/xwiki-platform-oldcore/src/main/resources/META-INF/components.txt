@@ -70,7 +70,6 @@ com.xpn.xwiki.store.migration.hibernate.R42000XWIKI7726DataMigration
 com.xpn.xwiki.store.migration.hibernate.R43000XWIKI6691DataMigration
 com.xpn.xwiki.store.migration.hibernate.R4340XWIKI883DataMigration
 com.xpn.xwiki.store.migration.hibernate.R4359XWIKI1459DataMigration
-com.xpn.xwiki.store.migration.hibernate.R50000XWIKI8948DataMigration
 com.xpn.xwiki.store.migration.hibernate.R6079XWIKI1878DataMigration
 com.xpn.xwiki.store.migration.hibernate.R6405XWIKI1933DataMigration
 com.xpn.xwiki.store.migration.hibernate.R7350XWIKI2079DataMigration

@@ -52,7 +52,7 @@
       ## If the target document already exists, warn the user
       ##-----------------------------------------------------------
       #if($xwiki.exists($targetDocReference) && $!{request.overwrite} != "true")
-        #warning($services.localization.render('core.copy.alreadyExists', [$targetspace, $targetpage]))
+        #warning($services.localization.render('core.copy.alreadyExists', [$services.model.serialize($targetDocReference, 'compactwiki')]))
         <form action="" class="xform third">
           ## CSRF prevention
           <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

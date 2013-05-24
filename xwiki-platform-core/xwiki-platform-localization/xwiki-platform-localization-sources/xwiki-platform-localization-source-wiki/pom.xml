@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-sources</artifactId>
-    <version>5.0.2-SNAPSHOT</version>
+    <version>5.0.2</version>
   </parent>
   <artifactId>xwiki-platform-localization-source-wiki</artifactId>
   <name>XWiki Platform - Localization - Source - Wiki</name>

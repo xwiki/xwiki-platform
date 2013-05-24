@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>5.0.2-SNAPSHOT</version>
+    <version>5.0.2</version>
   </parent>
   <artifactId>xwiki-platform-rendering-xwiki</artifactId>
   <name>XWiki Platform - Rendering - XWiki-specific implementation</name>

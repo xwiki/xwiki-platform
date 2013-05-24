@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-syntaxes</artifactId>
-    <version>5.0.2-SNAPSHOT</version>
+    <version>5.0.2</version>
   </parent>
   <artifactId>xwiki-platform-localization-syntax-messagetool</artifactId>
   <name>XWiki Platform - Localization - Syntax - MessageTool</name>

@@ -471,39 +471,22 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 #set($discard = $fields.add($field))
 ##
 ## The email address field, regex checked with an email pattern. Mandatory if registration uses email verification
+  #set($field = 
+    {'name' : 'register_email',
+      'label' : $services.localization.render('core.register.email'),
+      'params' : { 
+        'type' : 'text', 
+        'size' : '60' 
+      },
+      'validate' : {
+        'regex' : {
+          'pattern' : '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/',
+          'failureMessage' : $services.localization.render('xe.admin.registration.invalidEmail')
+        }
+      }
+    })
 #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
-  #set($field = 
-    {'name' : 'register_email',
-      'label' : $services.localization.render('core.register.email'),
-      'params' : { 
-        'type' : 'text', 
-        'size' : '60' 
-      },
-      'validate' : {
-        'mandatory' : { 
-          'failureMessage' : $services.localization.render('core.validation.required.message') 
-        },
-        'regex' : {
-          'pattern' : '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/',
-          'failureMessage' : $services.localization.render('xe.admin.registration.invalidEmail')
-        }
-      }
-    })
-#else
-  #set($field = 
-    {'name' : 'register_email',
-      'label' : $services.localization.render('core.register.email'),
-      'params' : { 
-        'type' : 'text', 
-        'size' : '60' 
-      },
-      'validate' : {
-        'regex' : {
-          'pattern' : '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/',
-          'failureMessage' : $services.localization.render('xe.admin.registration.invalidEmail')
-        }
-      }
-    })
+  #set($field.validate.mandatory = {'failureMessage' : $services.localization.render('core.validation.required.message')})
 #end
 #set($discard = $fields.add($field))
 ##

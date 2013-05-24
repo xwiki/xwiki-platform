@@ -183,8 +183,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             throw new ParseException("Failed to highlight code", e);
         }
 
-        // TODO: there is a bug in Pygments that makes it always put a newline at the end of the content, should be
-        // fixed in Pygments 1.3.
+        // TODO: there is a bug in Pygments that makes it always put a newline at the end of the content
         if (code.charAt(code.length() - 1) != '\n' && !blocks.isEmpty()
             && blocks.get(blocks.size() - 1) instanceof NewLineBlock) {
             blocks.remove(blocks.size() - 1);

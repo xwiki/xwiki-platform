@@ -52,18 +52,18 @@
       ## If the target document already exists, warn the user
       ##-----------------------------------------------------------
       #if($xwiki.exists($targetDocReference) && $!{request.overwrite} != "true")
-        #warning($services.localization.render('core.copy.alreadyExists', [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        #warning($services.localization.render('core.copy.alreadyExists', [$targetspace, $targetpage]))
         <form action="" class="xform third">
           ## CSRF prevention
           <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
           <input type="hidden" name="xpage" value="copy" />
           <input type="hidden" name="overwrite" value="true" />
-          <input type="hidden" name="sourceWikiName" value="$sourcewiki" />
-          <input type="hidden" name="sourceSpaceName" value="$sourcespace" />
-          <input type="hidden" name="sourcePageName" value="$sourcepage" />
-          <input type="hidden" name="targetWikiName" value="$targetwiki" />
-          <input type="hidden" name="targetSpaceName" value="$targetspace" />
-          <input type="hidden" name="targetPageName" value="$targetpage" />
+          <input type="hidden" name="sourceWikiName" value="$escapetool.xml($sourcewiki)" />
+          <input type="hidden" name="sourceSpaceName" value="$escapetool.xml($sourcespace)" />
+          <input type="hidden" name="sourcePageName" value="$escapetool.xml($sourcepage)" />
+          <input type="hidden" name="targetWikiName" value="$escapetool.xml($targetwiki)" />
+          <input type="hidden" name="targetSpaceName" value="$escapetool.xml($targetspace)" />
+          <input type="hidden" name="targetPageName" value="$escapetool.xml($targetpage)" />
           <div class="buttons">
             <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/></span>
             <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">$services.localization.render('core.copy.changeTarget')</a></span>

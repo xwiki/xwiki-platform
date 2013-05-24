@@ -137,6 +137,7 @@ workspacemanager.doc.createwiki.desc.owner=L'utilisateur propriétaire de l'espa
 workspacemanager.doc.createwiki.desc.wikiprettyname=Le nom d'affichage de l'espace de travail.
 workspacemanager.doc.createwiki.members=Les utilisateurs pouvant participer à l'espace de travail.\nTruc\: Utilisez CTRL+Click pour sélectionner plusieurs utilisateurs.
 workspacemanager.doc.createwiki.wikiname=L'identifiant unique du nouvel espace de travail.
+workspacemanager.error.notinvirtualmode=L'installation actuelle de XWiki n'est pas en mode "multiple-wiki". Cela signifie que vous avez accès uniquement au wiki principal. Veillez à ce que vous ayez &lt;tt&gt;xwiki.virtual\=1&lt;/tt&gt; dans le fichier &lt;tt&gt;xwiki.cfg&lt;/tt&gt;.  
 workspacemanager.error.workspacedoesnotexist=L''espace de travail [{0}] n''existe pas
 workspacemanager.errorcreatewiki=Échec de la création de l''espace de travail "{0}"\: {1}.
 workspacemanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=L''espace de travail \\"{0}\\" existe déjà. Veuillez choisir un autre nom.

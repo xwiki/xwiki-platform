@@ -24,10 +24,18 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
 import org.xwiki.rest.internal.RangeIterable;
@@ -49,6 +57,15 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("org.xwiki.rest.internal.resources.pages.PageResourceImpl")
 public class PageResourceImpl extends ModifiablePageResource implements PageResource
 {
+    @Inject
+    @Named("configured")
+    DocumentDisplayer displayer;
+    
+    @Inject
+    @Named("xhtml/1.0")
+    BlockRenderer blockRenderer;
+    
+    
     @Override
     public Page getPage(String wikiName, String spaceName, String pageName, Boolean withPrettyNames, 
                         Boolean withRenderedContent, Boolean withAttachments, Boolean withObjects)
@@ -64,7 +81,27 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
             
             // adding rendered content
             if (withRenderedContent) {
-                page.setRenderedContent(doc.getRenderedContent());
+                try {
+                    XWikiDocument mydoc = doc.getDocument();
+                     
+                    DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                    parameters.setTransformationContextIsolated(true);
+                    // Display the document standalone. This will force the sheet to be applied, if there is one.
+                    parameters.setExecutionContextIsolated(true);
+                    
+                    // Render the translated content (matching the current language) using this document's syntax.
+                    parameters.setContentTranslated(!doc.getLanguage().equals(""));
+                     
+                    // DocumentDisplayer displayer =  services.component.getInstance(DocumentDisplayer.class, "configured");
+                    XDOM content = displayer.display(mydoc, parameters);
+                     
+                    // BlockRenderer renderer = services.component.getInstance(BlockRenderer.class, "xhtml/1.0");
+                    WikiPrinter printer = new DefaultWikiPrinter();
+                    blockRenderer.render(content, printer);
+                    page.setRenderedContent(printer.toString());
+                } catch (Exception e) {
+                    page.setRenderedContent("Exception " + e.getMessage());      
+                }
             }
             
             // adding all attachments

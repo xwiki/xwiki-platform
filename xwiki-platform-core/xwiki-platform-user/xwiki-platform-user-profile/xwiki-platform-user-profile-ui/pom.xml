@@ -34,6 +34,8 @@
   <packaging>xar</packaging>
   <description>User Profile UI</description>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>User Profile Application</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-user-ui</xwiki.extension.features>
     <!-- Don't run CLIRR here since there's no Java code. -->

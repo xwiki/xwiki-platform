@@ -26,21 +26,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-user</artifactId>
+    <artifactId>xwiki-platform-user-profile-test</artifactId>
     <version>5.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user-test</artifactId>
-  <name>XWiki Platform - User - Tests - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - User - Tests - Parent POM</description>
-  <properties>
-    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
-  <modules>
-    <module>xwiki-platform-user-test-pageobjects</module>
-    <module>xwiki-platform-user-test-tests</module>
-  </modules>
+  <artifactId>xwiki-platform-user-profile-test-pageobjects</artifactId>
+  <name>XWiki Platform - User - Profile - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - User - Profile - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

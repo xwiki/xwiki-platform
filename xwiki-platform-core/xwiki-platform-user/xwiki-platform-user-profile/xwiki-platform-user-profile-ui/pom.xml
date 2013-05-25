@@ -26,14 +26,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-user</artifactId>
+    <artifactId>xwiki-platform-user-profile</artifactId>
     <version>5.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user-ui</artifactId>
-  <name>XWiki Platform - User - UI</name>
+  <artifactId>xwiki-platform-user-profile-ui</artifactId>
+  <name>XWiki Platform - User - Profile - UI</name>
   <packaging>xar</packaging>
-  <description>User profile UI</description>
+  <description>User Profile UI</description>
   <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-user-ui</xwiki.extension.features>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>

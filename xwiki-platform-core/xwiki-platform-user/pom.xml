@@ -34,15 +34,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - User - Parent POM</description>
   <modules>
-    <module>xwiki-platform-user-ui</module>
+    <module>xwiki-platform-user-profile</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-user-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>
        

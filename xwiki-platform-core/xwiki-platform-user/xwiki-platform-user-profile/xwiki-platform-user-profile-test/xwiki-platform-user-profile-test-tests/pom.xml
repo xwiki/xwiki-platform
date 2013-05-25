@@ -26,22 +26,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-user-test</artifactId>
+    <artifactId>xwiki-platform-user-profile-test</artifactId>
     <version>5.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user-test-tests</artifactId>
-  <name>XWiki Platform - User - Tests - Functional Tests</name>
+  <artifactId>xwiki-platform-user-profile-test-tests</artifactId>
+  <name>XWiki Platform - User - Profile - Tests - Functional Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
-  <description>Functional Tests for the User Application</description>
+  <description>Functional Tests for the User Profile Application</description>
   <properties>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-ui</artifactId>
+      <artifactId>xwiki-platform-user-profile-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
@@ -54,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-user-profile-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

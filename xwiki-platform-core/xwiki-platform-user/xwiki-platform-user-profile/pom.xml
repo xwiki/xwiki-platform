@@ -26,18 +26,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-user-test</artifactId>
+    <artifactId>xwiki-platform-user</artifactId>
     <version>5.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user-test-pageobjects</artifactId>
-  <name>XWiki Platform - User - Tests - Page Objects</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - User - Tests - Page Objects</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-user-profile</artifactId>
+  <name>XWiki Platform - User - Profile - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - User - Profile - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-user-profile-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-user-profile-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
+       

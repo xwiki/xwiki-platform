@@ -222,32 +222,32 @@ public class TextAreaClass extends StringClass
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
-            	try {
-            		// If the author of the document hasn't PR, let's drop permissions before rendering this textArea content.
-            		// This need to be done in case the content author of the document has PR, but not the author of this textArea. 
-            		// See XWiki-7941.
-            	    boolean dropPR ;
-            	    if(context.hasDroppedPermissions()) {
-            	    	// If permissions have already been dropped, no need to do it again
-            	        dropPR = false ; 
-            	    } else {
-            	    	// Let's drop permissions if the document (and potentially textArea) author hasn't PR. 
-                	    DocumentReference metaAuthor = doc.getAuthorReference();
-            	        dropPR = !context.getWiki().getRightService().hasAccessLevel
-                	            ("programming", metaAuthor.toString(), doc.getDocumentReference().toString(), context);
-            	    }
+                try {
+                    // If the author of the document hasn't PR, let's drop permissions before rendering this textArea content.
+                    // This need to be done in case the content author of the document has PR, but not the author of this textArea. 
+                    // See XWiki-7941.
+                    boolean dropPR ;
+                    if(context.hasDroppedPermissions()) {
+                        // If permissions have already been dropped, no need to do it again
+                        dropPR = false ; 
+                    } else {
+                        // Let's drop permissions if the document (and potentially textArea) author hasn't PR. 
+                        DocumentReference metaAuthor = doc.getAuthorReference();
+                        dropPR = !context.getWiki().getRightService().hasAccessLevel
+                                ("programming", metaAuthor.toString(), doc.getDocumentReference().toString(), context);
+                    }
                     if(dropPR) {
-            		    context.dropPermissions();
-            	    }
+                        context.dropPermissions();
+                    }
                     buffer.append(doc.getRenderedContent(result.toString(), getObjectDocumentSyntax(object, context)
                         .toIdString(), context));
                     // If we dropped PR, let's reinstate them
                     if(dropPR) {
                         context.remove(XWikiConstant.DROPPED_PERMISSIONS);
                     }
-            	} catch (XWikiException e) {
-            	    LOGGER.warn("Failed to check rights for this textArea : " + e.toString());
-            	}
+                } catch (XWikiException e) {
+                    LOGGER.warn("Failed to check rights for this textArea : " + e.toString());
+                }
             } else {
                 buffer.append(result);
             }

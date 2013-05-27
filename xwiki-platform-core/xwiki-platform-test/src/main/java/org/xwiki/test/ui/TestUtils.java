@@ -81,6 +81,12 @@ public class TestUtils
         "admin");
 
     /**
+     * @since 5.1M1
+     */
+    public static final UsernamePasswordCredentials SUPER_ADMIN_CREDENTIALS = new UsernamePasswordCredentials(
+        "superadmin", "pass");
+
+    /**
      * @since 5.0M2
      */
     public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT + "/xwiki/";
@@ -190,6 +196,11 @@ public class TestUtils
         return getURLToLoginAs(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
     }
 
+    public String getURLToLoginAsSuperAdmin()
+    {
+        return getURLToLoginAs(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword());
+    }
+
     public String getURLToLoginAs(final String username, final String password)
     {
         return getURLToLoginAndGotoPage(username, password, null);
@@ -202,6 +213,16 @@ public class TestUtils
     public String getURLToLoginAsAdminAndGotoPage(final String pageURL)
     {
         return getURLToLoginAndGotoPage(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), pageURL);
+    }
+
+    /**
+     * @param pageURL the URL of the page to go to after logging in.
+     * @return URL to accomplish login and goto.
+     */
+    public String getURLToLoginAsSuperAdminAndGotoPage(final String pageURL)
+    {
+        return getURLToLoginAndGotoPage(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword(),
+            pageURL);
     }
 
     /**

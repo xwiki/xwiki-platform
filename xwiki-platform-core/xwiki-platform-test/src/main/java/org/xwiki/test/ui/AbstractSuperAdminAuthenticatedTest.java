@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,24 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.test.ui;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>5.1-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-user</artifactId>
-  <name>XWiki Platform - User - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - User - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-user-directory</module>
-    <module>xwiki-platform-user-profile</module>
-  </modules>
-</project>
-       
+import org.junit.Before;
+
+/**
+ * Helper class to be extended by tests requiring the Super Admin user logged in.
+ * 
+ * @version $Id$
+ * @since 5.1M1
+ */
+public abstract class AbstractSuperAdminAuthenticatedTest extends AbstractTest
+{
+    @Before
+    public void setUp() throws Exception
+    {
+        loginSuperAdminUser();
+    }
+
+    public static void loginSuperAdminUser()
+    {
+        if (!"superadmin".equals(getUtil().getLoggedInUserName())) {
+            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
+            // going to the home page for example.
+            getDriver().get(getUtil().getURLToLoginAsSuperAdminAndGotoPage(getUtil().getURLToNonExistentPage()));
+            getUtil().recacheSecretToken();
+        }
+    }
+}

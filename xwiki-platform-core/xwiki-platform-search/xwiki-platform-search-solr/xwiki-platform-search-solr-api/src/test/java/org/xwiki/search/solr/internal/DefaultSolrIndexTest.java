@@ -61,7 +61,7 @@ public class DefaultSolrIndexTest
 {
     @Rule
     public final MockitoComponentMockingRule<SolrIndexer> mocker = new MockitoComponentMockingRule<SolrIndexer>(
-        DefaultSolrIndex.class);
+        DefaultSolrIndexer.class);
 
     private XWikiContext xcontext;
 

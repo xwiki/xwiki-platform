@@ -49,12 +49,7 @@ import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
- * The {@link Runnable} {@link SolrIndex} implementation that is executed inside a thread launched by the default
- * {@link SolrIndex} implementation.
- * <p/>
- * The {@link QueuedSolrIndex} expects that the references it receives are already expanded (they are "leaf-references")
- * as opposed to the default implementation that performs expansion (using {@link IndexableReferenceExtractor}) before
- * delegating to the {@link QueuedSolrIndex}.
+ * Default implementation of {@link SolrIndexer}.
  * <p/>
  * This implementation does not directly process the given leaf-references, but adds them to a processing queue, in the
  * order they were received. The {@link Runnable} part of this implementation is the one that sequentially reads and
@@ -65,7 +60,7 @@ import com.xpn.xwiki.util.AbstractXWikiRunnable;
  */
 @Component
 @Singleton
-public class DefaultSolrIndex extends AbstractXWikiRunnable implements SolrIndexer, Initializable, Disposable
+public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrIndexer, Initializable, Disposable
 {
     /**
      * Index queue entry.
@@ -149,7 +144,8 @@ public class DefaultSolrIndex extends AbstractXWikiRunnable implements SolrIndex
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
 
         // Initialize the queue
-        this.indexOperationsQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
+        this.indexOperationsQueue =
+            new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
     }
 
     @Override

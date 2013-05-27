@@ -1,6 +1,6 @@
 org.xwiki.search.solr.internal.DefaultIndexableReferenceExtractor
 org.xwiki.search.solr.internal.DefaultSolrConfiguration
-org.xwiki.search.solr.internal.DefaultSolrIndex
+org.xwiki.search.solr.internal.DefaultSolrIndexer
 org.xwiki.search.solr.internal.EmbeddedSolrInstance
 org.xwiki.search.solr.internal.RemoteSolrInstance
 org.xwiki.search.solr.internal.SolrIndexScriptService

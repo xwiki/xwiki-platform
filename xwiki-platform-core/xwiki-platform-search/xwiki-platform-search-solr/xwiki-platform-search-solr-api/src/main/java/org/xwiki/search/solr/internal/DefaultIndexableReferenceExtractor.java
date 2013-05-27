@@ -25,13 +25,12 @@ import java.util.Locale;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -61,12 +60,6 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 public class DefaultIndexableReferenceExtractor implements IndexableReferenceExtractor
 {
     /**
-     * Execution component.
-     */
-    @Inject
-    protected Execution execution;
-
-    /**
      * DocumentAccessBridge component.
      */
     @Inject
@@ -77,6 +70,12 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
      */
     @Inject
     protected QueryManager queryManager;
+
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
 
     @Override
     public List<EntityReference> getReferences(EntityReference startReference) throws SolrIndexException
@@ -147,9 +146,8 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
         BaseObjectReference objectReference = new BaseObjectReference(objectPropertyReference.getParent());
         DocumentReference classReference = objectReference.getXClassReference();
 
-        // FIXME: The things we do to make checkstyle happy...
-        if (!(getDocument(classReference).getXClass().get(objectPropertyReference.getName())
-            instanceof PasswordClass)) {
+        // FIXME: This is very bad, it's not this code job to know about things like PasswordClass
+        if (!(getDocument(classReference).getXClass().get(objectPropertyReference.getName()) instanceof PasswordClass)) {
             result.add(objectPropertyReference);
         }
 
@@ -192,13 +190,9 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xcontextProvider.get();
 
-        // FIXME: The GSoC implementation had a second part in the if. Remove this comment if it proves to be not
-        // important in, say... version 5.1.
-        // && !documentReference.getName().contains("WatchList")
-        if (documentAccessBridge.exists(documentReference)) {
-
+        if (context.getWiki().exists(documentReference, context)) {
             // Document itself
             result.add(documentReference);
 
@@ -221,7 +215,7 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
 
                 // Attachments
                 List<AttachmentReference> attachmentReferences =
-                    documentAccessBridge.getAttachmentReferences(documentReference);
+                    this.documentAccessBridge.getAttachmentReferences(documentReference);
                 // Directly add references since we`ve reached the bottom.
                 result.addAll(attachmentReferences);
 
@@ -255,7 +249,7 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
 
         // Make sure the list of spaces is from the requested wiki.
         documentNames =
-            queryManager.getNamedQuery("getSpaceDocsName").setWiki(spaceReference.getParent().getName())
+            this.queryManager.getNamedQuery("getSpaceDocsName").setWiki(spaceReference.getParent().getName())
                 .bindValue("space", spaceReference.getName()).execute();
 
         for (String documentName : documentNames) {
@@ -281,7 +275,7 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
         List<String> spaces = null;
 
         // Make sure the list of spaces is from the requested wiki.
-        spaces = queryManager.getNamedQuery("getSpaces").setWiki(wikiReference.getName()).execute();
+        spaces = this.queryManager.getNamedQuery("getSpaces").setWiki(wikiReference.getName()).execute();
 
         // Visit each space
         for (String space : spaces) {
@@ -294,21 +288,6 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
     }
 
     /**
-     * @return the XWikiContext
-     */
-    protected XWikiContext getXWikiContext()
-    {
-        ExecutionContext executionContext = this.execution.getContext();
-        XWikiContext context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        // FIXME: Do we need this? Maybe when running an index Thread?
-        // if (context == null) {
-        // context = this.contextProvider.createStubContext();
-        // executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
-        // }
-        return context;
-    }
-
-    /**
      * Utility method.
      * 
      * @param documentReference reference to a document.
@@ -317,7 +296,7 @@ public class DefaultIndexableReferenceExtractor implements IndexableReferenceExt
      */
     protected XWikiDocument getDocument(DocumentReference documentReference) throws Exception
     {
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xcontextProvider.get();
         XWikiDocument document = context.getWiki().getDocument(documentReference, context);
 
         return document;

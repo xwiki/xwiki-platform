@@ -33,12 +33,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
@@ -87,7 +90,7 @@ CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvid
 CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
 DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class,
 DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
-DefaultStringEntityReferenceSerializer.class})
+DefaultStringEntityReferenceSerializer.class, DefaultExecution.class})
 public class DefaultIndexableReferenceExtractorTest
 {
     @Rule
@@ -166,18 +169,26 @@ public class DefaultIndexableReferenceExtractorTest
 
         Utils.setComponentManager(this.mocker);
 
-        // XWikiContext and XWiki
-
-        final Execution execution = this.mocker.getInstance(Execution.class);
-        final ExecutionContext executionContext = new ExecutionContext();
+        // XWiki
 
         this.xwiki = mock(XWiki.class);
+
+        // XWikiContext
 
         this.xcontext = new XWikiContext();
         this.xcontext.setDatabase("xwiki");
         this.xcontext.setWiki(this.xwiki);
 
-        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xcontext);
+        // XWikiContext Provider
+
+        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(this.xcontext);
+
+        // XWikiContext trough Execution
+
+        Execution execution = this.mocker.getInstance(Execution.class);
+        execution.setContext(new ExecutionContext());
+        execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xcontext);
 
         // References
 
@@ -206,8 +217,6 @@ public class DefaultIndexableReferenceExtractorTest
         final Query documentsSpace12Query = mock(DefaultQuery.class, "getSpaceDocsNameSpace12");
         final Query documentsSpace13Query = mock(DefaultQuery.class, "getSpaceDocsNameSpace13");
         final Query spacesWiki2Query = mock(DefaultQuery.class, "getSpacesWiki2");
-
-        when(execution.getContext()).thenReturn(executionContext);
 
         // Data
 

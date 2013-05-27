@@ -82,4 +82,16 @@ public interface SolrConfiguration
      * @return a map of (fileName, fileURL) to be used to initialize the Solr instance.
      */
     Map<String, URL> getHomeDirectoryConfiguration();
+
+    /**
+     * @return the size of the batch when indexing enqueued entities
+     * @since 5.1M2
+     */
+    int getIndexerBatchSize();
+
+    /**
+     * @return the maximum size of the indexer queue
+     * @since 5.1M2
+     */
+    int getIndexerQueueCapacity();
 }

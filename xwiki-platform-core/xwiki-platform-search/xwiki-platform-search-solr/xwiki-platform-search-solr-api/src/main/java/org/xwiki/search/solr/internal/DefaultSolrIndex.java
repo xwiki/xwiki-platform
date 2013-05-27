@@ -22,54 +22,113 @@ package org.xwiki.search.solr.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
-import org.xwiki.search.solr.internal.api.SolrIndex;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
+
+import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
- * Default implementation of the index.
+ * The {@link Runnable} {@link SolrIndex} implementation that is executed inside a thread launched by the default
+ * {@link SolrIndex} implementation.
+ * <p/>
+ * The {@link QueuedSolrIndex} expects that the references it receives are already expanded (they are "leaf-references")
+ * as opposed to the default implementation that performs expansion (using {@link IndexableReferenceExtractor}) before
+ * delegating to the {@link QueuedSolrIndex}.
+ * <p/>
+ * This implementation does not directly process the given leaf-references, but adds them to a processing queue, in the
+ * order they were received. The {@link Runnable} part of this implementation is the one that sequentially reads and
+ * processes the queue.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 5.1M2
  */
 @Component
 @Singleton
-public class DefaultSolrIndex implements SolrIndex, EventListener
+public class DefaultSolrIndex extends AbstractXWikiRunnable implements SolrIndexer, Initializable, Disposable
 {
     /**
-     * The events to listen to.
+     * Index queue entry.
+     * 
+     * @version $Id$
      */
-    private static List<Event> EVENTS = Arrays.asList((Event) new ApplicationReadyEvent());
+    private static class IndexQueueEntry
+    {
+        /**
+         * The reference of the entity to index.
+         */
+        public EntityReference reference;
+
+        /**
+         * The indexing operation to perform.
+         */
+        public IndexOperation operation;
+
+        /**
+         * @param reference the reference of the entity to index.
+         * @param operation the indexing operation to perform.
+         */
+        public IndexQueueEntry(EntityReference reference, IndexOperation operation)
+        {
+            this.reference = reference;
+            this.operation = operation;
+        }
+    }
 
     /**
      * Logging framework.
      */
     @Inject
-    protected Logger logger;
+    private Logger logger;
+
+    /**
+     * Component manager used to get metadata extractors.
+     */
+    @Inject
+    private ComponentManager componentManager;
+
+    /**
+     * The Solr configuration source.
+     */
+    @Inject
+    private SolrConfiguration configuration;
 
     /**
      * Communication with the Solr instance.
      */
     @Inject
-    protected Provider<SolrInstance> solrInstanceProvider;
+    private Provider<SolrInstance> solrInstanceProvider;
 
     /**
      * Extract contained indexable references.
      */
     @Inject
-    protected IndexableReferenceExtractor indexableReferenceExtractor;
+    private IndexableReferenceExtractor indexableReferenceExtractor;
+
+    /**
+     * The queue of index operation to perform.
+     */
+    private BlockingQueue<IndexQueueEntry> indexOperationsQueue;
 
     /**
      * Thread in which the indexUpdater will be executed.
@@ -77,50 +136,242 @@ public class DefaultSolrIndex implements SolrIndex, EventListener
     private Thread indexThread;
 
     /**
-     * Component in charge with updating the index.
+     * Indicate of the component has been disposed.
      */
-    @Inject
-    @Named("queued")
-    private SolrIndex indexUpdater;
+    private boolean disposed;
 
-    /**
-     * TODO DOCUMENT ME!
-     */
-    public void startThread()
+    @Override
+    public void initialize() throws InitializationException
     {
         // Launch the index thread that runs the indexUpdater.
-        this.indexThread = new Thread((QueuedSolrIndex) indexUpdater);
+        this.indexThread = new Thread(this);
         this.indexThread.start();
+        this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
+
+        // Initialize the queue
+        this.indexOperationsQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // Mark the component as disposed
+        this.disposed = true;
+
+        // Empty the queue
+        this.indexOperationsQueue.clear();
+
+        // Wait until the thread actually die
+        try {
+            this.indexThread.join();
+        } catch (InterruptedException e) {
+            this.logger.error("The index thread was unexpectedly interrupted", e);
+        }
+    }
+
+    @Override
+    protected void runInternal()
+    {
+        while (!Thread.interrupted()) {
+            // Block until there is at least one entry in the queue
+            IndexQueueEntry queueEntry = null;
+            try {
+                queueEntry = this.indexOperationsQueue.take();
+            } catch (InterruptedException e) {
+                // Stop and pass the interrupt to the current thread.
+                Thread.currentThread().interrupt();
+
+                return;
+            }
+
+            // Add to the batch until either the batch size is achieved or the queue gets emptied
+            List<IndexQueueEntry> batchList = new ArrayList<IndexQueueEntry>();
+
+            int tempBatchSize = this.configuration.getIndexerBatchSize() - 1;
+            do {
+                // Add the entry to the batch.
+                batchList.add(queueEntry);
+
+                tempBatchSize--;
+
+                if (tempBatchSize > 0) {
+                    queueEntry = this.indexOperationsQueue.poll();
+                } else {
+                    queueEntry = null;
+                }
+            } while (queueEntry != null);
+
+            // Process the current batch
+            processBatch(batchList);
+        }
+    }
+
+    /**
+     * Process a batch of operations that were just read from the index operations queue. This method also commits the
+     * batch when it finishes to process it.
+     * 
+     * @param batchList the batch to process
+     */
+    private void processBatch(List<IndexQueueEntry> batchList)
+    {
+        SolrInstance solrInstance = this.solrInstanceProvider.get();
+
+        // To improve performance, we group contiguous index or delete operations and issue them only when a
+        // different type of operation is encountered.
+        List<SolrInputDocument> solrDocumentsToAdd = new ArrayList<SolrInputDocument>();
+        List<String> solrDocumentIDsToDelete = new ArrayList<String>();
+        IndexOperation previousOperation = null;
+
+        for (IndexQueueEntry batchEntry : batchList) {
+            EntityReference reference = batchEntry.reference;
+            IndexOperation operation = batchEntry.operation;
+
+            try {
+                // Issue add/delete operations to the server in batches whenever the contiguity stops
+                if (previousOperation != null && !operation.equals(previousOperation)) {
+                    if (IndexOperation.INDEX.equals(previousOperation)) {
+                        solrInstance.add(solrDocumentsToAdd);
+
+                        // Clear the just processed contiguous inner-batch.
+                        solrDocumentsToAdd.clear();
+                    } else if (IndexOperation.DELETE.equals(previousOperation)) {
+                        solrInstance.delete(solrDocumentIDsToDelete);
+
+                        // Clear the just processed contiguous inner-batch.
+                        solrDocumentIDsToDelete.clear();
+                    }
+
+                    // Start of a new contiguous operation batch.
+                }
+
+                // For the current contiguous operations queue, group the changes
+                if (IndexOperation.INDEX.equals(operation)) {
+                    SolrInputDocument solrDocument = getSolrDocument(reference);
+                    if (solrDocument != null) {
+                        solrDocumentsToAdd.add(solrDocument);
+                    }
+                } else if (IndexOperation.DELETE.equals(operation)) {
+                    String id = getId(reference);
+                    solrDocumentIDsToDelete.add(id);
+                }
+            } catch (Exception e) {
+                this.logger.error("Failed to process entity [{}] for the [{}] operation", reference, operation, e);
+            }
+
+            previousOperation = operation;
+        }
+
+        // Commit the index changes so that they become available to queries. This is a costly operation and that is
+        // the reason why we perform it at the end of the batch.
+        try {
+            solrInstance.commit();
+        } catch (Exception e) {
+            this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);
+
+            try {
+                solrInstance.rollback();
+            } catch (Exception ex) {
+                // Just log the failure.
+                this.logger.error("Failed to rollback index changes.", ex);
+            }
+        }
+    }
+
+    /**
+     * @param reference the reference to extract metadata from.
+     * @return the {@link SolrInputDocument} containing extracted metadata from the passed reference; {@code null} if
+     *         the reference type is not supported.
+     * @throws SolrIndexException if problems occur.
+     * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
+     */
+    private SolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexException,
+        IllegalArgumentException
+    {
+        SolrInputDocument solrDocument = null;
+        SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
+        // If the entity type is supported, use the extractor to get the SolrInputDocuent.
+        if (metadataExtractor != null) {
+            solrDocument = metadataExtractor.getSolrDocument(reference);
+        }
+
+        return solrDocument;
+    }
+
+    /**
+     * @param entityType the entity type
+     * @return the metadata extractor that is registered for the specified type or {@code null} if none exists.
+     */
+    private SolrMetadataExtractor getMetadataExtractor(EntityType entityType)
+    {
+        SolrMetadataExtractor result = null;
+        try {
+            result = this.componentManager.getInstance(SolrMetadataExtractor.class, entityType.name().toLowerCase());
+        } catch (ComponentLookupException e) {
+            this.logger.warn("Unsupported entity type: [{}]", entityType.toString(), e);
+        }
+
+        return result;
+    }
+
+    /**
+     * @param reference the reference for which to extract the ID
+     * @return the ID of the entity, as it is used in the index
+     * @throws SolrIndexException if problems occur
+     */
+    private String getId(EntityReference reference) throws SolrIndexException
+    {
+        String result = null;
+
+        SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
+        if (metadataExtractor != null) {
+            result = metadataExtractor.getId(reference);
+        }
+
+        return result;
     }
 
     @Override
     public void index(EntityReference reference) throws SolrIndexException
     {
-        index(Arrays.asList(reference));
+        this.index(Arrays.asList(reference));
     }
 
     @Override
     public void index(List<EntityReference> references) throws SolrIndexException
     {
-        // Build the list of references to index directly
-        List<EntityReference> indexableReferences = getUniqueIndexableEntityReferences(references);
-
-        indexUpdater.index(indexableReferences);
+        addToQueue(references, IndexOperation.INDEX);
     }
 
     @Override
     public void delete(EntityReference reference) throws SolrIndexException
     {
-        delete(Arrays.asList(reference));
+        this.delete(Arrays.asList(reference));
+
     }
 
     @Override
     public void delete(List<EntityReference> references) throws SolrIndexException
     {
-        // Preserve consistency by deleting all the indexable entities contained by each input reference.
-        List<EntityReference> indexableReferences = getUniqueIndexableEntityReferences(references);
+        addToQueue(references, IndexOperation.DELETE);
+    }
 
-        indexUpdater.delete(indexableReferences);
+    /**
+     * Add a list of references to the index queue, all having the same operation.
+     * 
+     * @param references the references to add
+     * @param operation the operation to assign to the given references
+     * @throws SolrIndexException when failed to resolve passed references
+     */
+    private void addToQueue(List<EntityReference> references, IndexOperation operation) throws SolrIndexException
+    {
+        if (!this.disposed) {
+            // Build the list of references to index directly
+            List<EntityReference> indexableReferences = getUniqueIndexableEntityReferences(references);
+
+            for (EntityReference reference : indexableReferences) {
+                this.indexOperationsQueue.add(new IndexQueueEntry(reference, operation));
+            }
+        }
     }
 
     /**
@@ -139,7 +390,7 @@ public class DefaultSolrIndex implements SolrIndex, EventListener
                 continue;
             }
 
-            List<EntityReference> containedReferences = indexableReferenceExtractor.getReferences(reference);
+            List<EntityReference> containedReferences = this.indexableReferenceExtractor.getReferences(reference);
             for (EntityReference containedReference : containedReferences) {
                 // Avoid duplicates again
                 if (result.contains(containedReference)) {
@@ -151,24 +402,5 @@ public class DefaultSolrIndex implements SolrIndex, EventListener
         }
 
         return result;
-    }
-
-    @Override
-    public List<Event> getEvents()
-    {
-        return EVENTS;
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.getClass().getName();
-    }
-
-    @Override
-    public void onEvent(Event event, Object source, Object data)
-    {
-        // Launch the index thread when XWiki has started.
-        startThread();
     }
 }

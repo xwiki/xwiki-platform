@@ -20,22 +20,20 @@
 package org.xwiki.search.solr.internal;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.search.solr.internal.api.SolrIndex;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -58,14 +56,14 @@ import com.xpn.xwiki.web.Utils;
 RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceResolver.class,
 CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvider.class,
 CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
-DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class})
+DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class, DefaultExecution.class})
 public class DefaultSolrIndexTest
 {
     @Rule
-    public final MockitoComponentMockingRule<SolrIndex> mocker = new MockitoComponentMockingRule<SolrIndex>(
+    public final MockitoComponentMockingRule<SolrIndexer> mocker = new MockitoComponentMockingRule<SolrIndexer>(
         DefaultSolrIndex.class);
 
-    private XWikiContext xwikiContext;
+    private XWikiContext xcontext;
 
     private XWiki xwiki;
 
@@ -74,18 +72,15 @@ public class DefaultSolrIndexTest
     {
         Utils.setComponentManager(mocker);
 
-        final Execution execution = this.mocker.getInstance(Execution.class);
-        final ExecutionContext executionContext = new ExecutionContext();
+        // XWiki
 
         this.xwiki = mock(XWiki.class);
 
-        this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setDatabase("xwiki");
-        this.xwikiContext.setWiki(this.xwiki);
+        // XWikiContext
 
-        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xwikiContext);
-
-        when(execution.getContext()).thenReturn(executionContext);
+        this.xcontext = new XWikiContext();
+        this.xcontext.setDatabase("xwiki");
+        this.xcontext.setWiki(this.xwiki);
 
         URL url = this.getClass().getClassLoader().getResource("solrhome");
         System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());

@@ -34,7 +34,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
-import org.xwiki.search.solr.internal.api.SolrIndex;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
@@ -79,7 +79,7 @@ public class SolrIndexScriptService implements ScriptService
      * Wrapped {@link SolrIndex} component.
      */
     @Inject
-    protected SolrIndex solrIndex;
+    protected SolrIndexer solrIndex;
 
     /**
      * Index an entity and all it's contained entities recursively.

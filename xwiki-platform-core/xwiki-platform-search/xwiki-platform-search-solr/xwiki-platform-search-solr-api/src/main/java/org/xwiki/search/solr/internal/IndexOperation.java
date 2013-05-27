@@ -20,12 +20,27 @@
 package org.xwiki.search.solr.internal;
 
 /**
- * TODO DOCUMENT ME!
- *
+ * The operation to perform on the queued entry.
+ * 
  * @version $Id$
+ * @since 5.1M2
  */
 public enum IndexOperation
 {
+    /**
+     * Index the entry.
+     */
     INDEX,
-    DELETE
+
+    /**
+     * Remove entry from index.
+     */
+    DELETE,
+
+    // General operations
+
+    /**
+     * Stop indexing thread.
+     */
+    STOP
 }

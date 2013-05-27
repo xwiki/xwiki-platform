@@ -35,7 +35,7 @@ import org.xwiki.stability.Unstable;
  */
 @Unstable
 @Role
-public interface SolrIndex
+public interface SolrIndexer
 {
     /**
      * Index an entity recursively.

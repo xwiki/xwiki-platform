@@ -35,7 +35,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.search.solr.internal.api.SolrIndex;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -48,6 +48,7 @@ import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
  * Event listener that monitors changes in the wiki and updates the Solr index accordingly.
  * 
  * @version $Id$
+ * @since 5.1M2
  */
 @Component
 @Named("solr")
@@ -66,8 +67,11 @@ public class SolrIndexEventListener implements EventListener
     @Inject
     protected Logger logger;
 
+    /**
+     * The solr index.
+     */
     @Inject
-    private SolrIndex solrIndex;
+    private SolrIndexer solrIndexer;
 
     @Override
     public List<Event> getEvents()
@@ -88,33 +92,33 @@ public class SolrIndexEventListener implements EventListener
             if (event instanceof DocumentUpdatedEvent || event instanceof DocumentCreatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                solrIndex.index(document.getDocumentReference());
+                this.solrIndexer.index(document.getDocumentReference());
             } else if (event instanceof DocumentDeletedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                solrIndex.delete(document.getDocumentReference());
+                this.solrIndexer.delete(document.getDocumentReference());
             } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();
                 XWikiAttachment attachment = document.getAttachment(fileName);
 
-                solrIndex.index(attachment.getReference());
+                this.solrIndexer.index(attachment.getReference());
             } else if (event instanceof AttachmentDeletedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();
                 XWikiAttachment attachment = document.getAttachment(fileName);
 
-                solrIndex.delete(attachment.getReference());
+                this.solrIndexer.delete(attachment.getReference());
             } else if (event instanceof WikiCreatedEvent) {
                 String wikiName = (String) source;
                 WikiReference wikiReference = new WikiReference(wikiName);
 
-                solrIndex.index(wikiReference);
+                this.solrIndexer.index(wikiReference);
             } else if (event instanceof WikiDeletedEvent) {
                 String wikiName = (String) source;
                 WikiReference wikiReference = new WikiReference(wikiName);
 
-                solrIndex.delete(wikiReference);
+                this.solrIndexer.delete(wikiReference);
             }
         } catch (Exception e) {
             logger.error("Failed to handle event [{}] with source [{}]", event, source, e);

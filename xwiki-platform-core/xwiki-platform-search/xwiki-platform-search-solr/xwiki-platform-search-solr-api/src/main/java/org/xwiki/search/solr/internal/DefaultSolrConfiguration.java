@@ -100,6 +100,26 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         "stoptags", "stopwords", "synonyms", "userdict"};
 
     /**
+     * The name of the configuration property containing the batch size.
+     */
+    public static final String SOLR_INDEXER_BATCHSIZE_PROPERTY = "solr.indexer.batchSize";
+
+    /**
+     * The default size of the batch.
+     */
+    public static final int SOLR_INDEXER_BATCHSIZE_DEFAULT = 50;
+
+    /**
+     * The name of the configuration property containing the batch size.
+     */
+    public static final String SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY = "solr.indexer.queue.capacity";
+
+    /**
+     * The default size of the batch.
+     */
+    public static final int SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT = 10000;
+
+    /**
      * The Solr configuration source.
      */
     @Inject
@@ -177,5 +197,18 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         }
 
         return result;
+    }
+
+    @Override
+    public int getIndexerBatchSize()
+    {
+        return this.configuration.getProperty(SOLR_INDEXER_BATCHSIZE_PROPERTY, SOLR_INDEXER_BATCHSIZE_DEFAULT);
+    }
+
+    @Override
+    public int getIndexerQueueCapacity()
+    {
+        return this.configuration
+            .getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY, SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
     }
 }

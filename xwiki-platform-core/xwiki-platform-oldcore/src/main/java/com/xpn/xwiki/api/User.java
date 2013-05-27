@@ -152,20 +152,22 @@ public class User extends Api
     }
     
     /**
-     * Check if the password passed as argument is the user password.
+     * Check if the password passed as argument is the user password. This method is used when a user
+     * wants to change its password. To make sure that it wouldn't be used to perform brute force attacks,
+     * we ensure that this is only used to check the current user password on its profile page.
      * 
      * @param password Password submitted.
      * @return true if password is really the user password.
-     * @throws XWikiException error if programming rights are missing.
+     * @throws XWikiException error if authorization denied.
      */
-    @Programming
     public boolean checkPassword(String password) throws XWikiException
     {
-        if (hasProgrammingRights()) {
+        EntityReference userReference = REFERENCE_RESOLVER.resolve(user.getUser());
+        EntityReference docReference = getXWikiContext().getDoc().getDocumentReference();
+        if (userReference.equals(getXWikiContext().getUserReference()) && userReference.equals(docReference)) {
             try {
                 boolean result = false;
                 
-                EntityReference userReference = REFERENCE_RESOLVER.resolve(user.getUser());
                 XWikiDocument userDoc = getXWikiContext().getWiki().getDocument(userReference, getXWikiContext());
                 BaseObject obj = userDoc.getXObject(USERCLASS_REFERENCE);
                 // We only allow empty password from users having a XWikiUsers object.
@@ -181,7 +183,7 @@ public class User extends Api
             }
         } else {
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "You need programming rights in order to use this method", null);
+                "You cannot use this method for checking another user password.", null);
         }
     }
 

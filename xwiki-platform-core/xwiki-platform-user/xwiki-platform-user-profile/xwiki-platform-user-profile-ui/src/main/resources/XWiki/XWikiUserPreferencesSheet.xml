@@ -85,8 +85,7 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
     #end
       &lt;div class="passwordManagement"&gt;
         &lt;h1&gt;$services.localization.render('platform.core.profile.section.security')&lt;/h1&gt;
-        #set($changePasswordDoc = $xwiki.getDocument('XWiki.ChangePassword'))
-        &lt;span class="buttonwrapper"&gt;&lt;a id="changePassword" href="$changePasswordDoc.getURL('view', "docName=$doc.fullName")"&gt;$services.localization.render('platform.core.profile.changePassword')&lt;/a&gt;&lt;/span&gt;
+        &lt;span class="buttonwrapper"&gt;&lt;a id="changePassword" href="$doc.getURL('view', 'xpage=passwd')"&gt;$services.localization.render('platform.core.profile.changePassword')&lt;/a&gt;&lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   #end

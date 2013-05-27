@@ -19,8 +19,10 @@
  */
 package org.xwiki.user.directory.test.ui;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.test.ui.AbstractSuperAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.user.directory.test.po.UserDirectoryPage;
 
@@ -33,8 +35,11 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 5.1M1
  */
-public class UserDirectoryTest extends AbstractSuperAdminAuthenticatedTest
+public class UserDirectoryTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     @Test
     public void verifyAdminUserListed()
     {

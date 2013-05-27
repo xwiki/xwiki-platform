@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-user-directory-ui</artifactId>
   <name>XWiki Platform - User - Directory - UI</name>
   <packaging>xar</packaging>
-  <description>User Directory UI</description>
+  <description>Displays a directory of all users in the wiki</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>User Directory Application</xwiki.extension.name>

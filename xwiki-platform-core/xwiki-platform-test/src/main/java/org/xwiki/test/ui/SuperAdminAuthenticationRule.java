@@ -19,29 +19,18 @@
  */
 package org.xwiki.test.ui;
 
-import org.junit.Before;
+import org.openqa.selenium.WebDriver;
 
 /**
- * Helper class to be extended by tests requiring the Super Admin user logged in.
- * 
+ * Authenticates the superadmin user in the wiki before the test starts.
+ *
  * @version $Id$
  * @since 5.1M1
  */
-public abstract class AbstractSuperAdminAuthenticatedTest extends AbstractTest
+public class SuperAdminAuthenticationRule extends AuthenticationRule
 {
-    @Before
-    public void setUp() throws Exception
+    public SuperAdminAuthenticationRule(TestUtils testUtils, WebDriver driver)
     {
-        loginSuperAdminUser();
-    }
-
-    public static void loginSuperAdminUser()
-    {
-        if (!"superadmin".equals(getUtil().getLoggedInUserName())) {
-            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
-            // going to the home page for example.
-            getDriver().get(getUtil().getURLToLoginAsSuperAdminAndGotoPage(getUtil().getURLToNonExistentPage()));
-            getUtil().recacheSecretToken();
-        }
+        super("superadmin", "pass", testUtils, driver);
     }
 }

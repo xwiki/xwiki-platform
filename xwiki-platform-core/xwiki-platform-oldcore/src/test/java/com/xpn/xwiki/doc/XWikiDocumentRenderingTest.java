@@ -299,6 +299,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setLargeStringValue("area", "{{velocity}}#macro(testmacrocache)ok#end{{/velocity}}");
         this.document.setContent("{{velocity}}$doc.display(\"area\")#testmacrocache{{/velocity}}");
         this.document.setSyntax(Syntax.XWIKI_2_0);
+        this.document.setAuthor("xwiki:Xwiki.User");
 
         // We need to put the current doc in the Velocity Context since it's normally set before the rendering is
         // called in the execution flow.
@@ -321,6 +322,9 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(vengine));
 
+        this.mockXWikiRightService.expects(once()).method("hasAccessLevel").with(eq("programming"), ANYTHING, ANYTHING, ANYTHING)
+            .will(returnValue(false));
+        
         // $doc.display will ask for the syntax of the current document so we need to mock it.
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").with(eq("xwiki/2.0"), ANYTHING).will(returnValue(
             "xwiki/2.0"));

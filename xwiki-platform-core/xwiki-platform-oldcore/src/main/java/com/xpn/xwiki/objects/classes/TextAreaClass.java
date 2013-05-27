@@ -23,10 +23,13 @@ import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -219,8 +222,29 @@ public class TextAreaClass extends StringClass
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
-                buffer.append(doc.getRenderedContent(result.toString(), getObjectDocumentSyntax(object, context)
-                    .toIdString(), context));
+            	try {
+            	    boolean dropPR ;
+            	    if(context.hasDroppedPermissions()) {
+            	        dropPR = false ; 
+            	    } else {
+                	    DocumentReference metaAuthor = doc.getAuthorReference();
+            	        dropPR = !context.getWiki().getRightService().hasAccessLevel
+                	            ("programming", metaAuthor.toString(), doc.getDocumentReference().toString(), context);
+            	    }
+            	    // If the author hasn't PR, do not render the content with PR. This need to be done in case
+            	    // the content author of the document has PR, but not the author of this textArea. See XWiki-7941.
+                    if(dropPR) {
+            		    context.dropPermissions();
+            	    }
+                    buffer.append(doc.getRenderedContent(result.toString(), getObjectDocumentSyntax(object, context)
+                        .toIdString(), context));
+                    // If we dropped PR, let's reinstate them
+                    if(dropPR) {
+                        context.remove(XWikiConstant.DROPPED_PERMISSIONS);
+                    }
+            	} catch (XWikiException e) {
+            	    LOGGER.warn("Failed to check rights for this textArea : " + e.toString());
+            	}
             } else {
                 buffer.append(result);
             }

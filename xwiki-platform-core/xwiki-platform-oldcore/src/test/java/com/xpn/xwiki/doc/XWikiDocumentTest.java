@@ -136,6 +136,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
+        this.document.setAuthor("xwiki:XWiki.User");
 
         this.translatedDocument = new XWikiDocument();
         this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
@@ -827,6 +828,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
             this.document.display("string", "edit", getContext()));
 
+        this.mockXWikiRightService.expects(once()).method("hasAccessLevel").with(eq("programming"), ANYTHING, ANYTHING, ANYTHING)
+            .will(returnValue(false));
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING)
             .will(returnValue("area"));
 
@@ -844,6 +847,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", getContext()));
 
+        this.mockXWikiRightService.expects(once()).method("hasAccessLevel").with(eq("programming"), ANYTHING, ANYTHING, ANYTHING)
+            .will(returnValue(false));
+        
         assertEquals("{{html clean=\"false\" wiki=\"false\"}}<p>area</p>{{/html}}",
             this.document.display("area", "view", getContext()));
     }
@@ -862,6 +868,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(
             "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
             this.document.display("string", "edit", getContext()));
+        
+        this.mockXWikiRightService.expects(once()).method("hasAccessLevel").with(eq("programming"), ANYTHING, ANYTHING, ANYTHING)
+            .will(returnValue(false));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", getContext()));
     }
@@ -879,6 +888,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", getContext()));
 
+        this.mockXWikiRightService.expects(once()).method("hasAccessLevel").with(eq("programming"), ANYTHING, ANYTHING, ANYTHING)
+            .will(returnValue(false));
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING)
             .will(returnValue("area"));
 
@@ -896,6 +907,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             "<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>",
             this.document.display("string", "edit", getContext()));
 
+        this.mockXWikiRightService.expects(once()).method("hasAccessLevel").with(eq("programming"), ANYTHING, ANYTHING, ANYTHING)
+            .will(returnValue(false));
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING)
             .will(returnValue("area"));
 
@@ -915,6 +928,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             "<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>",
             this.document.display("string", "edit", getContext()));
 
+        this.mockXWikiRightService.expects(once()).method("hasAccessLevel").with(eq("programming"), ANYTHING, ANYTHING, ANYTHING)
+            .will(returnValue(false));
+        
         assertEquals("<p>area</p>", this.document.display("area", "view", getContext()));
     }
 

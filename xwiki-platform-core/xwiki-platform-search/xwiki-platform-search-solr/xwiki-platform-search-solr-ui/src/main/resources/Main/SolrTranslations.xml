@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1369063635000</creationDate>
-  <date>1369390495000</date>
-  <contentUpdateDate>1369390239000</contentUpdateDate>
+  <date>1369655569000</date>
+  <contentUpdateDate>1369654393000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <defaultTemplate/>
@@ -92,5 +92,11 @@ solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Video
 solr.filterBy.fileType.text=Text
 solr.filter.queryBoost.label=Query boost
-solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5</content>
+solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5
+
+solr.facets.title=Refine your search
+solr.facets.hint=Select a category and activate filters on the current results
+solr.facets.resetAll=Reset all
+solr.facets.expandAll=Expand all
+solr.facets.collapseAll=Collapse all</content>
 </xwikidoc>

@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1368797502000</creationDate>
-  <date>1369390491000</date>
-  <contentUpdateDate>1369390123000</contentUpdateDate>
+  <date>1369655565000</date>
+  <contentUpdateDate>1369654054000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search</title>
   <defaultTemplate/>
@@ -202,9 +202,58 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     }
   });
 
+  var SearchFacetsBehavior = Class.create({
+    initialize: function(container) {
+      this.container = container;
+
+      this.container.select('.search-facet-header').each(function(facetHeader) {
+        facetHeader.observe('click', this._onToggle.bindAsEventListener(this));
+      }.bind(this))
+
+      this.globalToggle = new Element('a', {href: '#', style: 'float:right'});
+      this.globalToggle.observe('click', this._onGlobalToggle.bindAsEventListener(this));
+      var clearFloats = new Element('span', {'class': 'clearfloats'});
+      this.container.down('.search-facets-actions').down('p').insert(this.globalToggle).insert(clearFloats);
+      this._updateGlobalToggleState();
+    },
+
+    _onToggle: function(event) {
+      event.element().up('.search-facet').toggleClassName('expanded');
+      this._updateGlobalToggleState();
+    },
+
+    _onGlobalToggle : function(event) {
+      event.stop();
+      this.container.select('.search-facet').each(function(facetContainer) {
+        if (this.globalToggle._collapse) {
+          facetContainer.removeClassName('expanded');
+        } else {
+          facetContainer.addClassName('expanded');
+        }
+      }.bind(this));
+      this._updateGlobalToggleState();
+    },
+
+    _updateGlobalToggleState: function() {
+      var facetCount = this.container.select('.search-facet').length;
+      var expandedFacetCount = this.container.select('.search-facet.expanded').length;
+      this.globalToggle._collapse = expandedFacetCount &gt; facetCount/2;
+      if (this.globalToggle._collapse) {
+        this.globalToggle.update("$escapetool.javascript($services.localization.render('solr.facets.collapseAll'))");
+      } else {
+        this.globalToggle.update("$escapetool.javascript($services.localization.render('solr.facets.expandAll'))");
+      }
+    }
+  });
+
   var init = function() {
     var searchFilter = $('body').down('.search-filter');
-    return searchFilter &amp;&amp; new SearchFilterBehavior(searchFilter);
+    searchFilter &amp;&amp; new SearchFilterBehavior(searchFilter);
+
+    var searchFacets = $('body').down('.search-facets');
+    searchFacets &amp;&amp; new SearchFacetsBehavior(searchFacets);
+
+    return true;
   };
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
 })();</code>
@@ -371,12 +420,13 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 
-.search-filter-intro {
+.search-filter-header {
   padding: 1em .5em .5em;
   border-bottom: 1px solid $theme.borderColor;
 }
 
-.search-filter-intro strong, .facets-item strong {
+.search-filter-header strong,
+.search-facets-header strong {
   #css_textShadow('0', '1px', '0', $theme.pageContentBackgroundColor)
 }
 
@@ -520,22 +570,9 @@ blockquote.search-result-highlight {
   border-radius: 4px;
 }
 
-.facets-general {
-  font-size: .8em;
-  padding: .5em 0 0;
-}
-
-.facets-general a {
-  color: $theme.textSecondaryColor;
-  text-decoration: none;
-}
-
-.facets-general a:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
-}
-
-.facets-item {
+.search-facets-header,
+.search-facets-actions,
+.search-facet {
   background-color: $theme.backgroundSecondaryColor;
   padding: 0.5em 1em;
   border-bottom: 1px solid $theme.borderColor;
@@ -543,15 +580,35 @@ blockquote.search-result-highlight {
   position: relative;
 }
 
-.facets-item:first-of-type {
+.search-facets-header {
   border-top: none;
 }
 
-.facets-item:last-of-type {
+.search-facets-actions &gt; p {
+  font-size: .8em;
+  margin: 0;
+}
+
+.search-facets-actions a {
+  color: $theme.textSecondaryColor;
+  text-decoration: none;
+}
+
+.search-facets-actions a:hover {
+  color: $theme.linkColor;
+  text-decoration: underline;
+}
+
+.search-facets-actions .clearfloats {
+  /* Fix the horizontal scroll bar, caused by the fact that we use a SPAN element instead of a DIV. */
+  display: block;
+}
+
+.search-facet:last-of-type {
   border-bottom: none;
 }
 
-.facets-toggle {
+.search-facet-header {
   cursor: pointer;
   background: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-left.png')") no-repeat scroll 100% 50% transparent;
   color: $theme.titleColor;
@@ -559,7 +616,7 @@ blockquote.search-result-highlight {
   text-transform: capitalize;
 }
 
-.facets-toggle:after {
+.search-facet-header:after {
   border-bottom: 1px dotted $theme.pageContentBackgroundColor;
   border-top: 1px dotted $theme.borderColor;
   clear: both;
@@ -573,34 +630,34 @@ blockquote.search-result-highlight {
   width: 100%;
 }
 
-.facets-item:last-of-type .facets-toggle:after {
+.search-facet:last-of-type .search-facet-header:after {
   border: medium none;
 }
 
-.facets-item.expand:last-of-type .facets-toggle:after {
+.search-facet.expanded:last-of-type .search-facet-header:after {
   border-bottom: 1px dotted $theme.pageContentBackgroundColor;
   border-top: 1px dotted $theme.borderColor;
 }
 
-.facets-content {
+.search-facet-body {
   overflow: hidden; /* required for effect */
   display: none;
   margin-top: .5em;
 }
 
-.facets-content ul {
+.search-facet-body ul {
   font-size: .9em;
 }
 
-.facets-item.expand .facets-toggle {
+.search-facet.expanded .search-facet-header {
   background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
 }
 
-.facets-item.expand .facets-content {
+.search-facet.expanded .search-facet-body {
   display: block;
 }
 
-.facets-content ul {
+.search-facet-body ul {
   color: $theme.textSecondaryColor;
   list-style: none;
   display: block;
@@ -608,19 +665,19 @@ blockquote.search-result-highlight {
   margin: 0px;
 }
 
-.facets-content li {
+.search-facet-body li {
   clear: both;
 }
 
-.facets-content li {
+.search-facet-body li {
   margin-left: -0.3em;
 }
 
-.facets-content .itemCheck {
+.search-facet-body input[type="checkbox"] {
   float: left;
 }
 
-.facets-content .itemName {
+.search-facet-body .itemName {
   float: left;
   overflow: hidden;
   position: relative;
@@ -628,26 +685,22 @@ blockquote.search-result-highlight {
   width: 75%;
 }
 
-.facets-content .itemAll {
-  font-weight: 700;
-}
-
-.facets-content .itemName, .facets-content .itemAll {
+.search-facet-body .itemName {
   /* Remove link styling */
   color: $theme.textColor;
   text-decoration: none;
 }
 
-.facets-content .itemName:hover, .facets-content .itemAll:hover {
+.search-facet-body .itemName:hover {
   color: $theme.linkColor;
   text-decoration: underline;
 }
 
-.facets-content .itemCount {
+.search-facet-body .itemCount {
   float: right;
 }
 
-.facets-content .itemName, .facets-content .itemCount {
+.search-facet-body .itemName, .search-facet-body .itemCount {
   padding: 0.2em 0;
 }
 
@@ -676,6 +729,7 @@ blockquote.search-result-highlight {
   </object>
   <content>{{velocity output='false'}}
 #macro (displaySearchForm)
+  {{html}}
   &lt;form class="search-form" action=""&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
@@ -694,11 +748,12 @@ blockquote.search-result-highlight {
     &lt;/div&gt;
     #displaySearchFilter()
   &lt;/form&gt;
+  {{/html}}
 #end
 
 #macro (displaySearchFilter)
   &lt;div class="search-filter xform&gt;
-    &lt;div class="search-filter-intro"&gt;
+    &lt;div class="search-filter-header"&gt;
       &lt;strong&gt;$services.localization.render('solr.filter.title')&lt;/strong&gt;
       &lt;p class="xHint"&gt;$services.localization.render('solr.filter.hint')&lt;/p&gt;
     &lt;/div&gt;
@@ -837,60 +892,77 @@ blockquote.search-result-highlight {
 #end
 
 #macro (displaySearchDebugInfo)
-  &lt;div class="search-debug#if ($debug == '') hidden#end"&gt;
-    &lt;span&gt;Debug is On&lt;/span&gt;
+  (% class="search-debug#if ($debug == '') hidden#end" %)(((
+    Debug is On
     #set ($debugMap = $searchResponse.debugMap)
     #if ($debugMap)
+
+      {{html}}
       &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!debugMap.get('QParser')&lt;/div&gt;
       &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!debugMap.get('parsedquery_toString')&lt;/div&gt;
       &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!debugMap.get('timing')&lt;/div&gt; 
+      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!debugMap.get('timing')&lt;/div&gt;
+      {{/html}}
     #end
-  &lt;/div&gt;
+  )))
 #end
 
 #macro (displaySearchFacets $searchResponse)
-  &lt;div class='search-facets xform'&gt;
-    &lt;div class='facets-item'&gt;
-      &lt;p&gt;&lt;strong&gt;Refine your search&lt;/strong&gt;&lt;/p&gt;
-      &lt;p class="xHint"&gt;Select a category and activate filters on the current results&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;div class='facets-item'&gt;
-      &lt;div class='facets-general'&gt;
-        &lt;span style='float: left'&gt;&lt;a href='#'&gt;Reset all&lt;/a&gt;&lt;/span&gt;
-        &lt;span style='float: right'&gt;&lt;a href='#'&gt;Expand all&lt;/a&gt;&lt;/span&gt;
-      &lt;/div&gt;
-      &lt;div class='clearfloats'&gt;&lt;/div&gt;
-    &lt;/div&gt;
-    #foreach ($facetfield in $searchResponse.getFacetFields())
-      #set ($facetValues = $facetfield.getValues())
-      #set ($frem = $facetfield.getLimitingFields(1).getValues())
-      #set ($freq = $facetValues.removeAll($frem))
-      #if ($facetValues.size() &gt; 1)
-        &lt;div class='facets-item expand'&gt;
-          &lt;div class='facets-toggle'&gt;${facetfield.getName()}&lt;/div&gt; 
-          &lt;div class='facets-content'&gt;
-            &lt;!--p class="xHint"&gt;Select a category and activate filters on the current results&lt;/p--&gt;
+  (% class="search-facets xform" %)(((
+    (% class="search-facets-header" %)(((
+      **{{translation key="solr.facets.title"/}}**
+
+      (% class="xHint" %)
+      {{translation key="solr.facets.hint"/}}
+    )))
+    (% class="search-facets-actions" %)(((
+      #set ($resetParameters = {})
+      #foreach ($parameter in $request.parameterMap.entrySet())
+        #if ($parameter.key.startsWith('f_'))
+          #set ($discard = $resetParameters.put($parameter.key, []))
+        #end
+      #end
+      #extendQueryString($url $resetParameters)
+      [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
+    )))
+    #foreach ($facetField in $searchResponse.facetFields)
+      #set ($facetValues = $facetField.values)
+      ## Keep only the values that have at least one match.
+      #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
+      ## Display the facets that have values specified on the request or that have at least 2 different values matched.
+      #set ($facetRequestParameter = "f_$facetField.name")
+      #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+      #if ($facetRequestValues || $facetValues.size() &gt; 1)
+        (% class="search-facet expanded" %)(((
+          {{html}}
+          &lt;div class="search-facet-header"&gt;$escapetool.xml($facetField.name)&lt;/div&gt; 
+          &lt;div class="search-facet-body"&gt;
             &lt;ul&gt;
-              &lt;li&gt;&lt;a href="$doc.getURL('view', "text=${escapetool.url($text)}")"&gt;
-                &lt;input class='itemCheck' type='checkbox'/&gt; &lt;span class='itemAll itemName'&gt;All&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
               #foreach ($facetValue in $facetValues)
-                #if ($facetValue.count &gt; 0 &amp;&amp; $facetValue.name != 'date' &amp;&amp; $facetValue.name != 'creationdate')
-                  &lt;li&gt;
-                    &lt;a href="$doc.getURL('view', "text=${escapetool.url($text)}&amp;${facetfield.name}=${escapetool.url($facetValue.name)}")"&gt;
-                      &lt;input class='itemCheck' type='checkbox'/&gt;
-                      &lt;span class='itemName'&gt;$facetValue.name&lt;/span&gt;
-                      &lt;span class='itemCount'&gt;$facetValue.count&lt;/span&gt;
-                    &lt;/a&gt;
-                  &lt;/li&gt;
-                #end
+                &lt;li&gt;
+                  #set ($selectedValues = [])
+                  #if ($facetRequestValues)
+                    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+                  #end
+                  #set ($checked = $selectedValues.remove($facetValue.name))
+                  #if (!$checked)
+                    #set ($discard = $selectedValues.add($facetValue.name))
+                  #end
+                  #extendQueryString($url {$facetRequestParameter: $selectedValues})
+                  &lt;a href="$url"&gt;
+                    &lt;input type="checkbox"#if ($checked) checked="checked"#end /&gt;
+                    &lt;span class="itemName"&gt;$escapetool.xml($facetValue.name)&lt;/span&gt;
+                    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
+                  &lt;/a&gt;
+                &lt;/li&gt;
               #end
             &lt;/ul&gt;
           &lt;/div&gt;
-        &lt;/div&gt;
+          {{/html}}
+        )))
       #end
     #end
-  &lt;/div&gt;
+  )))
 #end
 
 #macro (displaySearchResultsSort)
@@ -1115,39 +1187,54 @@ blockquote.search-result-highlight {
     #set ($discard = $query.bindValue('debugQuery', 'on'))
   #end
   ##
-  ## Filters
-  ##
-  ## Build filter query. Use AND as default operation for the filter query.
-  #set ($defaultFilterQuery = '{!q.op=AND}')
-  #set ($filterQuery = $defaultFilterQuery)
+  ## Collect the query filters.
+  #set ($filters = {})
   #if ($language != '')
-    #set ($filterQuery = "$filterQuery lang:""$language""")
+    #set ($discard = $filters.put('lang', [$language]))
   #end
   #if ($wiki != '')
-    #set ($filterQuery = "$filterQuery wiki:""$wiki""")
+    #set ($discard = $filters.put('wiki', [$wiki]))
   #end
   #if ($space != '' &amp;&amp; !$blacklistedSpaces.contains($space))
-    #set ($filterQuery = "$filterQuery space_exact:""$space""")
+    #set ($discard = $filters.put('space_exact', [$space]))
   #end
   #if ($type != '')
-    #set ($filterQuery = "$filterQuery type:""$type""")
+    #set ($discard = $filters.put('type', [$type]))
   #end
   #if ($fileType != '')
-    #set ($filterQuery = "$filterQuery mimetype:$fileType")
+    #set ($discard = $filters.put('mimetype', [$fileType]))
   #end
-  ##
-  ## Hidden documents
   #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
-    #set ($filterQuery = "$filterQuery hidden:false")
+    #set ($discard = $filters.put('hidden', [false]))
+  #end
+  ## Add the facets.
+  #foreach ($parameter in $request.parameterMap.entrySet())
+    #if ($parameter.key.startsWith('f_'))
+      #set ($discard = $filters.put($parameter.key.substring(2), $parameter.value))
+    #end
   #end
   ##
-  ## Apply the filter query.
-  #if ($filterQuery != $defaultFilterQuery)
-    #set ($discard = $query.bindValue('fq', $filterQuery))
+  ## Build the query filter. Use AND as the default operation between different filters/facets.
+  #if ($filters.size() &gt; 0)
+    #set ($queryFilter = '{!q.op=AND}')
+    #foreach ($filter in $filters.entrySet())
+      #if ($filter.value.size() &gt; 1)
+        ## Use OR between different values of the same filter/facet.
+        #set ($queryFilter = "$queryFilter $filter.key:(")
+        #set ($separator = '')
+        #foreach ($value in $filter.value)
+          #set ($queryFilter = "$queryFilter$separator""$value""")
+          #set ($separator = ' OR ')
+        #end
+        #set ($queryFilter = "$queryFilter)")
+      #else
+        #set ($queryFilter = "$queryFilter $filter.key:""$filter.value.get(0)""")
+      #end
+    #end
+    #set ($discard = $query.bindValue('fq', $queryFilter))
   #end
   ##
   ## Execute the query.
-  ##
   #set ($searchResponse = $query.execute()[0])
 #end
 
@@ -1207,17 +1294,13 @@ blockquote.search-result-highlight {
 #set ($docextras = [])
 #processRequestParameters()
 (% class="search-form-container" %)(((
-  {{html}}
   #displaySearchForm()
   #displaySearchDebugInfo()
-  {{/html}}
 )))
 #if ($text != '')
   #getSearchResults()
   (% class="search-results-container" %)(((
-    {{html}}
     #displaySearchFacets($searchResponse)
-    {{/html}}
     (% class="search-results-left" %)(((
       #displaySearchResultsSort()
 

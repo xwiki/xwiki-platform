@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1368797502000</creationDate>
-  <date>1369655565000</date>
-  <contentUpdateDate>1369654054000</contentUpdateDate>
+  <date>1369656770000</date>
+  <contentUpdateDate>1369656740000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search</title>
   <defaultTemplate/>
@@ -1279,8 +1279,8 @@ blockquote.search-result-highlight {
     #set ($type = 'DOCUMENT')
   #end
   ## Subwikis search by default in their content only.
-  #set ($wiki = $request.wiki)
-  #if ("$!wiki" == '' &amp;&amp; !$xcontext.isMainWiki())
+  #set ($wiki = "$!request.wiki")
+  #if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
     #set ($wiki = $xcontext.database)
   #end
 #end

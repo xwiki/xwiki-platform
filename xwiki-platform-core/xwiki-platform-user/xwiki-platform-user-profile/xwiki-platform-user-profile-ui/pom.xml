@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-user-profile-ui</artifactId>
   <name>XWiki Platform - User - Profile - UI</name>
   <packaging>xar</packaging>
-  <description>User Profile UI</description>
+  <description>Performs operations related to the User Profile (change preferences, user watchlist, follow users, etc)</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>User Profile Application</xwiki.extension.name>

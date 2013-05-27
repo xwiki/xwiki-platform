@@ -50,7 +50,7 @@
 $doc.use($obj)
 $xwiki.ssx.use('XWiki.XWikiUserSheet')##
 {{html wiki="true"}}
-  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
+  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class="userPreferences"&gt;
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
         &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=preferences')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.preferences.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;

@@ -203,7 +203,7 @@
   &lt;div class="vcard"&gt;
   &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
 #end
-  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
+  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class='userInfo'&gt;
     #if($context.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;

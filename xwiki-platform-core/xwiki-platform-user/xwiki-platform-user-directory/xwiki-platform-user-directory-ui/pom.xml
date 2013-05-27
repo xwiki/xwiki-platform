@@ -26,18 +26,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-user-profile</artifactId>
+    <artifactId>xwiki-platform-user-directory</artifactId>
     <version>5.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user-profile-ui</artifactId>
-  <name>XWiki Platform - User - Profile - UI</name>
+  <artifactId>xwiki-platform-user-directory-ui</artifactId>
+  <name>XWiki Platform - User - Directory - UI</name>
   <packaging>xar</packaging>
-  <description>Performs operations related to the User Profile (change preferences, user watchlist, follow users, etc)</description>
+  <description>Displays a directory of all users in the wiki</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>User Profile Application</xwiki.extension.name>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-user-ui</xwiki.extension.features>
+    <xwiki.extension.name>User Directory Application</xwiki.extension.name>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
@@ -49,44 +47,35 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-html</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed to change the user's profile avatar -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-attachment-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed for the {{error}} macro used by the ChangePassword feature -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-message</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Need for the user's activity stream -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activitystream-ui</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- User Directory uses the Tag Cloud feature of the Livetable -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tag-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- Need for the user's message stream -->
+    <!-- Used by the User Directory livetable -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-messagestream-ui</artifactId>
+      <artifactId>xwiki-platform-livetable-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

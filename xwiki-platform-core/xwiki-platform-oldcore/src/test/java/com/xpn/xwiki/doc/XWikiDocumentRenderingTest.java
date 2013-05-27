@@ -299,7 +299,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setLargeStringValue("area", "{{velocity}}#macro(testmacrocache)ok#end{{/velocity}}");
         this.document.setContent("{{velocity}}$doc.display(\"area\")#testmacrocache{{/velocity}}");
         this.document.setSyntax(Syntax.XWIKI_2_0);
-        this.document.setAuthor("xwiki:Xwiki.User");
+        this.document.setAuthor("xwiki:XWiki.User");
 
         // We need to put the current doc in the Velocity Context since it's normally set before the rendering is
         // called in the execution flow.

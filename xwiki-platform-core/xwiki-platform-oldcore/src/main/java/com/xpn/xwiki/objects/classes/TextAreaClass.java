@@ -223,16 +223,19 @@ public class TextAreaClass extends StringClass
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
             	try {
+            		// If the author of the document hasn't PR, let's drop permissions before rendering this textArea content.
+            		// This need to be done in case the content author of the document has PR, but not the author of this textArea. 
+            		// See XWiki-7941.
             	    boolean dropPR ;
             	    if(context.hasDroppedPermissions()) {
+            	    	// If permissions have already been dropped, no need to do it again
             	        dropPR = false ; 
             	    } else {
+            	    	// Let's drop permissions if the document (and potentially textArea) author hasn't PR. 
                 	    DocumentReference metaAuthor = doc.getAuthorReference();
             	        dropPR = !context.getWiki().getRightService().hasAccessLevel
                 	            ("programming", metaAuthor.toString(), doc.getDocumentReference().toString(), context);
             	    }
-            	    // If the author hasn't PR, do not render the content with PR. This need to be done in case
-            	    // the content author of the document has PR, but not the author of this textArea. See XWiki-7941.
                     if(dropPR) {
             		    context.dropPermissions();
             	    }

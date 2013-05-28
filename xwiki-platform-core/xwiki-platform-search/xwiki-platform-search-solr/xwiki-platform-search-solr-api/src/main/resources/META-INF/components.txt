@@ -3,9 +3,9 @@ org.xwiki.search.solr.internal.DefaultSolrConfiguration
 org.xwiki.search.solr.internal.DefaultSolrIndexer
 org.xwiki.search.solr.internal.EmbeddedSolrInstance
 org.xwiki.search.solr.internal.RemoteSolrInstance
-org.xwiki.search.solr.internal.SolrIndexScriptService
 org.xwiki.search.solr.internal.SolrInstanceProvider
 org.xwiki.search.solr.internal.metadata.AttachmentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.DocumentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectPropertySolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectSolrMetadataExtractor
+org.xwiki.search.solr.internal.script.SolrIndexScriptService

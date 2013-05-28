@@ -83,6 +83,8 @@ public interface SolrConfiguration
      */
     Map<String, URL> getHomeDirectoryConfiguration();
 
+    // Indexer
+
     /**
      * @return the size of the batch when indexing enqueued entities
      * @since 5.1M2

@@ -22,6 +22,7 @@ package org.xwiki.search.solr.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -227,8 +228,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     {
         // To improve performance, we group contiguous index or delete operations and issue them only when a
         // different type of operation is encountered.
-        List<SolrInputDocument> solrDocumentsToIndex = new ArrayList<SolrInputDocument>();
-        List<String> solrDocumentIDsToDelete = new ArrayList<String>();
+        List<SolrInputDocument> solrDocumentsToIndex = new LinkedList<SolrInputDocument>();
+        List<String> solrDocumentIDsToDelete = new LinkedList<String>();
 
         IndexQueueEntry previousBatchEntry = null;
 
@@ -238,7 +239,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
             try {
                 // Issue add/delete operations to the server in batches whenever the contiguity stops
-                checkContiguity(previousBatchEntry, operation, solrDocumentsToIndex, solrDocumentIDsToDelete);
+                checkBatch(previousBatchEntry, operation, solrDocumentsToIndex, solrDocumentIDsToDelete);
 
                 // For the current contiguous operations queue, group the changes
                 if (IndexOperation.INDEX.equals(operation)) {
@@ -274,6 +275,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
+     * Check various limits and send the current batch if needed.
+     * 
      * @param previousBatchEntry the previous batch entry
      * @param operation the current operation
      * @param solrDocumentsToIndex the documents stored for {@link IndexOperation#INDEX}
@@ -281,7 +284,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * @throws SolrServerException when fail to apply operation
      * @throws IOException when fail to apply operation
      */
-    private void checkContiguity(IndexQueueEntry previousBatchEntry, IndexOperation operation,
+    private void checkBatch(IndexQueueEntry previousBatchEntry, IndexOperation operation,
         List<SolrInputDocument> solrDocumentsToIndex, List<String> solrDocumentIDsToDelete) throws SolrServerException,
         IOException
     {
@@ -317,6 +320,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         IllegalArgumentException
     {
         SolrInputDocument solrDocument = null;
+
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
         // If the entity type is supported, use the extractor to get the SolrInputDocuent.
         if (metadataExtractor != null) {

@@ -45,13 +45,13 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public SizedSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
         IllegalArgumentException
     {
         BaseObjectReference objectReference = new BaseObjectReference(entityReference);
 
         try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+            SizedSolrInputDocument solrDocument = new SizedSolrInputDocument();
 
             DocumentReference classReference = objectReference.getXClassReference();
             DocumentReference documentReference = new DocumentReference(objectReference.getParent());

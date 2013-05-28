@@ -48,13 +48,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public SizedSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
         IllegalArgumentException
     {
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);
 
         try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+            SizedSolrInputDocument solrDocument = new SizedSolrInputDocument();
 
             DocumentReference documentReference = attachmentReference.getDocumentReference();
 

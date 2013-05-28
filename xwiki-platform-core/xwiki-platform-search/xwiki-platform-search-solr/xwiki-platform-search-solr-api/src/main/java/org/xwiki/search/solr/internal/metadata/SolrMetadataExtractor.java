@@ -46,7 +46,7 @@ public interface SolrMetadataExtractor
      * @throws SolrIndexException if problems occur.
      * @throws IllegalArgumentException if the passed reference is not supported by the current implementation.
      */
-    SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    SizedSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
         IllegalArgumentException;
 
     /**

@@ -19,7 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -31,7 +30,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -262,40 +260,60 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     {
         // To improve performance, we group contiguous index or delete operations and issue them only when a
         // different type of operation is encountered.
-        List<SolrInputDocument> solrDocumentsToIndex = new LinkedList<SolrInputDocument>();
-        List<String> solrDocumentIDsToDelete = new LinkedList<String>();
+        List<SolrInputDocument> documentsToIndex = new LinkedList<SolrInputDocument>();
+        List<String> documentIDsToDelete = new LinkedList<String>();
 
         IndexQueueEntry batchEntry = queueEntry;
         IndexQueueEntry previousBatchEntry = null;
+
         int length = 0;
+        int size = 0;
 
         for (; batchEntry != null; previousBatchEntry = batchEntry, batchEntry = this.indexQueue.poll()) {
             EntityReference reference = batchEntry.reference;
             IndexOperation operation = batchEntry.operation;
 
-            try {
-                // Issue add/delete operations to the server in batches whenever the contiguity stops
-                length =
-                    checkBatch(previousBatchEntry, operation, length, solrDocumentsToIndex, solrDocumentIDsToDelete);
+            // Issue add/delete operations to the server in batches whenever the contiguity stops
+            checkContiguity(previousBatchEntry, operation, documentsToIndex, documentIDsToDelete);
 
-                // For the current contiguous operations queue, group the changes
+            // For the current contiguous operations queue, group the changes
+            try {
                 if (IndexOperation.INDEX.equals(operation)) {
                     LengthSolrInputDocument solrDocument = getSolrDocument(reference);
                     if (solrDocument != null) {
-                        solrDocumentsToIndex.add(solrDocument);
+                        documentsToIndex.add(solrDocument);
                         length += solrDocument.getLength();
+                        ++size;
                     }
                 } else if (IndexOperation.DELETE.equals(operation)) {
                     String id = getId(reference);
-                    solrDocumentIDsToDelete.add(id);
+                    documentIDsToDelete.add(id);
+                    ++size;
                 }
             } catch (Exception e) {
                 this.logger.error("Failed to process entity [{}] for the [{}] operation", reference, operation, e);
             }
+
+            // Commit the index changes so that they become available to queries. This is a costly operation and that is
+            // the reason why we perform it at the end of the batch.
+            if (shouldCommit(operation, length, size)) {
+                commit();
+                length = 0;
+                size = 0;
+            }
         }
 
-        // Commit the index changes so that they become available to queries. This is a costly operation and that is
-        // the reason why we perform it at the end of the batch.
+        // Commit what's left
+        if (size > 0) {
+            commit();
+        }
+    }
+
+    /**
+     * Commit.
+     */
+    private void commit()
+    {
         try {
             this.solrInstanceProvider.commit();
         } catch (Exception e) {
@@ -311,69 +329,54 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
-     * Check various constraints to know if the batch should be sent.
+     * Check various constraints to know if the batch should be committed.
      * 
-     * @param previousOperation the previous operation
      * @param operation the current operation
      * @param length the current length
-     * @param solrDocumentsToIndex the documents stored for {@link IndexOperation#INDEX}
-     * @param solrDocumentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
+     * @param size the current size
      * @return true if the batch should be sent
      */
-    private boolean shouldSendBatch(IndexOperation previousOperation, IndexOperation operation, int length,
-        List<SolrInputDocument> solrDocumentsToIndex, List<String> solrDocumentIDsToDelete)
+    private boolean shouldCommit(IndexOperation operation, int length, int size)
     {
-        // 1) If previous operation is different
-        // 2) If the length is above the configured maximum
-        if (operation != previousOperation || length >= this.configuration.getIndexerBatchMaxLengh()) {
+        // If the length is above the configured maximum
+        if (length >= this.configuration.getIndexerBatchMaxLengh()) {
             return true;
         }
 
-        // 3) If the size is above the configured maximum
-        int maxSize = this.configuration.getIndexerBatchSize();
-
-        return solrDocumentsToIndex.size() >= maxSize || solrDocumentIDsToDelete.size() >= maxSize;
+        // If the size is above the configured maximum
+        return size >= this.configuration.getIndexerBatchSize();
     }
 
     /**
-     * Check various limits and send the current batch if needed.
-     * 
      * @param previousBatchEntry the previous batch entry
      * @param operation the current operation
-     * @param length the current length
      * @param documentsToIndex the documents stored for {@link IndexOperation#INDEX}
      * @param documentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
-     * @return the current size
-     * @throws SolrServerException when fail to apply operation
-     * @throws IOException when fail to apply operation
      */
-    private int checkBatch(IndexQueueEntry previousBatchEntry, IndexOperation operation, int length,
-        List<SolrInputDocument> documentsToIndex, List<String> documentIDsToDelete) throws SolrServerException,
-        IOException
+    private void checkContiguity(IndexQueueEntry previousBatchEntry, IndexOperation operation,
+        List<SolrInputDocument> documentsToIndex, List<String> documentIDsToDelete)
     {
-        int newLength = length;
+        try {
+            if (previousBatchEntry != null) {
+                IndexOperation previousOperation = previousBatchEntry.operation;
 
-        if (previousBatchEntry != null) {
-            IndexOperation previousOperation = previousBatchEntry.operation;
+                if (previousOperation != operation) {
+                    if (IndexOperation.INDEX.equals(previousOperation)) {
+                        this.solrInstanceProvider.add(documentsToIndex);
 
-            if (shouldSendBatch(previousOperation, operation, newLength, documentsToIndex, documentIDsToDelete)) {
-                if (IndexOperation.INDEX.equals(previousOperation)) {
-                    this.solrInstanceProvider.add(documentsToIndex);
+                        // Clear the just processed contiguous inner-batch.
+                        documentsToIndex.clear();
+                    } else if (IndexOperation.DELETE.equals(previousOperation)) {
+                        this.solrInstanceProvider.delete(documentIDsToDelete);
 
-                    // Clear the just processed contiguous inner-batch.
-                    documentsToIndex.clear();
-                    newLength = 0;
-                } else if (IndexOperation.DELETE.equals(previousOperation)) {
-                    this.solrInstanceProvider.delete(documentIDsToDelete);
-
-                    // Clear the just processed contiguous inner-batch.
-                    documentIDsToDelete.clear();
-                    newLength = 0;
+                        // Clear the just processed contiguous inner-batch.
+                        documentIDsToDelete.clear();
+                    }
                 }
             }
+        } catch (Exception e) {
+            this.logger.error("Failed to add/delete entities", e);
         }
-
-        return newLength;
     }
 
     /**

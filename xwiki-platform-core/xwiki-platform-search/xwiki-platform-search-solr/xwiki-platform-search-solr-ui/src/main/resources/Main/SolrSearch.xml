@@ -738,10 +738,8 @@ blockquote.search-result-highlight {
     &lt;/div&gt;
     &lt;div class="search-bar"&gt;
       &lt;label class="hidden" for="searchQuery"&gt;$services.localization.render('search.page.bar.query.label')&lt;/label&gt;
-      &lt;input type="text" id="searchQuery" name="text" class="search-query"
-        placeholder="$services.localization.render('search.page.bar.query.tip')"
-        title="$services.localization.render('search.page.bar.query.title')"
-        value="$escapetool.xml($text)"/&gt;##
+      &lt;input type="text" id="searchQuery" name="text" class="search-query withTip useTitleAsTip"
+        title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;##
       &lt;span class="buttonwrapper"&gt;##
         &lt;input type="submit" value="$services.localization.render('search.page.bar.submit')"
           class="button" title="$services.localization.render('search.page.bar.submit.title')" /&gt;

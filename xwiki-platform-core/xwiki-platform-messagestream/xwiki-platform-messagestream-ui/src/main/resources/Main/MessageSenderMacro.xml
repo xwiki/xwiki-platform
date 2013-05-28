@@ -643,8 +643,8 @@ return XWiki;
           &lt;/label&gt;
           &lt;label for="targetName$!{targetNameCounter}"&gt;
             &lt;span class='hidden'&gt;Name:&lt;/span&gt;
-            &lt;input type="text" name="targetName" id="targetName$!targetNameCounter" class="targetName" value="$!targetName" size="15"
-              placeholder="$services.localization.render('xe.activity.messages.visibility.targetName.tip')" #if ($inEditMode) disabled="disabled"#end/&gt;
+            &lt;input type="text" name="targetName" id="targetName$!targetNameCounter" class="targetName withTip useTitleAsTip" value="$!targetName" size="15"
+              title="$services.localization.render('xe.activity.messages.visibility.targetName.tip')" #if ($inEditMode) disabled="disabled"#end/&gt;
           &lt;/label&gt;
           #if (!$targetNameCounter)
             #set ($targetNameCounter = 1)

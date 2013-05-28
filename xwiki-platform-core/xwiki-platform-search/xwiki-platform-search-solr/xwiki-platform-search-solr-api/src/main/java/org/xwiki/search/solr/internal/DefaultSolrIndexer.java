@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -153,7 +154,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * Communication with the Solr instance.
      */
     @Inject
-    private SolrInstance solrInstanceProvider;
+    private Provider<SolrInstance> solrInstanceProvider;
 
     /**
      * Extract contained indexable references.
@@ -314,13 +315,15 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      */
     private void commit()
     {
+        SolrInstance solrInstance = this.solrInstanceProvider.get();
+
         try {
-            this.solrInstanceProvider.commit();
+            solrInstance.commit();
         } catch (Exception e) {
             this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);
 
             try {
-                this.solrInstanceProvider.rollback();
+                solrInstance.rollback();
             } catch (Exception ex) {
                 // Just log the failure.
                 this.logger.error("Failed to rollback index changes.", ex);
@@ -358,16 +361,18 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     {
         try {
             if (previousBatchEntry != null) {
+                SolrInstance solrInstance = this.solrInstanceProvider.get();
+
                 IndexOperation previousOperation = previousBatchEntry.operation;
 
                 if (previousOperation != operation) {
                     if (IndexOperation.INDEX.equals(previousOperation)) {
-                        this.solrInstanceProvider.add(documentsToIndex);
+                        solrInstance.add(documentsToIndex);
 
                         // Clear the just processed contiguous inner-batch.
                         documentsToIndex.clear();
                     } else if (IndexOperation.DELETE.equals(previousOperation)) {
-                        this.solrInstanceProvider.delete(documentIDsToDelete);
+                        solrInstance.delete(documentIDsToDelete);
 
                         // Clear the just processed contiguous inner-batch.
                         documentIDsToDelete.clear();

@@ -23,13 +23,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -90,6 +90,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Inject
     protected DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
+
     @Override
     public String getId(EntityReference reference) throws SolrIndexException
     {
@@ -101,21 +107,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     /**
-     * @return the XWikiContext
-     */
-    protected XWikiContext getXWikiContext()
-    {
-        ExecutionContext executionContext = this.execution.getContext();
-        XWikiContext context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        // FIXME: Do we need this? Maybe when running an index Thread?
-        // if (context == null) {
-        // context = this.contextProvider.createStubContext();
-        // executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
-        // }
-        return context;
-    }
-
-    /**
      * Utility method.
      * 
      * @param documentReference reference to a document.
@@ -124,8 +115,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      */
     protected XWikiDocument getDocument(DocumentReference documentReference) throws XWikiException
     {
-        XWikiContext context = getXWikiContext();
-        XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
         return document;
     }
@@ -142,7 +134,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         try {
             XWikiDocument document = getDocument(documentReference);
             XWikiDocument translatedDocument =
-                document.getTranslatedDocument(documentReference.getLocale(), getXWikiContext());
+                document.getTranslatedDocument(documentReference.getLocale(), this.xcontextProvider.get());
             return translatedDocument;
         } catch (Exception e) {
             throw new SolrIndexException(
@@ -219,9 +211,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         String fieldName = String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, language);
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
-        BaseClass xClass = object.getXClass(context);
+        BaseClass xClass = object.getXClass(xcontext);
 
         for (Object field : object.getFieldList()) {
             BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) field;

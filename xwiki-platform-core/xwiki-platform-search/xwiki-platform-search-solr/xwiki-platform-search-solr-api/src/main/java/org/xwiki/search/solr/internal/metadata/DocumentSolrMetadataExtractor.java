@@ -65,7 +65,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
             SolrInputDocument solrDocument = new SolrInputDocument();
@@ -83,7 +83,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             renderer.render(translatedDocument.getXDOM(), printer);
 
             // Same for document title
-            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, context);
+            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
             // Get the rendered plain text title.
             solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, language), plainTitle);
@@ -93,9 +93,9 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             // Get both serialized user reference string and pretty user name (first_name last_name).
             String authorString = serializer.serialize(translatedDocument.getAuthorReference());
-            String authorDisplayString = context.getWiki().getUserName(authorString, null, false, context);
+            String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
             String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
-            String creatorDisplayString = context.getWiki().getUserName(creatorString, null, false, context);
+            String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
 
             solrDocument.addField(Fields.AUTHOR, authorString);
             solrDocument.addField(Fields.AUTHOR_DISPLAY, authorDisplayString);

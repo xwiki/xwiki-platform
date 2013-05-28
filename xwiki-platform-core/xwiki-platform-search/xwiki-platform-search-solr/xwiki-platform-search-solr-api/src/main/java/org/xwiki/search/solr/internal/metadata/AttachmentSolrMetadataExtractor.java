@@ -89,7 +89,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Get all the languages in which the document is available.
-        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
+        List<String> documentLanguages = originalDocument.getTranslationList(this.xcontextProvider.get());
         // Make sure that the original document's language is there as well.
         String originalDocumentLanguage = getLanguage(documentReference);
         if (!documentLanguages.contains(originalDocumentLanguage)) {
@@ -131,14 +131,17 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
             Metadata metadata = new Metadata();
             metadata.set(Metadata.RESOURCE_NAME_KEY, attachment.getName());
 
-            InputStream in = documentAccessBridge.getAttachmentContent(attachment);
+            InputStream in = this.documentAccessBridge.getAttachmentContent(attachment);
 
-            String result = StringUtils.lowerCase(tika.parseToString(in, metadata));
+            try {
+                String result = StringUtils.lowerCase(tika.parseToString(in, metadata));
 
-            return result;
+                return result;
+            } finally {
+                in.close();
+            }
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to retrieve attachment content for '%s'", attachment),
-                e);
+            throw new SolrIndexException(String.format("Failed to retrieve attachment content for '%s'", attachment), e);
         }
     }
 
@@ -148,7 +151,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
      */
     protected String getMimeType(AttachmentReference reference)
     {
-        String mimetype = getXWikiContext().getEngineContext().getMimeType(reference.getName().toLowerCase());
+        String mimetype = this.xcontextProvider.get().getEngineContext().getMimeType(reference.getName().toLowerCase());
         if (mimetype != null) {
             return mimetype;
         } else {

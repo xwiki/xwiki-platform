@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,9 +27,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -91,6 +92,11 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
+     * Stop indexing thread.
+     */
+    private static final IndexQueueEntry STOP = new IndexQueueEntry(null, IndexOperation.STOP);
+
+    /**
      * Logging framework.
      */
     @Inject
@@ -112,7 +118,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * Communication with the Solr instance.
      */
     @Inject
-    private Provider<SolrInstance> solrInstanceProvider;
+    private SolrInstance solrInstanceProvider;
 
     /**
      * Extract contained indexable references.
@@ -157,6 +163,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         // Empty the queue
         this.indexOperationsQueue.clear();
 
+        this.indexOperationsQueue.add(STOP);
+
         // Wait until the thread actually die
         try {
             this.indexThread.join();
@@ -168,16 +176,21 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     @Override
     protected void runInternal()
     {
+        this.logger.debug("Start indexer thread");
+
         while (!Thread.interrupted()) {
             // Block until there is at least one entry in the queue
             IndexQueueEntry queueEntry = null;
             try {
                 queueEntry = this.indexOperationsQueue.take();
             } catch (InterruptedException e) {
-                // Stop and pass the interrupt to the current thread.
-                Thread.currentThread().interrupt();
+                this.logger.warn("The thread has been interrupted", e);
 
-                return;
+                queueEntry = STOP;
+            }
+
+            if (queueEntry == STOP) {
+                break;
             }
 
             // Add to the batch until either the batch size is achieved or the queue gets emptied
@@ -200,6 +213,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             // Process the current batch
             processBatch(batchList);
         }
+
+        this.logger.debug("Stop indexer thread");
     }
 
     /**
@@ -210,13 +225,12 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      */
     private void processBatch(List<IndexQueueEntry> batchList)
     {
-        SolrInstance solrInstance = this.solrInstanceProvider.get();
-
         // To improve performance, we group contiguous index or delete operations and issue them only when a
         // different type of operation is encountered.
-        List<SolrInputDocument> solrDocumentsToAdd = new ArrayList<SolrInputDocument>();
+        List<SolrInputDocument> solrDocumentsToIndex = new ArrayList<SolrInputDocument>();
         List<String> solrDocumentIDsToDelete = new ArrayList<String>();
-        IndexOperation previousOperation = null;
+
+        IndexQueueEntry previousBatchEntry = null;
 
         for (IndexQueueEntry batchEntry : batchList) {
             EntityReference reference = batchEntry.reference;
@@ -224,27 +238,13 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
             try {
                 // Issue add/delete operations to the server in batches whenever the contiguity stops
-                if (previousOperation != null && !operation.equals(previousOperation)) {
-                    if (IndexOperation.INDEX.equals(previousOperation)) {
-                        solrInstance.add(solrDocumentsToAdd);
-
-                        // Clear the just processed contiguous inner-batch.
-                        solrDocumentsToAdd.clear();
-                    } else if (IndexOperation.DELETE.equals(previousOperation)) {
-                        solrInstance.delete(solrDocumentIDsToDelete);
-
-                        // Clear the just processed contiguous inner-batch.
-                        solrDocumentIDsToDelete.clear();
-                    }
-
-                    // Start of a new contiguous operation batch.
-                }
+                checkContiguity(previousBatchEntry, operation, solrDocumentsToIndex, solrDocumentIDsToDelete);
 
                 // For the current contiguous operations queue, group the changes
                 if (IndexOperation.INDEX.equals(operation)) {
                     SolrInputDocument solrDocument = getSolrDocument(reference);
                     if (solrDocument != null) {
-                        solrDocumentsToAdd.add(solrDocument);
+                        solrDocumentsToIndex.add(solrDocument);
                     }
                 } else if (IndexOperation.DELETE.equals(operation)) {
                     String id = getId(reference);
@@ -254,21 +254,54 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                 this.logger.error("Failed to process entity [{}] for the [{}] operation", reference, operation, e);
             }
 
-            previousOperation = operation;
+            previousBatchEntry = batchEntry;
         }
 
         // Commit the index changes so that they become available to queries. This is a costly operation and that is
         // the reason why we perform it at the end of the batch.
         try {
-            solrInstance.commit();
+            this.solrInstanceProvider.commit();
         } catch (Exception e) {
             this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);
 
             try {
-                solrInstance.rollback();
+                this.solrInstanceProvider.rollback();
             } catch (Exception ex) {
                 // Just log the failure.
                 this.logger.error("Failed to rollback index changes.", ex);
+            }
+        }
+    }
+
+    /**
+     * @param previousBatchEntry the previous batch entry
+     * @param operation the current operation
+     * @param solrDocumentsToIndex the documents stored for {@link IndexOperation#INDEX}
+     * @param solrDocumentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
+     * @throws SolrServerException when fail to apply operation
+     * @throws IOException when fail to apply operation
+     */
+    private void checkContiguity(IndexQueueEntry previousBatchEntry, IndexOperation operation,
+        List<SolrInputDocument> solrDocumentsToIndex, List<String> solrDocumentIDsToDelete) throws SolrServerException,
+        IOException
+    {
+        if (previousBatchEntry != null) {
+            IndexOperation previousOperation = previousBatchEntry.operation;
+
+            // 1) If previous operation is different
+            // 2) If previous entry is an attachment send it right away to be safer regarding memory
+            if (operation != previousOperation || previousBatchEntry.reference.getType() == EntityType.ATTACHMENT) {
+                if (IndexOperation.INDEX.equals(previousOperation)) {
+                    this.solrInstanceProvider.add(solrDocumentsToIndex);
+
+                    // Clear the just processed contiguous inner-batch.
+                    solrDocumentsToIndex.clear();
+                } else if (IndexOperation.DELETE.equals(previousOperation)) {
+                    this.solrInstanceProvider.delete(solrDocumentIDsToDelete);
+
+                    // Clear the just processed contiguous inner-batch.
+                    solrDocumentIDsToDelete.clear();
+                }
             }
         }
     }

@@ -93,7 +93,7 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Get all the languages in which the document is available.
-        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
+        List<String> documentLanguages = originalDocument.getTranslationList(this.xcontextProvider.get());
         // Make sure that the original document's language is there as well.
         String originalDocumentLanguage = getLanguage(documentReference);
         if (!documentLanguages.contains(originalDocumentLanguage)) {

@@ -57,7 +57,7 @@ RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceRe
 CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvider.class,
 CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
 DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class, DefaultExecution.class})
-public class DefaultSolrIndexTest
+public class DefaultSolrIndexerTest
 {
     @Rule
     public final MockitoComponentMockingRule<SolrIndexer> mocker = new MockitoComponentMockingRule<SolrIndexer>(

@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
@@ -94,9 +95,43 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
+     * Extract children references from passed references and dispatch them to the index queue.
+     * 
+     * @version $Id$
+     */
+    private class Resolver extends Thread
+    {
+        @Override
+        public void run()
+        {
+            logger.debug("Start SOLR resolver thread");
+
+            while (!Thread.interrupted()) {
+                IndexQueueEntry queueEntry = resolveQueue.poll();
+
+                if (queueEntry == QUEUE_ENTRY_STOP) {
+                    break;
+                }
+
+                try {
+                    List<EntityReference> references = indexableReferenceExtractor.getReferences(queueEntry.reference);
+
+                    for (EntityReference reference : references) {
+                        indexQueue.offer(new IndexQueueEntry(reference, queueEntry.operation));
+                    }
+                } catch (Throwable e) {
+                    logger.warn("Failed to index root reference [{}]", queueEntry.reference, e);
+                }
+            }
+
+            logger.debug("Stop SOLR resolver thread");
+        }
+    }
+
+    /**
      * Stop indexing thread.
      */
-    private static final IndexQueueEntry STOP = new IndexQueueEntry(null, IndexOperation.STOP);
+    private static final IndexQueueEntry QUEUE_ENTRY_STOP = new IndexQueueEntry(null, IndexOperation.STOP);
 
     /**
      * Logging framework.
@@ -131,12 +166,22 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     /**
      * The queue of index operation to perform.
      */
-    private BlockingQueue<IndexQueueEntry> indexOperationsQueue;
+    private BlockingQueue<IndexQueueEntry> indexQueue;
+
+    /**
+     * The queue of resolve references and add them to the index queue.
+     */
+    private ConcurrentLinkedQueue<IndexQueueEntry> resolveQueue;
 
     /**
      * Thread in which the indexUpdater will be executed.
      */
     private Thread indexThread;
+
+    /**
+     * Thread in which the provided references children will be resolved.
+     */
+    private Thread resolveThread;
 
     /**
      * Indicate of the component has been disposed.
@@ -146,14 +191,19 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     @Override
     public void initialize() throws InitializationException
     {
+        // Launch the resolve thread that runs the indexUpdater.
+        this.resolveThread = new Resolver();
+        this.resolveThread.start();
+        this.resolveThread.setPriority(Thread.NORM_PRIORITY - 1);
+
         // Launch the index thread that runs the indexUpdater.
         this.indexThread = new Thread(this);
         this.indexThread.start();
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
 
         // Initialize the queue
-        this.indexOperationsQueue =
-            new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
+        this.resolveQueue = new ConcurrentLinkedQueue<IndexQueueEntry>();
+        this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
     }
 
     @Override
@@ -163,9 +213,9 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         this.disposed = true;
 
         // Empty the queue
-        this.indexOperationsQueue.clear();
+        this.indexQueue.clear();
 
-        this.indexOperationsQueue.add(STOP);
+        this.indexQueue.add(QUEUE_ENTRY_STOP);
 
         // Wait until the thread actually die
         try {
@@ -178,20 +228,20 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     @Override
     protected void runInternal()
     {
-        this.logger.debug("Start indexer thread");
+        this.logger.debug("Start SOLR indexer thread");
 
         while (!Thread.interrupted()) {
             // Block until there is at least one entry in the queue
             IndexQueueEntry queueEntry = null;
             try {
-                queueEntry = this.indexOperationsQueue.take();
+                queueEntry = this.indexQueue.take();
             } catch (InterruptedException e) {
-                this.logger.warn("The thread has been interrupted", e);
+                this.logger.warn("The SOLR index thread has been interrupted", e);
 
-                queueEntry = STOP;
+                queueEntry = QUEUE_ENTRY_STOP;
             }
 
-            if (queueEntry == STOP) {
+            if (queueEntry == QUEUE_ENTRY_STOP) {
                 break;
             }
 
@@ -199,7 +249,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             processBatch(queueEntry);
         }
 
-        this.logger.debug("Stop indexer thread");
+        this.logger.debug("Stop SOLR indexer thread");
     }
 
     /**
@@ -219,7 +269,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         IndexQueueEntry previousBatchEntry = null;
         int length = 0;
 
-        for (; batchEntry != null; previousBatchEntry = batchEntry, batchEntry = this.indexOperationsQueue.poll()) {
+        for (; batchEntry != null; previousBatchEntry = batchEntry, batchEntry = this.indexQueue.poll()) {
             EntityReference reference = batchEntry.reference;
             IndexOperation operation = batchEntry.operation;
 
@@ -409,45 +459,34 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * 
      * @param references the references to add
      * @param operation the operation to assign to the given references
-     * @throws SolrIndexException when failed to resolve passed references
      */
-    private void addToQueue(List<EntityReference> references, IndexOperation operation) throws SolrIndexException
+    private void addToQueue(List<EntityReference> references, IndexOperation operation)
     {
         if (!this.disposed) {
-            // Build the list of references to index directly
-            List<EntityReference> indexableReferences = getUniqueIndexableEntityReferences(references);
-
-            for (EntityReference reference : indexableReferences) {
-                this.indexOperationsQueue.add(new IndexQueueEntry(reference, operation));
+            for (EntityReference reference : references) {
+                this.resolveQueue.add(new IndexQueueEntry(reference, operation));
             }
         }
     }
 
     /**
-     * @param startReferences the references from where to start the search from.
+     * @param reference the reference from where to start the search.
      * @return the unique list of indexable references starting from each of the input start references.
      * @throws SolrIndexException if problems occur.
      */
-    protected List<EntityReference> getUniqueIndexableEntityReferences(List<EntityReference> startReferences)
+    protected List<EntityReference> getUniqueIndexableEntityReferences(EntityReference reference)
         throws SolrIndexException
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
 
-        for (EntityReference reference : startReferences) {
-            // Avoid duplicates
-            if (result.contains(reference)) {
+        List<EntityReference> containedReferences = this.indexableReferenceExtractor.getReferences(reference);
+        for (EntityReference containedReference : containedReferences) {
+            // Avoid duplicates again
+            if (result.contains(containedReference)) {
                 continue;
             }
 
-            List<EntityReference> containedReferences = this.indexableReferenceExtractor.getReferences(reference);
-            for (EntityReference containedReference : containedReferences) {
-                // Avoid duplicates again
-                if (result.contains(containedReference)) {
-                    continue;
-                }
-
-                result.add(containedReference);
-            }
+            result.add(containedReference);
         }
 
         return result;

@@ -1,0 +1,1040 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntax</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1203507376000</creationDate>
+  <date>1253107969000</date>
+  <contentUpdateDate>1253107969000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWiki Syntaxes</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <attachment>
+    <filename>img.png</filename>
+    <filesize>959</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1238497750000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAAAAADgE0Q3AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfWBxcOEy+3/bdlAAADUElEQVRIx52WTW/cVBSG32tfezxJZiaT0EwnCkVKgVZI3cFAVYkFLEFCKoI/wz9Bgh/ApqqEWLQLFmUHAtJKqKIqMKhSJ50R+aCTTHzPey4L2/PVIru9C8u6Po/f83XtYzxefAUvwcACAMZPjrXc1gfJVm0VgPHA+HCQGmOMKcfQ6jYypeO/jQ1tWAGCng1sHRY4ehzYuBbUwzIojb1nOkmMBf5xNonW46iCUhoxPY3WLPBvEK826lFQAUq8xhawgNrE1muBqZJsFwVQWMAE8Vq0xIxv7a+rjhN38Z3Ezu3HQORgPO6G7VYSLjD9Gx92SJK8e//z15KFF3qJAgBmOZz+d5+ec8455+TSe18/mCw8NEAAPFvXGx9Z55yIiHPr79/suwq9d+fd0ImIc86JuFbrx5EvhwY7LndORCS9uPfo7HkNu7goQiWZXWhOn5wmpZB3M4JK6kTKleAKHVGSozAMKkCS6YiSSh4mjbiyUu4b03qjVpq98eMs3yLihCKj+lpUqvRzV0hRKkmlsjV8epaUKR2tO+co4kQoItJ1fx2Vutc9dCJ5F4mI7FPKO2JrNI+IjNrbjVLovP81s6aIk8HoaXc7KYXsZ40D5hhl8OjC5XNhKWQ2r0ym7k2423urgfLixu2sGZTKk/obVzq2AgRkZVKqnq502hZVoFcPEyU9VVVXl3vo//4aTVJIISmTqBaiktKBcapUVVXWrKkGfdNkjmhkjDcVoOGXJioYjf54uL1iyqDht7+3QdUsD/TRzb2Pdxc/lzAe9+xGM9/t//bLSQuFilIzsvN275VZaC6ag/o//MkVy4Iorqr0Pn7zg0tJsAyN7txn02R29My8o5+iCC/0crkCSm/3NyLmZizc0iIyVQAIbOdarxMUUP2r8wHpqXO+Kf0UmZ7BcOuLTbjIAsDDDQinxpr7VUQ2d2w5fLBZpHzsnV8MfuagLhx1OZjWSZpHupjnWUyLVdxJ84Y1uPa6kJSsRUmhZvdcZnD1kxyqAX6XuX1mKxSKyDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm+QsNjAcwUSSm2vBhYTIlAGk1xmQzinmZcfQ/40v+ffqYGLoAAAAASUVORK5CYII=</content>
+  </attachment>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.XWikiSyntax</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>5164c7fb-18e0-4164-b970-893bd212bf11</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/* Firefox panics when it has an overflowing table but the content is pre-formatted. */
+tbody&gt;tr&gt;td&gt;tt {
+    white-space: normal !important;
+}</code>
+    </property>
+    <property>
+      <name>FF_table_fix</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity}}$xwiki.get('ssx').use($doc.getFullName()){{/velocity}}
+
+{{box cssClass="floatinginfobox" title="**Contents**"}}
+{{toc depth="1"/}}
+{{/box}}
+
+Starting with XWiki Enterprise version 1.7 we've introduced a new wiki syntax. We've named the old syntax the //XWiki Syntax 1.0// and the new syntax was logically called the //XWiki Syntax 2.0//. The main reasons for introducing the new syntax were:
+* Fix the limitations and ambiguities of the XWiki Syntax 1.0 (which was inspired by both Radeox - the underlying rendering engine - and TWiki).
+** Not optimal symbols. For example the symbol for bold was single stars. This was causing trouble when users were entering text containing stars since that text was mistakenly considered to be bold when it wasn't. Hence we've rationalized the syntax by using at least double characters everywhere. 
+** Ambiguities. For example there was an ambiguity between a bold item starting a line and a bulletted list. Resolving the ambiguities was required in order to rewrite the WYSIWYG editor so that it could be deterministic.
+* Be closer to the [[Creole 1.0 syntax&gt;&gt;http://www.wikicreole.org/]] which is becoming a standard for wiki syntax. In addition the Creole community has taken the time to analyze all the existing wiki syntaxes before deciding on symbols. The choices made are thus very good.
+
+Since the introduction of XWiki Syntax 2.0 a few shortcomings of this syntax have been found. To fix these a new, as of now //experimental//, XWiki Syntax 2.1 was introduced in XWiki Enterprise version 3.0. Some reason for the development of this new syntax are:
+* Homogenize the link and image syntax for better clarity, consistency and extensibility.
+* Added ability to display icons,  to link to files using the UNC notation and to link to relative URLs.
+
+{{info}}Since XWiki Syntax 2.1 is based on XWiki Syntax 2.0 all syntax from XWiki Syntax 2.0 is valid unless the 2.1 specifications suggest differently.{{/info}}
+
+In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;#syntaxes]].
+
+= General Remarks =
+
+XWiki Syntax 2.0 corrects some errors or ambiguous syntax entered by the user as shown in the examples in the table below.
+
+|=Description|=Example of invalid or ambiguous syntax|=Fixed XWiki Syntax 2.0
+|Unclosed text styles|{{{**bold}}}|{{{**bold**}}}
+|Two standalone elements not separated by 2 new lines|{{{| table cell}}}\\{{{* list item}}}|{{{| table cell}}}\\\\{{{* list item}}}
+|Two standalone elements not separated by 2 new lines|{{{paragraph}}}\\{{{----}}}\\{{{paragraph}}}|{{{paragraph}}}\\\\{{{----}}}\\\\{{{paragraph}}}
+|Ignored new line at beginning of document|&lt;new line at beginning of document&gt;\\paragraph|paragraph
+|Not closed heading syntax|{{{=== heading}}}|{{{=== heading ===}}}
+
+= Paragraphs =
+
+Paragraphs are text elements separated by 2 or more new lines.
+
+{{info}}
+In XWiki Syntax 2.0 new lines are honored which is not the case in XWiki Syntax 1.0 and in Creole Syntax.
+{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result XWiki Syntax 1.0|=Result XWiki Syntax 2.0
+|Simple paragraph|This is a paragraph|This is a paragraph|This is a paragraph|This is a paragraph
+|Paragraph on multiple lines|Paragraph on{{{\\}}}\\multiple lines|Paragraph on\\multiple lines|Paragraph on\\multiple lines|Paragraph on\\multiple lines
+|Two paragraphs|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two
+|Parametrized paragraph|&lt;p style="text-align:center;color:blue"&gt;Centered and blue paragraph&lt;/p&gt;|{{{(% style="text-align:center;color:blue" %)}}}\\Centered and blue paragraph|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph
+
+= Headings =
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Standard headings|(((
+1 level 1
+1.1 level 2
+1.1.1 level 3
+1.1.1.1 level 4
+1.1.1.1.1 level 5
+1.1.1.1.1.1 level 6
+)))|((({{{
+= level 1 = 
+== level 2 ==
+=== level 3 ===
+==== level 4 ====
+===== level 5 =====
+====== level 6 ======
+}}})))|(((
+{{html}}
+&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
+&lt;h1 id="Hlevel1"&gt;&lt;span&gt;level 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;level 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;level 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;level 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;level 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;level 6&lt;/span&gt;&lt;/h6&gt;
+{{/html}})))
+|Parametrized headings|&lt;h1&gt;&lt;span style="color:blue"&gt;heading&lt;/span&gt;&lt;/h1&gt;|{{{(% style="color:blue" %)}}}\\= heading =|(((
+{{html}}
+&lt;h1 id="Hheading" style="color:blue"&gt;&lt;span&gt;heading&lt;/span&gt;&lt;/h1&gt;
+{{/html}})))
+|Headings with XWiki Syntax|1.1.1 Heading with *bold*|{{{=== Heading with **bold** ===}}}|(((=== Heading with **bold** ===)))
+
+= Text Formatting =
+
+{{info}}
+New in XWiki Syntax 2.0 over XWiki Syntax 1.0:
+* Spaces are allowed just after the syntax symbols (for example in XWiki Syntax 1.0, this was not possible: * bold *).
+* Use double symbols when there was only a single symbol in XWiki Syntax 1.0 so that it's less likely that the user will mistakenly use them in text.
+* Ability to span several lines (wasn't possible in XWiki Syntax 1.0).
+{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Bold|{{{*bold*}}}|{{{**bold**}}}|**bold**
+|Underline|{{{__underline___}}}|{{{__underline__}}}|__underline__
+|Italics|{{{~~italic~~}}}|{{{//italic//}}}|//italic//
+|Striked out|{{{--strike--}}}|{{{--strike--}}}|--strike--
+|Monospace|&lt;tt&gt;monospace&lt;/tt&gt;|{{{##monospace##}}}|##monospace##
+|Superscript|some &lt;sup&gt;superscript&lt;/sup&gt;|{{{some ^^superscript^^}}}|some ^^superscript^^
+|Subscript|some &lt;sub&gt;subscript&lt;/sub&gt;|{{{some ,,subscript,,}}}|some ,,subscript,,
+
+= Horizontal Line =
+
+{{info}}There must be 4 or more dashes.{{/info}}
+
+{{info}}Note that this is different from Creole where exactly 4 dashes are required.{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Simple horizontal line|{{{----}}}|{{{----}}}|(((----)))
+|Parametrized horizontal line|&lt;hr style="color:blue"/&gt;|((({{{
+(% style="color:blue" %)
+----
+}}})))|(((
+(% style="color:blue" %)
+----
+)))
+
+= Lists =
+
+{{info}}Some of the mentioned styles do not work on all browsers. For a comprehensive list follow [[this link&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Bulleted list|((({{{
+* item 1
+** item 2
+*** item 3
+* item 4
+}}})))|((({{{
+* item 1
+** item 2
+*** item 3
+* item 4
+}}})))|(((
+* item 1
+** item 2
+*** item 3
+* item 4
+)))
+|Numbered list|((({{{
+1. item 1
+11. item 2
+111. item 3
+1. item 4
+}}})))|((({{{
+1. item 1
+11. item 2
+111. item 3
+1. item 4
+}}})))|(((
+1. item 1
+11. item 2
+111. item 3
+1. item 4
+)))
+|Mixed list|((({{{
+1. item 1
+1*. item 2
+1*. item 3
+1. item 4
+}}})))|((({{{
+1. item 1
+1*. item 2
+1*. item 3
+1. item 4
+}}})))|(((
+1. item 1
+1*. item 2
+1*. item 3
+1. item 4
+)))
+|Square list|((({{{
+- item 1
+- item 2
+}}})))|((({{{
+(% style="list-style-type: square" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: square" %)
+* item 1
+* item 2
+)))
+|Disc list|(((
+&lt;ul style="list-style-type: disc"&gt;
+  &lt;li&gt;item 1&lt;/li&gt;
+  &lt;li&gt;item 2&lt;/li&gt;
+&lt;/ul&gt;
+)))|((({{{
+(% style="list-style-type: disc" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: disc" %)
+* item 1
+* item 2
+)))
+|Lowercase Alphabetical list|((({{{
+a. item 1
+a. item 2
+}}})))|((({{{
+(% style="list-style-type: lower-alpha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* item 1
+* item 2
+)))
+|Uppercase Alphabetical list|((({{{
+A. item 1
+A. item 2
+}}})))|((({{{
+(% style="list-style-type: upper-alpha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* item 1
+* item 2
+)))
+|Lowercase Roman list|((({{{
+i. item 1
+i. item 2
+}}})))|((({{{
+(% style="list-style-type: lower-roman" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* item 1
+* item 2
+)))
+|Uppercase Roman list|((({{{
+I. item 1
+I. item 2
+}}})))|((({{{
+(% style="list-style-type: upper-roman" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* item 1
+* item 2
+)))
+|Lowercase Greek list|((({{{
+g. item 1
+g. item 2
+}}})))|((({{{
+(% style="list-style-type: lower-greek" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* item 1
+* item 2
+)))
+|Uppercase Greek list|((({{{
+G. item 1
+G. item 2
+}}})))|((({{{
+(% style="list-style-type: upper-greek" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* item 1
+* item 2
+)))
+|Hiragana list|((({{{
+h. item 1
+h. item 2
+}}})))|((({{{
+(% style="list-style-type: hiragana" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* item 1
+* item 2
+)))
+|Hiragana Iroah list|((({{{
+H. item 1
+H. item 2
+}}})))|((({{{
+(% style="list-style-type: hiragana-iroha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* item 1
+* item 2
+)))
+|Katakana list|((({{{
+k. item 1
+k. item 2
+}}})))|((({{{
+(% style="list-style-type: katakana" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* item 1
+* item 2
+)))
+|Katakana Iroha list|((({{{
+K. item 1
+K. item 2
+}}})))|((({{{
+(% style="list-style-type: katakana-iroha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* item 1
+* item 2
+)))
+|Armenian list|((({{{
+&lt;ul style="list-style-type: armenian"&gt;
+  &lt;li&gt;item 1&lt;/li&gt;
+  &lt;li&gt;item 2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|((({{{
+(% style="list-style-type: armenian" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* item 1
+* item 2
+)))
+|Hebrew list|((({{{
+j. item 1
+j. item 2
+}}})))|((({{{
+(% style="list-style-type: hebrew" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* item 1
+* item 2
+)))
+|Georgian list|((({{{
+&lt;ul style="list-style-type: georgian"&gt;
+  &lt;li&gt;item 1&lt;/li&gt;
+  &lt;li&gt;item 2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|((({{{
+(% style="list-style-type: georgian" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* item 1
+* item 2
+)))
+|CJK ideographic list|((({{{
+&lt;ul style="list-style-type: cjk-ideographic"&gt;
+  &lt;li&gt;item 1&lt;/li&gt;
+  &lt;li&gt;item 2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|((({{{
+(% style="list-style-type: cjk-ideographic" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* item 1
+* item 2
+)))
+
+= Definition Lists =
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Standard definition|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;term&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|((({{{
+; term
+: definition
+}}})))|(((
+; term
+: definition
+)))
+|Nested definitions|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;term 1&lt;/dt&gt;
+  &lt;dd&gt;definition 1
+    &lt;dl&gt;
+      &lt;dt&gt;term 2&lt;/dt&gt;
+      &lt;dd&gt;definition 2&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|((({{{
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+}}})))|(((
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+)))
+|Parametrized definition|((({{{
+&lt;dl style="color:blue"&gt;
+  &lt;dt&gt;term&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|((({{{
+(% style="color:blue" %)
+; term
+: definition
+}}})))|(((
+(% style="color:blue" %)
+; term
+: definition
+)))
+
+= New Line/Line breaks =
+
+A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
+
+{{info}}
+In XWiki Syntax 2.0 new lines are honored which is not the case in XWiki Syntax 1.0 and in Creole Syntax.
+{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result XWiki Syntax 1.0|=Result XWiki Syntax 2.0
+|Line break|{{{Line\\New line}}}|{{{Line\\New line}}}|Line\\New line|Line\\New line
+|New line|Line\\New line|Line\\New line|Line New line|Line\\New line
+
+= Links =
+
+(% style="width:100%;table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
+|=(% style="width:10%" %)Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=(% style="width:15%" %)Result XWiki Syntax 1.0|=(% style="width:15%" %)Result XWiki Syntax 2.0
+|Link to a page in the current Space|{{{[WebHome]}}}|{{{[[WebHome]]}}}|[[Web Home&gt;&gt;WebHome]]|[[WebHome]]
+|Link with a label|{{{[label&gt;WebHome]}}}|(((
+{{{[[label&gt;&gt;WebHome]]}}}
+{{info}}XWiki Syntax is supported inside link labels.{{/info}}
+)))|[[label&gt;&gt;WebHome]]|[[label&gt;&gt;WebHome]]
+|Link with XWiki Syntax in the label|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;bold label&lt;/strong&gt;&lt;/a&gt;}}}|{{{[[**bold label**&gt;&gt;WebHome]]}}}|[[**bold label**&gt;&gt;WebHome]]|[[**bold label**&gt;&gt;WebHome]]
+|Link to a page with the space specified|{{{[Main.WebHome]}}}|{{{[[Main.WebHome]]}}}|[[Web Home&gt;&gt;Main.WebHome]]|[[Main.WebHome]]
+|Link to a subwiki|{{{[subwiki:Main.WebHome]}}}|{{{[[subwiki:Main.WebHome]]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]|[[xwiki:Main.WebHome]]
+|Link that opens in a new window|{{{[label&gt;WebHome&gt;_blank]}}}|{{{[[label&gt;&gt;WebHome||rel="__blank"]]}}}|[[label&gt;&gt;WebHome||rel="__blank"]]|[[label&gt;&gt;WebHome||rel="__blank"]]
+|Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org|This is a URL: http://xwiki.org
+|Link to a URL|{{{[http://xwiki.org]}}}|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]|[[http://xwiki.org]]
+|Link to a URL with a label|{{{[XWiki&gt;http://xwiki.org]}}}|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]|[[XWiki&gt;&gt;http://xwiki.org]]
+|Link to an email address|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Image Link|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2}&lt;/a&gt;}}}|{{{[[image:Space2.Page2@img.png&gt;&gt;Space1.Page1]]}}}|[[image:img.png&gt;&gt;Main.WebHome]]|[[image:img.png&gt;&gt;Main.WebHome]]
+|Image Link with image parameters|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2|width=26|height=26}&lt;/a&gt;}}}|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]|[[[[image:img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Link to an attachment on the current page|(((
+{{info}}See [[Attach Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] for details{{/info}}
+{{{{attach:text|file=img.png}}}}
+)))|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:img.png]]|[[text&gt;&gt;attach:img.png]]
+|Link to an attachment in a different page|(((
+{{info}}See [[Attach Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] for details{{/info}}
+{{{{attach:text|document=Space.Page|file=img.png}}}}
+)))|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntax@img.png]]|[[text&gt;&gt;attach:XWiki.XWikiSyntax@img.png]]
+|Link to an Anchor in a page|{{{[label&gt;Space.Page#anchor]}}}|{{{[[label&gt;&gt;Space.Page#anchor]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax#HLinks]]|[[label&gt;&gt;XWiki.XWikiSyntax#HLinks]]
+|Link to a Heading in a page|(((
+{{info}}When you add a Heading, an anchor named "H" followed by the heading title with only alpha characters is created. For example, for a Heading named "My heading", the generated anchor will be "HMyheading".{{/info}}
+{{{[label&gt;Space.Page#HMyheading]}}}
+)))|{{{[[label&gt;&gt;Space.Page#HMyheading]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax#HLinks]]|[[label&gt;&gt;XWiki.XWikiSyntax#HLinks]]
+
+== XWiki Syntax 1.0 Link Specification ==
+
+{{info}}
+Part in ##( )## is required, parts in ##[ ]## are optional and one of the two chars in ##{ }## needs to be added if optional parts are being used.
+{{/info}}
+
+The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias] [{&gt; or |} target]##**
+
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. Example: ##My Page##
+* **##resource##**: The full link reference using the following syntax: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: The link reference. This can be either
+*** **A URI** in the form **##protocol:path##** (examples: ##http:~/~/xwiki.org##, ##mailto~:john@smith.com##), or
+*** **A wiki page** reference in the form **##~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
+**** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
+**** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
+* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
+* **##target##**: An optional string corresponding to the HTML ##target## attribute for a HTML ##A## link element. This element is used when rendering the link. It defaults to opening the link in the current window. Examples: ##_self##, ##_blank##
+
+== XWiki Syntax 2.0 Link Specification ==
+
+{{info}}
+The part in ##( )## is required, while the parts in ##[ ]## are optional.
+{{/info}}
+
+The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [||parameters]##**
+
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Example: ##My Page##
+* **##resource##**: The full link reference using the following syntax: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: The link reference in one of the following forms:
+*** **URL**: Any URL in the form of **##protocol:~/~/path##**. Examples: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
+*** **Wiki page name** reference in the form **##~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
+**** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
+**** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+*** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
+**** **##attach~:##**: A required string identifying the resource as attachment.
+**** **##wikiPageName##**: An optional string referencing the document that holds the attachment, see "Wiki page name" above.
+**** **##attachmentName##**: Name of the attachment as it is stored in the wiki.
+*** **Email address** in the form **##mailto~: (emailAddress)##** (###anchor## is not valid). Example: ##mailto~:john@smith.com##
+**** **##mailto~:##**: A required string identifying the resource as email.
+**** **##emailAddress##**: Targeted email address. Example: "##john@smith.com##"
+** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
+* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
+* **##parameters##**: An optional list of parameters passed to the link. Example: ##rel="~_~_blank"## (open in new window)
+
+== XWiki Syntax 2.1 Link Specification ==
+
+{{info}}
+The part in ##( )## is required, while the parts in ##[ ]## are optional.
+{{/info}}
+
+The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
+
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Example: ##My Page##
+* **##resource##**: A required string with the link reference in one of the following forms
+** **URL**: Any URL in the form of **##[url:] (protocol:~/~/path)##**. Examples: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
+*** **##url:##** An optional string identifying the resource as an URL.
+** **Wiki page name** reference in the form **##[doc:] ~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+*** **##doc:##** An optional string identifying the resource as an XWiki document.
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
+*** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
+*** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+** **InterWiki page name** reference in the form **##interwiki: {{{(interWikiAlias:)}}} (page)##**. Example: ##interwiki:wikipedia:XWiki##
+*** **##interwiki:##** A required string identifying the resource as an InterWiki link.
+*** **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Example: ##wikipedia##
+*** **##page##**: A required string containing the name of the linked page. Example: ##XWiki##
+** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
+*** **##attach~:##**: A required string identifying the resource as attachment.
+*** **##wikiPageName##**: An optional string referencing the document that holds the attachment, see "Wiki page name" above.
+*** **##attachmentName##**: Name of the attachment as it is stored in the wiki.
+** **Email address** in the form **##mailto~: (emailAddress)##** (###anchor## is not valid). Example: ##mailto~:john@smith.com##
+*** **##mailto~:##**: A required string identifying the resource as email.
+*** **##emailAddress##**: Targeted email address. Example: ##john@smith.com##
+** **Relative path** reference on the server in the form **##path: (relPath)##**. Example: ##path:$doc.getURL('reset')## produces target address ##http:~/~/server.domain.com/xwiki/bin/reset/Space/Page## where ##/xwiki/bin/reset/Space/Page## is produced by ##$doc.getURL('reset')##.
+*** **##path:##** A required string identifying the resource as a relative path.
+*** **##relPath##**: A required string containing the relative path of the resource on the server that shall be linked.
+** **UNC (Windows Explorer)** reference in the form **##unc: (path)##**. The link is rendered as a ##file:~/~/## link. Examples: ##unc:C:\Windows\##, ##unc:~\~\myserver\path\img.png##, ##unc:home/user/somefile##
+*** **##unc:##** A required string identifying the resource as a UNC (Windows Explorer) path.
+*** **##path##**: A required string containing the local path of resource accessible by the user. Examples: ##C:\Windows\##, ##~\~\myserver\path\img.png##, ##home/user/somefile##
+* **##parameters##**: An optional list of space-separated parameters passed to the link. Example: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" rel="~_~_blank"##
+** **##queryString##**: An optional query string for specifying parameters that will be appended to the link target address and used in the rendered URL. Example: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## produces target address ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##
+** **##rel##**: An optional parameter that allows to open link target in new window. Example: ##rel="~_~_blank"##
+
+= Tables =
+
+Allows to easily create content in table format. Parameters for table, row or cell are also supported in XWiki Syntax 2.0.
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Standard table|((({{{
+{table}
+Title 1 | Title 2
+Word 1 | Word 2
+{table}
+}}})))|((({{{
+|=Title 1|=Title 2
+|Word 1|Word 2
+}}}))) or ((({{{
+!=Title 1!=Title 2
+!!Word 1!!Word 2
+}}})))|(((
+|=Title 1|=Title 2
+|Word 1|Word 2
+)))
+|Parametrized table|(((
+&lt;table style="background-color:red;align:center"&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Title 1&lt;/td&gt;
+      &lt;td style="background-color:yellow"&gt;Title 2&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Word 1&lt;/td&gt;
+      &lt;td&gt;Word 2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+)))|((({{{
+(% style="background-color:red;align=center" %)
+|=Title 1|=(% style="background-color:yellow" %)Title 2
+|Word 1|Word 2
+}}})))|(((
+(% style="background-color:red;align=center" %)
+|=Title 1|=(% style="background-color:yellow" %)Title 2
+|Word 1|Word 2
+)))
+|Filterable Sortable table|((({{{
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+  &lt;tr class="sortHeader"&gt;
+    &lt;th&gt;Title 1&lt;/th&gt;
+    &lt;th&gt;Title 2&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td&gt;Cell 11&lt;/td&gt;
+   &lt;td&gt;Cell 12&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td&gt;Cell 21&lt;/td&gt;
+   &lt;td&gt;Cell 22&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+}}}
+
+{{info}}For improved features see the [[Livetable Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+)))|((({{{
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=Title 1|=Title 2
+|Cell 11|Cell 12
+|Cell 21|Cell 22
+}}}
+
+{{info}}For improved features see the [[Livetable Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+)))|(((
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=Title 1|=Title 2
+|Cell 11|Cell 12
+|Cell 21|Cell 22
+)))
+
+= Images =
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Image from attachment on current page|(((
+{{info}}See [[Image Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] for details{{/info}}
+{{{{image:img.png}}}}
+)))|{{{image:img.png}}}|image:img.png
+|Image from attachment on another page|{{{{image:img.png|document=Space.Page}}}}|{{{image:Space.Page@img.png}}}|image:img.png
+|Image with parameters|{{{{image:img.png|width=25|height=25}}}}|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:img.png||width="25" height="25"]]
+|Images located at URL|{{{http://some/url/img.png}}}|{{{image:http://some/url/img.png}}}|image:img.png
+
+== XWiki Syntax 2.0 Image Specification ==
+
+{{info}}
+The part in ##( )## is required, while the parts in ##{ }## are optional.
+{{/info}}
+
+The full format of an image is either **##image~: (reference)##** or **##~[~[image~: (reference) {||parameters}]]##**
+
+* **##image~:##** A required string identifying the resource as image.
+* **##reference##**: The reference to the image that shall be displayed in one of the following forms:
+** **URL**: Any URL to an image in the form of **##http:~/~/path/imageName##**. Example: ##http:~/~/domain.org/path/img.png##
+** **Attachment** reference in the form **##~{~{~{wikiName:} space.} page@} (imageName)##**
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The image reference will point to an image attached to a page inside that virtual wiki. Example: mywiki
+*** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: Main
+*** **##page##**: An optional string containing the name of the wiki page to which the referenced image is attached. Example: WebHome
+*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki.
+* **##parameters##**: An optional list of space-separated parameters passed to the image. Example: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTML attributes**: All attributes defined by the HTML standard will be added to the rendered HTML ##&lt;img&gt;## tag.
+*** **##style##**: CSS style information that should be applied to the image. Examples: ##style="float:right;height:50"## (image on right side, height 50 px), ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (image centered, width 80% of block width), ##style="vertical-align:bottom"## (text starts at bottom of picture)
+*** **##height##**: A parameter that defines the height of the displayed image. The value should be presented either in pixel (example: ##height="80"##) or in pixel related to the height of the block containing the image (example: ##height="40%"##).
+*** **##width##**: A parameter that defines the width of the displayed image. The value should be presented either in pixel (example: ##width="80"##) or in pixel related to the width of the block containing the image (example: ##width="40%"##).
+*** **##title##**: A parameter that defines the title the displayed image which will be visible when hovering the mouse trigger over the image, for instance. Example: ##title="My nice image"##
+*** **##alt##**: A parameter that defines which text should be displayed if the browser is not able to display the image. Since this is a required HTML attribute XWiki will use the file name instead if the ##alt## parameter is not defined. Example: ##alt="img.png"##
+*** **More**: A more in depth explanation on the HTML ##&lt;img&gt;## tag including more attributes can be reviewed [[on w3.org&gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]].
+
+== XWiki Syntax 2.1 Image Specification ==
+
+{{info}}
+The part in ##( )## is required, while the parts in ##{ }## are optional.
+{{/info}}
+
+The full format of an image is either **##image~: (reference)##** or **##~[~[image~: (reference) {||parameters}]]##**
+
+* **##image~:##** A required string identifying the resource as image.
+* **##reference##**: The reference to the image that shall be displayed in one of the following forms:
+** **URL**: Any URL to an image in the form of **##protocol:~/~/path/imageName##**. Example: ##http:~/~/domain.org/path/img.png##
+** **Attachment** reference in the form **##~{~{~{wikiName:} space.} page@} (imageName)##**
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The image reference will point to an image attached to a page inside that virtual wiki. Example: mywiki
+*** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: Main
+*** **##page##**: An optional string containing the name of the wiki page to which the referenced image is attached. Example: WebHome
+*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki.
+** **Icon** reference in the form **##{{{(icon:)}}} (iconName)##**. Example: **##icon:accept##**
+*** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
+*** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##
+* **##parameters##**: An optional list of space-separated parameters passed to the image. Example: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTML attributes**: All attributes defined by the HTML standard will be added to the rendered HTML ##&lt;img&gt;## tag.
+*** **##style##**: CSS style information that should be applied to the image. Examples: ##style="float:right;height:50"## (image on right side, height 50 px), ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (image centered, width 80% of block width), ##style="vertical-align:bottom"## (text starts at bottom of picture)
+*** **##height##**: A parameter that defines the height of the displayed image. The value should be presented either in pixel (example: ##height="80"##) or in pixel related to the height of the block containing the image (example: ##height="40%"##).
+*** **##width##**: A parameter that defines the width of the displayed image. The value should be presented either in pixel (example: ##width="80"##) or in pixel related to the width of the block containing the image (example: ##width="40%"##).
+*** **##title##**: A parameter that defines the title the displayed image which will be visible when hovering the mouse trigger over the image, for instance. Example: ##title="My nice image"##
+*** **##alt##**: A parameter that defines which text should be displayed if the browser is not able to display the image. Since this is a required HTML attribute XWiki will use the file name instead if the ##alt## parameter is not defined. Example: ##alt="img.png"##
+*** **More**: A more in depth explanation on the HTML ##&lt;img&gt;## tag including more attributes can be reviewed [[on w3.org&gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]].
+** **##queryString##**: Allows queries to be passed to the server when creating the download link for the referenced image. Example: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## will fail if the ##width## and ##height## parameters are specified in addition to ##queryString##!**)
+
+= Verbatim =
+
+Allow to enter content that will not be formatted (in other words the XWiki Syntax will not be taken into account).
+
+{{info}}
+In XWiki Syntax 1.0 the [[Pre macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] only preserves XWiki Syntax and Radeox macros. However HTML snippets and Groovy/Velocity scripts are still executed.
+{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result XWiki Syntax 1.0|=Result XWiki Syntax 2.0
+|Verbatim inline|{{{Some verbatim {pre}*[not rendered]*{/pre} content}}}|{{{Some verbatim {{{**[[not rendered]]**}}} content}}}|Some verbatim {{{*[not rendered]*}}} content|Some verbatim {{{**[[not rendered]]**}}} content
+|Verbatim block|((({{{
+{pre}
+multi line
+*verbatim*
+content
+{/pre}
+}}}
+{{info}}It's also possible to use the [[Code macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]] but it displays its content in a box by default.{{/info}}
+)))|((({{{
+{{{
+multi line
+**verbatim**
+content
+}}}
+}}})))|((({{{
+multi line
+*verbatim*
+content
+}}})))|((({{{
+multi line
+**verbatim**
+content
+}}})))
+
+= Quotations =
+
+Allows to quote some text.
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|Simple quote|(((
+&lt;blockquote&gt;&lt;p&gt;john said this&lt;/p&gt;&lt;/blockquote&gt;
+I said ok
+)))|((({{{
+&gt; john said this
+I said ok
+}}})))|(((
+&gt; john said this
+I said ok
+)))
+|Nested quotes|(((
+&lt;blockquote&gt;&lt;p&gt;john said this&lt;/p&gt;
+  &lt;blockquote&gt;&lt;p&gt;marie answered that&lt;/p&gt;&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+I said ok 
+)))|((({{{
+&gt; john said this
+&gt;&gt; marie answered that
+I said ok
+}}})))|(((
+&gt; john said this
+&gt;&gt; marie answered that
+I said ok
+)))
+
+= Groups =
+
+Groups can be used to insert another document inline directly into the current document. This allows for example to insert complex elements inside a list item or inside a table cell. Groups are delimited by the following syntactic elements: ##{{{(((...)))}}}##. One Group can contain another Group and there is no limit of imbrication.
+
+(% style="width:100%" %)
+|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|{{info}}This feature doesn't exist in XWiki Syntax 1.0. You'd have to use pure HTML to achieve the result.{{/info}}|((({{{
+|=Header 1|=Header 2|=Header 3
+|Cell One|(((
+= Embedded document =
+
+Some embedded paragraph.
+
+* list item one
+* list item two
+  ** sub-item 1
+  ** sub-item 2
+))) | Cell Three
+
+Next paragraph in the top-level document
+}}})))|(((
+|=Header 1|=Header 2|=Header 3
+|Cell One|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+Some embedded paragraph.
+
+* list item one
+* list item two
+  ** sub-item 1
+  ** sub-item 2
+))) | Cell Three
+
+Next paragraph in the top-level document
+)))
+
+= Escapes =
+
+Allows to escape XWiki Syntax.
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result XWiki Syntax 1.0|=Result XWiki Syntax 2.0
+|Escape a character|{{{This is not a \[link\]}}}|(((
+{{{This is not a ~[~[link~]~]}}}
+{{info}}To enter a ~~ character use a double escape: ~~~~{{/info}}
+)))|{{{This is not a [link]}}}|{{{This is not a [[link]]}}}
+
+= Macros =
+
+There are 2 kinds of macros in XWiki Syntax 1.0:
+* Velocity macros (called using the ###macroname(param1 ... paramN)## syntax)
+* Radeox macros (called using the ##{macroname:param1=value1|...|paramN=valueN}## syntax)
+
+There are also 2 kinds of macros in XWiki Syntax 2.0:
+* Velocity macros (called using the ###macroname(param1 ... paramN)## syntax inside the Velocity Macro)
+* XWiki macros (called using the ##{{{{{macroname param1="value1" ... paramN="valueN"}}}}}## syntax)
+
+{{info}}The Radeox macros cannot be used in XWiki Syntax 2.0. Thus they have been rewritten as XWiki macros.{{/info}}
+
+{{info}}For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0
+|Velocity Macro|((({{{#info("Some text")}}})))|((({{{
+{{info}}
+Some text
+{{/info}}
+}}})))
+|Radeox Macro/XWiki Macro|((({{{
+{code:java}
+java content
+{code}
+}}})))|((({{{
+{{code language="java"}}
+java content
+{{/code}}
+}}})))
+
+= HTML =
+
+{{info}}In XWiki Syntax 2.0 HTML or XHTML must be entered by using the HTML macro whereas in XWiki Syntax 1.0 it's possible to enter HTML directly in the text.{{/info}}
+
+(% style="width:100%" %)
+|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Result
+|&lt;b&gt;bold&lt;/b&gt;|{{{{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}}}}|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
+
+{{info}}In XWiki Syntax 2.0, by default the HTML macro does not understands XWiki Syntax (other macros included since it's XWiki Syntax too). To enable it, use {{{{{html wiki="true"}}}}}.{{/info}}
+
+= Velocity/Groovy Scripts =
+
+{{info}}In XWiki Syntax 1.0 it was possible to enter Velocity scripts anywhere directly in the page. This lead to issues for example when the user was involuntarily entering Velocity content. It was also performance hungry for pages not requiring Velocity content. There were several other technical limitations. Thus in XWiki Syntax 2.0 Velocity scripts must be entered using the ##velocity## macro. Same goes for entering Groovy scripts.{{/info}}
+
+(% style="width:100%" %)
+|=Feature|=XWiki Syntax 1.0|=XWiki Syntax 2.0
+|Velocity script|((({{{
+#set ($var = "whatever")
+}}})))|((({{{
+{{velocity}}
+#set ($var = "whatever")
+{{/velocity}}
+}}})))
+|Groovy script|((({{{
+&lt;%
+def var = "whatever"
+%&gt;
+}}})))|((({{{
+{{groovy}}
+def var = "whatever"
+{{/groovy}}
+}}})))
+
+= Parameters =
+
+With XWiki Syntax 2.0 it's possible to pass parameters to the different syntax elements and also to blocks of text. This is used for example to style them. You can set any parameter key/value pair you want. The XHTML renderer will pass these parameters as XHTML attributes to the underlying XHTML representation of the different syntax elements. In XWiki Syntax 1.0 there was no syntax for passing parameters and the only way to do it was to write XHTML directly in the content as shown in the table below.
+
+(% style="width:100%" %)
+|=XWiki Syntax 1.0|=XWiki Syntax 2.0|=Generated XHTML
+|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
+}}})))|((({{{
+(% class="myClass" style="myStyle" id="myId" %)
+= heading =
+}}})))|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
+}}})))
+
+{{id name="syntaxes"/}}
+= Other syntaxes =
+
+The following other syntaxes are implemented in XWiki Enterprise 1.6 and later:
+* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
+* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
+* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
+* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
+* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
+* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
+
+{{warning}}The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.{{/warning}}</content>
+</xwikidoc>

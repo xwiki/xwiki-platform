@@ -60,7 +60,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected BlockRenderer renderer;
 
     @Override
-    public SizedSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
         IllegalArgumentException
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
@@ -68,7 +68,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
-            SizedSolrInputDocument solrDocument = new SizedSolrInputDocument();
+            LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
             XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
             String language = getLanguage(documentReference);

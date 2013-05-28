@@ -46,7 +46,7 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.search.solr.internal.metadata.SizedSolrInputDocument;
+import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
@@ -196,24 +196,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             }
 
             // Add to the batch until either the batch size is achieved or the queue gets emptied
-            List<IndexQueueEntry> batchList = new ArrayList<IndexQueueEntry>();
-
-            int tempBatchSize = this.configuration.getIndexerBatchSize() - 1;
-            do {
-                // Add the entry to the batch.
-                batchList.add(queueEntry);
-
-                tempBatchSize--;
-
-                if (tempBatchSize > 0) {
-                    queueEntry = this.indexOperationsQueue.poll();
-                } else {
-                    queueEntry = null;
-                }
-            } while (queueEntry != null);
-
-            // Process the current batch
-            processBatch(batchList);
+            processBatch(queueEntry);
         }
 
         this.logger.debug("Stop indexer thread");
@@ -223,29 +206,31 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * Process a batch of operations that were just read from the index operations queue. This method also commits the
      * batch when it finishes to process it.
      * 
-     * @param batchList the batch to process
+     * @param queueEntry the batch to process
      */
-    private void processBatch(List<IndexQueueEntry> batchList)
+    private void processBatch(IndexQueueEntry queueEntry)
     {
         // To improve performance, we group contiguous index or delete operations and issue them only when a
         // different type of operation is encountered.
         List<SolrInputDocument> solrDocumentsToIndex = new LinkedList<SolrInputDocument>();
         List<String> solrDocumentIDsToDelete = new LinkedList<String>();
 
+        IndexQueueEntry batchEntry = queueEntry;
         IndexQueueEntry previousBatchEntry = null;
         int length = 0;
 
-        for (IndexQueueEntry batchEntry : batchList) {
+        for (; batchEntry != null; previousBatchEntry = batchEntry, batchEntry = this.indexOperationsQueue.poll()) {
             EntityReference reference = batchEntry.reference;
             IndexOperation operation = batchEntry.operation;
 
             try {
                 // Issue add/delete operations to the server in batches whenever the contiguity stops
-                checkBatch(previousBatchEntry, operation, length, solrDocumentsToIndex, solrDocumentIDsToDelete);
+                length =
+                    checkBatch(previousBatchEntry, operation, length, solrDocumentsToIndex, solrDocumentIDsToDelete);
 
                 // For the current contiguous operations queue, group the changes
                 if (IndexOperation.INDEX.equals(operation)) {
-                    SizedSolrInputDocument solrDocument = getSolrDocument(reference);
+                    LengthSolrInputDocument solrDocument = getSolrDocument(reference);
                     if (solrDocument != null) {
                         solrDocumentsToIndex.add(solrDocument);
                         length += solrDocument.getLength();
@@ -257,8 +242,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             } catch (Exception e) {
                 this.logger.error("Failed to process entity [{}] for the [{}] operation", reference, operation, e);
             }
-
-            previousBatchEntry = batchEntry;
         }
 
         // Commit the index changes so that they become available to queries. This is a costly operation and that is
@@ -278,39 +261,69 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
+     * Check various constraints to know if the batch should be sent.
+     * 
+     * @param previousOperation the previous operation
+     * @param operation the current operation
+     * @param length the current length
+     * @param solrDocumentsToIndex the documents stored for {@link IndexOperation#INDEX}
+     * @param solrDocumentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
+     * @return true if the batch should be sent
+     */
+    private boolean shouldSendBatch(IndexOperation previousOperation, IndexOperation operation, int length,
+        List<SolrInputDocument> solrDocumentsToIndex, List<String> solrDocumentIDsToDelete)
+    {
+        // 1) If previous operation is different
+        // 2) If the length is above the configured maximum
+        if (operation != previousOperation || length >= this.configuration.getIndexerBatchMaxLengh()) {
+            return true;
+        }
+
+        // 3) If the size is above the configured maximum
+        int maxSize = this.configuration.getIndexerBatchSize();
+
+        return solrDocumentsToIndex.size() >= maxSize || solrDocumentIDsToDelete.size() >= maxSize;
+    }
+
+    /**
      * Check various limits and send the current batch if needed.
      * 
      * @param previousBatchEntry the previous batch entry
      * @param operation the current operation
-     * @param length the length above which the batch should be sent
-     * @param solrDocumentsToIndex the documents stored for {@link IndexOperation#INDEX}
-     * @param solrDocumentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
+     * @param length the current length
+     * @param documentsToIndex the documents stored for {@link IndexOperation#INDEX}
+     * @param documentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
+     * @return the current size
      * @throws SolrServerException when fail to apply operation
      * @throws IOException when fail to apply operation
      */
-    private void checkBatch(IndexQueueEntry previousBatchEntry, IndexOperation operation, int length,
-        List<SolrInputDocument> solrDocumentsToIndex, List<String> solrDocumentIDsToDelete) throws SolrServerException,
+    private int checkBatch(IndexQueueEntry previousBatchEntry, IndexOperation operation, int length,
+        List<SolrInputDocument> documentsToIndex, List<String> documentIDsToDelete) throws SolrServerException,
         IOException
     {
+        int newLength = length;
+
         if (previousBatchEntry != null) {
             IndexOperation previousOperation = previousBatchEntry.operation;
 
-            // 1) If previous operation is different
-            // 2) If the length is above the configured maximum send it right away
-            if (operation != previousOperation || length > this.configuration.getIndexerBatchMaxLengh()) {
+            if (shouldSendBatch(previousOperation, operation, newLength, documentsToIndex, documentIDsToDelete)) {
                 if (IndexOperation.INDEX.equals(previousOperation)) {
-                    this.solrInstanceProvider.add(solrDocumentsToIndex);
+                    this.solrInstanceProvider.add(documentsToIndex);
 
                     // Clear the just processed contiguous inner-batch.
-                    solrDocumentsToIndex.clear();
+                    documentsToIndex.clear();
+                    newLength = 0;
                 } else if (IndexOperation.DELETE.equals(previousOperation)) {
-                    this.solrInstanceProvider.delete(solrDocumentIDsToDelete);
+                    this.solrInstanceProvider.delete(documentIDsToDelete);
 
                     // Clear the just processed contiguous inner-batch.
-                    solrDocumentIDsToDelete.clear();
+                    documentIDsToDelete.clear();
+                    newLength = 0;
                 }
             }
         }
+
+        return newLength;
     }
 
     /**
@@ -320,7 +333,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * @throws SolrIndexException if problems occur.
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
      */
-    private SizedSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexException,
+    private LengthSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexException,
         IllegalArgumentException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());

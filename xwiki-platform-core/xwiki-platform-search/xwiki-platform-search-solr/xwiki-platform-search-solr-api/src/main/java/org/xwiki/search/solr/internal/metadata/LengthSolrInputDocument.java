@@ -8,7 +8,7 @@ import org.apache.solr.common.SolrInputDocument;
  * @version $Id$
  * @since 5.1M2
  */
-public class SizedSolrInputDocument extends SolrInputDocument
+public class LengthSolrInputDocument extends SolrInputDocument
 {
     /**
      * @see #getLength()

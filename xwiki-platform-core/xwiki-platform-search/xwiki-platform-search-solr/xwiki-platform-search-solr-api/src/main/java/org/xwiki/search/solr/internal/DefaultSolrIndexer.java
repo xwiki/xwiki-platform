@@ -46,6 +46,7 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.metadata.SizedSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
@@ -232,6 +233,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         List<String> solrDocumentIDsToDelete = new LinkedList<String>();
 
         IndexQueueEntry previousBatchEntry = null;
+        int length = 0;
 
         for (IndexQueueEntry batchEntry : batchList) {
             EntityReference reference = batchEntry.reference;
@@ -239,13 +241,14 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
             try {
                 // Issue add/delete operations to the server in batches whenever the contiguity stops
-                checkBatch(previousBatchEntry, operation, solrDocumentsToIndex, solrDocumentIDsToDelete);
+                checkBatch(previousBatchEntry, operation, length, solrDocumentsToIndex, solrDocumentIDsToDelete);
 
                 // For the current contiguous operations queue, group the changes
                 if (IndexOperation.INDEX.equals(operation)) {
-                    SolrInputDocument solrDocument = getSolrDocument(reference);
+                    SizedSolrInputDocument solrDocument = getSolrDocument(reference);
                     if (solrDocument != null) {
                         solrDocumentsToIndex.add(solrDocument);
+                        length += solrDocument.getLength();
                     }
                 } else if (IndexOperation.DELETE.equals(operation)) {
                     String id = getId(reference);
@@ -279,12 +282,13 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * 
      * @param previousBatchEntry the previous batch entry
      * @param operation the current operation
+     * @param length the length above which the batch should be sent
      * @param solrDocumentsToIndex the documents stored for {@link IndexOperation#INDEX}
      * @param solrDocumentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
      * @throws SolrServerException when fail to apply operation
      * @throws IOException when fail to apply operation
      */
-    private void checkBatch(IndexQueueEntry previousBatchEntry, IndexOperation operation,
+    private void checkBatch(IndexQueueEntry previousBatchEntry, IndexOperation operation, int length,
         List<SolrInputDocument> solrDocumentsToIndex, List<String> solrDocumentIDsToDelete) throws SolrServerException,
         IOException
     {
@@ -292,8 +296,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             IndexOperation previousOperation = previousBatchEntry.operation;
 
             // 1) If previous operation is different
-            // 2) If previous entry is an attachment send it right away to be safer regarding memory
-            if (operation != previousOperation || previousBatchEntry.reference.getType() == EntityType.ATTACHMENT) {
+            // 2) If the length is above the configured maximum send it right away
+            if (operation != previousOperation || length > this.configuration.getIndexerBatchMaxLengh()) {
                 if (IndexOperation.INDEX.equals(previousOperation)) {
                     this.solrInstanceProvider.add(solrDocumentsToIndex);
 
@@ -316,18 +320,17 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * @throws SolrIndexException if problems occur.
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
      */
-    private SolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexException,
+    private SizedSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexException,
         IllegalArgumentException
     {
-        SolrInputDocument solrDocument = null;
-
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
+
         // If the entity type is supported, use the extractor to get the SolrInputDocuent.
         if (metadataExtractor != null) {
-            solrDocument = metadataExtractor.getSolrDocument(reference);
+            return metadataExtractor.getSolrDocument(reference);
         }
 
-        return solrDocument;
+        return null;
     }
 
     /**

@@ -11,16 +11,16 @@ import org.apache.solr.common.SolrInputDocument;
 public class SizedSolrInputDocument extends SolrInputDocument
 {
     /**
-     * @see #getSize()
+     * @see #getLength()
      */
-    private int size;
+    private int length;
 
     /**
-     * @return the size (generally the number of characters). It's not the exact byte size, it's more a scale value.
+     * @return the length (generally the number of characters). It's not the exact byte length, it's more a scale value.
      */
-    public int getSize()
+    public int getLength()
     {
-        return this.size;
+        return this.length;
     }
 
     @Override
@@ -29,9 +29,9 @@ public class SizedSolrInputDocument extends SolrInputDocument
         super.addField(name, value, boost);
 
         if (value instanceof String) {
-            this.size += ((String) value).length();
+            this.length += ((String) value).length();
         } else if (value instanceof byte[]) {
-            this.size += ((byte[]) value).length;
+            this.length += ((byte[]) value).length;
         }
 
         // TODO: support more type ?

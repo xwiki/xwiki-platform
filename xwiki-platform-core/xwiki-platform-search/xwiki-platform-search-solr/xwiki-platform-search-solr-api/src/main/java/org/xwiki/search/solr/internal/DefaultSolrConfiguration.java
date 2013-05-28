@@ -102,12 +102,22 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * The name of the configuration property containing the batch size.
      */
-    public static final String SOLR_INDEXER_BATCHSIZE_PROPERTY = "solr.indexer.batchSize";
+    public static final String SOLR_INDEXER_BATCH_SIZE_PROPERTY = "solr.indexer.batch.size";
 
     /**
      * The default size of the batch.
      */
-    public static final int SOLR_INDEXER_BATCHSIZE_DEFAULT = 50;
+    public static final int SOLR_INDEXER_BATCH_SIZE_DEFAULT = 50;
+
+    /**
+     * The name of the configuration property containing the batch maximum length.
+     */
+    public static final String SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY = "solr.indexer.batch.maxLength";
+
+    /**
+     * The default length of the data above which the batch is sent without waiting.
+     */
+    public static final int SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT = 10000;
 
     /**
      * The name of the configuration property containing the batch size.
@@ -202,7 +212,13 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public int getIndexerBatchSize()
     {
-        return this.configuration.getProperty(SOLR_INDEXER_BATCHSIZE_PROPERTY, SOLR_INDEXER_BATCHSIZE_DEFAULT);
+        return this.configuration.getProperty(SOLR_INDEXER_BATCH_SIZE_PROPERTY, SOLR_INDEXER_BATCH_SIZE_DEFAULT);
+    }
+
+    @Override
+    public int getIndexerBatchMaxLengh()
+    {
+        return this.configuration.getProperty(SOLR_INDEXER_BATCH_SIZE_PROPERTY, SOLR_INDEXER_BATCH_SIZE_DEFAULT);
     }
 
     @Override

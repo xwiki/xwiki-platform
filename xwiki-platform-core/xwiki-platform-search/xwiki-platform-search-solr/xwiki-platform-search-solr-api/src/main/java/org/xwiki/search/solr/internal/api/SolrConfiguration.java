@@ -92,6 +92,12 @@ public interface SolrConfiguration
     int getIndexerBatchSize();
 
     /**
+     * @return the size of the batch when indexing enqueued entities
+     * @since 5.1M2
+     */
+    int getIndexerBatchMaxLengh();
+
+    /**
      * @return the maximum size of the indexer queue
      * @since 5.1M2
      */

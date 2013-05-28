@@ -38,7 +38,10 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.security.authorization.ContentAuthorController;
 import org.xwiki.uiextension.UIExtension;
+
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Provides a bridge between Panels defined in XObjects and {@link UIExtension}.
@@ -147,7 +150,11 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
         try {
             TransformationContext transformationContext = new TransformationContext(xdom, syntax);
             transformationContext.setId(this.getRoleHint());
+            ContentAuthorController cac = Utils.getComponent(ContentAuthorController.class);
+            // For this transformation, rights should be checked against the panel content author.
+            cac.pushContentAuthor(authorReference);
             macroTransformation.transform(transformedXDOM, transformationContext);
+            cac.popContentAuthor();
         } catch (TransformationException e) {
             LOGGER.error("Error while executing wiki component macro transformation for extension [{}]",
                 documentReference.toString());

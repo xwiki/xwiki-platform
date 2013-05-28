@@ -549,10 +549,12 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
     public void init(IndexUpdater indexUpdater, XWikiContext context)
     {
-        Directory directory = indexUpdater.getDirectory();
-
-        boolean needInitialRebuild = true;
-        needInitialRebuild = !DirectoryReader.indexExists(directory);
+        boolean needInitialRebuild = false;
+        try {
+            needInitialRebuild = !DirectoryReader.indexExists(indexUpdater.getDirectory());
+        } catch (IOException e) {
+            LOGGER.error("Failed to check if index already exist", e);
+        }
 
         IndexRebuilder indexRebuilder = new IndexRebuilder(indexUpdater, context);
         if (needInitialRebuild) {

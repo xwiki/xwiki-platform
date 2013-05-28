@@ -33,6 +33,9 @@
   <name>XWiki Platform - Search - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Search - Parent POM</description>
+  <properties>
+    <lucene.version>4.3.0</lucene.version>
+  </properties>
   <modules>
     <module>xwiki-platform-search-lucene</module>
     <module>xwiki-platform-search-solr</module>

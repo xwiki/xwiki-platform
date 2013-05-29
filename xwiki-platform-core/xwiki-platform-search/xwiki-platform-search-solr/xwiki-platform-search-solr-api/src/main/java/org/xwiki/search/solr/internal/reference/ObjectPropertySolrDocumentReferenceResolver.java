@@ -58,7 +58,7 @@ public class ObjectPropertySolrDocumentReferenceResolver extends AbstractSolrDoc
         try {
             xclassDocument = getDocument(classReference);
         } catch (Exception e) {
-            throw new SolrIndexException("Failed to get document for xclass [" + classReference + "]");
+            throw new SolrIndexException("Failed to get document for xclass [" + classReference + "]", e);
         }
 
         if (!(xclassDocument.getXClass().get(objectPropertyReference.getName()) instanceof PasswordClass)) {

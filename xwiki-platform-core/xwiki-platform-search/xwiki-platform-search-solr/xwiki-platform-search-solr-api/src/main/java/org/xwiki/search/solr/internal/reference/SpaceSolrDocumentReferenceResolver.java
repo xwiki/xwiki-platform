@@ -71,7 +71,7 @@ public class SpaceSolrDocumentReferenceResolver extends AbstractSolrDocumentRefe
                 this.queryManager.getNamedQuery("getSpaceDocsName").setWiki(spaceReference.getParent().getName())
                     .bindValue("space", spaceReference.getName()).execute();
         } catch (QueryException e) {
-            throw new SolrIndexException("Failed to query space [" + spaceReference + "] documents");
+            throw new SolrIndexException("Failed to query space [" + spaceReference + "] documents", e);
         }
 
         for (String documentName : documentNames) {
@@ -79,8 +79,8 @@ public class SpaceSolrDocumentReferenceResolver extends AbstractSolrDocumentRefe
 
             try {
                 result.addAll(this.documentResolver.getReferences(documentReference));
-            } catch (Exception a) {
-                this.logger.error("Failed to resolve references for document [" + documentReference + "]");
+            } catch (Exception e) {
+                this.logger.error("Failed to resolve references for document [" + documentReference + "]", e);
             }
         }
 

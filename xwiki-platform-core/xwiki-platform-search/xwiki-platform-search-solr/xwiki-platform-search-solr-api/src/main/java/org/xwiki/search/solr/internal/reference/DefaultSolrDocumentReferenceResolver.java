@@ -58,7 +58,7 @@ public class DefaultSolrDocumentReferenceResolver implements SolrDocumentReferen
                 this.componentManager.getInstance(SolrDocumentReferenceResolver.class, type.name().toLowerCase());
         } catch (ComponentLookupException e) {
             throw new SolrIndexException("Failed to get SolrDocumentReferenceResolver corresponding to entity type ["
-                + type + "]");
+                + type + "]", e);
         }
 
         return resolver.getReferences(reference);

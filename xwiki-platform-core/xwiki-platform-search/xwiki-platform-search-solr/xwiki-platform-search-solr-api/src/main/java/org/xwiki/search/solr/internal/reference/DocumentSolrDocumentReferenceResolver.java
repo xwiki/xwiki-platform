@@ -89,7 +89,7 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
                 try {
                     document = getDocument(documentReference);
                 } catch (Exception e) {
-                    throw new SolrIndexException(String.format("Failed to get document [%]", documentReference));
+                    throw new SolrIndexException(String.format("Failed to get document [%]", documentReference), e);
                 }
 
                 // Document translations
@@ -97,9 +97,8 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
                 try {
                     translatedLanguages = document.getTranslationList(context);
                 } catch (XWikiException e) {
-
                     throw new SolrIndexException(String.format("Failed to get document [%s] translations",
-                        documentReference));
+                        documentReference), e);
                 }
 
                 for (String translatedLanguage : translatedLanguages) {
@@ -131,8 +130,8 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
 
             try {
                 result.addAll(this.attachmentResolver.getReferences(attachmentReference));
-            } catch (Exception a) {
-                this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]");
+            } catch (Exception e) {
+                this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]", e);
             }
         }
     }
@@ -151,8 +150,8 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
 
                     try {
                         result.addAll(this.objectResolver.getReferences(objectReference));
-                    } catch (Exception a) {
-                        this.logger.error("Failed to resolve references for object [" + objectReference + "]");
+                    } catch (Exception e) {
+                        this.logger.error("Failed to resolve references for object [" + objectReference + "]", e);
                     }
                 }
             }

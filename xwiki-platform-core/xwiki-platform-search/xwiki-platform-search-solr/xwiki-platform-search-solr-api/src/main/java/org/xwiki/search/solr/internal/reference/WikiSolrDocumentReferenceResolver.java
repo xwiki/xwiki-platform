@@ -70,14 +70,18 @@ public class WikiSolrDocumentReferenceResolver extends AbstractSolrDocumentRefer
         try {
             spaces = this.queryManager.getNamedQuery("getSpaces").setWiki(wikiReference.getName()).execute();
         } catch (QueryException e) {
-            throw new SolrIndexException("Failed to query wiki [" + wikiReference.getName() + "] spaces");
+            throw new SolrIndexException("Failed to query wiki [" + wikiReference.getName() + "] spaces", e);
         }
 
         // Visit each space
         for (String space : spaces) {
             SpaceReference spaceReference = new SpaceReference(space, wikiReference);
 
-            result.addAll(this.spaceResolver.getReferences(spaceReference));
+            try {
+                result.addAll(this.spaceResolver.getReferences(spaceReference));
+            } catch (Exception e) {
+                this.logger.error("Failed to resolve references for space [" + spaceReference + "]", e);
+            }
         }
 
         return result;

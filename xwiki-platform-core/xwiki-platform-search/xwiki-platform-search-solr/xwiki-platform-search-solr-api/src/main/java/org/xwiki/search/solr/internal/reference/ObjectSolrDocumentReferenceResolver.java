@@ -69,7 +69,7 @@ public class ObjectSolrDocumentReferenceResolver extends AbstractSolrDocumentRef
         try {
             document = getDocument(documentReference);
         } catch (Exception e) {
-            throw new SolrIndexException("Failed to get document for object [" + objectReference + "]");
+            throw new SolrIndexException("Failed to get document for object [" + objectReference + "]", e);
         }
 
         BaseObject object = document.getXObject(objectReference);
@@ -81,9 +81,9 @@ public class ObjectSolrDocumentReferenceResolver extends AbstractSolrDocumentRef
 
                 try {
                     result.addAll(this.objectPropertyResolver.getReferences(objectPropertyReference));
-                } catch (Exception a) {
+                } catch (Exception e) {
                     this.logger.error("Failed to resolve references for object property [" + objectPropertyReference
-                        + "]");
+                        + "]", e);
                 }
             }
         }

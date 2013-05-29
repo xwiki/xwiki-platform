@@ -62,7 +62,7 @@ public class ObjectPropertySolrDocumentReferenceResolver extends AbstractSolrDoc
         }
 
         if (!(xclassDocument.getXClass().get(objectPropertyReference.getName()) instanceof PasswordClass)) {
-            Arrays.asList(objectPropertyReference);
+            return Arrays.asList(objectPropertyReference);
         }
 
         return Collections.EMPTY_LIST;

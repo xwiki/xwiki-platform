@@ -104,7 +104,7 @@ DefaultStringEntityReferenceSerializer.class, DefaultExecution.class, Attachment
 DefaultSolrDocumentReferenceResolver.class, DocumentSolrDocumentReferenceResolver.class,
 ObjectPropertySolrDocumentReferenceResolver.class, ObjectSolrDocumentReferenceResolver.class,
 SpaceSolrDocumentReferenceResolver.class, WikiSolrDocumentReferenceResolver.class})
-public class WikiSolrDocumenrReferenceResolverTest
+public class SolrDocumenrReferenceResolverTest
 {
     @Rule
     public final MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
@@ -301,7 +301,7 @@ public class WikiSolrDocumenrReferenceResolverTest
         when(xwiki.getDocument(eq(document113), any(XWikiContext.class))).thenReturn(xwikiDocument113);
 
         when(xwikiDocument113.getAttachmentList()).thenReturn(Collections.EMPTY_LIST);
-        
+
         when(xwikiDocument113.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
         when(xwikiDocument113.getTranslationList(any(XWikiContext.class))).thenReturn(Arrays.asList("ro"));
@@ -315,8 +315,9 @@ public class WikiSolrDocumenrReferenceResolverTest
 
         when(xwikiDocument121.getAttachmentList()).thenReturn(Arrays.asList(xwikiAttachment1211, xwikiAttachment1212));
 
-        when(xwikiAttachment1211.getFilename()).thenReturn(attachment1211.getName());
-        when(xwikiAttachment1212.getFilename()).thenReturn(attachment1212.getName());
+        when(xwikiAttachment1211.getReference()).thenReturn(attachment1211);
+
+        when(xwikiAttachment1212.getReference()).thenReturn(attachment1212);
 
         when(xwikiDocument121.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
@@ -336,6 +337,7 @@ public class WikiSolrDocumenrReferenceResolverTest
 
         // object 1221
         when(xwikiDocument122.getXObject(object1221)).thenReturn(xwikiObject1221);
+        when(xwikiDocument122.getXObject((EntityReference) object1221)).thenReturn(xwikiObject1221);
 
         when(xwikiObject1221.getReference()).thenReturn(object1221);
 
@@ -345,6 +347,7 @@ public class WikiSolrDocumenrReferenceResolverTest
 
         // object 1222
         when(xwikiDocument122.getXObject(object1222)).thenReturn(xwikiObject1222);
+        when(xwikiDocument122.getXObject((EntityReference) object1222)).thenReturn(xwikiObject1222);
 
         when(xwikiObject1222.getReference()).thenReturn(object1222);
 
@@ -387,7 +390,6 @@ public class WikiSolrDocumenrReferenceResolverTest
     {
         List<EntityReference> result = this.defaultReferenceResolver.getReferences(wiki1);
         Assert.assertNotNull(result);
-        Assert.assertEquals(12, result.size());
 
         assertThat(
             result,

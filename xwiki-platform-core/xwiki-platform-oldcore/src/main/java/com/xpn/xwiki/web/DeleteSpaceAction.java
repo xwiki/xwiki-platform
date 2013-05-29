@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -26,9 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -78,24 +77,17 @@ public class DeleteSpaceAction extends XWikiAction
             return false;
         }
 
-        if (!hasDocumentsInSpace(space, xwiki.getStore())) {
+        List<String> documentsInSpace = getDocumentsInSpace(space, xwiki.getStore());
+        if (documentsInSpace.isEmpty()) {
             // Redirect the user to the view template so that he gets the "document doesn't exist" box.
             sendRedirect(response, Utils.getRedirect("view", context));
             redirected = true;
         } else {
             // Delete to recycle bin
-            try {
-                Query spaceDocsQuery = Utils.getComponent(QueryManager.class).createQuery(
-                    String.format("where doc.space = :%s", SPACE_BIND_NAME), Query.XWQL);
-                spaceDocsQuery.bindValue(SPACE_BIND_NAME, space);
-                for (String docName : spaceDocsQuery.<String> execute()) {
-                    DocumentReference docReference =
-                        new DocumentReference(nameResolver.resolve(docName, EntityType.DOCUMENT));
-                    xwiki.deleteAllDocuments(xwiki.getDocument(docReference, context), context);
-                }
-            } catch (QueryException ex) {
-                LOGGER.warn("Failed to get the list of documents while trying to delete space {}: {}", space, ex
-                    .getMessage());
+            for (String docName : documentsInSpace) {
+                DocumentReference docReference =
+                    new DocumentReference(nameResolver.resolve(docName, EntityType.DOCUMENT));
+                xwiki.deleteAllDocuments(xwiki.getDocument(docReference, context), context);
             }
         }
         if (!redirected) {
@@ -125,24 +117,25 @@ public class DeleteSpaceAction extends XWikiAction
     }
 
     /**
-     * @param space the space to check
-     * @param store the store implementation to use to check if documents are existing
-     * @return true if there are documents in the passed space
+     * @param space the space to get documents from
+     * @param store the store implementation to use
+     * @return the list of documents (even hidden ones) located in the passed space
      */
-    private boolean hasDocumentsInSpace(String space, XWikiStoreInterface store)
+    private List<String> getDocumentsInSpace(String space, XWikiStoreInterface store)
     {
-        boolean result = false;
+        List<String> results;
         try {
             // Note: We're not using the "hidden" filter since we want to be able to remove all pages even if there are
             // only hidden documents.
-            List<String> docsInSpace = store.getQueryManager().getNamedQuery("getSpaceDocsName")
+            results = store.getQueryManager().getNamedQuery("getSpaceDocsName")
                 .bindValue(SPACE_BIND_NAME, space)
                 .execute();
-            result = !docsInSpace.isEmpty();
         } catch (QueryException e) {
-            LOGGER.warn("Failed to locate documents in space [{}]", space, e.getMessage());
+            LOGGER.warn("Failed to get the list of documents while trying to delete space [{}]: [{}]", space,
+                e.getMessage());
+            results = Collections.EMPTY_LIST;
         }
 
-        return result;
+        return results;
     }
 }

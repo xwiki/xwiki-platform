@@ -1296,8 +1296,14 @@ document.observe('xwiki:dom:loading', function() {
     placeholderPolyfill = function(event) {
       var item = event.memo.element;
       if (item.placeholder === '') {
-        item.placeholder = item.defaultValue;
-        item.value = '';
+        if (item.hasClassName('useTitleAsTip')) {
+          // The place-holder text is different than the initial (default) input value.
+          item.placeholder = item.title;
+        } else {
+          // Use the initial (default) input value as place-holder.
+          item.placeholder = item.defaultValue;
+          item.value = '';
+        }
       }
     }
   } else {
@@ -1321,6 +1327,8 @@ document.observe('xwiki:dom:loading', function() {
       var item = event.memo.element;
       if (item.readAttribute('placeholder')) {
         item.defaultValue = item.readAttribute('placeholder');
+      } else if (item.hasClassName('useTitleAsTip')) {
+        item.defaultValue = item.title;
       }
       if (item.value == item.defaultValue) {
         // The 'empty' CSS class has two functions:

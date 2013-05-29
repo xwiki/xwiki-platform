@@ -19,7 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -114,7 +113,9 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                 }
 
                 try {
-                    List<EntityReference> references = indexableReferenceExtractor.getReferences(queueEntry.reference);
+                    // FIXME: it's not very clean to load all the reference in memory in the case of the wiki for
+                    // example. Would be better to stream or cut that a bit instead.
+                    List<EntityReference> references = solrDocumentRefereceResolver.getReferences(queueEntry.reference);
 
                     for (EntityReference reference : references) {
                         indexQueue.offer(new IndexQueueEntry(reference, queueEntry.operation));
@@ -161,7 +162,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * Extract contained indexable references.
      */
     @Inject
-    private SolrDocumentReferenceResolver indexableReferenceExtractor;
+    private SolrDocumentReferenceResolver solrDocumentRefereceResolver;
 
     /**
      * The queue of index operation to perform.
@@ -476,28 +477,5 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                 this.resolveQueue.add(new IndexQueueEntry(reference, operation));
             }
         }
-    }
-
-    /**
-     * @param reference the reference from where to start the search.
-     * @return the unique list of indexable references starting from each of the input start references.
-     * @throws SolrIndexException if problems occur.
-     */
-    protected List<EntityReference> getUniqueIndexableEntityReferences(EntityReference reference)
-        throws SolrIndexException
-    {
-        List<EntityReference> result = new ArrayList<EntityReference>();
-
-        List<EntityReference> containedReferences = this.indexableReferenceExtractor.getReferences(reference);
-        for (EntityReference containedReference : containedReferences) {
-            // Avoid duplicates again
-            if (result.contains(containedReference)) {
-                continue;
-            }
-
-            result.add(containedReference);
-        }
-
-        return result;
     }
 }

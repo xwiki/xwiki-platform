@@ -1,4 +1,3 @@
-org.xwiki.search.solr.internal.DefaultIndexableReferenceExtractor
 org.xwiki.search.solr.internal.DefaultSolrConfiguration
 org.xwiki.search.solr.internal.DefaultSolrIndexer
 org.xwiki.search.solr.internal.EmbeddedSolrInstance
@@ -9,3 +8,10 @@ org.xwiki.search.solr.internal.metadata.DocumentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectPropertySolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectSolrMetadataExtractor
 org.xwiki.search.solr.internal.script.SolrIndexScriptService
+org.xwiki.search.solr.internal.reference.AttachmentSolrDocumentReferenceResolver
+org.xwiki.search.solr.internal.reference.DefaultSolrDocumentReferenceResolver
+org.xwiki.search.solr.internal.reference.DocumentSolrDocumentReferenceResolver
+org.xwiki.search.solr.internal.reference.ObjectPropertySolrDocumentReferenceResolver
+org.xwiki.search.solr.internal.reference.ObjectSolrDocumentReferenceResolver
+org.xwiki.search.solr.internal.reference.SpaceSolrDocumentReferenceResolver
+org.xwiki.search.solr.internal.reference.WikiSolrDocumentReferenceResolver

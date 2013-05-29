@@ -22,6 +22,7 @@ package org.xwiki.search.solr.internal.metadata;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
@@ -42,6 +43,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  */
 @Component
 @Named("object")
+@Singleton
 public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override

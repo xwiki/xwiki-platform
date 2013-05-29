@@ -48,6 +48,7 @@ import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
+import org.xwiki.search.solr.internal.reference.SolrDocumentReferenceResolver;
 
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
@@ -160,7 +161,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * Extract contained indexable references.
      */
     @Inject
-    private IndexableReferenceExtractor indexableReferenceExtractor;
+    private SolrDocumentReferenceResolver indexableReferenceExtractor;
 
     /**
      * The queue of index operation to perform.

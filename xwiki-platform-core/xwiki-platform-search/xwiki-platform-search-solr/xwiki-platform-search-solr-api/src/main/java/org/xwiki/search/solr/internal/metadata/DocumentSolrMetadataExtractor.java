@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
@@ -50,6 +51,7 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component
 @Named("document")
+@Singleton
 public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     /**

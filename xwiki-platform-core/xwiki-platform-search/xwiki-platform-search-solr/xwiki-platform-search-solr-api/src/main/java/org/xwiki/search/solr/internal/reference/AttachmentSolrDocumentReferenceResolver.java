@@ -17,29 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.search.solr.internal.reference;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.xwiki.component.annotation.Role;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
-import org.xwiki.stability.Unstable;
 
 /**
- * Recursively retrieves the references for all the indexable entities contained by the given start entity.
+ * Resolve attachment references.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 5.1M2
  */
-@Unstable
-@Role
-public interface IndexableReferenceExtractor
+@Component
+@Named("attachment")
+@Singleton
+public class AttachmentSolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
 {
-    /**
-     * @param startReference the start entity reference.
-     * @return references for the indexable contained entities, including the given one (but only if it is indexable).
-     * @throws SolrIndexException if problems occur.
-     */
-    List<EntityReference> getReferences(EntityReference startReference) throws SolrIndexException;
+    @Override
+    public List<EntityReference> getReferences(EntityReference attachmentReference) throws SolrIndexException
+    {
+        return Arrays.asList(attachmentReference);
+    }
 }

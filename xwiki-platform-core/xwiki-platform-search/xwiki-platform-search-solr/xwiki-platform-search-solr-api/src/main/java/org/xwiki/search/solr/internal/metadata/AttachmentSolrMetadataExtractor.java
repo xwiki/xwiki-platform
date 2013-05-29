@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -45,6 +46,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 @Component
 @Named("attachment")
+@Singleton
 public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override

@@ -96,7 +96,7 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
     }
 
     @Override
-    protected void start() throws Exception
+    protected void runInternal() throws Exception
     {
         notifyPushLevelProgress(getRequest().getExtensions().size());
 

@@ -391,6 +391,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     public void deletePreviousWikiJobStatus(String wiki)
     {
         this.jobStatusStorage.remove(getWikiJobId(wiki));
+        this.wikiDistributionJobs.remove(wiki);
     }
 
     @Override

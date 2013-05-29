@@ -111,7 +111,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     }
 
     @Override
-    protected void start() throws Exception
+    protected void runInternal() throws Exception
     {
         List<DistributionStep> steps = getDistributionJobStatus().getSteps();
 

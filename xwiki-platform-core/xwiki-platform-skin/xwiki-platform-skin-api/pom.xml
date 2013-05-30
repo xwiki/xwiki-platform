@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-skin</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.1-milestone-1</version>
   </parent>
   <artifactId>xwiki-platform-skin-api</artifactId>
   <name>XWiki Platform - Skin - API</name>

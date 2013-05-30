@@ -60,16 +60,19 @@ public class DefaultSelection extends AbstractSelection
     @Override
     public void addRange(Range range)
     {
-        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
-        if (wrapper.getNativeRange() == null) {
-            Document doc = (Document) range.getStartContainer().getOwnerDocument();
-            wrapper.setNativeRange(NativeRange.newInstance(doc));
+        NativeSelection selection = getNativeSelection();
+        if (selection != null) {
+            NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
+            if (wrapper.getNativeRange() == null) {
+                Document doc = (Document) range.getStartContainer().getOwnerDocument();
+                wrapper.setNativeRange(NativeRange.newInstance(doc));
+            }
+            NativeRange nativeRange = wrapper.getNativeRange().cast();
+            nativeRange.setStart(range.getStartContainer(), range.getStartOffset());
+            nativeRange.setEnd(range.getEndContainer(), range.getEndOffset());
+            selection.addRange(nativeRange);
+            DOMUtils.getInstance().scrollIntoView(range);
         }
-        NativeRange nativeRange = wrapper.getNativeRange().cast();
-        nativeRange.setStart(range.getStartContainer(), range.getStartOffset());
-        nativeRange.setEnd(range.getEndContainer(), range.getEndOffset());
-        getNativeSelection().addRange(nativeRange);
-        DOMUtils.getInstance().scrollIntoView(range);
     }
 
     @Override
@@ -91,19 +94,26 @@ public class DefaultSelection extends AbstractSelection
     @Override
     public int getRangeCount()
     {
-        return getNativeSelection().getRangeCount();
+        NativeSelection selection = getNativeSelection();
+        return selection == null ? 0 : selection.getRangeCount();
     }
 
     @Override
     public void removeAllRanges()
     {
-        getNativeSelection().removeAllRanges();
+        NativeSelection selection = getNativeSelection();
+        if (selection != null) {
+            selection.removeAllRanges();
+        }
     }
 
     @Override
     public void removeRange(Range range)
     {
-        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
-        getNativeSelection().removeRange((NativeRange) wrapper.getNativeRange());
+        NativeSelection selection = getNativeSelection();
+        if (selection != null) {
+            NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
+            selection.removeRange((NativeRange) wrapper.getNativeRange());
+        }
     }
 }

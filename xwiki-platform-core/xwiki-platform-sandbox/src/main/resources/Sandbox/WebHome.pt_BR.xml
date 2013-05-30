@@ -24,5 +24,6 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
   <content>O sandbox é uma parte de seu wiki que você pode modificar à vontade. É para treinar e  alterar. Você vai descobrir como funciona a alteração de páginas e criar novas páginas. Basta clicar em **Editar** para começar!
-</content>
+
+{{info}}Não se preocupe ser você está sobrescrevendo ou perdendo coisas ao editar essa página. Você pode sempre voltar para a primeira versão dá página na aba "Histórico" no fim da página.{{/info}}</content>
 </xwikidoc>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>WorkspaceManager</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>WorkspaceManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1307189790000</date>
+  <contentUpdateDate>1307189790000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+workspacemanager.browse=Durchsuche Workspaces
+workspacemanager.browse._actions=Aktionen
+workspacemanager.browse._actions.cancelJoinRequest=Anfrage abbrechen
+workspacemanager.browse._actions.delete=Löschen
+workspacemanager.browse._actions.join=Beitreten
+workspacemanager.browse._actions.leave=Verlassen
+workspacemanager.browse._actions.requestJoin=Beitritt anfragen
+workspacemanager.browse._actions.viewInvitation=Einladung anzeigen
+workspacemanager.browse.description=Beschreibung
+workspacemanager.browse.membershipType=Mitgliedschaftstyp
+workspacemanager.browse.owner=Besitzer
+workspacemanager.createworkspace=Neuen Workspace erstellen
+workspacemanager.dependencies.applicationmanager.missing=Der [[Application Manager Plugin&gt;&gt;http\://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]] ist nicht installiert. Bitte installieren und nochmal versuchen.
+workspacemanager.dependencies.wikimanager.missing=Der [[Wiki Manager Plugin&gt;&gt;http\://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Manager+Plugin]] ist nicht installiert. Bitte installieren und erneut versuchen.
+workspacemanager.members=MITGLIEDER
+workspacemanager.menu.mainwiki.admin=Main Wiki administrieren
+workspacemanager.menu.workspace.delete=Löschen
+workspacemanager.menu.workspace.index=Workspace Verzeichnis
+workspacemanager.prop.wiki.description=Beschreibung
+workspacemanager.prop.wiki.wikiname=Workspace Identifizierer
+workspacemanager.prop.wiki.wikiprettyname=Ausführlicher Name
+workspacemanager.prop.workspace.membershipType.hint=So können Benutzer dem Workspace beitreten.
+workspacemanager.prop.workspace.membershipType.label=Mitgliedschaftstyp
+workspacemanager.searchSuggestions.install.success=Die Workspace Suchvorschläge, wurden erfolgreich installiert.
+workspacemanager.successcreatewiki=Dein Workspace "{0}" wurde erstellt. Dieser ist über die folgende Adresse erreichbar\: {1}
+</content>
+</xwikidoc>

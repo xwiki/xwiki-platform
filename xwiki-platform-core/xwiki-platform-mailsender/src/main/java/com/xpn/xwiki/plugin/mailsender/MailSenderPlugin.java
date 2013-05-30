@@ -798,6 +798,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         XWikiURLFactory originalURLFactory = context.getURLFactory();
         try {
             context.setURLFactory(new ExternalServletURLFactory(context));
+			
+			context.setLanguage(language);
+			
             VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);

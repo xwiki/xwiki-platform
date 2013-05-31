@@ -49,6 +49,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.ContentAuthorController;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
@@ -106,6 +107,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiMessageTool;
 
     private Mock mockXWikiRightService;
+    
+    private Mock mockContentAuthorController;
 
     private Mock mockVelocityManager;
 
@@ -136,6 +139,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
+        this.document.setAuthorReference(new DocumentReference("xwiki", "XWiki", "User"));
 
         this.translatedDocument = new XWikiDocument();
         this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
@@ -161,6 +165,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWikiRightService = mock(XWikiRightService.class);
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+        
+        this.mockContentAuthorController = mock(ContentAuthorController.class);
 
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));

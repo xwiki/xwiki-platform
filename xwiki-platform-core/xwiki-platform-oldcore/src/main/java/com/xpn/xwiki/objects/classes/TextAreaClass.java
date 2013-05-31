@@ -217,8 +217,12 @@ public class TextAreaClass extends StringClass
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
+                //ContentAuthorController cac = Utils.getComponent(ContentAuthorController.class);
+                // For this transformation, rights should be checked against the panel content author.
+                //cac.pushContentAuthor(doc.getAuthorReference());
                 buffer.append(doc.getRenderedContent(result.toString(), getObjectDocumentSyntax(object, context)
-                    .toIdString(), context));
+                    .toIdString(), context, doc.getAuthorReference()));
+                //cac.popContentAuthor();
             } else {
                 buffer.append(result);
             }

@@ -942,6 +942,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         return getRenderedContent(text, syntaxId, Syntax.XHTML_1_0.toIdString(), context);
     }
+    
+    /**
+     * 
+     * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param context the XWiki Context object
+     * @param author author of the text to be rendered
+     * @return the given text rendered in the context of this document using the passed Syntax
+     */
+    public String getRenderedContent(String text, String syntaxId, XWikiContext context, DocumentReference author)
+    {
+        return getRenderedContent(text, syntaxId, Syntax.XHTML_1_0.toIdString(), context, author);
+    }
 
     /**
      * @param text the text to render
@@ -968,6 +981,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId, XWikiContext context)
     {
         return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false, context);
+    }
+    
+    /**
+     * 
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @param context the XWiki Context object
+     * @param author the author of the text to be rendered
+     * @return the given text rendered in the context of this document using the passed Syntax
+     */
+    public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId, XWikiContext context,
+        DocumentReference author)
+    {
+        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false, context, author);
     }
 
     /**
@@ -1005,6 +1033,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 parameters.setTransformationContextIsolated(true);
                 parameters.setTransformationContextRestricted(restrictedTransformationContext);
                 XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters);
+                result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
+
+                getRenderingCache().setRenderedContent(getDocumentReference(), text, result, context);
+            } catch (Exception e) {
+                // Failed to render for some reason. This method should normally throw an exception but this
+                // requires changing the signature of calling methods too.
+                LOGGER.warn("Failed to render content [" + text + "]", e);
+                result = "";
+            } finally {
+                if (backup != null) {
+                    restoreContext(backup, context);
+                }
+            }
+        }
+
+        return result;
+    }
+    
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param author the author of the text to be rendered
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 4.2M1
+     */
+    public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
+        boolean restrictedTransformationContext, XWikiContext context, DocumentReference author)
+    {
+        String result = getRenderingCache().getRenderedContent(getDocumentReference(), text, context);
+
+        if (result == null) {
+            Map<String, Object> backup = null;
+            try {
+                // We have to render the given text in the context of this document. Check if this document is already
+                // on the context (same Java object reference). We don't check if the document references are equal
+                // because this document can have temporary changes that are not present on the context document even if
+                // it has the same document reference.
+                if (context.getDoc() != this) {
+                    backup = new HashMap<String, Object>();
+                    backupContext(backup, context);
+                    setAsContextDoc(context);
+                }
+
+                // Reuse this document's reference so that the Velocity macro name-space is computed based on it.
+                XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
+                fakeDocument.setSyntax(this.syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
+                fakeDocument.setContent(text);
+                // Let's specify the author to make sure rights are given according to him
+                fakeDocument.setContentAuthorReference(author);
+                // Let's set isMetaDataDirty, isContentDirty and isNew to false to enable rights evaluation
+                fakeDocument.setMetaDataDirty(false);
+                fakeDocument.setContentDirty(false);
+                fakeDocument.setNew(false);
+
+                DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                parameters.setTransformationContextIsolated(true);
+                parameters.setTransformationContextRestricted(restrictedTransformationContext);
+                XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters, fakeDocument);
                 result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
 
                 getRenderingCache().setRenderedContent(getDocumentReference(), text, result, context);

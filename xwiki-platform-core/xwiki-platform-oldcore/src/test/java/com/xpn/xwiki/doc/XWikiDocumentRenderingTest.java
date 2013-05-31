@@ -93,6 +93,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
+        this.document.setAuthorReference(new DocumentReference("xwiki", "XWiki", "User"));
 
         getContext().setDoc(this.document);
 

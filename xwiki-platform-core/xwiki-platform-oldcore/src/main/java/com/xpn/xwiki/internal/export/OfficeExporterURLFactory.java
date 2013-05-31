@@ -25,18 +25,18 @@ import java.net.URL;
 import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.pdf.impl.PdfURLFactory;
+import com.xpn.xwiki.pdf.impl.FileSystemURLFactory;
 
 /**
  * URL factory used while exporting a wiki page as an office document.
  * <p>
- * Note: We extends {@link PdfURLFactory} for convenience. This is just a temporary solution. The entire export code
- * needs to be redesigned.
+ * Note: We extend {@link FileSystemURLFactory} for convenience. This is just a temporary solution. The entire export
+ * code needs to be redesigned.
  * 
  * @version $Id$
  * @since 3.1M1
  */
-public class OfficeExporterURLFactory extends PdfURLFactory
+public class OfficeExporterURLFactory extends FileSystemURLFactory
 {
     @Override
     public String getURL(URL url, XWikiContext context)

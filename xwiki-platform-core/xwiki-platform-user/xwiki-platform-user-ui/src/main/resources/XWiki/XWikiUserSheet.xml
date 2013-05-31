@@ -629,24 +629,24 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 ## Categories
 ##
 #set($categories = [])
-#set($discard = $categories.add(['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.png']))
+#set($discard = $categories.add(['profile', $services.localization.render('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.png']))
 #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
 #if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add(['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/wrench.png']))
+  #set($discard = $categories.add(['preferences', $services.localization.render('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/wrench.png']))
 #end
 ## TODO: add APIs to be able to display users watchlists to admins
 #if($isMyProfile &amp;&amp; $hasWatch)
-  #set($discard = $categories.add(['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.png']))
+  #set($discard = $categories.add(['watchlist', $services.localization.render('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.png']))
 #end
 #if ($isMyProfile)
-  #set ($discard = $categories.add(['network', $msg.get('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.png']))
+  #set ($discard = $categories.add(['network', $services.localization.render('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.png']))
 #end
 #set ($userWorkspaceSheet = 'WorkspaceManager.UserWorkspaceSheet')
 #if ($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWorkspaceSheet))
-  #set ($discard = $categories.add(['workspaces', $msg.get('workspacemanager.profile.category.workspaces'), $userWorkspaceSheet, 'icons/silk/chart_organisation.png']))
+  #set ($discard = $categories.add(['workspaces', $services.localization.render('workspacemanager.profile.category.workspaces'), $userWorkspaceSheet, 'icons/silk/chart_organisation.png']))
 #end
 #if ($isMyProfile &amp;&amp; $hasDashboard)
-  #set ($discard = $categories.add(['dashboard', $msg.get('platform.core.profile.category.dashboard'), 'Dashboard.XWikiUserDashboardSheet', 'icons/silk/application_view_tile.png']))
+  #set ($discard = $categories.add(['dashboard', $services.localization.render('platform.core.profile.category.dashboard'), 'Dashboard.XWikiUserDashboardSheet', 'icons/silk/application_view_tile.png']))
 #end
 ##
 ## Current category
@@ -670,7 +670,7 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 #else
 {{/html}}
 
-{{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$msg.get('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
+{{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
 
 {{html clean="false"}}
 #end

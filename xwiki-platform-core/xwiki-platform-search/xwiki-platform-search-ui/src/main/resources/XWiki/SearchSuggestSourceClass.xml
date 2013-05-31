@@ -84,15 +84,17 @@
     </name>
     <query>
       <disabled>0</disabled>
+      <editor>PureText</editor>
       <name>query</name>
       <number>3</number>
       <picker>0</picker>
       <prettyName>query</prettyName>
-      <size>30</size>
+      <rows>5</rows>
+      <size>40</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </query>
     <resultsNumber>
       <disabled>0</disabled>
@@ -100,7 +102,7 @@
       <number>4</number>
       <picker>0</picker>
       <prettyName>resultsNumber</prettyName>
-      <size>30</size>
+      <size>3</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>

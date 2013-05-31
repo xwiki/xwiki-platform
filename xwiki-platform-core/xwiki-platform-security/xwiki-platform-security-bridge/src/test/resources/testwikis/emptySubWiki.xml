@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin">
+    <user name="XWiki.user" />
+    <allowUser type="view" name="XWiki.Admin" />
+    <allowUser type="edit" name="XWiki.Admin" />
+    <allowUser type="comment" name="XWiki.Admin" />
+    <allowUser type="delete" name="XWiki.Admin" />
+    <allowUser type="register" name="XWiki.Admin" />
+    <allowUser type="admin" name="XWiki.Admin" />
+    <allowUser type="programming" name="XWiki.Admin" />
+  </wiki>
+  <wiki name="wiki2" mainWiki="false" owner="wiki:XWiki.Admin" >
+    <space name="Space">
+      <document name="Page">
+      </document>
+    </space>
+  </wiki>
+</wikis>

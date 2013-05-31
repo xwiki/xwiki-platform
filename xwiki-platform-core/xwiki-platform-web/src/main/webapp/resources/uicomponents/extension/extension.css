@@ -44,6 +44,11 @@
   float: right;
   text-align: right;
 }
+/* Display the drop-down menu of a button group on top of the extension to make sure it is visible. */
+.extension-actions .button-group > .dropdown-menu {
+  left: auto;
+  right: 0;
+}
 
 .extension-status {
   font-size: 0.8em;
@@ -103,12 +108,9 @@
   display: block;
 }
 
-ul.extension-metadata {
-  list-style-type: none;
+dl.extension-metadata > dd > ul {
+  list-style-position: inside;
   margin: 0;
-}
-ul.extension-metadata li {
-  padding-top: 0.5em;
 }
 
 .extension-body-dependencies ul, .extension-body-progress > ul {
@@ -246,7 +248,7 @@ ul.extension-metadata li {
   text-align: right;
 }
 
-#extension-search-advanced legend a:after {
+#extension-search-advanced legend a:after, a.extension-versions-link:after {
   content: " \bb";
 }
 #extension-search-advanced legend a.expanded:after {
@@ -256,7 +258,8 @@ ul.extension-metadata li {
   display: none;
 }
 #extension-search-advanced-body:target ~ div.hidden {
-  display: block;
+  /* The 'hidden' class forces display:none using !important so we have to use it too in order to overwrite it.  */
+  display: block !important;
 }
 .extension-search-advanced-popup {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
@@ -387,4 +390,22 @@ ul.extension-metadata li {
   line-height: inherit;
   margin: 0;
   min-width: 100px;
+}
+
+#extensionUpdater > .ui-progress {
+  margin-bottom: .5em;
+}
+#extensionUpdater > .extension-body-progress {
+  display: block;
+}
+
+.xLabel {
+  font-weight: 700;
+  margin: 1.2em 0 0.3em 0;
+  text-transform: uppercase;
+}
+.xHint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  margin: 0.3em 0;
 }

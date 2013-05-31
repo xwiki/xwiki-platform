@@ -20,8 +20,8 @@
 package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -75,18 +75,12 @@ public class DefaultWikiComponentManager implements WikiComponentManager
     /**
      * Map of registered components.
      */
-    private Map<DocumentReference, WikiComponent> registeredComponents =
-        new HashMap<DocumentReference, WikiComponent>();
+    private Set<WikiComponent> registeredComponents = new HashSet<WikiComponent>();
     
     @Override
     @SuppressWarnings("unchecked")
     public void registerWikiComponent(WikiComponent component) throws WikiComponentException
     {
-        if (registeredComponents.containsKey(component.getDocumentReference())) {
-            throw new
-                WikiComponentAlreadyRegisteredException("Component already registered. Try unregistering it first.");
-        }
-
         // Save current context information
         DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
         EntityReference currentEntityReference = this.wikiComponentManagerContext.getCurrentEntityReference();
@@ -114,7 +108,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
                 roleTypeClass.cast(component));
 
             // And hold a reference to it.
-            this.registeredComponents.put(component.getDocumentReference(), component);
+            this.registeredComponents.add(component);
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s] wiki "
                 + "component registration failed",
@@ -135,7 +129,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
         DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
         EntityReference currentEntityReference = this.wikiComponentManagerContext.getCurrentEntityReference();
 
-        for (WikiComponent registered : this.registeredComponents.values()) {
+        for (WikiComponent registered : this.registeredComponents) {
             if (registered.getDocumentReference().equals(reference)) {
                 // Unregister component
                 unregisteredComponent = registered;

@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -61,7 +60,16 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiRightServiceImpl implements XWikiRightService
 {
+    public static final EntityReference RIGHTCLASS_REFERENCE = new EntityReference("XWikiRights", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.SPACE));
+
+    public static final EntityReference GLOBALRIGHTCLASS_REFERENCE = new EntityReference("XWikiGlobalRights",
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRightServiceImpl.class);
+
+    private static final EntityReference XWIKIPREFERENCES_REFERENCE = new EntityReference("XWikiPreferences",
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     private static final List<String> ALLLEVELS = Arrays.asList("admin", "view", "edit", "comment", "delete",
         "undelete", "register", "programming");
@@ -324,7 +332,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             throw new XWikiRightNotFoundException();
         }
 
-        String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
+        EntityReference rightClassReference = global ? GLOBALRIGHTCLASS_REFERENCE : RIGHTCLASS_REFERENCE;
         String fieldName = user ? "users" : "groups";
         boolean found = false;
 
@@ -343,16 +351,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 accessLevel, user, allow, global);
         }
 
-        Vector<BaseObject> vobj = doc.getObjects(className);
-        if (vobj != null) {
+        List<BaseObject> rightObjects = doc.getXObjects(rightClassReference);
+        if (rightObjects != null) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Checking objects [{}]", vobj.size());
+                LOGGER.debug("Checking objects [{}]", rightObjects.size());
             }
 
-            for (int i = 0; i < vobj.size(); i++) {
+            for (int i = 0; i < rightObjects.size(); i++) {
                 LOGGER.debug("Checking object [{}]", i);
 
-                BaseObject bobj = vobj.get(i);
+                BaseObject bobj = rightObjects.get(i);
 
                 if (bobj == null) {
                     LOGGER.debug("Bypass object [{}]", i);
@@ -433,8 +441,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         addMemberGroups(doc.getWikiName(), prefixedFullName, userOrGroupDocumentReference, grouplist, context);
 
         // Get member groups from member's wiki
-        if (context.getWiki().isVirtualMode()
-            && !context.getDatabase().equalsIgnoreCase(userOrGroupDocumentReference.getWikiReference().getName())) {
+        if (!context.getDatabase().equalsIgnoreCase(userOrGroupDocumentReference.getWikiReference().getName())) {
             addMemberGroups(userOrGroupDocumentReference.getWikiReference().getName(), prefixedFullName,
                 userOrGroupDocumentReference, grouplist, context);
         }
@@ -592,7 +599,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
             }
 
-            XWikiDocument entityWikiPreferences = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
+            XWikiDocument entityWikiPreferences = context.getWiki().getDocument(XWIKIPREFERENCES_REFERENCE, context);
 
             // Verify XWiki register right
             if (accessLevel.equals("register")) {
@@ -753,10 +760,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 // Delete must be denied by default.
                 if ("delete".equals(accessLevel)) {
                     if (hasAccessLevel("admin", userOrGroupName, entityReference, user, context)) {
-                        logAllow(userOrGroupName, entityReference, accessLevel, "admin rights imply delete on empty wiki");
+                        logAllow(userOrGroupName, entityReference, accessLevel,
+                            "admin rights imply delete on empty wiki");
                         return true;
                     }
-                    logDeny(userOrGroupName, entityReference, accessLevel, "global level (delete right must be explicit)");
+                    logDeny(userOrGroupName, entityReference, accessLevel,
+                        "global level (delete right must be explicit)");
 
                     return false;
                 } else {
@@ -813,7 +822,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         try {
             // The master user and programming rights are checked in the main wiki
             context.setDatabase(context.getMainXWiki());
-            XWikiDocument xwikimasterdoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
+            XWikiDocument xwikimasterdoc = context.getWiki().getDocument(XWIKIPREFERENCES_REFERENCE, context);
             // Verify XWiki Master super user
             try {
                 allow = checkRight(name, xwikimasterdoc, "admin", true, true, true, context);

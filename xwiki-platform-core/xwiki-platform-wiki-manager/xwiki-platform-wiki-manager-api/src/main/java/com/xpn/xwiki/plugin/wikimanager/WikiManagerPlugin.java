@@ -90,6 +90,6 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
      */
     public GlobalSearchPluginApi getGlobalSearchApiPlugin(XWikiContext context)
     {
-        return (GlobalSearchPluginApi) searchPlugin.getPluginApi(searchPlugin, context);
+        return (GlobalSearchPluginApi) this.searchPlugin.getPluginApi(searchPlugin, context);
     }
 }

@@ -62,7 +62,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     private static final String DATE = "date";
 
     /**
-     * Constructor used by {@link XWiki} during storage initialization.
+     * Constructor used by {@link com.xpn.xwiki.XWiki} during storage initialization.
      * 
      * @param context The current context.
      * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentRecycleBinStore.class) instead.

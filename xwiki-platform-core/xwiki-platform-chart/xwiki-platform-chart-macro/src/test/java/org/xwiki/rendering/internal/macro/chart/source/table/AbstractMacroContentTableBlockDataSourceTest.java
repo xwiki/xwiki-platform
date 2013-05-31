@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.chart.source.DataSource;
-import org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;

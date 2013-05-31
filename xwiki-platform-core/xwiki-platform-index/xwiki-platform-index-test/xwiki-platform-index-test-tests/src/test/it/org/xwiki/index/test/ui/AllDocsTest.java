@@ -1,4 +1,4 @@
- /*
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -52,5 +52,22 @@ public class AllDocsTest extends AbstractTest
         livetable = page.clickIndexTab();
         livetable.filterColumn("xwiki-livetable-alldocs-filter-1", "XWikiAllGroup");
         Assert.assertTrue(livetable.hasRow("Page", "XWikiAllGroup"));
+    }
+
+    @Test
+    public void testRecycleBinTabs() throws Exception
+    {
+        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
+        getUtil().recacheSecretToken();
+
+        AllDocsPage page = new AllDocsPage();
+        AllDocsPage.gotoPage();
+        Assert.assertTrue("Deleted documents tab is not visible to Admin", page.hasDeletedDocsTab());
+        Assert.assertTrue("Deleted attachments tab is not visible to Admin", page.hasDeletedAttachmentsTab());
+        // Logs out to be guest
+        page.logout();
+        Assert.assertFalse("Deleted documents shouldn't be visible to guests", page.hasDeletedDocsTab());
+        Assert.assertFalse("Deleted attachments shouldn't be visible to guests", page.hasDeletedAttachmentsTab());
+
     }
 }

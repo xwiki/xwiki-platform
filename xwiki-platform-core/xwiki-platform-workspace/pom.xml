@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>xwiki-platform-workspace</artifactId>
@@ -16,55 +16,6 @@
     <module>xwiki-platform-workspace-template-features</module>
     <module>xwiki-platform-workspace-ui</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <!-- XWiki Plugins -->
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-wiki-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-wiki-manager-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-application-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-application-manager-ui</artifactId>
-        <version>${project.version}</version>
-        <type>xar</type>
-      </dependency>
-
-      <!-- XWiki Core -->
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-oldcore</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-component-api</artifactId>
-        <version>${commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-component-default</artifactId>
-        <version>${commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-script</artifactId>
-        <version>${commons.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <description>Parent POM for the Workspace feature.</description>
   <build>

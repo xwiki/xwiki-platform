@@ -239,6 +239,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * @see #getNumber()
      * @since 2.4M2
      */
+    @Override
     public int compareTo(PropertyClass other)
     {
         return this.getBasePropertyClass().compareTo(other.getBasePropertyClass());

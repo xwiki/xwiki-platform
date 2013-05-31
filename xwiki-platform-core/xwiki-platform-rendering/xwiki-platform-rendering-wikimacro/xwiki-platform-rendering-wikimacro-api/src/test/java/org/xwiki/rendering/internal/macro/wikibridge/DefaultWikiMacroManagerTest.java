@@ -27,7 +27,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
@@ -62,6 +64,8 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
     private DocumentAccessBridge mockDocumentAccessBridge;
 
+    private EntityReferenceValueProvider mockCurrentValueProvider;
+
     private WikiMacroFactory mockWikiMacroFactory;
 
     private Parser xwiki20Parser;
@@ -73,6 +77,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
         // Document Access Bridge Mock
         this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
+        this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);
     }
 
@@ -91,14 +96,18 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentAccessBridge).getCurrentWiki();
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki"));
-                allowing(mockDocumentAccessBridge).getCurrentUser();
-                will(returnValue("dummy"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document"));
                 allowing(mockDocumentAccessBridge).setCurrentUser("dummy");
                 allowing(mockDocumentAccessBridge).setCurrentUser((String) with(anything()));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "dummy")));
+                allowing(mockDocumentAccessBridge).getCurrentUser();
+                will(returnValue("XWiki.dummy"));
             }
         });
     }

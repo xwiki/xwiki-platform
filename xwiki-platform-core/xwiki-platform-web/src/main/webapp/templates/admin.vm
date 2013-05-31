@@ -58,12 +58,12 @@
 #set ($force = $!request.get('force'))
 #if (!$hasAdmin)
   $response.setStatus(403)
-  #xwikimessageboxstart($msg.get('error') $msg.get('notallowed'))
+  #xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
   #xwikimessageboxend()
 #elseif (($tdoc.getLocked() == true) && (!$force))
   $response.setStatus(423)
-  #xwikimessageboxstart($msg.get('notice') "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
-  <a href="$doc.getURL($xcontext.action, "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get('forcelock')</a>
+  #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
+  <a href="$doc.getURL($xcontext.action, "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$services.localization.render('forcelock')</a>
   #xwikimessageboxend()
 #else
   #if ($xwiki.exists('XWiki.AdminSheet'))
@@ -83,14 +83,14 @@
       #else
         #set ($URL = "${URLhost}/releases/${URLgroup}/${URLartifact}/$URLversion/${URLartifact}-${URLversion}.xar")
       #end
-      #warning($msg.get('admin.defaultwikinotinstalled', ["<a href='$URL'>$URL</a>"]))
+      #warning($services.localization.render('admin.defaultwikinotinstalled', ["<a href='$URL'>$URL</a>"]))
     #else
       ## More than 40 pages and Admin app not installed, probably an upgrade.
-      #warning($msg.get('admin.adminappnotinstalled', ['<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application">http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application</a>']))
+      #warning($services.localization.render('admin.adminappnotinstalled', ['<a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application">http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application</a>']))
     #end
     <div id="admin-page">
       <div id="admin-page-header">
-        <h1 id="admin-header">$msg.get('admin.import')</h1>
+        <h1 id="admin-header">$services.localization.render('admin.import')</h1>
       </div> ## admin-page-header
       <div id="admin-page-content">
         #template("importinline.vm")

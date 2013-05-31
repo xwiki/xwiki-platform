@@ -20,6 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.importer;
 
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 
 /**
  * Filters the DOM tree generated from the text pasted into a right text area.
@@ -37,6 +38,16 @@ public class PasteFilter
      * @param document the DOM document to be filtered
      */
     public void filter(Document document)
+    {
+        filter(document.getDocumentElement());
+    }
+
+    /**
+     * Filters the given element.
+     * 
+     * @param element the element to be filtered
+     */
+    public void filter(Element element)
     {
         // No filtering is done by default. Browser specific implementations may overwrite this method.
     }

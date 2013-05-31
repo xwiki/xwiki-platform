@@ -160,7 +160,7 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     public void testModifiedDocumentXObjectModified()
     {
         this.document.addXObject(this.xobject);
-        this.documentOrigin.addXObject((BaseObject) this.xobject.clone());
+        this.documentOrigin.addXObject(this.xobject.clone());
         
         this.xobject.setStringValue("newproperty", "newvalue");
 
@@ -180,7 +180,7 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     public void testModifiedDocumentXObjectPropertyAdded()
     {
         this.document.addXObject(this.xobject);
-        this.documentOrigin.addXObject((BaseObject) this.xobject.clone());
+        this.documentOrigin.addXObject(this.xobject.clone());
         
         this.xobject.setStringValue("newproperty", "newvalue");
 
@@ -199,7 +199,7 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     @Test
     public void testModifiedDocumentXObjectPropertyDeleted()
     {
-        this.document.addXObject((BaseObject) this.xobject.clone());
+        this.document.addXObject(this.xobject.clone());
         this.documentOrigin.addXObject(this.xobject);
         
         this.xobject.setStringValue("deletedproperty", "deletedvalue");
@@ -221,7 +221,7 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     {
         this.xobject.setStringValue("updatedproperty", "propertyvalue");
      
-        BaseObject xobjectModified = (BaseObject) this.xobject.clone();
+        BaseObject xobjectModified = this.xobject.clone();
         xobjectModified.setStringValue("updatedproperty", "propertyvaluemodified");
         
         this.document.addXObject(this.xobject);

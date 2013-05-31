@@ -22,6 +22,7 @@ package org.xwiki.security.authorization.internal;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -54,7 +55,7 @@ public class ConservativeContentAuthorResolverTest
 
     private final SpaceReference spaceReference = new SpaceReference("space", wikiReference);
 
-    private final SpaceReference wikiSpace = new SpaceReference(XWikiConstants.WIKI_SPACE, wikiReference);
+    private final SpaceReference wikiSpace = new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference);
 
     private final DocumentReference requiredRight = new DocumentReference(XWikiConstants.REQUIRED_RIGHT_CLASSNAME,
                                                                           wikiSpace);

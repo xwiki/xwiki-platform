@@ -4,15 +4,15 @@
   #set ($statsService = $xwiki.getStatsService())
   #if ($statsService.isEnabledGlobally())
     #set ($documents = $statsService.getRecentActions('view', 13))
-    #set ($title = $msg.get('listofrecentlyviewedpages'))
+    #set ($title = $services.localization.render('listofrecentlyviewedpages'))
   #else
-    #warning($msg.get('warningstartspluginisnotactivated'))
+    #warning($services.localization.render('warningstartspluginisnotactivated'))
     #set($documents = [])
   #end
 #else
   #set ($sql = 'where 1=1 order by doc.date desc')
   #set ($documents = $xwiki.searchDocuments($sql, 50, 0))
-  #set ($title = $msg.get('listofrecentlymodifiedpages'))
+  #set ($title = $services.localization.render('listofrecentlymodifiedpages'))
 #end
 
 #set ($hasDocuments = false)
@@ -31,8 +31,8 @@
       #set ($itemSpace = $escapetool.xml($escapetool.javascript($bentrydoc.space)))
       #set ($itemName = $escapetool.xml($escapetool.javascript($bentrydoc.name)))
       <a href="#" onclick="document.forms[0].wiki_page.value='$itemName';if ('$currentSpaceEscaped' != '$itemSpace') document.forms[0].wiki_space.value='$itemSpace'; else document.forms[0].wiki_space.value=''; return false;">
-      $escapetool.xml($bentrydoc.name)</a> $msg.get('inspace') $escapetool.xml($bentrydoc.space) $msg.get('wikiweb'), $msg.get('lastmodifiedby')
-      $xwiki.getUserName($bentrydoc.author) $msg.get('lastmodifiedon') $xwiki.formatDate($bentrydoc.date, 'MMMM dd, yyyy HH:mm')
+      $escapetool.xml($bentrydoc.name)</a> $services.localization.render('inspace') $escapetool.xml($bentrydoc.space) $services.localization.render('wikiweb'), $services.localization.render('lastmodifiedby')
+      $xwiki.getUserName($bentrydoc.author) $services.localization.render('lastmodifiedon') $xwiki.formatDate($bentrydoc.date, 'MMMM dd, yyyy HH:mm')
       </li>
       #set ($counter = $counter + 1)
     #else

@@ -51,7 +51,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
         Principal principal = null;
 
         // Trim the username to allow users to enter their names with spaces before or after
-        String username  = (ldapusername==null) ? null : ldapusername.replaceAll(" ", "");
+        String username = (ldapusername == null) ? null : ldapusername.replaceAll(" ", "");
 
         if ((username == null) || (username.equals("")))
             return null;
@@ -72,60 +72,50 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
             if (i != -1)
                 susername = username.substring(i + 1);
 
-           String DN = getLDAP_DN(ldapusername, context);
+            String DN = getLDAP_DN(ldapusername, context);
 
-           if (DN != null && DN.length()!=0)
-           {
-               if (checkDNPassword(DN, ldapusername, password, context))
-               {
-                   principal = GetUserPrincipal(susername, context);
-               }
-           }
-           else
-            {
-               HashMap attributes = new HashMap();
-               if (checkUserPassword(ldapusername, password, attributes, context))
-               {
-                   if (LOGGER.isDebugEnabled())
+            if (DN != null && DN.length() != 0) {
+                if (checkDNPassword(DN, ldapusername, password, context)) {
+                    principal = GetUserPrincipal(susername, context);
+                }
+            } else {
+                HashMap attributes = new HashMap();
+                if (checkUserPassword(ldapusername, password, attributes, context)) {
+                    if (LOGGER.isDebugEnabled())
                         LOGGER.debug("User authenticated successfully");
-                   principal = GetUserPrincipal(susername, context);
-                   if (principal == null && attributes.size() > 0)
-                   {
-                       if (LOGGER.isDebugEnabled())
+                    principal = GetUserPrincipal(susername, context);
+                    if (principal == null && attributes.size() > 0) {
+                        if (LOGGER.isDebugEnabled())
                             LOGGER.debug("Ready to create user from LDAP");
 
-                	   // In case of Virtual Wikis, users should be added in the main wiki
-                	   	// if ldap is not configured for the virtual wiki
-						if (context.getWiki().isVirtualMode()) {
-							String db = context.getDatabase();
-							try {
-								// Switch to the main database in case of
-								// virtual and if not local LDAP configuration
-								if (context.getWiki().getXWikiPreference("ldap_server", context) == null || context.getWiki().getXWikiPreference("ldap_server", context).length() == 0) {
-									context.setDatabase(context.getWiki().getDatabase());
-								}
-								try {
-									CreateUserFromLDAP(attributes,	context);
-                                    LOGGER.debug("Looking for user again " + susername);
-									principal = GetUserPrincipal(susername, context);
-								} catch (Exception e) {
-								}
-							} finally {
-								context.setDatabase(db);
-							}
-						} else {
-							CreateUserFromLDAP(attributes, context);
-                            LOGGER.debug("Looking for user again " + susername);
-							principal = GetUserPrincipal(susername, context);
-						}
-						context.getWiki().flushCache(context);
-                   }
-                   if (principal ==null) {
-                       if (LOGGER.isDebugEnabled())
-                          LOGGER.debug("Accept user even without account");
-                       principal = new SimplePrincipal("XWiki." + susername);
-                   }
-               }
+                        // Users should be added in the main wiki
+                        // if ldap is not configured for the virtual wiki
+
+                        String db = context.getDatabase();
+                        try {
+                            // Switch to the main database in case of
+                            // virtual and if not local LDAP configuration
+                            if (StringUtils.isEmpty(context.getWiki().getXWikiPreference("ldap_server", context))) {
+                                context.setDatabase(context.getWiki().getDatabase());
+                            }
+                            try {
+                                CreateUserFromLDAP(attributes, context);
+                                LOGGER.debug("Looking for user again " + susername);
+                                principal = GetUserPrincipal(susername, context);
+                            } catch (Exception e) {
+                            }
+                        } finally {
+                            context.setDatabase(db);
+                        }
+
+                        context.getWiki().flushCache(context);
+                    }
+                    if (principal == null) {
+                        if (LOGGER.isDebugEnabled())
+                            LOGGER.debug("Accept user even without account");
+                        principal = new SimplePrincipal("XWiki." + susername);
+                    }
+                }
             }
         }
         return principal;

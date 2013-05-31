@@ -29,10 +29,11 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 /**
- * SecurityReference is a variant of EntityReference used internally in the security-autorization module, for the
+ * SecurityReference is a variant of EntityReference used internally in the security-authorization module, for the
  * purpose of conveniently maintaining a hierarchy where all entities are rooted by the main wiki.  This form of
  * hierarchical view is required to deciding which access levels that should be enforced.  There is always a one-to-one
- * correspondence between a SecurityReference and a Wiki-, Space-, or DocumentReference.
+ * correspondence between a SecurityReference and a Wiki-, Space-, or DocumentReference. Moreover, a security reference
+ * built with a null EntityReference is equivalent to the main wiki reference (but with a null original reference).
  *
  * @see {@link SecurityReferenceFactory}
  * @version $Id$
@@ -47,7 +48,7 @@ public class SecurityReference extends EntityReference
     private static final long serialVersionUID = 1L;
 
     /** Main wiki reference. */
-    private SecurityReference mainWikiReference;
+    protected SecurityReference mainWikiReference;
 
     /** Original reference represented by this reference. */
     private EntityReference originalReference;
@@ -68,8 +69,8 @@ public class SecurityReference extends EntityReference
      */
     SecurityReference(EntityReference reference, SecurityReference mainWiki)
     {
-        super(reference);
-        this.originalReference = reference;
+        super((reference != null) ? reference : mainWiki);
+        this.originalReference = (reference != null) ? reference : mainWiki.getOriginalReference();
         this.mainWikiReference = mainWiki;
     }
 
@@ -104,7 +105,7 @@ public class SecurityReference extends EntityReference
     }
 
     /**
-     * @return the entity reference type, but for the main wiki, return {@link Right.FARM}.
+     * @return the entity reference type, but for the main wiki, return {@link SecurityReference.FARM}.
      */
     public EntityType getSecurityType()
     {
@@ -113,6 +114,17 @@ public class SecurityReference extends EntityReference
             return type;
         }
         return FARM;
+    }
+
+    /**
+     * @return a SecurityReference representing the first reference of EntityType.WIKI in this security reference.
+     */
+    public SecurityReference getWikiReference() {
+        SecurityReference result = this;
+        while (result != null && result.getType() != EntityType.WIKI) {
+            result = result.getParentSecurityReference();
+        }
+        return result;
     }
 
     /**

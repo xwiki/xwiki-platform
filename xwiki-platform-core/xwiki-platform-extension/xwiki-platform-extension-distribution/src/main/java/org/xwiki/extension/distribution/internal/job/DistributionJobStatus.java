@@ -19,9 +19,12 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
@@ -30,36 +33,71 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  * @since 4.2M3
  */
-public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
+public class DistributionJobStatus<R extends DistributionRequest> extends DefaultJobStatus<DistributionRequest>
 {
     /**
      * Serialization identifier.
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId previousDistributionExtension;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId previousDistributionExtensionUi;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId distributionExtension;
 
+    /**
+     * Note that this field should not be renamed since it's expected by job status parser.
+     */
     private ExtensionId distributionExtensionUi;
 
-    private List<DistributionStepStatus> steps;
+    private List<DistributionStep> stepList;
 
     private int currentStateIndex;
 
-    public DistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
-        LoggerManager loggerManager, List<DistributionStepStatus> steps)
+    public DistributionJobStatus(DistributionJobStatus<R> status, ObservationManager observationManager,
+        LoggerManager loggerManager)
+    {
+        super(status.getRequest(), observationManager, loggerManager, false);
+
+        this.previousDistributionExtension = status.previousDistributionExtension;
+        this.previousDistributionExtensionUi = status.previousDistributionExtensionUi;
+        this.distributionExtension = status.distributionExtension;
+        this.distributionExtensionUi = status.distributionExtensionUi;
+        this.stepList = status.stepList;
+    }
+
+    public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
+        List<DistributionStep> steps)
     {
         super(request, observationManager, loggerManager, false);
 
-        this.steps = steps;
+        this.stepList = steps;
     }
 
-    public List<DistributionStepStatus> getSteps()
+    public List<DistributionStep> getSteps()
     {
-        return this.steps;
+        return this.stepList != null ? this.stepList : Collections.<DistributionStep> emptyList();
+    }
+
+    public DistributionStep getStep(String stepId)
+    {
+        for (DistributionStep step : getSteps()) {
+            if (step.getId().equals(stepId)) {
+                return step;
+            }
+        }
+
+        return null;
     }
 
     public int getCurrentStateIndex()
@@ -67,7 +105,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         return this.currentStateIndex;
     }
 
-    public DistributionStepStatus getCurrentStateStatus()
+    public DistributionStep getCurrentStep()
     {
         return getCurrentStateIndex() < getSteps().size() ? getSteps().get(getCurrentStateIndex()) : null;
     }
@@ -89,14 +127,14 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         this.previousDistributionExtension = previousDistributionExtension;
     }
 
-    public ExtensionId getPreviousDistributionExtensionUi()
+    public ExtensionId getPreviousDistributionExtensionUI()
     {
         return this.previousDistributionExtensionUi;
     }
 
-    public void setPreviousDistributionExtensionUi(ExtensionId previousDistributionExtensionUi)
+    public void setPreviousDistributionExtensionUI(ExtensionId previousDistributionExtensionUI)
     {
-        this.previousDistributionExtensionUi = previousDistributionExtensionUi;
+        this.previousDistributionExtensionUi = previousDistributionExtensionUI;
     }
 
     public ExtensionId getDistributionExtension()
@@ -109,13 +147,47 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         this.distributionExtension = distributionExtension;
     }
 
-    public ExtensionId getDistributionExtensionUi()
+    public ExtensionId getDistributionExtensionUI()
     {
         return this.distributionExtensionUi;
     }
 
-    public void setDistributionExtensionUi(ExtensionId distributionExtensionUi)
+    public void setDistributionExtensionUI(ExtensionId distributionExtensionUI)
     {
-        this.distributionExtensionUi = distributionExtensionUi;
+        this.distributionExtensionUi = distributionExtensionUI;
+    }
+
+    public static DistributionState getDistributionState(ExtensionId previousExtensionId,
+        ExtensionId distributionExtensionId)
+    {
+        DistributionState distributionState;
+
+        if (distributionExtensionId != null) {
+            if (previousExtensionId == null) {
+                distributionState = DistributionState.NEW;
+            } else {
+                if (previousExtensionId.equals(distributionExtensionId)) {
+                    distributionState = DistributionState.SAME;
+                } else if (!distributionExtensionId.getId().equals(previousExtensionId.getId())) {
+                    distributionState = DistributionState.DIFFERENT;
+                } else {
+                    int diff = distributionExtensionId.getVersion().compareTo(previousExtensionId.getVersion());
+                    if (diff > 0) {
+                        distributionState = DistributionState.UPGRADE;
+                    } else {
+                        distributionState = DistributionState.DOWNGRADE;
+                    }
+                }
+            }
+        } else {
+            distributionState = DistributionState.NONE;
+        }
+
+        return distributionState;
+    }
+
+    public DistributionState getDistributionState()
+    {
+        return getDistributionState(getPreviousDistributionExtension(), getDistributionExtension());
     }
 }

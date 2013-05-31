@@ -69,7 +69,8 @@ public class ModalMessageDialog extends DefaultDialog
         }
         Button closeButton = new Button(this.app.getTranslation("Ok"));
         closeButton.addClickListener(new ClickListener(){
-           public void onClick(Widget arg0)
+           @Override
+        public void onClick(Widget arg0)
            {
                ModalMessageDialog.this.hide();
            }

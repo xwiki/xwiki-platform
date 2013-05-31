@@ -40,26 +40,26 @@
       $!entryObj.set('hidden', 0)
       #set($discard = $articleDoc.removeObjects('XWiki.ArticleClass'))
       $articleDoc.setContent($newContent)
-      $!articleDoc.save($msg.get('xe.blog.migration.migrated'), true)
-      * $msg.get('xe.blog.migration.updated') [[$entryObj.title&gt;&gt;${article}]] ($msg.get('xe.blog.migration.inspace') [[$articleDoc.space&gt;&gt;${articleDoc.space}.WebHome]])
+      $!articleDoc.save($services.localization.render('xe.blog.migration.migrated'), true)
+      * $services.localization.render('xe.blog.migration.updated') [[$entryObj.title&gt;&gt;${article}]] ($services.localization.render('xe.blog.migration.inspace') [[$articleDoc.space&gt;&gt;${articleDoc.space}.WebHome]])
     #else
-      * $msg.get('xe.blog.migration.skipping') [[$article]]
+      * $services.localization.render('xe.blog.migration.skipping') [[$article]]
     #end
   #end
-  $msg.get('xe.blog.migration.done') [[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
+  $services.localization.render('xe.blog.migration.done') [[$services.localization.render('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
 #else
-$msg.get('xe.blog.migration.pleaseconfirm')
+$services.localization.render('xe.blog.migration.pleaseconfirm')
 
 {{html clean="false" wiki="true"}}
   &lt;form action="$doc.getURL()" method="post"&gt;
     &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-    &lt;input type="submit" name="migrate" value="$msg.get('xe.blog.migration.confirm')"/&gt;
+    &lt;input type="submit" name="migrate" value="$services.localization.render('xe.blog.migration.confirm')"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
 
-[[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
+[[$services.localization.render('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
 #end
 {{/velocity}}</content>
 </xwikidoc>

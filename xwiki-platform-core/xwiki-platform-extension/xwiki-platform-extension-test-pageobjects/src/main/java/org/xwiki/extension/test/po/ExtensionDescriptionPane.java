@@ -32,6 +32,11 @@ import org.xwiki.test.ui.po.BaseElement;
 public class ExtensionDescriptionPane extends BaseElement
 {
     /**
+     * The XPath used to access a definition list item if we know the definition term.
+     */
+    private static final String DEFINITION_FOR_TERM_XPATH = ".//dd[preceding-sibling::dt[1][. = '%s']]";
+
+    /**
      * The section container.
      */
     private final WebElement container;
@@ -51,9 +56,7 @@ public class ExtensionDescriptionPane extends BaseElement
      */
     public String getLicense()
     {
-        By xpath = By.xpath(".//li[starts-with(., 'License: ')]");
-        WebElement license = getUtil().findElementWithoutWaiting(getDriver(), container, xpath);
-        return license.getText().substring("License: ".length());
+        return getMetaData("License");
     }
 
     /**
@@ -61,7 +64,33 @@ public class ExtensionDescriptionPane extends BaseElement
      */
     public WebElement getWebSite()
     {
-        By xpath = By.xpath(".//li[starts-with(normalize-space(.), 'Website: ')]//a");
+        By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH + "//a", "Website"));
         return getUtil().findElementWithoutWaiting(getDriver(), container, xpath);
+    }
+
+    /**
+     * @return the extension id
+     */
+    public String getId()
+    {
+        return getMetaData("Id");
+    }
+
+    /**
+     * @return the extension type
+     */
+    public String getType()
+    {
+        return getMetaData("Type");
+    }
+
+    /**
+     * @param label the meta data label
+     * @return the extension meta data for the specified label
+     */
+    private String getMetaData(String label)
+    {
+        By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH, label));
+        return getUtil().findElementWithoutWaiting(getDriver(), container, xpath).getText();
     }
 }

@@ -19,13 +19,12 @@
  */
 package com.xpn.xwiki.gwt.api.client;
 
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.core.client.GWT;
-
 import java.util.List;
 import java.util.Map;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 public interface XWikiService extends RemoteService {
 

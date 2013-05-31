@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-zipexplorer</artifactId>
   <name>XWiki Platform - ZIP Explorer</name>
   <description>Navigates through ZIPs attached to documents and create links to files in them</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>74.94</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -88,7 +88,7 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable == "funct
                 })
               )
             )
-          });   
+          });
         }
         // replace the id of the limits element by the one expected by convention by the new LiveTable widget
         $("showLimits").id = domNode + "-limits";
@@ -101,7 +101,7 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable == "funct
          }
          $('scrollbar1').up("td").remove();  // remove the td that holds the scrollbar
       }
- 
+
       if($('table-filters')) {
          // replace the id of the filters container by the one expected by convention by the new LiveTable widget
          $('table-filters').id = domNode + "-filters";
@@ -110,7 +110,7 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable == "funct
       // Ouf, that should be all for compatibility code, now we call father initialize method of new widget.
       // Some arguments are dropped since the new signature is different.
       $super(url, domNode, getHandler, {"action" : action});
-    } 
+    }
   });
 }
 
@@ -122,7 +122,7 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable == "funct
  * Deprecated since 2.6 RC1
  */
 window.hideForm = function(form){
-    warn("window.hideForm is deprecated since XWiki 2.6RC1. Use a CSS selector + Element#toggleClassName instead.");    
+    warn("window.hideForm is deprecated since XWiki 2.6RC1. Use a CSS selector + Element#toggleClassName instead.");
     form.getElementsByTagName("fieldset").item(0).className = "collapsed";
 }
 

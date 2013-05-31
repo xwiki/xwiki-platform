@@ -19,13 +19,14 @@
  */
 package com.xpn.xwiki.plugin.applicationmanager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -36,6 +37,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Hidden toolkit used by the plugin API that make all the plugins actions.
@@ -65,18 +67,28 @@ public final class ApplicationManager
     private static final String XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP = ",";
 
     /**
-     * The message tool to use to generate error or comments.
+     * Used to access translations.
      */
-    private XWikiPluginMessageTool messageTool;
+    private ContextualLocalizationManager localizationManager;
 
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @param messageTool the message tool
+     * Default constructor.
      */
+    public ApplicationManager()
+    {
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
+    }
+
+    /**
+     * @param messageTool the message tool
+     * @deprecated since 5.0M1 use {@link #ApplicationManager()} instead
+     */
+    @Deprecated
     public ApplicationManager(XWikiPluginMessageTool messageTool)
     {
-        this.messageTool = messageTool;
+        this();
     }
 
     /**
@@ -84,10 +96,12 @@ public final class ApplicationManager
      * 
      * @param context the XWiki context.
      * @return a translated strings manager.
+     * @deprecated since 5.0M1 use {@link org.xwiki.localization.LocalizationManager} instead
      */
+    @Deprecated
     public XWikiPluginMessageTool getMessageTool(XWikiContext context)
     {
-        return this.messageTool != null ? this.messageTool : ApplicationManagerMessageTool.getDefault(context);
+        return ApplicationManagerMessageTool.getDefault(context);
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -153,16 +167,16 @@ public final class ApplicationManager
             // If we are not allowed to continue if server page already exists
             if (failOnExist) {
                 if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
-                        userAppSuperDoc.getAppName()));
+                    LOGGER.error(this.localizationManager.getTranslationPlain(
+                        ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS, userAppSuperDoc.getAppName()));
                 }
 
                 throw new ApplicationManagerException(ApplicationManagerException.ERROR_AM_APPDOCALREADYEXISTS,
-                    getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
-                        userAppSuperDoc.getAppName()));
+                    this.localizationManager.getTranslationPlain(
+                        ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS, userAppSuperDoc.getAppName()));
             } else if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
-                    userAppSuperDoc.getAppName()));
+                LOGGER.warn(this.localizationManager.getTranslationPlain(
+                    ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS, userAppSuperDoc.getAppName()));
             }
 
         }
@@ -286,8 +300,8 @@ public final class ApplicationManager
             }
 
             if (updateprefs) {
-                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
-                    translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
+                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES,
+                    StringUtils.join(translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
                 xwiki.saveDocument(prefsDoc, comment, context);
             }
         }
@@ -307,8 +321,9 @@ public final class ApplicationManager
      */
     public void updateAllApplicationTranslation(XWikiContext context) throws XWikiException
     {
-        updateApplicationsTranslation(getApplicationList(context), getMessageTool(context).get(
-            ApplicationManagerMessageTool.COMMENT_REFRESHALLTRANSLATIONS), context);
+        updateApplicationsTranslation(getApplicationList(context),
+            this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.COMMENT_REFRESHALLTRANSLATIONS),
+            context);
     }
 
     /**
@@ -329,7 +344,7 @@ public final class ApplicationManager
     {
         List<XWikiApplication> appList =
             XWikiApplicationClass.getInstance(context).newXObjectDocumentList(document, context);
-        updateApplicationsTranslation(appList, getMessageTool(context).get(
+        updateApplicationsTranslation(appList, this.localizationManager.getTranslationPlain(
             ApplicationManagerMessageTool.COMMENT_AUTOUPDATETRANSLATIONS, document.getFullName()), context);
     }
 
@@ -361,8 +376,8 @@ public final class ApplicationManager
             boolean updateprefs = updateApplicationTranslation(translationPrefs, app);
 
             if (updateprefs) {
-                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
-                    translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
+                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES,
+                    StringUtils.join(translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
                 xwiki.saveDocument(prefsDoc, comment, context);
             }
         }
@@ -391,8 +406,8 @@ public final class ApplicationManager
     }
 
     /**
-     * During initialization the method updateApplicationTranslation must be called.  However, it cannot be called
-     * directly, as the application list will be searched for using the access rights of the context user.  This means
+     * During initialization the method updateApplicationTranslation must be called. However, it cannot be called
+     * directly, as the application list will be searched for using the access rights of the context user. This means
      * that applications that aren't viewable by the user that happens to initiate the wiki will not be on the list.
      * Hence, the only purpose of this method is to query the datastore without checking access rights on the documents
      * holding instances of XWikiApplicationClass.
@@ -406,10 +421,13 @@ public final class ApplicationManager
         final XWikiApplicationClass instance = XWikiApplicationClass.getInstance(context, false);
         final List<Object> parameterValues = new ArrayList<Object>();
         final String where = instance.createWhereClause(null, parameterValues);
-        final List<XWikiApplication> applicationList
-            = instance.newXObjectDocumentList(context.getWiki().getStore()
-                 .searchDocuments(where, true, false, false, 0, 0, parameterValues, context), context);
-        updateApplicationsTranslation(applicationList, getMessageTool(context).get(
-            ApplicationManagerMessageTool.COMMENT_REFRESHALLTRANSLATIONS), context);
+        final List<XWikiApplication> applicationList =
+            instance
+                .newXObjectDocumentList(
+                    context.getWiki().getStore()
+                        .searchDocuments(where, true, false, false, 0, 0, parameterValues, context), context);
+        updateApplicationsTranslation(applicationList,
+            this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.COMMENT_REFRESHALLTRANSLATIONS),
+            context);
     }
 }

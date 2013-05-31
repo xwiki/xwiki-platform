@@ -34,7 +34,7 @@ import java.util.UUID;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link EntityReference}.

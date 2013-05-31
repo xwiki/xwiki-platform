@@ -21,7 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Random;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
@@ -56,8 +56,8 @@ public class PropertyClassTest extends AbstractBridgedXWikiComponentTestCase
                 Assert.assertEquals(Math.signum(one.compareTo(two)), -1.0, 0);
                 Assert.assertEquals(Math.signum(two.compareTo(one)), 1.0, 0);
             } else {
-                Assert.assertEquals(Math.signum(one.compareTo(two)), Math.signum(n1 - n2));
-                Assert.assertEquals(Math.signum(two.compareTo(one)), Math.signum(n2 - n1));
+                Assert.assertEquals(0, Float.compare(Math.signum(one.compareTo(two)), Math.signum(n1 - n2)));
+                Assert.assertEquals(0, Float.compare(Math.signum(two.compareTo(one)), Math.signum(n2 - n1)));
             }
         }
 

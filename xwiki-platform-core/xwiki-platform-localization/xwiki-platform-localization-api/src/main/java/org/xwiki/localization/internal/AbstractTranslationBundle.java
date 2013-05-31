@@ -98,6 +98,7 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
 
     /**
      * @param id the identifier of the bundle
+     * @see #getId()
      */
     protected void setId(String id)
     {
@@ -108,6 +109,15 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
     public int getPriority()
     {
         return this.priority;
+    }
+
+    /**
+     * @param priority the priority
+     * @see #getPriority()
+     */
+    protected void setPriority(int priority)
+    {
+        this.priority = priority;
     }
 
     /**

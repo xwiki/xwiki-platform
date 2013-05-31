@@ -27,11 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-autotag</artifactId>
   <name>XWiki Platform - AutoTag plugin</name>
   <description>A deprecated plugin which extracts a set of tags from a text.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>AutoTag Plugin</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

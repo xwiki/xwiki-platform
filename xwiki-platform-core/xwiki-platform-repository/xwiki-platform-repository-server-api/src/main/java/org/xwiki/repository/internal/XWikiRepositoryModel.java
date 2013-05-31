@@ -26,82 +26,84 @@ public interface XWikiRepositoryModel
 {
     // References
 
-    public final static String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
+    String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
 
-    public final static String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
+    String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
 
-    public final static String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
+    String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
 
-    public final static String EXTENSIONPROXY_CLASSNAME = "ExtensionCode.ExtensionProxyClass";
+    String EXTENSIONPROXY_CLASSNAME = "ExtensionCode.ExtensionProxyClass";
 
-    public final static EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass",
+    EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass", EntityType.DOCUMENT,
+        new EntityReference("ExtensionCode", EntityType.SPACE));
+
+    EntityReference EXTENSIONVERSION_CLASSREFERENCE = new EntityReference("ExtensionVersionClass", EntityType.DOCUMENT,
+        new EntityReference("ExtensionCode", EntityType.SPACE));
+
+    EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference("ExtensionDependencyClass",
         EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    public final static EntityReference EXTENSIONVERSION_CLASSREFERENCE = new EntityReference("ExtensionVersionClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    EntityReference EXTENSIONPROXY_CLASSREFERENCE = new EntityReference("ExtensionProxyClass", EntityType.DOCUMENT,
+        new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    public final static EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference(
-        "ExtensionDependencyClass", EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate", EntityType.DOCUMENT,
+        new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    public final static EntityReference EXTENSIONPROXY_CLASSREFERENCE = new EntityReference("ExtensionProxyClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    String CONFIGURATION_CLASSNAME = "ExtensionCode.RepositoryConfigClass";
 
-    public final static EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    EntityReference CONFIGURATION_CLASSREFERENCE = new EntityReference("RepositoryConfigClass", EntityType.DOCUMENT,
+        new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    public final static String CONFIGURATION_CLASSNAME = "ExtensionCode.RepositoryConfigClass";
-
-    public final static EntityReference CONFIGURATION_CLASSREFERENCE = new EntityReference("RepositoryConfigClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
-
-    public final static EntityReference CONFIGURATION_REFERENCE = new EntityReference("RepositoryConfig",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    EntityReference CONFIGURATION_REFERENCE = new EntityReference("RepositoryConfig", EntityType.DOCUMENT,
+        new EntityReference("ExtensionCode", EntityType.SPACE));
 
     // Properties
 
-    public final static String PROP_EXTENSION_ID = "id";
+    String PROP_EXTENSION_ID = "id";
 
-    public static final String PROP_EXTENSION_TYPE = "type";
+    String PROP_EXTENSION_TYPE = "type";
 
-    public static final String PROP_EXTENSION_LICENSENAME = "licenseName";
+    String PROP_EXTENSION_LICENSENAME = "licenseName";
 
-    public static final String PROP_EXTENSION_SUMMARY = "summary";
+    String PROP_EXTENSION_SUMMARY = "summary";
 
-    public static final String PROP_EXTENSION_DESCRIPTION = "description";
+    String PROP_EXTENSION_DESCRIPTION = "description";
 
-    public static final String PROP_EXTENSION_NAME = "name";
+    String PROP_EXTENSION_NAME = "name";
 
-    public static final String PROP_EXTENSION_WEBSITE = "website";
+    String PROP_EXTENSION_WEBSITE = "website";
 
-    public static final String PROP_EXTENSION_AUTHORS = "authors";
+    String PROP_EXTENSION_AUTHORS = "authors";
 
-    public static final String PROP_EXTENSION_FEATURES = "features";
+    String PROP_EXTENSION_FEATURES = "features";
 
-    public final static String PROP_VERSION_ID = "id";
+    String PROP_VERSION_ID = "id";
 
-    public final static String PROP_VERSION_VERSION = "version";
+    String PROP_VERSION_VERSION = "version";
 
-    public final static String PROP_VERSION_DOWNLOAD = "download";
+    String PROP_VERSION_DOWNLOAD = "download";
 
-    public static final String PROP_DEPENDENCY_EXTENSIONVERSION = "extensionVersion";
+    String PROP_DEPENDENCY_EXTENSIONVERSION = "extensionVersion";
 
-    public static final String PROP_DEPENDENCY_ID = "id";
+    String PROP_DEPENDENCY_ID = "id";
 
-    public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
+    String PROP_DEPENDENCY_CONSTRAINT = "constraint";
 
-    public static final String PROP_PROXY_REPOSITORYID = "repositoryId";
+    String PROP_PROXY_REPOSITORYID = "repositoryId";
 
-    public static final String PROP_PROXY_REPOSITORYTYPE = "repositoryType";
+    String PROP_PROXY_REPOSITORYTYPE = "repositoryType";
 
-    public static final String PROP_PROXY_REPOSITORYURI = "repositoryURI";
+    String PROP_PROXY_REPOSITORYURI = "repositoryURI";
 
-    public final static String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
+    String PROP_PROXY_AUTOUPDATE = "autoUpdate";
 
-    public static final String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";
+    String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
+
+    String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";
 
     // Consolidation
 
-    public final static String PROP_EXTENSION_LASTVERSION = "lastVersion";
+    String PROP_EXTENSION_LASTVERSION = "lastVersion";
 
-    public final static String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
+    String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
 }

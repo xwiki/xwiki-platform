@@ -99,8 +99,8 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{velocity}}
-#panelheader($msg.get('xe.statistics.spaces.mostedited'))
+      <content>{{include document="Stats.Macros" /}}((({{velocity}}
+#panelheader($services.localization.render('xe.statistics.spaces.mostedited'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($scope = $xwiki.criteriaService.scopeFactory.ALL_SPACES)
@@ -117,7 +117,7 @@
 #end
 {{/html}}
 #panelfooter()
-{{/velocity}}</content>
+{{/velocity}})))</content>
     </property>
     <property>
       <description>Display the most edited spaces</description>
@@ -129,7 +129,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Stats.Macros" /}}
-
-{{include document="Panels.PanelSheet" /}}</content>
+  <content>{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1186679007000</creationDate>
-  <date>1300991417000</date>
-  <contentUpdateDate>1300991417000</contentUpdateDate>
+  <date>1357298520000</date>
+  <contentUpdateDate>1357298514000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <template/>
@@ -85,6 +85,7 @@ wikimanager.listwikirank=Rang
 wikimanager.listwikistate=État
 wikimanager.listwikitemplate=Template de wiki
 wikimanager.notinvirtualmode=Le wiki n'est pas en mode virtuel. Cela signifie que vous ne pouvez accéder qu'au wiki principal. Veuillez vérifier que la propriété &lt;tt&gt;xwiki.virtual\=1&lt;/tt&gt; dans le fichier &lt;tt&gt;xwiki.cfg&lt;/tt&gt;. 
+wikimanager.panels.applicationsPanelEntryLabel=Gestionnaire de Wikis
 wikimanager.pluginnotenabled=Le plugin Wiki Manager n'est pas activé, cette page ne peut donc pas fonctionner correctement. Veuillez vous assurer que &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; est bien listé en tant que paramétre dans la section &lt;tt&gt;xwiki.plugins&lt;/tt&gt; du fichier &lt;tt&gt;xwiki.cfg&lt;/tt&gt;.
 wikimanager.prop.alias.description=Description
 wikimanager.prop.alias.homepage=Page d'accueil

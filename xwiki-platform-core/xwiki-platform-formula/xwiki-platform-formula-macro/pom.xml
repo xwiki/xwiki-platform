@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
     <relativePath>../../xwiki-platform-rendering/xwiki-platform-rendering-macros</relativePath>
   </parent>
   <artifactId>xwiki-platform-formula-macro</artifactId>
   <name>XWiki Platform - Formula - Macro</name>
   <description>Macro for displaying mathematical formulae</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>55.23</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

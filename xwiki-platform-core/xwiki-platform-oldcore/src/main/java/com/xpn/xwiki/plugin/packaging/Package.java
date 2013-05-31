@@ -431,10 +431,11 @@ public class Package
         return "";
     }
 
-/**
+    /**
      * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
-     * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
-     *
+     * Your should prefer {@link #Import(InputStream, XWikiContext)} which may avoid loading the package twice in
+     * memory.
+     * 
      * @param file a byte array containing the content of a zipped package file
      * @param context current XWikiContext
      * @return an empty string, useless.
@@ -617,7 +618,7 @@ public class Package
 
     public int install(XWikiContext context) throws XWikiException
     {
-        boolean isAdmin = context.getWiki().getRightService().hasAdminRights(context);
+        boolean isAdmin = context.getWiki().getRightService().hasWikiAdminRights(context);
 
         if (testInstall(isAdmin, context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             setStatus(DocumentInfo.INSTALL_IMPOSSIBLE, context);
@@ -732,7 +733,7 @@ public class Package
         try {
             context.setDatabase(context.getMainXWiki());
 
-            return context.getWiki().getRightService().hasAdminRights(context);
+            return context.getWiki().getRightService().hasWikiAdminRights(context);
         } finally {
             context.setDatabase(wiki);
         }
@@ -1085,10 +1086,9 @@ public class Package
      * Write the package.xml file to a ZipOutputStream
      * 
      * @param zos the ZipOutputStream to write to
-     * @param context curent XWikiContext
-     * @throws IOException when an error occurs during streaming operation
+     * @param context current XWikiContext
      */
-    private void addInfosToZip(ZipArchiveOutputStream zos, XWikiContext context) throws IOException
+    private void addInfosToZip(ZipArchiveOutputStream zos, XWikiContext context)
     {
         try {
             String zipname = DefaultPackageFileName;

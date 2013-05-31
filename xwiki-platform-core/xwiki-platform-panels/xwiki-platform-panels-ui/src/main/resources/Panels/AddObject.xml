@@ -106,14 +106,14 @@
     </property>
     <property>
       <content>{{velocity}}
-#largepanelheader($msg.get('addobject'))
+#largepanelheader($services.localization.render('addobject'))
 {{html}}
 &lt;form id="objectadd" method="post" action="$doc.getURL('objectadd')" onsubmit="cancelCancelEdit()"&gt;
 &lt;p&gt;
 &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="xredirect" value="$doc.getURL('edit', 'editor=object')" /&gt;
 &lt;select name="classname" size="1"&gt;
-&lt;option value="---"&gt;$msg.get('selectclass')&lt;/option&gt;
+&lt;option value="---"&gt;$services.localization.render('selectclass')&lt;/option&gt;
 ##
 ## Existing classes are enumerated, grouped by space name.
 ## The list is already sorted alphabetically
@@ -139,7 +139,7 @@
 &lt;/select&gt;
 &lt;/p&gt;
 &lt;p&gt;
-&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('addobjectfromclass')" class="button"/&gt;&lt;/span&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('addobjectfromclass')" class="button"/&gt;&lt;/span&gt;
 &lt;/p&gt;
 &lt;/form&gt;
 {{/html}}

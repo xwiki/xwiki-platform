@@ -99,8 +99,8 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{velocity}}
-#panelheader($msg.get('xe.statistics.contributors.mostactive'))
+      <content>{{include document="Stats.Macros" /}}((({{velocity}}
+#panelheader($services.localization.render('xe.statistics.contributors.mostactive'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #set ($period = $xwiki.criteriaService.periodFactory.ALL_TIME)
@@ -116,7 +116,7 @@
 #end
 {{/html}}
 #panelfooter()
-{{/velocity}}</content>
+{{/velocity}})))</content>
     </property>
     <property>
       <description>Displays the most active contributors</description>
@@ -128,7 +128,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Stats.Macros" /}}
-
-{{include document="Panels.PanelSheet" /}}</content>
+  <content>{{include document="Panels.PanelSheet" /}}</content>
 </xwikidoc>

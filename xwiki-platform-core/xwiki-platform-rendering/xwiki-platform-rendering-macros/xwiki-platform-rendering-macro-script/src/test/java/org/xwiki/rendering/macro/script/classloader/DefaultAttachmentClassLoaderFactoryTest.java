@@ -21,14 +21,13 @@ package org.xwiki.rendering.macro.script.classloader;
 
 import java.net.URL;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
-import org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**

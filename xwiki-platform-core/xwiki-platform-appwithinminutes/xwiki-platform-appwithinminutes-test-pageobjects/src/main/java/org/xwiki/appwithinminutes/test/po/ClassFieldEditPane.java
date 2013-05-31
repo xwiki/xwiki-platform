@@ -21,6 +21,7 @@ package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -101,8 +102,15 @@ public class ClassFieldEditPane extends BaseElement
     {
         // Workaround for the fact that ends-with XPath function is not implemented.
         // substring(@id, string-length(@id) - string-length(suffix) + 1)
-        String xpath = "//*[substring(@id, string-length(@id) - %s - 2) = '_0_%s']";
-        return container.findElement(By.xpath(String.format(xpath, fieldName.length(), fieldName)));
+        String xpath = ".//*[substring(@id, string-length(@id) - %s - 2) = '_0_%s']";
+        try {
+            return getUtil().findElementWithoutWaiting(getDriver(), container,
+                By.xpath(String.format(xpath, fieldName.length(), fieldName)));
+        } catch (NoSuchElementException e) {
+            // Return the first input element from the field display. This is needed for the Title and Content fields.
+            return getUtil().findElementWithoutWaiting(getDriver(), container,
+                By.xpath(".//dl[@class = 'field-viewer']/dd//*[@name]"));
+        }
     }
 
     /**

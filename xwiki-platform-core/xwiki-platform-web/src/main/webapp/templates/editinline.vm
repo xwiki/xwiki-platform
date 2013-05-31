@@ -38,8 +38,8 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   $response.setStatus(423)
   #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
   #set($forceEditURL = $doc.getURL($xcontext.action, ${newquerystring}))
-  #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
-    <a href="$forceEditURL">$msg.get('forcelock')</a>
+  #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
+    <a href="$forceEditURL">$services.localization.render('forcelock')</a>
   #xwikimessageboxend()
   </div>
 #else

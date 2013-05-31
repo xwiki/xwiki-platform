@@ -1,6 +1,6 @@
 // ======================================
 // Ajax tag editing
-// 
+//
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 var viewers = XWiki.viewers = XWiki.viewers || {};

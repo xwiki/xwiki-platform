@@ -99,4 +99,10 @@ public interface WysiwygEditorConfiguration
      * @return the maximum number of history entries that will be stored
      */
     Integer getHistorySize();
+
+    /**
+     * @return {@code true} if the content pasted into the rich text area should be cleaned automatically, {@code false}
+     *         otherwise (the user can trigger the clean manually using the tool bar icon)
+     */
+    Boolean isPasteContentCleanedAutomatically();
 }

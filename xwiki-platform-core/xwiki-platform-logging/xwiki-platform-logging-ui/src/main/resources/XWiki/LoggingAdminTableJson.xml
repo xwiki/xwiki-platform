@@ -162,7 +162,7 @@
               &lt;option label='default' value=''&gt;&amp;lt;default&amp;gt;&lt;/option&gt;
             #end
           &lt;/select&gt;
-          &lt;span class='buttonwrapper'&gt;&lt;input name='loggeraction_set' value='${escapetool.xml($msg.get('logging.admin.livetable.actions.set'))}' class='button' type='submit'&gt;&lt;/span&gt;
+          &lt;span class='buttonwrapper'&gt;&lt;input name='loggeraction_set' value='${escapetool.xml($services.localization.render('logging.admin.livetable.actions.set'))}' class='button' type='submit'&gt;&lt;/span&gt;
         &lt;/fieldset&gt;
         &lt;/form&gt;")}"
     }

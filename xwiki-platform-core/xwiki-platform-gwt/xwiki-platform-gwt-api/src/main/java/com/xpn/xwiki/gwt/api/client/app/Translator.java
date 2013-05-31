@@ -112,6 +112,7 @@ public class Translator {
 
     public void init() {
         app.getXWikiServiceInstance().getTranslation(app.getTranslationPage(), app.getLocale(), new XWikiAsyncCallback(app) {
+            @Override
             public void onSuccess(Object result) {
                 super.onSuccess(result);
                 dictionary = (Dictionary) result;

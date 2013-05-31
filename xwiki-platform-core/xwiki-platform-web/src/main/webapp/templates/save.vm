@@ -1,2 +1,0 @@
-#set($message=$msg.get("changessaved"))
-#template("view.vm")

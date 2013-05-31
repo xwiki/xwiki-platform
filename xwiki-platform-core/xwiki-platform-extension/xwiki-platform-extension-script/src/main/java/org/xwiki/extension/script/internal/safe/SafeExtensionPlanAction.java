@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import java.util.Collection;
+
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
@@ -56,9 +58,16 @@ public class SafeExtensionPlanAction extends AbstractWrappingObject<ExtensionPla
     }
 
     @Override
+    @Deprecated
     public InstalledExtension getPreviousExtension()
     {
         return this.safeProvider.get(getWrapped().getPreviousExtension());
+    }
+
+    @Override
+    public Collection<InstalledExtension> getPreviousExtensions()
+    {
+        return this.safeProvider.get(getWrapped().getPreviousExtensions());
     }
 
     @Override

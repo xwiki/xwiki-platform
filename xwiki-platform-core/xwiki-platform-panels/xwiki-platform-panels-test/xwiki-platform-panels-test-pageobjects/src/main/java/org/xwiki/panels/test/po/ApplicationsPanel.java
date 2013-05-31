@@ -39,6 +39,11 @@ public class ApplicationsPanel extends ViewPage
         return new ApplicationsPanel();
     }
 
+    public static String getURL()
+    {
+        return getUtil().getURL("Panels", "Applications");
+    }
+
     public boolean containsApplication(String applicationName)
     {
         return getUtil().findElementsWithoutWaiting(getDriver(), By.xpath(

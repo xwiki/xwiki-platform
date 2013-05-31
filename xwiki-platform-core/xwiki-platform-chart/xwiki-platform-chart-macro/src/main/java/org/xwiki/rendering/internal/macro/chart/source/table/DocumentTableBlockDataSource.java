@@ -34,9 +34,13 @@ import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -150,7 +154,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         // Parse the document content into an XDOM. If the reference is to the current document then we should not
         // Parse the content again since 1) that's unnecessary since we can hold of the XDOM from the Transformation
         // Context and 2) it's going to cause a cycle...
-        if (this.documentReference == null) {
+        if (isDefinedChartSourceTheCurrentDocument(context.getCurrentMacroBlock())) {
             xdom = context.getXDOM();
         } else {
             try {
@@ -164,6 +168,29 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
             }
         }
         return xdom;
+    }
+
+    /**
+     * @param currentMacroBlock the current macro block being rendered
+     * @return true if the chart macro takes its source in the current document or false otherwise
+     */
+    protected boolean isDefinedChartSourceTheCurrentDocument(MacroBlock currentMacroBlock)
+    {
+        boolean result;
+        if (this.documentReference == null) {
+            result = true;
+        } else {
+            String sourceReference = extractSourceContentReference(currentMacroBlock);
+            if (this.documentReferenceResolver.resolve(sourceReference,
+                this.docBridge.getCurrentDocumentReference()).equals(this.documentReference))
+            {
+                result = true;
+            } else {
+                result = false;
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -200,5 +227,20 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
                     String.format("Document [%s] does not exist.", this.documentReference));
             }
         }
+    }
+
+    /**
+     * @param source the blocks from where to try to extract the source content
+     * @return the source content reference or null if none is found
+     */
+    private String extractSourceContentReference(Block source)
+    {
+        String contentSource = null;
+        MetaDataBlock metaDataBlock =
+            source.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
+        if (metaDataBlock != null) {
+            contentSource = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+        }
+        return contentSource;
     }
 }

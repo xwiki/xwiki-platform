@@ -32,8 +32,6 @@ import com.sun.syndication.feed.synd.SyndImage;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.web.XWikiRequest;
 

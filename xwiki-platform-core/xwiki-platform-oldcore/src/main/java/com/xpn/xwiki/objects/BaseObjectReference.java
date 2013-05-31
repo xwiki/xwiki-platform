@@ -38,11 +38,11 @@ import com.xpn.xwiki.web.Utils;
  * <dt>className[objectNumber]
  * <dd>interpreted as the object of class className with number objectNumber. refers the object returned by
  * XWikiDocument.getObject(String className, int objectNumber). In this case, className is obtained by calling
- * {@link #getClassName()} and object index by calling {@link #getObjectNumber()}.
+ * {@link #getXClassReference()} and object index by calling {@link #getObjectNumber()}.
  * <dt>className
  * <dd>interpreted as the first object of class className. refers the object returned by XWikiDocument.getObject(String
  * className). In this case, {@link #getObjectNumber()} will return {@code null} and {@code className} is obtained by
- * calling {@link #getClassName()}.
+ * calling {@link #getXClassReference()}.
  * </dl>
  * 
  * @version $Id$
@@ -54,18 +54,6 @@ public class BaseObjectReference extends ObjectReference
      * changes.
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Used to parse object reference name to class reference.
-     */
-    private static final DocumentReferenceResolver<String> RESOLVER = Utils
-        .getComponent(DocumentReferenceResolver.TYPE_STRING);
-
-    /**
-     * Used to serialize class reference to object reference name.
-     */
-    private static final EntityReferenceSerializer<String> SERIALIZER = Utils
-        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * Used to match number part of the object reference name.
@@ -117,7 +105,9 @@ public class BaseObjectReference extends ObjectReference
      */
     private static String toName(DocumentReference classReference, Integer objectNumber)
     {
-        String name = SERIALIZER.serialize(classReference);
+        String name =
+            Utils.<EntityReferenceSerializer<String>> getComponent(EntityReferenceSerializer.TYPE_STRING).serialize(
+                classReference);
 
         if (objectNumber != null) {
             StringBuilder builder = new StringBuilder(name);
@@ -186,7 +176,9 @@ public class BaseObjectReference extends ObjectReference
             objectNumberStr = null;
         }
 
-        this.xclassReference = RESOLVER.resolve(classReferenceStr);
+        this.xclassReference =
+            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
+                classReferenceStr);
         if (objectNumberStr != null) {
             this.objectNumber = Integer.valueOf(objectNumberStr);
         }

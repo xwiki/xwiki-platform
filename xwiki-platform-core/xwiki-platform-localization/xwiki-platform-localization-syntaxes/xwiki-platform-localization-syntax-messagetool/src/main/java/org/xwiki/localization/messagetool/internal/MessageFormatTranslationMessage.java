@@ -71,7 +71,12 @@ public class MessageFormatTranslationMessage implements TranslationMessage
     {
         String result;
         if (parameters.length > 0) {
-            result = MessageFormat.format(this.message, parameters);
+            try {
+                result = MessageFormat.format(this.message, parameters);
+            } catch (IllegalArgumentException e) {
+                // TODO: log the error ?
+                result = this.message;
+            }
         } else {
             result = this.message;
         }

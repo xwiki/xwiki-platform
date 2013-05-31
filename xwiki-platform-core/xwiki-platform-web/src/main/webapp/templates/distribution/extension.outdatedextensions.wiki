@@ -1,0 +1,41 @@
+##syntax=xwiki/2.1
+{{velocity}}
+#if ("$!request.action" == '')
+  ## Display the step.
+  #if (!$isAjaxRequest)
+    $services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', [
+      '[[', '>>http://platform.xwiki.org/xwiki/bin/view/Features/Applications]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices]]'])
+
+  #end
+  {{html}}
+  #getExtensionUpdaterPlan($plan)
+  #isExtensionUpdaterPlanOutdated($plan $outdated)
+  #if ($outdated)
+    ## There is no upgrade plan computed or the previously computed plan is outdated.
+    #computeExtensionUpdaterPlan($plan)
+  #end
+  {{/html}}
+  (% id="extensionUpdater" %)(((
+    #if ($plan.state != 'FINISHED')
+      {{translation key="platform.extension.updater.loading"/}}
+
+      {{html}}
+      #displayJobProgressBar($plan)
+      #displayExtensionUpdaterPlanStatus($plan)
+      {{/html}}
+    #else
+      {{html}}#displayExtensionUpdaterPlan($plan){{/html}}
+      (% class="xHint" %)
+      $services.localization.render('platform.extension.updater.reloadHint', ['[[', ">>||class=""checkForUpdates""
+        queryString=""action=checkForUpdates&xredirect=$!escapetool.url($request.xredirect)""]]"])
+      #set ($showCompleteStepButton = $invalid.isEmpty())
+    #end
+  )))
+#elseif ($request.action == 'checkForUpdates')
+  #computeExtensionUpdaterPlan()
+#end
+{{/velocity}}

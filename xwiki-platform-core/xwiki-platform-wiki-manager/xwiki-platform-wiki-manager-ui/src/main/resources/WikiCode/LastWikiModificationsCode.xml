@@ -45,7 +45,7 @@
 #############################################################################
 #set($WikiManager = $services.wikimanager)
 #if(!$WikiManager)
-  #error($msg.get("wikimanager.pluginnotenabled"))
+  #error($services.localization.render('wikimanager.pluginnotenabled'))
 #end
 #set($Globalsearch = $WikiManager.searchApi)
 ##

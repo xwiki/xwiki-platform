@@ -33,7 +33,7 @@
              since Oracle imposes a limitation on it: there can be only be one LONG column per table. Thus when
              size > 4000 chars we must use a "materialized_clob" type
              See https://hibernate.onjira.com/browse/HHH-5569
-         - Thus, use the followig strategy: use the "string" type when size<4000 and materialized_clob when size>40000
+         - Thus, use the following strategy: use the "string" type when size<4000 and materialized_clob when size>40000
          - Lots of columns have not-null="false", since Oracle treats the empty string as NULL
          - Numeric index columns have an explicit sql-type="integer"
          - materialized_clob mapping to a org.hibernate.type.StringClobType type
@@ -182,7 +182,7 @@
             <column name="XWA_ID" not-null="true" sql-type="integer" />
             <generator class="assigned" />
         </id>
-        <property name="content" type="materialized_blob" column="XWA_CONTENT" length="1000000000" not-null="true" />
+        <property name="content" type="materialized_blob" column="XWA_CONTENT" length="1000000000" not-null="false"/>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachmentArchive" table="xwikiattachment_archive">
@@ -190,7 +190,7 @@
             <column name="XWA_ID" not-null="true" sql-type="integer" />
             <generator class="assigned" />
         </id>
-        <property name="archive" type="materialized_blob" column="XWA_ARCHIVE" length="1000000000" />
+        <property name="archive" type="materialized_blob" column="XWA_ARCHIVE" length="1000000000" not-null="false"/>
     </class>
 
     <class name="com.xpn.xwiki.objects.BaseProperty" table="xwikiproperties">
@@ -262,7 +262,7 @@
             <property name="value" type="materialized_clob" column="XWL_VALUE" length="60000" />
         </joined-subclass>
 
-        <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikilargestrings">
+        <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikistringlists">
             <key>
                 <column name="XWL_ID" />
                 <column name="XWL_NAME" />

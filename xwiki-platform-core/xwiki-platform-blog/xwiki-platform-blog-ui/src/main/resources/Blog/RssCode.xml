@@ -163,8 +163,7 @@
  * @param entries The entries to display. Usually, these are the last entries published in the wiki.
  *###
 #macro(printGlobalBlogRssChannelDescription $entries)
-  ## TODO: Replace hardcoded Main.WebHome with a setting once the core provides this information.
-  #set($mainDoc = $xwiki.getDocument('Main.WebHome'))
+  #set ($mainDoc = $xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
   &lt;channel rdf:about="$mainDoc.getExternalURL()"&gt;
     &lt;title&gt;$escapetool.xml($mainDoc.plainTitle)&lt;/title&gt;
     &lt;link&gt;$mainDoc.getExternalURL()&lt;/link&gt;

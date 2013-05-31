@@ -47,9 +47,10 @@ public class RollbackAction extends XWikiAction
             return true;
         }
 
-        XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
-        XWikiDocument newdoc = xwiki.rollback(tdoc, rev, context);
-        // forward to view
+        // We don't clone the document here because the rollback method does it before making modifications.
+        xwiki.rollback(getTranslatedDocument(doc, language, context), rev, context);
+
+        // Forward to view.
         String redirect = Utils.getRedirect("view", context);
         sendRedirect(response, redirect);
         return false;

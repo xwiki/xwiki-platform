@@ -41,6 +41,7 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.velocity.VelocityManager;
@@ -182,8 +183,8 @@ public class HtmlPackager
     private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
         throws XWikiException, IOException
     {
-        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
-        DocumentReference docReference = new DocumentReference(resolver.resolve(pageName, EntityType.DOCUMENT));
+        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        DocumentReference docReference = resolver.resolve(pageName);
         XWikiDocument doc = context.getWiki().getDocument(docReference, context);
 
         if (doc.isNew()) {
@@ -245,7 +246,7 @@ public class HtmlPackager
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
         try {
-            XWikiContext renderContext = (XWikiContext) context.clone();
+            XWikiContext renderContext = context.clone();
             renderContext.put("action", "view");
 
             ExecutionContext executionContext = ecim.clone(execution.getContext());

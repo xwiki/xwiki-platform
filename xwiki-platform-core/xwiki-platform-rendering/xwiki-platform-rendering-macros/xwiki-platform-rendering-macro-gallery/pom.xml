@@ -27,11 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
   <name>XWiki Platform - Rendering - Macro - Gallery</name>
-  <description>A simple image gallery. Images are collected from the macro content and displayed using a slide-show view.</description>
+  <description>Collects images from the macro content and display them using a slide-show view</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>95.91</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Gallery Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

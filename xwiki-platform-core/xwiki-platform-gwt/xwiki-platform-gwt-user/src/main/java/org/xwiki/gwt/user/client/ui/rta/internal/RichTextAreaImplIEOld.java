@@ -142,8 +142,10 @@ public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.Ri
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         var body = elem.contentWindow.document.body;
         body.ondblclick =
-        body.onpaste = body.onclick;
-        
+        body.onbeforepaste =
+        body.onpaste =
+        body.oncopy = body.onclick;
+
         if (body.parentNode.nodeName.toLowerCase() == 'html') {
           // In standards mode the body element doesn't take all the available space so the user can click on the HTML
           // element. When this happens the text selection is lost. To prevent this we listen to mouse up event and
@@ -173,7 +175,9 @@ public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.Ri
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         var body = elem.contentWindow.document.body;
         body.ondblclick =
+        body.onbeforepaste =
         body.onpaste =
+        body.oncopy =
         body.parentNode.onmouseup = null;
     }-*/;
 }

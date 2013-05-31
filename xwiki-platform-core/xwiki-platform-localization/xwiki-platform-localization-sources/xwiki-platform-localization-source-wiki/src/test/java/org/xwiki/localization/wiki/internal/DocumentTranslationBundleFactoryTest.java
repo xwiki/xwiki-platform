@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
@@ -33,10 +33,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.localization.TranslationBundleDoesNotExistsException;
-import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundleDoesNotExistsException;
+import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
@@ -215,9 +215,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                     }
                 });
 
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(true));
-
                 allowing(mockXWiki).getStore();
                 will(returnValue(mockStore));
 
@@ -255,7 +252,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
         this.observation = getComponentManager().getInstance(ObservationManager.class);
 
         // Initialiaze document bundle factory
-        getComponentManager().getInstance(TranslationBundleFactory.class, "document");
+        getComponentManager().getInstance(TranslationBundleFactory.class, DocumentTranslationBundleFactory.ID);
 
         this.localization = getComponentManager().getInstance(LocalizationManager.class);
     }
@@ -350,7 +347,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
 
         addTranslation("wiki.translation", "Wiki translation", translationDocument, Locale.ROOT, Scope.ON_DEMAND);
 
-        this.localization.use("document", translationDocument.toString());
+        this.localization.use(DocumentTranslationBundleFactory.ID, translationDocument.toString());
 
         assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
     }

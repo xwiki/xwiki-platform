@@ -111,18 +111,21 @@ final class GlobalSearch
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The plugin internationalization service.
-     */
-    private XWikiPluginMessageTool messageTool;
-
-    /**
      * Hidden constructor of GlobalSearch only access via getInstance().
      * 
      * @param messageTool the plugin internationalization service.
      */
+    @Deprecated
     public GlobalSearch(XWikiPluginMessageTool messageTool)
     {
-        this.messageTool = messageTool;
+        this();
+    }
+
+    /**
+     * Default constructor.
+     */
+    public GlobalSearch()
+    {
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -135,11 +138,6 @@ final class GlobalSearch
     private Collection<String> getAllWikiNameList(XWikiContext context) throws XWikiException
     {
         Collection<String> wikiNames = context.getWiki().getVirtualWikisDatabaseNames(context);
-
-        if (!wikiNames.contains(context.getMainXWiki())) {
-            wikiNames.add(context.getMainXWiki());
-        }
-
         return wikiNames;
     }
 
@@ -160,14 +158,9 @@ final class GlobalSearch
         List<String> selectColumns = parseSelectColumns(query.getHql());
         List<Object[]> orderColumns = parseOrderColumns(query.getHql());
 
-        Collection<String> wikiNameList;
-        if (context.getWiki().isVirtualMode()) {
-            wikiNameList = query.getWikiNameList();
-            if (wikiNameList.isEmpty()) {
-                wikiNameList = getAllWikiNameList(context);
-            }
-        } else {
-            wikiNameList = Collections.singletonList(context.getMainXWiki());
+        Collection<String> wikiNameList = query.getWikiNameList();
+        if (wikiNameList.isEmpty()) {
+            wikiNameList = getAllWikiNameList(context);
         }
 
         int max = query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0) : 0;
@@ -425,9 +418,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -452,9 +445,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -500,9 +493,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a

@@ -1,0 +1,3 @@
+org.xwiki.localization.jar.internal.JARTranslationBundleFactory
+org.xwiki.localization.jar.internal.JARTranslationBundleFactoryListener
+org.xwiki.localization.jar.internal.RootClassLoaderTranslationBundle

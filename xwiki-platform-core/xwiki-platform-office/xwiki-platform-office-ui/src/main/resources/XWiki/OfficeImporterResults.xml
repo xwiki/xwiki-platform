@@ -15,7 +15,7 @@
   <date>1261481206000</date>
   <contentUpdateDate>1261481206000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.officeimporter.results.title")</title>
+  <title>$services.localization.render('xe.officeimporter.results.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -25,16 +25,16 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #if ($isguest)
-  #error($msg.get("xe.officeimporter.notallowed"))  
+  #error($services.localization.render('xe.officeimporter.notallowed'))
 #else
 #########################
 ## Validate Input File ##
 #########################
-  #set ($goBack = "[[$msg.get('xe.officeimporter.results.goback')&gt;&gt;XWiki.OfficeImporter]]")  
+  #set ($goBack = "[[$services.localization.render('xe.officeimporter.results.goback')&gt;&gt;XWiki.OfficeImporter]]")
   #set ($fileUpload = $xwiki.fileupload)
   #set ($fileName = $fileUpload.getFileName("filePath"))
   #if (!$fileName)
-    {{error}}$msg.get("xe.officeimporter.results.missingfile", [$goBack]){{/error}}
+    {{error}}$services.localization.render('xe.officeimporter.results.missingfile', [$goBack]){{/error}}
   #else
     #set ($discard = $fileUpload.loadFileList())
     #set ($officeFileStream = $fileUpload.fileItems.get(0).inputStream)
@@ -86,13 +86,13 @@
 ############
   #if($fileName)
     #set ($targetDocumentReference = $services.model.createDocumentReference($xcontext.database, $targetSpace, $targetPage))
-    #set ($resultDocumentLink = "[[**$msg.get('xe.officeimporter.results.result')**&gt;&gt;doc:$services.model.serialize($targetDocumentReference)]]")
+    #set ($resultDocumentLink = "[[**$services.localization.render('xe.officeimporter.results.result')**&gt;&gt;doc:$services.model.serialize($targetDocumentReference)]]")
     #set ($xdomOfficeDoc = $services.officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentReference, $filterStyles))
     #if ($xdomOfficeDoc)
       #if (!$splitDocument)
         #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, "xwiki/2.0", $parentReference, $null, $appendContent))
-        #if ($result)          
-          {{info}}$msg.get("xe.officeimporter.results.success", [$resultDocumentLink, $goBack]){{/info}}
+        #if ($result)
+          {{info}}$services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack]){{/info}}
         #else
           {{error}}$services.officeimporter.errorMessage{{/error}}
         #end
@@ -112,7 +112,7 @@
               {{warning}}$services.officeimporter.errorMessage{{/warning}}
             #end
           #end
-          {{info}}$msg.get("xe.officeimporter.results.success", [$resultDocumentLink, $goBack]){{/info}}
+          {{info}}$services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack]){{/info}}
         #else
           {{error}}$services.officeimporter.errorMessage{{/error}}
         #end
@@ -120,7 +120,7 @@
     #else
       {{error}}$services.officeimporter.errorMessage{{/error}}
     #end
-  #end  
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -21,18 +21,12 @@ package com.xpn.xwiki.web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.portlet.PortalContext;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletSession;
-import javax.portlet.WindowState;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -85,72 +79,6 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     @Override
     public Cookie getCookie(String cookieName)
-    {
-        return null;
-    }
-
-    @Override
-    public boolean isWindowStateAllowed(WindowState windowState)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isPortletModeAllowed(PortletMode portletMode)
-    {
-        return false;
-    }
-
-    @Override
-    public PortletMode getPortletMode()
-    {
-        return null;
-    }
-
-    @Override
-    public WindowState getWindowState()
-    {
-        return null;
-    }
-
-    @Override
-    public PortletPreferences getPreferences()
-    {
-        return null;
-    }
-
-    @Override
-    public PortletSession getPortletSession()
-    {
-        return null;
-    }
-
-    @Override
-    public PortletSession getPortletSession(boolean b)
-    {
-        return null;
-    }
-
-    @Override
-    public String getProperty(String s)
-    {
-        return null;
-    }
-
-    @Override
-    public Enumeration getProperties(String s)
-    {
-        return null;
-    }
-
-    @Override
-    public Enumeration getPropertyNames()
-    {
-        return null;
-    }
-
-    @Override
-    public PortalContext getPortalContext()
     {
         return null;
     }
@@ -282,18 +210,6 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     @Override
-    public String getResponseContentType()
-    {
-        return null;
-    }
-
-    @Override
-    public Enumeration getResponseContentTypes()
-    {
-        return null;
-    }
-
-    @Override
     public boolean isRequestedSessionIdFromCookie()
     {
         return false;
@@ -329,12 +245,6 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     @Override
     public String getCharacterEncoding()
-    {
-        return null;
-    }
-
-    @Override
-    public InputStream getPortletInputStream() throws IOException
     {
         return null;
     }

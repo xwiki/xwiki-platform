@@ -19,11 +19,8 @@
  */
 package com.xpn.xwiki.gwt.api.client.dialog;
 
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Image;
-import com.xpn.xwiki.gwt.api.client.dialog.DefaultDialog;
+import com.google.gwt.user.client.ui.Label;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTAppConstants;
 

@@ -25,12 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-formula</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-formula-renderer</artifactId>
   <name>XWiki Platform - Formula - Renderer</name>
   <packaging>jar</packaging>
   <description>XWiki component for rendering mathematical formulae into images</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <!-- Apache commons, helper libraries for keeping the code small -->
     <dependency>

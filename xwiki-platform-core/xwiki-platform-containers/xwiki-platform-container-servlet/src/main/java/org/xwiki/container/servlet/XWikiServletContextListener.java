@@ -25,7 +25,6 @@ import javax.servlet.ServletContextListener;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.environment.Environment;
@@ -45,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class XWikiServletContextListener implements ServletContextListener
 {
     /** The component manager used to lookup other components. */
-    private ComponentManager componentManager;
+    private EmbeddableComponentManager componentManager;
 
     /** A logger. */
     private Logger logger = LoggerFactory.getLogger(XWikiServletContextListener.class);
@@ -142,5 +141,8 @@ public class XWikiServletContextListener implements ServletContextListener
             // Nothing to do here.
             logger.error("Failed to look up the application context listener manager!", ex);
         }
+
+        // Make sure to dispose all components before leaving
+        this.componentManager.dispose();
     }
 }

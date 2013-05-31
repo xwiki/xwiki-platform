@@ -98,6 +98,14 @@ public class LocalizationScriptService implements ScriptService
         return true;
     }
 
+    /**
+     * @return the {@link Locale} to use by default in the current context
+     */
+    public Locale getCurrentLocale()
+    {
+        return this.localizationContext.getCurrentLocale();
+    }
+
     // Helpers
 
     /**

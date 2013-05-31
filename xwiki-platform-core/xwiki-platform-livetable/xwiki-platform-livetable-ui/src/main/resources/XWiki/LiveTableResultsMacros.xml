@@ -15,7 +15,7 @@
   <date>1267453085000</date>
   <contentUpdateDate>1267453085000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.livetable.resultsMacros")</title>
+  <title>$services.localization.render('platform.livetable.resultsMacros')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -239,10 +239,8 @@
     #set($discard = $row.put('doc_space', $itemDoc.space))
     #set($discard = $row.put('doc_url', $xwiki.getURL($item)))
     #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
-    #if($xwiki.isVirtualMode())
-      #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
-      #set($discard = $row.put('doc_wiki_url', $xwiki.getURL("${itemDoc.wiki}:Main.WebHome")))
-    #end
+    #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
+    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $context.user, $fullname)))
     #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $context.user, $fullname)))
@@ -275,7 +273,7 @@
 #macro(gridresult_buildColumnJSON $colname $row)
   #if($colname.startsWith('doc.'))
   #elseif($colname == '_action')
-    #set($discard = $row.put($colname, $msg.get("${request.transprefix}actiontext")))
+    #set($discard = $row.put($colname, $services.localization.render("${request.transprefix}actiontext")))
   #elseif($colname == '_attachments')
     #livetable_getAttachmentsList($itemDoc)
     #set($discard = $row.put($colname, $attachlist))
@@ -301,13 +299,13 @@
     #set($fieldValue = "$!itemDoc.getValue($colname)")
     #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
     #if($fieldDisplayValue == '')
-      #set($fieldDisplayValue = $msg.get("${request.transprefix}emptyvalue"))
+      #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
     #set($fieldUrl = '')
     ## only retrieve an URL for a DBListClass item
-    #if($propType == 'DBListClass')
-      #set($fieldUrl = $xwiki.getDocument($fieldValue).getURL())
-      #if($fieldUrl == $xwiki.getURL('Main.WebHome'))
+    #if($propType == 'DBListClass' &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
+      #set($fieldUrl = $xwiki.getURL($fieldValue))
+      #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
         #set($fieldUrl = '')
       #end
     #end

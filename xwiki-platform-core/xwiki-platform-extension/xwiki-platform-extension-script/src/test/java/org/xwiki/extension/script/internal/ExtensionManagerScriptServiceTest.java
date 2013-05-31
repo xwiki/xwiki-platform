@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
@@ -48,7 +48,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
 
     private XWikiRightService mockRightService;
 
-    private RepositoryUtil repositoryUtil;
+    private RepositoryUtils repositoryUtil;
 
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
@@ -62,7 +62,7 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     {
         super.setUp();
 
-        this.repositoryUtil = new RepositoryUtil(getComponentManager(), getMockery());
+        this.repositoryUtil = new RepositoryUtils(getComponentManager(), getMockery());
         this.repositoryUtil.setup();
 
         // mock
@@ -70,12 +70,6 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         // TODO: replace with a real mock when moving to JMock 2.6 (http://www.jmock.org/threading-synchroniser.html)
         this.mockXWiki = new XWiki()
         {
-            @Override
-            public boolean isVirtualMode()
-            {
-                return true;
-            }
-
             @Override
             public XWikiRightService getRightService()
             {
@@ -158,6 +152,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
@@ -174,6 +170,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
@@ -190,6 +188,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));
@@ -206,6 +206,8 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
+                will(returnValue(true));
                 oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
                     with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
                     with(any(XWikiContext.class)));

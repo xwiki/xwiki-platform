@@ -123,6 +123,7 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
 
         wnd.addEventListener('dblclick', elem.__gwt_handler, true);
         wnd.addEventListener('paste', elem.__gwt_handler, true);
+        wnd.addEventListener('copy', elem.__gwt_handler, true);
     }-*/;
 
     @Override
@@ -144,6 +145,7 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         elem.contentWindow.removeEventListener('dblclick', elem.__gwt_handler, true);
         elem.contentWindow.removeEventListener('paste', elem.__gwt_handler, true);
+        elem.contentWindow.removeEventListener('copy', elem.__gwt_handler, true);
     }-*/;
 
     @Override

@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mailsender</artifactId>
   <name>XWiki Platform - Mail Sender</name>
   <description>XWiki Platform - Mail Sender</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>24.22</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

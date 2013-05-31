@@ -106,7 +106,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('xe.panels.navigation'))
+#panelheader($services.localization.render('xe.panels.navigation'))
 #set ($hiddenPages = ['Main.WebRss', 'Main.DatabaseSearch', 'Main.WebSearch', 'Main.LuceneSearch', 'Main.WebSearchRss', 'Main.BlogRss', 'Main.TagsRss', 'Main.RegisterNewUserAction', 'Main.SpaceIndex', 'Blog.Category'])
 #set ($blacklistedPages = ['WebPreferences'])
 #set ($spaces = $xwiki.spaces)
@@ -146,7 +146,6 @@
 #end
 )))## xwikinav
 )))## xwikinavcontainer
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
 $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
 {{html clean="false"}}
 &lt;script type="text/javascript"&gt;

@@ -33,9 +33,7 @@ import com.xpn.xwiki.plugin.PluginApi;
  * {@link org.apache.commons.fileupload.FileItem}s. This is the wrapper accessible from in-document scripts.
  * 
  * @version $Id$
- * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-@Deprecated
 public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
 {
 

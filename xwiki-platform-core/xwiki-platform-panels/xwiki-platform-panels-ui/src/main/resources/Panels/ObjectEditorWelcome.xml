@@ -106,8 +106,8 @@
     </property>
     <property>
       <content>{{velocity}}
-#largepanelheader($msg.get('welcome'))
-$msg.get('welcometoobjecteditor')
+#largepanelheader($services.localization.render('welcome'))
+$services.localization.render('welcometoobjecteditor')
 #panelfooter()
 {{/velocity}}</content>
     </property>

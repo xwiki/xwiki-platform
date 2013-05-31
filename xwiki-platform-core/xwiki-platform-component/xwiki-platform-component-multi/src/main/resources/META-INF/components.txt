@@ -1,4 +1,8 @@
 org.xwiki.component.internal.ContextComponentManager
+org.xwiki.component.internal.DocumentComponentManager
+org.xwiki.component.internal.DocumentComponentManagerFactory
+org.xwiki.component.internal.SpaceComponentManager
+org.xwiki.component.internal.SpaceComponentManagerFactory
 org.xwiki.component.internal.UserComponentManager
 org.xwiki.component.internal.UserComponentManagerFactory
 org.xwiki.component.internal.WikiComponentManager

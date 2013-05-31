@@ -4,6 +4,5 @@ org.xwiki.security.authorization.internal.DefaultContentAuthorResolver
 org.xwiki.security.authorization.internal.ConservativeContentAuthorResolver
 org.xwiki.security.authorization.internal.DefaultEffectiveUserUpdater
 org.xwiki.security.authorization.internal.UserAndGroupReferenceResolver
-org.xwiki.security.internal.DefaultEntityBridge
 org.xwiki.security.internal.DefaultUserBridge
 org.xwiki.security.internal.DefaultXWikiBridge

@@ -10,6 +10,7 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  * <li>Stacking of multiple notifications on the screen.</li>
  * <li>Possibility to replace a notification with another one, preserving the position.</li>
  * <li>Automatic hide after a configurable period of time.</li>
+ * <li> After hiding, call the function specified in the options.</li>
  * <li>Configurable icon, background and text color.</li>
  * </ul>
  * To display a notification, it suffices to create a new XWiki.widgets.Notification object. Constructor parameters:
@@ -121,6 +122,7 @@ widgets.Notification = Class.create({
       window.clearTimeout(this.timer);
       this.timer = null;
     }
+    (typeof this.options.onHide == 'function') && this.options.onHide();
   },
   /** Silently replace this notification with another one, keeping the same place. */
   replace : function(notification) {

@@ -27,53 +27,50 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-filesystem-attachments</artifactId>
   <name>XWiki Platform - Store - Filesystem - Attachments</name>
   <description>A means to store XWikiAttachments on the filesystem with versioning.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>37.82</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
     <!-- Needed for DocumentReferenceSerializer implementation. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Used to serialize the metadata for attachments -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-serialization</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- StreamProvider -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- TransactionRunnable -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-transaction</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- FileSaveTransactionRunnable, FileDeleteTransactionRunnable -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-filesystem</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!--
      * Needed for:
      * XWikiAttachment, XWikiDocument, XWikiHibernateStore,
@@ -85,31 +82,25 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- LockProvider for locking attachments -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-locks</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Used for getting the persistent storage directory in FilesystemStoreTools. -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
-
     <!-- Testing Dependencies -->
-
     <!-- Needed for ClassImposteriser for mocking XWikiContext etc. -->
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
     </dependency>
-
     <!-- For some tests we need to have the Servlet API JAR available -->
     <dependency>
       <groupId>javax.servlet</groupId>

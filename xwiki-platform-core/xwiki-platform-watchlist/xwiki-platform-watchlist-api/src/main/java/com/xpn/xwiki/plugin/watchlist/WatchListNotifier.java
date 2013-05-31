@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.script.service.ScriptServiceManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -31,6 +32,7 @@ import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Utility class used by the watchlist plugin to send notifications to users. The current implementation offers email
@@ -106,6 +108,7 @@ public class WatchListNotifier
         vcontext.put("modifiedDocuments", modifiedDocuments);
         vcontext.put("previousFireTime", previousFireTime);        
         vcontext.put("context", new Context(context));
+        vcontext.put("services", Utils.getComponent(ScriptServiceManager.class));
 
         // Get wiki's default language (default en)
         String language = context.getWiki().getXWikiPreference("default_language", "en", context);

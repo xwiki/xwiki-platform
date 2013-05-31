@@ -27,7 +27,7 @@ XWiki.widgets.LiveTable = Class.create({
     if (!options) {
       var options = {};
     }
-     
+
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
 
@@ -36,7 +36,7 @@ XWiki.widgets.LiveTable = Class.create({
     if ($(this.domNodeName).down('tr.xwiki-livetable-initial-message')) {
       $(this.domNodeName).down('tr.xwiki-livetable-initial-message').remove();
     }
-    
+
     // id of the display element (the inner dynamic table) of this livetable
     // defined by convention as the root node id on which is appended "-display".
     // fallback on the unique "display1" id for backward compatibility.
@@ -54,7 +54,7 @@ XWiki.widgets.LiveTable = Class.create({
 
      // Array of nodes under which a page size control will be displayed
     this.pageSizeNodes = options.pageSizeNodes || $(this.domNodeName).select(".xwiki-livetable-pagesize");
-    
+
     if (typeof options == "undefined") {
        options = {};
     }
@@ -96,7 +96,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.filter = new LiveTableFilter(this, this.filtersNodes, this.permalinks.getFilters(), {
         throttlingDelay: this.throttlingDelay
       });
-    } 
+    }
 
     if ($(domNodeName + "-tagcloud"))
     {
@@ -114,13 +114,13 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Initialize sort column and observe sort events
     this.observeSortableColumns(this.permalinks.getSortColumn(), this.permalinks.getSortDirection());
- 
+
     this.currentOffset = (initialPage - 1) * this.limit + 1;
 
     // Show initial rows
     this.showRows(this.currentOffset, this.limit);
   },
-  
+
   /**
    * Set the page size of the table and refresh the display
    * @param pageSize The new maximum number of rows to display per page
@@ -270,19 +270,19 @@ XWiki.widgets.LiveTable = Class.create({
     * @param limit Maximum number of rows to display.
     */
   displayRows: function(offset, limit)
-  { 
+  {
     var f = offset + limit - 1;
     if (f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0) ? offset : 0;
-    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
+    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $services.localization.render('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$msg.get('platform.livetable.paginationResults') " + msg;
+    this.limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {
       if (this.fetchedRows[i]) {
-        var elem = this.handler(this.fetchedRows[i], i, this);      
+        var elem = this.handler(this.fetchedRows[i], i, this);
         this.displayNode.appendChild(elem);
         var memo = {
           "data": this.fetchedRows[i],
@@ -312,7 +312,7 @@ XWiki.widgets.LiveTable = Class.create({
     * any) rows should be fetched from the server, then forwards the call to {@link #displayRows}.
     * @param offset Starting offset; the index of the first row that should be displayed.
     * @param limit Maximum number of rows to display.
-    * @param in case we need to fetch rows, an optional delay before the rows are actually fetched 
+    * @param in case we need to fetch rows, an optional delay before the rows are actually fetched
     *         against the server (allows submission throttling)
     */
   showRows: function(offset, limit, delay)
@@ -354,7 +354,7 @@ XWiki.widgets.LiveTable = Class.create({
       buff += 'we need to get rows '+min+' to '+ (max+1) +' <br />\n';
       this.getRows(min, max - min + 1, offset, limit);
     }
- 
+
     if(this.paginator) this.paginator.refreshPagination();
 
     return buff;
@@ -406,7 +406,7 @@ XWiki.widgets.LiveTable = Class.create({
     else {
       this.showRows(newoffset, this.limit);
     }
-                                     
+
     if (this.paginator) this.paginator.refreshPagination();
 
     // Let code know displaying is finished
@@ -705,7 +705,7 @@ var LiveTablePagination = Class.create({
             this.pagesNodes.invoke("insert", " ... ");
          }
       }
-      // display pages 
+      // display pages
       for (var i=(startPage<=0) ? 1 : startPage;i<=Math.min(startPage + currentMax + 1, pages);i++) {
          var selected = (currentPage == i);
          this.pagesNodes.each(function(elem){
@@ -819,18 +819,18 @@ var LiveTablePagination = Class.create({
     this.startValue = bounds[0] || 10;
     this.step = bounds[2] || 10;
     this.maxValue = bounds[1] || 100;
-    
+
     var self = this;
     this.pageSizeNodes = [];
     domNodes.each(function(elem) {
       self.pageSizeNodes.push(elem.down(".xwiki-livetable-pagesize-content"));
     });
-    
+
     this.pageSizeNodes.each(function(elem) {
       elem.insert(self.createPageSizeSelectControl());
     });
   },
-  
+
   /**
    * Create the page size control using a select node and returns it
    * @return an Element containing the select
@@ -852,7 +852,7 @@ var LiveTablePagination = Class.create({
     select.observe("change", this.changePageSize.bind(this));
     return select;
   },
-  
+
   /**
    * Change the page size of the table
    **/
@@ -988,8 +988,7 @@ var LiveTableFilter = Class.create({
    * Apply style to livetable filters that are applied
    */
   applyActiveFilterStyle: function(element) {
-    if(element && element.tagName && 
-	    ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
+    if(element && element.tagName && ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
       if ($F(element) != '') {
         element.addClassName('xwiki-livetable-filter-active');
       } else {
@@ -1032,7 +1031,7 @@ var LiveTableTagCloud = Class.create({
     * Tags selected as filters
     */
    selectedTags: {},
-   
+
    /**
     * Default popularity levels. Used as CSS class on the tag list items.
     */
@@ -1044,12 +1043,12 @@ var LiveTableTagCloud = Class.create({
     */
    updateTagCloud: function(tags, matchingTags) {
       if (!this.hasTags && tags.length > 0) {
-        this.tags = tags;    
+        this.tags = tags;
         this.map = this.buildPopularityMap(this.tags);
         this.hasTags = true;
         this.domNode.removeClassName("hidden");
       }
-      this.matchingTags = matchingTags;       
+      this.matchingTags = matchingTags;
       this.displayTagCloud();
    },
 

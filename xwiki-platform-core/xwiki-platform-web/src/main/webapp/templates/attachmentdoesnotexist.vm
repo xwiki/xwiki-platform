@@ -5,7 +5,7 @@ $response.setStatus(404)
 #if($xwiki.exists("XWiki.AttachmentDoesNotExist"))
   $xwiki.includeForm("XWiki.AttachmentDoesNotExist",false)
 #else
-  #xwikimessageboxstart($msg.get("error") $msg.get("attachmentdoesnotexist"))
+  #xwikimessageboxstart($services.localization.render('error') $services.localization.render('attachmentdoesnotexist'))
   $!exception
   #xwikimessageboxend()
 #end

@@ -28,7 +28,7 @@ import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * UI tests for the IRC Bot feature.

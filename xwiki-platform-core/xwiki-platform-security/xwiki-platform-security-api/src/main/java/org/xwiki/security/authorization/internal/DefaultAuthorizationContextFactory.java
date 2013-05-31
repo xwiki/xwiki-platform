@@ -73,7 +73,7 @@ public class DefaultAuthorizationContextFactory implements ExecutionContextIniti
 
     /** Execution context key for indicating that the privileged mode is disabled. */
     private static final String PRIVILEGED_MODE_DISABLED_EXECUTION_CONTEXT_KEY = "privileged_mode_disabled";
-
+    
     /** The execution. */
     @Inject
     private Execution execution;

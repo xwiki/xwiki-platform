@@ -103,4 +103,23 @@
       <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.WebKitPasteFilter">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter" />
+    <when-property-is name="user.agent" value="safari" />
+  </replace-with>
+
+  <!-- PasteManager -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteManager">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteManager" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.IEPasteManager">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteManager" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie9" />
+    </any>
+  </replace-with>
 </module>

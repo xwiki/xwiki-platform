@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.reference.AbstractURIResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.type.AbstractURIResourceReferenceTypeParser;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 

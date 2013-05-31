@@ -715,7 +715,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             }
 
             // Look in the main wiki
-            if (context.getWiki().isVirtualMode() && !StringUtils.equals(context.getDatabase(), context.getMainXWiki())) {
+            if (!context.isMainWiki()) {
                 reference = new DocumentReference(context.getMainXWiki(), "XWiki", pageName);
                 if (context.getWiki().exists(reference, context)) {
                     LOGGER.debug("Found default custom displayer for property class name in main wiki: [{}]", pageName);

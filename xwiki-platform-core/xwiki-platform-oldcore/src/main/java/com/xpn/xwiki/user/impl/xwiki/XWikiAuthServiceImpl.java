@@ -26,13 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -40,8 +37,10 @@ import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
@@ -50,19 +49,21 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Default implementation of {@link XWikiAuthService}.
+ * Default implementation of {@link com.xpn.xwiki.user.api.XWikiAuthService}.
  * 
  * @version $Id$
  */
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAuthServiceImpl.class);
+
+    private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.SPACE));
 
     /**
      * Used to convert a string into a proper Document Name.
@@ -221,16 +222,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         // Debug time taken.
         long time = System.currentTimeMillis();
 
-        XWiki xwiki = context.getWiki();
         HttpServletRequest request = null;
-        HttpServletResponse response = null;
+        HttpServletResponse response = context.getResponse();
 
         if (context.getRequest() != null) {
             request = context.getRequest().getHttpServletRequest();
-        }
-
-        if (context.getResponse() != null) {
-            response = context.getResponse().getHttpServletResponse();
         }
 
         if (request == null) {
@@ -286,14 +282,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         throws XWikiException
     {
         HttpServletRequest request = null;
-        HttpServletResponse response = null;
+        HttpServletResponse response = context.getResponse();
 
         if (context.getRequest() != null) {
             request = context.getRequest().getHttpServletRequest();
-        }
-
-        if (context.getResponse() != null) {
-            response = context.getResponse().getHttpServletResponse();
         }
 
         if (request == null) {
@@ -349,8 +341,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     {
         try {
             if (context.getMode() == XWikiContext.MODE_SERVLET) {
-                getAuthenticator(context).showLogin(context.getRequest().getHttpServletRequest(),
-                    context.getResponse().getHttpServletResponse(), context);
+                getAuthenticator(context).showLogin(context.getRequest().getHttpServletRequest(), context.getResponse(),
+                    context);
             }
         } catch (IOException e) {
             LOGGER.error("Unknown failure when calling showLogin", e);
@@ -505,7 +497,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             boolean result = false;
 
             final XWikiDocument doc = context.getWiki().getDocument(username, context);
-            final BaseObject userObject = doc.getObject("XWiki.XWikiUsers");
+            final BaseObject userObject = doc.getXObject(USERCLASS_REFERENCE);
             // We only allow empty password from users having a XWikiUsers object.
             if (userObject != null) {
                 final String stored = userObject.getStringValue("password");

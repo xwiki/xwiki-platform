@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search</artifactId>
   <name>XWiki Platform - Search - Parent POM</name>
@@ -35,7 +35,7 @@
   <description>XWiki Platform - Search - Parent POM</description>
   <modules>
     <module>xwiki-platform-search-lucene</module>
-    <module>xwiki-platform-search-ui</module>
     <module>xwiki-platform-search-solr</module>
+    <module>xwiki-platform-search-ui</module>
   </modules>
 </project>

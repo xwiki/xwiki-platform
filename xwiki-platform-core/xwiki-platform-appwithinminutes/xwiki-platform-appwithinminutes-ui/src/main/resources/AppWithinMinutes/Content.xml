@@ -15,7 +15,7 @@
   <date>1352137734000</date>
   <contentUpdateDate>1352137734000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('platform.appwithinminutes.classEditorContentFieldName')</title>
+  <title>$services.localization.render('platform.appwithinminutes.classEditorContentFieldName')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -138,15 +138,31 @@
   </object>
   <content>{{velocity}}
 #if ($type == 'edit')
-  #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
+  #set ($className = $object.getxWikiClass().name)
+  #if ($doc.fullName == $className)
+    ## We are editing the class so the content must be read from / written to the template document.
+    #set ($name = 'templateContent')
+    #set ($editedDocument = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template"))
+    ## Don't load the WYSIWYG editor when editing the class, because it's too heavy.
+    #set ($useWysiwygEditor = false)
+  #else
+    ## We are editing an application entry so the content must be read from / written to the current document.
+    #set ($name = 'content')
+    #set ($editedDocument = $tdoc)
+    ## Use the preferred content editor.
+    #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
+  #end
   {{html clean="false"}}
   #if (!$useWysiwygEditor)
     &lt;div id="xwikieditcontentinner"&gt;
-      #template('simpleedittoolbar.vm')
+      ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.
+      #set ($toolBar = "#template('simpleedittoolbar.vm')")
+      $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
   #end
-  $xwiki.getTextArea($tdoc.content)
+  ## The "content" id is expected by some JavaScript and CSS code.
+  &lt;textarea id="content" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
   #if ($useWysiwygEditor)
-    #wysiwyg_editProperty($tdoc "content" true)
+    #wysiwyg_editProperty($editedDocument 'content' true)
   #else
     &lt;/div&gt;
   #end

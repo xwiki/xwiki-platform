@@ -24,7 +24,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;

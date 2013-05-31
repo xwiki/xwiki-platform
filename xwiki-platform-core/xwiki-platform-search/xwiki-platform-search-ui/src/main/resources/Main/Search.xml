@@ -15,7 +15,7 @@
   <date>1273048536000</date>
   <contentUpdateDate>1273048536000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if("$!{request.text}"=="")$msg.get("search.page.title.noquery")#else$msg.get("search.page.title.query", [$request.text])#end</title>
+  <title>#if("$!{request.text}" == '')$services.localization.render('search.page.title.noquery')#else$services.localization.render('search.page.title.query', [$request.text])#end</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

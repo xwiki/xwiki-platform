@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.internal;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
@@ -54,9 +54,9 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
     protected DocumentReferenceResolver<String> mockDocumentReferenceResolver;
 
     /**
-     * Mock {@link OpenOfficeManager} component.
+     * Mock office server.
      */
-    protected OpenOfficeManager mockOpenOfficeManager;
+    protected OfficeServer mockOfficeServer;
 
     @Override
     protected void registerComponents() throws Exception
@@ -70,6 +70,6 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
             registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki", "s2");
         this.mockDocumentReferenceResolver =
             registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        this.mockOpenOfficeManager = registerMockComponent(OpenOfficeManager.class);
+        this.mockOfficeServer = registerMockComponent(OfficeServer.class);
     }
 }

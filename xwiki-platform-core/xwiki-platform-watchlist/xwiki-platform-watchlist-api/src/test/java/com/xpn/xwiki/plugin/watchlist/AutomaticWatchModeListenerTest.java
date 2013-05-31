@@ -19,20 +19,39 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import static org.mockito.Mockito.*;
+
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.internal.DefaultObservationContext;
+import org.xwiki.observation.internal.ObservationContextListener;
+import org.xwiki.test.ComponentManagerRule;
+import org.xwiki.test.annotation.ComponentList;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.web.Utils;
 
 /**
- * Validate {@link AutomaticWatchModeListener}.
+ * Unit tests for {@link AutomaticWatchModeListener}.
  * 
  * @version $Id$
  */
-public class AutomaticWatchModeListenerTest extends AbstractBridgedComponentTestCase
+@ComponentList({
+    ObservationContextListener.class,
+    DefaultExecution.class,
+    DefaultObservationContext.class
+})
+public class AutomaticWatchModeListenerTest
 {
     private WatchListStore mockStore;
 
@@ -40,29 +59,72 @@ public class AutomaticWatchModeListenerTest extends AbstractBridgedComponentTest
 
     private EventListener observationContextListener;
 
-    @Override
+    @Rule
+    public final ComponentManagerRule componentManager = new ComponentManagerRule();
+
+    @Before
     public void setUp() throws Exception
     {
-        super.setUp();
-
-        this.mockStore = getMockery().mock(WatchListStore.class);
+        this.mockStore = mock(WatchListStore.class);
         this.listener = new AutomaticWatchModeListener(this.mockStore);
 
+        Utils.setComponentManager(this.componentManager);
+
+        // Make sure we have an Execution Context since the observationContextListener will store current events in it
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        execution.setContext(new ExecutionContext());
+
         this.observationContextListener =
-            getComponentManager().getInstance(EventListener.class, "ObservationContextListener");
+            this.componentManager.getInstance(EventListener.class, "ObservationContextListener");
     }
 
+    /**
+     * Verify that we don't do anything when the current event is inside a WikiCreatingEvent.
+     */
     @Test
-    public void testWikiCreatingEvent()
+    public void onEventWhenInContextOfWikiCreatingEvent()
     {
+        // We simulate a WikiCreatingEvent in the Execution Context
         this.observationContextListener.onEvent(new WikiCreatingEvent(), null, null);
+
+        this.listener.onEvent(new DocumentCreatedEvent(), null, null);
+    }
+
+    /**
+     * Verify that we don't do anything when the current event is inside a XARImportingEvent.
+     */
+    @Test
+    public void onEventWhenInContextOXARImportingEvent()
+    {
+        // We simulate a XARImportingEvent in the Execution Context
+        this.observationContextListener.onEvent(new XARImportingEvent(), null, null);
+
         this.listener.onEvent(new DocumentCreatedEvent(), null, null);
     }
 
     @Test
-    public void testXARImportingEvent()
+    public void onEventWhenDocumentCreatedEvent() throws Exception
     {
-        this.observationContextListener.onEvent(new XARImportingEvent(), null, null);
-        this.listener.onEvent(new DocumentCreatedEvent(), null, null);
+        XWikiContext context = mock(XWikiContext.class);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference documentReference = new DocumentReference("authorWiki", "authorSpace", "authorPage");
+        when(document.getContentAuthor()).thenReturn("content author");
+        when(document.getContentAuthorReference()).thenReturn(documentReference);
+        when(document.getPrefixedFullName()).thenReturn("authorSpace.authorPage");
+
+        when(this.mockStore.getAutomaticWatchMode("content author", context)).thenReturn(
+                AutomaticWatchMode.ALL);
+
+        com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(xwiki.exists(documentReference, context)).thenReturn(true);
+
+        when(context.getWiki()).thenReturn(xwiki);
+
+        this.listener.onEvent(new DocumentCreatedEvent(), document, context);
+
+        // Verify that the document is added to the watchlist
+        verify(this.mockStore).addWatchedElement(
+            "content author", "authorSpace.authorPage", WatchListStore.ElementType.DOCUMENT, context);
     }
 }

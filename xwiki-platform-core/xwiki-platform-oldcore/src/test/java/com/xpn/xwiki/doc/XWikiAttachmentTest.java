@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.util.Random;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -114,11 +113,13 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
             this.state = seed;
         }
 
+        @Override
         public int available()
         {
             return this.bytes;
         }
 
+        @Override
         public int read()
         {
             if (this.bytes == 0) {

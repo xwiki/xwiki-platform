@@ -131,7 +131,7 @@ public class CommentEventGeneratorListenerTest extends AbstractBridgedComponentT
     public void testModifiedComment()
     {
         this.document.addXObject(this.commentXObject);
-        this.documentOrigin.addXObject((BaseObject) this.commentXObject.clone());
+        this.documentOrigin.addXObject(this.commentXObject.clone());
         
         this.commentXObject.setStringValue("comment", "comment");
 

@@ -28,7 +28,9 @@ import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.MacroId;
@@ -63,6 +65,9 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
  */
 public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 {
+    private static final EntityReference XWIKIPREFERENCES_REFERENCE = new EntityReference("XWikiPreferences",
+        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
     /**
      * Dummy document reference of the document which contains the wiki macro.
      */
@@ -139,8 +144,6 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getDocument(with(equal(wikiMacroDocumentReference)), with(any(XWikiContext.class)));
                 will(returnValue(wikiMacroDocument));
 
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(false));
                 allowing(mockXWiki).isReadOnly();
                 will(returnValue(false));
                 allowing(mockXWiki).getLanguagePreference(with(any(XWikiContext.class)));
@@ -154,7 +157,7 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
                     with(any(int.class)), with(any(int.class)), with(any(XWikiContext.class)));
                 will(returnValue(Collections.EMPTY_LIST));
 
-                allowing(mockXWiki).getDocument(with(equal("XWiki.XWikiPreferences")), with(any(XWikiContext.class)));
+                allowing(mockXWiki).getDocument(with(equal(XWIKIPREFERENCES_REFERENCE)), with(any(XWikiContext.class)));
                 will(returnValue(prefs));
                 allowing(mockGlobalRightObj).getStringValue("levels");
                 will(returnValue("programming"));

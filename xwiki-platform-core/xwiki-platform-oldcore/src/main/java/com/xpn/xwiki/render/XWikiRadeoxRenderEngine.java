@@ -318,6 +318,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
      * 
      * @return result String with an HTML link to an image
      */
+    @Override
     public String getExternalImageLink()
     {
         return "";

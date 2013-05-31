@@ -22,6 +22,30 @@ package com.xpn.xwiki.internal.template;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer;
+import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceObjectReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
+import org.xwiki.model.internal.DefaultModelContext;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
 import org.xwiki.security.authorization.GrantProgrammingRightController;
 
 import com.xpn.xwiki.XWikiContext;
@@ -53,7 +77,7 @@ public class DefaultPrivilegedTemplateRendererTest
     @Test
     public void ordinaryTemplate() throws Exception
     {
-        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getMockedComponent();
+        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getComponentUnderTest();
 
         final XWikiContext context = mock(XWikiContext.class);
 
@@ -78,7 +102,10 @@ public class DefaultPrivilegedTemplateRendererTest
     @Test
     public void privilegedTemplate() throws Exception
     {
-        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getMockedComponent();
+        // Required in order to instantiate an XWikiDocument
+        Utils.setComponentManager(mocker);
+
+        PrivilegedTemplateRenderer privilegedTemplateRenderer = mocker.getComponentUnderTest();
 
         final XWikiContext context = mock(XWikiContext.class);
 

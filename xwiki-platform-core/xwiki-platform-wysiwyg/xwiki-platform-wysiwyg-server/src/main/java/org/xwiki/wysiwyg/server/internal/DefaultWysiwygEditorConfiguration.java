@@ -183,4 +183,11 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
     {
         return (Integer) getProperty("historySize");
     }
+
+    @Override
+    public Boolean isPasteContentCleanedAutomatically()
+    {
+        Integer cleanPaste = (Integer) getProperty("cleanPaste");
+        return cleanPaste == null ? null : ONE.equals(cleanPaste);
+    }
 }

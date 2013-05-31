@@ -20,7 +20,6 @@
 package com.xpn.xwiki.gwt.api.client.app;
 
 import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
 /** See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.

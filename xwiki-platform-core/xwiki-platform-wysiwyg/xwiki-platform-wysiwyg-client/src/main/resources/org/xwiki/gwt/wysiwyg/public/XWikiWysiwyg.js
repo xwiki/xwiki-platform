@@ -275,5 +275,5 @@ Wysiwyg.onModuleLoad(function() {
 }, true);
 
 #if("$!request.lazy" != "true")
-Wysiwyg.load();
+(XWiki.domIsLoaded && Wysiwyg.load()) || document.observe('xwiki:dom:loaded', Wysiwyg.load.bind(Wysiwyg));
 #end

@@ -1,0 +1,26 @@
+##syntax=xwiki/2.1
+{{velocity}}
+#if ("$!request.action" == '')
+  ## Display the step.
+  ## We use a hack to insert the new line in the translation parameters.
+  $services.localization.render('platform.extension.distributionWizard.welcomeStepDescription', ['
+    * ', '
+    * '])
+
+  (% class="steps-hint" %)
+  {{translation key="platform.extension.distributionWizard.welcomeStepStepsHint"/}}
+
+  (% class="steps vertical" %)
+  #foreach ($step in $steps)
+    * (% class="number" %)$velocityCount(%%)##
+      (% class="name" %){{translation key="platform.extension.distributionWizard.${step.id}StepTitle"/}}(%%)##
+      (% class="description" %){{translation key="platform.extension.distributionWizard.${step.id}StepSummary"/}}
+  #end
+
+  (% class="xHint" %)
+  {{translation key="platform.extension.distributionWizard.welcomeStepActionsHint"/}}
+
+  #set ($showCompleteStepButton = true)
+  #set ($canCloseWizard = true)
+#end
+{{/velocity}}

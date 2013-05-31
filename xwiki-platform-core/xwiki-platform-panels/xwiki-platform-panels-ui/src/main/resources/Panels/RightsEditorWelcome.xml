@@ -106,13 +106,13 @@
     </property>
     <property>
       <content>{{velocity}}
-#largepanelheader($msg.get('welcome'))
+#largepanelheader($services.localization.render('welcome'))
 
-$msg.get('xe.panels.rights.welcome')
+$services.localization.render('xe.panels.rights.welcome')
 
-$msg.get('xe.panels.rights.explanation')
+$services.localization.render('xe.panels.rights.explanation')
 
-**$msg.get('xe.panels.rights.warning')** $msg.get('xe.panels.rights.noauthentication')
+**$services.localization.render('xe.panels.rights.warning')** $services.localization.render('xe.panels.rights.noauthentication')
 #panelfooter()
 {{/velocity}}</content>
     </property>

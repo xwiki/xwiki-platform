@@ -77,7 +77,7 @@ public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem
         this.periodType = periodType;
         this.period = StatsUtil.getPeriodAsInt(this.periodDate, this.periodType);
 
-        this.context = (XWikiContext) context.clone();
+        this.context = context.clone();
     }
 
     @Override

@@ -243,7 +243,7 @@ Object.extend(XWiki, {
     $(content).select(".xwikirenderingerror").each(function(error) {
         if(error.next().innerHTML !== "" && error.next().hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
-            error.title = "$msg.get('platform.core.rendering.error.readTechnicalInformation')";
+            error.title = "$services.localization.render('platform.core.rendering.error.readTechnicalInformation')";
             Event.observe(error, "click", function(event){
                    event.element().next().toggleClassName("hidden");
             });
@@ -313,12 +313,21 @@ Object.extend(XWiki, {
 
               if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
                   var editspan = document.createElement("SPAN");
-                  var editlink = document.createElement("A");
-
-                  editlink.href = window.docediturl + "?section=" + sectioncount;
-                  editlink.style.textDecoration = "none";
-                  editlink.innerHTML = "$msg.get('edit')";
                   editspan.className = "edit_section";
+
+                  // If there's no Syntax Renderer for the current document's syntax then make sure the section edit
+                  // button will be displayed inactive since editing a section requires a Syntax Renderer.
+                  var editlink;
+                  if (!XWiki.hasRenderer) {
+                      editlink = document.createElement("SPAN");
+                      editspan.className = editspan.className + " disabled";
+                      editlink.title = "$services.localization.render('platform.core.rendering.noRendererForSectionEdit')";
+                  } else {
+                      editlink = document.createElement("A");
+                      editlink.href = window.docediturl + "?section=" + sectioncount;
+                      editlink.style.textDecoration = "none";
+                      editlink.innerHTML = "$services.localization.render('edit')";
+                  }
 
                   editspan.appendChild(editlink);
                   node.insert( { 'after': editspan } );
@@ -374,7 +383,7 @@ Object.extend(XWiki, {
                           }
                       },
                       onFailure: function() {
-                        new XWiki.widgets.Notification("$msg.get('core.create.ajax.error')", 'error', {inactive: true}).show();
+                        new XWiki.widgets.Notification("$services.localization.render('core.create.ajax.error')", 'error', {inactive: true}).show();
                       }
                   });
                   event.stop();
@@ -1488,7 +1497,7 @@ document.observe('xwiki:dom:loaded', function() {
       });
     }
     $('body').observe('click', function (event) {
-      if (!event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
+      if (event.element().descendantOf && !event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
         hideParentSection();
       }
     })

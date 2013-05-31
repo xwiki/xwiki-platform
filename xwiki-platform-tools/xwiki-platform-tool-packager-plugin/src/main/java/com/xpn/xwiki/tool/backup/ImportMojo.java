@@ -22,24 +22,29 @@ package com.xpn.xwiki.tool.backup;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
+import org.apache.maven.repository.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.DefaultExtensionAuthor;
@@ -80,25 +85,25 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * @parameter default-value = "xwiki"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private String databaseName;
 
     /**
      * @parameter default-value = "${basedir}/src/main/packager/hibernate.cfg.xml"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private File hibernateConfig;
 
     /**
      * @parameter
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private File sourceDirectory;
 
     /**
      * @parameter default-value = "${project.build.directory}/data/"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
     private File xwikiDataDir;
 
@@ -114,11 +119,11 @@ public class ImportMojo extends AbstractMojo
     /**
      * Project builder -- builds a model from a pom.xml.
      * 
-     * @component role="org.apache.maven.project.MavenProjectBuilder"
+     * @component role="org.apache.maven.project.ProjectBuilder"
      * @required
      * @readonly
      */
-    protected MavenProjectBuilder mavenProjectBuilder;
+    protected ProjectBuilder projectBuilder;
 
     /**
      * Used to look up Artifacts in the remote repository.
@@ -126,25 +131,15 @@ public class ImportMojo extends AbstractMojo
      * @component
      * @required
      */
-    protected ArtifactFactory factory;
+    protected RepositorySystem repositorySystem;
 
     /**
-     * List of Remote Repositories used by the resolver.
+     * The current repository/network configuration of Maven.
      * 
-     * @parameter expression="${project.remoteArtifactRepositories}"
+     * @parameter default-value="${repositorySystemSession}"
      * @readonly
-     * @required
      */
-    protected List<ArtifactRepository> remoteRepos;
-
-    /**
-     * Location of the local repository.
-     * 
-     * @parameter expression="${localRepository}"
-     * @readonly
-     * @required
-     */
-    private ArtifactRepository local;
+    private RepositorySystemSession repositorySystemSession;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -179,19 +174,21 @@ public class ImportMojo extends AbstractMojo
     {
         XWikiContext xcontext = importer.createXWikiContext(databaseName, hibernateConfig);
 
-        Set<Artifact> artifacts = this.project.getArtifacts();
-        if (artifacts != null) {
-            for (Artifact artifact : artifacts) {
-                if (!artifact.isOptional()) {
-                    if ("xar".equals(artifact.getType())) {
-                        getLog().info("  ... Importing XAR file: " + artifact.getFile());
+        // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an ordered
+        // LinkedHashSet behind the scene)
+        List<Artifact> dependenciesFirstArtifacts = new ArrayList<Artifact>(this.project.getArtifacts());
+        Collections.reverse(dependenciesFirstArtifacts);
 
-                        // Import XAR into database
-                        importer.importXAR(artifact.getFile(), null, xcontext);
+        for (Artifact artifact : dependenciesFirstArtifacts) {
+            if (!artifact.isOptional()) {
+                if ("xar".equals(artifact.getType())) {
+                    getLog().info("  ... Importing XAR file: " + artifact.getFile());
 
-                        // Install extension
-                        installExtension(artifact, xcontext);
-                    }
+                    // Import XAR into database
+                    importer.importXAR(artifact.getFile(), null, xcontext);
+
+                    // Install extension
+                    installExtension(artifact, xcontext);
                 }
             }
         }
@@ -239,7 +236,7 @@ public class ImportMojo extends AbstractMojo
         extension.setWebsite(getPropertyString(model, MPNAME_WEBSITE, model.getUrl()));
 
         // authors
-        for (Developer developer : (List<Developer>) model.getDevelopers()) {
+        for (Developer developer : model.getDevelopers()) {
             URL authorURL = null;
             if (developer.getUrl() != null) {
                 try {
@@ -256,7 +253,7 @@ public class ImportMojo extends AbstractMojo
         // licenses
         if (!model.getLicenses().isEmpty()) {
             ExtensionLicenseManager licenseManager = componentManager.getInstance(ExtensionLicenseManager.class);
-            for (License license : (List<License>) model.getLicenses()) {
+            for (License license : model.getLicenses()) {
                 extension.addLicense(getExtensionLicense(license, licenseManager));
             }
         }
@@ -270,7 +267,7 @@ public class ImportMojo extends AbstractMojo
         }
 
         // dependencies
-        for (Dependency mavenDependency : (List<Dependency>) model.getDependencies()) {
+        for (Dependency mavenDependency : model.getDependencies()) {
             if (!mavenDependency.isOptional()
                 && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
                 extension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ':'
@@ -281,16 +278,19 @@ public class ImportMojo extends AbstractMojo
 
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
     {
-        MavenProject pomProject;
-        Artifact pomArtifact =
-            this.factory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
         try {
-            pomProject = this.mavenProjectBuilder.buildFromRepository(pomArtifact, this.remoteRepos, this.local);
+            ProjectBuildingRequest request = new DefaultProjectBuildingRequest()
+                .setRepositorySession(this.repositorySystemSession)
+                // We don't want to execute any plugin here
+                .setProcessPlugins(false)
+                // It's not this plugin job to validate this pom.xml
+                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+            // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
+            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
+            return result.getProject();
         } catch (ProjectBuildingException e) {
-            throw new MojoExecutionException(String.format("Failed to build project for [%s]", pomArtifact), e);
+            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
         }
-
-        return pomProject;
     }
 
     private String getProperty(Model model, String propertyName)

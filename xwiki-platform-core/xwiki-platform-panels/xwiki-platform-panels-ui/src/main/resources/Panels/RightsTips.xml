@@ -108,49 +108,48 @@
       <content>{{velocity}}
 (% id="xwikirightstipspanel" %)
 (((
-#largepanelheader($msg.get("xe.panels.rights.tips"))
+#largepanelheader($services.localization.render('xe.panels.rights.tips'))
 (% id="xwikirightstips" %)
 (((
   (% id="xwikitipspublic" %)
   (((
     (% id="xwikitipspublicHeader" class="accordionTabTitleBar" %)
-    (((= $msg.get('xe.panels.rights.publicwiki') =)))
+    (((= $services.localization.render('xe.panels.rights.publicwiki') =)))
     (% id="xwikitipspublicContent" class="accordionTabContentBox" %)
-    ((($msg.get('xe.panels.rights.openwiki')
-* $msg.get("xe.panels.rights.opengroups")
-* $msg.get("xe.panels.rights.openusers")
-* $msg.get("xe.panels.rights.openaccess")
-* $msg.get("xe.panels.rights.openallow")
+    ((($services.localization.render('xe.panels.rights.openwiki')
+* $services.localization.render('xe.panels.rights.opengroups')
+* $services.localization.render('xe.panels.rights.openusers')
+* $services.localization.render('xe.panels.rights.openaccess')
+* $services.localization.render('xe.panels.rights.openallow')
     )))
   )))
   (% id="xwikitipsregistered" class="accordion" %)
   (((
     (% id="xwikitipsregisteredHeader" class="accordionTabTitleBar"%)
-    (((= $msg.get('xe.panels.rights.authenticate') =)))
+    (((= $services.localization.render('xe.panels.rights.authenticate') =)))
     (% id="xwikitipsregisteredContent" class="accordionTabContentBox" %)
-    ((($msg.get('xe.panels.rights.protectedwiki')
-* $msg.get('xe.panels.rights.protectedgroups')
-* $msg.get('xe.panels.rights.protectedusers')
-* $msg.get('xe.panels.rights.protectedaccess')
-* $msg.get('xe.panels.rights.protectedallow')
+    ((($services.localization.render('xe.panels.rights.protectedwiki')
+* $services.localization.render('xe.panels.rights.protectedgroups')
+* $services.localization.render('xe.panels.rights.protectedusers')
+* $services.localization.render('xe.panels.rights.protectedaccess')
+* $services.localization.render('xe.panels.rights.protectedallow')
     )))
   )))
   (% id="xwikitipsbanned" %)
   (((
     (% id="xwikitipsbannedHeader" class="accordionTabTitleBar" %)
-    (((= $msg.get('xe.panels.rights.banned') =)))
+    (((= $services.localization.render('xe.panels.rights.banned') =)))
     (% id="xwikitipsbannedContent" class="accordionTabContentBox" %)
-    ((($msg.get('xe.panels.rights.bannedgroup')
-* $msg.get('xe.panels.rights.banedgroups')
-* $msg.get('xe.panels.rights.bannedusers')
-* $msg.get('xe.panels.rights.bannedaccess')
-* $msg.get('xe.panels.rights.banneddeny')
+    ((($services.localization.render('xe.panels.rights.bannedgroup')
+* $services.localization.render('xe.panels.rights.banedgroups')
+* $services.localization.render('xe.panels.rights.bannedusers')
+* $services.localization.render('xe.panels.rights.bannedaccess')
+* $services.localization.render('xe.panels.rights.banneddeny')
     )))
   )))
 )))## xwikirightstips
 #panelfooter()
 )))## xwikirightstipspanel
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
 $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
 {{html clean="false"}}
 &lt;script type="text/javascript"&gt;

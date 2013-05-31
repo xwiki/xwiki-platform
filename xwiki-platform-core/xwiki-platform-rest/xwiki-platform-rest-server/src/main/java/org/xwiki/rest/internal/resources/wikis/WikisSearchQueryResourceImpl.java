@@ -33,17 +33,21 @@ public class WikisSearchQueryResourceImpl extends BaseSearchResult implements Wi
 {
     @Override
     public SearchResults search(String query, Integer number, Integer start, Boolean distinct, String searchWikis,
-            String orderField, String order, Boolean withPrettyNames, String className)
-            throws XWikiRestException
+        String orderField, String order, Boolean withPrettyNames, String className) throws XWikiRestException
     {
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s", UriBuilder.fromUri(uriInfo.getBaseUri()).toString(),
-                    MULTIWIKI_QUERY_TEMPLATE_INFO));
+                MULTIWIKI_QUERY_TEMPLATE_INFO));
 
-            searchResults.getSearchResults().addAll(searchQuery(query, QueryType.LUCENE.toString(), null, searchWikis,
+            searchResults.getSearchResults().addAll(
+                searchQuery(
+                    query,
+                    QueryType.LUCENE.toString(),
+                    getXWikiContext().getDatabase(),
+                    searchWikis,
                     Utils.getXWiki(componentManager).getRightService()
-                            .hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order, distinct,
+                        .hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order, distinct,
                     number, start, withPrettyNames, className));
 
             return searchResults;

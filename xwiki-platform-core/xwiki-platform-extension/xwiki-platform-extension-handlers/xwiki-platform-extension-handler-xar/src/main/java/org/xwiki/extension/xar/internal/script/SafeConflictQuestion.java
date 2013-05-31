@@ -34,8 +34,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
 {
-    private ConflictQuestion question;
-
     /**
      * @param question the wrapped object
      * @param safeProvider the provider of instances safe for public scripts
@@ -71,17 +69,17 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
 
     public GlobalAction getGlobalAction()
     {
-        return this.question.getGlobalAction();
+        return getWrapped().getGlobalAction();
     }
 
     public void setGlobalAction(GlobalAction globalAction)
     {
-        this.question.setGlobalAction(globalAction);
+        getWrapped().setGlobalAction(globalAction);
     }
 
     public Document getCustomDocument()
     {
-        return safe(this.question.getCustomDocument());
+        return safe(getWrapped().getCustomDocument());
     }
 
     /**
@@ -92,7 +90,7 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
         try {
             XWikiDocument document = (XWikiDocument) FieldUtils.readField(customDocument, "doc", true);
 
-            this.question.setCustomDocument(document);
+            getWrapped().setCustomDocument(document);
         } catch (IllegalAccessException e) {
             // TODO: log something ?
         }

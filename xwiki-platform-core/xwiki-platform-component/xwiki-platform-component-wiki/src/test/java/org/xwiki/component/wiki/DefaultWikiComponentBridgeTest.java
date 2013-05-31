@@ -60,7 +60,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceRes
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 @ComponentList({
     DefaultModelContext.class,

@@ -93,6 +93,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
+        this.document.setAuthorReference(new DocumentReference("xwiki", "XWiki", "User"));
 
         getContext().setDoc(this.document);
 
@@ -141,7 +142,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
         this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
         this.mockXWiki.stubs().method("Param").with(eq("xwiki.render.velocity.macrolist")).will(returnValue(""));
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
         this.mockXWiki.stubs().method("evaluateTemplate").will(returnValue(""));
 

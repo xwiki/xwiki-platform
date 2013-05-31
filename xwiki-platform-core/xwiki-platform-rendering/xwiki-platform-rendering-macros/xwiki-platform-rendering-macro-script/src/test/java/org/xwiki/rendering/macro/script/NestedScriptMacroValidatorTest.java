@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
@@ -51,7 +51,7 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @since 2.4M2
  */
 @MockingRequirement(NestedScriptMacroValidatorListener.class)
-public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase
+public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase<EventListener>
 {
     private EventListener validator;
 

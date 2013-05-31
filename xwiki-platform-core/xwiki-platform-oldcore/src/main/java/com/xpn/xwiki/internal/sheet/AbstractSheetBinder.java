@@ -136,11 +136,12 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     {
         sheetBindingsQuery.setWiki(expectedSheetRef.getWikiReference().getName());
         try {
-            List<String[]> sheetBindings = sheetBindingsQuery.execute();
+            List<Object[]> sheetBindings = sheetBindingsQuery.execute();
             List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
-            for (String[] sheetBinding : sheetBindings) {
-                DocumentReference docRef = documentReferenceResolver.resolve(sheetBinding[0], expectedSheetRef);
-                DocumentReference sheetRef = documentReferenceResolver.resolve(sheetBinding[1], docRef);
+            for (Object[] sheetBinding : sheetBindings) {
+                DocumentReference docRef =
+                    documentReferenceResolver.resolve((String) sheetBinding[0], expectedSheetRef);
+                DocumentReference sheetRef = documentReferenceResolver.resolve((String) sheetBinding[1], docRef);
                 if (sheetRef.equals(expectedSheetRef)) {
                     documentReferences.add(docRef);
                 }
@@ -213,6 +214,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
      * @return the XWiki context
      * @deprecated avoid using this method; try using the document access bridge instead
      */
+    @Deprecated
     private XWikiContext getXWikiContext()
     {
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");

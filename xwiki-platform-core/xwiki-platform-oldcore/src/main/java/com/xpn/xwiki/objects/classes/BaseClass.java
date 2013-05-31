@@ -664,6 +664,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    public boolean addEmailField(String fieldName, String fieldPrettyName, int size)
+    {
+        if (get(fieldName) == null) {
+            EmailClass emailClass = new EmailClass();
+            emailClass.setName(fieldName);
+            emailClass.setPrettyName(fieldPrettyName);
+            emailClass.setSize(size);
+            emailClass.setObject(this);
+            put(fieldName, emailClass);
+
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
     {
         if (get(fieldName) == null) {
@@ -1058,8 +1074,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference classReference,
-     *             com.xpn.xwiki.XWikiContext)}
+     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference, XWikiContext)}
      */
     @Deprecated
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
@@ -1160,7 +1175,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context)
-        throws XWikiException
     {
         try {
             XWikiValidationInterface validObject =

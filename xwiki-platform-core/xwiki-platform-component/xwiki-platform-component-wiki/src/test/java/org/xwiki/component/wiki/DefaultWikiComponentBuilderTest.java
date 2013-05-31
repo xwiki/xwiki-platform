@@ -34,7 +34,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 @MockingRequirement(DefaultWikiComponentBuilder.class)
 public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTestCase implements WikiComponentConstants

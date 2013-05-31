@@ -46,6 +46,8 @@ public interface ChartImageWriter
      *
      * @param imageId the image id for the image that we have stored
      * @return the URL to use to access the stored generate chart image
+     * @throws MacroExecutionException if an error happened when computing the URL (eg if the current wiki cannot be
+     *         computed)
      */
-    String getURL(ImageId imageId);
+    String getURL(ImageId imageId) throws MacroExecutionException;
 }

@@ -38,14 +38,14 @@ public interface XHTMLOfficeDocumentBuilder
     /**
      * Builds a {@link XHTMLOfficeDocument} corresponding to the specified office document.
      * 
-     * @param officeFileStream {@link InputStream} corresponding to the office document.
-     * @param officeFileName name of the office document (used to determine input document format).
-     * @param reference reference document w.r.t which html cleaning is performed. If the office file contains images or
-     *        other binary artifacts, html cleaning will be performed assuming that those artifacts are present as
-     *        attachments to the reference document.
-     * @param filterStyles whether to filter css styles present in the html content produced by openoffice server.
-     * @return an {@link XHTMLOfficeDocument} corresponding to the office document.
-     * @throws OfficeImporterException if an error occurs while performing the import operation.
+     * @param officeFileStream {@link InputStream} corresponding to the office document
+     * @param officeFileName name of the office document (used to determine input document format)
+     * @param reference reference document w.r.t which HTML cleaning is performed. If the office file contains images or
+     *            other binary artifacts, HTML cleaning will be performed assuming that those artifacts are present as
+     *            attachments to the reference document
+     * @param filterStyles whether to filter CSS styles present in the HTML content produced by office server
+     * @return an {@link XHTMLOfficeDocument} corresponding to the office document
+     * @throws OfficeImporterException if an error occurs while performing the import operation
      * @since 2.2M1
      */
     XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,

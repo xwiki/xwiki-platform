@@ -24,21 +24,21 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
-import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.document.OfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentBuilder}.
- * 
+ *
  * @version $Id$
  * @since 2.1M1
  */
@@ -68,12 +68,12 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
     }
 
     /**
-     * Test {@link XDOMOfficeDocument} building.
+     * Test {@link OfficeDocument} building.
      */
-    @org.junit.Test
-    public void testXDOMOfficeDocumentBuilding()
+    @Test
+    public void testXDOMOfficeDocumentBuilding() throws Exception
     {
-        // Create & register a mock document converter to by-pass openoffice server.
+        // Create & register a mock document converter to by-pass the office server.
         final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
         final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
         mockInput.put(INPUT_FILE_NAME, mockOfficeFileStream);
@@ -81,35 +81,27 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
         mockOutput.put(OUTPUT_FILE_NAME,
             "<html><head><title></tile></head><body><p><strong>Hello There</strong></p></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
+        final OfficeConverter mockDocumentConverter = getMockery().mock(OfficeConverter.class);
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
 
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockOpenOfficeManager).getConverter();
+                oneOf(mockOfficeServer).getConverter();
                 will(returnValue(mockDocumentConverter));
 
-                try {
-                    allowing(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
-                    will(returnValue(mockOutput));
-                } catch (OpenOfficeConverterException e) {
-                    Assert.fail(e.getMessage());
-                }
+                allowing(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
+                will(returnValue(mockOutput));
 
                 allowing(mockDefaultStringEntityReferenceSerializer).serialize(documentReference);
                 will(returnValue("xwiki:Main.Test"));
             }
         });
 
-        XDOMOfficeDocument document = null;
-        try {
-            document = xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
-        } catch (OfficeImporterException e) {
-            Assert.fail(e.getMessage());
-        }
-        Assert.assertNotNull(document.getContentDocument());
-        Assert.assertEquals("**Hello There**", document.getContentAsString());
-        Assert.assertEquals(0, document.getArtifacts().size());
+        OfficeDocument document =
+            xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
+        assertNotNull(document.getContentDocument());
+        assertEquals("**Hello There**", document.getContentAsString());
+        assertEquals(0, document.getArtifacts().size());
     }
 }

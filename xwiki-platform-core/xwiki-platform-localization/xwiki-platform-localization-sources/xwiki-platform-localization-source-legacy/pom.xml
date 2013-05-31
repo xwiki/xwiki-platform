@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-sources</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-source-legacy</artifactId>
   <name>XWiki Platform - Localization - Source - Legacy</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Localization - Source - Legacy</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>86.52</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -52,7 +55,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
-      <version>${platform.version}</version>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-source-jar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     
     <!-- Test dependencies -->

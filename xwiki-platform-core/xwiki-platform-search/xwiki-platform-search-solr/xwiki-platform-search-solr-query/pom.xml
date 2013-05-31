@@ -27,12 +27,17 @@
   <parent>
     <artifactId>xwiki-platform-search-solr</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-query</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - Search - Solr - Query</name>
-  <description>Query module for the Solr index. Allows performing Solr queries using XWiki's Query API.</description>
+  <description>Query module for the Solr index. Allows performing Solr queries using XWiki's Query API</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Solr Search Query API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>1.94</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

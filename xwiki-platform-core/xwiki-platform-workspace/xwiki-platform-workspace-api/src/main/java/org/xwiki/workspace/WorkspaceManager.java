@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 
-import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;    
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 
 /**
  * Component in charge of creating and managing workspaces.
@@ -56,28 +56,25 @@ public interface WorkspaceManager
 
     /**
      * Creates a new workspace from a wiki descriptor.
-     *
-     * @param workspaceName name of the new workspace
+     * 
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
-     *            document will be created. This method will take care of saving the document.
-     * @param templateWikiName the name of the wiki from where to copy document to the new wiki.
+     *            document will be created. This method will take care of saving the document. <b>Note:</b>The name of
+     *            the wiki will also have to be set inside this descriptor.
+     * @param templateWikiName the name of the wiki template to use when creating the new workspace.
      * @return {@link XWikiServer} descriptor for the newly created workspace
      * @throws WorkspaceException if problems occur
      */
-    XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument, String templateWikiName)
-        throws WorkspaceException;
+    XWikiServer createWorkspace(XWikiServer newWikiXObjectDocument, String templateWikiName) throws WorkspaceException;
 
     /**
-     * Creates a new workspace from a wiki descriptor.
+     * Creates a new workspace from a wiki descriptor. The default template will be used.
      * 
-     * @param workspaceName name of the new workspace
      * @param newWikiXObjectDocument a new (in-memory) wiki descriptor document from which the new wiki descriptor
      *            document will be created. This method will take care of saving the document.
      * @return {@link XWikiServer} descriptor for the newly created workspace
      * @throws WorkspaceException if problems occur
      */
-    XWikiServer createWorkspace(String workspaceName, XWikiServer newWikiXObjectDocument)
-        throws WorkspaceException;
+    XWikiServer createWorkspace(XWikiServer newWikiXObjectDocument) throws WorkspaceException;
 
     /**
      * @param workspaceName name of the workspace to delete
@@ -88,7 +85,7 @@ public interface WorkspaceManager
     /**
      * @param workspaceName name of the workspace to edit
      * @param modifiedWikiXObjectDocument an in-memory modified wiki descriptor document. This method will take care of
-     *            saving the changes.
+     *            saving the changes. <b>Note</b>: The wiki name is not modifiable.
      * @throws WorkspaceException if problems occur
      */
     void editWorkspace(String workspaceName, XWikiServer modifiedWikiXObjectDocument) throws WorkspaceException;
@@ -112,10 +109,9 @@ public interface WorkspaceManager
     List<Workspace> getWorkspaces() throws WorkspaceException;
 
     /**
-     * Get the list of all workspace templates. It basically gets all workspace returned by
-     * {@link #WorkspaceManager.getWorkspaces} and which are considered as template (see
-     * {@link #XWikiServer.isWikiTemplate}).
-     *
+     * Get the list of all workspace templates. It basically gets all workspace returned by {@link #WorkspaceManager.getWorkspaces}
+     * and which are considered as template (see {@link #XWikiServer.isWikiTemplate}).
+     * 
      * @return list of available workspace templates
      * @throws WorkspaceException if problems occur
      */

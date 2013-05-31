@@ -35,7 +35,7 @@
   <date>1270567353000</date>
   <contentUpdateDate>1270567353000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('annotations.config.title')</title>
+  <title>$services.localization.render('annotations.config.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -562,7 +562,7 @@ E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content>
     <className>XWiki.ConfigurableClass</className>
     <guid>f2fe8d2b-4815-4c51-955d-5cc4a8b89969</guid>
     <property>
-      <codeToExecute>$msg.get('annotations.config.activate.explanation')</codeToExecute>
+      <codeToExecute>$services.localization.render('annotations.config.activate.explanation')</codeToExecute>
     </property>
     <property>
       <configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
@@ -574,7 +574,7 @@ E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content>
       <displayInSection>Annotations</displayInSection>
     </property>
     <property>
-      <heading>$msg.get('annotations.config.activate.title')</heading>
+      <heading>$services.localization.render('annotations.config.activate.title')</heading>
     </property>
     <property>
       <iconAttachment>AnnotationsSectionIcon.png</iconAttachment>
@@ -716,7 +716,7 @@ E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content>
       <displayInSection>Annotations</displayInSection>
     </property>
     <property>
-      <heading>$msg.get('annotations.config.display.title')</heading>
+      <heading>$services.localization.render('annotations.config.display.title')</heading>
     </property>
     <property>
       <iconAttachment/>
@@ -846,7 +846,7 @@ E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content>
     <className>XWiki.ConfigurableClass</className>
     <guid>d7373c3c-9aae-45a0-b18b-cb6213741755</guid>
     <property>
-      <codeToExecute>$msg.get('annotations.config.type.explanation')</codeToExecute>
+      <codeToExecute>$services.localization.render('annotations.config.type.explanation')</codeToExecute>
     </property>
     <property>
       <configurationClass>AnnotationCode.AnnotationConfig</configurationClass>
@@ -858,7 +858,7 @@ E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content>
       <displayInSection>Annotations</displayInSection>
     </property>
     <property>
-      <heading>$msg.get('annotations.config.type.title')</heading>
+      <heading>$services.localization.render('annotations.config.type.title')</heading>
     </property>
     <property>
       <iconAttachment/>

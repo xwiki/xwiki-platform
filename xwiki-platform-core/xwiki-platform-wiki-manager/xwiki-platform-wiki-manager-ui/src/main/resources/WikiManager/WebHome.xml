@@ -23,7 +23,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>1 $msg.get("wikimanager.wikimanager")
+  <content>1 $services.localization.render('wikimanager.wikimanager')
 ##
 #############################################################################
 ##
@@ -31,10 +31,10 @@ $xwiki.jsfx.use('js/xwiki/table/tablefilterNsort.js', true)##
 $xwiki.ssfx.use('js/xwiki/table/table.css', true)##
 #set($WikiManager = $services.wikimanager)
 #if(!$WikiManager)
-  #error($msg.get("wikimanager.pluginnotenabled"))
+  #error($services.localization.render('wikimanager.pluginnotenabled'))
 #end
 #if(!$services.applicationmanager)
-  #error($msg.get("xapp.pluginnotenabled"))
+  #error($services.localization.render('xapp.pluginnotenabled'))
 #end
 ##
 #set($Exception = $WikiManager.DefaultException)
@@ -68,26 +68,23 @@ $xwiki.ssfx.use('js/xwiki/table/table.css', true)##
 #############################################################################
 ##
 #set($wikiList = $WikiManager.getAllWikis())
-$msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
+$services.localization.render('wikimanager.totalnumberofwiki') : $wikiList.size()
 #############################################################################
-#if(!$xwiki.isVirtualMode())
-  #warning($msg.get("wikimanager.notinvirtualmode"))
-#end
 #if($WikiManager.canCreateWiki())
 \\
-    [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki?stepbystep=0&amp;amp;doc=1]    
+    [$services.localization.render('wikimanager.createwiki')&gt;WikiManager.CreateNewWiki?stepbystep=0&amp;amp;doc=1]
 #end
 #############################################################################
 ##
 #if($wikiList.size()!=0)
   &lt;table id="wikiTable" class="grid sortable filterable doOddEven"&gt;
       &lt;tr class="sortHeader"&gt;
-        &lt;th scope="col"&gt;$msg.get("wikimanager.listwikiname")&lt;/th&gt;
-        &lt;th scope="col"&gt;$msg.get("wikimanager.listwikidomains")&lt;/th&gt;
-        &lt;th scope="col"&gt;$msg.get("wikimanager.listwikiadmin")&lt;/th&gt;
-        &lt;th scope="col"&gt;$msg.get("wikimanager.listwikicreation")&lt;/th&gt;
-        &lt;th scope="col"&gt;$msg.get("wikimanager.listwikitemplate")&lt;/th&gt;
-        &lt;th scope="col" class="unsortable noFilter"&gt;$msg.get("more")&lt;/th&gt;
+        &lt;th scope="col"&gt;$services.localization.render('wikimanager.listwikiname')&lt;/th&gt;
+        &lt;th scope="col"&gt;$services.localization.render('wikimanager.listwikidomains')&lt;/th&gt;
+        &lt;th scope="col"&gt;$services.localization.render('wikimanager.listwikiadmin')&lt;/th&gt;
+        &lt;th scope="col"&gt;$services.localization.render('wikimanager.listwikicreation')&lt;/th&gt;
+        &lt;th scope="col"&gt;$services.localization.render('wikimanager.listwikitemplate')&lt;/th&gt;
+        &lt;th scope="col" class="unsortable noFilter"&gt;$services.localization.render('more')&lt;/th&gt;
       &lt;/tr&gt;
     #foreach($wiki in $wikiList)
       #set($wikiAliasList = $wiki.wikiAliasList)
@@ -105,17 +102,17 @@ $msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
         &lt;td&gt;$xwiki.formatDate($wiki.creationDate,"dd/MM/yyyy")&lt;/td&gt;
         &lt;td&gt;
           #if($firstalias.isWikiTemplate())
-            $msg.yes#if ($WikiManager.canEditWiki()) \[[$msg.get("wikimanager.action.settemplate.false")&gt;?action=settemplate&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikitemplate=0]\]#end
+            $msg.yes#if ($WikiManager.canEditWiki()) \[[$services.localization.render('wikimanager.action.settemplate.false')&gt;?action=settemplate&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikitemplate=0]\]#end
           #else
-            $msg.no#if ($WikiManager.canEditWiki()) \[[$msg.get("wikimanager.action.settemplate.true")&gt;?action=settemplate&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikitemplate=1]\]#end
+            $msg.no#if ($WikiManager.canEditWiki()) \[[$services.localization.render('wikimanager.action.settemplate.true')&gt;?action=settemplate&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikitemplate=1]\]#end
           #end
         &lt;/td&gt;
         &lt;td&gt;
-          #if(($WikiManager.canDeleteWiki()) &amp;&amp; ($wiki.WikiName != $xcontext.mainWikiName)) [$msg.get("delete")&gt;?action=delete&amp;amp;wikiname=$wiki.WikiName] |#end &lt;a href="$wiki.getURL("view")"&gt;$msg.get("wikimanager.action.settings")&lt;/a&gt;&lt;/td&gt;
+          #if(($WikiManager.canDeleteWiki()) &amp;&amp; ($wiki.WikiName != $xcontext.mainWikiName)) [$services.localization.render('delete')&gt;?action=delete&amp;amp;wikiname=$wiki.WikiName] |#end &lt;a href="$wiki.getURL("view")"&gt;$services.localization.render('wikimanager.action.settings')&lt;/a&gt;&lt;/td&gt;
       &lt;/tr&gt;
     #end
   &lt;/table&gt;
 #else
-  $msg.get("wikimanager.listwikiempty")
+  $services.localization.render('wikimanager.listwikiempty')
 #end</content>
 </xwikidoc>

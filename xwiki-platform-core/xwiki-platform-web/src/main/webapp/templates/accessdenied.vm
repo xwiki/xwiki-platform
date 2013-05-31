@@ -7,15 +7,15 @@
   ## Otherwise, unauthenticated user with Basic authentication, a 401 status has been set in Java.
 #end
 #if("$!request.ajax" != '')
-$msg.get('notallowed')
+$services.localization.render('notallowed')
 #else
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
 #if ($xwiki.isReadOnly())
-#xwikimessageboxstart($msg.get("error") $msg.get("readonly"))
+#xwikimessageboxstart($services.localization.render('error') $services.localization.render('readonly'))
 #else
-#xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+#xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
 #end
 $!exception
 #xwikimessageboxend()

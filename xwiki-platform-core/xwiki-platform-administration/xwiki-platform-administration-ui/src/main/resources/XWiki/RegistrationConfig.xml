@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1264284581000</creationDate>
-  <date>1267221469000</date>
-  <contentUpdateDate>1267221469000</contentUpdateDate>
+  <creationDate>1364502207000</creationDate>
+  <date>1364564095000</date>
+  <contentUpdateDate>1267217869000</contentUpdateDate>
   <version>1.1</version>
   <title>Registration Configuration</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -305,13 +304,13 @@
     <className>XWiki.Registration</className>
     <guid>1a0c3cf7-de63-4f07-8a74-5c30bf880641</guid>
     <property>
-      <defaultRedirect>$xwiki.getURL("Main.WebHome")</defaultRedirect>
+      <defaultRedirect>$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))</defaultRedirect>
     </property>
     <property>
-      <heading>$msg.get('core.register.title')</heading>
+      <heading>$services.localization.render('core.register.title')</heading>
     </property>
     <property>
-      <liveValidation_defaultFieldOkMessage>$msg.get('core.validation.valid.message')</liveValidation_defaultFieldOkMessage>
+      <liveValidation_defaultFieldOkMessage>$services.localization.render('core.validation.valid.message')</liveValidation_defaultFieldOkMessage>
     </property>
     <property>
       <liveValidation_enabled>1</liveValidation_enabled>
@@ -324,13 +323,13 @@
     </property>
     <property>
       <registrationSuccessMessage>#set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
-{{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}</registrationSuccessMessage>
+{{info}}$services.localization.render('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}</registrationSuccessMessage>
     </property>
     <property>
       <requireCaptcha>0</requireCaptcha>
     </property>
     <property>
-      <welcomeMessage>$msg.get('core.register.welcome')</welcomeMessage>
+      <welcomeMessage>{{translation key="core.register.welcome"/}}</welcomeMessage>
     </property>
   </object>
   <content>{{info}}This page contains a configuration object for [[XWiki.Registration&gt;&gt;XWiki.Registration]], You can configure [[XWiki.Registration&gt;&gt;XWiki.Registration]] from the [[registration section of the administration application&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin]].{{/info}}</content>

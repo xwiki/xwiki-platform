@@ -36,8 +36,10 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
@@ -51,7 +53,7 @@ import org.xwiki.environment.Environment;
 @Component
 @Named("infinispan")
 @Singleton
-public class InfinispanCacheFactory implements CacheFactory, Initializable
+public class InfinispanCacheFactory implements CacheFactory, Initializable, Disposable
 {
     /**
      * The folder containing Infinispan properties files.
@@ -110,6 +112,12 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable
         } else {
             this.cacheManager = new DefaultCacheManager();
         }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        getCacheManager().stop();
     }
 
     /**

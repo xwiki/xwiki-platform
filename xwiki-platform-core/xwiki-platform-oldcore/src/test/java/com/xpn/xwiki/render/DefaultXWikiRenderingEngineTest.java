@@ -22,11 +22,13 @@ package com.xpn.xwiki.render;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
 import org.junit.Assert;
+import org.xwiki.localization.LocalizationContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -57,19 +59,22 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
         XWikiConfig config = new XWikiConfig();
 
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+        
         Mock mockServletContext = mock(ServletContext.class);
         ByteArrayInputStream bais = new ByteArrayInputStream("code=wiki:code:type:content".getBytes("UTF-8"));
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.txt")).will(
-            returnValue(bais));
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache.properties")).will(
-            returnValue(new ByteArrayInputStream("".getBytes("UTF-8"))));
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache-local.properties")).will(
-            returnValue(new ByteArrayInputStream("".getBytes("UTF-8"))));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.txt"))
+            .will(returnValue(bais));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache.properties"))
+            .will(returnValue(new ByteArrayInputStream("".getBytes("UTF-8"))));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache-local.properties"))
+            .will(returnValue(new ByteArrayInputStream("".getBytes("UTF-8"))));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
 
         getContext().setURL(new URL("http://host"));
         getContext().setRequest(new XWikiServletRequestStub());
-        
+
         xwiki = new XWiki(config, getContext(), engineContext, false)
         {
             @Override
@@ -157,8 +162,8 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
     public void testRenderGroovy() throws Exception
     {
-        assertEquals("hello world", engine.renderText("<% println(\"hello world\"); %>", 
-                                        new XWikiDocument(), getContext()));
+        assertEquals("hello world",
+            engine.renderText("<% println(\"hello world\"); %>", new XWikiDocument(), getContext()));
     }
 
     public void testSwitchOrderOfRenderers() throws Exception
@@ -170,30 +175,35 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         XWikiDocument document = new XWikiDocument();
 
         // Prove that the renderers are in the right order by default.
-        assertEquals(engine.getRendererNames(), new ArrayList<String>(){{
-            add("mapping");
-            add("groovy");
-            add("velocity");
-            add("plugin");
-            add("wiki");
-            add("xwiki");
-        }});
+        assertEquals(engine.getRendererNames(), new ArrayList<String>()
+        {
+            {
+                add("mapping");
+                add("groovy");
+                add("velocity");
+                add("plugin");
+                add("wiki");
+                add("xwiki");
+            }
+        });
 
         assertEquals(groovyFirst, engine.renderText(text, document, getContext()));
 
-        xwiki.getConfig().put("xwiki.render.renderingorder",
-                              "macromapping, velocity, groovy, plugin, wiki, wikiwiki");
+        xwiki.getConfig().put("xwiki.render.renderingorder", "macromapping, velocity, groovy, plugin, wiki, wikiwiki");
 
         DefaultXWikiRenderingEngine myEngine = new DefaultXWikiRenderingEngine(xwiki, getContext());
 
-        assertEquals(myEngine.getRendererNames(), new ArrayList<String>(){{
-            add("mapping");
-            add("velocity");
-            add("groovy");
-            add("plugin");
-            add("wiki");
-            add("xwiki");
-        }});
+        assertEquals(myEngine.getRendererNames(), new ArrayList<String>()
+        {
+            {
+                add("mapping");
+                add("velocity");
+                add("groovy");
+                add("plugin");
+                add("wiki");
+                add("xwiki");
+            }
+        });
 
         assertEquals(velocityFirst, myEngine.renderText(text, document, getContext()));
     }

@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link Context}.
@@ -130,8 +130,6 @@ public class ContextTest extends AbstractComponentTestCase
             will(returnValue(baseClass));
             // Decide that there's no custom Displayer for the String field
             allowing(xwiki).exists(new DocumentReference("testwiki", "XWiki", "StringDisplayer"), xcontext);
-            will(returnValue(false));
-            allowing(xwiki).isVirtualMode();
             will(returnValue(false));
             allowing(xwiki).evaluateTemplate("displayer_string.vm", xcontext);
             will(returnValue(""));

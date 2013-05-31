@@ -300,7 +300,7 @@
       <displayInSection>Invitation</displayInSection>
     </property>
     <property>
-      <heading>$msg.get("xe.invitation.configuration.smtpHeading")</heading>
+      <heading>$services.localization.render('xe.invitation.configuration.smtpHeading')</heading>
     </property>
     <property>
       <propertiesToShow>
@@ -623,7 +623,7 @@
 #set($joinLink = "float:left;")
 #set($declineLink = "color:#f88;float:right;text-decoration:none;")
 
-$msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiName])
+$services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])
 
 {{html clean=false}}
 #if("$!messageBody" != "")
@@ -633,19 +633,19 @@ $msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $
 #end
 &lt;p style="margin-top:30px"&gt;
 &lt;a href="${guestActionsURL}?doAction_accept=y&amp;amp;messageID=$messageID" style="$bigText$joinLink$linkStyle"&gt;
-$msg.get("xe.invitation.emailContent.joinLink")
+$services.localization.render('xe.invitation.emailContent.joinLink')
 &lt;/a&gt;
 &lt;a href="${guestActionsURL}?doAction_decline=y&amp;amp;messageID=$messageID" style="$bigText$declineLink"&gt;
- $msg.get("xe.invitation.emailContent.declineLink")
+ $services.localization.render('xe.invitation.emailContent.declineLink')
 &lt;/a&gt;&lt;/p&gt;
 &lt;hr style="clear:both" /&gt;
-$msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.getQ()${guestActionsURL}?doAction_report=y&amp;amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;", "&lt;/a&gt;"])
+$services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;a href=$escapetool.getQ()${guestActionsURL}?doAction_report=y&amp;amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;", "&lt;/a&gt;"])
 {{/html}}
 {{/velocity}}</messageBodyTemplate>
     </property>
     <property>
       <messageBodyTemplatePlain>{{velocity}}
-#set($userName = $xwiki.getUserName($xcontext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get("guestsActionsPage")).getExternalURL())$msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiName])#if("$!messageBody" != "")  $messageBody#end$msg.get("xe.invitation.emailContent.joinLink")${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$msg.get("xe.invitation.emailContent.declineLink")${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID$msg.get("xe.invitation.emailContent.reportMessage", ["", "$util.getNewline()${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID"]){{/velocity}}</messageBodyTemplatePlain>
+#set($userName = $xwiki.getUserName($xcontext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"))#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get('guestsActionsPage')).getExternalURL())$services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])#if("$!messageBody" != '')  $messageBody#end$services.localization.render('xe.invitation.emailContent.joinLink')${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.declineLink')${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.reportMessage', ['', "$util.getNewline()${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID"]){{/velocity}}</messageBodyTemplatePlain>
     </property>
     <property>
       <smtp_port>25</smtp_port>
@@ -660,7 +660,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
       <smtp_server_username/>
     </property>
     <property>
-      <subjectLineTemplate>{{velocity}}$msg.get("xe.invitation.emailContent.subjectLine", [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
+      <subjectLineTemplate>{{velocity}}$services.localization.render('xe.invitation.emailContent.subjectLine', [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
     </property>
     <property>
       <usersMayPersonalizeMessage>1</usersMayPersonalizeMessage>
@@ -669,5 +669,5 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
       <usersMaySendToMultiple>0</usersMaySendToMultiple>
     </property>
   </object>
-  <content>{{velocity}}{{info}}$msg.get("xe.invitation.internalDocument", ["Invitation.WebHome"]){{/info}}{{/velocity}}</content>
+  <content>{{velocity}}{{info}}$services.localization.render('xe.invitation.internalDocument', ['Invitation.WebHome']){{/info}}{{/velocity}}</content>
 </xwikidoc>

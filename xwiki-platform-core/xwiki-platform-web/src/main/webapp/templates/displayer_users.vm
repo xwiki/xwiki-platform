@@ -1,10 +1,10 @@
-#if ($type == 'edit')
+#if ($type == 'edit' || $type == 'search')
   #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
   #userPicker_import($isMultiSelect)
   #set($id = $escapetool.xml("${prefix}${name}"))
   <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
     class="suggestUsers#if ($isMultiSelect) multipleSelection#end" />
-#elseif ($type == 'view')
+#elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedUsers = [])
   #foreach ($value in $values)
@@ -27,7 +27,7 @@
         <div>
           <span class="user-alias">$escapetool.xml($userReference.name)</span>
           ## Display the wiki only for local users.
-          #if ($xwiki.isVirtualMode() && $userReference.wikiReference.name != $xcontext.getMainWikiName())
+          #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
             <span class="user-wiki">$escapetool.xml($userReference.wikiReference.name)</span>
           #end
         </div>
@@ -35,6 +35,9 @@
     #end
     </ul>
   #end
+#elseif ($type == 'hidden')
+  #set($id = $escapetool.xml("${prefix}${name}"))
+  <input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml($value)" />
 #else
   ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
   ## mode must not be empty. Let's output something.

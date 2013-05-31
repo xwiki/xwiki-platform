@@ -26,11 +26,11 @@
   <content>#if($action &amp;&amp; $action == "settemplate")
   #set($result = $WikiManager.setIsWikiTemplate($wikiname, $wikitemplate))
   #if ($result == $Exception.ERROR_NOERROR)
-    #info($msg.get("wikimanager.successsettemplate", [$wikiname, $wikitemplate]))
+    #info($services.localization.render('wikimanager.successsettemplate', [$wikiname, $wikitemplate]))
   #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-    #error($msg.get("notallowed"))
+    #error($services.localization.render('notallowed'))
   #else
-    #error($msg.get("wikimanager.errorsettemplate", [$wikiname, $xcontext.lastexception]))
+    #error($services.localization.render('wikimanager.errorsettemplate', [$wikiname, $xcontext.lastexception]))
   #end
 #end</content>
 </xwikidoc>

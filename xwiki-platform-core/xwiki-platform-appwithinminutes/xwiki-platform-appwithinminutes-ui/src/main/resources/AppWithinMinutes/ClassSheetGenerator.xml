@@ -28,8 +28,12 @@
  * Generic property display.
  *#
 #macro(displayProperty $property $indentation)
-${indentation}; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}doc.displayPrettyName('$property.name', false, false)&lt;/label&gt;${escapetool.h}${escapetool.h}
-${indentation}  (% class="xHint" %)${escapetool.d}msg.get('$!property.hint')
+${indentation}; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;##
+#if ("$!property.hint" != '')${escapetool.h}${escapetool.h}
+${indentation}  (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
+#else
+
+#end
 ${indentation}: ${escapetool.d}doc.display('$property.name')
 #end
 #**
@@ -37,9 +41,11 @@ ${indentation}: ${escapetool.d}doc.display('$property.name')
  * some conditions are met (e.g. a specific action) so we're putting the custom display code in the sheet.
  *#
 #macro(displayBooleanProperty $property)
-  ${escapetool.h}if(${escapetool.d}context.display == 'edit')
-    ; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}doc.display('$property.name')${escapetool.d}doc.displayPrettyName('$property.name', false, false)&lt;/label&gt;
-    : (% class="xHint" %)${escapetool.d}msg.get('$!property.hint')
+  ${escapetool.h}if (${escapetool.d}context.display == 'edit')
+    ; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}doc.display('$property.name')${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;
+#if ("$!property.hint" != '')
+    : (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
+#end
   ${escapetool.h}else
 #displayProperty($property '    ')
   ${escapetool.h}end
@@ -47,8 +53,10 @@ ${indentation}: ${escapetool.d}doc.display('$property.name')
 {{{##
 {{velocity}}
 {{html wiki="true"}}
-${escapetool.h}set(${escapetool.d}discard = ${escapetool.d}doc.use('$doc.fullName'))
-${escapetool.h}${escapetool.h} We don't have access to the form element to set the CSS class for the vertical form layout standard.
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use('$doc.fullName'))
+#set ($translationBundleId = "$stringtool.removeEnd($doc.fullName, 'Class')Translations")
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '$translationBundleId'))
+## We don't have access to the form element to set the CSS class for the vertical form layout standard.
 (% class="xform" %)
 (((
 #foreach($property in $doc.getxWikiClass().properties)

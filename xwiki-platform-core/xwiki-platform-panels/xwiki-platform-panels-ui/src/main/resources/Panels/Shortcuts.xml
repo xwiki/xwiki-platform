@@ -106,10 +106,10 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('xe.panels.shortcuts'))
-(% class="panelitem" %)[[$msg.get('comments')&gt;&gt;?viewer=comments]](%%)##
+#panelheader($services.localization.render('xe.panels.shortcuts'))
+(% class="panelitem" %)[[$services.localization.render('comments')&gt;&gt;?viewer=comments]](%%)##
 (% class="pitemseparator" %) ~| (%%)##
-(% class="panelitem" %)[[$msg.get('attachments')&gt;&gt;?viewer=attachments]](%%)##
+(% class="panelitem" %)[[$services.localization.render('attachments')&gt;&gt;?viewer=attachments]](%%)##
 #panelfooter()
 {{/velocity}}</content>
     </property>

@@ -8,9 +8,9 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
 XWiki.widgets.ConfirmationBox = Class.create(XWiki.widgets.ModalPopup, {
   /** Default displayed texts */
   defaultInteractionParameters : {
-    confirmationText: "$msg.get('core.widgets.confirmationBox.defaultQuestion')",
-    yesButtonText: "$msg.get('core.widgets.confirmationBox.button.yes')",
-    noButtonText: "$msg.get('core.widgets.confirmationBox.button.no')"
+    confirmationText: "$services.localization.render('core.widgets.confirmationBox.defaultQuestion')",
+    yesButtonText: "$services.localization.render('core.widgets.confirmationBox.button.yes')",
+    noButtonText: "$services.localization.render('core.widgets.confirmationBox.button.no')"
   },
   /** Constructor. Registers the key listener that pops up the dialog. */
   initialize : function($super, behavior, interactionParameters) {

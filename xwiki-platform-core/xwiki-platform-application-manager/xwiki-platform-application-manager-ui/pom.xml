@@ -27,15 +27,20 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-application-manager</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-application-manager-ui</artifactId>
   <name>XWiki Platform - Application Manager - UI</name>
   <packaging>xar</packaging>
   <description>Manages creation and installation of XWiki Applications</description>
   <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform.applications:xwiki-application-application-manager</xwiki.extension.features>
+
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Application Manager Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

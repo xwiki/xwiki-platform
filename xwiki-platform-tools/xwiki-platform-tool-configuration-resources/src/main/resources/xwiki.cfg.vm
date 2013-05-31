@@ -36,7 +36,7 @@
 #-# Available syntaxes are: 
 #-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
 #-#    html/4.01, plain/1.0, docbook/4.4, markdown/1.0, apt/1.0
-xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0, xwiki/2.1
+xwiki.rendering.syntaxes = xwiki/2.0, xwiki/2.1
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
 #-# document names.
@@ -121,11 +121,11 @@ xwiki.tags=1
 # xwiki.store.cache.capacity=100
 
 #-# [Since 1.6M1]
-#-# Force the database name for the main wiki in virtual mode and for the wiki itself in non virtual mode.
+#-# Force the database name for the main wiki.
 # xwiki.db=xwiki
 
 #-# [Since 1.6M1]
-#-# Add a prefix to all databases names of the wikis in virtual mode and to the wiki name in non virtual mode.
+#-# Add a prefix to all databases names of each wiki.
 # xwiki.db.prefix=
 
 
@@ -168,19 +168,21 @@ xwiki.store.migration=1
 # Virtual wikis (farm)
 #
 
-#-# This parameter allows XWiki to operate in Hosting mode allowing to create multiple wikis having their own database
-#-# and responding to different URLs
-xwiki.virtual=$xwikiCfgVirtual
+#-# Starting with XWiki 5.0M2, virtual mode is enabled by default.
 
-#-# URL to redirect to when a requested wiki does not exist. This should be changed to a real page.
-xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
+#-# [Since 5.0M2]
+#-# What to do when the requested wiki does not exist:
+#-# - 0: (default) serve the main wiki
+#-# - 1: display an error (customizable through wikidoesnotexist.vm or xwiki:XWiki.WikiDoesNotExist)
+# xwiki.virtual.failOnWikiDoesNotExist=0
 
 #-# Forbidden names that should not be allowed when creating a new wiki.
 # xwiki.virtual.reserved_wikis=
 
-#-# How virtual wikis are mapped to different URLs. If set to 0, then virtual wikis have different domain
-#-# names, in the format http://wikiname.myfarm.net/. If set to 1 (the default), then the domain is common for the entire farm, but
-#-# the path contains the wiki name, in the format http://myfarm.net/xwiki/wiki/wikiname/.
+#-# How virtual wikis are mapped to different URLs.
+#-# If set to 0, then virtual wikis have different domain names, in the format http://wikiname.myfarm.net/.
+#-# If set to 1 (the default), then the domain is common for the entire farm, but the path contains the wiki name,
+#-# in the format http://myfarm.net/xwiki/wiki/wikiname/.
 #-# Note that you can configure the "/wiki/" part with xwiki.virtual.usepath.servletpath property.
 #if ($xwikiCfgVirtualUsepath)
 xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
@@ -306,17 +308,17 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 
 #-# The group management class.
 # xwiki.authentication.groupclass=com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl
-#-# Default value for exo:
-# xwiki.authentication.groupclass=com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl
 
 #-# The authentication management class.
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl
-#-# Default value for exo:
-# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl
-#-# Default value for LDAP:
-# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl
 
-#-# The authorization management class.
+#-# (Deprecated) The authorization management class.
+#-# [Since 5.0M2] The default right service is now org.xwiki.security.authorization.internal.XWikiCachingRightService
+#-# which is a bridge to the new security authorization component. It provides increased security and performance, but
+#-# its right policies differ sightly from the old Right Service implementation. In rare situation, you may want to
+#-# switch back to the old unmaintained implementation by uncommenting the following line. However, only old
+#-# implementation, still using a bridged RightService will be impacted by this parameter. Customization of the new
+#-# security authorization component should be done in the new xwiki.properties configuration (security.*).
 # xwiki.authentication.rightsclass=com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl
 
 #-# If an unauthenticated user (guest) tries to perform a restricted action, by default the wiki redirects to the login

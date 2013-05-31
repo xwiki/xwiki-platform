@@ -125,7 +125,7 @@ public class XWikiCachingRightService implements XWikiRightService
     /** Resolver for document references. */
     @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> documentReferenceResolver
-        = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+        = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** Resolver for user and group document references. */
     @SuppressWarnings("unchecked")

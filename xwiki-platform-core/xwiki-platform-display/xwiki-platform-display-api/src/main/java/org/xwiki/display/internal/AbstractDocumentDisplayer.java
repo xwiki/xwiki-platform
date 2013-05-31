@@ -22,7 +22,6 @@ package org.xwiki.display.internal;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.rendering.block.XDOM;
@@ -45,10 +44,6 @@ public abstract class AbstractDocumentDisplayer implements DocumentDisplayer, In
     /** Provide a privileged mode controller. */
     @Inject
     private Provider<PrivilegedModeController> privilegedModeControllerProvider;
-    
-    /** Provide a logger. */
-    @Inject
-    private Logger logger;
 
     /** This is used for disabling privileged mode, if the restricted parameter is set. */
     private PrivilegedModeController privilegedModeController;

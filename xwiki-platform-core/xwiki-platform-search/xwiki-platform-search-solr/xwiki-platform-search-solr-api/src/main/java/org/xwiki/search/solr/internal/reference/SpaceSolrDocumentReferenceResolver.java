@@ -31,7 +31,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 /**
  * Resolve space references.
@@ -58,7 +58,7 @@ public class SpaceSolrDocumentReferenceResolver extends AbstractSolrDocumentRefe
     private QueryManager queryManager;
 
     @Override
-    public List<EntityReference> getReferences(EntityReference spaceReference) throws SolrIndexException
+    public List<EntityReference> getReferences(EntityReference spaceReference) throws SolrIndexerException
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
 
@@ -71,7 +71,7 @@ public class SpaceSolrDocumentReferenceResolver extends AbstractSolrDocumentRefe
                 this.queryManager.getNamedQuery("getSpaceDocsName").setWiki(spaceReference.getParent().getName())
                     .bindValue("space", spaceReference.getName()).execute();
         } catch (QueryException e) {
-            throw new SolrIndexException("Failed to query space [" + spaceReference + "] documents", e);
+            throw new SolrIndexerException("Failed to query space [" + spaceReference + "] documents", e);
         }
 
         for (String documentName : documentNames) {

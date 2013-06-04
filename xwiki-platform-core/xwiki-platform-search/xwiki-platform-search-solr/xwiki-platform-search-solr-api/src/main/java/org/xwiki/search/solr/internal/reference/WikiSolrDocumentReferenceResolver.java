@@ -31,7 +31,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 /**
  * Resolve wiki references.
@@ -58,7 +58,7 @@ public class WikiSolrDocumentReferenceResolver extends AbstractSolrDocumentRefer
     private QueryManager queryManager;
 
     @Override
-    public List<EntityReference> getReferences(EntityReference wikiReference) throws SolrIndexException
+    public List<EntityReference> getReferences(EntityReference wikiReference) throws SolrIndexerException
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
 
@@ -70,7 +70,7 @@ public class WikiSolrDocumentReferenceResolver extends AbstractSolrDocumentRefer
         try {
             spaces = this.queryManager.getNamedQuery("getSpaces").setWiki(wikiReference.getName()).execute();
         } catch (QueryException e) {
-            throw new SolrIndexException("Failed to query wiki [" + wikiReference.getName() + "] spaces", e);
+            throw new SolrIndexerException("Failed to query wiki [" + wikiReference.getName() + "] spaces", e);
         }
 
         // Visit each space

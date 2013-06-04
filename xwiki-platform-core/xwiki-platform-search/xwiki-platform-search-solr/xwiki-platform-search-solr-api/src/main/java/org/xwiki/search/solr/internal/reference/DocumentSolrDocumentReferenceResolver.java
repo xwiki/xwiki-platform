@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -66,7 +66,7 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
     private SolrDocumentReferenceResolver attachmentResolver;
 
     @Override
-    public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexException
+    public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
 
@@ -89,7 +89,7 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
                 try {
                     document = getDocument(documentReference);
                 } catch (Exception e) {
-                    throw new SolrIndexException(String.format("Failed to get document [%]", documentReference), e);
+                    throw new SolrIndexerException(String.format("Failed to get document [%]", documentReference), e);
                 }
 
                 // Document translations
@@ -97,7 +97,7 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
                 try {
                     translatedLanguages = document.getTranslationList(context);
                 } catch (XWikiException e) {
-                    throw new SolrIndexException(String.format("Failed to get document [%s] translations",
+                    throw new SolrIndexerException(String.format("Failed to get document [%s] translations",
                         documentReference), e);
                 }
 

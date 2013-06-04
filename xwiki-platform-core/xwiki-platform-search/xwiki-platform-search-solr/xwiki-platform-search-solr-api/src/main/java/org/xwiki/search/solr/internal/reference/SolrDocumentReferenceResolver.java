@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -39,7 +39,7 @@ public interface SolrDocumentReferenceResolver
     /**
      * @param rootReference the root entity reference.
      * @return references for the indexable contained entities, including the given one (but only if it is indexable).
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    List<EntityReference> getReferences(EntityReference rootReference) throws SolrIndexException;
+    List<EntityReference> getReferences(EntityReference rootReference) throws SolrIndexerException;
 }

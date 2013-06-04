@@ -34,7 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -97,7 +97,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected Provider<XWikiContext> xcontextProvider;
 
     @Override
-    public String getId(EntityReference reference) throws SolrIndexException
+    public String getId(EntityReference reference) throws SolrIndexerException
     {
         String result = this.serializer.serialize(reference);
 
@@ -127,9 +127,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param documentReference reference to the document to be translated.
      * @return translated document.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    protected XWikiDocument getTranslatedDocument(DocumentReference documentReference) throws SolrIndexException
+    protected XWikiDocument getTranslatedDocument(DocumentReference documentReference) throws SolrIndexerException
     {
         try {
             XWikiDocument document = getDocument(documentReference);
@@ -137,7 +137,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 document.getTranslatedDocument(documentReference.getLocale(), this.xcontextProvider.get());
             return translatedDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(
+            throw new SolrIndexerException(
                 String.format("Failed to get translated document for '%s'", documentReference), e);
         }
     }
@@ -168,9 +168,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     /**
      * @param documentReference reference to the document.
      * @return the language code of the referenced document.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    protected String getLanguage(DocumentReference documentReference) throws SolrIndexException
+    protected String getLanguage(DocumentReference documentReference) throws SolrIndexerException
     {
         String language = null;
 
@@ -186,7 +186,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 language = "en";
             }
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Exception while fetching the language of the document '%s'",
+            throw new SolrIndexerException(String.format("Exception while fetching the language of the document '%s'",
                 documentReference), e);
         }
 

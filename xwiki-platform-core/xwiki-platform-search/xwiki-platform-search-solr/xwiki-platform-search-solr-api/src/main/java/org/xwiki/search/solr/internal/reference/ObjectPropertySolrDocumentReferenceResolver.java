@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObjectReference;
@@ -47,7 +47,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 public class ObjectPropertySolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
 {
     @Override
-    public List<EntityReference> getReferences(EntityReference objectPropertyReference) throws SolrIndexException
+    public List<EntityReference> getReferences(EntityReference objectPropertyReference) throws SolrIndexerException
     {
         // Avoid indexing passwords.
         BaseObjectReference objectReference = new BaseObjectReference(objectPropertyReference.getParent());
@@ -58,7 +58,7 @@ public class ObjectPropertySolrDocumentReferenceResolver extends AbstractSolrDoc
         try {
             xclassDocument = getDocument(classReference);
         } catch (Exception e) {
-            throw new SolrIndexException("Failed to get document for xclass [" + classReference + "]", e);
+            throw new SolrIndexerException("Failed to get document for xclass [" + classReference + "]", e);
         }
 
         if (!(xclassDocument.getXClass().get(objectPropertyReference.getName()) instanceof PasswordClass)) {

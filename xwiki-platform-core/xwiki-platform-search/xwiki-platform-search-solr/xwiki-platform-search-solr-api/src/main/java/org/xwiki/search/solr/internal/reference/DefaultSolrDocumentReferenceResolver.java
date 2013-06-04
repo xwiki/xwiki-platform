@@ -29,7 +29,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 /**
  * Dispatch to the proper {@link SolrDocumentReferenceResolver}.
@@ -48,7 +48,7 @@ public class DefaultSolrDocumentReferenceResolver implements SolrDocumentReferen
     private ComponentManager componentManager;
 
     @Override
-    public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexException
+    public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
     {
         EntityType type = reference.getType();
 
@@ -57,7 +57,7 @@ public class DefaultSolrDocumentReferenceResolver implements SolrDocumentReferen
             resolver =
                 this.componentManager.getInstance(SolrDocumentReferenceResolver.class, type.name().toLowerCase());
         } catch (ComponentLookupException e) {
-            throw new SolrIndexException("Failed to get SolrDocumentReferenceResolver corresponding to entity type ["
+            throw new SolrIndexerException("Failed to get SolrDocumentReferenceResolver corresponding to entity type ["
                 + type + "]", e);
         }
 

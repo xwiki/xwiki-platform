@@ -23,9 +23,9 @@ package org.xwiki.search.solr.internal.api;
  * Index component exception.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 5.1M2
  */
-public class SolrIndexException extends Exception
+public class SolrIndexerException extends Exception
 {
     /** Needed for correctly implementing {@link java.io.Serializable}. */
     private static final long serialVersionUID = -4795008341521444886L;
@@ -36,7 +36,7 @@ public class SolrIndexException extends Exception
      * @param message the exception message
      * @param cause the exception that caused this exception
      */
-    public SolrIndexException(String message, Exception cause)
+    public SolrIndexerException(String message, Exception cause)
     {
         super(message, cause);
     }
@@ -46,7 +46,7 @@ public class SolrIndexException extends Exception
      * 
      * @param message the exception message
      */
-    public SolrIndexException(String message)
+    public SolrIndexerException(String message)
     {
         super(message);
     }

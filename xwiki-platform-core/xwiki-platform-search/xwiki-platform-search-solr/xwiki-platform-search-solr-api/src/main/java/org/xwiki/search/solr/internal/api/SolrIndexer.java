@@ -41,31 +41,31 @@ public interface SolrIndexer
      * Index an entity recursively.
      * 
      * @param reference the entity's reference.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    void index(EntityReference reference) throws SolrIndexException;
+    void index(EntityReference reference) throws SolrIndexerException;
 
     /**
      * Index multiple entities, each recursively. This is a batch operation.
      * 
      * @param references the list of entity references.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    void index(List<EntityReference> references) throws SolrIndexException;
+    void index(List<EntityReference> references) throws SolrIndexerException;
 
     /**
      * Delete an indexed entity recursively.
      * 
      * @param reference the entity's reference.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    void delete(EntityReference reference) throws SolrIndexException;
+    void delete(EntityReference reference) throws SolrIndexerException;
 
     /**
      * Delete multiple entities, each recursively. This is a batch operation.
      * 
      * @param references the list of entity references.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    void delete(List<EntityReference> references) throws SolrIndexException;
+    void delete(List<EntityReference> references) throws SolrIndexerException;
 }

@@ -36,7 +36,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -62,7 +62,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected BlockRenderer renderer;
 
     @Override
-    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
@@ -116,7 +116,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get input document for '%s'", documentReference), e);
+            throw new SolrIndexerException(String.format("Failed to get input document for '%s'", documentReference),
+                e);
         }
     }
 
@@ -188,7 +189,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     @Override
-    public String getId(EntityReference reference) throws SolrIndexException, IllegalArgumentException
+    public String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException
     {
         DocumentReference documentReference = new DocumentReference(reference);
 

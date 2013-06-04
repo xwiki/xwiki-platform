@@ -36,7 +36,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
     <solr.version>${lucene.version}</solr.version>
-    <xwiki.jacoco.instructionRatio>62.38</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>49.65</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -149,4 +149,17 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            **/DefaultSolrIndexer.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

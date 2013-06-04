@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 /**
  * Resolve attachment references.
@@ -41,7 +41,7 @@ import org.xwiki.search.solr.internal.api.SolrIndexException;
 public class AttachmentSolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
 {
     @Override
-    public List<EntityReference> getReferences(EntityReference attachmentReference) throws SolrIndexException
+    public List<EntityReference> getReferences(EntityReference attachmentReference) throws SolrIndexerException
     {
         return Arrays.asList(attachmentReference);
     }

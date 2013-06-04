@@ -63,7 +63,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -328,7 +328,7 @@ public class DocumentSolrMetadataExtractorTest
         DocumentSolrMetadataExtractor extractor = (DocumentSolrMetadataExtractor) this.mocker.getComponentUnderTest();
         try {
             extractor.getSolrDocument(reference);
-        } catch (SolrIndexException ex) {
+        } catch (SolrIndexerException ex) {
             Assert.assertEquals("Failed to get input document for '" + this.documentReferenceFrench + "'",
                 ex.getMessage());
             Assert.assertEquals("Failed to get translated document for '" + this.documentReferenceFrench + "'", ex

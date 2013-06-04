@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -47,7 +47,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override
-    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
         BaseObjectReference objectReference = new BaseObjectReference(entityReference);
@@ -70,7 +70,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'", objectReference), e);
+            throw new SolrIndexerException(String.format("Failed to get Solr document for '%s'", objectReference), e);
         }
     }
 

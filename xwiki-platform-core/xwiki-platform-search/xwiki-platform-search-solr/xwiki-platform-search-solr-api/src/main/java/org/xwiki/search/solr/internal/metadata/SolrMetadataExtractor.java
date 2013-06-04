@@ -21,7 +21,7 @@ package org.xwiki.search.solr.internal.metadata;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 /**
  * Internal component interface for handling the extraction of metadata into a {@link SolrInputDocument} from XWiki
@@ -42,17 +42,17 @@ public interface SolrMetadataExtractor
      * 
      * @param entityReference the reference to the entity.
      * @return the {@link SolrInputDocument} containing the fields to be indexed for the entity.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if the passed reference is not supported by the current implementation.
      */
-    LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException;
 
     /**
      * @param reference reference to an entity.
      * @return the ID of the entity, as it is used in the index.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if the passed reference is not supported by the current implementation.
      */
-    String getId(EntityReference reference) throws SolrIndexException, IllegalArgumentException;
+    String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException;
 }

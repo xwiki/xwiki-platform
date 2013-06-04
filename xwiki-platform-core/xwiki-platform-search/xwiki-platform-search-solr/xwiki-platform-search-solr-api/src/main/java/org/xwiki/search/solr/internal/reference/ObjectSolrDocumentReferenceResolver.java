@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -55,7 +55,7 @@ public class ObjectSolrDocumentReferenceResolver extends AbstractSolrDocumentRef
     private SolrDocumentReferenceResolver objectPropertyResolver;
 
     @Override
-    public List<EntityReference> getReferences(EntityReference objectReference) throws SolrIndexException
+    public List<EntityReference> getReferences(EntityReference objectReference) throws SolrIndexerException
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
 
@@ -69,7 +69,7 @@ public class ObjectSolrDocumentReferenceResolver extends AbstractSolrDocumentRef
         try {
             document = getDocument(documentReference);
         } catch (Exception e) {
-            throw new SolrIndexException("Failed to get document for object [" + objectReference + "]", e);
+            throw new SolrIndexerException("Failed to get document for object [" + objectReference + "]", e);
         }
 
         BaseObject object = document.getXObject(objectReference);

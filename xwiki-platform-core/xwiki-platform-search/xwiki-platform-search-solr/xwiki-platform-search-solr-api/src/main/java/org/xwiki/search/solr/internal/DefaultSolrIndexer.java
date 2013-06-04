@@ -41,7 +41,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
@@ -408,10 +408,10 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * @param reference the reference to extract metadata from.
      * @return the {@link SolrInputDocument} containing extracted metadata from the passed reference; {@code null} if
      *         the reference type is not supported.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
      */
-    private LengthSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexException,
+    private LengthSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexerException,
         IllegalArgumentException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
@@ -443,9 +443,9 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     /**
      * @param reference the reference for which to extract the ID
      * @return the ID of the entity, as it is used in the index
-     * @throws SolrIndexException if problems occur
+     * @throws SolrIndexerException if problems occur
      */
-    private String getId(EntityReference reference) throws SolrIndexException
+    private String getId(EntityReference reference) throws SolrIndexerException
     {
         String result = null;
 
@@ -458,26 +458,26 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     @Override
-    public void index(EntityReference reference) throws SolrIndexException
+    public void index(EntityReference reference) throws SolrIndexerException
     {
         this.index(Arrays.asList(reference));
     }
 
     @Override
-    public void index(List<EntityReference> references) throws SolrIndexException
+    public void index(List<EntityReference> references) throws SolrIndexerException
     {
         addToQueue(references, IndexOperation.INDEX);
     }
 
     @Override
-    public void delete(EntityReference reference) throws SolrIndexException
+    public void delete(EntityReference reference) throws SolrIndexerException
     {
         this.delete(Arrays.asList(reference));
 
     }
 
     @Override
-    public void delete(List<EntityReference> references) throws SolrIndexException
+    public void delete(List<EntityReference> references) throws SolrIndexerException
     {
         addToQueue(references, IndexOperation.DELETE);
     }

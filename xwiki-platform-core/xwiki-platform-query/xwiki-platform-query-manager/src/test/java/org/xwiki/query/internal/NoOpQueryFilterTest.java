@@ -34,7 +34,7 @@ import org.junit.Test;
 public class NoOpQueryFilterTest
 {
     @Test
-    public void verifyStatementIsUnchanged()
+    public void verifyStatementAndResultsAreUnchanged()
     {
         NoOpQueryFilter filter = new NoOpQueryFilter();
 

@@ -841,6 +841,10 @@ public class XWiki implements EventListener
 
         resetRenderingEngine(context);
 
+        // "Pre-initialize" XWikiStubContextProvider so that plugins or listeners reacting to potential document changes
+        // can use it
+        Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+
         // Prepare the Plugin Engine
         preparePlugins(context);
 

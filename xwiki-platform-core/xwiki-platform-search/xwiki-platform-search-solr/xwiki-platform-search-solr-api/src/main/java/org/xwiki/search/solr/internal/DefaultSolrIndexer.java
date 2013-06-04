@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
@@ -98,15 +97,22 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * 
      * @version $Id$
      */
-    private class Resolver extends Thread
+    private class Resolver extends AbstractXWikiRunnable
     {
         @Override
-        public void run()
+        public void runInternal()
         {
             logger.debug("Start SOLR resolver thread");
 
             while (!Thread.interrupted()) {
-                IndexQueueEntry queueEntry = resolveQueue.poll();
+                IndexQueueEntry queueEntry;
+                try {
+                    queueEntry = resolveQueue.take();
+                } catch (InterruptedException e) {
+                    logger.warn("The SOLR resolve thread has been interrupted", e);
+
+                    queueEntry = QUEUE_ENTRY_STOP;
+                }
 
                 if (queueEntry == QUEUE_ENTRY_STOP) {
                     break;
@@ -172,7 +178,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     /**
      * The queue of resolve references and add them to the index queue.
      */
-    private ConcurrentLinkedQueue<IndexQueueEntry> resolveQueue;
+    private BlockingQueue<IndexQueueEntry> resolveQueue;
 
     /**
      * Thread in which the indexUpdater will be executed.
@@ -193,7 +199,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     public void initialize() throws InitializationException
     {
         // Launch the resolve thread that runs the indexUpdater.
-        this.resolveThread = new Resolver();
+        this.resolveThread = new Thread(new Resolver());
         this.resolveThread.start();
         this.resolveThread.setPriority(Thread.NORM_PRIORITY - 1);
 
@@ -203,7 +209,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
 
         // Initialize the queue
-        this.resolveQueue = new ConcurrentLinkedQueue<IndexQueueEntry>();
+        this.resolveQueue = new LinkedBlockingQueue<IndexQueueEntry>();
         this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
     }
 
@@ -299,7 +305,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
             // the reason why we perform it at the end of the batch.
-            if (shouldCommit(operation, length, size)) {
+            if (shouldCommit(length, size)) {
+                flush(documentsToIndex, documentIDsToDelete);
                 commit();
                 length = 0;
                 size = 0;
@@ -308,6 +315,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
         // Commit what's left
         if (size > 0) {
+            flush(documentsToIndex, documentIDsToDelete);
             commit();
         }
     }
@@ -336,12 +344,11 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     /**
      * Check various constraints to know if the batch should be committed.
      * 
-     * @param operation the current operation
      * @param length the current length
      * @param size the current size
      * @return true if the batch should be sent
      */
-    private boolean shouldCommit(IndexOperation operation, int length, int size)
+    private boolean shouldCommit(int length, int size)
     {
         // If the length is above the configured maximum
         if (length >= this.configuration.getIndexerBatchMaxLengh()) {
@@ -361,25 +368,36 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     private void checkContiguity(IndexQueueEntry previousBatchEntry, IndexOperation operation,
         List<SolrInputDocument> documentsToIndex, List<String> documentIDsToDelete)
     {
+        if (previousBatchEntry != null) {
+            IndexOperation previousOperation = previousBatchEntry.operation;
+
+            if (previousOperation != operation) {
+                flush(documentsToIndex, documentIDsToDelete);
+            }
+        }
+    }
+
+    /**
+     * @param documentsToIndex the list of document to index
+     * @param documentIDsToDelete the list of documents to remove from the index
+     */
+    private void flush(List<SolrInputDocument> documentsToIndex, List<String> documentIDsToDelete)
+    {
         try {
-            if (previousBatchEntry != null) {
-                SolrInstance solrInstance = this.solrInstanceProvider.get();
+            SolrInstance solrInstance = this.solrInstanceProvider.get();
 
-                IndexOperation previousOperation = previousBatchEntry.operation;
+            if (!documentsToIndex.isEmpty()) {
+                solrInstance.add(documentsToIndex);
 
-                if (previousOperation != operation) {
-                    if (IndexOperation.INDEX.equals(previousOperation)) {
-                        solrInstance.add(documentsToIndex);
+                // Clear the just processed contiguous inner-batch.
+                documentsToIndex.clear();
+            }
 
-                        // Clear the just processed contiguous inner-batch.
-                        documentsToIndex.clear();
-                    } else if (IndexOperation.DELETE.equals(previousOperation)) {
-                        solrInstance.delete(documentIDsToDelete);
+            if (!documentIDsToDelete.isEmpty()) {
+                solrInstance.delete(documentIDsToDelete);
 
-                        // Clear the just processed contiguous inner-batch.
-                        documentIDsToDelete.clear();
-                    }
-                }
+                // Clear the just processed contiguous inner-batch.
+                documentIDsToDelete.clear();
             }
         } catch (Exception e) {
             this.logger.error("Failed to add/delete entities", e);
@@ -474,7 +492,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     {
         if (!this.disposed) {
             for (EntityReference reference : references) {
-                this.resolveQueue.add(new IndexQueueEntry(reference, operation));
+                this.resolveQueue.offer(new IndexQueueEntry(reference, operation));
             }
         }
     }

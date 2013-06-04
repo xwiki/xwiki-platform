@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
@@ -35,7 +36,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,6 +51,7 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component
 @Named("document")
+@Singleton
 public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     /**
@@ -60,15 +62,15 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected BlockRenderer renderer;
 
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+            LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
             XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
             String language = getLanguage(documentReference);
@@ -83,7 +85,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             renderer.render(translatedDocument.getXDOM(), printer);
 
             // Same for document title
-            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, context);
+            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
             // Get the rendered plain text title.
             solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, language), plainTitle);
@@ -93,9 +95,9 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             // Get both serialized user reference string and pretty user name (first_name last_name).
             String authorString = serializer.serialize(translatedDocument.getAuthorReference());
-            String authorDisplayString = context.getWiki().getUserName(authorString, null, false, context);
+            String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
             String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
-            String creatorDisplayString = context.getWiki().getUserName(creatorString, null, false, context);
+            String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
 
             solrDocument.addField(Fields.AUTHOR, authorString);
             solrDocument.addField(Fields.AUTHOR_DISPLAY, authorDisplayString);
@@ -114,7 +116,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get input document for '%s'", documentReference), e);
+            throw new SolrIndexerException(String.format("Failed to get input document for '%s'", documentReference),
+                e);
         }
     }
 
@@ -186,7 +189,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     @Override
-    public String getId(EntityReference reference) throws SolrIndexException, IllegalArgumentException
+    public String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException
     {
         DocumentReference documentReference = new DocumentReference(reference);
 

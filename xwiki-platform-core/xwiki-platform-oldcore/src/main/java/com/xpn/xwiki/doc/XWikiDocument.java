@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +53,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -4954,16 +4954,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return null;
     }
 
-    public XWikiAttachment addAttachment(String fileName, InputStream iStream, XWikiContext context)
-        throws XWikiException, IOException
+    /**
+     * @deprecated use {@link #addAttachment(String, InputStream, XWikiContext)} instead
+     */
+    public XWikiAttachment addAttachment(String fileName, byte[] content, XWikiContext context) throws XWikiException
     {
-        ByteArrayOutputStream bAOut = new ByteArrayOutputStream();
-        IOUtils.copy(iStream, bAOut);
-
-        return addAttachment(fileName, bAOut.toByteArray(), context);
+        try {
+            return addAttachment(fileName, new ByteArrayInputStream(content != null ? content : new byte[0]), context);
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to set Attachment content", e);
+        }
     }
 
-    public XWikiAttachment addAttachment(String fileName, byte[] data, XWikiContext context) throws XWikiException
+    public XWikiAttachment addAttachment(String fileName, InputStream content, XWikiContext context)
+        throws XWikiException, IOException
     {
         int i = fileName.indexOf('\\');
         if (i == -1) {
@@ -4980,7 +4985,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             getAttachmentList().add(attachment);
         }
 
-        attachment.setContent(data);
+        attachment.setContent(content);
         attachment.setFilename(filename);
         attachment.setAuthor(context.getUser());
         // Add the attachment to the document

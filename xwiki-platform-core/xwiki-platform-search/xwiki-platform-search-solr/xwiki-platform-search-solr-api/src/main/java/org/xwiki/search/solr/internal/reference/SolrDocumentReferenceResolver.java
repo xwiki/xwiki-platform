@@ -17,37 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal.api;
+package org.xwiki.search.solr.internal.reference;
+
+import java.util.List;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
+import org.xwiki.stability.Unstable;
 
 /**
- * Index component exception.
+ * Recursively retrieves the references for all the indexable entities contained by the given start entity.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-public class SolrIndexException extends Exception
+@Unstable
+@Role
+public interface SolrDocumentReferenceResolver
 {
-    /** Needed for correctly implementing {@link java.io.Serializable}. */
-    private static final long serialVersionUID = -4795008341521444886L;
-
     /**
-     * Constructor.
-     * 
-     * @param message the exception message
-     * @param cause the exception that caused this exception
+     * @param rootReference the root entity reference.
+     * @return references for the indexable contained entities, including the given one (but only if it is indexable).
+     * @throws SolrIndexerException if problems occur.
      */
-    public SolrIndexException(String message, Exception cause)
-    {
-        super(message, cause);
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param message the exception message
-     */
-    public SolrIndexException(String message)
-    {
-        super(message);
-    }
+    List<EntityReference> getReferences(EntityReference rootReference) throws SolrIndexerException;
 }

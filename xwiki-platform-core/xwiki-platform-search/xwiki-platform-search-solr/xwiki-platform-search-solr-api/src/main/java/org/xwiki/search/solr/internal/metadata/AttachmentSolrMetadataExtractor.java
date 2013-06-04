@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -33,7 +34,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -45,16 +46,17 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 @Component
 @Named("attachment")
+@Singleton
 public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);
 
         try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+            LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
             DocumentReference documentReference = attachmentReference.getDocumentReference();
 
@@ -68,7 +70,8 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'", attachmentReference), e);
+            throw new SolrIndexerException(String.format("Failed to get Solr document for '%s'", attachmentReference),
+                e);
         }
     }
 
@@ -89,7 +92,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Get all the languages in which the document is available.
-        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
+        List<String> documentLanguages = originalDocument.getTranslationList(this.xcontextProvider.get());
         // Make sure that the original document's language is there as well.
         String originalDocumentLanguage = getLanguage(documentReference);
         if (!documentLanguages.contains(originalDocumentLanguage)) {
@@ -121,9 +124,9 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
      * 
      * @param attachment reference to the attachment.
      * @return the text representation of the attachment's content.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    protected String getContentAsText(AttachmentReference attachment) throws SolrIndexException
+    protected String getContentAsText(AttachmentReference attachment) throws SolrIndexerException
     {
         try {
             Tika tika = new Tika();
@@ -131,13 +134,17 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
             Metadata metadata = new Metadata();
             metadata.set(Metadata.RESOURCE_NAME_KEY, attachment.getName());
 
-            InputStream in = documentAccessBridge.getAttachmentContent(attachment);
+            InputStream in = this.documentAccessBridge.getAttachmentContent(attachment);
 
-            String result = StringUtils.lowerCase(tika.parseToString(in, metadata));
+            try {
+                String result = StringUtils.lowerCase(tika.parseToString(in, metadata));
 
-            return result;
+                return result;
+            } finally {
+                in.close();
+            }
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to retrieve attachment content for '%s'", attachment),
+            throw new SolrIndexerException(String.format("Failed to retrieve attachment content for '%s'", attachment),
                 e);
         }
     }
@@ -148,7 +155,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
      */
     protected String getMimeType(AttachmentReference reference)
     {
-        String mimetype = getXWikiContext().getEngineContext().getMimeType(reference.getName().toLowerCase());
+        String mimetype = this.xcontextProvider.get().getEngineContext().getMimeType(reference.getName().toLowerCase());
         if (mimetype != null) {
             return mimetype;
         } else {

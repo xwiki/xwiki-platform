@@ -17,29 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.search.solr.internal.metadata;
 
-import java.util.List;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
-import org.xwiki.stability.Unstable;
+import org.apache.solr.common.SolrInputDocument;
 
 /**
- * Recursively retrieves the references for all the indexable entities contained by the given start entity.
+ * Extended SolrInputDocument with calculated size.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 5.1M2
  */
-@Unstable
-@Role
-public interface IndexableReferenceExtractor
+public class LengthSolrInputDocument extends SolrInputDocument
 {
     /**
-     * @param startReference the start entity reference.
-     * @return references for the indexable contained entities, including the given one (but only if it is indexable).
-     * @throws SolrIndexException if problems occur.
+     * @see #getLength()
      */
-    List<EntityReference> getReferences(EntityReference startReference) throws SolrIndexException;
+    private int length;
+
+    /**
+     * @return the length (generally the number of characters). It's not the exact byte length, it's more a scale value.
+     */
+    public int getLength()
+    {
+        return this.length;
+    }
+
+    @Override
+    public void addField(String name, Object value, float boost)
+    {
+        super.addField(name, value, boost);
+
+        if (value instanceof String) {
+            this.length += ((String) value).length();
+        } else if (value instanceof byte[]) {
+            this.length += ((byte[]) value).length;
+        }
+
+        // TODO: support more type ?
+    }
 }

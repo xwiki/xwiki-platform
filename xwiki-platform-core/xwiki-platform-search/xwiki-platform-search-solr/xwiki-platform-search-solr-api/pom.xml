@@ -35,8 +35,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <solr.version>4.0.0</solr.version>
-    <xwiki.jacoco.instructionRatio>62.38</xwiki.jacoco.instructionRatio>
+    <solr.version>${lucene.version}</solr.version>
+    <xwiki.jacoco.instructionRatio>49.65</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -128,13 +128,19 @@
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-query-manager</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Testing dependencies -->
 
     <!-- Since we're mocking a class (XWiki) we need those -->
     <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -143,4 +149,17 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            **/DefaultSolrIndexer.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -37,7 +37,6 @@
     <xwiki.extension.name>Lucene Search API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>xwiki-platform-search-lucene</xwiki.extension.features>
-    <lucene.version>4.0.0</lucene.version>
     <xwiki.jacoco.instructionRatio>35.58</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

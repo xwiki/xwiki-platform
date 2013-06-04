@@ -513,14 +513,15 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public List<AttachmentReference> getAttachmentReferences(DocumentReference documentReference) throws Exception
     {
-        List<AttachmentReference> attachmentReferences = new ArrayList<AttachmentReference>();
         XWikiContext xcontext = getContext();
-        DocumentReference resolvedReference = documentReference;
         List<XWikiAttachment> attachments =
-            xcontext.getWiki().getDocument(resolvedReference, xcontext).getAttachmentList();
+            xcontext.getWiki().getDocument(documentReference, xcontext).getAttachmentList();
+
+        List<AttachmentReference> attachmentReferences = new ArrayList<AttachmentReference>(attachments.size());
         for (XWikiAttachment attachment : attachments) {
-            attachmentReferences.add(new AttachmentReference(attachment.getFilename(), resolvedReference));
+            attachmentReferences.add(attachment.getReference());
         }
+
         return attachmentReferences;
     }
 

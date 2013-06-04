@@ -23,18 +23,18 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -90,29 +90,20 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Inject
     protected DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
+
     @Override
-    public String getId(EntityReference reference) throws SolrIndexException
+    public String getId(EntityReference reference) throws SolrIndexerException
     {
         String result = this.serializer.serialize(reference);
 
         // TODO: Include language all the other entities once object/attachment translation is implemented.
 
         return result;
-    }
-
-    /**
-     * @return the XWikiContext
-     */
-    protected XWikiContext getXWikiContext()
-    {
-        ExecutionContext executionContext = this.execution.getContext();
-        XWikiContext context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        // FIXME: Do we need this? Maybe when running an index Thread?
-        // if (context == null) {
-        // context = this.contextProvider.createStubContext();
-        // executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
-        // }
-        return context;
     }
 
     /**
@@ -124,8 +115,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      */
     protected XWikiDocument getDocument(DocumentReference documentReference) throws XWikiException
     {
-        XWikiContext context = getXWikiContext();
-        XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
         return document;
     }
@@ -135,17 +127,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param documentReference reference to the document to be translated.
      * @return translated document.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    protected XWikiDocument getTranslatedDocument(DocumentReference documentReference) throws SolrIndexException
+    protected XWikiDocument getTranslatedDocument(DocumentReference documentReference) throws SolrIndexerException
     {
         try {
             XWikiDocument document = getDocument(documentReference);
             XWikiDocument translatedDocument =
-                document.getTranslatedDocument(documentReference.getLocale(), getXWikiContext());
+                document.getTranslatedDocument(documentReference.getLocale(), this.xcontextProvider.get());
             return translatedDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(
+            throw new SolrIndexerException(
                 String.format("Failed to get translated document for '%s'", documentReference), e);
         }
     }
@@ -176,9 +168,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     /**
      * @param documentReference reference to the document.
      * @return the language code of the referenced document.
-     * @throws SolrIndexException if problems occur.
+     * @throws SolrIndexerException if problems occur.
      */
-    protected String getLanguage(DocumentReference documentReference) throws SolrIndexException
+    protected String getLanguage(DocumentReference documentReference) throws SolrIndexerException
     {
         String language = null;
 
@@ -194,7 +186,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 language = "en";
             }
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Exception while fetching the language of the document '%s'",
+            throw new SolrIndexerException(String.format("Exception while fetching the language of the document '%s'",
                 documentReference), e);
         }
 
@@ -219,9 +211,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         String fieldName = String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, language);
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
-        BaseClass xClass = object.getXClass(context);
+        BaseClass xClass = object.getXClass(xcontext);
 
         for (Object field : object.getFieldList()) {
             BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) field;

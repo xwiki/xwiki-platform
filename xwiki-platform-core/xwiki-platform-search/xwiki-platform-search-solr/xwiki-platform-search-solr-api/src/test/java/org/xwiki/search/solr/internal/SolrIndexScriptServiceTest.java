@@ -19,8 +19,15 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
@@ -34,7 +41,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.search.solr.internal.api.SolrIndex;
+import org.xwiki.search.solr.internal.script.SolrIndexScriptService;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
@@ -60,8 +67,6 @@ public class SolrIndexScriptServiceTest
 
     private DocumentReference userReference;
 
-    private Object mockSolrIndex;
-
     private SolrIndexScriptService service;
 
     private Logger logger;
@@ -72,7 +77,6 @@ public class SolrIndexScriptServiceTest
         service = mocker.getComponentUnderTest();
 
         logger = mocker.getMockedLogger();
-        mockSolrIndex = mocker.getInstance(SolrIndex.class);
         userReference = new DocumentReference("wiki", "space", "userName");
 
         // Context

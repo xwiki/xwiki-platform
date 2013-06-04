@@ -22,13 +22,14 @@ package org.xwiki.search.solr.internal.metadata;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,16 +43,17 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  */
 @Component
 @Named("object")
+@Singleton
 public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
         BaseObjectReference objectReference = new BaseObjectReference(entityReference);
 
         try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+            LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
             DocumentReference classReference = objectReference.getXClassReference();
             DocumentReference documentReference = new DocumentReference(objectReference.getParent());
@@ -68,7 +70,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'", objectReference), e);
+            throw new SolrIndexerException(String.format("Failed to get Solr document for '%s'", objectReference), e);
         }
     }
 
@@ -89,7 +91,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Get all the languages in which the document is available.
-        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
+        List<String> documentLanguages = originalDocument.getTranslationList(this.xcontextProvider.get());
         // Make sure that the original document's language is there as well.
         String originalDocumentLanguage = getLanguage(documentReference);
         if (!documentLanguages.contains(originalDocumentLanguage)) {

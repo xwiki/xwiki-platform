@@ -126,7 +126,11 @@ public class RemoteSolrInstance extends AbstractSolrInstance
             InputStream zipFileInputStream = createZip(homeDirectoryFiles);
 
             // Attach the file.
-            configurationDocument.addAttachment(CONFIGURATION_ZIP_FILE_NAME, zipFileInputStream, context);
+            try {
+                configurationDocument.addAttachment(CONFIGURATION_ZIP_FILE_NAME, zipFileInputStream, context);
+            } finally {
+                zipFileInputStream.close();
+            }
         }
     }
 

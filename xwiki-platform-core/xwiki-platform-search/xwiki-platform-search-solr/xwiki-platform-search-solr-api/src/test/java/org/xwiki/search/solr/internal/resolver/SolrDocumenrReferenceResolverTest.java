@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.search.solr.internal.resolver;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -33,12 +33,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
@@ -56,11 +59,21 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
+import org.xwiki.search.solr.internal.reference.AttachmentSolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.DefaultSolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.DocumentSolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.ObjectPropertySolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.ObjectSolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.SolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.SpaceSolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.WikiSolrDocumentReferenceResolver;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
@@ -87,14 +100,16 @@ CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvid
 CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
 DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class,
 DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
-DefaultStringEntityReferenceSerializer.class})
-public class DefaultIndexableReferenceExtractorTest
+DefaultStringEntityReferenceSerializer.class, DefaultExecution.class, AttachmentSolrDocumentReferenceResolver.class,
+DefaultSolrDocumentReferenceResolver.class, DocumentSolrDocumentReferenceResolver.class,
+ObjectPropertySolrDocumentReferenceResolver.class, ObjectSolrDocumentReferenceResolver.class,
+SpaceSolrDocumentReferenceResolver.class, WikiSolrDocumentReferenceResolver.class})
+public class SolrDocumenrReferenceResolverTest
 {
     @Rule
-    public final MockitoComponentMockingRule<DefaultIndexableReferenceExtractor> mocker =
-        new MockitoComponentMockingRule<DefaultIndexableReferenceExtractor>(DefaultIndexableReferenceExtractor.class);
+    public final MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
 
-    private DefaultIndexableReferenceExtractor referenceExtractor;
+    private SolrDocumentReferenceResolver defaultReferenceResolver;
 
     private XWikiContext xcontext;
 
@@ -125,7 +140,11 @@ public class DefaultIndexableReferenceExtractorTest
 
     private AttachmentReference attachment1211 = new AttachmentReference("picture.png", document121);
 
+    private XWikiAttachment xwikiAttachment1211;
+
     private AttachmentReference attachment1212 = new AttachmentReference("document.doc", document121);
+
+    private XWikiAttachment xwikiAttachment1212;
 
     private XWikiDocument xwikiDocument121;
 
@@ -159,25 +178,40 @@ public class DefaultIndexableReferenceExtractorTest
 
     private QueryManager queryManager;
 
+    @BeforeComponent
+    public void registerComponents() throws Exception
+    {
+        this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        this.mocker.registerMockComponent(QueryManager.class);
+    }
+
     @Before
     public void setUp() throws Exception
     {
-        this.referenceExtractor = this.mocker.getComponentUnderTest();
+        this.defaultReferenceResolver = this.mocker.getInstance(SolrDocumentReferenceResolver.class);
 
         Utils.setComponentManager(this.mocker);
 
-        // XWikiContext and XWiki
-
-        final Execution execution = this.mocker.getInstance(Execution.class);
-        final ExecutionContext executionContext = new ExecutionContext();
+        // XWiki
 
         this.xwiki = mock(XWiki.class);
+
+        // XWikiContext
 
         this.xcontext = new XWikiContext();
         this.xcontext.setDatabase("xwiki");
         this.xcontext.setWiki(this.xwiki);
 
-        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xcontext);
+        // XWikiContext Provider
+
+        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(this.xcontext);
+
+        // XWikiContext trough Execution
+
+        Execution execution = this.mocker.getInstance(Execution.class);
+        execution.setContext(new ExecutionContext());
+        execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xcontext);
 
         // References
 
@@ -189,16 +223,18 @@ public class DefaultIndexableReferenceExtractorTest
 
         // XWiki model data
 
-        this.xwikiDocument11x = mock(XWikiDocument.class, "document11x");
+        this.xwikiDocument11x = mock(XWikiDocument.class, "xwikiDocument11x");
         this.xwikiClass111 = mock(BaseClass.class);
-        this.xwikiDocument113 = mock(XWikiDocument.class, "document113");
-        this.xwikiDocument121 = mock(XWikiDocument.class, "document121");
-        this.xwikiDocument122 = mock(XWikiDocument.class, "document122");
-        this.xwikiObject1221 = mock(BaseObject.class, "object1221");
-        this.xwikiProperty12221 = mock(StringProperty.class, "property12221");
-        this.xwikiPasswordProperty12222 = mock(StringProperty.class, "passwordProperty12222");
-        this.xwikiProperty12223 = mock(IntegerProperty.class, "property12223");
-        this.xwikiObject1222 = mock(BaseObject.class, "object1222");
+        this.xwikiDocument113 = mock(XWikiDocument.class, "xwikiDocument113");
+        this.xwikiDocument121 = mock(XWikiDocument.class, "xwikiDocument121");
+        this.xwikiAttachment1211 = mock(XWikiAttachment.class, "xwikiAttachment1211");
+        this.xwikiAttachment1212 = mock(XWikiAttachment.class, "xwikiAttachment1212");
+        this.xwikiDocument122 = mock(XWikiDocument.class, "xwikiDocument122");
+        this.xwikiObject1221 = mock(BaseObject.class, "xwikiObject1221");
+        this.xwikiProperty12221 = mock(StringProperty.class, "xwikiProperty12221");
+        this.xwikiPasswordProperty12222 = mock(StringProperty.class, "xwikiPasswordProperty12222");
+        this.xwikiProperty12223 = mock(IntegerProperty.class, "xwikiProperty12223");
+        this.xwikiObject1222 = mock(BaseObject.class, "xwikiObject1222");
 
         this.queryManager = this.mocker.getInstance(QueryManager.class);
         final Query spacesWiki1Query = mock(DefaultQuery.class, "getSpacesWiki1");
@@ -207,13 +243,9 @@ public class DefaultIndexableReferenceExtractorTest
         final Query documentsSpace13Query = mock(DefaultQuery.class, "getSpaceDocsNameSpace13");
         final Query spacesWiki2Query = mock(DefaultQuery.class, "getSpacesWiki2");
 
-        when(execution.getContext()).thenReturn(executionContext);
-
         // Data
 
         when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(true);
-
-        when(referenceExtractor.documentAccessBridge.exists(any(DocumentReference.class))).thenReturn(true);
 
         // Query manager and specific queries mocking.
 
@@ -246,16 +278,20 @@ public class DefaultIndexableReferenceExtractorTest
         // document 111
         when(xwiki.getDocument(eq(class111), any(XWikiContext.class))).thenReturn(xwikiDocument11x);
 
-        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(class111)).thenReturn(
-            Collections.EMPTY_LIST);
+        /*
+         * when(referenceExtractor.documentAccessBridge.getAttachmentReferences(class111)).thenReturn(
+         * Collections.EMPTY_LIST);
+         */
 
         when(xwikiDocument11x.getXClass()).thenReturn(xwikiClass111);
 
         // document 112
         when(xwiki.getDocument(eq(document112), any(XWikiContext.class))).thenReturn(xwikiDocument11x);
 
-        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document112)).thenReturn(
-            Collections.EMPTY_LIST);
+        /*
+         * when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document112)).thenReturn(
+         * Collections.EMPTY_LIST);
+         */
 
         when(xwikiDocument11x.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
@@ -264,8 +300,7 @@ public class DefaultIndexableReferenceExtractorTest
         // document 113
         when(xwiki.getDocument(eq(document113), any(XWikiContext.class))).thenReturn(xwikiDocument113);
 
-        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document113)).thenReturn(
-            Collections.EMPTY_LIST);
+        when(xwikiDocument113.getAttachmentList()).thenReturn(Collections.EMPTY_LIST);
 
         when(xwikiDocument113.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
@@ -278,8 +313,11 @@ public class DefaultIndexableReferenceExtractorTest
         // document 121
         when(xwiki.getDocument(eq(document121), any(XWikiContext.class))).thenReturn(xwikiDocument121);
 
-        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document121)).thenReturn(
-            Arrays.asList(attachment1211, attachment1212));
+        when(xwikiDocument121.getAttachmentList()).thenReturn(Arrays.asList(xwikiAttachment1211, xwikiAttachment1212));
+
+        when(xwikiAttachment1211.getReference()).thenReturn(attachment1211);
+
+        when(xwikiAttachment1212.getReference()).thenReturn(attachment1212);
 
         when(xwikiDocument121.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
@@ -288,8 +326,7 @@ public class DefaultIndexableReferenceExtractorTest
         // document 122
         when(xwiki.getDocument(eq(document122), any(XWikiContext.class))).thenReturn(xwikiDocument122);
 
-        when(referenceExtractor.documentAccessBridge.getAttachmentReferences(document122)).thenReturn(
-            Collections.EMPTY_LIST);
+        when(xwikiDocument122.getAttachmentList()).thenReturn(Collections.EMPTY_LIST);
 
         Map<DocumentReference, List<BaseObject>> xObjects = new HashMap<DocumentReference, List<BaseObject>>();
         // Yes, it seems that we can have null objects for some reason.
@@ -300,6 +337,7 @@ public class DefaultIndexableReferenceExtractorTest
 
         // object 1221
         when(xwikiDocument122.getXObject(object1221)).thenReturn(xwikiObject1221);
+        when(xwikiDocument122.getXObject((EntityReference) object1221)).thenReturn(xwikiObject1221);
 
         when(xwikiObject1221.getReference()).thenReturn(object1221);
 
@@ -309,6 +347,7 @@ public class DefaultIndexableReferenceExtractorTest
 
         // object 1222
         when(xwikiDocument122.getXObject(object1222)).thenReturn(xwikiObject1222);
+        when(xwikiDocument122.getXObject((EntityReference) object1222)).thenReturn(xwikiObject1222);
 
         when(xwikiObject1222.getReference()).thenReturn(object1222);
 
@@ -341,7 +380,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testEmptyWiki() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(wiki2);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(wiki2);
         Assert.assertNotNull(result);
         Assert.assertEquals(0, result.size());
     }
@@ -349,9 +388,8 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testWiki() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(wiki1);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(wiki1);
         Assert.assertNotNull(result);
-        Assert.assertEquals(12, result.size());
 
         assertThat(
             result,
@@ -363,7 +401,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testEmptySpace() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(space13);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(space13);
 
         Assert.assertNotNull(result);
         Assert.assertEquals(0, result.size());
@@ -372,7 +410,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testSpaceReference() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(space11);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(space11);
         Assert.assertNotNull(result);
         Assert.assertEquals(4, result.size());
 
@@ -386,7 +424,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testEmptyDocument() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(document112);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(document112);
         Assert.assertNotNull(result);
         Assert.assertEquals(1, result.size());
 
@@ -396,7 +434,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testTranslatedDocument() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(document113);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(document113);
         Assert.assertNotNull(result);
         Assert.assertEquals(2, result.size());
 
@@ -406,7 +444,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testDocumentWithAttachments() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(document121);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(document121);
 
         Assert.assertNotNull(result);
         Assert.assertEquals(3, result.size());
@@ -417,7 +455,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testDocumentWithObjects() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(document122);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(document122);
 
         Assert.assertNotNull(result);
         Assert.assertEquals(5, result.size());
@@ -429,7 +467,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testAttachment() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(attachment1211);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(attachment1211);
         Assert.assertNotNull(result);
         Assert.assertEquals(1, result.size());
 
@@ -439,7 +477,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testEmptyObject() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(object1221);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(object1221);
         Assert.assertNotNull(result);
         Assert.assertEquals(1, result.size());
 
@@ -449,7 +487,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testObject() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(object1222);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(object1222);
         Assert.assertNotNull(result);
         Assert.assertEquals(3, result.size());
 
@@ -460,7 +498,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testProperty() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(property12221);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(property12221);
         Assert.assertNotNull(result);
         Assert.assertEquals(1, result.size());
 
@@ -470,7 +508,7 @@ public class DefaultIndexableReferenceExtractorTest
     @Test
     public void testRestrictedProperty() throws Exception
     {
-        List<EntityReference> result = referenceExtractor.getReferences(passwordProperty12222);
+        List<EntityReference> result = this.defaultReferenceResolver.getReferences(passwordProperty12222);
         Assert.assertNotNull(result);
         Assert.assertEquals(0, result.size());
     }

@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
+import javax.inject.Provider;
+
 import org.junit.Assert;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -61,7 +63,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -163,6 +165,7 @@ public class DocumentSolrMetadataExtractorTest
         // Mock
 
         this.mockContext = mock(XWikiContext.class);
+        
         Execution mockExecution = this.mocker.getInstance(Execution.class);
         ExecutionContext mockExecutionContext = new ExecutionContext();
         mockExecutionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.mockContext);
@@ -174,6 +177,9 @@ public class DocumentSolrMetadataExtractorTest
 
         when(this.mockContext.getWiki()).thenReturn(this.mockXWiki);
         when(this.mockXWiki.getDocument(this.documentReference, this.mockContext)).thenReturn(this.mockDocument);
+
+        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(this.mockContext);
 
         when(this.mockDocument.getTranslatedDocument(org.mockito.Matchers.isNull(Locale.class), eq(this.mockContext)))
             .thenReturn(this.mockDocument);
@@ -322,7 +328,7 @@ public class DocumentSolrMetadataExtractorTest
         DocumentSolrMetadataExtractor extractor = (DocumentSolrMetadataExtractor) this.mocker.getComponentUnderTest();
         try {
             extractor.getSolrDocument(reference);
-        } catch (SolrIndexException ex) {
+        } catch (SolrIndexerException ex) {
             Assert.assertEquals("Failed to get input document for '" + this.documentReferenceFrench + "'",
                 ex.getMessage());
             Assert.assertEquals("Failed to get translated document for '" + this.documentReferenceFrench + "'", ex

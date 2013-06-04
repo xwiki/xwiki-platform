@@ -22,6 +22,7 @@ package org.xwiki.search.solr.internal.metadata;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
@@ -29,7 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObjectReference;
@@ -43,16 +44,17 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 @Component
 @Named("object_property")
+@Singleton
 public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
         ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference(entityReference);
 
         try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+            LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
             BaseObjectReference objectReference = new BaseObjectReference(objectPropertyReference.getParent());
             DocumentReference classReference = objectReference.getXClassReference();
@@ -71,7 +73,7 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexException(
+            throw new SolrIndexerException(
                 String.format("Failed to get Solr document for '%s'", objectPropertyReference), e);
         }
     }
@@ -93,7 +95,7 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Get all the languages in which the document is available.
-        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
+        List<String> documentLanguages = originalDocument.getTranslationList(this.xcontextProvider.get());
         // Make sure that the original document's language is there as well.
         String originalDocumentLanguage = getLanguage(documentReference);
         if (!documentLanguages.contains(originalDocumentLanguage)) {

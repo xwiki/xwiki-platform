@@ -375,7 +375,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             needsUpdate |= updateBaseClass(this.baseClass);
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class document", context);
             }
         } finally {
             this.checkingClass = false;
@@ -460,7 +460,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             }
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class sheet document", context);
             }
         } finally {
             this.checkingClassSheet = false;
@@ -520,7 +520,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             needsUpdate |= updateClassTemplateDocument(doc);
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class template document", context);
             }
         } finally {
             this.checkingClassTemplate = false;

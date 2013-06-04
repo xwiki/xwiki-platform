@@ -91,7 +91,8 @@ public class AllDocsTest extends AbstractTest
         // Create a tree structure.
         String spaceName = getTestMethodName();
         getUtil().createPage(spaceName, "WebHome", null, "Grandparent Page");
-        getUtil().createPageWithAttachment(spaceName, "Parent", null, "Parent Page", null, spaceName + ".WebHome",
+        getUtil().createPage(spaceName, "Parent", null, "Parent Page", null, spaceName + ".WebHome");
+        getUtil().createPageWithAttachment(spaceName, "Child", null, "Child Page", null, spaceName + ".Parent",
             "file.txt", getClass().getResourceAsStream("/file.txt"), TestUtils.SUPER_ADMIN_CREDENTIALS);
 
         EntityTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();

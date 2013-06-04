@@ -981,6 +981,13 @@ public class TestUtils
         }
     }
 
+    public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists,
+        UsernamePasswordCredentials credentials) throws Exception
+    {
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, credentials);
+        attachFile(space, page, name, is, failIfExists);
+    }
+
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists)
         throws Exception
     {

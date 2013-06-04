@@ -404,6 +404,48 @@ public class TestUtils
         return new ViewPage();
     }
 
+    /**
+     * @since 5.1M2
+     */
+    public ViewPage createPageWithAttachment(String space, String page, String content, String title, String syntaxId,
+        String parentFullPageName, String attachmentName, InputStream attachmentData) throws Exception
+    {
+        return createPageWithAttachment(space, page, content, title, syntaxId, parentFullPageName, attachmentName,
+            attachmentData, null);
+    }
+
+    /**
+     * @since 5.1M2
+     */
+    public ViewPage createPageWithAttachment(String space, String page, String content, String title, String syntaxId,
+        String parentFullPageName, String attachmentName, InputStream attachmentData,
+        UsernamePasswordCredentials credentials) throws Exception
+    {
+        ViewPage vp = createPage(space, page, content, title, syntaxId, parentFullPageName);
+        attachFile(space, page, attachmentName, attachmentData, false, credentials);
+        return vp;
+    }
+
+    /**
+     * @since 5.1M2
+     */
+    public ViewPage createPageWithAttachment(String space, String page, String content, String title,
+        String attachmentName, InputStream attachmentData) throws Exception
+    {
+        return createPageWithAttachment(space, page, content, title, null, null, attachmentName, attachmentData);
+    }
+
+    /**
+     * @since 5.1M2
+     */
+    public ViewPage createPageWithAttachment(String space, String page, String content, String title,
+        String attachmentName, InputStream attachmentData, UsernamePasswordCredentials credentials) throws Exception
+    {
+        ViewPage vp = createPage(space, page, content, title);
+        attachFile(space, page, attachmentName, attachmentData, false, credentials);
+        return vp;
+    }
+
     public void deletePage(String space, String page)
     {
         getDriver().get(getURLToDeletePage(space, page));
@@ -979,6 +1021,18 @@ public class TestUtils
         } finally {
             is.close();
         }
+    }
+
+    /**
+     * @since 5.1M2
+     */
+    public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists,
+        UsernamePasswordCredentials credentials) throws Exception
+    {
+        if (credentials != null) {
+            this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, credentials);
+        }
+        attachFile(space, page, name, is, failIfExists);
     }
 
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists)

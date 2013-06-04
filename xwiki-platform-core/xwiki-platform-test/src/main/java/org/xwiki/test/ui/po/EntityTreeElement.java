@@ -226,6 +226,9 @@ public class EntityTreeElement extends BaseElement
     private boolean hasNodeWithHintAndLabel(String hint, String label)
     {
         String format = "//td[starts-with(@class, 'treeCell')]//*[@title = '%s' and . = '%s']";
-        return getDriver().findElements(By.xpath(String.format(format, hint, label))).size() == 1;
+        // Note: make sure to use findElementsWithoutWaiting() to speed up tests. Tests need to call waitFor*() APIs
+        // beforehand to ensure elements are visible in the tree.
+        return getUtil().findElementsWithoutWaiting(getDriver(),
+            By.xpath(String.format(format, hint, label))).size() == 1;
     }
 }

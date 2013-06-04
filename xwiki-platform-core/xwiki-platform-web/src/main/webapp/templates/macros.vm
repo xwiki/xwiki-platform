@@ -2400,3 +2400,34 @@ $string##
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
 #end
+
+#**
+ * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the
+ * current document (i.e. the document the sheet is applied to). If the condition is not specified then it checks if the
+ * current document is a sheet by looking for an object of type 'XWiki.SheetDescriptorClass'. You can pass a traslation
+ * key for the sheet title. This macro makes sure the document title is not displayed recursively.
+ *
+ * @param $title the sheet title, you can pass a translation key
+ * @param $condition optional condition, whether to display the sheet title or the document title
+ *#
+#macro (sheetTitle $title $condition)
+## NOTE: Don't format the code because spaces are preserved in document title.
+#if (!$condition && "$!condition" == '')##
+## Undefined condition. Use the default condition.
+#set ($condition = $doc.getObject('XWiki.SheetDescriptorClass'))
+#end##
+##
+#if ($condition)##
+## Display the sheet title.
+$services.localization.render($title)##
+##
+#elseif (!$sheetTitle_displayingDocumentTitle)##
+## Display the document title without going through the sheet and preventing recursion.
+#set ($sheetTitle_displayingDocumentTitle = true)
+$services.display.title($doc, {'displayerHint': 'default'})##
+#set ($sheetTitle_displayingDocumentTitle = false)
+##
+#else##
+Recursive title display detected!##
+#end##
+#end

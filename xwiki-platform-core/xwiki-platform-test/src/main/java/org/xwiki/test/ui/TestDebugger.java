@@ -114,12 +114,21 @@ public class TestDebugger extends TestWatcher
      */
     private void takeScreenshot(Description description)
     {
+        takeScreenshot(getTestName(description));
+    }
+
+    /**
+     * Captures a screenshot of the browser window.
+     *
+     * @param testName the name of the file in which the screenshot will be taken. A ".png" suffix will be appended
+     */
+    public void takeScreenshot(String testName)
+    {
         if (!(driver instanceof TakesScreenshot)) {
             LOGGER.warn("The WebDriver that is currently used doesn't support taking screenshots.");
             return;
         }
 
-        String testName = getTestName(description);
         try {
             File sourceFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File screenshotFile;

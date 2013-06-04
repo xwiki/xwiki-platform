@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin" >
+    <user name="user" />
+    <allowUser name="user" type="edit" />
+    <space name="Space">
+      <allowUser name="user" type="view" />
+      <document name="Page">
+        <denyUser name="user" type="view" />
+        <denyUser name="user" type="edit" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

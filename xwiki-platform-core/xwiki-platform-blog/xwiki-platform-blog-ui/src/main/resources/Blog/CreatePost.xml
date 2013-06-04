@@ -25,10 +25,15 @@
   <hidden>true</hidden>
   <content>{{include document="Blog.BlogCode"/}}
 
-{{velocity filter="none"}}
+{{velocity}}
 {{html clean="false" wiki="true"}}
 #set($name = "$!request.entryTitle")
 #if($name == '')
+  ## If there's also a form_token passed it means the user has entered an empty blog post title, let the user know about it!
+  #if ("$!request.form_token" != '')
+    {{error}}$services.localization.render('xe.blog.post.titleEmptyError'){{/error}}
+
+  #end
   ## First step, display the create form
   #if($hasEdit)
   $xwiki.jsx.use($blogScriptsDocumentName)##
@@ -36,7 +41,7 @@
   #if($space == '')
     #set($space = $doc.space)
   #end
-  &lt;form action="${xwiki.getURL('Blog.CreatePost', 'view', 'xpage=plain')}" id="newBlogPost" method="post" class="xformInline"&gt;
+  &lt;form action='' id="newBlogPost" method="post" class="xformInline"&gt;
   &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="entrySpace" value="$!{escapetool.xml($space)}"/&gt;

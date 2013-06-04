@@ -296,7 +296,6 @@ span.wikicreatelink a:after {
 /* ---------------------Lists----------------------------*/
 .main ol, .main ul {
   line-height: 1.4em;
-  list-style-position: inside;
   margin: 1em 0 1em 2em;
 }
 .main ol *, .main ul * {

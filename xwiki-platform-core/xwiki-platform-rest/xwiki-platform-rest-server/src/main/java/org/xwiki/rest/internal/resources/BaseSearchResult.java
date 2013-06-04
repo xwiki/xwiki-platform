@@ -211,14 +211,8 @@ public class BaseSearchResult extends XWikiResource
                 }
             }
 
-            /* Add some filters if the user doesn't have programming rights. */
-            if (hasProgrammingRights) {
-                f.format(") order by %s", orderClause);
-            } else {
-                f.format(
-                        ") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by %s",
-                        orderClause);
-            }
+            // Add ordering
+            f.format(") order by %s", orderClause);
 
             String query = f.toString();
 
@@ -226,15 +220,20 @@ public class BaseSearchResult extends XWikiResource
 
             /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
             if (space != null) {
-                queryResult =
-                        queryManager.createQuery(query, Query.XWQL)
-                                .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
-                                .bindValue("space", space).setLimit(number).setOffset(start).execute();
+                queryResult = this.queryManager.createQuery(query, Query.XWQL)
+                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                    .bindValue("space", space)
+                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager))
+                    .setOffset(start)
+                    .setLimit(number)
+                    .execute();
             } else {
-                queryResult =
-                        queryManager.createQuery(query, Query.XWQL)
-                                .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
-                                .setOffset(start).execute();
+                queryResult = this.queryManager.createQuery(query, Query.XWQL)
+                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager))
+                    .setOffset(start)
+                    .setLimit(number)
+                    .execute();
             }
 
             for (Object object : queryResult) {

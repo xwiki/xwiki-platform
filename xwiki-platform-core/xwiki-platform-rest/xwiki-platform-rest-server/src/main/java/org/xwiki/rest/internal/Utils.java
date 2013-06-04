@@ -26,11 +26,14 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.QueryFilter;
+import org.xwiki.query.internal.NoOpQueryFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -279,5 +282,21 @@ public class Utils
             }
         }
         return UriBuilder.fromUri(baseURI).path(resourceClass).buildFromEncoded(encodedPathElements);
+    }
+
+    /**
+     * @param componentManager the component manager to be used to retrieve the hidden query filter
+     * @return the hidden query filter or a NoOp filter if the hidden filter isn't found
+     */
+    public static QueryFilter getHiddenQueryFilter(ComponentManager componentManager)
+    {
+        QueryFilter filter;
+        try {
+            filter = componentManager.getInstance(QueryFilter.class, "hidden");
+        } catch (ComponentLookupException e) {
+            // They hidden filter is not available at runtime, don't use it
+            filter = new NoOpQueryFilter();
+        }
+        return filter;
     }
 }

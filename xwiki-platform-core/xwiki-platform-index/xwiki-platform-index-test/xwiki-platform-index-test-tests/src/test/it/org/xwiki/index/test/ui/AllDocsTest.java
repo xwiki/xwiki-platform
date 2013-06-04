@@ -86,17 +86,13 @@ public class AllDocsTest extends AbstractTest
      * Validate the tree view.
      */
     @Test
-    public void treeViewTab()
+    public void treeViewTab() throws Exception
     {
         // Create a tree structure.
         String spaceName = getTestMethodName();
         getUtil().createPage(spaceName, "WebHome", null, "Grandparent Page");
-        getUtil().createPage(spaceName, "Parent", null, "Parent Page", null, spaceName + ".WebHome");
-        AttachmentsPane attachmentsPane =
-            getUtil().createPage(spaceName, "Child", null, "Child Page", null, spaceName + ".Parent")
-                .openAttachmentsDocExtraPane();
-        attachmentsPane.setFileToUpload(getClass().getResource("/file.txt").getPath());
-        attachmentsPane.waitForUploadToFinish("file.txt");
+        getUtil().createPageWithAttachment(spaceName, "Parent", null, "Parent Page", null, spaceName + ".WebHome",
+            "file.txt", getClass().getResourceAsStream("/file.txt"), TestUtils.SUPER_ADMIN_CREDENTIALS);
 
         EntityTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
 
@@ -166,12 +162,10 @@ public class AllDocsTest extends AbstractTest
     {
         // Create 2 pages with attachments so that this test filter returns only one.
         // Note that we need to be logged in.
-        getUtil().createPage(getTestClassName(), "Page", "content1", "title1");
-        getUtil().attachFile(getTestClassName(), "Page", "attachment1.txt",
-            new ByteArrayInputStream("attachment content1".getBytes()), false, TestUtils.SUPER_ADMIN_CREDENTIALS);
-        getUtil().createPage(getTestClassName(), "OtherPage", "content2", "title2");
-        getUtil().attachFile(getTestClassName(), "OtherPage", "attachment2.txt",
-            new ByteArrayInputStream("attachment content2".getBytes()), false, TestUtils.SUPER_ADMIN_CREDENTIALS);
+        getUtil().createPageWithAttachment(getTestClassName(), "Page", null, null, "attachment1.txt",
+            new ByteArrayInputStream("attachment content1".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+        getUtil().createPageWithAttachment(getTestClassName(), "OtherPage", null, null, "attachment2.txt",
+            new ByteArrayInputStream("attachment content2".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
 
         AllDocsPage docsPage = AllDocsPage.gotoPage();
         LiveTableElement liveTable = docsPage.clickAttachmentsTab();

@@ -46,6 +46,7 @@ import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -216,7 +217,8 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * 
      * @param html the HTML text to parse
      * @param targetDocumentReference specifies the document where the presentation will be imported; we use the target
-     *            document reference to get the syntax of the target document;
+     *            document reference to get the syntax of the target document and to set the {@code BASE} meta data on
+     *            the created XDOM
      * @return a XDOM tree
      * @throws OfficeImporterException if parsing the given HTML fails
      */
@@ -231,7 +233,10 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", galleryParameters, renderer, false);
             gallery.addChild(this.xhtmlParser.parse(new StringReader(html)));
 
-            return new XDOM(Collections.singletonList((Block) gallery));
+            XDOM xdom = new XDOM(Collections.singletonList((Block) gallery));
+            // Make sure (image) references are resolved relative to the target document reference.
+            xdom.getMetaData().addMetaData(MetaData.BASE, entityReferenceSerializer.serialize(targetDocumentReference));
+            return xdom;
         } catch (Exception e) {
             throw new OfficeImporterException("Failed to build presentation XDOM.", e);
         }

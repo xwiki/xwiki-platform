@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -31,10 +33,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.OfficeDocument;
+import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.xwiki.rendering.listener.MetaData;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentBuilder}.
@@ -98,9 +99,9 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
             }
         });
 
-        OfficeDocument document =
+        XDOMOfficeDocument document =
             xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
-        assertNotNull(document.getContentDocument());
+        assertEquals("xwiki:Main.Test", document.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
         assertEquals("**Hello There**", document.getContentAsString());
         assertEquals(0, document.getArtifacts().size());
     }

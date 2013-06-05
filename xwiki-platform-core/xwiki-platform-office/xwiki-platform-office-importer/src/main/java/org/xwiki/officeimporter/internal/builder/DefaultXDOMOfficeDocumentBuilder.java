@@ -30,12 +30,14 @@ import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.xml.html.HTMLUtils;
@@ -69,11 +71,22 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * Used to serialize the target document reference.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @Override
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        return build(this.xhtmlOfficeDocumentBuilder.build(officeFileStream, officeFileName, reference, filterStyles));
+        XDOMOfficeDocument xdomOfficeDocument =
+            build(this.xhtmlOfficeDocumentBuilder.build(officeFileStream, officeFileName, reference, filterStyles));
+        // Make sure references are resolved relative to the target document reference.
+        xdomOfficeDocument.getContentDocument().getMetaData()
+            .addMetaData(MetaData.BASE, entityReferenceSerializer.serialize(reference));
+        return xdomOfficeDocument;
     }
 
     @Override

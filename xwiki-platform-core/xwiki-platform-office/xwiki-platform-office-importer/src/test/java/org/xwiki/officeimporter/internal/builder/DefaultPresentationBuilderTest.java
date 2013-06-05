@@ -27,24 +27,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
-import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -97,7 +94,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
      * Tests {@link DefaultPresentationBuilder#importPresentation(InputStream, String)}.
      */
     @Test
-    public void testImportPresentation()
+    public void testImportPresentation() throws Exception
     {
         InputStream officeFileStream = new ByteArrayInputStream(new byte[1024]);
         final Map<String, InputStream> input = Collections.singletonMap(INPUT_FILE_NAME, officeFileStream);
@@ -110,20 +107,12 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
                 oneOf(mockOfficeServer).getConverter();
                 will(returnValue(mockDocumentConverter));
 
-                try {
-                    oneOf(mockDocumentConverter).convert(input, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
-                    will(returnValue(output));
-                } catch (OfficeConverterException e) {
-                    Assert.fail(e.getMessage());
-                }
+                oneOf(mockDocumentConverter).convert(input, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
+                will(returnValue(output));
             }
         });
 
-        try {
-            Assert.assertEquals(output, presentationBuilder.importPresentation(officeFileStream, INPUT_FILE_NAME));
-        } catch (OfficeImporterException e) {
-            Assert.fail(e.getMessage());
-        }
+        Assert.assertEquals(output, presentationBuilder.importPresentation(officeFileStream, INPUT_FILE_NAME));
     }
 
     /**
@@ -183,7 +172,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
      * Tests {@link DefaultPresentationBuilder#buildPresentationXDOM(String, DocumentReference)}.
      */
     @Test
-    public void testBuildPresentationXDOM()
+    public void testBuildPresentationXDOM() throws Exception
     {
         final DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
         final DocumentModelBridge mockDocumentModelBridge = getMockery().mock(DocumentModelBridge.class);
@@ -191,32 +180,22 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         getMockery().checking(new Expectations()
         {
             {
-                try {
-                    oneOf(mockDocumentAccessBridge).getDocument(reference);
-                    will(returnValue(mockDocumentModelBridge));
-                } catch (Exception e) {
-                    Assert.fail(e.getMessage());
-                }
+                oneOf(mockDocumentAccessBridge).getDocument(reference);
+                will(returnValue(mockDocumentModelBridge));
 
                 oneOf(mockDocumentModelBridge).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
 
-                try {
-                    oneOf(mockXHTMLParser).parse(with(aNonNull(StringReader.class)));
-                    will(returnValue(galleryContent));
-                } catch (ParseException e) {
-                    Assert.fail(e.getMessage());
-                }
+                oneOf(mockXHTMLParser).parse(with(aNonNull(StringReader.class)));
+                will(returnValue(galleryContent));
+
+                oneOf(mockDefaultStringEntityReferenceSerializer).serialize(reference);
+                will(returnValue("foo"));
             }
         });
 
-        XDOM xdom = null;
-        try {
-            xdom = presentationBuilder.buildPresentationXDOM("some HTML", reference);
-        } catch (OfficeImporterException e) {
-            Assert.fail(e.getMessage());
-        }
-        Assert.assertNotNull(xdom);
+        XDOM xdom = presentationBuilder.buildPresentationXDOM("some HTML", reference);
+        Assert.assertEquals("foo", xdom.getMetaData().getMetaData(MetaData.BASE));
 
         List<ExpandedMacroBlock> macros =
             xdom.getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.CHILD);

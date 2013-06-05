@@ -21,7 +21,7 @@ package org.xwiki.security.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Formatter;
+import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -64,10 +64,17 @@ public class DefaultUserBridge implements UserBridge
     }
 
     @Override
-    public Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user) throws AuthorizationException
+    public Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user, WikiReference wikiReference)
+        throws AuthorizationException
     {
-        Collection<DocumentReference> groupRefs = getGroupsReferencesFor(user.getOriginalReference().getWikiReference(),
-            user.getOriginalReference());
+        DocumentReference userRef = user.getOriginalReference();
+
+        if (userRef == null) {
+            // Public users (not logged in) may not appears in any group
+            return Collections.emptyList();
+        }
+
+        Collection<DocumentReference> groupRefs = getGroupsReferencesFor(wikiReference, userRef);
 
         Collection<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>(groupRefs.size());
         for (DocumentReference groupRef : groupRefs) {
@@ -100,11 +107,8 @@ public class DefaultUserBridge implements UserBridge
             xwikiContext.setDatabase(wiki.getName());
             return groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference, 0, 0, xwikiContext);
         } catch (Exception e) {
-            throw new AuthorizationException(new Formatter()
-                                             .format("Failed to get groups for user or group [%s] in wiki [%s]",
-                                                     userOrGroupDocumentReference,
-                                                     wiki)
-                                             .toString(), e);
+            throw new AuthorizationException(String.format("Failed to get groups for user or group [%s] in wiki [%s]",
+                userOrGroupDocumentReference, wiki), e);
         } finally {
             xwikiContext.setDatabase(currentWiki);
         }

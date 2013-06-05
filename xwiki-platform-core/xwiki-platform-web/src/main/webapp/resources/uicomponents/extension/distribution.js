@@ -1,16 +1,16 @@
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 /**
- * Enhances the distribution step where the main UI is installed, upgraded or downgraded.
+ * Enhances the distribution step where the default UI is installed, upgraded or downgraded.
  */
-XWiki.MainUIStep = Class.create({
+XWiki.DefaultUIStep = Class.create({
   initialize : function () {
     document.observe('xwiki:extension:statusChanged', this._onExtensionStatusChanged.bindAsEventListener(this));
     this._maybeEnhancePreviousUiForm();
   },
 
   /**
-   * Reacts to the actions taken on the extensions displayed on the main UI step.
+   * Reacts to the actions taken on the extensions displayed on the default UI step.
    */
   _onExtensionStatusChanged : function(event) {
     var stepButtons = $('stepButtons') && $('stepButtons').select('button');
@@ -25,7 +25,7 @@ XWiki.MainUIStep = Class.create({
       stepButtons.invoke('enable');
       if (extension.getId() == '$services.distribution.getUIExtensionId().id'
           && extension.getVersion() == '$services.distribution.getUIExtensionId().version.value') {
-        this._onMainUiExtensionStatusChanged(stepButtons, status);
+        this._onDefaultUiExtensionStatusChanged(stepButtons, status);
       } else if (this._previousUiExtensionId && extension.getId() == this._previousUiExtensionId.id
           && extension.getVersion() == this._previousUiExtensionId.version) {
         this._onPreviousUiExtensionStatusChanged(status);
@@ -34,9 +34,9 @@ XWiki.MainUIStep = Class.create({
   },
 
   /**
-   * Enables the continue button after the main UI extension is installed.
+   * Enables the continue button after the default UI extension is installed.
    */
-  _onMainUiExtensionStatusChanged : function(stepButtons, status) {
+  _onDefaultUiExtensionStatusChanged : function(stepButtons, status) {
     if (status == 'installed') {
       // Show the Continue button.
       stepButtons[0].up().removeClassName('hidden');
@@ -71,9 +71,10 @@ XWiki.MainUIStep = Class.create({
     question.down('.button.secondary').observe('click', hidePreviousUiForm);
     // Hide the form.
     form.hide()
-    // Hide the recommended UI.
+    // Hide the recommended UI (everything up to the step buttons).
+    var stop = $('stepButtons').up('form');
     var next = form.next();
-    while (next && next.tagName.toLowerCase() != 'form') {
+    while (next && next != stop) {
       next = next.hide().next();
     }
   },
@@ -84,8 +85,8 @@ XWiki.MainUIStep = Class.create({
       type: 'image',
       'class': 'icon',
       src: '$xwiki.getSkinFile("icons/silk/pencil.png")',
-      alt: '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint"))',
-      title: '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint"))'
+      alt: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))",
+      title: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))"
     });
     var idInput = $('previousUiId');
     var versionInput = $('previousUiVersion');
@@ -112,15 +113,33 @@ XWiki.MainUIStep = Class.create({
     // Auto-complete the id based on the selected version.
     if (versionList.selectedIndex == 0) {
       var id = '';
-    } else if (versionList.selectedIndex < 27) {
-      // 4.2M2 -> 3.3-milestone-1
-      var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
-    } else if (versionList.selectedIndex < 53) {
-      // 3.2.1 -> 2.6-rc-1
-      var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
+    } else if (versionList.length == 102) {
+      // XWiki Manager versions
+      if (versionList.selectedIndex < 27) {
+        // 4.2M2 -> 3.3-milestone-1
+        var id = 'org.xwiki.manager:xwiki-manager-ui';
+      } else if (versionList.selectedIndex < 38) {
+        // 3.2.1 -> 3.1-milestone-1
+        var id = 'org.xwiki.manager:xwiki-manager-wiki-administrator';
+      } else if (versionList.selectedIndex < 46) {
+        // 3.0.1 -> 2.6
+        var id = 'org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator';
+      } else {
+        // 2.5.2 -> 1.0-milestone-1
+        var id = 'com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator';
+      }
     } else {
-      // 2.5.2 -> 1.1-milestone-3
-      var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
+      // XWiki Enterprise versions
+      if (versionList.selectedIndex < 27) {
+        // 4.2M2 -> 3.3-milestone-1
+        var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
+      } else if (versionList.selectedIndex < 53) {
+        // 3.2.1 -> 2.6-rc-1
+        var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
+      } else {
+        // 2.5.2 -> 1.1-milestone-3
+        var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
+      }
     }
     // Update the value of the hidden input.
     idInput.value = id;
@@ -143,10 +162,7 @@ XWiki.MainUIStep = Class.create({
     event && event.stop();
     var form = $('previousUi');
     form.hide().previous().hide();
-    var next = form.next();
-    while (next && next.tagName.toLowerCase() != 'form') {
-      next = next.show().next();
-    }
+    for (var next = form.next(); next; next = next.show().next());
   },
 
   _resolvePreviousUiExtension : function(event) {
@@ -156,7 +172,8 @@ XWiki.MainUIStep = Class.create({
     new Ajax.Request(form.action, {
       parameters: {
         extensionId: formData.previousUiId,
-        extensionVersion: formData.previousUiVersion
+        extensionVersion: formData.previousUiVersion,
+        hideExtensionDetails: true
       },
       onCreate: function() {
         form.disable();
@@ -168,7 +185,7 @@ XWiki.MainUIStep = Class.create({
         var container = new Element('div').update(response.responseText);
         var previousUiExtension = container.down('.extension-item');
         if (previousUiExtension) {
-          if (previousUiExtension.down('input[name="actionInstall"]')) {
+          if (previousUiExtension.down('button[name="extensionAction"][value="install"]')) {
             // The specified previous UI is not installed. We have to update the extension index.
             this._previousUiExtensionId = {
               id: formData.previousUiId,
@@ -189,36 +206,29 @@ XWiki.MainUIStep = Class.create({
       },
       onFailure: function() {
         form.enable();
-        new XWiki.widgets.Notification('$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRequestFailed"))', 'error');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
       }
     });
   },
 
   _displayPreviousUiExtension : function(previousUiExtension) {
     var form = $('previousUi');
-    var hint = new Element('div', {'class': 'xHint'}).update('$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIHint"))'.escapeHTML());
+    var hint = new Element('div', {'class': 'xHint'}).update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIHint'))".escapeHTML());
     var container = new Element('div').insert(hint).insert(previousUiExtension);
     form.hide().insert({after: container});
     // Enhance the extension display.
     document.fire('xwiki:dom:updated', {elements: [container]});
     // Hack the install button to perform a fake install (only mark the extension as installed).
-    var installButton = previousUiExtension.down('input[name="actionInstall"]');
-    installButton.value = '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairLabel"))';
-    installButton.title = '$escapetool.javascript($msg.get("platform.extension.distributionWizard.uiStepPreviousUIRepairHint"))';
-    installButton.name = 'actionRepairXAR';
+    var installButton = previousUiExtension.down('button[name="extensionAction"][value="install"]');
+    installButton.update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairLabel'))".escapeHTML());
+    installButton.title = "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairHint'))";
+    installButton.value = 'repairXAR';
     installButton.activate();
-    // Add the form token (for CSRF protection) and the confirm hidden input (to execute the job without confirmation,
-    // since the repair job doesn't have a plan job).
-    var fieldSet = installButton.up('fieldset');
-    fieldSet.insert({top: new Element('input', {
+    // Add the form token (for CSRF protection) to execute the job without confirmation (without a job plan).
+    installButton.insert({after: new Element('input', {
       type: 'hidden',
       name: 'form_token',
       value: document.head.down('meta[name="form_token"]').readAttribute('content')
-    })});
-    fieldSet.insert({top: new Element('input', {
-      type: 'hidden',
-      name: 'confirm',
-      value: '1'
     })});
   },
 
@@ -227,11 +237,11 @@ XWiki.MainUIStep = Class.create({
       var form = $('previousUi');
       // Remove the previous UI extension display.
       form.next().remove();
-      // Display the recommended UI extension.
-      var next = form.next();
-      while (next && next.tagName.toLowerCase() != 'form') {
-        next = next.show().next();
-      }
+      // Display the default UI extension.
+      for (var next = form.next(); next; next = next.show().next());
+      // Refresh the display of the default UI extension so that we get the upgrade button.
+      var defaultUiExtension = form.next('.xform').previous().down('.extension-item');
+      defaultUiExtension && defaultUiExtension._extensionBehaviour.refresh({hideExtensionDetails: true});
     }
   }
 });
@@ -244,65 +254,28 @@ XWiki.OutdatedExtensionsStep = Class.create({
     this.container = $('distributionWizard');
     // Listen to extension status change to be able to update the step buttons.
     document.observe('xwiki:extension:statusChanged', this._updateStepButtons.bind(this));
-    // Refresh the upgrade plan job status.
-    this._maybeScheduleRefresh(false);
-  },
-
-  _maybeScheduleRefresh : function(afterUpdate, timeout) {
-    if (this.container.down('.xdialog-content > .ui-progress')) {
-      // Disable the step buttons while the upgrade plan is being created.
-      $('stepButtons').up().disable();
-      this._refresh.bind(this).delay(timeout || 1);
-    } else if (afterUpdate) {
-      // Enhance the behaviour of the extensions.
-      this.container.select('.extension-item').each(function(extension) {
-        new XWiki.ExtensionBehaviour(extension);
-      });
-      this._updateStepButtons();
-    }
-  },
-
-  _refresh : function() {
-    new Ajax.Request('', {
-      onSuccess: function(response) {
-        this._update(response.responseText);
-      }.bind(this),
-      onFailure : this._maybeScheduleRefresh.bind(this, false, 10)
-    });
-  },
-
-  _update : function(html) {
-    var content = this.container.down('.xdialog-content');
-    var progressBar = content.childElements().find(function(child) {
-      return child.hasClassName('ui-progress');
-    })
-    if (progressBar) {
-      // Remove the loading message.
-      progressBar.previous().remove();
-      // Insert the HTML response before the progress bar.
-      progressBar.insert({before: html});
-      // Remove the old upgrade log and the old progress bar.
-      progressBar.next().remove();
-      progressBar.remove();
-      // Enhance the inserted HTML content.
-      document.fire('xwiki:dom:updated', {elements: [content]});
-      this._maybeScheduleRefresh(true);
-    }
+    // Listen to DOM changes to catch when the list of extensions is reloaded.
+    document.observe('xwiki:dom:updated', function(event) {
+      event.memo.elements.each(function(element) {
+        element.id == 'extensionUpdater' && this._updateStepButtons();
+      }.bind(this));
+    }.bindAsEventListener(this));
   },
 
   _updateStepButtons : function() {
     var stepButtons = $('stepButtons');
     if (!stepButtons) return;
     stepButtons = stepButtons.select('button');
+    var checkForUpdatesLink = this.container.down('.checkForUpdates');
     // Disable the step buttons if there is any extension loading.
-    if (this.container.select('.extension-item-loading').size() > 0) {
+    if (this.container.down('.extension-item-loading') || this.container.down('.extension-log-item-loading')) {
       // Disable all step buttons.
       stepButtons.invoke('disable');
-      $('prepareUpgradeLink') && $('prepareUpgradeLink').up().hide();
+      checkForUpdatesLink && checkForUpdatesLink.up().hide();
     } else {
       // Enable all step buttons.
       stepButtons.invoke('enable');
-      $('prepareUpgradeLink') && $('prepareUpgradeLink').up().show();
+      checkForUpdatesLink && checkForUpdatesLink.up().show();
       // Show the Continue button if all the invalid extensions have been fixed.
       if (this._noInvalidExtensions()) {
         // Show the Continue button.
@@ -319,20 +292,21 @@ XWiki.OutdatedExtensionsStep = Class.create({
   },
 
   _noInvalidExtensions : function() {
-    var invalidExtensionsWrapper = $('invalidExtensions');
-    if (!invalidExtensionsWrapper) {
-      return true;
-    } else {
+    var invalidExtensionsCount = 0;
+    var invalidExtensionsFixedCount = 0;
+    this.container.select('.invalidExtensions').each(function(invalidExtensionsWrapper) {
       var invalidExtensions = invalidExtensionsWrapper.childElements();
-      return invalidExtensions.size() == invalidExtensions.filter(function(extension) {
+      invalidExtensionsCount += invalidExtensions.size();
+      invalidExtensionsFixedCount += invalidExtensions.filter(function(extension) {
         return extension.hasClassName('extension-item-installed');
       }).size();
-    }
+    });
+    return invalidExtensionsFixedCount == invalidExtensionsCount;
   }
 });
 
 function init() {
-  $('extension.mainui') && new XWiki.MainUIStep();
+  $('extension.defaultui') && new XWiki.DefaultUIStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();
   return true;
 }

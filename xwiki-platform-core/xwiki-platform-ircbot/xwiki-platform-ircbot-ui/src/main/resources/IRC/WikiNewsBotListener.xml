@@ -195,24 +195,16 @@ List getLastModifications(String sql, int nbModifications, XWiki xwiki, XWikiCon
 {
   def documentlist = [];
 
-  if (xwiki.isVirtualMode()) {
-    def names = wikiNames
-    if (names == null || names.size() == 0) {
-      def mainWiki = services.model.resolveDocument('', 'default').wikiReference.name
-      names = xwiki.getVirtualWikisDatabaseNames(context)
-      if (!names.contains(mainWiki)) {
-        names.add(mainWiki)
-      }
+  def names = wikiNames
+  if (names == null || names.size() == 0) {
+    names = xwiki.getVirtualWikisDatabaseNames(context)
+  }
+
+  for (wikiname in names) {
+    addModifications(documentlist, wikiname, sql, nbModifications, xwiki, context)
+    if (documentlist.size() &gt; nbModifications)  {
+      documentlist = documentlist.subList(0, nbModifications)
     }
-  
-    for (wikiname in names) {
-      addModifications(documentlist, wikiname, sql, nbModifications, xwiki, context)
-      if (documentlist.size() &gt; nbModifications)  {
-        documentlist = documentlist.subList(0, nbModifications)
-      }
-    }
-  } else {
-    addModifications(documentlist, null, sql, nbModifications, xwiki, context)
   }
 
   return documentlist;

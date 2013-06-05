@@ -119,7 +119,7 @@
  * Macros also depend on other macros but only other macros which are contained in this script.
  *###
 #if($doc.getName() == 'InvitationMembersCommon')
-  {{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}
+  {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##
 #*
@@ -141,21 +141,21 @@
  *###
 #macro(displayMessageTable, $messages, $fieldsToDisplay, $asAdmin, $numberOfRecipientsByMessage)
   #if(!$messages || $messages.size() &lt; 1)
-    {{info}}$msg.get('xe.invitation.displayMessageTable.noMessages'){{/info}}
+    {{info}}$services.localization.render('xe.invitation.displayMessageTable.noMessages'){{/info}}
   #else
 
     (%class="message-table"%)(((
      #foreach($field in $fieldsToDisplay)
        #if($field == '_history')
-         |=(%class="history"%)$msg.get("xe.invitation.displayMessageTable.history")##
+         |=(%class="history"%)$services.localization.render('xe.invitation.displayMessageTable.history')##
        #elseif($field == '_checkbox')
          |=(%class="checkbox"%)##
        #elseif($field == 'recipient' || $field == 'sentDate')
        ## We need to prevent tables from overflowing
        ## unfortunately it makes displayMessageTable aware of the properties of a message.
-         |=(%class="$field"%)$msg.get("xe.invitation.displayMessageTable.$field")##
+         |=(%class="$field"%)$services.localization.render("xe.invitation.displayMessageTable.${field}")##
        #else
-         |=$msg.get("xe.invitation.displayMessageTable.$field")##
+         |=$services.localization.render("xe.invitation.displayMessageTable.${field}")##
        #end
      #end
 
@@ -174,14 +174,14 @@
                  &amp;&amp; $numberOfRecipientsByMessage
                  &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient'))
                  &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient')) &gt; 1)
-           |$msg.get('xe.invitation.displayMessageTable.various')
+           |$services.localization.render('xe.invitation.displayMessageTable.various')
          #elseif($field == 'status')
            |#messageStatusForCode($message.getProperty('status').getValue())##
          #elseif($field == 'recipient'
                  &amp;&amp; $numberOfRecipientsByMessage
                  &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient'))
                  &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient')) &gt; 1)
-           |$msg.get('xe.invitation.displayMessageTable.multipleRecipients',
+           |$services.localization.render('xe.invitation.displayMessageTable.multipleRecipients',
                      [$numberOfRecipientsByMessage.get($message.get('recipient'))])
          #elseif($field == '_checkbox')
            |&lt;input type="checkbox" name="messageID" value="$message.getProperty('messageID').getValue()" ##
@@ -191,7 +191,7 @@
            #end
            /&gt;##
          #elseif($field == '_history')
-           |[[$msg.get('xe.invitation.displayMessageTable.history')&gt;&gt;##
+           |[[$services.localization.render('xe.invitation.displayMessageTable.history')&gt;&gt;##
               $doc.getFullName()?inspect=history##
               ## If we are looking as an admin then go to historyAsAdmin
               #if($asAdmin)
@@ -228,19 +228,19 @@
 
 
    ## User Tools
-   = $msg.get('xe.invitation.tools.heading') =
+   = $services.localization.render('xe.invitation.tools.heading') =
    ## Invite friends.
    #if($doc.getFullName() != $config.get('mainPage') || $parameterMap.size() &gt; 0)
-     * [[$msg.get('xe.invitation.tools.senderLink')&gt;&gt;$config.get('mainPage')]]
+     * [[$services.localization.render('xe.invitation.tools.senderLink')&gt;&gt;$config.get('mainPage')]]
    #else
-     * **$msg.get('xe.invitation.tools.senderLink')**
+     * **$services.localization.render('xe.invitation.tools.senderLink')**
    #end
    ## My invitations
    #if($inspect != 'all')
-     * [[$msg.get('xe.invitation.tools.myInvitationsLink')&gt;&gt;$config.get('membersActionsPage')?inspect=all]] ##
+     * [[$services.localization.render('xe.invitation.tools.myInvitationsLink')&gt;&gt;$config.get('membersActionsPage')?inspect=all]] ##
      #if($inspect == 'group')
 
-       ** **$msg.get('xe.invitation.tools.invitationsInGroup')**
+       ** **$services.localization.render('xe.invitation.tools.invitationsInGroup')**
      #else
        #set($messagesByMe = [])
        #getMessagesBySender($mail.values(), $xcontext.getUser(), $messagesByMe)
@@ -252,33 +252,33 @@
        ## If viewing message history then show history brelow group.
        #if($inspect == 'history')
 
-         ** [[$msg.get('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
+         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
                inspect=group&amp;messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]
-         *** **$msg.get('xe.invitation.tools.invitationHistory')**##
+         *** **$services.localization.render('xe.invitation.tools.invitationHistory')**##
        #end
 
      #end
    #else
-     * **$msg.get('xe.invitation.tools.myInvitationsLink')**
+     * **$services.localization.render('xe.invitation.tools.myInvitationsLink')**
    #end
    #if($isAdmin)
      ## Administrative Tools
 
 
-     = $msg.get('xe.invitation.adminTools.heading') =
+     = $services.localization.render('xe.invitation.adminTools.heading') =
      ##
      ## Warn the user if guests are unable to be invited.
      #if("#canGuestAcceptInvitation($xwiki.getDocument($config.get('guestsActionsPage')))" != 'true')
-       {{error}}$msg.get('xe.invitation.guestsCanNotJoin', [$config.get('guestsActionsPage')]){{/error}}
+       {{error}}$services.localization.render('xe.invitation.guestsCanNotJoin', [$config.get('guestsActionsPage')]){{/error}}
 
      #end
      ## Click here to configure the friend inviter
      * {{html}}&lt;a href="$xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'admin=globaladmin&amp;section=Invitation')"&gt;##
-         $msg.get('xe.invitation.adminTools.configureLink')##
+         $services.localization.render('xe.invitation.adminTools.configureLink')##
        &lt;/a&gt;{{/html}}
      ## View all invitations
      #if($inspect != 'allAsAdmin')
-       * [[$msg.get('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;##
+       * [[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;##
          $config.get('membersActionsPage')?inspect=allAsAdmin]] ##
        #set($spamReports = [])
        #getMessagesByStatus($mail.values(), 'reported', $spamReports)
@@ -287,15 +287,15 @@
        #end
 
        #if($inspect == 'groupAsAdmin')
-         ** **$msg.get('xe.invitation.tools.invitationsInGroup')**
+         ** **$services.localization.render('xe.invitation.tools.invitationsInGroup')**
        #elseif($inspect == 'historyAsAdmin')
-         ** [[$msg.get('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
+         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
                inspect=groupAsAdmin&amp;messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]
-         *** **$msg.get('xe.invitation.tools.invitationHistory')**
+         *** **$services.localization.render('xe.invitation.tools.invitationHistory')**
        #end
      #else
        ## Inspect all as admin is selected.
-       * **$msg.get('xe.invitation.adminTools.allInvitationsLink')**
+       * **$services.localization.render('xe.invitation.adminTools.allInvitationsLink')**
      #end
    #end
   )))
@@ -354,30 +354,30 @@
   ##
   #if($doc.getFullName() == $config.get('mainPage'))
     ## Invitation
-    #set($discard = $trail.add($msg.get('xe.invitation.heading')))
+    #set($discard = $trail.add($services.localization.render('xe.invitation.heading')))
   #else
-    #set($discard = $trail.add("[[$msg.get('xe.invitation.heading')&gt;&gt;$config.get('mainPage')]]"))
+    #set($discard = $trail.add("[[$services.localization.render('xe.invitation.heading')&gt;&gt;$config.get('mainPage')]]"))
     #if($doc.getFullName() == $config.get('membersActionsPage'))
       ##
       ## Administration
       #if($inspect.contains('AsAdmin'))
         #if($inspect == 'allAsAdmin')
           ## [[Invitation]]  --&gt;  All invitations
-          #set($discard = $trail.add($msg.get('xe.invitation.adminTools.allInvitationsLink')))
+          #set($discard = $trail.add($services.localization.render('xe.invitation.adminTools.allInvitationsLink')))
         #else
-          #set($allAsAdminLink = "[[$msg.get('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;"
+          #set($allAsAdminLink = "[[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;"
                                  + "$config.get('membersActionsPage')?inspect=allAsAdmin]]")
           #set($discard = $trail.add($allAsAdminLink))
           #if($inspect == 'groupAsAdmin')
             ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  Invitations in group
-            #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationsInGroup')))
+            #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationsInGroup')))
           #elseif($inspect == 'historyAsAdmin')
             ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  [[Invitations in group]]  --&gt;  History of this invitation
-            #set($allInGroupAsAdminLink = "[[$msg.get('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
+            #set($allInGroupAsAdminLink = "[[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
                                           + "$config.get('membersActionsPage')?inspect=groupAsAdmin&amp;"
                                           + "messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]")
             #set($discard = $trail.add($allInGroupAsAdminLink))
-            #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationHistory')))
+            #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationHistory')))
           #end
         #end
       ##
@@ -385,20 +385,20 @@
       #else
         #if($inspect == 'all')
           ## [[Invitation]] --&gt; My Invitations
-          #set($discard = $trail.add($msg.get('xe.invitation.tools.myInvitationsLink')))
+          #set($discard = $trail.add($services.localization.render('xe.invitation.tools.myInvitationsLink')))
         #else
-          #set($myInvitationsLink = "[[$msg.get('xe.invitation.tools.myInvitationsLink')&gt;&gt;"
+          #set($myInvitationsLink = "[[$services.localization.render('xe.invitation.tools.myInvitationsLink')&gt;&gt;"
                                     + "$config.get('membersActionsPage')?inspect=all]]")
           #set($discard = $trail.add($myInvitationsLink))
           #if($inspect == 'group')
-            #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationsInGroup')))
+            #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationsInGroup')))
           #else
-            #set($myInvitationsinGroupLink = "[[$msg.get('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
+            #set($myInvitationsinGroupLink = "[[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
                                              + "$config.get('membersActionsPage')?inspect=group&amp;amp;messageID="
                                              + "$escapetool.xml($parameterMap.get('messageID').get(0))]]")
             #set($discard = $trail.add($myInvitationsinGroupLink))
             #if($inspect == 'history')
-              #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationHistory')))
+              #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationHistory')))
             #end
           #end
         #end## If not inspect 'all'

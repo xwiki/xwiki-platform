@@ -67,10 +67,10 @@ public class CountFilter extends AbstractQueryFilter
         String result = statement.trim();
         String original = result;
 
-        if (Query.HQL.equals(language) && isFilterable(statement)) {
-            String distinct = getSelectColumns(statement).contains(DISTINCT_FULLNAME_COLUMN) ? "distinct " : "";
+        if (Query.HQL.equals(language) && isFilterable(original)) {
+            String distinct = getSelectColumns(original).contains(DISTINCT_FULLNAME_COLUMN) ? "distinct " : "";
             result = "select count(" + distinct + "doc.fullName) "
-                + result.substring(statement.indexOf("from XWikiDocument"));
+                + result.substring(original.indexOf("from XWikiDocument"));
 
             int oidx = result.indexOf("order by ");
             int gidx = result.indexOf("group by ");

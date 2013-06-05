@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyForGlobalFullWikiAccess() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki denying all access to userA">
+    <user name="userA" />
+    <denyUser name="userA" />
+
+    <space name="any space">
+      <document name="any document" />
+    </space>
+
+    <space name="spaceAllowA" alt="a space allowing full access to userA">
+      <allowUser name="userA" />
+
+      <document name="any document" />
+
+      <document name="docDenyA" alt="a document denying all access to userA">
+        <denyUser name="userA" />
+      </document>
+    </space>
+
+    <space name="any space">
+      <document name="docAllowA" alt="a document allowing full access to userA">
+        <allowUser name="userA" />
+      </document>
+    </space>
+  </wiki>
+  <wiki name="wikiNoRules" alt="a subwiki without any rules" owner="wiki:XWiki.Admin">
+    <space name="any space">
+      <document name="any document" />
+    </space>
+
+    <space name="spaceAllowA" alt="a space allowing full access to userA">
+      <allowUser name="wiki:XWiki.userA" />
+
+      <document name="any document" />
+
+      <document name="docDenyA" alt="a document denying all access to userA">
+        <denyUser name="wiki:XWiki.userA" />
+      </document>
+    </space>
+
+    <space name="any space">
+      <document name="docAllowA" alt="a document allowing full access to userA">
+        <allowUser name="wiki:XWiki.userA" />
+      </document>
+    </space>
+  </wiki>
+  <wiki name="wikiAllowA" alt="a subwiki allowing full access to userA" owner="wiki:XWiki.Admin">
+    <allowUser name="wiki:XWiki.userA" />
+
+    <space name="any space">
+      <document name="any document" />
+    </space>
+
+    <space name="spaceDenyA" alt="a space denying all access to userA">
+      <denyUser name="wiki:XWiki.userA" />
+
+      <document name="any document" />
+
+      <document name="docAllowA" alt="a document allowing full access to userA">
+        <allowUser name="wiki:XWiki.userA" />
+      </document>
+    </space>
+
+    <space name="any space">
+      <document name="docDenyA" alt="a document denying all access to userA">
+        <denyUser name="wiki:XWiki.userA" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

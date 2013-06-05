@@ -62,6 +62,11 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     protected static final String ID = "XWikiPreferences";
 
     /**
+     * The prefix to use when generating documents bundles unique ids.
+     */
+    protected static final String IDPREFIX = "XWikiPreferences:";
+
+    /**
      * Used to access current wiki.
      */
     @Inject
@@ -149,6 +154,22 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     {
         XWikiPreferencesWikiTranslationBundle bundle = this.wikiBundlesCache.get(wiki);
         if (bundle == null) {
+            bundle = getBundleSynchronized(wiki);
+        }
+
+        return bundle;
+    }
+
+    /**
+     * Synchronized version of {@link #getBundle()} so that we synchronize only when necessary.
+     * 
+     * @param wiki the wiki
+     * @return the {@link XWikiPreferencesWikiTranslationBundle} for the provided wiki
+     */
+    private synchronized XWikiPreferencesWikiTranslationBundle getBundleSynchronized(String wiki)
+    {
+        XWikiPreferencesWikiTranslationBundle bundle = this.wikiBundlesCache.get(wiki);
+        if (bundle == null) {
             try {
                 bundle = createWikiBundle(wiki);
                 this.wikiBundlesCache.put(wiki, bundle);
@@ -163,7 +184,7 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     /**
      * @param wiki the wiki
      * @return the XWikiPreferencesWikiBundle for the provided wiki
-     * @throws ComponentLookupException faleid to create the bundle
+     * @throws ComponentLookupException failed to create the bundle
      */
     private XWikiPreferencesWikiTranslationBundle createWikiBundle(String wiki) throws ComponentLookupException
     {
@@ -182,9 +203,27 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
 
         DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
         if (documentBundle == null) {
+            documentBundle = getDocumentTranslationBundleSynchronized(uid, document);
+        }
+
+        return documentBundle;
+    }
+
+    /**
+     * Get document bundle from passed reference.
+     * 
+     * @param uid the bundle uid
+     * @param document the document reference
+     * @return the document bundle
+     */
+    private synchronized DefaultDocumentTranslationBundle getDocumentTranslationBundleSynchronized(String uid,
+        DocumentReference document)
+    {
+        DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
+        if (documentBundle == null) {
             try {
                 documentBundle =
-                    new DefaultDocumentTranslationBundle(document, this.componentManager,
+                    new DefaultDocumentTranslationBundle(IDPREFIX, document, this.componentManager,
                         this.translationMessageParser);
                 this.documentBundlesCache.set(uid, documentBundle);
             } catch (ComponentLookupException e) {

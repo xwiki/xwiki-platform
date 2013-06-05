@@ -53,19 +53,19 @@
   <content>{{velocity}}
 #if($doc.getObject('XWiki.SchedulerJobClass'))
 #set($job = $doc.getObject("XWiki.SchedulerJobClass"))
-**$msg.get("xe.scheduler.job.name")**
+**$services.localization.render('xe.scheduler.job.name')**
 
 $!doc.display('jobName')
 
-**$msg.get("xe.scheduler.job.description")**
+**$services.localization.render('xe.scheduler.job.description')**
 
 $!doc.display('jobDescription')
 
-**$msg.get("xe.scheduler.job.expression")**
+**$services.localization.render('xe.scheduler.job.expression')**
 
 $!doc.display('cron')
 
-**$msg.get("xe.scheduler.job.script")**
+**$services.localization.render('xe.scheduler.job.script')**
 
 #if($xcontext.action=="inline")
 $!doc.display("script")
@@ -76,7 +76,7 @@ $job.getProperty('script').value
 #end
 
 #if($xcontext.action=="inline")
-{{info}}$msg.get('xe.scheduler.job.scriptexplanation')){{/info}}
+{{info}}$services.localization.render('xe.scheduler.job.scriptexplanation')){{/info}}
 
 {{info}}Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.quartz-scheduler.org/documentation||rel=__blank]]:
 
@@ -88,10 +88,10 @@ $job.getProperty('script').value
 {{/info}}
 
 #elseif($xcontext.action=="view")
-[[$msg.get("xe.scheduler.job.backtolist")&gt;&gt;Scheduler.WebHome]]
+[[$services.localization.render('xe.scheduler.job.backtolist')&gt;&gt;Scheduler.WebHome]]
 #end
 #else
- {{warning}}$msg.get('xe.scheduler.job.object'){{/warning}}
+ {{warning}}$services.localization.render('xe.scheduler.job.object'){{/warning}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

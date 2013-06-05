@@ -15,7 +15,7 @@
   <date>1166177445000</date>
   <contentUpdateDate>1213000374000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('panelwizard.panellayoutupdate')</title>
+  <title>$services.localization.render('panelwizard.panellayoutupdate')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -38,7 +38,7 @@
 ##
 #if (!$xwiki.hasAccessLevel('admin', $xcontext.user, $prefsdocument))
   {{html clean="false"}}
-  #xwikimessageboxstart($msg.get('panelwizard.placemanager') $msg.get('panelwizard.notadmininplace', [$place]))
+  #xwikimessageboxstart($services.localization.render('panelwizard.placemanager') $services.localization.render('panelwizard.notadmininplace', [$place]))
   #xwikimessageboxend()
   {{/html}}
 #elseif ("$!request.xpage" == 'plain')
@@ -66,7 +66,7 @@
     #set ($discard = $prefsdoc.set('showRightPanels', $showRightPanels))
   #end
   #if (${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #set ($ok = $prefsdoc.save($msg.get('panelwizard.save.versionComment', true)))
+    #set ($ok = $prefsdoc.save($services.localization.render('panelwizard.save.versionComment', true)))
   #else
     ## CSRF protection
     $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
@@ -74,9 +74,9 @@
   SUCCESS
 #else
 
-= $msg.get('panelwizard.panellayoutupdate') =
+= $services.localization.render('panelwizard.panellayoutupdate') =
 
-{{warning}}$msg.get('panelwizard.nodirectaccess', ['[[Panel Wizard&gt;&gt;Panels.PanelWizard]]']){{/warning}}
+{{warning}}$services.localization.render('panelwizard.nodirectaccess', ['[[Panel Wizard&gt;&gt;Panels.PanelWizard]]']){{/warning}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

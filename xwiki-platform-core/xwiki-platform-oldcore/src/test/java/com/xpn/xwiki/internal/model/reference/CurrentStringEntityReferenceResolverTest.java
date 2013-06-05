@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.xwiki.context.Execution;

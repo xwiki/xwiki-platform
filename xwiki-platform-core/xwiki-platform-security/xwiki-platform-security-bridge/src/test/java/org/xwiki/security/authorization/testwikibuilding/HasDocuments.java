@@ -19,22 +19,24 @@
  */
 package org.xwiki.security.authorization.testwikibuilding;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
- * This interface is used for building a mocked test setup for testing the authorization manager.
- *
- * Interface for entities that contain documents.  I.e., a space.
- *
+ * This interface is used for building a mocked test setup for testing the authorization manager. Interface for entities
+ * that contain documents. I.e., a space.
+ * 
  * @since 4.2
  * @version $Id$
  */
 public interface HasDocuments extends HasAcl
 {
-
     /**
      * @param name The name of the document to add.
-     * @param creator The name of the creator.  May be {\code null}.
+     * @param creator The name of the creator. May be {\code null}.
+     * @param alt The pretty name of the document. (optional)
      * @return an entity representing the document that holds the acl of the document.
      */
-    HasAcl addDocument(String name, String creator);
+    HasAcl addDocument(String name, String creator, String alt);
 
+    XWikiDocument removeDocument(String name);
 }

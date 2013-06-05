@@ -11,10 +11,10 @@ org.xwiki.officeimporter.internal.filter.RedundancyFilter
 org.xwiki.officeimporter.internal.filter.StripperFilter
 org.xwiki.officeimporter.internal.filter.StyleFilter
 org.xwiki.officeimporter.internal.filter.TableFilter
-org.xwiki.officeimporter.internal.cleaner.OpenOfficeHTMLCleaner
+org.xwiki.officeimporter.internal.cleaner.OfficeHTMLCleaner
 org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner
-org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeConfiguration
-org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeManager
-org.xwiki.officeimporter.internal.openoffice.OpenOfficeManagerLifecycleListener
-org.xwiki.officeimporter.internal.openoffice.script.OpenOfficeManagerScriptService
+org.xwiki.officeimporter.internal.server.DefaultOfficeServerConfiguration
+org.xwiki.officeimporter.internal.server.DefaultOfficeServer
+org.xwiki.officeimporter.internal.server.OfficeServerLifecycleListener
+org.xwiki.officeimporter.internal.server.script.OfficeServerScriptService
 org.xwiki.officeimporter.internal.script.OfficeImporterScriptService

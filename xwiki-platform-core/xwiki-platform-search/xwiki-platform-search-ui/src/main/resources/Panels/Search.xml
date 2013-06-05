@@ -101,14 +101,14 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelhiddenheader($msg.get("panels.search.title"))
+#panelhiddenheader($services.localization.render('panels.search.title'))
 {{html}}
   &lt;form action="$xwiki.getURL('Main.Search')"&gt;
     &lt;div class="globalsearch"&gt;
-      &lt;label for="globalsearchinput" class="hidden"&gt;$msg.get('panels.search.query')&lt;/label&gt;
-      &lt;input id="globalsearchinput" class="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" onfocus="if (this.value == '$msg.get('panels.search.inputText')') value=''; this.select();" onblur="if (this.value == '') value='$msg.get('panels.search.inputText')'; this.blur()"/&gt;
+      &lt;label for="globalsearchinput" class="hidden"&gt;$services.localization.render('panels.search.query')&lt;/label&gt;
+      &lt;input id="globalsearchinput" class="globalsearchinput" type="text" name="text" value="$services.localization.render('panels.search.inputText')" size="15" onfocus="if (this.value == '$services.localization.render('panels.search.inputText')') value=''; this.select();" onblur="if (this.value == '') value='$services.localization.render('panels.search.inputText')'; this.blur()"/&gt;
 &amp;nbsp;
-      &lt;input class="button" value="$msg.get('panels.search.submit')" type="image" src="$xwiki.getSkinFile('go.png')" alt="$msg.get('panels.search.submit')"/&gt;
+      &lt;input class="button" value="$services.localization.render('panels.search.submit')" type="image" src="$xwiki.getSkinFile('go.png')" alt="$services.localization.render('panels.search.submit')"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}

@@ -48,7 +48,7 @@ import org.xwiki.security.authorization.SecurityEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
-import org.xwiki.security.authorization.cache.SecurityCache;
+import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 
 /**
  * Default implementation of the security cache.
@@ -62,6 +62,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 {
     /** Default capacity for security cache. */
     private static final int DEFAULT_CAPACITY = 500;
+
+    /** Separator used for composing key for the cache. */
+    private static final String KEY_CACHE_SEPARATOR = "@@";
 
     /** Logger. **/
     @Inject
@@ -101,8 +104,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         try {
             return cacheManager.createNewCache(cacheConfig);
         } catch (Exception e) {
-            throw new InitializationException("Unable to create the security cache with a capacity of "
-                + lru.getMaxEntries(), e);
+            throw new InitializationException(
+                String.format("Unable to create the security cache with a capacity of [%d] entries",
+                    lru.getMaxEntries()), e);
         }
     }
 
@@ -159,6 +163,26 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 this.parents = null;
                 logNewEntry();
             }
+
+        }
+
+        /**
+         * Create a new cache entry for a security shadow, linking it to its parent.
+         * @param entry the security rule entry to cache.
+         * @throws ParentEntryEvictedException if the parent required is no more available in the cache.
+         */
+        SecurityCacheEntry(SecurityShadowEntry entry) throws ParentEntryEvictedException
+        {
+            this.entry = entry;
+            SecurityCacheEntry parent1 = DefaultSecurityCache.this.getEntry(entry.getReference());
+            SecurityCacheEntry parent2 = DefaultSecurityCache.this.getEntry(entry.getWikiReference());
+            if (parent1 == null || parent2 == null) {
+                throw new ParentEntryEvictedException();
+            }
+            this.parents = Arrays.asList(parent1, parent2);
+            parent1.addChild(this);
+            parent2.addChild(this);
+            logNewEntry();
         }
 
         /**
@@ -168,11 +192,23 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          */
         SecurityCacheEntry(SecurityAccessEntry entry) throws ParentEntryEvictedException
         {
+            this(entry, null);
+        }
+
+        /**
+         * Create a new cache entry for a user access, linking it to the related entity and user, or shadow user.
+         * @param entry the security access entry to cache.
+         * @param wiki if not null, the wiki context of the shadow user.
+         * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
+         */
+        SecurityCacheEntry(SecurityAccessEntry entry, SecurityReference wiki) throws ParentEntryEvictedException
+        {
             this.entry = entry;
             boolean isSelf = entry.getReference().equals(entry.getUserReference());
             SecurityCacheEntry parent1 = DefaultSecurityCache.this.getEntry(entry.getReference());
             SecurityCacheEntry parent2 = (isSelf) ? parent1
-                : DefaultSecurityCache.this.getEntry(entry.getUserReference());
+                : (wiki != null) ? DefaultSecurityCache.this.getShadowEntry(entry.getUserReference(), wiki)
+                                 : DefaultSecurityCache.this.getEntry(entry.getUserReference());
             if (parent1 == null || parent2 == null) {
                 throw new ParentEntryEvictedException();
             }
@@ -193,14 +229,38 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         SecurityCacheEntry(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups)
             throws ParentEntryEvictedException
         {
+            this(entry, groups, entry.getReference().getParentSecurityReference());
+        }
+
+        /**
+         * Create a new cache entry for a user rule entry, linking it to its parent and to all provided groups.
+         * @param entry the security rule entry to cache.
+         * @param groups the list of groups to link this entry to.
+         * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
+         */
+        SecurityCacheEntry(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups)
+            throws ParentEntryEvictedException
+        {
+            this(entry, groups, entry.getReference());
+        }
+
+        /**
+         * Create a new cache entry for a user rule entry, linking it to its parent and to all provided groups.
+         * @param entry the security rule entry to cache.
+         * @param groups the list of groups to link this entry to.
+         * @param parentReference the reference to the parent to link to.
+         * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
+         */
+        private SecurityCacheEntry(SecurityEntry entry, Collection<GroupSecurityReference> groups,
+            SecurityReference parentReference)
+            throws ParentEntryEvictedException
+        {
             this.entry = entry;
-            SecurityReference entity = entry.getReference();
-            SecurityReference parentReference = entry.getReference().getParentSecurityReference();
             int parentSize = groups.size() + ((parentReference == null) ? 0 : 1);
             if (parentSize > 0) {
                 this.parents = new ArrayList<SecurityCacheEntry>(parentSize);
                 if (parentReference != null) {
-                    SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(entity.getParentSecurityReference());
+                    SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(parentReference);
                     if (parent == null) {
                         throw new ParentEntryEvictedException();
                     }
@@ -211,7 +271,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     if (group.equals(parentReference)) {
                         continue;
                     }
-                    SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(group);
+                    SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
+                        ? DefaultSecurityCache.this.getShadowEntry(group,
+                            ((SecurityShadowEntry) entry).getWikiReference())
+                        : DefaultSecurityCache.this.getEntry(group);
                     if (parent == null) {
                         throw new ParentEntryEvictedException();
                     }
@@ -228,7 +291,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         /**
          * Log the new entry creation.
          */
-        private void logNewEntry() 
+        private void logNewEntry()
         {
             if (logger.isDebugEnabled()) {
                 if (parents == null || parents.size() == 0) {
@@ -254,7 +317,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         /**
          * @return the original security entry cached in this cache entry.
          */
-        SecurityEntry getEntry() 
+        SecurityEntry getEntry()
         {
             return this.entry;
         }
@@ -262,7 +325,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         /**
          * @return the serialized key of this entry.
          */
-        String getKey() 
+        String getKey()
         {
             return DefaultSecurityCache.this.getEntryKey(entry);
         }
@@ -273,7 +336,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * locking should be done externally.
          * @return false if the entry was already disposed, true in all other cases.
          */
-        boolean dispose() 
+        boolean dispose()
         {
             if (disposed) {
                 return false;
@@ -293,7 +356,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     }
                 }
             }
-            String key = getKey();
             disposed = true;
             return true;
         }
@@ -302,7 +364,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * Add a children to this cache entry.
          * @param entry the children entry to add.
          */
-        private void addChild(SecurityCacheEntry entry) 
+        private void addChild(SecurityCacheEntry entry)
         {
             if (this.children == null) {
                 this.children = new ArrayList<SecurityCacheEntry>();
@@ -314,7 +376,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * Remove a children from this cache entry.
          * @param entry the children entry to remove.
          */
-        private void removeChild(SecurityCacheEntry entry) 
+        private void removeChild(SecurityCacheEntry entry)
         {
             if (this.children != null) {
                 this.children.remove(entry);
@@ -329,7 +391,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      * @param reference the reference to build the key.
      * @return a unique key for this reference.
      */
-    private String getEntryKey(SecurityReference reference) {
+    private String getEntryKey(SecurityReference reference)
+    {
         return keySerializer.serialize(reference);
     }
 
@@ -338,9 +401,20 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      * @param reference the entity reference to build the key.
      * @return a unique key for the combination of this user and entity.
      */
-    private String getEntryKey(UserSecurityReference userReference, SecurityReference reference) {
+    private String getEntryKey(UserSecurityReference userReference, SecurityReference reference)
+    {
         return keySerializer.serialize(userReference)
-            + "@@" + keySerializer.serialize(reference);
+            + KEY_CACHE_SEPARATOR + keySerializer.serialize(reference);
+    }
+
+    /**
+     * @param userReference the user reference to build the key.
+     * @param root the entity reference of the sub-wiki.
+     * @return a unique key for the combination of this user and entity.
+     */
+    private String getShadowEntryKey(SecurityReference userReference, SecurityReference root)
+    {
+        return keySerializer.serialize(root) + KEY_CACHE_SEPARATOR + keySerializer.serialize(userReference);
     }
 
     /**
@@ -352,9 +426,21 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     {
         if (entry instanceof SecurityAccessEntry) {
             return getEntryKey((SecurityAccessEntry) entry);
-        } else {
+        } else if (entry instanceof SecurityRuleEntry) {
             return getEntryKey((SecurityRuleEntry) entry);
+        } else {
+            return getEntryKey((SecurityShadowEntry) entry);
         }
+    }
+
+    /**
+     * @param entry the security entry for which a key is requested. It could be either a {@link SecurityRuleEntry}
+     *              or a {@link SecurityAccessEntry}.
+     * @return a unique key for this security entry.
+     */
+    private String getEntryKey(SecurityShadowEntry entry)
+    {
+        return getShadowEntryKey(entry.getReference(), entry.getWikiReference());
     }
 
     /**
@@ -406,6 +492,22 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     }
 
     /**
+     * @param userReference the user reference requested.
+     * @param wiki the wiki context of the shadow reference to retrieve.
+     * @return a security cache entry corresponding to the given user and reference, null if none is available
+     *         in the cache.
+     */
+    private SecurityCacheEntry getShadowEntry(SecurityReference userReference, SecurityReference wiki)
+    {
+        readLock.lock();
+        try {
+            return cache.get(getShadowEntryKey(userReference, wiki));
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    /**
      * @param key the key of the cache slot to check.
      * @param entry the entry to compare to.
      * @return true, if the given entry has been inserted by another thread, false if the slot is available.
@@ -437,27 +539,97 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     public void add(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
+        add((SecurityEntry) entry, groups);
+    }
+
+    @Override
+    public void add(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups)
+        throws ConflictingInsertionException, ParentEntryEvictedException
+    {
+        add((SecurityEntry) entry, groups);
+    }
+
+    /**
+     * Add either a rule or shadow user/group entry into the cache.
+     * @param entry the rule or shadow entry
+     * @param groups Local groups references that this user/group is a member.
+     * @exception ParentEntryEvictedException when the parent entry of
+     * this entry was evicted before this insertion.  Since all
+     * entries, except wiki-entries, must have a parent cached, the
+     * {@link org.xwiki.security.authorization.cache.SecurityCacheLoader} must restart its load attempt.
+     * @throws ConflictingInsertionException when another thread have
+     * inserted this entry, but with a different content.
+     */
+    private void add(SecurityEntry entry, Collection<GroupSecurityReference> groups)
+        throws ConflictingInsertionException, ParentEntryEvictedException
+    {
         String key = getEntryKey(entry);
-        
+
         writeLock.lock();
         try {
             if (isAlreadyInserted(key, entry)) {
                 return;
             }
-            SecurityCacheEntry newEntry = (groups == null || groups.isEmpty())
-                ? new SecurityCacheEntry(entry)
-                : new SecurityCacheEntry(entry, groups);
-            cache.set(key, newEntry);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Added rule entry [{}] into the cache.", key);
-            }
+            cache.set(key, newSecurityCacheEntry(entry, groups));
+
+            logger.debug("Added rule/shadow entry [{}] into the cache.", key);
         } finally {
             writeLock.unlock();
         }
     }
 
+    /**
+     * Construct a security cache entry for the given arguments.
+     * @param entry the rule or shadow entry
+     * @param groups Local groups references that this user/group is a member.
+     * @return the created security cache entry
+     * @exception ParentEntryEvictedException when the parent entry of
+     * this entry was evicted before this insertion.  Since all
+     * entries, except wiki-entries, must have a parent cached, the
+     * {@link org.xwiki.security.authorization.cache.SecurityCacheLoader} must restart its load attempt.
+     * @throws ConflictingInsertionException when another thread have
+     * inserted this entry, but with a different content.
+     */
+    private SecurityCacheEntry newSecurityCacheEntry(SecurityEntry entry, Collection<GroupSecurityReference> groups)
+        throws ConflictingInsertionException, ParentEntryEvictedException
+    {
+        if (entry instanceof SecurityRuleEntry) {
+            return (groups == null || groups.isEmpty())
+                ? new SecurityCacheEntry((SecurityRuleEntry) entry)
+                : new SecurityCacheEntry((SecurityRuleEntry) entry, groups);
+        } else {
+            return (groups == null || groups.isEmpty())
+                ? new SecurityCacheEntry((SecurityShadowEntry) entry)
+                : new SecurityCacheEntry((SecurityShadowEntry) entry, groups);
+        }
+    }
+
     @Override
     public void add(SecurityAccessEntry entry)
+        throws ParentEntryEvictedException, ConflictingInsertionException
+    {
+        internalAdd(entry, null);
+    }
+
+    @Override
+    public void add(SecurityAccessEntry entry,  SecurityReference wiki)
+        throws ParentEntryEvictedException, ConflictingInsertionException
+    {
+        internalAdd(entry, wiki);
+    }
+
+    /**
+     * Add an entry to this cache.
+     * @param entry The access entry to add.
+     * @param wiki The sub-wiki context of this entry. Null for a global entry.
+     * @throws ParentEntryEvictedException when the parent entry of
+     * this entry was evicted before this insertion.  Since all
+     * entries, except wiki-entries, must have a parent cached, the
+     * {@link org.xwiki.security.authorization.cache.SecurityCacheLoader} must restart its load attempt.
+     * @throws ConflictingInsertionException when another thread have
+     * inserted this entry, but with a different content.
+     */
+    private void internalAdd(SecurityAccessEntry entry, SecurityReference wiki)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
         String key = getEntryKey(entry);
@@ -467,14 +639,22 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (isAlreadyInserted(key, entry)) {
                 return;
             }
-            SecurityCacheEntry newEntry = new SecurityCacheEntry(entry);
-            cache.set(key, newEntry);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Added access entry [{}] into the cache.", key);
-            }
+            cache.set(key, new SecurityCacheEntry(entry, wiki));
+
+            logger.debug("Added access entry [{}] into the cache.", key);
         } finally {
             writeLock.unlock();
         }
+    }
+
+    /**
+     * Retrieve an entry from the cache directly the internal cache. Used during unit test only.
+     * @param entryKey the key to be retrieved.
+     * @return the entry stored in the internal cache or Null if no entry was found.
+     */
+    SecurityEntry get(String entryKey) {
+        SecurityCacheEntry entry = cache.get(entryKey);
+        return (entry != null) ? entry.getEntry() : null;
     }
 
     @Override

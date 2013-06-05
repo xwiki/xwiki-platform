@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
@@ -44,6 +45,7 @@ import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
+import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -124,6 +126,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     public List<Event> getEvents()
     {
         Event[] events = {
+            new DocumentCreatedEvent(),
             new DocumentUpdatedEvent(),
             new DocumentDeletedEvent(),
         };
@@ -156,9 +159,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     }
 
     /**
-     * Due to the special case where a user have been added to the
-     * group, we need to step through all members of the group and
-     * remove all corresponding user entries.
+     * Drop from the cache all members of a given group.
      * @param group The group.
      * @param securityCache Right cache instance to invalidate.
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
@@ -204,6 +205,10 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
         try {
             deliverUpdateEvent(ref);
             if (isGroupDocument(source)) {
+                // When a group receive a new member, the update event is triggered and the above invalidate the group
+                // and also all its existing members already in cache, but NOT the new member that could be currently
+                // in the cache, and is not yet linked to the group. Here, we invalidate individually all members of
+                // the group based on the updated group, which will only have the effect of invaliding new members.
                 invalidateGroupMembers(ref, securityCache);
             }
         } catch (AuthorizationException e) {
@@ -222,7 +227,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     private void deliverUpdateEvent(DocumentReference ref)
     {
         if (ref.getName().equals(XWikiConstants.WIKI_DOC)
-            && ref.getLastSpaceReference().getName().equals(XWikiConstants.WIKI_SPACE)) {
+            && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)) {
             securityCache.remove(securityReferenceFactory.newEntityReference(ref.getWikiReference()));
         } else if (ref.getName().equals(XWikiConstants.SPACE_DOC)) {
             securityCache.remove(securityReferenceFactory.newEntityReference(ref.getParent()));

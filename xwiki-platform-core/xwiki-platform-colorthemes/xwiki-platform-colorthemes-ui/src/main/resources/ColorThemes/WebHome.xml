@@ -15,7 +15,7 @@
   <date>1251108485000</date>
   <contentUpdateDate>1251108485000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('xe.themes.colors.title')</title>
+  <title>$services.localization.render('xe.themes.colors.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -322,10 +322,10 @@ $xwiki.ssx.use($doc.fullName)
   &lt;div class="x-theme-info"&gt;
     &lt;div class="x-theme-title"&gt;[[$themeDoc.displayTitle&gt;&gt;$themeDocName]]&lt;/div&gt;   
     {{html wiki="false"}}
-      &lt;span class="theme-info"&gt;$msg.get('core.footer.creation', [$xwiki.getUserName($themeDoc.creator), $xwiki.formatDate($themeDoc.creationDate)])&lt;/span&gt;
+      &lt;span class="theme-info"&gt;$services.localization.render('core.footer.creation', [$xwiki.getUserName($themeDoc.creator), $xwiki.formatDate($themeDoc.creationDate)])&lt;/span&gt;
       #if($hasAdmin &amp;&amp; !$isCurrentTheme)
         &lt;div class="x-theme-set" id="$themeDoc.fullName"&gt;
-          &lt;a href="$doc.getURL('view', "xaction=setTheme&amp;theme=${themeDoc.fullName}&amp;form_token=$!{services.csrf.getToken()}")" class="use-theme"&gt;$msg.get('xe.themes.useTheme')&lt;/a&gt;
+          &lt;a href="$doc.getURL('view', "xaction=setTheme&amp;theme=${themeDoc.fullName}&amp;form_token=$!{services.csrf.getToken()}")" class="use-theme"&gt;$services.localization.render('xe.themes.useTheme')&lt;/a&gt;
         &lt;/div&gt;
       #end
     {{/html}}
@@ -340,7 +340,7 @@ $xwiki.ssx.use($doc.fullName)
 
 {{velocity}}
 #if("$!request.theme" != '')
-  {{info}}$msg.get('xe.themes.themeSet', [$xwiki.getDocument($request.theme).displayTitle]){{/info}}
+  {{info}}$services.localization.render('xe.themes.themeSet', [$xwiki.getDocument($request.theme).displayTitle]){{/info}}
 
 #end
 {{html wiki="true"}}
@@ -348,23 +348,23 @@ $xwiki.ssx.use($doc.fullName)
   #if("$!currentTheme" == '')
     #set($currentTheme = 'ColorThemes.DefaultColorTheme')
   #end
-  == $msg.get('xe.themes.current') ==
+  == $services.localization.render('xe.themes.current') ==
   #displayTheme($currentTheme)
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
   #set($query = ", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;? and doc.fullName&lt;&gt;'ColorThemes.ColorThemeSheet' order by doc.title")
   #set($params = ["$!currentTheme"])
   #set($themeList = $xwiki.searchDocuments($query, 0, 0, $params))
   #if($themeList.size() &gt; 0)
-    == $msg.get('xe.themes.others') ==
+    == $services.localization.render('xe.themes.others') ==
   #end
   #if(!$isGuest &amp;&amp; $xcontext.action != 'inline')
   &lt;form action="$doc.getURL()" method="post" class="xformInline"&gt;
   &lt;div class="x-theme-create"&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="xaction" value="create"/&gt;
-    &lt;label for="newThemeName" class="hidden"&gt;$msg.get('xe.themes.create.nameLabel')&lt;/label&gt;
-    &lt;input type="text" name="newThemeName" id="newThemeName" value="$msg.get('xe.themes.create.nameTip')" class="withTip" size="30"/&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.themes.create')" class="button"/&gt;&lt;/span&gt;
+    &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('xe.themes.create.nameLabel')&lt;/label&gt;
+    &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('xe.themes.create.nameTip')" class="withTip" size="30"/&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.themes.create')" class="button"/&gt;&lt;/span&gt;
   &lt;/div&gt;
   &lt;/form&gt;
   #end

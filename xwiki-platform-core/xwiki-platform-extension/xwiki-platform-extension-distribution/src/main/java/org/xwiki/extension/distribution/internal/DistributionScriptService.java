@@ -21,6 +21,7 @@ package org.xwiki.extension.distribution.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -29,8 +30,17 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Provide helpers to manage running distribution.
@@ -39,6 +49,9 @@ import org.xwiki.script.service.ScriptService;
  * 
  * @version $Id$
  * @since 4.2M3
+ */
+/**
+ * @version $Id$
  */
 @Component
 @Named("distribution")
@@ -64,6 +77,19 @@ public class DistributionScriptService implements ScriptService
     private DistributionManager distributionManager;
 
     /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Used to access HTML renderer.
+     */
+    @Inject
+    @Named("xhtml/1.0")
+    private BlockRenderer xhtmlRenderer;
+
+    /**
      * @param <T> the type of the object
      * @param unsafe the unsafe object
      * @return the safe version of the passed object
@@ -81,7 +107,10 @@ public class DistributionScriptService implements ScriptService
      */
     public DistributionState getState()
     {
-        return this.distributionManager.getDistributionState();
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki() ? this.distributionManager.getFarmDistributionState() : this.distributionManager
+            .getWikiDistributionState(xcontext.getDatabase());
     }
 
     /**
@@ -97,24 +126,75 @@ public class DistributionScriptService implements ScriptService
      */
     public ExtensionId getUIExtensionId()
     {
-        return this.distributionManager.getUIExtensionId();
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki() ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
+            .getWikiUIExtensionId();
     }
 
     /**
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
      */
-    public DistributionJobStatus getPreviousJobStatus()
+    public DistributionJobStatus< ? > getPreviousJobStatus()
     {
-        return this.distributionManager.getPreviousJobStatus();
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki() ? this.distributionManager.getPreviousFarmJobStatus() : this.distributionManager
+            .getPreviousWikiJobStatus(xcontext.getDatabase());
+    }
+
+    /**
+     * @return indicate of it's allowed to display the Distribution Wizard in the current context
+     */
+    public boolean canDisplayDistributionWizard()
+    {
+        return this.distributionManager.canDisplayDistributionWizard();
     }
 
     /**
      * @return the status of the current distribution job
      */
-    public DistributionJobStatus getJobStatus()
+    public DistributionJobStatus< ? > getJobStatus()
     {
-        DistributionJob job = this.distributionManager.getJob();
+        DistributionJob job = this.distributionManager.getCurrentDistributionJob();
 
-        return job != null ? (DistributionJobStatus) job.getStatus() : null;
+        return job != null ? (DistributionJobStatus< ? >) job.getStatus() : null;
+    }
+
+    /**
+     * @return the HTML resulting in the executing of the current step
+     */
+    public String renderCurrentStepToXHTML()
+    {
+        DistributionJob job = this.distributionManager.getCurrentDistributionJob();
+
+        if (job != null) {
+            JobStatus jobStatus = job.getStatus();
+
+            if (jobStatus != null) {
+                State jobState = jobStatus.getState();
+
+                if (jobState == State.RUNNING || jobState == State.WAITING) {
+                    Block block = job.getCurrentStep().render();
+
+                    WikiPrinter printer = new DefaultWikiPrinter();
+
+                    this.xhtmlRenderer.render(block, printer);
+
+                    return printer.toString();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return the upgrade mode
+     * @since 5.0RC1
+     */
+    public UpgradeMode getUpgradeMode()
+    {
+        return this.distributionManager.getUpgradeMode();
     }
 }

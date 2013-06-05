@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.message.TranslationMessageElement;
 import org.xwiki.rendering.block.Block;
 
 /**

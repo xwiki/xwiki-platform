@@ -27,6 +27,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Select;
 
 /**
  * Represents the actions possible on a livetable.
@@ -85,11 +86,16 @@ public class LiveTableElement extends BaseElement
 
     public void filterColumn(String inputId, String filterValue)
     {
-        // Make extra sure selenium can't go quicker than the livetable status by forcing it before filtering
+        // Make extra sure Selenium can't go quicker than the live table status by forcing it before filtering.
         executeJavascript("return $('" + livetableId + "-ajax-loader').removeClassName('hidden')");
 
         WebElement element = getDriver().findElement(By.id(inputId));
-        element.sendKeys(filterValue);
+        if ("select".equals(element.getTagName())) {
+            new Select(element).selectByVisibleText(filterValue);
+        } else {
+            element.clear();
+            element.sendKeys(filterValue);
+        }
         waitUntilReady();
     }
 
@@ -155,6 +161,7 @@ public class LiveTableElement extends BaseElement
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
+            @Override
             public Boolean apply(WebDriver driver)
             {
                 return driver.findElements(by).size() >= minimalExpectedRowCount;

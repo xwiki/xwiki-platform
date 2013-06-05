@@ -130,6 +130,7 @@ public class Dialog extends DefaultDialog {
         if ((buttonModes & BUTTON_PREVIOUS) == BUTTON_PREVIOUS) {
             String previousName = getPreviousText();
             ClickListener cancelListener = new ClickListener(){
+                @Override
                 public void onClick(Widget sender){
                     cancelDialogAsBack();
                 }
@@ -145,6 +146,7 @@ public class Dialog extends DefaultDialog {
         if ((buttonModes & BUTTON_CANCEL) == BUTTON_CANCEL) {
             String cancelName = getCancelText();
             ClickListener cancelListener = new ClickListener(){
+                @Override
                 public void onClick(Widget sender){
                     cancelDialog();
                 }
@@ -159,6 +161,7 @@ public class Dialog extends DefaultDialog {
         if ((buttonModes & BUTTON_NEXT) == BUTTON_NEXT) {
             String nextName = getNextText();
             ClickListener buttonListener = new ClickListener(){
+                @Override
                 public void onClick(Widget sender){
                     endDialog();
                 }

@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Formatter;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
@@ -57,6 +56,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** The delete access right. */
     public static final Right DELETE;
 
+    /** Imply rights provided to creator of a document. */
+    public static final Right CREATOR;
+
     /** The Admin access right. */
     public static final Right ADMIN;
 
@@ -71,6 +73,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
 
     /** Illegal value. */
     public static final Right ILLEGAL;
+
+    /** Illegal right name. */
+    public static final String ILLEGAL_RIGHT_NAME = "illegal";
 
     /** Targeted entity type list to target only the main wiki. */
     public static final Set<EntityType> FARM_ONLY = null;
@@ -115,18 +120,21 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     static {
         LOGIN    = new Right("login",       ALLOW,  ALLOW, true,  null, WIKI_ONLY          , true);
         VIEW     = new Right("view",        ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, true);
-        EDIT     = new Right("edit",        ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
+        EDIT     = new Right("edit",        ALLOW,  DENY,  true,
+                                                    new RightSet(VIEW), WIKI_SPACE_DOCUMENT, false);
         DELETE   = new Right("delete",      DENY,   DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
-        REGISTER = new Right("register",    ALLOW,  ALLOW, false, null, WIKI_ONLY          , false);
+        CREATOR  = new Right("creator",     DENY,   ALLOW, false,
+            new RightSet(DELETE), EnumSet.of(EntityType.DOCUMENT), false);
+        REGISTER = new Right("register",    ALLOW,  ALLOW, true,  null, WIKI_ONLY          , false);
         COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
 
-        PROGRAM  = new Right("programming", DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), FARM_ONLY         , true);
-
         ADMIN    = new Right("admin",       DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, PROGRAM), WIKI_SPACE, true);
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), WIKI_SPACE         , true);
 
-        ILLEGAL  = new Right("illegal",     DENY,   DENY,  false, null, null               , false);
+        PROGRAM  = new Right("programming", DENY,   ALLOW, false,
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, ADMIN), FARM_ONLY   , true);
+
+        ILLEGAL  = new Right(ILLEGAL_RIGHT_NAME, DENY, DENY, false, null, null             , false);
     }
 
     /** The numeric value of this access right. */
@@ -194,7 +202,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
                 throw new IndexOutOfBoundsException();
             }
             VALUES.add(this);
-            ALL_RIGHTS.add(name);
+            if (!name.equals(ILLEGAL_RIGHT_NAME)) {
+                ALL_RIGHTS.add(name);
+            }
             if (validEntityTypes != null) {
                 for (EntityType type : validEntityTypes) {
                     if (type == EntityType.WIKI) {
@@ -234,23 +244,18 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      */
     private void checkIllegalArguments(String name, RuleState defaultState, RuleState tieResolutionPolicy)
     {
-        if (name == null || ALL_RIGHTS.contains(name)) {
-            throw new IllegalArgumentException(new Formatter()
-                                               .format("Duplicate name for right [%s]", name).toString());
+        if (name == null || ALL_RIGHTS.contains(name) || (ILLEGAL != null && name.equals(ILLEGAL_RIGHT_NAME))) {
+            throw new IllegalArgumentException(String.format("Duplicate name for right [%s]", name));
         }
 
         if (defaultState == null || defaultState == UNDETERMINED) {
-            throw new IllegalArgumentException(new Formatter()
-                                               .format("Invalid default state [%s] for right [%s]", defaultState, name)
-                                               .toString());
+            throw new IllegalArgumentException(
+                String.format("Invalid default state [%s] for right [%s]", defaultState, name));
         }
 
         if (tieResolutionPolicy == null || tieResolutionPolicy == UNDETERMINED) {
-            throw new IllegalArgumentException(new Formatter()
-                                               .format("Invalid tie resolution policy [%s] for right [%s]",
-                                                       tieResolutionPolicy,
-                                                       name)
-                                               .toString());
+            throw new IllegalArgumentException(
+                String.format("Invalid tie resolution policy [%s] for right [%s]", tieResolutionPolicy, name));
         }
     }
 

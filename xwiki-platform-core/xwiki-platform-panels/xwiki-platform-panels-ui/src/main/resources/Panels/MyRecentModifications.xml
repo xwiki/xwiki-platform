@@ -108,7 +108,7 @@
       <content>{{velocity}}
 #set ($recentDocs = $services.query.xwql('where doc.author=?1 order by doc.date desc').addFilter('hidden').bindValue(1, $xcontext.user).setLimit(5).execute())
 #if ($recentDocs.size() &gt; 0 || $showEmptyPanels)
-  #panelheader($msg.get('xe.panels.modifications.my'))
+  #panelheader($services.localization.render('xe.panels.modifications.my'))
   #foreach ($docname in $recentDocs)
     #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
     #if ($foreach.index &gt; 0)

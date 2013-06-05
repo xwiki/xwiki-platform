@@ -44,6 +44,8 @@ public class XarInstalledExtension extends WrappingInstalledExtension<InstalledE
     {
         super(installedExtension);
 
+        this.repository = repository;
+
         enumeratePages(packager);
     }
 

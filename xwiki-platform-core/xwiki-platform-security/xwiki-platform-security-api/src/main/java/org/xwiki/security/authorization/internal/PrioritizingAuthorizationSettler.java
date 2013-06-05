@@ -44,6 +44,8 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * Provide similar decision as the old xwiki right service, but consider rules at the same
  * level by prioritizing user rules, over group rules and all group rules in this order.
  *
+ * IMPORTANT NOTE: This experimental settler is current unmaintained and untested. Use at you own risk.
+ *
  * @version $Id$
  * @since 4.0M2
  */

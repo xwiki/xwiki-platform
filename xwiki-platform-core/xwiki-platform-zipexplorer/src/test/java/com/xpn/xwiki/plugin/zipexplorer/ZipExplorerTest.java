@@ -35,7 +35,7 @@ import java.util.zip.ZipEntry;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin} class.

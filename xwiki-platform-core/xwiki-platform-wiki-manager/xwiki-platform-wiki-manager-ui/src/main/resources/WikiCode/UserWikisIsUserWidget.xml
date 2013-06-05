@@ -105,13 +105,13 @@
       <category>Information</category>
     </property>
     <property>
-      <content>#panelheader($msg.get("wikimanager.widget.userwikisuser.title")) 
+      <content>#panelheader($services.localization.render('wikimanager.widget.userwikisuser.title'))
   ##
   #includeMacros("WikiCode.Macros")
   ##
   #set($WikiManager = $services.wikimanager)
   #if(!$WikiManager)
-    #error($msg.get("wikimanager.pluginnotenabled"))
+    #error($services.localization.render('wikimanager.pluginnotenabled'))
   #end
   #set($Exception = $WikiManager.DefaultException)
   ##
@@ -139,10 +139,10 @@
 #panelfooter()</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Lists the wikis the current user has access to.</description>
     </property>
     <property>
-      <name>UserWikisIsUserWidget</name>
+      <name>Wikis you view</name>
     </property>
     <property>
       <type>view</type>

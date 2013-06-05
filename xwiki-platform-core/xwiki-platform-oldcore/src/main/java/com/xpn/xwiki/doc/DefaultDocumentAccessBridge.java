@@ -230,6 +230,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldSyntaxId, syntaxId), true);
     }
 
+    @Override
     public void setDocumentParentReference(DocumentReference documentReference, DocumentReference parentReference)
         throws Exception
     {
@@ -240,6 +241,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
     }
 
+    @Override
     public void setDocumentTitle(DocumentReference documentReference, String title) throws Exception
     {
         XWikiContext xcontext = getContext();
@@ -412,6 +414,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * @see org.xwiki.bridge.DocumentAccessBridge#setProperty(java.lang.String, java.lang.String, java.lang.String,
      *      java.lang.Object)
      */
+    @Override
     @Deprecated
     public void setProperty(String documentReference, String className, String propertyName, Object propertyValue)
         throws Exception

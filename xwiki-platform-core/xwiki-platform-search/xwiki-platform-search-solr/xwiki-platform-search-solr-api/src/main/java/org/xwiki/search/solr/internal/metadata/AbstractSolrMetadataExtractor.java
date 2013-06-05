@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.util.Locale;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,7 +46,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
- * TODO DOCUMENT ME!
+ * Abstract implementation for a metadata extractor.
  * 
  * @version $Id$
  * @since 4.3M2
@@ -54,9 +54,9 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtractor
 {
     /**
-     * Underscore.
+     * The format used when indexing the objcontent field: "&lt;propertyName&gt;:&lt;propertyValue&gt;".
      */
-    protected static final String USCORE = "_";
+    private static final String OBJCONTENT_FORMAT = "%s:%s";
 
     /**
      * Logging framework.
@@ -77,11 +77,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected EntityReferenceSerializer<String> serializer;
 
     /**
-     * Reference to String serializer. Used for fields such as fullName that are relative to the wiki.
+     * Reference to String serializer. Used for fields such as class and fullname that are relative to their wiki and
+     * are stored without the wiki name.
      */
     @Inject
-    @Named("compactwiki")
-    protected EntityReferenceSerializer<String> compactSerializer;
+    @Named("local")
+    protected EntityReferenceSerializer<String> localSerializer;
 
     /**
      * DocumentAccessBridge component.
@@ -92,7 +93,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Override
     public String getId(EntityReference reference) throws SolrIndexException
     {
-        String result = serializer.serialize(reference);
+        String result = this.serializer.serialize(reference);
 
         // TODO: Include language all the other entities once object/attachment translation is implemented.
 
@@ -140,19 +141,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     {
         try {
             XWikiDocument document = getDocument(documentReference);
-
-            // TODO: replace with getLanguage(documentReference) ?
-            String doclang = "";
-            Locale locale = documentReference.getLocale();
-            if (locale != null && !StringUtils.isEmpty(locale.toString())) {
-                doclang = documentReference.getLocale().toString();
-            }
-
-            XWikiDocument translatedDocument = document.getTranslatedDocument(doclang, getXWikiContext());
+            XWikiDocument translatedDocument =
+                document.getTranslatedDocument(documentReference.getLocale(), getXWikiContext());
             return translatedDocument;
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Failed to get translated document for '%s'",
-                serializer.serialize(documentReference)), e);
+                this.serializer.serialize(documentReference)), e);
         }
     }
 
@@ -192,15 +186,16 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             if (documentReference.getLocale() != null
                 && !StringUtils.isEmpty(documentReference.getLocale().getDisplayLanguage())) {
                 language = documentReference.getLocale().toString();
-            } else if (!StringUtils.isEmpty(documentAccessBridge.getDocument(documentReference).getRealLanguage())) {
-                language = documentAccessBridge.getDocument(documentReference).getRealLanguage();
+            } else if (StringUtils.isNotEmpty(this.documentAccessBridge.getDocument(documentReference)
+                .getRealLanguage())) {
+                language = this.documentAccessBridge.getDocument(documentReference).getRealLanguage();
             } else {
                 // Multilingual and Default placeholder
                 language = "en";
             }
         } catch (Exception e) {
             throw new SolrIndexException(String.format("Exception while fetching the language of the document '%s'",
-                serializer.serialize(documentReference)), e);
+                this.serializer.serialize(documentReference)), e);
         }
 
         return language;
@@ -212,13 +207,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param solrDocument the document where to add the properties.
      * @param object the object whose properties to add.
+     * @param language the language of the indexed document. In case of translations, this will obviously be different
+     *            than the original document's language.
      */
-    protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object)
+    protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object, String language)
     {
         if (object == null) {
             // Yes, the platform can return null objects.
             return;
         }
+
+        String fieldName = String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, language);
 
         XWikiContext context = getXWikiContext();
 
@@ -228,11 +227,23 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) field;
 
             // Avoid indexing empty properties.
-            if (property.getValue() != null) {
+            Object propertyValue = property.getValue();
+            if (propertyValue != null) {
                 // Avoid indexing password.
                 PropertyClass propertyClass = (PropertyClass) xClass.get(property.getName());
-                if (!(propertyClass instanceof PasswordClass)) {
-                    solrDocument.addField(Fields.OBJECT_CONTENT, property.getName() + ":" + property.getValue());
+                if (propertyClass instanceof PasswordClass) {
+                    continue;
+                } else if (propertyValue instanceof List) {
+                    // Handle list property values, by adding each list entry.
+                    List propertyListValues = (List) propertyValue;
+                    for (Object propertyListValue : propertyListValues) {
+                        solrDocument.addField(fieldName,
+                            String.format(OBJCONTENT_FORMAT, property.getName(), propertyListValue));
+                    }
+                } else {
+                    // Generic toString on the property value
+                    solrDocument.addField(fieldName,
+                        String.format(OBJCONTENT_FORMAT, property.getName(), propertyValue));
                 }
             }
         }

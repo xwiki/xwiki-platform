@@ -27,14 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
   <name>XWiki Platform - Tools - XML Doc Update Plugin</name>
   <packaging>maven-plugin</packaging>
   <description>A Maven plugin to load XWiki documents from XML and perform file attachment or setting object properties, before writting the document back to XML </description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>44.33</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
@@ -52,7 +54,6 @@
       <artifactId>xwiki-commons-environment-standard</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -107,7 +108,6 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -117,8 +117,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -139,7 +140,7 @@
   <profiles>
     <profile>
       <id>clover</id>
-      <!-- Add dependnency on Clover JAR since the XMLDoc Update plugin uses XWiki oldcore which gets Clovered and
+      <!-- Add dependency on Clover JAR since the XMLDoc Update plugin uses XWiki oldcore which gets Clovered and
            thus when unit tests are executed we need the Clover JAR in the classpath -->
       <dependencies>
         <dependency>

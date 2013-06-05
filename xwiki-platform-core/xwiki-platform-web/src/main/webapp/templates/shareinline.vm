@@ -1,7 +1,7 @@
 #template('xwikivars.vm')
 #if ($isGuest)
 ##  $response.setStatus(401)
-  #error ($msg.get('core.viewers.share.error.mustLogin'))
+  #error ($services.localization.render('core.viewers.share.error.mustLogin'))
 #elseif ("$!{request.send}" != '')
   #set ($message = "$!{request.message.trim()}")
   #set ($sender = $xwiki.getUserName($context.user, false))
@@ -41,25 +41,25 @@
           #set ($discard = $recipients.add($recipient))
           #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${NULL}, ${NULL}, $context.language, 'XWiki.SharePage', {}))
           #if ($result != 0)
-            #set ($discard = $errors.put($fullRecipientName, $msg.get('core.viewers.share.error.serverError')))
+            #set ($discard = $errors.put($fullRecipientName, $services.localization.render('core.viewers.share.error.serverError')))
           #else
             #set ($discard = $successes.add($fullRecipientName))
           #end
         #elseif ("$!recipient" == '')
-          #set ($discard = $errors.put($fullRecipientName, $msg.get('core.viewers.share.error.unknownEmail')))
+          #set ($discard = $errors.put($fullRecipientName, $services.localization.render('core.viewers.share.error.unknownEmail')))
         #end ## Non empty/handled recipient
       #end ## Non empty recipient
     #end ## Foreach recipient
   #end ## Foreach parameter value
   #if ($successes.size() > 0)
-    #info($msg.get('core.viewers.share.send.success', [$successes.toString().replaceAll('^\[', '').replaceAll('\]$', '')]))
+    #info($services.localization.render('core.viewers.share.send.success', [$successes.toString().replaceAll('^\[', '').replaceAll('\]$', '')]))
   #end
   #if ($errors.size() > 0)
     #foreach ($recipient in $errors.keySet())
-      #error($msg.get('core.viewers.share.send.error', [${recipient}, ${errors.get($recipient)}]))
+      #error($services.localization.render('core.viewers.share.send.error', [${recipient}, ${errors.get($recipient)}]))
     #end
   #end
-  <a href='$doc.getURL()' class='share-backlink'>$msg.get('core.viewers.share.send.back', ["<em>${doc.displayTitle}</em>"])</a>
+  <a href='$doc.getURL()' class='share-backlink'>$services.localization.render('core.viewers.share.send.back', ["<em>${doc.displayTitle}</em>"])</a>
 #else ## Form not sent, display the UI
 #userPicker_import()
 #set ($discard = $xwiki.ssx.use('XWiki.SharePage'))
@@ -71,33 +71,33 @@
   </div>
   <dl>
     <dt>
-      <label for="shareTarget">$msg.get('core.viewers.share.target')</label>
-      <span class="xHint">$msg.get('core.viewers.share.target.hint')</span>
+      <label for="shareTarget">$services.localization.render('core.viewers.share.target')</label>
+      <span class="xHint">$services.localization.render('core.viewers.share.target.hint')</span>
     </dt>
-    <dd><input type="text" name="target" id="shareTarget" value="" /></dd>
+    <dd><input type="text" name="target" id="shareTarget" value="$!escapetool.xml($stringtool.join($request.getParameterValues('target'), ','))" /></dd>
     #set ($ownEmail = "$!{xwiki.getDocument($context.user).getObject('XWiki.XWikiUsers').getProperty('email').value}")
     #if ($ownEmail != '')
-      <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($context.user, false)} $escapetool.xml("<${ownEmail}>")" /> $msg.get('core.viewers.share.target.ccMe')</label></dd>
+      <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($context.user, false)} $escapetool.xml("<${ownEmail}>")" /> $services.localization.render('core.viewers.share.target.ccMe')</label></dd>
     #end
-    <dt><label>$msg.get('core.viewers.share.includeMethod')</label></dt>
-    <dd><label><input type="radio" name="includeDocument" value="link" checked="checked"/> $msg.get('core.viewers.share.includeMethod.link')</label></dd>
-    <dd><label><input type="radio" name="includeDocument" value="inline"/> $msg.get('core.viewers.share.includeMethod.inline')</label></dd>
-    ## <dd><label><input type="radio" name="includeDocument" value="attachment"/> $msg.get('core.viewers.share.includeMethod.attachment')</label></dd>
-    ## <dd><label><input type="checkbox" name="includeComments"/> $msg.get('core.viewers.share.includeComments')</label></dd>
+    <dt><label>$services.localization.render('core.viewers.share.includeMethod')</label></dt>
+    <dd><label><input type="radio" name="includeDocument" value="link" checked="checked"/> $services.localization.render('core.viewers.share.includeMethod.link')</label></dd>
+    <dd><label><input type="radio" name="includeDocument" value="inline"/> $services.localization.render('core.viewers.share.includeMethod.inline')</label></dd>
+    ## <dd><label><input type="radio" name="includeDocument" value="attachment"/> $services.localization.render('core.viewers.share.includeMethod.attachment')</label></dd>
+    ## <dd><label><input type="checkbox" name="includeComments"/> $services.localization.render('core.viewers.share.includeComments')</label></dd>
 
-    #set ($message = "<textarea name='message' rows='3' cols='80'>${msg.get('core.viewers.share.defaultMessage')}</textarea>")
+    #set ($message = "<textarea name='message' rows='3' cols='80'>${services.localization.render('core.viewers.share.defaultMessage')}</textarea>")
     #set ($fullMessage = $xwiki.getDocument('XWiki.SharePage').getObject('XWiki.Mail', 'language', $context.language, true).getProperty('html').value)
-    #set ($fullMessage = $fullMessage.replace('${recipientName}', $msg.get('core.viewers.share.recipientPlaceholder')))
+    #set ($fullMessage = $fullMessage.replace('${recipientName}', $services.localization.render('core.viewers.share.recipientPlaceholder')))
     #set ($fullMessage = $fullMessage.replaceAll('<pre[^>]*+>[^<]*+</pre>', $message))
     #set ($fullMessage = $xwiki.parseContent($fullMessage))
 
-    <dt><label for="message">$msg.get('core.viewers.share.messagePreviewLabel')</label></dt>
+    <dt><label for="message">$services.localization.render('core.viewers.share.messagePreviewLabel')</label></dt>
     <dd class='mail-preview'>$fullMessage</dd>
 
   </dl>
   <div class="buttons">
-    <span class="buttonwrapper"><input type="submit" class="button" value="$msg.get('core.viewers.share.submit')" /></span>
-    <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$msg.get('core.viewers.share.cancel')</a></span>
+    <span class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('core.viewers.share.submit')" /></span>
+    <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.viewers.share.cancel')</a></span>
   </div>
 </form>
 #end

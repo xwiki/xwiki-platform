@@ -36,7 +36,7 @@ public class DefaultTranslation extends AbstractTranslation
      * @param key the key associated to the translation
      * @param message the actual translation message
      */
-    public DefaultTranslation(TranslationBundleContext context, LocalizedBundle localeBundle, String key,
+    public DefaultTranslation(TranslationBundleContext context, LocalizedTranslationBundle localeBundle, String key,
         TranslationMessage message)
     {
         super(context, localeBundle, key, message);

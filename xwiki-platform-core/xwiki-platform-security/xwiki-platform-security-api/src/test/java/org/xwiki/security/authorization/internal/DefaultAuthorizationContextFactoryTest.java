@@ -73,6 +73,7 @@ public class DefaultAuthorizationContextFactoryTest extends AbstractMockingCompo
 
     private Execution execution;
 
+
     @Before
     @Override
     public void setUp() throws Exception

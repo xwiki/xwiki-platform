@@ -27,13 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform-url-default</artifactId>
   <name>XWiki Platform - URL - Default Implementation</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - URL - Default Implementation</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>68.70</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

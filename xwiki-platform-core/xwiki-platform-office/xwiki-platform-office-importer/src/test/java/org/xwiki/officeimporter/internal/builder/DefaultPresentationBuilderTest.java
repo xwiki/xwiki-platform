@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
@@ -37,9 +37,9 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -102,18 +102,18 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         InputStream officeFileStream = new ByteArrayInputStream(new byte[1024]);
         final Map<String, InputStream> input = Collections.singletonMap(INPUT_FILE_NAME, officeFileStream);
         final Map<String, byte[]> output = Collections.singletonMap(OUTPUT_FILE_NAME, new byte[0]);
-        final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
+        final OfficeConverter mockDocumentConverter = getMockery().mock(OfficeConverter.class);
 
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockOpenOfficeManager).getConverter();
+                oneOf(mockOfficeServer).getConverter();
                 will(returnValue(mockDocumentConverter));
 
                 try {
                     oneOf(mockDocumentConverter).convert(input, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
                     will(returnValue(output));
-                } catch (OpenOfficeConverterException e) {
+                } catch (OfficeConverterException e) {
                     Assert.fail(e.getMessage());
                 }
             }

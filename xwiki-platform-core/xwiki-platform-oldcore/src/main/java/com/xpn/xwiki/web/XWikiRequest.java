@@ -19,12 +19,10 @@
  */
 package com.xpn.xwiki.web;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.RenderRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-public interface XWikiRequest extends HttpServletRequest, RenderRequest, ActionRequest
+public interface XWikiRequest extends HttpServletRequest
 {
     public String get(String name);
 

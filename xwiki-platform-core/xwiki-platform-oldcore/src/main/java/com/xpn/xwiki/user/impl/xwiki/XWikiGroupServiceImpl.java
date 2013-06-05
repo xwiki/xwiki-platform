@@ -25,9 +25,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -36,8 +37,10 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -52,7 +55,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
@@ -65,6 +67,11 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 {
+    public static final EntityReference GROUPCLASS_REFERENCE = new EntityReference("XWikiGroups", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.SPACE));
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
+
     /**
      * Name of the "XWiki.XWikiGroups" class without the space name.
      */
@@ -278,10 +285,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     {
         boolean needUpdate = false;
 
-        Vector<BaseObject> groupVector = groupDocument.getObjects(CLASS_XWIKIGROUPS);
+        List<BaseObject> groups = groupDocument.getXObjects(GROUPCLASS_REFERENCE);
 
-        if (groupVector != null) {
-            for (BaseObject bobj : groupVector) {
+        if (groups != null) {
+            for (BaseObject bobj : groups) {
                 if (bobj != null) {
                     String member = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
 
@@ -349,7 +356,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 String gshortname = Util.getName(group, context);
                 XWikiDocument docgroup = context.getWiki().getDocument(gshortname, context);
 
-                Vector<BaseObject> groups = docgroup.getObjects("XWiki.XWikiGroups");
+                List<BaseObject> groups = docgroup.getXObjects(GROUPCLASS_REFERENCE);
                 if (groups != null) {
                     for (BaseObject bobj : groups) {
                         if (bobj != null) {
@@ -364,8 +371,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 return list;
             }
         } catch (XWikiException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("Failed to get group document", e);
         }
 
         return null;
@@ -401,7 +407,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         XWikiDocument oldDocument = document.getOriginalDocument();
 
         // if there is any chance some group changed, flush the group cache
-        if (document.getObject(CLASS_XWIKIGROUPS) != null || oldDocument.getObject(CLASS_XWIKIGROUPS) != null) {
+        if (document.getXObject(GROUPCLASS_REFERENCE) != null || oldDocument.getXObject(GROUPCLASS_REFERENCE) != null) {
             flushCache();
         }
     }
@@ -603,8 +609,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
-     * @param nb the maximum number of result to return.
-     * @param start the index of the first found user or group to return.
      * @param context the {@link XWikiContext}.
      * @return the of found users or groups.
      * @throws XWikiException error when calling for

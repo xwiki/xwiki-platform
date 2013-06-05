@@ -390,9 +390,9 @@ document.observe("xwiki:dom:loaded", function() { new XWiki.SyntaxConverter(); }
       <content>{{velocity}}
 $xwiki.ssx.use('Panels.DocumentInformation')##
 #set ($pages = $tdoc.includedPages)
-#largepanelheader($msg.get('panels.documentInformation.title'))
+#largepanelheader($services.localization.render('panels.documentInformation.title'))
 #if ($tdoc.language == '' &amp;&amp; $xwiki.isMultiLingual())
-; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$msg.get('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
+; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$services.localization.render('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
 : {{html}}&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;{{/html}}
 #end
 ##--------------------------------------------------------------------------
@@ -401,12 +401,10 @@ $xwiki.ssx.use('Panels.DocumentInformation')##
 $xwiki.jsx.use($paneldoc.fullName)##
 #set ($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
 #if ($configuredSyntaxes.size() &gt; 1)
-  ; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$msg.get('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
+  ; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$services.localization.render('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
   : {{html}}
     &lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
       #set ($docSyntax = $tdoc.getSyntax())
-      &lt;option value="xwiki/1.0"#if ($docSyntax.toIdString().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
-      ##
       ## Starting with XE 2.3 the $syntaxFactory binding has been removed and the new $services binding added.
       ## To make sure this Panel application still work with versions less than 2.3 we verify the availability of bindings.
       #set ($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
@@ -430,14 +428,14 @@ $xwiki.jsx.use($paneldoc.fullName)##
 ##--------------------------------------------------------------------------
 
 {{html}}
-&lt;input id="xhidden" type="checkbox" name="xhidden" #if($doc.isHidden()) checked="checked"#end value="1"/&gt;&lt;label for="xhidden"&gt;$msg.get('panels.documentInformation.hiddenDocument')&lt;/label&gt;
+&lt;input id="xhidden" type="checkbox" name="xhidden" #if($doc.isHidden()) checked="checked"#end value="1"/&gt;&lt;label for="xhidden"&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;
 &lt;input name="xhidden" type="hidden" value="0" /&gt;
 {{/html}}
 ##--------------------------------------------------------------------------
 #if($pages.size() != 0)
-  ; $msg.get('panels.documentInformation.includesCount', [$pages.size()])
+  ; $services.localization.render('panels.documentInformation.includesCount', [$pages.size()])
   #foreach ($page in $pages)
-  : [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$msg.get('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
+  : [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$services.localization.render('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
   #end
 #end
 #panelfooter()

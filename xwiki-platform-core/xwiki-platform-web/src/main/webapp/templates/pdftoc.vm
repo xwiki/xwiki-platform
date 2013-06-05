@@ -1,1 +1,1 @@
-<h1>$msg.get('core.pdf.tableOfContents')</h1>
+<h1>$services.localization.render('core.pdf.tableOfContents')</h1>

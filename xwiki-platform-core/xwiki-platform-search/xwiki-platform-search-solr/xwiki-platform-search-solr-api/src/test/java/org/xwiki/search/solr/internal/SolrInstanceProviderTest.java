@@ -19,56 +19,86 @@
  */
 package org.xwiki.search.solr.internal;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.net.URL;
 
-import javax.inject.Provider;
-
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.search.solr.internal.EmbeddedSolrInstance;
-import org.xwiki.search.solr.internal.SolrInstanceProvider;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
- * TODO DOCUMENT ME!
+ * Tests for {@link SolrInstanceProvider}.
  * 
  * @version $Id$
  */
-public class SolrInstanceProviderTest extends AbstractComponentTestCase
+public class SolrInstanceProviderTest
 {
-    private Provider<SolrInstance> provider;
+    @Rule
+    public final MockitoComponentMockingRule<SolrInstanceProvider> mocker =
+        new MockitoComponentMockingRule<SolrInstanceProvider>(SolrInstanceProvider.class);
+
+    private ComponentManager mockCM;
+
+    private SolrInstance embedded;
+
+    private SolrInstance remote;
+
+    private SolrConfiguration mockConfig;
 
     @Before
-    @Override
     public void setUp() throws Exception
     {
-        super.setUp();
-
-        this.provider =
-            getComponentManager().getInstance(new DefaultParameterizedType(null, Provider.class, SolrInstance.class));
-
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_KEY, url.getPath());
+        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
+
+        this.embedded = mock(SolrInstance.class);
+        this.remote = mock(SolrInstance.class);
+
+        this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
+
+        this.mockCM = this.mocker.getInstance(ComponentManager.class);
+        when(this.mockCM.getInstance(SolrInstance.class, "embedded")).thenReturn(this.embedded);
+        when(this.mockCM.getInstance(SolrInstance.class, "remote")).thenReturn(this.remote);
+        when(this.mockCM.getInstance(SolrInstance.class, "none")).thenThrow(
+            new ComponentLookupException("No such component"));
     }
 
     @Test
-    public void testProviderLookup() throws Exception
+    public void testEmbeddedInstanceRetrieval() throws Exception
     {
-        Assert.assertNotNull(provider);
-        Assert.assertTrue(this.provider instanceof SolrInstanceProvider);
-    }
-
-    @Test
-    public void testInstanceRetrieval() throws Exception
-    {
-        Assert.assertEquals(SolrInstanceProvider.DEFAULT_SOLR_TYPE, ((SolrInstanceProvider) provider).getType());
-
-        SolrInstance instance = provider.get();
+        when(this.mockConfig.getServerType()).thenReturn("embedded");
+        SolrInstance instance = this.mocker.getComponentUnderTest().get();
         Assert.assertNotNull(instance);
-        Assert.assertTrue(instance instanceof EmbeddedSolrInstance);
+        Assert.assertSame(this.embedded, instance);
+    }
+
+    @Test
+    public void testRemoteInstanceRetrieval() throws Exception
+    {
+        when(this.mockConfig.getServerType()).thenReturn("remote");
+        SolrInstance instance = this.mocker.getComponentUnderTest().get();
+        Assert.assertNotNull(instance);
+        Assert.assertSame(this.remote, instance);
+    }
+
+    @Test(expected = InitializationException.class)
+    public void testInstanceRetrievalWithWrongConfiguration() throws Throwable
+    {
+        when(this.mockConfig.getServerType()).thenReturn("none");
+        try {
+            this.mocker.getComponentUnderTest();
+        } catch (ComponentLookupException ex) {
+            throw ex.getCause();
+        }
     }
 }

@@ -23,7 +23,7 @@
 ## Import the documents from the selected XAR.
 ##---------------------------------------------------------------------------
 #if("$!{request.action}" == 'import')
-<p class="legend">$msg.get('import') #if("$!{request.withversions}" == '1')$msg.get('export_addhistory')#end</p>
+<p class="legend">$services.localization.render('import') #if("$!{request.withversions}" == '1')$services.localization.render('export_addhistory')#end</p>
 #template("imported.vm")
 ##---------------------------------------------------------------------------
 ## Browse the XARs and let the user select a XAR and the list of documents
@@ -37,7 +37,7 @@
   $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)##
   <div id="import">
     <div id="packagelist">
-      <div class="legend">$msg.get('core.importer.uploadPackage')</div>
+      <div class="legend">$services.localization.render('core.importer.uploadPackage')</div>
       ## Let the user upload XAR files.
       <form action="$doc.getURL('upload')" enctype="multipart/form-data" method="post" id="AddAttachment">
         <div>
@@ -46,10 +46,10 @@
           <input type="hidden" name="xredirect" value="$!{escapetool.xml($redirect)}" />
           <fieldset id="attachform">
             ## Temporarily disabled, until we fix attachment name handling
-            ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get('core.viewers.attachments.upload.filename')</label></div>
+            ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="30"/></div>
             <div class="package-upload">
-               <label for="xwikiuploadfile" class="hidden">$msg.get('core.viewers.attachments.upload.file')</label>
+               <label for="xwikiuploadfile" class="hidden">$services.localization.render('core.viewers.attachments.upload.file')</label>
                <input id="xwikiuploadfile" type="file" name="filepath" value="" size="30" class="uploadFileInput"/>
                <span class="buttonwrapper">
                  <input type="submit" value="Upload" class="button" />
@@ -58,7 +58,7 @@
           </fieldset>
         </div>
       </form>
-    <div class="legend">$msg.get('core.importer.availablePackages')</div>
+    <div class="legend">$services.localization.render('core.importer.availablePackages')</div>
     <div id="packagelistcontainer">
       #template('packagelist.vm')
     </div> ## packagelistcontainer
@@ -77,34 +77,34 @@
           #if(!$ok)
             #error("There was an error reading the file ${escapetool.xml(${request.file})}. $!xcontext.import_error")
           #else
-          <div class="legend">$msg.get('core.importer.availableDocuments')</div>
+          <div class="legend">$services.localization.render('core.importer.availableDocuments')</div>
           <div id="packageDescription">
             <div class="packageinfos">
               <div>
-                <span class="label">$msg.get('core.importer.package')</span>
+                <span class="label">$services.localization.render('core.importer.package')</span>
                 <span class="filename">$attach.filename</span>
               </div>
               #if("$!packager.name" != '')
               <div>
-                <span class="label">$msg.get('core.importer.package.description')</span>
+                <span class="label">$services.localization.render('core.importer.package.description')</span>
                 <span class="name">$packager.name</span>
               </div>
               #end
               #if("$!packager.version" != '')
               <div>
-                <span class="label">$msg.get('core.importer.package.version')</span>
+                <span class="label">$services.localization.render('core.importer.package.version')</span>
                 <span class="version">$packager.version</span>
               </div>
               #end
               #if("$!packager.authorName" != '')
               <div>
-                <span class="label">$msg.get('core.importer.package.author')</span>
+                <span class="label">$services.localization.render('core.importer.package.author')</span>
                 <span class="author">$packager.getAuthorName()</span>
               </div>
               #end
               #if("$!packager.licence" != '')
               <div>
-                <span class="label">$msg.get('core.importer.package.licence')</span>
+                <span class="label">$services.localization.render('core.importer.package.licence')</span>
                 <span class="licence">$packager.licence</span>
               </div>
               #end
@@ -117,6 +117,11 @@
                 <input type="hidden" name="name" value="$!{escapetool.xml($request.file)}" />
                 <div id="package">
                   <ul class="xlist package">
+                    <li>
+                      ## This hidden input ensures that if no page is selected, the 'pages' parameter is still passsed, thus skipping all the documents in the xar
+                      <input type='hidden' name='pages' value=''/>
+                    </li>
+                    ## List each page in the package
                     #foreach($space in $sorttool.sort($json.get('files').keySet()))
                     <li class="xitem xunderline">
                       <div class="xitemcontainer">
@@ -124,23 +129,25 @@
                       <div class="clearfloats"></div>
                       <div class="pages">
                       <ul class="xlist pages">
-                       #foreach($document in $sorttool.sort($json.get('files').get($space).keySet()))
+                      ## List each document in the current space
+                      #foreach($document in $sorttool.sort($json.get('files').get($space).keySet()))
+                        ## List each version of the current document
                         #foreach($version in $json.get('files').get($space).get($document))
                         <li class="xitem xhighlight">
                           <div class="xitemcontainer xpagecontainer">
                             <span class="checkbox">
-                            <input type="checkbox" name="pages"
-                                   value="${version.fullName}#if("$!version.language" != ''):${version.language}#end" checked />
+                              <input type="checkbox" name="pages"
+                                    value="${version.fullName}#if("$!version.language" != ''):${version.language}#end" checked />
                             </span>
                             <span class="documentName">
-                            <input type="hidden" name="$!{escapetool.xml($version.fullName)}:$!{escapetool.xml($version.language)}" value="$!{escapetool.xml($version.language)}" />
-                            $document #if("$!version.language" != '') - $version.language #end
+                              <input type="hidden" name="$!{escapetool.xml($version.fullName)}:$!{escapetool.xml($version.language)}" value="$!{escapetool.xml($version.language)}" />
+                              $document #if("$!version.language" != '') - $version.language #end
                             </span>
                             <div class="clearfloats"></div>
                           </div>
                         </li>
                         #end
-                       #end
+                      #end
                       </ul>
                       </div>
                       </div>
@@ -148,28 +155,28 @@
                     #end
                 </ul>
                 <div class="importOption">
-                  <em>$msg.get('core.importer.whenDocumentAlreadyExists')</em>
+                  <em>$services.localization.render('core.importer.whenDocumentAlreadyExists')</em>
                   <div class="historyStrategyOption">
                      <input type="radio" name="historyStrategy" value="add" checked="checked" />
-                     $msg.get('core.importer.addNewVersion')
+                     $services.localization.render('core.importer.addNewVersion')
                   </div>
                   <div class="historyStrategyOption">
                      <input type="radio" name="historyStrategy" value="replace" />
-                     $msg.get('core.importer.replaceDocumentHistory')
+                     $services.localization.render('core.importer.replaceDocumentHistory')
                   </div>
                   <div class="historyStrategyOption">
                      <input type="radio" name="historyStrategy" value="reset" />
-                     $msg.get('core.importer.resetHistory')
+                     $services.localization.render('core.importer.resetHistory')
                   </div>
                 </div>
                 #if($packager.hasBackupPackImportRights())
                 <div class="importOption">
                   <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
-                  $msg.get('core.importer.importAsBackup')
+                  $services.localization.render('core.importer.importAsBackup')
                 </div>
                 #end
                 <span class="buttonwrapper">
-                  <input class="button" type="submit" value="$msg.get('core.importer.import')" />
+                  <input class="button" type="submit" value="$services.localization.render('core.importer.import')" />
                 </span>
               </div>
               </div>

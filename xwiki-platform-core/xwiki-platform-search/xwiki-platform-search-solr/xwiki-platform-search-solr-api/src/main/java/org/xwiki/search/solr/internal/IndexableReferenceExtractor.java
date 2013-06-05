@@ -24,6 +24,7 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.stability.Unstable;
 
 /**
  * Recursively retrieves the references for all the indexable entities contained by the given start entity.
@@ -31,6 +32,7 @@ import org.xwiki.search.solr.internal.api.SolrIndexException;
  * @version $Id$
  * @since 4.3M2
  */
+@Unstable
 @Role
 public interface IndexableReferenceExtractor
 {

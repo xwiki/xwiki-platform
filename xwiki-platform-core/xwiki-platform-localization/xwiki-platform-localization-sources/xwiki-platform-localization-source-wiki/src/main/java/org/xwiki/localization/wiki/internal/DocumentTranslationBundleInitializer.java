@@ -48,7 +48,7 @@ public class DocumentTranslationBundleInitializer implements EventListener
     /**
      * The name of the event listener.
      */
-    protected static final String NAME = "localization.bundle.DocumentBundleInitializer";
+    protected static final String NAME = "localization.bundle.DocumentTranslationBundleInitializer";
 
     /**
      * The events to listen.
@@ -60,7 +60,7 @@ public class DocumentTranslationBundleInitializer implements EventListener
      * {@link org.xwiki.observation.ObservationManager}).
      */
     @Inject
-    @Named("document")
+    @Named(DocumentTranslationBundleFactory.ID)
     private Provider<TranslationBundleFactory> bundleFactoryProvider;
 
     /**

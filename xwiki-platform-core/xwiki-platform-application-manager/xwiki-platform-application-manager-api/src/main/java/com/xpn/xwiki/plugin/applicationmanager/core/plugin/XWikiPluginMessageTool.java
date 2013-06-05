@@ -34,6 +34,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  * 
  * @version $Id$
  */
+@Deprecated
 public class XWikiPluginMessageTool extends XWikiMessageTool
 {
     /**

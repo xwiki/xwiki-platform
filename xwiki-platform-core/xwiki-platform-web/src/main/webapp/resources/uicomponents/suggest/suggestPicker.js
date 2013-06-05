@@ -43,7 +43,7 @@ var XWiki = (function (XWiki) {
 
     // Process options
     this.options = Object.extend(Object.clone(this.options), options || { });
-    this.input = element;
+    this.input = $(element);
     this.suggest = suggest;
     this.inputName = this.input.name;
     if (!this.options.acceptFreeText) {
@@ -74,8 +74,8 @@ var XWiki = (function (XWiki) {
       this.clearTool = new Element('a', {
         href: '#clearSelection',
         'class' : 'clear-tool',
-        title : "$msg.get('core.widgets.suggestPicker.deleteAll.tooltip')"
-      }).update("$msg.get('core.widgets.suggestPicker.deleteAll')");
+        title : "$services.localization.render('core.widgets.suggestPicker.deleteAll.tooltip')"
+      }).update("$services.localization.render('core.widgets.suggestPicker.deleteAll')");
       this.clearTool.hide().observe('click', this.clearAcceptedList.bindAsEventListener(this));
       this.list.insert({'after': this.clearTool});
     }
@@ -88,7 +88,8 @@ var XWiki = (function (XWiki) {
    * list of accepted suggestions.
    */
   initializeSelection: function() {
-    this.input.readonly = true;
+    this.input.readOnly = true;
+    this.input.addClassName('loading');
     this.loadSelectedValue(this.input.value.split(this.options.separator), 0);
   },
 
@@ -97,8 +98,12 @@ var XWiki = (function (XWiki) {
    */
   loadSelectedValue: function(values, index) {
     if (index >= values.length) {
-      this.input.clear();
-      this.input.readonly = false;
+      this.input.readOnly = false;
+      this.input.value = '';
+      this.input.removeClassName('loading');
+      return;
+    } else if (values[index].strip() == '') {
+      this.loadSelectedValue(values, index + 1);
       return;
     }
     // Look for the selected value in all the sources.
@@ -139,7 +144,7 @@ var XWiki = (function (XWiki) {
    * @return default suggestion data for when a selected value is not found in any of the configured sources
    */
   getDefaultSuggestion: function(value) {
-    return {id: value, value: value};
+    return {id: value, value: value, info: value};
   },
 
   /**
@@ -268,7 +273,7 @@ var XWiki = (function (XWiki) {
   createDeleteTool: function() {
     var deleteTool = new Element("span", {
       'class': "delete-tool",
-      title : "$msg.get('core.widgets.suggestPicker.delete.tooltip')"
+      title : "$services.localization.render('core.widgets.suggestPicker.delete.tooltip')"
     }).update('&times;').observe('click', this.removeItem);
     deleteTool.insert({top: new Element('span', {'class': 'hidden'}).update('[')});
     deleteTool.insert({bottom: new Element('span', {'class': 'hidden'}).update(']')});

@@ -33,11 +33,13 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  * 
  * @version $Id$
  */
+@Deprecated
 public class GlobalSearchMessageTool extends XWikiPluginMessageTool
 {
     /**
      * Key to use with {@link XWikiContext#get(Object)}.
      */
+    @Deprecated
     public static final String MESSAGETOOL_CONTEXT_KEY = "globalsearchmessagetool";
 
     /**

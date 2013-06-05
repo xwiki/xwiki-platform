@@ -7,12 +7,12 @@
     <input type="hidden" name="xredirect" value="" />
     </div>
     <p>
-      ##$msg.get('choosetargetfilename'):
+      ##$services.localization.render('choosetargetfilename'):
       ##<input type="text" name="filename" value="" size="20" />
       ##<br /><br />
-      $msg.get('choosefiletoupload'):
+      $services.localization.render('choosefiletoupload'):
       <input type="file" name="filepath" value="" size="40"  /> <br /><br />
-      <input type="submit" id="attachment" name="attachment" value="$msg.get('attachthisfile')" />
+      <input type="submit" id="attachment" name="attachment" value="$services.localization.render('attachthisfile')" />
     </p>
   </form>
   #set($hasAttachments = false)
@@ -20,7 +20,7 @@
     #if((!$request.images) || $attachment.isImage())
       #if(!$hasAttachments)
         <table width="95%">
-        <tr class="title"><th scope="col"></th><th scope="col">$msg.get('filename')</th><th scope="col">$msg.get('version')</th><th scope="col">$msg.get('author')</th></tr>
+        <tr class="title"><th scope="col"></th><th scope="col">$services.localization.render('filename')</th><th scope="col">$services.localization.render('version')</th><th scope="col">$services.localization.render('author')</th></tr>
         #set($hasAttachments = true)
       #end
       <tr>

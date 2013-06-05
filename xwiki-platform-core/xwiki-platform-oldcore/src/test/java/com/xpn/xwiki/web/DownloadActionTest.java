@@ -176,7 +176,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     }
 
     @Test(expected = XWikiException.class)
-    public void testDownloadMissingFile() throws XWikiException, IOException
+    public void testDownloadMissingFile() throws XWikiException
     {
         setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l);
         this.action.render(getContext());
@@ -248,7 +248,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     }
 
     @Test(expected = XWikiException.class)
-    public void testDownloadWithIncompletePath() throws XWikiException, IOException
+    public void testDownloadWithIncompletePath() throws XWikiException
     {
         setRequestExpectations("/xwiki/bin/download/", null, null, null, -1l);
         this.action.render(getContext());

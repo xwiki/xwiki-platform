@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.macro.chart;
 import org.junit.Test;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link ImageId}.

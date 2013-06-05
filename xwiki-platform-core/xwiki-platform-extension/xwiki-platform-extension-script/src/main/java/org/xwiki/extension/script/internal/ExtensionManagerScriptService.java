@@ -41,7 +41,6 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
@@ -270,9 +269,8 @@ public class ExtensionManagerScriptService implements ScriptService
      * @param offset the offset from where to start returning versions
      * @param nb the maximum number of versions to return
      * @return the versions of the provided extension id
-     * @throws ResolveException fail to find extension for provided id
      */
-    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb)
     {
         setError(null);
 
@@ -430,21 +428,11 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public InstallRequest createInstallRequest(String id, String version, String namespace)
     {
-        InstallRequest installRequest = new InstallRequest();
+        InstallRequest installRequest = createInstallPlanRequest(id, version, namespace);
+
         installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
         installRequest.setInteractive(true);
-        installRequest.addExtension(new ExtensionId(id, version));
-        if (StringUtils.isNotBlank(namespace)) {
-            installRequest.addNamespace(namespace);
-        }
-
-        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
-        XWikiDocument callerDocument = getCallerDocument();
-        if (callerDocument != null) {
-            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
-        }
-
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
 
         return installRequest;
     }
@@ -475,14 +463,75 @@ public class ExtensionManagerScriptService implements ScriptService
     {
         setError(null);
 
-        if (installRequest.getProperty(PROPERTY_CHECKRIGHTS) != Boolean.TRUE
-            && !this.documentAccessBridge.hasProgrammingRights()) {
-            installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            // Make sure only PR user can remove the right checking or change the users
+            setRightsProperties(installRequest);
         }
 
         Job job = null;
         try {
             job = this.jobManager.addJob(InstallJob.JOBTYPE, installRequest);
+        } catch (JobException e) {
+            setError(e);
+        }
+
+        return job;
+    }
+
+    /**
+     * Create an {@link InstallRequest} instance based on given parameters, to be used to create the install plan.
+     * 
+     * @param id the identifier of the extension to install
+     * @param version the version to install
+     * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
+     *            will be installed globally
+     * @return the {@link InstallRequest}
+     */
+    public InstallRequest createInstallPlanRequest(String id, String version, String namespace)
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, id, namespace));
+        installRequest.addExtension(new ExtensionId(id, version));
+        if (StringUtils.isNotBlank(namespace)) {
+            installRequest.addNamespace(namespace);
+        }
+
+        setRightsProperties(installRequest);
+
+        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
+
+        return installRequest;
+    }
+
+    private void setRightsProperties(InstallRequest installRequest)
+    {
+        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+    }
+
+    /**
+     * Start the asynchronous installation plan creation process for an extension.
+     * 
+     * @param installRequest installation instructions
+     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     *         {@code null} in case of failure
+     */
+    public Job createInstallPlan(InstallRequest installRequest)
+    {
+        setError(null);
+
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            // Make sure only PR user can remove the right checking or change the users
+            setRightsProperties(installRequest);
+        }
+
+        Job job = null;
+        try {
+            job = this.jobManager.addJob(InstallPlanJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
         }
@@ -502,32 +551,7 @@ public class ExtensionManagerScriptService implements ScriptService
      */
     public Job createInstallPlan(String id, String version, String namespace)
     {
-        setError(null);
-
-        InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, id, namespace));
-        installRequest.addExtension(new ExtensionId(id, version));
-        if (StringUtils.isNotBlank(namespace)) {
-            installRequest.addNamespace(namespace);
-        }
-
-        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
-        XWikiDocument callerDocument = getCallerDocument();
-        if (callerDocument != null) {
-            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
-        }
-
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
-
-        Job job = null;
-        try {
-            job = this.jobManager.addJob(InstallPlanJob.JOBTYPE, installRequest);
-        } catch (JobException e) {
-            setError(e);
-        }
-
-        return job;
+        return createInstallPlan(createInstallPlanRequest(id, version, namespace));
     }
 
     /**
@@ -590,6 +614,7 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallJob.JOBTYPE);
 
         Job job = null;
         try {
@@ -674,7 +699,7 @@ public class ExtensionManagerScriptService implements ScriptService
         return job;
     }
 
-    private InstallRequest createUpgradePlanRequest(String namespace)
+    public InstallRequest createUpgradePlanRequest(String namespace)
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));

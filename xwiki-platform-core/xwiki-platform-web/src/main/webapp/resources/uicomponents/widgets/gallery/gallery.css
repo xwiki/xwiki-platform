@@ -1,31 +1,6 @@
-#macro(ieOpacity $selector $value)
-/* start IE opacity setting */
-$selector {
-  /* We need to quote the property value because the equal sign is not valid inside a CSS property value. */
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=$value)";
-}
-
-#foreach($item in $selector.split('\s*,\s*'))
-*+html $item, ##
-#end {
-  /* This is for IE7, which doesn't accept the quoted value but fortunately understands the escape syntax. */
-  filter: alpha(opacity\=$value);
-  /* Unicode escape works too. */
-  /*filter: alpha(opacity\003d $value);*/
-}
-
-#foreach($item in $selector.split('\s*,\s*'))
-* html $item, ##
-#end {
-  /* This is for IE6, which doesn't understand the escaped equal sign (not even the unicode escape) but fortunately
-  accepts the quoted value. */
-  filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=$value)";
-}
-/* end IE opacity setting */
-#end
-
 #set($imageMaxWidth = 492)
 #set($imageMaxHeight = 369)
+#set($px = 'px')
 
 .xGallery {
   background-color: black;
@@ -33,13 +8,7 @@ $selector {
   /* Position relative is required because some of the inner elements have position absolute and the gallery container
   must be their offset parent. */
   position: relative;
-  width: ${mathtool.add($imageMaxWidth, 128)}px;
-}
-
-/* Mouse cursor is invisible in IE7 when moved over the gallery. This happens because IE7 shows the text cursor which is
-black and thus it's not visible on gallery's black background. */
-*+html .xGallery {
-  cursor: default;
+  width: $mathtool.add($imageMaxWidth, 128)$px;
 }
 
 .xGallery.maximized {
@@ -49,16 +18,9 @@ black and thus it's not visible on gallery's black background. */
   z-index: 1001;
 }
 
-/* IE6 position:fixed workaround. */
-* html .xGallery.maximized {
-  height: 100%;
-  position: absolute;
-  width: 100%
-}
-
 .xGallery .currentImageWrapper {
-  height: ${imageMaxHeight}px;
-  line-height: ${imageMaxHeight}px;
+  height: $imageMaxHeight$px;
+  line-height: $imageMaxHeight$px;
   /* This is just in case the browser doesn't support the max-height and max-width CSS properties. */
   overflow: hidden;
   text-align: center;
@@ -66,17 +28,9 @@ black and thus it's not visible on gallery's black background. */
 }
 
 .xGallery .currentImage {
-  max-height: ${imageMaxHeight}px;
-  max-width: ${imageMaxWidth}px;
+  max-height: $imageMaxHeight$px;
+  max-width: $imageMaxWidth$px;
   vertical-align: middle;
-}
-
-/* This is required to center the image vertically on IE6. See http://www.brunildo.org/test/IElineheight.html */
-.xGallery .currentImagePinPoint {
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-  width: 0;
 }
 
 .xGallery .previous, .xGallery .next {
@@ -146,9 +100,15 @@ black and thus it's not visible on gallery's black background. */
   opacity: 1;
 }
 
-#ieOpacity('.xGallery .maximize, .xGallery .minimize' 50)
+.xGallery .maximize, .xGallery .minimize {
+  /* We need to quote the property value because the equal sign is not valid inside a CSS property value. */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+}
 
-#ieOpacity('.xGallery .maximize:hover, .xGallery .minimize:hover' 100)
+.xGallery .maximize:hover, .xGallery .minimize:hover {
+  /* We need to quote the property value because the equal sign is not valid inside a CSS property value. */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+}
 
 .xGallery .maximize {
   background: transparent url('maximize.gif') no-repeat scroll center;

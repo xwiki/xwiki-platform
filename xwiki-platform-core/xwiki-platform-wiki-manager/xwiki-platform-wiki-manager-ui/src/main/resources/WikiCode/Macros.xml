@@ -25,7 +25,7 @@
   <hidden>true</hidden>
   <content>#macro(displaymodification $pagename $pagelink $date $formatDate $user $star)
   #if(!$formatDate)
-    #set($formatDate = $msg.get("wikimanager.defaultdatetimeformat"))
+    #set($formatDate = $services.localization.render('wikimanager.defaultdatetimeformat'))
   #end
   #if($formatDate == "wikimanager.defaultdatetimeformat")
     #set($formatDate = "yyyy MMMM dd 'at' HH:mm")

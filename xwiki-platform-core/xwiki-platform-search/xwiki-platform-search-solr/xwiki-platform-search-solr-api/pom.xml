@@ -27,13 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
-  <description>Solr engine management: configuration, indexing, listeners, script service, etc. This module does not handle the search queries.</description>
+  <description>Solr engine management: configuration, indexing, listeners, script service, etc. This module does not handle the search queries</description>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Solr Search API</xwiki.extension.name>
     <solr.version>4.0.0</solr.version>
+    <xwiki.jacoco.instructionRatio>62.38</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -91,6 +94,12 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <!-- Apache xalan used for Solr's internal XML operations. -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
     </dependency>
 
     <!-- XWiki dependencies -->

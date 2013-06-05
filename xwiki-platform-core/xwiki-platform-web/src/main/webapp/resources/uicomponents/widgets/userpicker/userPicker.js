@@ -102,8 +102,8 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
     this._scope = new Element('input', {
       type: 'image',
       'class': 'scope',
-      alt: "$msg.get('core.widgets.userPicker.scopeHint')",
-      title: "$msg.get('core.widgets.userPicker.scopeHint')"
+      alt: "$services.localization.render('core.widgets.userPicker.scopeHint')",
+      title: "$services.localization.render('core.widgets.userPicker.scopeHint')"
     });
     // Group the scope and the input.
     var wrapper = new Element('span').insert(this._scope);
@@ -148,11 +148,11 @@ var init = function(event) {
   var suggestionsMapping = {
     users: {
       script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&uorg=user&'),
-      noresults: "$msg.get('core.widgets.userPicker.noResults')"
+      noresults: "$services.localization.render('core.widgets.userPicker.noResults')"
     },
     groups: {
       script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&uorg=group&'),
-      noresults: "$msg.get('core.widgets.groupPicker.noResults')"
+      noresults: "$services.localization.render('core.widgets.groupPicker.noResults')"
     }
   }
   var containers = (event && event.memo.elements) || [$('body')];

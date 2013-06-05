@@ -68,6 +68,11 @@
     </any>
   </replace-with>
 
+  <replace-with class="org.xwiki.gwt.dom.client.internal.webkit.WebKitDOMUtils">
+    <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
+    <when-property-is name="user.agent" value="safari" />
+  </replace-with>
+
   <!-- TestRangeFactory -->
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory" />

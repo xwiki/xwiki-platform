@@ -27,15 +27,20 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-manager</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-manager-ui</artifactId>
   <name>XWiki Platform - Wiki Manager - UI</name>
   <packaging>xar</packaging>
   <description>Manages creation and installation of children Wikis</description>
   <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform.applications:xwiki-plugin-wiki-manager</xwiki.extension.features>
+
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Manager Application</xwiki.extension.name>
   </properties>
   <!-- TODO: Add back this dependency when the wiki-manager plugin is back -->
   <dependencies>

@@ -9,15 +9,15 @@
   <input type="hidden" name="xeditaction" value="$!xcontext.action" />
   #if ((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
     #set ($minorFieldAdded = 1)
-    <div class="meta-minorEdit"><label for="minorEdit"><input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/> $msg.get('core.minoredit')</label></div>
+    <div class="meta-minorEdit"><label for="minorEdit"><input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/> $services.localization.render('core.minoredit')</label></div>
   #end
   #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
     #set ($commentFieldAdded = 1)
     #if ($xwiki.isEditCommentFieldHidden())
       <input type="hidden" name="comment" id="comment" value="$!{escapetool.xml($request.comment)}" />
     #else
-      <label for="commentinput">$msg.get('core.comment') <span>$msg.get('core.comment.details')</span>
-      <input type="text" name="comment" id="commentinput" value="$!{escapetool.xml($request.comment)}" size="40" title="$msg.get('core.comment.tooltip')" />
+      <label for="commentinput">$services.localization.render('core.comment') <span>$services.localization.render('core.comment.details')</span>
+      <input type="text" name="comment" id="commentinput" value="$!{escapetool.xml($request.comment)}" size="40" title="$services.localization.render('core.comment.tooltip')" />
       </label>
     #end
   #end

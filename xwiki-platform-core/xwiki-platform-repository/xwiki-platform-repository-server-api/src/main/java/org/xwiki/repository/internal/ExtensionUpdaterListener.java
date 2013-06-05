@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ public class ExtensionUpdaterListener implements EventListener
     private Logger logger;
 
     @Inject
-    private RepositoryManager repositoryManager;
+    private Provider<RepositoryManager> repositoryManagerProvider;
 
     @Override
     public List<Event> getEvents()
@@ -76,7 +77,7 @@ public class ExtensionUpdaterListener implements EventListener
 
         if (extensionObject != null) {
             try {
-                this.repositoryManager.validateExtension(document, true);
+                this.repositoryManagerProvider.get().validateExtension(document, true);
             } catch (XWikiException e) {
                 this.logger.error("Failed to validate extension in document [{}]", document.getDocumentReference(), e);
             }

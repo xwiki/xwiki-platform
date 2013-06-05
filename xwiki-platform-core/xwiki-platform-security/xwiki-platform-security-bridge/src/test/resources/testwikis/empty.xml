@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <wikis>
-  <wiki name="xwiki" mainWiki="true" owner="XWiki.Admin" >
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin" >
     <space name="XWiki">
       <document name="XWikiPreferences" />
     </space>

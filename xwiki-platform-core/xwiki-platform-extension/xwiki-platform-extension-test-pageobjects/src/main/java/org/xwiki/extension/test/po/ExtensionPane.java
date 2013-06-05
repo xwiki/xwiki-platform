@@ -36,6 +36,16 @@ import org.xwiki.test.ui.po.BaseElement;
 public class ExtensionPane extends BaseElement
 {
     /**
+     * The XPath used to locate an extension action button.
+     */
+    private static final String ACTION_BUTTON_XPATH = ".//button[@name = 'extensionAction' and @value='%s']";
+
+    /**
+     * The name of the "class" attribute of HTML elements.
+     */
+    private static final String CLASS_ATTRIBUTE = "class";
+
+    /**
      * The element that wraps the extension display.
      */
     private final WebElement container;
@@ -56,7 +66,7 @@ public class ExtensionPane extends BaseElement
      */
     public String getStatus()
     {
-        String[] classNames = container.getAttribute("class").split("\\s+");
+        String[] classNames = container.getAttribute(CLASS_ATTRIBUTE).split("\\s+");
         if (classNames.length < 2) {
             return null;
         }
@@ -124,16 +134,23 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane showDetails()
     {
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, By.name("showDetails"));
-        if (found.size() > 0) {
-            found.get(0).click();
+        WebElement showDetailsButton = getShowDetailsButton();
+        if (showDetailsButton.getAttribute(CLASS_ATTRIBUTE).contains("visibilityAction")) {
+            // Just toggle show/hide details.
+            showDetailsButton.click();
             return this;
         } else {
-            // Wait until the extension body is not loading.
-            WebElement button =
-                getUtil().findElementWithoutWaiting(getDriver(), container, By.name("actionShowDetails"));
-            return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']");
+            // Retrieve the details. Wait until the extension body is not loading.
+            return clickAndWaitUntilElementIsVisible(showDetailsButton, "/*[@class = 'extension-body']");
         }
+    }
+
+    /**
+     * @return the button used to show the extension details
+     */
+    public WebElement getShowDetailsButton()
+    {
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "showDetails")));
     }
 
     /**
@@ -159,7 +176,7 @@ public class ExtensionPane extends BaseElement
     {
         String nameAndVersion =
             getUtil().findElementWithoutWaiting(getDriver(), container, By.className("extension-title")).getText();
-        return String.format("//*[contains(@class, 'extension-item') and descendant::*["
+        return String.format("//form[contains(@class, 'extension-item') and descendant::*["
             + "contains(@class, 'extension-title') and normalize-space(.) = '%s']]", nameAndVersion);
     }
 
@@ -170,8 +187,16 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane hideDetails()
     {
-        getUtil().findElementWithoutWaiting(getDriver(), container, By.name("hideDetails")).click();
+        getHideDetailsButton().click();
         return this;
+    }
+
+    /**
+     * @return the button used to hide the extension details
+     */
+    public WebElement getHideDetailsButton()
+    {
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "hideDetails")));
     }
 
     /**
@@ -182,11 +207,12 @@ public class ExtensionPane extends BaseElement
      */
     private ExtensionPane clickAndWaitForConfirmationOrJobDone(WebElement button)
     {
-        // Wait until the extension is not loading or the progress section contains a confirmation button.
-        return clickAndWaitUntilElementIsVisible(button, "/*[@class = 'extension-body']/*"
-            + "[@class = 'extension-body-progress extension-body-section' and "
-            + "(not(ancestor::*[contains(@class, 'loading')]) or "
-            + "descendant::input[@name = 'confirm' and not(@disabled)])]");
+        // Wait until the the continue button is present or the extension is not loading and both the extension body and
+        // the progress section are present and not loading.
+        return clickAndWaitUntilElementIsVisible(button,
+            "[descendant::button[@name = 'extensionAction' and @value = 'continue' and not(@disabled)] or ("
+            + "not(contains(@class, 'loading')) and descendant::*[@class = 'extension-body']"
+            + "/*[@class = 'extension-body-progress extension-body-section'])]");
     }
 
     /**
@@ -196,7 +222,7 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane install()
     {
-        return clickAndWaitForConfirmationOrJobDone(getInstallButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getInstallButton());
     }
 
     /**
@@ -204,7 +230,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getInstallButton()
     {
-        return maybeFindElement(By.xpath(".//input[@name = 'actionInstall' and @value = 'Install']"));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "install")));
     }
 
     /**
@@ -218,13 +244,28 @@ public class ExtensionPane extends BaseElement
     }
 
     /**
+     * Clicks on the drop-down toggle, if present, to expand the group of extension action buttons.
+     * 
+     * @return this
+     */
+    private ExtensionPane maybeOpenActionDropDownMenu()
+    {
+        String xpath = ".//*[@class = 'extension-actions']//*[@class = 'dropdown-toggle']";
+        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, By.xpath(xpath));
+        if (found.size() > 0) {
+            found.get(0).click();
+        }
+        return this;
+    }
+
+    /**
      * Clicks on the uninstall button and waits for the uninstall plan to be computed.
      * 
      * @return the extension pane displaying the uninstall plan
      */
     public ExtensionPane uninstall()
     {
-        return clickAndWaitForConfirmationOrJobDone(getUninstallButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getUninstallButton());
     }
 
     /**
@@ -232,7 +273,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getUninstallButton()
     {
-        return maybeFindElement(By.name("actionUninstall"));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "uninstall")));
     }
 
     /**
@@ -242,7 +283,7 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane upgrade()
     {
-        return clickAndWaitForConfirmationOrJobDone(getUpgradeButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getUpgradeButton());
     }
 
     /**
@@ -250,7 +291,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getUpgradeButton()
     {
-        return maybeFindElement(By.xpath(".//input[@name = 'actionInstall' and @value = 'Upgrade']"));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "upgrade")));
     }
 
     /**
@@ -260,7 +301,7 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane downgrade()
     {
-        return clickAndWaitForConfirmationOrJobDone(getDowngradeButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getDowngradeButton());
     }
 
     /**
@@ -268,7 +309,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getDowngradeButton()
     {
-        return maybeFindElement(By.xpath(".//input[@name = 'actionInstall' and @value = 'Downgrade']"));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "downgrade")));
     }
 
     /**
@@ -278,8 +319,15 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane confirm()
     {
-        WebElement button = getUtil().findElementWithoutWaiting(getDriver(), container, By.name("confirm"));
-        return clickAndWaitForConfirmationOrJobDone(button);
+        return clickAndWaitForConfirmationOrJobDone(getContinueButton());
+    }
+
+    /**
+     * @return the button used to continue the current job or to execute a previously computed job plan
+     */
+    public WebElement getContinueButton()
+    {
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "continue")));
     }
 
     /**

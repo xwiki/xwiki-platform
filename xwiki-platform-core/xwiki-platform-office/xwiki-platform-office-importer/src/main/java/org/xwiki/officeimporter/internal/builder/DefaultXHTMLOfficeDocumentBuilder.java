@@ -40,9 +40,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
@@ -66,14 +66,14 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
      * Used to obtain document converter.
      */
     @Inject
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     /**
-     * OpenOffice HTML cleaner.
+     * Office HTML cleaner.
      */
     @Inject
     @Named("openoffice")
-    private HTMLCleaner ooHtmlCleaner;
+    private HTMLCleaner officeHtmlCleaner;
 
     /**
      * Used to determine the encoding of the HTML byte array produced by the office server.
@@ -84,15 +84,15 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
     public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        // Invoke OpenOffice document converter.
+        // Invoke the office document converter.
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(officeFileName, officeFileStream);
         Map<String, byte[]> artifacts;
-        // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
+        // The office converter uses the output file name extension to determine the output format/syntax.
         String outputFileName = StringUtils.substringBeforeLast(officeFileName, ".") + ".html";
         try {
-            artifacts = this.officeManager.getConverter().convert(inputStreams, officeFileName, outputFileName);
-        } catch (OpenOfficeConverterException ex) {
+            artifacts = this.officeServer.getConverter().convert(inputStreams, officeFileName, outputFileName);
+        } catch (OfficeConverterException ex) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), ex);
         }
@@ -105,10 +105,10 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         }
 
         // Parse and clean the HTML output.
-        HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
+        HTMLCleanerConfiguration configuration = this.officeHtmlCleaner.getDefaultConfiguration();
         configuration.setParameters(params);
         Reader html = getReader(artifacts.remove(outputFileName));
-        Document xhtmlDoc = this.ooHtmlCleaner.clean(html, configuration);
+        Document xhtmlDoc = this.officeHtmlCleaner.clean(html, configuration);
 
         // Return a new XHTMLOfficeDocument instance.
         return new XHTMLOfficeDocument(xhtmlDoc, artifacts);

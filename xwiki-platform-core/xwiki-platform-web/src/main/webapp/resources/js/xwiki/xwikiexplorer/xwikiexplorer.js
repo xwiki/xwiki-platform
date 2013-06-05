@@ -61,14 +61,14 @@ isc.ClassFactory.defineClass("XWEResultTree", isc.ResultTree);
 isc.XWEResultTree.addClassProperties({
     constants : {
         addNodeSuffix : "..new",
-        pageHint : "$msg.get('xwikiexplorer.page.hint')",
-        attachmentsTitle : "$msg.get('xwikiexplorer.attachments.title')",
-        attachmentsHint : "$msg.get('xwikiexplorer.attachments.hint')",
-        attachmentHint : "$msg.get('xwikiexplorer.attachment.hint')",
-        addPageTitle : "$msg.get('xwikiexplorer.addpage.title')",
-        addPageHint : "$msg.get('xwikiexplorer.addpage.hint')",
-        addAttachmentTitle : "$msg.get('xwikiexplorer.addattachment.title')",
-        addAttachmentHint : "$msg.get('xwikiexplorer.addattachment.hint')"
+        pageHint : "$services.localization.render('xwikiexplorer.page.hint')",
+        attachmentsTitle : "$services.localization.render('xwikiexplorer.attachments.title')",
+        attachmentsHint : "$services.localization.render('xwikiexplorer.attachments.hint')",
+        attachmentHint : "$services.localization.render('xwikiexplorer.attachment.hint')",
+        addPageTitle : "$services.localization.render('xwikiexplorer.addpage.title')",
+        addPageHint : "$services.localization.render('xwikiexplorer.addpage.hint')",
+        addAttachmentTitle : "$services.localization.render('xwikiexplorer.addattachment.title')",
+        addAttachmentHint : "$services.localization.render('xwikiexplorer.addattachment.hint')"
     }
 });
 
@@ -484,10 +484,12 @@ isc.XWEDataSource.addProperties({
      * Properties passed to the RPCManager when request are performed.
      */
     requestProperties : {
-        promptStyle: "cursor",
+        // Don't block the entire UI when data is being fetched (e.g. when the tree is loaded or when a node is expanded).
+        // See http://www.smartclient.com/smartgwt/javadoc/com/smartgwt/client/rpc/RPCManager.html#setShowPrompt(boolean)
+        showPrompt: false,
         // Prevent the RPCManager from displaying a warning message every time a request fails. This is especially
         // annoying when we try to open the tree to a page that doesn't exist.
-        // See http://www.smartclient.com/smartgwtee/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
+        // See http://www.smartclient.com/smartgwt/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
         willHandleError: true
     },
 
@@ -1038,7 +1040,7 @@ isc.XWETreeGrid.addMethods({
     /**
      * Create a text input that will be used as a suggest for the tree.
      * The modifications on this input will be observed and the resource entered in the input,
-     * like Main.Dashboard for example, will be opened in the tree.
+     * like Dashboard.WebHome for example, will be opened in the tree.
      */
     drawInput : function() {
         var widthWithoutBorders = this.width - 6;
@@ -1056,7 +1058,7 @@ isc.XWETreeGrid.addMethods({
         if (this.displaySuggest) {
             input.className = "suggestDocuments";
             if (XWiki.domIsLoaded) {
-                // Activate the suggest input manually if the page has already been loaded 
+                // Activate the suggest input manually if the page has already been loaded
                 document.fire('xwiki:dom:updated', {elements: [this.htmlElement]});
             }
             // Call inputObserver for the first time when the first set of data arrives.
@@ -1133,10 +1135,16 @@ isc.XWETreeGrid.addMethods({
     getSelectedResourceProperty : function(propertyName) {
         var value = this.getValue();
         var selectedRecord = this.getSelectedRecord();
-        if (value.length > 0) {
-            return XWiki.resource.get(value)[propertyName];
-        } else if (selectedRecord != null) {
+        // The selected tree node matches the input value most of the time:
+        // (1) when you select a tree node the input value is updated with its reference
+        // (2) when you type something in the text input the tree selects the corresponding node, if any.
+        if (selectedRecord && (selectedRecord.reference || value == '')) {
+            // The selected tree node either corresponds to a server side entity or it's a "New Entity" node.
             return selectedRecord.isNewPage && propertyName == 'name' ? null : this.getResourceProperty(selectedRecord, propertyName);
+        } else if (value.length > 0) {
+            // The input value is parsed without knowing the type of entity it refers to (page, attachment, etc.).
+            // If the value is a relative reference then the result is not always expected.
+            return XWiki.resource.get(value)[propertyName];
         }
         return null;
     },
@@ -1152,7 +1160,7 @@ isc.XWETreeGrid.addMethods({
                 attachment: XWiki.EntityType.ATTACHMENT
             };
             var entityType = propertyNameToEntityType[propertyName];
-            if (entityType) {
+            if (typeof entityType != 'undefined') {
                 return this.getEntityName(node, entityType);
             }
         }

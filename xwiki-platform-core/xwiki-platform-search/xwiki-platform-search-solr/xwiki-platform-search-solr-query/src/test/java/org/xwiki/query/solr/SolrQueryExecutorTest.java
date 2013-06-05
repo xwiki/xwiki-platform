@@ -19,7 +19,7 @@
  */
 package org.xwiki.query.solr;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.xwiki.query.QueryExecutor;

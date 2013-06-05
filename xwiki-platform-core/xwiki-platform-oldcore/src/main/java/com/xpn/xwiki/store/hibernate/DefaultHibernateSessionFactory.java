@@ -205,7 +205,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
         }
 
         /**
-         * Replace variables defined in Hibernate properties using the {@code ${variable}} notation. Note that right
+         * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
          * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value
          * coming from the XWiki configuration.
          *

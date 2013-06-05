@@ -25,32 +25,32 @@
 #end
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}"/>
 </div>
-#xwikimessageboxstart($msg.get('login') '')
-#set($message = $msg.get($xwiki.parseMessage()))
+#xwikimessageboxstart($services.localization.render('login') '')
+#set($message = $services.localization.render($xwiki.parseMessage()))
 #if($message)
   <!-- previous login errors -->
   #error($message)
 #end
-<table class="xwikilogintable" summary="$msg.get('loginform')">
+<table class="xwikilogintable" summary="$services.localization.render('loginform')">
   <tr>
-    <th><label for="j_username">$msg.get('username'):</label></th>
+    <th><label for="j_username">$services.localization.render('username'):</label></th>
     <td><input type="text" id="j_username" name="j_username" value=""/></td>
   </tr>
   <tr>
-    <th><label for="j_password">$msg.get('password'):</label></th>
+    <th><label for="j_password">$services.localization.render('password'):</label></th>
     <td><input type="password" id="j_password" name="j_password" value=""/></td>
   </tr>
   <tr>
     <td colspan="2" style="text-align: left;">
       <input id="rememberme" type="checkbox" name="j_rememberme" value="true"/>
-      <label for="rememberme">$msg.get('remembermeonthiscomp')</label>
+      <label for="rememberme">$services.localization.render('remembermeonthiscomp')</label>
     </td>
   </tr>
 </table>
-<div class="buttons"><span class="buttonwrapper"><input type="submit" class="button" value="$msg.get('login')"/></span></div>
+<div class="buttons"><span class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('login')"/></span></div>
 ## TODO: Replace this with an interface extension once IX are implemented
 #if($xwiki.exists('XWiki.ResetPassword'))
-  <div style="font-size: 70%; margin-top: 2em;">$msg.get('plaform.web.login.forgotUserNameOrPassword', ["<a href='$xwiki.getURL('XWiki.ForgotUsername')'>", '</a>', "<a href='$xwiki.getURL('XWiki.ResetPassword')'>", '</a>'])</div>
+  <div style="font-size: 70%; margin-top: 2em;">$services.localization.render('plaform.web.login.forgotUserNameOrPassword', ["<a href='$xwiki.getURL('XWiki.ForgotUsername')'>", '</a>', "<a href='$xwiki.getURL('XWiki.ResetPassword')'>", '</a>'])</div>
 #end
 #xwikimessageboxend()
 </form>

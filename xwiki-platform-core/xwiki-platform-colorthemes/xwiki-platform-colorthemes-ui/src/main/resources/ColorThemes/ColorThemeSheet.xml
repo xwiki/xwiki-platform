@@ -15,7 +15,7 @@
   <date>1251108485000</date>
   <contentUpdateDate>1251108485000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('xe.themes.colors.sheet.title')</title>
+  <title>$services.localization.render('xe.themes.colors.sheet.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -306,7 +306,7 @@ XWiki.editors.ColorThemeWizard = Class.create({
 
       // Create close buttons for each picker
       var picker = $(this.fastDown(trigger, this.pickerSelector.substring(1)));
-      var closeButton = new Element('div', {'class' : 'close-button', 'title' : "$msg.get('xe.themes.colors.wizard.close')"}).update('X');
+      var closeButton = new Element('div', {'class' : 'close-button', 'title' : "$services.localization.render('xe.themes.colors.wizard.close')"}).update('X');
       picker.insert({top: closeButton});
       closeButton.observe('click', this.hidePicker.bindAsEventListener(this, this.fastUp(closeButton, this.triggerSelector.substring(1))));
       // To override the no-script activation css rule (hover), hide the pickers from the inline style;
@@ -359,7 +359,7 @@ XWiki.editors.ColorThemeWizard = Class.create({
         item.observe(monitoredEvent, this.inputValueChanged.bindAsEventListener(this, item));
       }.bind(this));
       // Create undo buttons
-      item._x_undoButton = new Element('button', {'class' : 'undo', 'title' : "$msg.get('xe.themes.colors.wizard.undo')"}).update("$msg.get('xe.themes.colors.wizard.undo')");
+      item._x_undoButton = new Element('button', {'class' : 'undo', 'title' : "$services.localization.render('xe.themes.colors.wizard.undo')"}).update("$services.localization.render('xe.themes.colors.wizard.undo')");
       item._x_undoButton._x_input = item;
       item._x_undoButton._x_value = item.value;
       item._x_undoButton.style.visibility = "hidden";
@@ -395,7 +395,7 @@ XWiki.editors.ColorThemeWizard = Class.create({
     // The theme property edited in this field, e.g. textColor
     var propName = this.retrievePropertyName(input.name);
     if (propName == this.logoProperty) {
-       if (input.value.trim() != '') {
+       if (input.value.strip() != '') {
          $(this.logoSelector).src = this.wrapImagePropertyValue(propName, input.value);
        } else {
          $(this.logoSelector).src = this.defaultLogoURl;
@@ -1383,7 +1383,7 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
     #if("$!{propnames}" != '' &amp;&amp; $propnames.size() &gt; 0)
     &lt;div id="colorthemewizard-${element}-trigger" class="colorthemewizard-trigger"&gt;
       &lt;div class="colorthemewizard-tip"&gt;
-        $msg.get('xe.themes.colors.wizard.choose'):
+        $services.localization.render('xe.themes.colors.wizard.choose'):
         &lt;ul&gt;
           #foreach($propname in $propnames)
             &lt;li&gt;#printPropertyPrettyname($propname)&lt;/li&gt;
@@ -1525,16 +1525,16 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
 {{html clean="false" wiki="false"}}
 ##
 ##
-#if($context.action == 'inline')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$msg.get('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
+#if($context.action == 'inline')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
 &lt;div #elementMetaData('page')&gt;
   #printColorThemeWizard('page')
   ## Main menu
   &lt;div #elementMetaData('mainmenu')&gt;
    &lt;div&gt;
-    $msg.get('xe.themes.colors.wizard.mainMenu')
-    &lt;span #elementMetaData('menuaddentry')&gt;$msg.get('xe.themes.colors.wizard.menuEntry')#$msg.get('core.menu.create')&lt;/span&gt;
-    &lt;span #elementMetaData('menuentry')&gt;$msg.get('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
-    &lt;span #elementMetaData('menuentry')&gt;$msg.get('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
+    $services.localization.render('xe.themes.colors.wizard.mainMenu')
+    &lt;span #elementMetaData('menuaddentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#$services.localization.render('core.menu.create')&lt;/span&gt;
+    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
+    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
    &lt;/div&gt;
    #printColorThemeWizard('mainmenu')
   &lt;/div&gt;
@@ -1550,7 +1550,7 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
         ## For this $logoname is already set in global.vm
         #set($themeLogoImage = "$xwiki.getSkinFile($logoname)")
       #end
-      &lt;img id="colorthemewizard-logo" src="$themeLogoImage" alt="$msg.get('xe.themes.colors.wizard.logo')"/&gt;
+      &lt;img id="colorthemewizard-logo" src="$themeLogoImage" alt="$services.localization.render('xe.themes.colors.wizard.logo')"/&gt;
     &lt;/div&gt;
     #printColorThemeWizard('headerbox')
   &lt;/div&gt;
@@ -1560,18 +1560,18 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
     &lt;div #elementMetaData('panel')&gt;
       ## Expanded panel header
       &lt;div #elementMetaData('panelheader')&gt;
-        &lt;div&gt;$msg.get('xe.themes.colors.wizard.panel')&lt;/div&gt;
+        &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel')&lt;/div&gt;
         #printColorThemeWizard('panelheader')
       &lt;/div&gt;
       ## Expanded panel contents
       &lt;div #elementMetaData('panelcontents')&gt;
-        &lt;div&gt;&lt;span #elementMetaData('text')&gt;$msg.get('xe.themes.colors.wizard.panel.text')&lt;/span&gt; | &lt;span  #elementMetaData('link')&gt;$msg.get('xe.themes.colors.wizard.panel.link')&lt;/span&gt;&lt;/div&gt;
+        &lt;div&gt;&lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.panel.text')&lt;/span&gt; | &lt;span  #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.panel.link')&lt;/span&gt;&lt;/div&gt;
         #printColorThemeWizard('panelcontents')
       &lt;/div&gt;
     &lt;/div&gt;
     ## Collapsed panel
     &lt;div #elementMetaData('collapsedpanel')&gt;
-      &lt;div&gt;$msg.get('xe.themes.colors.wizard.panel.collapsed')&lt;/div&gt;
+      &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel.collapsed')&lt;/div&gt;
       #printColorThemeWizard('collapsedpanel')
     &lt;/div&gt;
   &lt;/div&gt; ##panels
@@ -1579,51 +1579,51 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
     ## XWiki Content
     &lt;div #elementMetaData('content')&gt;
       &lt;div #elementMetaData('contentmenu')&gt;
-       $msg.get('xe.themes.colors.wizard.menu')
-       &lt;span #elementMetaData('menuentry')&gt;$msg.get('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
-       &lt;span #elementMetaData('menuentry')&gt;$msg.get('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
+       $services.localization.render('xe.themes.colors.wizard.menu')
+       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
+       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
        #printColorThemeWizard('contentmenu')
       &lt;/div&gt;
       &lt;div #elementMetaData('xwikicontent')&gt;
         &lt;div #elementMetaData('titlebox')&gt;
-          &lt;h2 #elementMetaData('title')&gt;$msg.get('xe.themes.colors.wizard.title')&lt;/h2&gt;
+          &lt;h2 #elementMetaData('title')&gt;$services.localization.render('xe.themes.colors.wizard.title')&lt;/h2&gt;
           #printColorThemeWizard('titlebox')
         &lt;/div&gt;
         &lt;div #elementMetaData('info')&gt;
-          &lt;div&gt;$msg.get('xe.themes.colors.wizard.informativeText')&lt;/div&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.informativeText')&lt;/div&gt;
           #printColorThemeWizard('info')
         &lt;/div&gt;
         &lt;div #elementMetaData('details')&gt;
-          &lt;div&gt;$msg.get('xe.themes.colors.wizard.detailsText')&lt;/div&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.detailsText')&lt;/div&gt;
           #printColorThemeWizard('details')
         &lt;/div&gt;
         &lt;div class="clearfloats" &gt;&lt;/div&gt;
         &lt;div #elementMetaData('textlink')&gt;
           &lt;div&gt;
-            &lt;span #elementMetaData('text')&gt;$msg.get('xe.themes.colors.wizard.text')&lt;/span&gt; |
-            &lt;span #elementMetaData('link')&gt;$msg.get('xe.themes.colors.wizard.link')&lt;/span&gt;
+            &lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.text')&lt;/span&gt; |
+            &lt;span #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.link')&lt;/span&gt;
           &lt;/div&gt;
           #printColorThemeWizard('textlink')
         &lt;/div&gt;
         &lt;div #elementMetaData('highlight')&gt;
-          &lt;div&gt;$msg.get('xe.themes.colors.wizard.highlightedText')&lt;/div&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.highlightedText')&lt;/div&gt;
           #printColorThemeWizard('highlight')
         &lt;/div&gt;
         &lt;div #elementMetaData('boxes')&gt;
-          &lt;div #elementMetaData('message')&gt;$msg.get('xe.themes.colors.wizard.messageBox')&lt;/div&gt;
+          &lt;div #elementMetaData('message')&gt;$services.localization.render('xe.themes.colors.wizard.messageBox')&lt;/div&gt;
           &lt;table #elementMetaData('table')&gt;
-            &lt;thead&gt;&lt;tr&gt;&lt;th colspan="2" scope="col" #elementMetaData('th')&gt;$msg.get('xe.themes.colors.wizard.table')&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
-            &lt;tbody&gt;&lt;tr&gt;&lt;td #elementMetaData('td')&gt;$msg.get('xe.themes.colors.wizard.table.data')#1&lt;/td&gt;&lt;td #elementMetaData('td')&gt;$msg.get('xe.themes.colors.wizard.table.data')#2&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+            &lt;thead&gt;&lt;tr&gt;&lt;th colspan="2" scope="col" #elementMetaData('th')&gt;$services.localization.render('xe.themes.colors.wizard.table')&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+            &lt;tbody&gt;&lt;tr&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#1&lt;/td&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#2&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
           &lt;/table&gt;
           #printColorThemeWizard('boxes')
         &lt;/div&gt;
         &lt;div class="clearfloats" &gt;&lt;/div&gt;
         &lt;div #elementMetaData('buttonbox')&gt;
-          &lt;div&gt;&lt;input #elementMetaData('button') type="button" value="$msg.get('xe.themes.colors.wizard.button')" /&gt;&lt;/div&gt;
+          &lt;div&gt;&lt;input #elementMetaData('button') type="button" value="$services.localization.render('xe.themes.colors.wizard.button')" /&gt;&lt;/div&gt;
           #printColorThemeWizard('buttonbox')
         &lt;/div&gt;
         &lt;div #elementMetaData('secondaryButtonbox')&gt;
-          &lt;div&gt;&lt;input #elementMetaData('secondaryButton') type="button" value="$msg.get('xe.themes.colors.wizard.secondaryButton')" /&gt;&lt;/div&gt;
+          &lt;div&gt;&lt;input #elementMetaData('secondaryButton') type="button" value="$services.localization.render('xe.themes.colors.wizard.secondaryButton')" /&gt;&lt;/div&gt;
           #printColorThemeWizard('secondaryButtonbox')
         &lt;/div&gt;
         &lt;div class="clearfloats" &gt;&lt;/div&gt;
@@ -1633,10 +1633,10 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
     ## Extra tabs - comments/attachments/history/information
     &lt;div  #elementMetaData('extratabs')&gt;
       &lt;div  #elementMetaData('tabshead')&gt;
-        &lt;span #elementMetaData('tabentryactive')&gt;$msg.get('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#1&lt;/span&gt;&lt;/span&gt;
-        &lt;span #elementMetaData('tabentry')&gt;$msg.get('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#2&lt;/span&gt;&lt;/span&gt;
+        &lt;span #elementMetaData('tabentryactive')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#1&lt;/span&gt;&lt;/span&gt;
+        &lt;span #elementMetaData('tabentry')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#2&lt;/span&gt;&lt;/span&gt;
       &lt;/div&gt;
-      &lt;div #elementMetaData('tabscontent')&gt;$msg.get('xe.themes.colors.wizard.tab.text')&lt;/div&gt;
+      &lt;div #elementMetaData('tabscontent')&gt;$services.localization.render('xe.themes.colors.wizard.tab.text')&lt;/div&gt;
       #printColorThemeWizard('extratabs')
     &lt;/div&gt;
   &lt;/div&gt; ## main column

@@ -5,7 +5,7 @@
   <name>WizardPropertyMapping</name>
   <language/>
   <defaultLanguage/>
-  <translation>1</translation>
+  <translation>0</translation>
   <parent>ColorThemes.ColorThemeSheet</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
@@ -15,7 +15,7 @@
   <date>1262108187000</date>
   <contentUpdateDate>1262108187000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('xe.themes.colors.mapping.title')</title>
+  <title>$services.localization.render('xe.themes.colors.mapping.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

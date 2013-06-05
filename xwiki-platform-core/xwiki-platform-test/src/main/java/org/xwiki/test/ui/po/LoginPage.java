@@ -21,6 +21,7 @@ package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.TestUtils;
 
 /**
  * Represents the actions possible on the Login page.
@@ -53,7 +54,7 @@ public class LoginPage extends ViewPage
 
     public void loginAsAdmin()
     {
-        loginAs("Admin", "admin", true);
+        loginAs(TestUtils.ADMIN_CREDENTIALS.getUserName(), TestUtils.ADMIN_CREDENTIALS.getPassword(), true);
     }
 
     public void loginAs(String username, String password, boolean rememberMe)
@@ -63,7 +64,7 @@ public class LoginPage extends ViewPage
             this.usernameText.sendKeys(username);
             this.passwordText.sendKeys(password);
             if (rememberMe) {
-                this.rememberMeCheckbox.click();;
+                this.rememberMeCheckbox.click();
             }
             this.submitButton.click();
         }

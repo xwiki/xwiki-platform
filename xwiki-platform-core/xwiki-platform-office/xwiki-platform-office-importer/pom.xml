@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>
@@ -34,6 +34,7 @@
   <properties>
     <!-- Skipping CLIRR since xwiki-platform-legacy-office-importer wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.jacoco.instructionRatio>58.77</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -108,18 +109,6 @@
       <!-- Used to detect the encoding of the HTML byte array produced by the office server. -->
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
-      <exclusions>
-        <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
-        <exclusion>
-          <groupId>org.gagravarr</groupId>
-          <artifactId>vorbis-java-core</artifactId>
-        </exclusion>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
     <dependency>
@@ -127,8 +116,17 @@
       <artifactId>vorbis-java-core</artifactId>
       <version>0.1</version>
     </dependency>
+    <!-- Replace a runtime transitive dependency of tika-parsers because it includes old bcprov/bcmail classes. -->
     <dependency>
-      <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk16</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcmail-jdk16</artifactId>
+    </dependency>
+    <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
+    <dependency>
       <groupId>de.l3s.boilerpipe</groupId>
       <artifactId>boilerpipe</artifactId>
     </dependency>

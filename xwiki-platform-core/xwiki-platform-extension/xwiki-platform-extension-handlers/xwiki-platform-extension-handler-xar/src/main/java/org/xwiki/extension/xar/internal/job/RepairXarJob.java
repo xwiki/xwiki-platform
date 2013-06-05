@@ -29,8 +29,10 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -39,6 +41,7 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Request;
+import org.xwiki.job.internal.DefaultJobStatus;
 
 /**
  * Make sure the provided XAR extension properly is registered in the installed extensions index.
@@ -48,7 +51,7 @@ import org.xwiki.job.Request;
  */
 @Component
 @Named(RepairXarJob.JOBTYPE)
-public class RepairXarJob extends AbstractExtensionJob<InstallRequest>
+public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJobStatus<InstallRequest>>
 {
     /**
      * The id of the job.
@@ -228,7 +231,11 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest>
 
             notifyStepPropress();
 
-            this.installedRepository.installExtension(localExtension, namespace, dependency);
+            InstalledExtension installedExtension =
+                this.installedRepository.installExtension(localExtension, namespace, dependency);
+
+            this.observationManager.notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace),
+                installedExtension);
         } finally {
             notifyPopLevelProgress();
         }

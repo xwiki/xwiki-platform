@@ -23,13 +23,97 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>XWiki.SolrSearchAdmin</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>5d55eff4-9ad5-4e40-924d-98e0264a9e5e</guid>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.search</extensionPointId>
+    </property>
+    <property>
+      <name>solr</name>
+    </property>
+    <property>
+      <parameters>label=$services.localization.render('search.extension.title.solr')
+admin=XWiki.SolrSearchAdmin
+search=Main.SolrSearch</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
   <content>{{velocity output='false'}}
 ## TODO: CSRF protection
 
-#set ($allWikis = $sorttool.sort($xwiki.xWiki.getVirtualWikisDatabaseNames($xcontext.context)))
-#if (!$allWikis.contains($xcontext.database))
-  #set ($discard = $allWikis.add($xcontext.database))
-#end
+#set ($allWikis = $sorttool.sort($xwiki.wikiNames))
 
 ## Handle request
 #if ("$!request.action" != '')
@@ -102,7 +186,7 @@
 
 #if ($hasGlobalAdmin)
 {{html}}
-&lt;form class='xform third' action="$xwiki.requestURL" method='post'&gt;
+&lt;form class='xform half' action="$xwiki.requestURL" method='post'&gt;
 &lt;dl&gt;
 &lt;dt&gt;
   &lt;label&gt;Action&lt;/label&gt;
@@ -121,11 +205,14 @@
 &lt;/dt&gt;
 &lt;dd&gt;
   &lt;select name='wiki' size='1'&gt;
-    #if ($xwiki.isVirtualMode() &amp;&amp; ($xcontext.database == $xcontext.mainWikiName))
-    &lt;option value=''&gt;Entire farm&lt;/option&gt;
-    #end
-    #foreach ($wiki in $allWikis)
-    &lt;option value='$wiki'&gt;$wiki&lt;/option&gt;
+    ## Indexing on the entire farm or on various wikis is done only on the main wiki.
+    #if ($xcontext.isMainWiki())
+      &lt;option value=''&gt;Entire farm&lt;/option&gt;
+      #foreach ($wiki in $allWikis)
+        &lt;option value='$wiki'&gt;$wiki&lt;/option&gt;
+      #end
+    #else
+      &lt;option value='$xcontext.database'&gt;$xcontext.database&lt;/option&gt;
     #end
   &lt;/select&gt;
 &lt;/dd&gt;

@@ -153,6 +153,7 @@
 .gwt-MenuItem .gwt-MenuItemIcon {
   float: left;
   margin-left: -5px;
+  max-width: none;
   vertical-align: middle;
 }
 

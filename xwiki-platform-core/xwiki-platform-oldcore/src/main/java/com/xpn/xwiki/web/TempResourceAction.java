@@ -125,7 +125,6 @@ public class TempResourceAction extends XWikiAction
      * @param uri request URI.
      * @param context xwiki context.
      * @return temporary file corresponding to the specified URI or null if no such file can be located.
-     * @throws UnsupportedEncodingException
      */
     protected File getTemporaryFile(String uri, XWikiContext context)
     {

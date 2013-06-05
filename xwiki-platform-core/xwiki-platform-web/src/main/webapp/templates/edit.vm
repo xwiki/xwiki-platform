@@ -16,8 +16,8 @@
     #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
                          + '&amp;force=1')
     #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
-    #xwikimessageboxstart($msg.get('notice') "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
-    <a href="$forceEditURL">$msg.get('forcelock')</a>
+    #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
+    <a href="$forceEditURL">$services.localization.render('forcelock')</a>
     #xwikimessageboxend()
     ##
    </div>## mainContentArea
@@ -34,7 +34,7 @@
       ## Determine the sheets using the default document translation because objects are accessible only from the default translation.
       #if(!$services.sheet.getSheets($doc, $context.action).isEmpty())
         #set($editor = 'inline')
-      #elseif(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()))
+      #elseif (($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($tdoc.syntax.toIdString() == 'xwiki/1.0' && !$tdoc.isAdvancedContent() || $services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString())))
         #set($editor = 'wysiwyg')
       #else
         #set($editor = 'wiki')
@@ -50,7 +50,10 @@
   ##
   ## "Compute" the title
   ##
-  #set($title = $xwiki.parseContent($msg.get('editpageTitle')))
+  #set ($title = $services.localization.render("platform.web.editors.${editor}.pageTitle", [$tdoc.plainTitle]))
+  #if ($title == "platform.web.editors.${editor}.pageTitle")
+    #set ($title = $services.localization.render('platform.web.editors.unknown.pageTitle', [$tdoc.plainTitle]))
+  #end
   ##
   ## Header
   ##
@@ -89,7 +92,6 @@
   #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
     #template('editmeta.vm')
   #end
-  #template("editmodes.vm")
   #template("edit${editor}.vm")
   ## This javascript must be placed here since it uses velocity variables set in the template above.
   <script type="text/javascript">
@@ -98,7 +100,7 @@
       // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
       Event.observe($('tmEditWysiwyg'), "click", function(event) {
         #if($doc.syntax.toIdString() == "xwiki/1.0")
-        if (checkAdvancedContent('$msg.get("checkadvancedcontent")') == false) {
+        if (checkAdvancedContent("$services.localization.render('checkadvancedcontent')") == false) {
           Event.stop(event);
           return;
         }

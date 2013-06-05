@@ -27,11 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-code</artifactId>
   <name>XWiki Platform - Rendering - Macro - Code</name>
-  <description>XWiki Platform - Rendering - Macro - Code</description>
+  <description>Highlights code</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>89.01</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Code Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
@@ -49,7 +54,7 @@
     <dependency>
       <groupId>org.pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

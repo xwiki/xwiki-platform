@@ -94,7 +94,21 @@ function maybeEnhanceField(field) {
     enhanceDefaultValue(field);
   }
 }
-function init() {
+function init(event, tryCount) {
+  // If there's no event then the code was probably lazy loaded. Make sure dependencies are present.
+  if (!event && (typeof Externals == 'undefined' || !Externals.SimpleDateFormat || !Externals.CalendarDateSelect)) {
+    tryCount = tryCount || 0;
+    if (tryCount < 3) {
+      typeof console != 'undefined' && console.warn
+        && console.warn('Cannot initialize DateTimePicker due to missing dependencies. Waiting a bit before trying again.');
+      setTimeout(init.bind(this, event, tryCount + 1), 100);
+    } else {
+      typeof console != 'undefined' && console.error
+        && console.error('Failed to initialize DateTimePicker due to missing dependencies: SimpleDateFormat and CalendarDateSelect.');
+    }
+    return;
+  }
+
   document.observe('xwiki:class:displayField', function(event) {
     maybeEnhanceField(event.memo.field);
   });

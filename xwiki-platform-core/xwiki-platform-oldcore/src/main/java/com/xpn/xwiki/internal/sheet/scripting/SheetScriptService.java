@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.sheet.scripting;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,7 +92,7 @@ public class SheetScriptService implements ScriptService
      */
     public List<DocumentReference> getSheets(Document document, String action)
     {
-        return filterViewable(sheetManager.getSheets(getDocument(document), action));
+        return filterViewable(sheetManager.getSheets(getReadOnlyDocument(document), action));
     }
 
     /**
@@ -104,7 +105,7 @@ public class SheetScriptService implements ScriptService
      */
     public List<DocumentReference> getClassSheets(Document classDocument)
     {
-        return filterViewable(classSheetBinder.getSheets(getDocument(classDocument)));
+        return filterViewable(classSheetBinder.getSheets(getReadOnlyDocument(classDocument)));
     }
 
     /**
@@ -116,7 +117,7 @@ public class SheetScriptService implements ScriptService
      */
     public boolean bindClassSheet(Document classDocument, DocumentReference sheetReference)
     {
-        return classSheetBinder.bind(getDocument(classDocument), sheetReference);
+        return classSheetBinder.bind(getModifiableDocument(classDocument), sheetReference);
     }
 
     /**
@@ -129,7 +130,7 @@ public class SheetScriptService implements ScriptService
      */
     public boolean unbindClassSheet(Document classDocument, DocumentReference sheetReference)
     {
-        return classSheetBinder.unbind(getDocument(classDocument), sheetReference);
+        return classSheetBinder.unbind(getModifiableDocument(classDocument), sheetReference);
     }
 
     /**
@@ -141,7 +142,7 @@ public class SheetScriptService implements ScriptService
      */
     public List<DocumentReference> getDocumentSheets(Document document)
     {
-        return filterViewable(documentSheetBinder.getSheets(getDocument(document)));
+        return filterViewable(documentSheetBinder.getSheets(getReadOnlyDocument(document)));
     }
 
     /**
@@ -153,7 +154,7 @@ public class SheetScriptService implements ScriptService
      */
     public boolean bindDocumentSheet(Document document, DocumentReference sheetReference)
     {
-        return documentSheetBinder.bind(getDocument(document), sheetReference);
+        return documentSheetBinder.bind(getModifiableDocument(document), sheetReference);
     }
 
     /**
@@ -165,7 +166,7 @@ public class SheetScriptService implements ScriptService
      */
     public boolean unbindDocumentSheet(Document document, DocumentReference sheetReference)
     {
-        return documentSheetBinder.unbind(getDocument(document), sheetReference);
+        return documentSheetBinder.unbind(getModifiableDocument(document), sheetReference);
     }
 
     /**
@@ -202,15 +203,36 @@ public class SheetScriptService implements ScriptService
      * 
      * @param document an instance of {@link Document} received from a script
      * @return an instance of {@link DocumentModelBridge} that wraps the low level document object exposed by the given
-     *         document API
+     *         document API and that <em>must</em> not be modified
      */
-    private DocumentModelBridge getDocument(Document document)
+    private DocumentModelBridge getReadOnlyDocument(Document document)
     {
         grantProgrammingRightController.pushGrantProgrammingRight();
         try {
             return document.getDocument();
         } finally {
             grantProgrammingRightController.popGrantProgrammingRight();
+        }
+    }
+
+    /**
+     * Note: This method gets the low level XWiki document through reflection by calling a protected method.
+     * 
+     * @param document an instance of {@link Document} received from a script
+     * @return an instance of {@link DocumentModelBridge} that wraps the low level document object exposed by the given
+     *         document API and that can be <em>safely</em> modified
+     */
+    private DocumentModelBridge getModifiableDocument(Document document)
+    {
+        try {
+            // HACK: We try to get the modifiable XWikiDocument instance wrapped by the document API using reflection
+            // because the corresponding method that clones the wrapped XWikiDocument instance is protected.
+            Method getDocMethod = Document.class.getDeclaredMethod("getDoc", new Class[] {});
+            getDocMethod.setAccessible(true);
+            return (DocumentModelBridge) getDocMethod.invoke(document);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Failed to get the modifiable XWikiDocument instance wrapped by the document API.", e);
         }
     }
 }

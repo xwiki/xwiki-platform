@@ -32,7 +32,7 @@ public class TestLegacyTestWiki extends AbstractLegacyWikiTestCase
     @Test
     public void testLegacyWikiBuilding() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "test.xml");
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "test.xml", true);
 
         XWikiRightServiceImpl legacyImpl = new XWikiRightServiceImpl();
 

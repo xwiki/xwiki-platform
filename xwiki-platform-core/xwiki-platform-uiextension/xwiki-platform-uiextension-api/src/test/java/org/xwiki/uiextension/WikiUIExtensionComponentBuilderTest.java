@@ -37,6 +37,7 @@ import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
@@ -49,6 +50,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -78,7 +80,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 @ComponentList({
     DefaultModelContext.class,
@@ -262,9 +264,9 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     {
         final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
         final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
-        final ContentParser contentParser = getComponentManager().getInstance(ContentParser.class);
-        final Parser parser = getMockery().mock(Parser.class);
         final Transformation transformation = getMockery().mock(Transformation.class, "macro");
+        final ModelContext modelContext = getMockery().mock(ModelContext.class);
+        final ContentParser contentParser = getMockery().mock(ContentParser.class);
         final VelocityManager velocityManager = getMockery().mock(VelocityManager.class);
         final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
         final VelocityContext velocityContext = new VelocityContext();
@@ -275,18 +277,14 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
 
         final ObjectReference extensionReference = new BaseObjectReference(DOC_REF, 1, DOC_REF);
         final StringWriter writer = new StringWriter();
-        final EntityReferenceSerializer<String> serializer =
-            registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
         writer.append("value=foo");
         final XDOM xdom = new XDOM(new ArrayList<Block>());
-
-
 
         getMockery().checking(new Expectations()
         {
             {
-                allowing(serializer).serialize(with(any(EntityReference.class)), with(anything()));
-                will(returnValue("does not matter"));
+                oneOf(componentDoc).getDocumentReference();
+                will(returnValue(DOC_REF));
                 oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(extensionObjects));
                 oneOf(componentDoc).getAuthorReference();
@@ -297,7 +295,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("XWiki.Admin"));
                 oneOf(rightService).hasAccessLevel("admin", "XWiki.Admin", "XWiki.XWikiPreferences", xwikiContext);
                 will(returnValue(true));
-                oneOf(extensionObject).getReference();
+                allowing(extensionObject).getReference();
                 will(returnValue(extensionReference));
                 oneOf(extensionObject).getStringValue(ID_PROPERTY);
                 will(returnValue("name"));
@@ -315,10 +313,16 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue(transformation));
                 oneOf(componentManager).getInstance(Execution.class);
                 will(returnValue(execution));
+                oneOf(componentManager).getInstance(ModelContext.class);
+                will(returnValue(modelContext));
+                oneOf(modelContext).getCurrentEntityReference();
+                will(returnValue(new WikiReference("xwiki")));
+                oneOf(componentManager).getInstance(ContentParser.class);
+                will(returnValue(contentParser));
+                oneOf(componentManager).getInstance(Execution.class);
+                will(returnValue(execution));
                 oneOf(componentManager).getInstance(VelocityManager.class);
                 will(returnValue(velocityManager));
-                oneOf(componentManager).getInstance(EntityReferenceSerializer.TYPE_STRING);
-                will(returnValue(serializer));
                 allowing(velocityManager).getVelocityEngine();
                 will(returnValue(velocityEngine));
                 allowing(velocityManager).getVelocityContext();

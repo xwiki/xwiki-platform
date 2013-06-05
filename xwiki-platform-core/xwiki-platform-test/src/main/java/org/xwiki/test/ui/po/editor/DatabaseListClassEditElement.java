@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormElement;
 
 /**
@@ -29,25 +27,20 @@ import org.xwiki.test.ui.po.FormElement;
  * @version $Id$
  * @since 3.2M3
  */
-public class DatabaseListClassEditElement extends BaseElement
+public class DatabaseListClassEditElement extends ClassPropertyEditPane
 {
-    private String propertyName;
-
-    private FormElement form;
-
     public DatabaseListClassEditElement(FormElement form, String propertyName)
     {
-        this.form = form;
-        this.propertyName = propertyName;
+        super(form, propertyName);
     }
 
     public void setHibernateQuery(String value)
     {
-        this.form.setFieldValue(By.id(this.propertyName + "_sql"), value);
+        setMetaProperty("sql", value);
     }
 
     public void setMultiSelect(boolean isMultiSelect)
     {
-        this.form.setFieldValue(By.id(this.propertyName + "_multiSelect"), isMultiSelect ? "true" : "false");
+        setMetaProperty("multiSelect", isMultiSelect ? "true" : "false");
     }
 }

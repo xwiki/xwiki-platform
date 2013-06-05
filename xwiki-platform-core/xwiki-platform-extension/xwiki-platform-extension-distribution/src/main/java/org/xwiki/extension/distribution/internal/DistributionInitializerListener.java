@@ -25,16 +25,19 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
+import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
-import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.DistributionStepStatus;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
+ * Initialize farm distribution job.
+ * 
  * @version $Id$
  * @since 4.2M3
  */
@@ -45,19 +48,14 @@ public class DistributionInitializerListener implements EventListener
     /**
      * The list of events to listen to.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent(),
+        new ActionExecutingEvent("view"));
 
     /**
      * The component used to get information about the current distribution.
      */
     @Inject
     private DistributionManager distributionManager;
-
-    /**
-     * The object used to log messages.
-     */
-    @Inject
-    private Logger logger;
 
     @Override
     public List<Event> getEvents()
@@ -72,29 +70,27 @@ public class DistributionInitializerListener implements EventListener
     }
 
     @Override
-    public void onEvent(Event arg0, Object arg1, Object arg2)
+    public void onEvent(Event event, Object arg1, Object arg2)
     {
-        DistributionState distributionState = this.distributionManager.getDistributionState();
+        DistributionState distributionState = this.distributionManager.getFarmDistributionState();
 
-        // Is install already done (allow to cancel stuff for example)
-        if (distributionState == DistributionState.SAME) {
-            DistributionJobStatus status = this.distributionManager.getPreviousJobStatus();
-
-            for (DistributionStepStatus step : status.getSteps()) {
-                if (step.getUpdateState() == null) {
-                    this.distributionManager.startJob();
-                    break;
-                }
+        if (distributionState != DistributionState.NONE) {
+            if (event instanceof ApplicationStartedEvent) {
+                this.distributionManager.startFarmJob();
+            } else if (!((XWikiContext) arg2).isMainWiki()
+                && this.distributionManager.getUpgradeMode() == UpgradeMode.WIKI) {
+                startWikiJob(((XWikiContext) arg2).getDatabase());
             }
+        }
+    }
 
-            if (this.distributionManager.getJob() != null) {
-                this.logger.info("Distribution up to date");
-            } else {
-                this.logger.info("Distribution partially up to date");
-            }
-        } else {
-            this.logger.info("Distribution state: {}", distributionState);
-            this.distributionManager.startJob();
+    /**
+     * @param wiki the wiki for which to start the distribution job
+     */
+    private synchronized void startWikiJob(String wiki)
+    {
+        if (this.distributionManager.getWikiJob(wiki) == null) {
+            this.distributionManager.startWikiJob(wiki);
         }
     }
 }

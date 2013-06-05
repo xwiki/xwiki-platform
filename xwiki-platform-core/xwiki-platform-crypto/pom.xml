@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-crypto</artifactId>
   <name>XWiki Platform - Cryptographic Services</name>
   <description>XWiki Platform - Cryptographic Services</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>75.41</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <!-- Used by CryptoScriptService which provides a service to Velocity scripts -->
     <dependency>
@@ -42,18 +45,16 @@
     <!-- The core cryptography engine, used everywhere -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15</artifactId>
-      <version>1.45</version>
+      <artifactId>bcprov-jdk16</artifactId>
     </dependency>
     <!-- 
       Used for generation and verification of PKCS#7 signatures.
-      PKCS#7 must be used because it's compatable with mozilla
+      PKCS#7 must be used because it's compatible with mozilla
       crypto.signText() javascript function.
     -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk15</artifactId>
-      <version>1.45</version>
+      <artifactId>bcmail-jdk16</artifactId>
     </dependency>
     <!-- Used exclusively by UserDocumentUtils -->
     <dependency>

@@ -153,7 +153,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("XWiki.Earth", copy.getCreator());
     }
 
-    public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException
+    public void testCreationDateAfterDocumentCopy() throws XWikiException
     {
         String copyName = this.apiDocument.getName() + "Copy";
         long startTime = (Calendar.getInstance().getTimeInMillis() / 1000) * 1000;

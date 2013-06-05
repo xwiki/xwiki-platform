@@ -97,9 +97,9 @@ public class DefaultSolrIndexTest extends AbstractMockingComponentTestCase<SolrI
         });
 
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_KEY, url.getPath());
+        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
 
-        // this.instance = (EmbeddedSolrInstance) getMockedComponent();
+        // this.instance = (EmbeddedSolrInstance) getComponentUnderTest();
         this.index = (DefaultSolrIndex) getMockedComponent();
     }
 

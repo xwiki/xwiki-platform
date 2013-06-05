@@ -27,14 +27,23 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-ui</artifactId>
   <name>XWiki Platform - Search - UI</name>
   <packaging>xar</packaging>
-  <description>Search application and related panels</description>
+  <description>Allows searching on the full wiki using wildcards, searching by space, getting search result RSS feeds and more. By default provides a Database-backed search but allows pluging other engines (such as Lucene, Solr and more)</description>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Search Application</xwiki.extension.name>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -59,7 +59,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.RegexEntityReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -79,16 +78,26 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 
 /**
- * Generate and manager wiki document based translations bundles.
+ * Generate and manage wiki document based translations bundles.
  * 
  * @version $Id$
  * @since 4.3M2
  */
 @Component
-@Named("document")
+@Named(DocumentTranslationBundleFactory.ID)
 @Singleton
 public class DocumentTranslationBundleFactory implements TranslationBundleFactory, Initializable, Disposable
 {
+    /**
+     * The identifier of this {@link TranslationBundleFactory}.
+     */
+    public final static String ID = "document";
+
+    /**
+     * The prefix to use in all wiki document based translations.
+     */
+    public static final String ID_PREFIX = ID + ':';
+
     private static final RegexEntityReference TRANSLATIONOBJET = new RegexEntityReference(Pattern.compile("[^:]+:"
         + TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING + "\\[\\d*\\]"), EntityType.OBJECT);
 
@@ -134,7 +143,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
     @Inject
     private AuthorizationManager authorizationManager;
-    
+
     /**
      * Used to access the current bundles.
      */
@@ -213,7 +222,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         try {
             Query query =
                 this.queryManager.createQuery(String.format(
-                    "select doc.space, doc.name from Document doc, doc.object(%s) as translation",
+                    "select distinct doc.space, doc.name from Document doc, doc.object(%s) as translation",
                     TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING), Query.XWQL);
 
             query.setWiki(wiki);
@@ -228,18 +237,18 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 registerTranslationBundle(document);
             }
         } catch (Exception e) {
-            this.logger.error("Failed to load eexisting translations", e);
+            this.logger.error("Failed to load existing translations", e);
         }
     }
 
     @Override
     public TranslationBundle getBundle(String bundleId) throws TranslationBundleDoesNotExistsException
     {
-        String id = AbstractDocumentTranslationBundle.ID_PREFIX + bundleId;
+        String roleHint = ID_PREFIX + bundleId;
 
-        if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, id)) {
+        if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, roleHint)) {
             try {
-                return this.componentManagerProvider.get().getInstance(TranslationBundle.class, id);
+                return this.componentManagerProvider.get().getInstance(TranslationBundle.class, roleHint);
             } catch (ComponentLookupException e) {
                 this.logger.debug("Failed to lookup component [{}] with hint [{}].", TranslationBundle.class, bundleId,
                     e);
@@ -301,7 +310,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         DefaultDocumentTranslationBundle documentBundle;
         try {
             documentBundle =
-                new DefaultDocumentTranslationBundle(document.getDocumentReference(),
+                new DefaultDocumentTranslationBundle(ID_PREFIX, document.getDocumentReference(),
                     this.componentManagerProvider.get(), this.translationParser);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
@@ -421,8 +430,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     {
         switch (scope) {
             case GLOBAL:
-                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), new WikiReference(
-                    this.xcontextProvider.get().getMainXWiki()));
+                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), null);
                 break;
             case WIKI:
                 this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), document
@@ -443,8 +451,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
         descriptor.setImplementation(DefaultDocumentTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
-        descriptor.setRoleHint(AbstractDocumentTranslationBundle.ID_PREFIX
-            + this.serializer.serialize(documentReference));
+        descriptor.setRoleHint(ID_PREFIX + this.serializer.serialize(documentReference));
         descriptor.setRoleType(TranslationBundle.class);
 
         return descriptor;

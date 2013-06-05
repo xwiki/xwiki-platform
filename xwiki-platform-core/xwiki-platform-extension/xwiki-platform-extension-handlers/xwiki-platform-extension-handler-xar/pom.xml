@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-handlers</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-handler-xar</artifactId>
   <name>XWiki Platform - Extension - Handler - XAR</name>
@@ -35,6 +35,7 @@
   <description>XWiki Platform - Extension - Handler - XAR</description>
   <properties>
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <xwiki.jacoco.instructionRatio>65</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

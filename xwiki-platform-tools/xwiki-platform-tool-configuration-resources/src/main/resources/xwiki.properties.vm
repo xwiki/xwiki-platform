@@ -459,6 +459,15 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.repositories.privatemavenid.auth.user=someuser
 # extension.repositories.privatemavenid.auth.password=thepassword
 #-# 
+#-# Here's an example to add your local Maven Repository
+## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
+## Apache Commons Configuration syntax for specifying the user.home system property!
+#set ($userHome = '${sys:user.home}')
+# extension.repositories=local:maven:file://${userHome}/.m2/repository
+#-#
+#-# And an example to add the XWiki Maven Snapshot Repository
+# extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
+#-#
 #-# The default is:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
@@ -476,3 +485,52 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # extension.userAgent=XWikiExtensionManager
 
+#-------------------------------------------------------------------------------------
+# Solr Search
+#-------------------------------------------------------------------------------------
+
+#-# [Since 4.5M1]
+#-# The Solr server type. Currently accepted values are "embedded" (default) and "remote".
+# solr.type=embedded
+
+#-# [Since 4.5M1]
+#-# The location where the embedded Solr instance stores its configuration and the indexed data.
+#-# The default is the subfolder "solr" inside the folder defined by the property "environment.permanentDirectory".
+#if ($xwikiPropertiesEnvironmentPermanentDirectory)
+# solr.embedded.home=$xwikiPropertiesEnvironmentPermanentDirectory/solr
+#else
+# solr.embedded.home=/var/local/xwiki/solr
+#end
+
+#-# [Since 4.5M1]
+#-# The URL to use to connect to the remote solr server.
+#-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
+# solr.remote.url=http://localhost:8983/solr
+
+#-# [Since 4.5M1]
+#-# Each language has its particularities and needs to be handled specially in order to index and retrieve the best results.
+#-# The list of available languages for which optimized indexing is possible. 
+# solr.multilingual.availableLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr 
+
+#-# [Since 4.5M1]
+#-# The list of languages for which to use optimized indexing.
+#-# The values used here must be a sublist of solr.multilingual.available. A smaller sublist can offer slightly better query time performance.
+# solr.multilingual.activeLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr
+
+#-# [Since 4.5M1]
+#-# The list of multilingual fields for which to use optimized indexing.
+# solr.multilingual.fields=title,doccontent,comment,objcontent,propertyvalue,attcontent
+
+#-------------------------------------------------------------------------------------
+# Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.0M2]
+#-# Define the authorization policies by choosing another implementation of the AuthorizationSettler. This component
+#-# is solely responsible for settling access decisions based on user, target entity and available security rules.
+#-# The identifier provided here is matched with the component role hint.
+#-#
+#-# The default is:
+# security.authorization.settler=default
+
+$!xwikiPropertiesAdditionalProperties

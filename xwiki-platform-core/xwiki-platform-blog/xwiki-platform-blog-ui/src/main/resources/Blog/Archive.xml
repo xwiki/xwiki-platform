@@ -68,14 +68,14 @@
       #end
     #end
   #else
-    #info($msg.get('xe.blog.archive.noarticle'))
+    #info($services.localization.render('xe.blog.archive.noarticle'))
   #end
 #end
 ##
 ##
 ##
 #macro(displayBlogYearArchive $blogDoc $year)
-= $msg.get('xe.blog.archive.postsyear', [$year]) =
+= $services.localization.render('xe.blog.archive.postsyear', [$year]) =
   #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = ? or doc.parent = ?)")
   #set ($queryParams = [$blogDoc.space, $blogDoc.fullName])
@@ -94,13 +94,13 @@
           #getEntryObject($entryDoc $entryObj)
           #isPublished($entryObj $isPublished)
           #isHidden($entryObj $isHidden)
-          * [[$entryDoc.display('title', 'view', $entryObj)&gt;&gt;$entryDoc]]#if(!$isPublished) $msg.get('xe.blog.archive.unpublished')#elseif($isHidden) $msg.get('xe.blog.archive.hidden')#end
+          * [[$entryDoc.display('title', 'view', $entryObj)&gt;&gt;$entryDoc]]#if(!$isPublished) $services.localization.render('xe.blog.archive.unpublished')#elseif($isHidden) $services.localization.render('xe.blog.archive.hidden')#end
 
         #end
       #end
     #end
   #else
-    #info($msg.get('xe.blog.archive.noarticlesyear'))
+    #info($services.localization.render('xe.blog.archive.noarticlesyear'))
   #end
 #end
 ##
@@ -111,7 +111,7 @@
   #set($tempDate = $xwiki.jodatime.mutableDateTime)
   $tempDate.setYear($mathtool.toInteger($year))##
   $tempDate.setMonthOfYear($mathtool.toInteger($month))##
-= $msg.get('xe.blog.archive.postsfor') $dateFormatter.print($tempDate) =
+= $services.localization.render('xe.blog.archive.postsfor') $dateFormatter.print($tempDate) =
   #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = ? or doc.parent = ?)")
   #set ($queryParams = [$blogDoc.space, $blogDoc.fullName])
@@ -123,7 +123,7 @@
       #displayEntry($entryDoc $entryObj true true)
     #end
   #else
-    #info($msg.get('xe.blog.archive.noarticlesmonth'))
+    #info($services.localization.render('xe.blog.archive.noarticlesmonth'))
   #end
 #end
 ##

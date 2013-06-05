@@ -102,6 +102,7 @@ public class ChoiceDialog extends Dialog {
 
     public void addChoice(ChoiceInfo choice) {
             ChoiceDialog.ChoiceButton button = new ChoiceDialog.ChoiceButton(choice, new ClickListener() {
+                @Override
                 public void onClick(Widget widget) {
                     onChoiceClick((ChoiceDialog.ChoiceButton)widget);
                 }
@@ -133,6 +134,7 @@ public class ChoiceDialog extends Dialog {
             return choiceInfo;
         }
 
+        @Override
         public void onBrowserEvent(Event event) {
             switch (DOM.eventGetType(event)) {
                 case Event.ONMOUSEOVER:

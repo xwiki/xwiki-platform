@@ -52,7 +52,9 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
      */
     public String getNextStep()
     {
-        return getExplorer().isNewAttachment() ? LinkWizardStep.ATTACHMENT_UPLOAD.toString()
+        AttachmentReference attachmentReference =
+            new AttachmentReference(getData().getDestination().getEntityReference());
+        return StringUtils.isEmpty(attachmentReference.getFileName()) ? LinkWizardStep.ATTACHMENT_UPLOAD.toString()
             : LinkWizardStep.LINK_CONFIG.toString();
     }
 

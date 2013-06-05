@@ -50,9 +50,9 @@
   <div class="box errormessage">
     #set($allowedSpaces = $createAllowedSpaces)
     #if ($allowedSpaces.size() == 1)
-      $msg.get('core.create.template.allowedspace.inline', [$templateProvider, $allowedSpaces.get(0)])
+      $services.localization.render('core.create.template.allowedspace.inline', [$templateProvider, $allowedSpaces.get(0)])
     #else
-      $msg.get('core.create.template.allowedspaces.inline', [$templateProvider, $allowedSpaces.toString()])
+      $services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider, $allowedSpaces.toString()])
     #end
   </div>
 #end
@@ -60,9 +60,9 @@
 #if("$!exception" != '' && $exception.code == 11002)
   <div class="box errormessage">
     #if($tocreate == 'space')
-        $msg.get('core.create.space.error.docalreadyexists', [$space])
+        $services.localization.render('core.create.space.error.docalreadyexists', [$space])
     #else
-        $msg.get('core.create.page.error.docalreadyexists', ["${space}.${page}"])
+        $services.localization.render('core.create.page.error.docalreadyexists', ["${space}.${page}"])
     #end
   </div>
   ## reset the space & page, user will have to fill in again
@@ -88,18 +88,18 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
      * Create Page Field Validator.
      */
     initPageValidator : function() {
-      this.pageValidator = new LiveValidation($$('.main [name=page]')[0], { validMessage: "$msg.get('core.validation.valid.message')" });
+      this.pageValidator = new LiveValidation($$('.main [name=page]')[0], { validMessage: "$services.localization.render('core.validation.valid.message')" });
       this.pageValidator.add(Validate.Presence, {
-        failureMessage: "$msg.get('core.validation.required.message')"
+        failureMessage: "$services.localization.render('core.validation.required.message')"
       });
     },
     /**
      * Create Space Field Validator.
      */
     initSpaceValidator : function() {
-      this.spaceValidator = new LiveValidation($$('.main [name=space]')[0], { validMessage: "$msg.get('core.validation.valid.message')" });
+      this.spaceValidator = new LiveValidation($$('.main [name=space]')[0], { validMessage: "$services.localization.render('core.validation.valid.message')" });
       this.spaceValidator.add(Validate.Presence, {
-         failureMessage: "$msg.get('core.validation.required.message')"
+         failureMessage: "$services.localization.render('core.validation.required.message')"
       });
     },
     /**
@@ -142,13 +142,13 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       #set ($jsSpaceInclusionValidationContainer = [])
       <dl>
         <dt>
-          <label>$msg.get('core.create.template')</label>
-          <span class="xHint">$msg.get("core.create.$!{tocreate}.template.hint")</span>
+          <label>$services.localization.render('core.create.template')</label>
+          <span class="xHint">$services.localization.render("core.create.$!{tocreate}.template.hint")</span>
         </dt>
         <dd>
           <label for="xwiki-create-form-0" class="xwiki-form-listclass">
             <input id="xwiki-create-form-0" type="radio" name="templateprovider" value="" checked="checked"/>
-            $msg.get("core.create.${tocreate}.template.empty")
+            $services.localization.render("core.create.${tocreate}.template.empty")
           </label>
           #set($discard = $jsSpaceInclusionValidationContainer.add(['xwiki-create-form-0', [], '']))
           #foreach($tpdoc in $availableTemplateProviders)
@@ -159,7 +159,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
               #set($tpdocRef = $services.model.serialize($tpdoc.documentReference, 'local'))
               <input id="$inputId" type="radio" name="templateprovider" value="$escapetool.xml(${tpdocRef})"/>
               ## use the template name as a translation key, to allow i18n
-              $escapetool.xml($msg.get($tpobj.getProperty('name').value))
+              $escapetool.xml($services.localization.render($tpobj.getProperty('name').value))
             </label>
             #set($jsAllowedSpacesArray = '')## Reset previous value
             #if ($tocreate == 'space')
@@ -179,9 +179,9 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
               #if($allowedSpaces.isEmpty())
                 #set($message = '')
               #elseif($allowedSpaces.size() == 1)
-                #set($message = $msg.get('core.create.template.allowedspace.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
+                #set($message = $services.localization.render('core.create.template.allowedspace.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
               #else
-                #set($message = $msg.get('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
+                #set($message = $services.localization.render('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
               #end
               #set($discard = $jsSpaceInclusionValidationContainer.add([$inputId, "[${jsAllowedSpacesArray}]", $message]))
             #end
@@ -241,8 +241,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #if($space == '')
       <dl>
         <dt>
-          <label for="space">$msg.get('core.create.space')</label>
-          <span class="xHint">$msg.get('core.create.page.space.hint')</span>
+          <label for="space">$services.localization.render('core.create.space')</label>
+          <span class="xHint">$services.localization.render('core.create.page.space.hint')</span>
         </dt>
         <dd>
           <input type="text" id="space" size="60" name="space" class="suggestSpaces" value="$!{escapetool.xml($defaultSpace)}"/>
@@ -258,11 +258,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #if($page == '')
       <dl>
         <dt>
-          <label for="page">$msg.get('core.create.page')</label>
-          <span class="xHint">$msg.get('core.create.page.hint')</span>
+          <label for="page">$services.localization.render('core.create.page')</label>
+          <span class="xHint">$services.localization.render('core.create.page.hint')</span>
         </dt>
         <dd>
-          #set ($pageText = $msg.get('core.create.pageText'))
+          #set ($pageText = $services.localization.render('core.create.pageText'))
           <input type="text" id="page" size="60" name="page" value="$pageText" class="withTip"/>
         </dd>
       </dl>
@@ -288,8 +288,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     ## ---------------------------------------------------------------------------------------------------------
     <dl>
       <dt>
-        <label for="space">$msg.get('core.create.space')</label>
-        <span class="xHint">$msg.get('core.create.space.hint')</span>
+        <label for="space">$services.localization.render('core.create.space')</label>
+        <span class="xHint">$services.localization.render('core.create.space.hint')</span>
       </dt>
       <dd>
         <input type="text" id="space" size="60" name="space"/>
@@ -303,7 +303,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #end
   <div class="buttons">
     <span class="buttonwrapper">
-      <input type="submit" class="button" value="$msg.get('create')"/>
+      <input type="submit" class="button" value="$services.localization.render('create')"/>
     </span>
   </div>
   </div>

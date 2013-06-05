@@ -22,6 +22,7 @@ package org.xwiki.security.internal;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
@@ -36,10 +37,13 @@ import org.xwiki.security.authorization.AuthorizationException;
 public interface UserBridge
 {
     /**
+     * Retrieve the collection of group reference for which the user is a member in the given wiki.
+     *
      * @param user the user to be queried.
-     * @return the collection of group reference for which the user is a member.
+     * @param wikiReference the reference of the wiki where group are evaluated.
+     * @return the collection of group reference for which the user is a member in the given wiki.
      * @throws AuthorizationException if an error occurs during retrieval.
      */
-    Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user)
+    Collection<GroupSecurityReference> getAllGroupsFor(UserSecurityReference user, WikiReference wikiReference)
         throws AuthorizationException;
 }

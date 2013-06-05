@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1319793499000</creationDate>
-  <date>1319797620000</date>
-  <contentUpdateDate>1319797620000</contentUpdateDate>
+  <creationDate>1360434145000</creationDate>
+  <date>1360434176000</date>
+  <contentUpdateDate>1360434167000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -48,5 +48,37 @@
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </answer>
   </class>
+  <object>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>FAQCode.FAQClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>054d2893-76ab-40d8-b7bb-e1b3663b2221</guid>
+    <property>
+      <sheet>FAQCode.FAQSheet</sheet>
+    </property>
+  </object>
   <content/>
 </xwikidoc>

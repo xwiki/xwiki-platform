@@ -126,7 +126,7 @@ var XWiki = (function(XWiki) {
         statusUI.FILE_INFO   = UploadUtils.createDiv('file-info');
         (statusUI.FILE_NAME  = UploadUtils.createSpan('file-name', this.file.name)).title = this.file.type;
         statusUI.FILE_SIZE   = UploadUtils.createSpan('file-size', ' (' + UploadUtils.bytesToSize(this.file.size) + ')');
-        statusUI.FILE_CANCEL = UploadUtils.createButton("$msg.get('core.widgets.html5upload.item.cancel')", this.cancelUpload.bindAsEventListener(this));
+        statusUI.FILE_CANCEL = UploadUtils.createButton("$services.localization.render('core.widgets.html5upload.item.cancel')", this.cancelUpload.bindAsEventListener(this));
         // TODO MIME type icon?
 
         statusUI.FILE_INFO.insert(statusUI.FILE_NAME).insert(statusUI.FILE_SIZE).insert(statusUI.FILE_CANCEL);
@@ -232,7 +232,7 @@ var XWiki = (function(XWiki) {
       this.request && this.request.abort();
       this.canceled = true;
       clearInterval(this.timer);
-      this.statusUI.FILE_CANCEL.addClassName('upload-canceled-label').removeClassName('buttonwrapper').update("$msg.get('core.widgets.html5upload.item.canceled')");
+      this.statusUI.FILE_CANCEL.addClassName('upload-canceled-label').removeClassName('buttonwrapper').update("$services.localization.render('core.widgets.html5upload.item.canceled')");
       this.statusUI.UPLOAD_STATUS.removeClassName('upload-inprogress').addClassName('upload-canceled');
     },
 
@@ -359,24 +359,20 @@ var XWiki = (function(XWiki) {
     }
   });
 
+  // Determine the configured maximum attachment size.
+  var maxAttachmentSize = '$!escapetool.javascript($xwiki.getSpacePreference("upload_maxsize"))';
+  // 32MB is the default maximum size used inside the FileUploadPlugin.
+  // There's no easy way of getting that internal value, so we just assume it didn't change.
+  maxAttachmentSize = parseInt(maxAttachmentSize || 33554432);
+
   /**
    * HTML5 file uploader associated with an input of type file.
    */
   XWiki.FileUploader = Class.create({
-    ##
-    ## Determine the configured maximum attachment size
-    #set ($maxAttachmentSize = "$!xwiki.getSpacePreference('upload_maxsize')")
-    #if ($maxAttachmentSize == '')
-      ## 32MB is the default maximum size used inside the FileUploadPlugin;
-      ## there's no easy way of getting that internal value, so we just assume it didn't change
-      #set ($maxAttachmentSize = 33554432)
-    #else
-      #set ($maxAttachmentSize = $mathtool.toInteger($maxAttachmentSize))
-    #end
     /** Default configuration. */
     options : {
       /** Maximum accepted file size. */
-      maxFilesize : ${maxAttachmentSize},
+      maxFilesize : maxAttachmentSize,
       /** Regular expression defining accepted MIME types. */
       fileFilter  : /.*/i,
       /** Should information (name, type, size) about each selected file be displayed? */
@@ -397,12 +393,12 @@ var XWiki = (function(XWiki) {
 
     /** Templates for feedback messages displayed to the user. */
     messages : {
-      UNKNOWN_ERROR         : new Template("$msg.get('core.widgets.html5upload.error.unknown', ['#{name}'])"),
-      INVALID_FILE_TYPE     : new Template("$msg.get('core.widgets.html5upload.error.invalidType', ['#{name}'])"),
-      UPLOAD_LIMIT_EXCEEDED : new Template("$msg.get('core.widgets.html5upload.error.invalidSize', ['#{name}', '#{size}'])"),
-      UPLOAD_ABORTED        : new Template("$msg.get('core.widgets.html5upload.error.aborted', ['#{name}'])"),
-      UPLOAD_FINISHING      : new Template("$msg.get('core.widgets.html5upload.status.finishing', ['#{name}'])"),
-      UPLOAD_FINISHED       : new Template("$msg.get('core.widgets.html5upload.status.finished', ['#{name}', '#{size}'])")
+      UNKNOWN_ERROR         : new Template("$services.localization.render('core.widgets.html5upload.error.unknown', ['#{name}'])"),
+      INVALID_FILE_TYPE     : new Template("$services.localization.render('core.widgets.html5upload.error.invalidType', ['#{name}'])"),
+      UPLOAD_LIMIT_EXCEEDED : new Template("$services.localization.render('core.widgets.html5upload.error.invalidSize', ['#{name}', '#{size}'])"),
+      UPLOAD_ABORTED        : new Template("$services.localization.render('core.widgets.html5upload.error.aborted', ['#{name}'])"),
+      UPLOAD_FINISHING      : new Template("$services.localization.render('core.widgets.html5upload.status.finishing', ['#{name}'])"),
+      UPLOAD_FINISHED       : new Template("$services.localization.render('core.widgets.html5upload.status.finished', ['#{name}', '#{size}'])")
     },
 
     /**
@@ -473,11 +469,11 @@ var XWiki = (function(XWiki) {
       statusUI.CONTAINER = UploadUtils.createDiv('upload-status-container');
       statusUI.LIST = UploadUtils.createDiv('upload-status-list');
       statusUI.CANCEL = UploadUtils.createButton(
-        "$msg.get('core.widgets.html5upload.cancelAll')",
+        "$services.localization.render('core.widgets.html5upload.cancelAll')",
          this.cancelUpload.bindAsEventListener(this)
       );
       statusUI.HIDE = UploadUtils.createButton(
-        "$msg.get('core.widgets.html5upload.hideStatus')",
+        "$services.localization.render('core.widgets.html5upload.hideStatus')",
          this.hideUploadStatus.bindAsEventListener(this)
       );
       statusUI.HIDE.hide();
@@ -488,7 +484,6 @@ var XWiki = (function(XWiki) {
      * Display the upload status UI and hide the target input when files are selected.
      */
     showUploadStatus : function() {
-      this.inputContainer.hide();
       this.inputContainer.insert({after: this.statusUI.CONTAINER});
       this.statusUI.HIDE.hide();
       this.statusUI.CANCEL.show();
@@ -499,7 +494,6 @@ var XWiki = (function(XWiki) {
      */
     hideUploadStatus : function(event) {
       event && event.stop();
-      this.inputContainer.show();
       this.input.value = '';
       this.statusUI.CONTAINER.up() && this.statusUI.CONTAINER.remove();
       this.statusUI.LIST.update('');

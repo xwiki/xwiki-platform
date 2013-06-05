@@ -19,10 +19,8 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.DocumentReference;
-
-import java.util.Formatter;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * This is the base exception raised for various reasons by the authorization module.
@@ -32,6 +30,12 @@ import java.util.Formatter;
  */
 public class AuthorizationException extends Exception
 {
+    /** Constant value displayed for null entityReference. */
+    static final String NULL_ENTITY = "Main Wiki";
+
+    /** Constant value displayed for null userReference. */
+    static final String NULL_USER = "Public";
+
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
 
@@ -63,9 +67,22 @@ public class AuthorizationException extends Exception
      */
     public AuthorizationException(DocumentReference userReference, EntityReference entityReference, String message)
     {
-        this(userReference, entityReference, message, null);
+        this(null, userReference, entityReference, message, null);
     }
-    
+
+    /**
+     * @param right The right being checked.
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
+     * @param message Message.
+     * @see java.lang.Exception
+     */
+    public AuthorizationException(Right right, DocumentReference userReference, EntityReference entityReference,
+        String message)
+    {
+        this(right, userReference, entityReference, message, null);
+    }
+
     /**
      * @param userReference The user, for which the query was attempted.
      * @param entityReference The entity, on which the query was attempted.
@@ -73,15 +90,31 @@ public class AuthorizationException extends Exception
      * @param cause Original cause.
      * @see java.lang.Exception
      */
-    public AuthorizationException(DocumentReference userReference,
+    public AuthorizationException(DocumentReference userReference, EntityReference entityReference, String message,
+        Throwable cause)
+    {
+        this(null, userReference, entityReference, message, cause);
+    }
+
+    /**
+     * @param right The right being checked.
+     * @param userReference The user, for which the query was attempted.
+     * @param entityReference The entity, on which the query was attempted.
+     * @param message Message.
+     * @param cause Original cause.
+     * @see java.lang.Exception
+     */
+    public AuthorizationException(Right right,
+                                  DocumentReference userReference,
                                   EntityReference entityReference,
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("%s when checking access to %s for user %s",
-                                     message, 
-                                     userReference,
-                                     entityReference).toString(), cause);
+        super(String.format("%s when checking %s access to [%s] for user [%s]",
+                            message,
+                            (right == null) ? "" : "[" + right.getName() + "]",
+                            (entityReference == null) ? NULL_ENTITY : entityReference,
+                            (userReference == null) ? NULL_USER : userReference), cause);
     }
 
     /**
@@ -94,9 +127,9 @@ public class AuthorizationException extends Exception
                                   String message,
                                   Throwable cause)
     {
-        super(new Formatter().format("%s when checking access to %s",
-                                     message, 
-                                     entityReference).toString(), cause);
+        super(String.format("%s when checking access to [%s]",
+                            message,
+                            (entityReference == null) ? NULL_ENTITY : entityReference), cause);
     }
 
     /**

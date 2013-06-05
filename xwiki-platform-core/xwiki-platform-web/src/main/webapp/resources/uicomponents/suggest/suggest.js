@@ -28,7 +28,7 @@ var XWiki = (function(XWiki){
     // Display a "no results" message, or simply hide the suggest box when no suggestions are available
     shownoresults : true,
     // The message to display as the "no results" message
-    noresults : "$msg.get('core.widgets.suggest.noResults')",
+    noresults : "$services.localization.render('core.widgets.suggest.noResults')",
     maxheight : 250,
     cache : false,
     seps : "",
@@ -58,13 +58,13 @@ var XWiki = (function(XWiki){
     // Show a 'hide suggestions' button
     hideButton: {
       positions: [ "top" ],
-      text: "$escapetool.javascript($msg.get('core.widgets.suggest.hide'))"
+      text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
     },
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text
-    displayValueText: "$msg.get('core.widgets.suggest.valuePrefix')",
+    displayValueText: "$services.localization.render('core.widgets.suggest.valuePrefix')",
     // How to align the suggestion list when its width is different from the input field width
     align: "left",
     // When there are several suggest sources, should the widget displays only one, unified, "loading" indicator for all requests undergoing,
@@ -95,7 +95,7 @@ var XWiki = (function(XWiki){
 
     // Clone default options from the prototype so that they are not shared and extend options with passed parameters
     this.options = Object.extend(Object.clone(this.options), param || { });
-    if (typeof this.options.sources == 'object' && this.options.sources.length > 1) {
+    if (typeof this.options.sources == 'object') {
       // We are in multi-sources mode
       this.sources = this.options.sources;
     } else {
@@ -317,7 +317,7 @@ var XWiki = (function(XWiki){
         onCreate: this.fld.addClassName.bind(this.fld, 'loading'),
         onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
         onFailure: function (response) {
-          new XWiki.widgets.Notification("$msg.get('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
+          new XWiki.widgets.Notification("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
         },
         onComplete: this.fld.removeClassName.bind(this.fld, 'loading')
       }

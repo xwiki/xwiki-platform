@@ -112,7 +112,7 @@
 #end
 #set ($recentlyViewed = $xwiki.statsService.getRecentActions('view', $rv_maxItems))
 #if ($recentlyViewed.size() &gt; 0 || $showEmptyPanels)
-  #panelheader($msg.get('panels.recentlyVisited.title'))
+  #panelheader($services.localization.render('panels.recentlyVisited.title'))
   #foreach ($docname in $recentlyViewed)
     #if ($xwiki.hasAccessLevel('view', $xcontext.getUser(), $docname))
       #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())

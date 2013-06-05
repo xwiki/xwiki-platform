@@ -19,10 +19,16 @@
  */
 package org.xwiki.search.solr.internal.api;
 
-
 /**
- * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of
- * special field values like dates.
+ * Contains constants naming the Solr/Lucene index fields used by this module for indexing entities. Also contains
+ * additional constants used for composing field names on multilingual fields.
+ * <p/>
+ * A multilingual and virtual/alias field, is not stored in the index with the specified name. It is only used at query
+ * time and it is expanded automatically to the actual fields from the index.
+ * <p/>
+ * Example: "title" becomes "title_ml | title_en | title_ro | title_fr | etc..."
+ * <p/>
+ * <b>Note</b>: When indexing a field, the actual field name must be used instead of the virtual field name.
  * 
  * @version $Id$
  * @since 4.3M2
@@ -51,22 +57,34 @@ public interface Fields
     String SPACE = "space";
 
     /**
+     * Unanalyzed and not stored version of the document's space.
+     */
+    String SPACE_EXACT = "space_exact";
+
+    /**
      * Name of the document.
      */
     String NAME = "name";
 
     /**
-     * FullName of the document (example : Main.WebHome).
+     * FullName of the document (example: {@code Main.WebHome}).
      */
     String FULLNAME = "fullname";
 
     /**
      * Title of the document.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String TITLE = "title";
 
     /**
-     * Version of the document.
+     * Lowercased, unanalyzed and not stored version of the document's title, used for sorting.
+     */
+    String TITLE_SORT = "title_sort";
+
+    /**
+     * Version of the document (example: {@code 4.2}).
      */
     String VERSION = "version";
 
@@ -84,6 +102,8 @@ public interface Fields
     /**
      * XWiki object content. Used by objects to index their properties and by documents to index all the properties of
      * the contained objects.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String OBJECT_CONTENT = "objcontent";
 
@@ -93,9 +113,24 @@ public interface Fields
     String AUTHOR = "author";
 
     /**
+     * Last modifier, in its display version (i.e., "first_name last_name").
+     */
+    String AUTHOR_DISPLAY = "author_display";
+
+    /**
+     * Lowercased, unanalyzed and not stored version of the document's last author display version, used for sorting.
+     */
+    String AUTHOR_DISPLAY_SORT = "author_display_sort";
+
+    /**
      * Creator of the document.
      */
     String CREATOR = "creator";
+
+    /**
+     * Creator of the document, in its display version (i.e., "first_name last_name").
+     */
+    String CREATOR_DISPLAY = "creator_display";
 
     /**
      * Date of last modification.
@@ -113,24 +148,23 @@ public interface Fields
     String HIDDEN = "hidden";
 
     /**
-     * Document score.
+     * Document score, not an actual field. It's only computed at query time.
      */
     String SCORE = "score";
 
     /**
      * Fulltext content, not stored (and can therefore not be restored from the index).
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String DOCUMENT_CONTENT = "doccontent";
 
     /**
      * Attachment content.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String ATTACHMENT_CONTENT = "attcontent";
-
-    /**
-     * not in use.
-     */
-    String KEYWORDS = "kw";
 
     /**
      * For storing mimetype of the attachments.
@@ -143,12 +177,9 @@ public interface Fields
     String FILENAME = "filename";
 
     /**
-     * For storing the doc reference . Used by attachments.
-     */
-    String DOC_REFERENCE = "docref";
-
-    /**
      * For storing the comments.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String COMMENT = "comment";
 
@@ -159,6 +190,23 @@ public interface Fields
 
     /**
      * For storing property value.
+     * <p/>
+     * Note: Multilingual and virtual field.
      */
     String PROPERTY_VALUE = "propertyvalue";
+
+    /**
+     * Underscore character, used to separate the field name from the suffix.
+     */
+    String USCORE = "_";
+
+    /**
+     * Multilingual field suffix for the field of "text_general" type.
+     */
+    String MULTILINGUAL = "ml";
+
+    /**
+     * Format string for multilingual fields.
+     */
+    String MULTILIGNUAL_FORMAT = "%s_%s";
 }

@@ -12,11 +12,11 @@
 #set($rev2 = ${request.get('rev2')})
 #if(!$rev1 || !$rev2)
   $response.setStatus(400)
-  #error($msg.get('core.versions.delete.needselect'))
-  <center><a href="javascript:history.go(-1)">$msg.get('core.versions.delete.goback')</a></center> 
+  #error($services.localization.render('core.versions.delete.needselect'))
+  <center><a href="javascript:history.go(-1)">$services.localization.render('core.versions.delete.goback')</a></center>
 #else
-  #set($fullmsg = $msg.get('core.versions.delete.confirm.many', [${escapetool.xml($rev1)}, ${escapetool.xml($rev2)}]))
-  #xwikimessagebox($msg.get('core.delete') $fullmsg $doc.getURL('deleteversions', "confirm=1&amp;rev1=$!{escapetool.url($rev1)}&amp;rev2=$!{escapetool.url($rev2)}&amp;$!{redirectparam}&amp;$languageparams") $doc.getURL("view", "viewer=history$!{redirectparam}&amp;$languageparams") $msg.get('yes') $msg.get('no'))
+  #set($fullmsg = $services.localization.render('core.versions.delete.confirm.many', [${escapetool.xml($rev1)}, ${escapetool.xml($rev2)}]))
+  #xwikimessagebox($services.localization.render('core.delete') $fullmsg $doc.getURL('deleteversions', "confirm=1&amp;rev1=$!{escapetool.url($rev1)}&amp;rev2=$!{escapetool.url($rev2)}&amp;$!{redirectparam}&amp;$languageparams") $doc.getURL('view', "viewer=history$!{redirectparam}&amp;$languageparams") $services.localization.render('yes') $services.localization.render('no'))
 #end
 <div class="clearfloats"></div>
 </div>## mainContentArea

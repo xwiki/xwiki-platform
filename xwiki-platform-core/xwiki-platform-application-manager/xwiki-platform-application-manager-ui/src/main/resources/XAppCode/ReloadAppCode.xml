@@ -26,11 +26,11 @@
   <content>#if($action &amp;&amp; $action == "reload")
   #set($result = $AppManager.reloadApplication($appname))
   #if ($result == $Exception.ERROR_NOERROR)
-    #info($msg.get("xapp.successreloadapp", [$appname]))
+    #info($services.localization.render('xapp.successreloadapp', [$appname]))
   #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-    #error($msg.get("notallowed"))
+    #error($services.localization.render('notallowed'))
   #else
-    #error($msg.get("xapp.errorreloadapp", [$appname, $result]))
+    #error($services.localization.render('xapp.errorreloadapp', [$appname, $result]))
   #end
 #end
 </content>

@@ -35,7 +35,7 @@ import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Integration test to verify the security configuration of the Groovy Macro.

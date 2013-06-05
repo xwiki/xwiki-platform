@@ -46,6 +46,7 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 import liquibase.Liquibase;
+import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
@@ -268,7 +269,9 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         changeLogs.append(liquibaseChangeLogs);
         changeLogs.append(getLiquibaseChangeLogFooter());
 
-        getStore().executeRead(getXWikiContext(), new HibernateCallback<Object>()
+        final XWikiHibernateBaseStore store = getStore();
+
+        store.executeRead(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             @SuppressWarnings("unchecked")
@@ -277,10 +280,17 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
                 Liquibase lb;
                 try {
+                    Database lbDatabase =
+                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
+                            new JdbcConnection(session.connection()));
+
+                    // Precise the schema name to liquibase, since it does not usually determine it
+                    // properly (See XWIKI-8813).
+                    lbDatabase.setDefaultSchemaName(store.getSchemaFromWikiName(getXWikiContext()));
+
                     lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
                         new MigrationResourceAccessor(changeLogs.toString()),
-                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
-                            new JdbcConnection(session.connection())));
+                        lbDatabase);
                 } catch (LiquibaseException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION,

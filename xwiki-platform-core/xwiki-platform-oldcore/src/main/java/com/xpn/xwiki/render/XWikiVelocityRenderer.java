@@ -184,6 +184,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         }
     }
 
+    @Override
     public String convertSingleLine(String macroname, String param, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {
@@ -193,6 +194,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         return result.toString();
     }
 
+    @Override
     public String convertMultiLine(String macroname, String param, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {

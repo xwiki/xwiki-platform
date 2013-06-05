@@ -37,24 +37,24 @@
     #end
     #set($result = $AppManager.exportApplicationXAR($appname, $recurse, $withversion))
     #if ($result == $Exception.ERROR_NOERROR)
-      #info($msg.get("xapp.successexportapp", [$appname]))
+      #info($services.localization.render('xapp.successexportapp', [$appname]))
     #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-      #error($msg.get("notallowed"))
+      #error($services.localization.render('notallowed'))
     #else
-      #error($msg.get("xapp.errorexportapp", [$appname, $result]))
+      #error($services.localization.render('xapp.errorexportapp', [$appname, $result]))
     #end
   #else
     &lt;form id="exportForm" action="" method="get"&gt;
-      #xwikimessageboxstart($msg.get("xapp.answer.exportapp.title", [$appname]) "")
+      #xwikimessageboxstart($services.localization.render('xapp.answer.exportapp.title', [$appname]) '')
         &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
         &lt;input type="hidden" id="confirm" name="confirm" value="1" /&gt;
         &lt;input type="hidden" id="action" name="action" value="$action" /&gt;
         &lt;input type="hidden" id="appname" name="appname" value="$appname" /&gt;
 
-        &lt;input type="checkbox" id="recurse" name="recurse" value="1" checked="checked"/&gt;&lt;label for="recurse"&gt;$msg.get("xapp.answer.exportapp.recursive")&lt;/label&gt;&lt;br/&gt;
-        &lt;input type="checkbox" id="withdetails" name="withdetails" value="1"/&gt;&lt;label for="withdetails"&gt;$msg.get("xapp.answer.exportapp.withdetails")&lt;/label&gt;
+        &lt;input type="checkbox" id="recurse" name="recurse" value="1" checked="checked"/&gt;&lt;label for="recurse"&gt;$services.localization.render('xapp.answer.exportapp.recursive')&lt;/label&gt;&lt;br/&gt;
+        &lt;input type="checkbox" id="withdetails" name="withdetails" value="1"/&gt;&lt;label for="withdetails"&gt;$services.localization.render('xapp.answer.exportapp.withdetails')&lt;/label&gt;
 
-        #submitButton("exportok", $null, $msg.get("ok"))
+        #submitButton('exportok', $null, $services.localization.render('ok'))
       #xwikimessageboxend()
     &lt;/form&gt;
   #end

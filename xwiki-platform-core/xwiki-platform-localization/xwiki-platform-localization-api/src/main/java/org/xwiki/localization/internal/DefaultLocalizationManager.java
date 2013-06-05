@@ -79,18 +79,16 @@ public class DefaultLocalizationManager implements LocalizationManager
     }
 
     @Override
-    public void use(String bundleType, String bundleId) throws TranslationBundleDoesNotExistsException,
-        TranslationBundleFactoryDoesNotExistsException
+    public TranslationBundle getTranslationBundle(String bundleType, String bundleId)
+        throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException
+
     {
         if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, bundleType + ':' + bundleId)) {
             try {
-                this.bundleContext.addBundle(this.componentManagerProvider.get().<TranslationBundle> getInstance(
-                    TranslationBundle.class, bundleType + ':' + bundleId));
-
-                return;
+                return this.componentManagerProvider.get().<TranslationBundle> getInstance(TranslationBundle.class,
+                    bundleType + ':' + bundleId);
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to lookup translation bundle with hint [{}] and type [{}].", bundleId,
-                    bundleType, e);
+                // Shoul never happen since we test it before
             }
         }
 
@@ -102,7 +100,14 @@ public class DefaultLocalizationManager implements LocalizationManager
                 "Failed to lookup BundleFactory for type [%s]", bundleType), e);
         }
 
-        TranslationBundle bundle = bundleFactory.getBundle(bundleId);
+        return bundleFactory.getBundle(bundleId);
+    }
+
+    @Override
+    public void use(String bundleType, String bundleId) throws TranslationBundleDoesNotExistsException,
+        TranslationBundleFactoryDoesNotExistsException
+    {
+        TranslationBundle bundle = getTranslationBundle(bundleType, bundleId);
 
         this.bundleContext.addBundle(bundle);
     }

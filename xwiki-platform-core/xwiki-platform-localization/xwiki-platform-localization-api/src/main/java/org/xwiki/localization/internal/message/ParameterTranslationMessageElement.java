@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.xwiki.localization.TranslationBundle;
+import org.xwiki.localization.message.TranslationMessageElement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -62,6 +63,7 @@ public class ParameterTranslationMessageElement implements TranslationMessageEle
     public ParameterTranslationMessageElement(int index, Parser plainParser)
     {
         this.index = index;
+        this.plainParser = plainParser;
     }
 
     @Override

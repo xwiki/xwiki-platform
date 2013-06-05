@@ -149,9 +149,6 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                     for (WikiComponent component : components) {
                         this.wikiComponentManager.registerWikiComponent(component);
                     }
-                } catch (WikiComponentAlreadyRegisteredException e) {
-                    // We voluntarily ignore this one, this method makes sure all the components are registered, and in
-                    // some cases (XAR import) we can try to register the same component more than once.
                 } catch (WikiComponentException e) {
                     this.logger.warn("Failed to register the wiki component located in the document [{}]. "
                         + "Root cause: {}", this.compactWikiSerializer.serialize(reference), e.getMessage());

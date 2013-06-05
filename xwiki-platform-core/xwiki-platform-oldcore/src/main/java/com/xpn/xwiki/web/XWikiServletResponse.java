@@ -20,16 +20,9 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.portlet.PortletMode;
-import javax.portlet.PortletModeException;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowState;
-import javax.portlet.WindowStateException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -38,9 +31,27 @@ public class XWikiServletResponse implements XWikiResponse
 {
     private HttpServletResponse response;
 
+    /**
+     * The HTTP response status (200, 302, etc), see {@link #getStatus()}.
+     */
+    private int httpStatus;
+
     public XWikiServletResponse(HttpServletResponse response)
     {
         this.response = response;
+    }
+
+    /**
+     * Note that in Servlet 3.0 there's a better way to get the servlet response's code by calling
+     * <a href="http://download.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#getStatus%28%29">
+     * getStatus()</a>.
+     *
+     * @return the HTTP response status (200, 302, etc)
+     * @since 5.0M1
+     */
+    public int getStatus()
+    {
+        return this.httpStatus;
     }
 
     @Override
@@ -52,6 +63,7 @@ public class XWikiServletResponse implements XWikiResponse
     @Override
     public void sendRedirect(String redirect) throws IOException
     {
+        this.httpStatus = SC_FOUND;
         this.response.sendRedirect(redirect);
     }
 
@@ -210,6 +222,7 @@ public class XWikiServletResponse implements XWikiResponse
     public void setStatus(int i)
     {
         this.response.setStatus(i);
+        this.httpStatus = i;
     }
 
     /**
@@ -220,6 +233,7 @@ public class XWikiServletResponse implements XWikiResponse
     public void setStatus(int i, String s)
     {
         this.response.setStatus(i, s);
+        this.httpStatus = i;
     }
 
     @Override
@@ -263,85 +277,20 @@ public class XWikiServletResponse implements XWikiResponse
     @Override
     public void sendError(int i, String s) throws IOException
     {
+        this.httpStatus = i;
         this.response.sendError(i, s);
     }
 
     @Override
     public void sendError(int i) throws IOException
     {
+        this.httpStatus = i;
         this.response.sendError(i);
-    }
-
-    /*
-     * Portlet Functions
-     */
-    @Override
-    public void addProperty(String s, String s1)
-    {
-    }
-
-    @Override
-    public void setProperty(String s, String s1)
-    {
     }
 
     @Override
     public String getContentType()
     {
-        return null;
-    }
-
-    @Override
-    public OutputStream getPortletOutputStream() throws IOException
-    {
-        return null;
-    }
-
-    @Override
-    public PortletURL createRenderURL()
-    {
-        return null;
-    }
-
-    @Override
-    public PortletURL createActionURL()
-    {
-        return null;
-    }
-
-    @Override
-    public String getNamespace()
-    {
-        return null;
-    }
-
-    @Override
-    public void setTitle(String s)
-    {
-    }
-
-    @Override
-    public void setWindowState(WindowState windowState) throws WindowStateException
-    {
-    }
-
-    @Override
-    public void setPortletMode(PortletMode portletMode) throws PortletModeException
-    {
-    }
-
-    @Override
-    public void setRenderParameters(Map map)
-    {
-    }
-
-    @Override
-    public void setRenderParameter(String s, String s1)
-    {
-    }
-
-    @Override
-    public void setRenderParameter(String s, String[] strings)
-    {
+        return this.response.getContentType();
     }
 }

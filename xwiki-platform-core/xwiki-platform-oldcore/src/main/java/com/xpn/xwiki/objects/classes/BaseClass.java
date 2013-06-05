@@ -90,6 +90,11 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * The owner document, if this object was obtained from a document.
      */
     private transient XWikiDocument ownerDocument;
+    
+    /**
+     * Used to specify who can add this object.
+     */
+    private String restriction;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -426,6 +431,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         bclass.setNameField(getNameField());
         bclass.setDirty(this.isDirty);
         bclass.setOwnerDocument(this.ownerDocument);
+        bclass.setRestriction(this.restriction);
 
         return bclass;
     }
@@ -469,6 +475,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         if (!getNameField().equals(bclass.getNameField())) {
+            return false;
+        }
+        
+        if(!getRestriction().equals(bclass.getRestriction())) {
             return false;
         }
 
@@ -520,6 +530,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         el = new DOMElement("validationScript");
         el.addText((getValidationScript() == null) ? "" : getValidationScript());
         cel.add(el);
+        
+        el = new DOMElement("restriction");
+        el.addText((getRestriction() == null) ? "" : getRestriction());
+        cel.add(el);
 
         // Iterate over values sorted by field name so that the values are
         // exported to XML in a consistent order.
@@ -570,6 +584,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             Element valel = cel.element("validationScript");
             if (valel != null) {
                 setValidationScript(valel.getText());
+                j++;
+            }
+            
+            Element resel = cel.element("restriction");
+            if (resel != null) {
+                setRestriction(resel.getText());
                 j++;
             }
 
@@ -1376,6 +1396,49 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         this.isDirty = isDirty;
         if (isDirty && ownerDocument != null) {
             ownerDocument.setContentDirty(true);
+        }
+    }
+    
+    /**
+     * 
+     * @param level Level of access required to use this class
+     */
+    public void setRestriction (String level)
+    {
+        this.restriction = level;
+    }
+    
+    public String getRestriction()
+    {
+        if (this.restriction == null) {
+            return "";
+        }
+        return this.restriction;
+    }
+    
+    public boolean isRestricted()
+    {
+        if (this.restriction == null) {
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean canAccess(XWikiContext context)
+    {
+        String level = getRestriction();
+        if(level.equals("")) {
+            return true;
+        }
+        String username = context.getUserReference().toString();
+        String docname = context.getDoc().getDocumentReference().toString();
+        try {
+            if(!context.getWiki().getRightService().hasAccessLevel(level, username, docname, context)) {
+                return false;
+            }
+            return true;
+        } catch (XWikiException e) {
+            return false;
         }
     }
 }

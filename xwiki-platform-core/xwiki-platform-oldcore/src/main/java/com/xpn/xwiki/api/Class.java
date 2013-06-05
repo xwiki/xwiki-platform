@@ -295,6 +295,35 @@ public class Class extends Collection
         BaseObject obj = (BaseObject) getBaseClass().newObject(getXWikiContext());
         return obj.newObjectApi(obj, getXWikiContext());
     }
+    
+    /**
+     * 
+     * @return the level of restriction for this class
+     */
+    public String getRestriction()
+    {
+        return this.getBaseClass().getRestriction();
+    }
+    
+    /**
+     * 
+     * @param level right necessary for creating objects from this class
+     */
+    public void setRestriction(String level)
+    {
+        this.getBaseClass().setRestriction(level);
+    }
+    
+    /**
+     * 
+     * @param docname
+     * @return
+     * @throws XWikiException
+     */
+    public boolean canAccess() throws XWikiException
+    {
+        return this.getBaseClass().canAccess(getXWikiContext());
+    }
 }
 
 class PropertyComparator implements Comparator<PropertyClass>

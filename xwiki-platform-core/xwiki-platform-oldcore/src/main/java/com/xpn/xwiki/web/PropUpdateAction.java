@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -33,17 +36,21 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.util.Util;
 
 public class PropUpdateAction extends XWikiAction
-{
+{   
     public boolean propUpdate(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
         XWikiMessageTool msg = context.getMessageTool();
-
+        
         // Prepare new class
         BaseClass bclass = doc.getXClass();
         BaseClass bclass2 = bclass.clone();
+        
+        // Set restriction level
+        String restrictionLevel = form.getRequest().getParameter("restriction").toString();
+        bclass2.setRestriction(restrictionLevel);
         bclass2.setFields(new HashMap());
 
         // Prepare a Map for field renames

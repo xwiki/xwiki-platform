@@ -1983,7 +1983,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * 
      * @param classReference the reference of the class
      * @param context the XWiki context
-     * @return the index of teh newly created object
+     * @return the index of the newly created object or -1 if the creation failed
      * @throws XWikiException error when creating the new object
      * @since 2.2.3
      */
@@ -1994,6 +1994,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         object.setDocumentReference(getDocumentReference());
         object.setOwnerDocument(this);
         object.setXClassReference(classReference);
+        BaseClass bclass = object.getXClass(context);
+        if(!bclass.canAccess(context)) {
+            LOGGER.warn("You are not authorized to create an object of this class.");
+            return -1;
+        }
         List<BaseObject> objects = this.xObjects.get(absoluteClassReference);
         if (objects == null) {
             objects = new ArrayList<BaseObject>();
@@ -3211,15 +3216,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             for (int i = 0; i < oldObjects.size(); i++) {
                 BaseObject oldobject = oldObjects.get(i);
                 if (oldobject != null) {
-                    BaseClass baseclass = oldobject.getXClass(context);
-                    BaseObject newobject =
-                        (BaseObject) baseclass.fromMap(
-                            eform.getObject(this.localEntityReferenceSerializer.serialize(baseclass
-                                .getDocumentReference()) + "_" + i), oldobject);
-                    newobject.setNumber(oldobject.getNumber());
-                    newobject.setGuid(oldobject.getGuid());
-                    newobject.setDocumentReference(getDocumentReference());
-                    newObjects.set(newobject.getNumber(), newobject);
+                    // Do not update the object if the user should not have access to it.
+                    if(oldobject.getXClass(context).canAccess(context)) {
+                        BaseClass baseclass = oldobject.getXClass(context);
+                        BaseObject newobject =
+                            (BaseObject) baseclass.fromMap(
+                                eform.getObject(this.localEntityReferenceSerializer.serialize(baseclass
+                                    .getDocumentReference()) + "_" + i), oldobject);
+                        newobject.setNumber(oldobject.getNumber());
+                        newobject.setGuid(oldobject.getGuid());
+                        newobject.setDocumentReference(getDocumentReference());
+                        newObjects.set(newobject.getNumber(), newobject);
+                    } else {
+                        newObjects.set(oldobject.getNumber(), oldobject);
+                    }
                 }
             }
             getXObjects().put(reference, newObjects);

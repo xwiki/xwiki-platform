@@ -83,12 +83,7 @@ public class XWikiUser
 
             DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(groupName);
 
-            Collection<DocumentReference> groups =
-                groupService.getAllGroupsReferencesForMember(getUserReference(context), 0, 0, context);
-
-            if (groups.contains(groupReference)) {
-                return true;
-            }
+            return groupService.isMemberInGroup(getUserReference(context), groupReference, context);
         }
 
         return false;

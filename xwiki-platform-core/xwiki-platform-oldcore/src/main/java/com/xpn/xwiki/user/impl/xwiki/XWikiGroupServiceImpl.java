@@ -857,4 +857,46 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         // TODO: improve using real request
         return getAllMembersNamesForGroup(group, 0, 0, context).size();
     }
+
+    @Override
+    public boolean isMemberInGroup(DocumentReference memberReference, DocumentReference groupReference,
+                                   XWikiContext context) throws XWikiException
+    {
+        return isMemberInGroup(memberReference, groupReference, new ArrayList<DocumentReference>(), context);
+    }
+
+    /**
+     * Check if a member (user or group) belongs to a group or not.
+     *
+     * @param memberReference The reference of the member to check
+     * @param groupReference The reference of the group to test
+     * @param alreadySeenGroups The members that have already been checked (to avoid infinite recursivity)
+     * @param context The current {@link XWikiContext context}.
+     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
+     * @throws XWikiException If an error occurs when checking the groups.
+     */
+    private boolean isMemberInGroup(DocumentReference memberReference, DocumentReference groupReference, Collection<DocumentReference> alreadySeenGroups,
+                                    XWikiContext context) throws XWikiException
+    {
+        Collection<DocumentReference> groups =
+                getAllGroupsReferencesForMember(memberReference, 0, 0, context);
+
+        // First case: the user is directly a member of the group
+        if (groups.contains(groupReference)) {
+            return true;
+        }
+
+        // Else, the user is a member of a group which is a subgroup of the group we are looking for
+        for(DocumentReference group : groups){
+            // Avoid cyclic research
+            if(alreadySeenGroups.contains(group))
+                continue;
+            alreadySeenGroups.add(group);
+            // Recurse
+            if(isMemberInGroup(group, groupReference, alreadySeenGroups, context))
+                return true;
+        }
+
+        return false;
+    }
 }

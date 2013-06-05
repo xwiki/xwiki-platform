@@ -24,16 +24,22 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 
 /**
@@ -45,14 +51,29 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Component
 @Named("object")
 @Singleton
-public class ObjectSolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
+public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
 {
     /**
      * Used to resolve object property references.
      */
     @Inject
     @Named("object_property")
-    private SolrDocumentReferenceResolver objectPropertyResolver;
+    protected Provider<SolrReferenceResolver> objectPropertyResolverProvider;
+
+    /**
+     * Used to resolve document references.
+     */
+    @Inject
+    @Named("document")
+    protected Provider<SolrReferenceResolver> documentResolverProvider;
+
+    /**
+     * Reference to String serializer. Used for fields such as class and fullname that are relative to their wiki and
+     * are stored without the wiki name.
+     */
+    @Inject
+    @Named("local")
+    protected EntityReferenceSerializer<String> localSerializer;
 
     @Override
     public List<EntityReference> getReferences(EntityReference objectReference) throws SolrIndexerException
@@ -80,7 +101,7 @@ public class ObjectSolrDocumentReferenceResolver extends AbstractSolrDocumentRef
                 ObjectPropertyReference objectPropertyReference = objectProperty.getReference();
 
                 try {
-                    result.addAll(this.objectPropertyResolver.getReferences(objectPropertyReference));
+                    result.addAll(this.objectPropertyResolverProvider.get().getReferences(objectPropertyReference));
                 } catch (Exception e) {
                     this.logger.error("Failed to resolve references for object property [" + objectPropertyReference
                         + "]", e);
@@ -89,5 +110,31 @@ public class ObjectSolrDocumentReferenceResolver extends AbstractSolrDocumentRef
         }
 
         return result;
+    }
+
+    @Override
+    public String getQuery(EntityReference reference) throws SolrIndexerException
+    {
+        BaseObjectReference objectReference = new BaseObjectReference(reference);
+
+        StringBuilder builder = new StringBuilder();
+
+        EntityReference spaceReference = reference.extractReference(EntityType.SPACE);
+        builder.append(documentResolverProvider.get().getQuery(spaceReference));
+
+        builder.append(QUERY_AND);
+
+        builder.append(Fields.CLASS);
+        builder.append(':');
+        builder
+            .append(ClientUtils.escapeQueryChars(this.localSerializer.serialize(objectReference.getXClassReference())));
+
+        builder.append(QUERY_AND);
+
+        builder.append(Fields.NUMBER);
+        builder.append(':');
+        builder.append(ClientUtils.escapeQueryChars(String.valueOf(objectReference.getObjectNumber())));
+
+        return builder.toString();
     }
 }

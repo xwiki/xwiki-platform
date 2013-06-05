@@ -22,8 +22,13 @@ package org.xwiki.search.solr.internal.reference;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -34,13 +39,24 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 5.1M2
  */
-public abstract class AbstractSolrDocumentReferenceResolver implements SolrDocumentReferenceResolver
+public abstract class AbstractSolrReferenceResolver implements SolrReferenceResolver
 {
+    /**
+     * SEparator between several element of the SOLR query.
+     */
+    protected static final String QUERY_AND = " AND ";
+    
     /**
      * Used to access current {@link XWikiContext}.
      */
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Reference to String serializer.
+     */
+    @Inject
+    protected EntityReferenceSerializer<String> serializer;
 
     /**
      * The logger.
@@ -61,5 +77,21 @@ public abstract class AbstractSolrDocumentReferenceResolver implements SolrDocum
         XWikiDocument document = context.getWiki().getDocument(documentReference, context);
 
         return document;
+    }
+
+    @Override
+    public String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException
+    {
+        String result = this.serializer.serialize(reference);
+
+        // TODO: Include locale all the other entities once object/attachment translation is implemented.
+
+        return result;
+    }
+
+    @Override
+    public String getQuery(EntityReference reference) throws IllegalArgumentException, SolrIndexerException
+    {
+        return Fields.ID + ':' + ClientUtils.escapeQueryChars(getId(reference));
     }
 }

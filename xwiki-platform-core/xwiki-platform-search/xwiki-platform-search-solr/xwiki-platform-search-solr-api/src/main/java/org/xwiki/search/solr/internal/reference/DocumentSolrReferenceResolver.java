@@ -26,12 +26,18 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -50,20 +56,34 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 @Component
 @Named("document")
 @Singleton
-public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
+public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
 {
     /**
      * Used to resolve object references.
      */
     @Inject
     @Named("object")
-    private SolrDocumentReferenceResolver objectResolver;
+    protected Provider<SolrReferenceResolver> objectResolverProvider;
+
+    /**
+     * Used to resolve space references.
+     */
+    @Inject
+    @Named("space")
+    protected Provider<SolrReferenceResolver> spaceResolverProvider;
 
     /**
      * Used to resolve attachment references.
      */
     @Inject
-    private SolrDocumentReferenceResolver attachmentResolver;
+    @Named("attachment")
+    protected Provider<SolrReferenceResolver> attachmentResolverProvider;
+
+    /**
+     * DocumentAccessBridge component.
+     */
+    @Inject
+    protected DocumentAccessBridge documentAccessBridge;
 
     @Override
     public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
@@ -93,17 +113,17 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
                 }
 
                 // Document translations
-                List<String> translatedLanguages;
+                List<String> translatedLocales;
                 try {
-                    translatedLanguages = document.getTranslationList(context);
+                    translatedLocales = document.getTranslationList(context);
                 } catch (XWikiException e) {
                     throw new SolrIndexerException(String.format("Failed to get document [%s] translations",
                         documentReference), e);
                 }
 
-                for (String translatedLanguage : translatedLanguages) {
+                for (String translatedLocale : translatedLocales) {
                     DocumentReference translatedDocumentReference =
-                        new DocumentReference(documentReference, new Locale(translatedLanguage));
+                        new DocumentReference(documentReference, new Locale(translatedLocale));
                     result.add(translatedDocumentReference);
                 }
 
@@ -129,7 +149,7 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
             AttachmentReference attachmentReference = attachment.getReference();
 
             try {
-                result.addAll(this.attachmentResolver.getReferences(attachmentReference));
+                result.addAll(this.attachmentResolverProvider.get().getReferences(attachmentReference));
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]", e);
             }
@@ -149,12 +169,75 @@ public class DocumentSolrDocumentReferenceResolver extends AbstractSolrDocumentR
                     BaseObjectReference objectReference = object.getReference();
 
                     try {
-                        result.addAll(this.objectResolver.getReferences(objectReference));
+                        result.addAll(this.objectResolverProvider.get().getReferences(objectReference));
                     } catch (Exception e) {
                         this.logger.error("Failed to resolve references for object [" + objectReference + "]", e);
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public String getId(EntityReference reference) throws SolrIndexerException
+    {
+        DocumentReference documentReference = new DocumentReference(reference);
+
+        String result = super.getId(reference);
+
+        // Document IDs also contain the locale code to differentiate between them.
+        // Objects, attachments, etc. don`t need this because the only thing that is translated in an XWiki document
+        // right now is the document title and content. Objects and attachments are not translated.
+        result += Fields.USCORE + getLocale(documentReference);
+
+        return result;
+    }
+
+    /**
+     * @param documentReference reference to the document.
+     * @return the locale code of the referenced document.
+     * @throws SolrIndexerException if problems occur.
+     */
+    protected String getLocale(DocumentReference documentReference) throws SolrIndexerException
+    {
+        String locale = null;
+
+        try {
+            if (documentReference.getLocale() != null
+                && !StringUtils.isEmpty(documentReference.getLocale().toString())) {
+                locale = documentReference.getLocale().toString();
+            } else {
+                String realLanguage = this.documentAccessBridge.getDocument(documentReference).getRealLanguage();
+
+                if (StringUtils.isNotEmpty(realLanguage)) {
+                    locale = realLanguage;
+                } else {
+                    // Multilingual and Default placeholder
+                    locale = "en";
+                }
+            }
+        } catch (Exception e) {
+            throw new SolrIndexerException(String.format("Exception while fetching the locale of the document '%s'",
+                documentReference), e);
+        }
+
+        return locale;
+    }
+
+    @Override
+    public String getQuery(EntityReference reference) throws SolrIndexerException
+    {
+        StringBuilder builder = new StringBuilder();
+
+        EntityReference spaceReference = reference.extractReference(EntityType.SPACE);
+        builder.append(spaceResolverProvider.get().getQuery(spaceReference));
+
+        builder.append(QUERY_AND);
+
+        builder.append(Fields.NAME);
+        builder.append(':');
+        builder.append(ClientUtils.escapeQueryChars(reference.getName()));
+
+        return builder.toString();
     }
 }

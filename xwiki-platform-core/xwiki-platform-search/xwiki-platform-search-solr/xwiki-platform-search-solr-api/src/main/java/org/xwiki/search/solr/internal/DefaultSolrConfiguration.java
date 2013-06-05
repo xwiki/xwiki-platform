@@ -50,16 +50,16 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String DEFAULT_SOLR_TYPE = "embedded";
 
     /**
-     * Default value for the available languages that support optimized indexing.
+     * Default value for the available locales that support optimized indexing.
      */
-    public static final List<String> DEFAULT_OPTIMIZABLE_LANGUAGES = Arrays.asList("ar", "bg", "ca", "cz", "da", "de",
+    public static final List<String> DEFAULT_OPTIMIZABLE_LOCALES = Arrays.asList("ar", "bg", "ca", "cz", "da", "de",
         "en", "el", "es", "eu", "fa", "fi", "fr", "ga", "gl", "hi", "hu", "hy", "id", "it", "ja", "lv", "nl", "no",
         "pt", "ro", "ru", "sv", "th", "tr");
 
     /**
-     * Default value for the languages that are have optimized indexing activated.
+     * Default value for the locales that are have optimized indexing activated.
      */
-    public static final List<String> DEFAULT_OPTIMIZED_LANGUAGES = DEFAULT_OPTIMIZABLE_LANGUAGES;
+    public static final List<String> DEFAULT_OPTIMIZED_LOCALES = DEFAULT_OPTIMIZABLE_LOCALES;
 
     /**
      * Default list of multilingual fields.
@@ -88,15 +88,15 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String[] HOME_DIRECTORY_FILE_NAMES = {"solr.xml"};
 
     /**
-     * Solr conf directory file names (including default language resources).
+     * Solr conf directory file names (including default locale resources).
      */
     public static final String[] CONF_DIRECTORY_FILE_NAMES = {"solrconfig.xml", "schema.xml", "elevate.xml",
         "protwords.txt", "stopwords.txt", "synonyms.txt"};
 
     /**
-     * Solr language analysis resource file names.
+     * Solr locale analysis resource file names.
      */
-    public static final String[] LANGUAGE_RESOURCE_FILE_NAME_PREFIXES = {"contractions", "hyphenations", "stemdict",
+    public static final String[] LOCALES_RESOURCE_FILE_NAME_PREFIXES = {"contractions", "hyphenations", "stemdict",
         "stoptags", "stopwords", "synonyms", "userdict"};
 
     /**
@@ -150,17 +150,17 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     }
 
     @Override
-    public List<String> getOptimizableLanguages()
+    public List<String> getOptimizableLocales()
     {
-        // Note: To avoid hardcoding the DEFAULT_OPTIMIZABLE_LANGUAGES value, we could try to read the default
+        // Note: To avoid hardcoding the DEFAULT_OPTIMIZABLE_LOCALES value, we could try to read the default
         // schema.xml file an look for "<fieldType name="text_XX"..." tags.
-        return this.configuration.getProperty("solr.multilingual.availableLanguages", DEFAULT_OPTIMIZABLE_LANGUAGES);
+        return this.configuration.getProperty("solr.multilingual.availableLocales", DEFAULT_OPTIMIZABLE_LOCALES);
     }
 
     @Override
-    public List<String> getOptimizedLanguages()
+    public List<String> getOptimizedLocales()
     {
-        return this.configuration.getProperty("solr.multilingual.activeLanguages", DEFAULT_OPTIMIZED_LANGUAGES);
+        return this.configuration.getProperty("solr.multilingual.activeLocales", DEFAULT_OPTIMIZED_LOCALES);
     }
 
     @Override
@@ -189,15 +189,15 @@ public class DefaultSolrConfiguration implements SolrConfiguration
             result.put(fileName, classPathURL);
         }
 
-        // Language resources. All combinations.
-        for (String language : this.getOptimizableLanguages()) {
-            for (String languageFileName : LANGUAGE_RESOURCE_FILE_NAME_PREFIXES) {
-                String fileName = String.format("%s/lang/%s_%s.txt", CONF_DIRECTORY, languageFileName, language);
+        // Locale resources. All combinations.
+        for (String locale : this.getOptimizableLocales()) {
+            for (String localeFileName : LOCALES_RESOURCE_FILE_NAME_PREFIXES) {
+                String fileName = String.format("%s/lang/%s_%s.txt", CONF_DIRECTORY, localeFileName, locale);
                 String classPathLocation = String.format(CLASSPATH_LOCATION_PREFIX, fileName);
                 URL classPathURL = this.getClass().getResource(classPathLocation);
                 try {
                     URLConnection testConnection = classPathURL.openConnection();
-                    // Attempt a connection, since most of the combinations ("fileName_language.txt") will not be valid.
+                    // Attempt a connection, since most of the combinations ("fileName_locale.txt") will not be valid.
                     testConnection.connect();
                     result.put(fileName, classPathURL);
                 } catch (Exception e) {

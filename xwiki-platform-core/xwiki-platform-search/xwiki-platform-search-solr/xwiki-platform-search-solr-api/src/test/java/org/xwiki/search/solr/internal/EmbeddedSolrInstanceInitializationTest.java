@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.core.CoreContainer;
@@ -48,7 +49,7 @@ public class EmbeddedSolrInstanceInitializationTest
     @Rule
     public final MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
 
-    protected File PERMANENT_DIRECTORY = new File(System.getProperty("java.io.tmpdir"), "data");
+    protected File PERMANENT_DIRECTORY = new File("target", "data-" + new Date().getTime());
 
     @Before
     public void setup() throws Exception

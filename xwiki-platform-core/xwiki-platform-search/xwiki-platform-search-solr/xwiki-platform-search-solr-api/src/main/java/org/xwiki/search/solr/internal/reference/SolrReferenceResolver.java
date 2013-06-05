@@ -17,34 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal.metadata;
+package org.xwiki.search.solr.internal.reference;
+
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
+import org.xwiki.stability.Unstable;
 
 /**
- * Internal component interface for handling the extraction of metadata into a {@link SolrInputDocument} from XWiki
- * entities reference. Each entity type is supported by a specific implementation so the correct implementation must be
- * used with the correct entity type.
- * <p/>
- * The implementation use as hint the same value as returned by something like
- * {@code org.xwiki.model.EntityType.DOCUMENT.name().toLowerCase()} so they are easily retrievable, if they exist.
+ * Recursively retrieves the references for all the indexable entities contained by the given start entity.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 5.1M2
  */
+@Unstable
 @Role
-public interface SolrMetadataExtractor
+public interface SolrReferenceResolver
 {
     /**
-     * Extract data from an XWiki entity and wrap it into a {@link SolrInputDocument} that is indexable by Solr.
-     * 
-     * @param entityReference the reference to the entity.
-     * @return the {@link SolrInputDocument} containing the fields to be indexed for the entity.
+     * @param rootReference the root entity reference.
+     * @return references for the indexable contained entities, including the given one (but only if it is indexable).
+     * @throws SolrIndexerException if problems occur.
+     */
+    List<EntityReference> getReferences(EntityReference rootReference) throws SolrIndexerException;
+
+    /**
+     * @param reference reference to an entity.
+     * @return the ID of the entity, as it is used in the index.
      * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if the passed reference is not supported by the current implementation.
      */
-    LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
-        IllegalArgumentException;
+    String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException;
+
+    /**
+     * @param reference reference to an entity.
+     * @return the criteria to access this entity (and its children)
+     * @throws SolrIndexerException when failing to generate query
+     */
+    String getQuery(EntityReference reference) throws SolrIndexerException;
 }

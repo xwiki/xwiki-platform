@@ -201,6 +201,10 @@
   <copyField source="title_*" dest="title_sort"/>
   <copyField source="author_display" dest="author_display_sort"/>
 
+  <!-- Aliases -->
+  <!-- Retro compatibility with old Lucene module fields names -->
+  <copyField source="lang" dest="locale"/>
+
   <!--  The way we handle attachments/objects/properties requires that multiple attcontent_<language> fields are indexed for the same attachment Lucene document.
         This triggeres copyField each time and forces us to use multiValued="true" on attcontent, thus leading to useless storage overhead.
         To fix this, we are doing the copyField logic from the code, only once per attachment/object/property Lucene document.

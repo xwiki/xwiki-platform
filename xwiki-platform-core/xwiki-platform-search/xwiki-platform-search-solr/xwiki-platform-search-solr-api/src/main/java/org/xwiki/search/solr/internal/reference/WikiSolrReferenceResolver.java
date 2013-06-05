@@ -24,13 +24,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 /**
@@ -42,14 +45,14 @@ import org.xwiki.search.solr.internal.api.SolrIndexerException;
 @Component
 @Named("wiki")
 @Singleton
-public class WikiSolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
+public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
 {
     /**
      * Used to resolve space references.
      */
     @Inject
     @Named("space")
-    private SolrDocumentReferenceResolver spaceResolver;
+    private Provider<SolrReferenceResolver> spaceResolverProvider;
 
     /**
      * Query manager used to perform queries on the XWiki model.
@@ -78,12 +81,18 @@ public class WikiSolrDocumentReferenceResolver extends AbstractSolrDocumentRefer
             SpaceReference spaceReference = new SpaceReference(space, wikiReference);
 
             try {
-                result.addAll(this.spaceResolver.getReferences(spaceReference));
+                result.addAll(this.spaceResolverProvider.get().getReferences(spaceReference));
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for space [" + spaceReference + "]", e);
             }
         }
 
         return result;
+    }
+
+    @Override
+    public String getQuery(EntityReference reference)
+    {
+        return Fields.WIKI + ':' + ClientUtils.escapeQueryChars(reference.getName());
     }
 }

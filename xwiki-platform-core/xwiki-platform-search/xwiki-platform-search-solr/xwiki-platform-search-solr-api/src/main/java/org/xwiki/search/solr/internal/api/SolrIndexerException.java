@@ -25,11 +25,8 @@ package org.xwiki.search.solr.internal.api;
  * @version $Id$
  * @since 5.1M2
  */
-public class SolrIndexerException extends Exception
+public class SolrIndexerException extends SolrException
 {
-    /** Needed for correctly implementing {@link java.io.Serializable}. */
-    private static final long serialVersionUID = -4795008341521444886L;
-
     /**
      * Constructor.
      * 

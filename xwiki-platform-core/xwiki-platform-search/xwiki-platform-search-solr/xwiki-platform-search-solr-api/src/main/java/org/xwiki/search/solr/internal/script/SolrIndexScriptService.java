@@ -83,6 +83,8 @@ public class SolrIndexScriptService implements ScriptService
 
     /**
      * Index an entity and all it's contained entities recursively.
+     * <p>
+     * Null reference means the whole farm.
      * 
      * @param reference the reference to index.
      */
@@ -93,7 +95,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(reference);
 
-            this.solrIndex.index(reference);
+            this.solrIndex.index(reference, true);
         } catch (Exception e) {
             error(e);
         }
@@ -101,6 +103,8 @@ public class SolrIndexScriptService implements ScriptService
 
     /**
      * Index multiple entities and all their contained entities recursively. This is a batch operation.
+     * <p>
+     * Null reference means the whole farm.
      * 
      * @param references the references to index.
      */
@@ -111,7 +115,9 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(references);
 
-            this.solrIndex.index(references);
+            for (EntityReference reference : references) {
+                this.solrIndex.index(reference, true);
+            }
         } catch (Exception e) {
             error(e);
         }
@@ -119,6 +125,8 @@ public class SolrIndexScriptService implements ScriptService
 
     /**
      * Delete an indexed entity and all its contained entities recursively.
+     * <p>
+     * Null reference means the whole farm.
      * 
      * @param reference the reference to delete from the index.
      */
@@ -129,7 +137,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(reference);
 
-            this.solrIndex.delete(reference);
+            this.solrIndex.delete(reference, true);
         } catch (Exception e) {
             error(e);
         }
@@ -137,6 +145,8 @@ public class SolrIndexScriptService implements ScriptService
 
     /**
      * Delete multiple entities and all their contained entities recursively. This is a batch operation.
+     * <p>
+     * Null reference means the whole farm.
      * 
      * @param references the references to delete from the index.
      */
@@ -147,32 +157,34 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(references);
 
-            this.solrIndex.delete(references);
+            for (EntityReference reference : references) {
+                this.solrIndex.delete(reference, true);
+            }
         } catch (Exception e) {
             error(e);
         }
     }
 
     /**
-     * @see SolrConfiguration#getOptimizableLanguages()
-     * @return the list of supported language codes for which optimized indexing can be performed.
+     * @see SolrConfiguration#getOptimizableLocales()
+     * @return the list of supported locale codes for which optimized indexing can be performed.
      */
-    public List<String> getOptimizableLanguages()
+    public List<String> getOptimizableLocales()
     {
         clearException();
 
-        return this.configuration.getOptimizableLanguages();
+        return this.configuration.getOptimizableLocales();
     }
 
     /**
-     * @see SolrConfiguration#getOptimizedLanguages()
-     * @return the list of language codes for which to perform optimized indexing.
+     * @see SolrConfiguration#getOptimizedLocales()
+     * @return the list of locale codes for which to perform optimized indexing.
      */
-    public List<String> getOptimizedLanguages()
+    public List<String> getOptimizedLocales()
     {
         clearException();
 
-        return this.configuration.getOptimizedLanguages();
+        return this.configuration.getOptimizedLocales();
     }
 
     /**

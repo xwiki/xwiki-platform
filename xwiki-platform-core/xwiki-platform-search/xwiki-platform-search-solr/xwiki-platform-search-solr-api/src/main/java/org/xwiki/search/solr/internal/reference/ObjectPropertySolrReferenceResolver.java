@@ -44,7 +44,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 @Component
 @Named("object_property")
 @Singleton
-public class ObjectPropertySolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
+public class ObjectPropertySolrReferenceResolver extends AbstractSolrReferenceResolver
 {
     @Override
     public List<EntityReference> getReferences(EntityReference objectPropertyReference) throws SolrIndexerException

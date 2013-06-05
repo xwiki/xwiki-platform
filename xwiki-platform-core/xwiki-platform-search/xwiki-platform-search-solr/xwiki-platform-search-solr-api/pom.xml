@@ -156,7 +156,9 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            **/DefaultSolrIndexer.java
+            **/DefaultSolrIndexer.java,
+            **/SolrIndexEventListener.java,
+            **/AbstractSolrMetadataExtractor.java
           </excludes>
         </configuration>
       </plugin>

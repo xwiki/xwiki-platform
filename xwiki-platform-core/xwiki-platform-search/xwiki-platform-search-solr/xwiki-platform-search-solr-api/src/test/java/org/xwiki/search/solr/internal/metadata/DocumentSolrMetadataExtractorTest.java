@@ -104,7 +104,9 @@ public class DocumentSolrMetadataExtractorTest
 
     private String documentReferenceLocalString;
 
-    private String locale;
+    private String language;
+
+    private Locale locale;
 
     private String renderedContent;
 
@@ -153,8 +155,9 @@ public class DocumentSolrMetadataExtractorTest
         this.documentReferenceString = serializer.serialize(this.documentReference);
         this.documentReferenceLocalString = localSerializer.serialize(this.documentReference);
         this.documentReferenceFrench = new DocumentReference(this.documentReference, Locale.FRENCH);
-        
-        this.locale = "en";
+
+        this.locale = Locale.US;
+        this.language = this.locale.getLanguage();
         this.renderedContent = "content";
         this.title = "title";
         this.version = "1.1";
@@ -228,6 +231,8 @@ public class DocumentSolrMetadataExtractorTest
         when(this.mockDocument.getContentUpdateDate()).thenReturn(this.date);
 
         when(this.mockDocument.isHidden()).thenReturn(this.hidden);
+
+        when(this.mockDocument.getRealLocale()).thenReturn(this.locale);
     }
 
     @Test
@@ -256,7 +261,8 @@ public class DocumentSolrMetadataExtractorTest
             solrDocument.getFieldValue(Fields.SPACE));
         Assert.assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(Fields.NAME));
 
-        Assert.assertEquals(this.locale, solrDocument.getFieldValue(Fields.LOCALE));
+        Assert.assertEquals(this.locale.toString(), solrDocument.getFieldValue(Fields.LOCALE));
+        Assert.assertEquals(this.language, solrDocument.getFieldValue(Fields.LANGUAGE));
         Assert.assertEquals(this.hidden, solrDocument.getFieldValue(Fields.HIDDEN));
         Assert.assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(Fields.TYPE));
 

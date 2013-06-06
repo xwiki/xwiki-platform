@@ -29,9 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -79,22 +77,16 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Named("attachment")
     protected Provider<SolrReferenceResolver> attachmentResolverProvider;
 
-    /**
-     * DocumentAccessBridge component.
-     */
-    @Inject
-    protected DocumentAccessBridge documentAccessBridge;
-
     @Override
     public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
 
-        XWikiContext context = this.xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         DocumentReference documentReference = new DocumentReference(reference);
 
-        if (context.getWiki().exists(documentReference, context)) {
+        if (xcontext.getWiki().exists(documentReference, xcontext)) {
             // Document itself
             result.add(documentReference);
 
@@ -113,17 +105,17 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
                 }
 
                 // Document translations
-                List<String> translatedLocales;
+                List<Locale> translatedLocales;
                 try {
-                    translatedLocales = document.getTranslationList(context);
+                    translatedLocales = document.getTranslationLocales(xcontext);
                 } catch (XWikiException e) {
                     throw new SolrIndexerException(String.format("Failed to get document [%s] translations",
                         documentReference), e);
                 }
 
-                for (String translatedLocale : translatedLocales) {
+                for (Locale translatedLocale : translatedLocales) {
                     DocumentReference translatedDocumentReference =
-                        new DocumentReference(documentReference, new Locale(translatedLocale));
+                        new DocumentReference(documentReference, translatedLocale);
                     result.add(translatedDocumentReference);
                 }
 
@@ -198,23 +190,16 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
      * @return the locale code of the referenced document.
      * @throws SolrIndexerException if problems occur.
      */
-    protected String getLocale(DocumentReference documentReference) throws SolrIndexerException
+    protected Locale getLocale(DocumentReference documentReference) throws SolrIndexerException
     {
-        String locale = null;
+        Locale locale = null;
 
         try {
-            if (documentReference.getLocale() != null
-                && !StringUtils.isEmpty(documentReference.getLocale().toString())) {
-                locale = documentReference.getLocale().toString();
+            if (documentReference.getLocale() != null) {
+                locale = documentReference.getLocale();
             } else {
-                String realLanguage = this.documentAccessBridge.getDocument(documentReference).getRealLanguage();
-
-                if (StringUtils.isNotEmpty(realLanguage)) {
-                    locale = realLanguage;
-                } else {
-                    // Multilingual and Default placeholder
-                    locale = "en";
-                }
+                XWikiContext xcontext = this.xcontextProvider.get();
+                locale = xcontext.getWiki().getDocument(documentReference, xcontext).getRealLocale();
             }
         } catch (Exception e) {
             throw new SolrIndexerException(String.format("Exception while fetching the locale of the document '%s'",

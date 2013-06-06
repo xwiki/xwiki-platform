@@ -42,6 +42,11 @@ public interface Fields
     String ID = "id";
 
     /**
+     * Language of the document.
+     */
+    String LANGUAGE = "language";
+    
+    /**
      * Locale of the document.
      */
     String LOCALE = "locale";

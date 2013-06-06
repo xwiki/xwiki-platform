@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -92,21 +93,21 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Get all the locales in which the document is available.
-        List<String> documentLocales = originalDocument.getTranslationList(this.xcontextProvider.get());
+        List<Locale> documentLocales = originalDocument.getTranslationLocales(this.xcontextProvider.get());
         // Make sure that the original document's locale is there as well.
-        String originalDocumentLocale = getLocale(documentReference);
+        Locale originalDocumentLocale = getLocale(documentReference);
         if (!documentLocales.contains(originalDocumentLocale)) {
             documentLocales.add(originalDocumentLocale);
         }
 
         // Do the work for each locale.
-        for (String documentLocale : documentLocales) {
+        for (Locale documentLocale : documentLocales) {
             if (!documentLocale.equals(originalDocumentLocale)) {
                 // The original document's locale is already set by the call to the addDocumentFields method.
                 solrDocument.addField(Fields.LOCALE, documentLocale);
             }
 
-            addObjectContent(solrDocument, object, documentLocale);
+            addObjectContent(solrDocument, object, documentLocale.toString());
         }
 
         // We can`t rely on the schema's copyField here because we would trigger it for each locale. Doing the copy to

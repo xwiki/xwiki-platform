@@ -298,7 +298,7 @@ public class SolrReferenceResolverTest
 
         when(xdocument112.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
-        when(xdocument112.getTranslationList(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument112.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
 
         // document 113
         when(xwiki.getDocument(eq(documentReference113), any(XWikiContext.class))).thenReturn(xdocument113);
@@ -307,7 +307,7 @@ public class SolrReferenceResolverTest
 
         when(xdocument113.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
-        when(xdocument113.getTranslationList(any(XWikiContext.class))).thenReturn(Arrays.asList("ro"));
+        when(xdocument113.getTranslationLocales(any(XWikiContext.class))).thenReturn(Arrays.asList(new Locale("ro")));
 
         // space 12
         when(documentsSpace12Query.execute()).thenReturn(
@@ -324,7 +324,7 @@ public class SolrReferenceResolverTest
 
         when(xdocument121.getXObjects()).thenReturn(Collections.EMPTY_MAP);
 
-        when(xdocument121.getTranslationList(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument121.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
 
         // document 122
         when(xwiki.getDocument(eq(documentReference122), any(XWikiContext.class))).thenReturn(xdocument122);
@@ -336,7 +336,7 @@ public class SolrReferenceResolverTest
         xObjects.put(classReference111, Arrays.asList(null, xobject1221, xobject1222));
         when(xdocument122.getXObjects()).thenReturn(xObjects);
 
-        when(xdocument122.getTranslationList(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument122.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
 
         // object 1221
         when(xdocument122.getXObject(objectReference1221)).thenReturn(xobject1221);
@@ -432,7 +432,6 @@ public class SolrReferenceResolverTest
     {
         List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference113);
         Assert.assertNotNull(result);
-        Assert.assertEquals(2, result.size());
 
         assertThat(result,
             containsInAnyOrder((EntityReference) documentReference113, (EntityReference) documentReference113RO));
@@ -531,26 +530,13 @@ public class SolrReferenceResolverTest
     @Test
     public void getIdLocaleInDatabase() throws Exception
     {
-        when(xdocument111.getRealLanguage()).thenReturn("fr");
+        when(xdocument111.getRealLocale()).thenReturn(Locale.FRENCH);
 
         // Call
         String id = this.defaultSolrReferenceResolver.getId(this.documentReference111);
 
         // Assert and verify
         Assert.assertEquals(this.documentReference111 + "_fr", id);
-    }
-
-    @Test
-    public void getIdLocaleNotAvailable() throws Exception
-    {
-        // Empty string returned as locale. The default "en" will be used.
-        when(xdocument111.getRealLanguage()).thenReturn("");
-
-        // Call
-        String id = this.defaultSolrReferenceResolver.getId(documentReference111);
-
-        // Assert and verify
-        Assert.assertEquals(this.documentReference111 + "_en", id);
     }
 
     // getQuery

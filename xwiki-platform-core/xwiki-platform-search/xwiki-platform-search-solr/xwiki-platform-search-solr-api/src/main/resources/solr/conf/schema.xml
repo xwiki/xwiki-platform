@@ -96,7 +96,8 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" />
-   <field name="lang" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="language" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="locale" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="wiki" type="string" indexed="true" stored="true" />
    <field name="space" type="text_general" indexed="true" stored="true" />
    <field name="space_exact" type="string" indexed="true" stored="false" />

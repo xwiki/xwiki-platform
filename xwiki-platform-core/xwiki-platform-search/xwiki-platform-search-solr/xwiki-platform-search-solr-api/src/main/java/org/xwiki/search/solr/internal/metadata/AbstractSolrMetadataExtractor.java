@@ -20,12 +20,12 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -83,12 +83,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected EntityReferenceSerializer<String> localSerializer;
 
     /**
-     * DocumentAccessBridge component.
-     */
-    @Inject
-    protected DocumentAccessBridge documentAccessBridge;
-
-    /**
      * Used to access current {@link XWikiContext}.
      */
     @Inject
@@ -120,7 +114,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
             return solrDocument;
         } catch (Exception e) {
-            throw new SolrIndexerException(String.format("Failed to get input document for '%s'", documentReference), e);
+            String message = String.format("Failed to get input document for '%s'", documentReference);
+            throw new SolrIndexerException(message, e);
         }
     }
 
@@ -200,8 +195,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         solrDocument.addField(Fields.SPACE, documentReference.getLastSpaceReference().getName());
         solrDocument.addField(Fields.NAME, documentReference.getName());
 
-        String locale = getLocale(documentReference);
-        solrDocument.addField(Fields.LOCALE, locale);
+        Locale locale = getLocale(documentReference);
+        solrDocument.addField(Fields.LOCALE, locale.toString());
+        solrDocument.addField(Fields.LANGUAGE, locale.getLanguage());
 
         XWikiDocument document = getDocument(documentReference);
         solrDocument.addField(Fields.HIDDEN, document.isHidden());
@@ -212,19 +208,16 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @return the locale code of the referenced document.
      * @throws SolrIndexerException if problems occur.
      */
-    protected String getLocale(DocumentReference documentReference) throws SolrIndexerException
+    protected Locale getLocale(DocumentReference documentReference) throws SolrIndexerException
     {
-        String locale = null;
+        Locale locale = null;
 
         try {
-            if (documentReference.getLocale() != null && !StringUtils.isEmpty(documentReference.getLocale().toString())) {
-                locale = documentReference.getLocale().toString();
-            } else if (StringUtils.isNotEmpty(this.documentAccessBridge.getDocument(documentReference)
-                .getRealLanguage())) {
-                locale = this.documentAccessBridge.getDocument(documentReference).getRealLanguage();
+            if (documentReference.getLocale() != null) {
+                locale = documentReference.getLocale();
             } else {
-                // Multilingual and Default placeholder
-                locale = "en";
+                XWikiContext xcontext = this.xcontextProvider.get();
+                locale = xcontext.getWiki().getDocument(documentReference, xcontext).getRealLocale();
             }
         } catch (Exception e) {
             throw new SolrIndexerException(String.format("Exception while fetching the locale of the document '%s'",
@@ -240,8 +233,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param solrDocument the document where to add the properties.
      * @param object the object whose properties to add.
-     * @param locale the locale of the indexed document. In case of translations, this will obviously be different than
-     *            the original document's locale.
+     * @param locale the locale of the indexed document. In case of translations, this will obviously be different
+     *            than the original document's locale.
      */
     protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object, String locale)
     {

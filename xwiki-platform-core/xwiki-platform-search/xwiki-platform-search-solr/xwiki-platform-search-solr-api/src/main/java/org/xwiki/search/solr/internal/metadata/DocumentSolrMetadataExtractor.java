@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -83,7 +84,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiContext xcontext = this.xcontextProvider.get();
 
         XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
-        String locale = getLocale(documentReference);
+        Locale locale = getLocale(documentReference);
 
         solrDocument.addField(Fields.FULLNAME, localSerializer.serialize(documentReference));
 
@@ -95,7 +96,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
         // Get the rendered plain text title.
-        solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, locale), plainTitle);
+        solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, locale.toString()), plainTitle);
         solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_CONTENT, locale),
             printer.toString());
         solrDocument.addField(Fields.VERSION, translatedDocument.getVersion());
@@ -129,7 +130,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale of which to index the extra data.
      * @throws XWikiException if problems occur.
      */
-    protected void addExtras(DocumentReference documentReference, SolrInputDocument solrDocument, String locale)
+    protected void addExtras(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale)
         throws XWikiException
     {
         // Index the Comments and Objects in general. Use the original document to get the comment objects since the
@@ -151,11 +152,11 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale for which to index the objects.
      * @param originalDocument the original document where the objects come from.
      */
-    protected void addObjects(SolrInputDocument solrDocument, String locale, XWikiDocument originalDocument)
+    protected void addObjects(SolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
             for (BaseObject object : objects.getValue()) {
-                this.addObjectContent(solrDocument, object, locale);
+                addObjectContent(solrDocument, object, locale.toString());
             }
         }
     }

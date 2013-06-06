@@ -5541,9 +5541,32 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return locale;
     }
 
+    /**
+     * @deprecated since 5.1M2 use {@link #getTranslationLocales(XWikiContext)} instead
+     */
+    @Deprecated
     public List<String> getTranslationList(XWikiContext context) throws XWikiException
     {
         return getStore().getTranslationList(this, context);
+    }
+
+    /**
+     * The locales of the translation of this document (the default locale is not included).
+     * 
+     * @param context the XWiki context
+     * @return the locales of the translations
+     * @throws XWikiException if retriving the translations from the database failed
+     */
+    public List<Locale> getTranslationLocales(XWikiContext context) throws XWikiException
+    {
+        List<String> translations = getTranslationList(context);
+
+        List<Locale> locales = new ArrayList<Locale>(translations.size());
+        for (String translationString : translations) {
+            locales.add(LocaleUtils.toLocale(translationString));
+        }
+
+        return locales;
     }
 
     public List<Delta> getXMLDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)

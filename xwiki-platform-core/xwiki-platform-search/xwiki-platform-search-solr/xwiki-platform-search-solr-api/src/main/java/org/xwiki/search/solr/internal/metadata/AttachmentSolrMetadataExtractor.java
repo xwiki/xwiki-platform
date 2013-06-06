@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.metadata;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -56,7 +58,13 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
      */
     @Inject
     @Named("attachment")
-    private SolrReferenceResolver resolver;
+    protected SolrReferenceResolver resolver;
+
+    /**
+     * DocumentAccessBridge component.
+     */
+    @Inject
+    protected DocumentAccessBridge documentAccessBridge;
 
     @Override
     public void addFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
@@ -89,26 +97,27 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Get all the locales in which the document is available.
-        List<String> documentLocales = originalDocument.getTranslationList(this.xcontextProvider.get());
+        List<Locale> documentLocales = originalDocument.getTranslationLocales(this.xcontextProvider.get());
         // Make sure that the original document's locale is there as well.
-        String originalDocumentLocale = getLocale(documentReference);
+        Locale originalDocumentLocale = getLocale(documentReference);
         if (!documentLocales.contains(originalDocumentLocale)) {
             documentLocales.add(originalDocumentLocale);
         }
 
         String attachmentTextContent = getContentAsText(attachmentReference);
         // Do the work for each locale.
-        for (String documentLocale : documentLocales) {
+        for (Locale documentLocale : documentLocales) {
             if (!documentLocale.equals(originalDocumentLocale)) {
                 // The original document's locale is already set by the call to the addDocumentFields method.
                 solrDocument.addField(Fields.LOCALE, documentLocale);
             }
 
-            solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.ATTACHMENT_CONTENT, documentLocale),
+            solrDocument.addField(
+                String.format(Fields.MULTILIGNUAL_FORMAT, Fields.ATTACHMENT_CONTENT, documentLocale.toString()),
                 attachmentTextContent);
         }
 
-        // We can`t rely on the schema's copyField here because we would trigger it for each locale. Doing the copy to
+        // We can`t rely on the schema's copyField here because we would trigger it for each language. Doing the copy to
         // the text_general field manually.
         solrDocument.addField(
             String.format(Fields.MULTILIGNUAL_FORMAT, Fields.ATTACHMENT_CONTENT, Fields.MULTILINGUAL),

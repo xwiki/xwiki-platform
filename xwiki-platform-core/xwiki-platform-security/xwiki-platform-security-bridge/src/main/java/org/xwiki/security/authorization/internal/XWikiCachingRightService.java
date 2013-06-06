@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -117,7 +116,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("objectsync", Right.EDIT)
             .putAction("rollback", Right.EDIT)
             .putAction("upload", Right.EDIT)
-            .putAction("create", Right.EDIT)
+            .putAction("create", Right.VIEW)
             .putAction("deleteversions", Right.ADMIN)
             .putAction("deletespace", Right.ADMIN)
             .putAction("temp", Right.VIEW);
@@ -301,10 +300,6 @@ public class XWikiCachingRightService implements XWikiRightService
     {
         Right right = actionToRight(action);
         EntityReference entityReference = doc.getDocumentReference();
-        // Quick fix for XWIKI-8892
-        if(action.equals("create") && !doc.isNew()){
-            entityReference = entityReference.extractReference(EntityType.SPACE);
-        }
 
         LOGGER.debug("checkAccess for action [{}] on entity [{}].", right, entityReference);
 

@@ -29,10 +29,7 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.*;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
@@ -43,6 +40,8 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Create document action.
@@ -144,6 +143,14 @@ public class CreateAction extends XWikiAction
         } else {
             space = request.getParameter(SPACE);
             page = request.getParameter(PAGE);
+        }
+        // Checking rights
+        SpaceReference spaceReference = doc.getDocumentReference().getSpaceReferences().get(0);
+        AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
+        if(!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)){
+            Object[] args = {doc.getFullName(), context.getUser()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access to document {0} has been denied to user {1}", null, args);
         }
 
         // get the available templates, in the current space, to check if all conditions to create a new document are

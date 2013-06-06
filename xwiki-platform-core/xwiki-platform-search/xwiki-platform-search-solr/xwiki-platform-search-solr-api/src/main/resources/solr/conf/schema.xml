@@ -156,7 +156,7 @@
    <dynamicField name="*_hi"  type="text_hi"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_hu"  type="text_hu"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_hy"  type="text_hy"    indexed="true"  stored="true" multiValued="true" />
-   <dynamicField name="*_id"  type="text_id"    indexed="true"  stored="true" multiValued="true" />
+   <dynamicField name="*_in"  type="text_in"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_it"  type="text_it"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ja"  type="text_ja"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_lv"  type="text_lv"    indexed="true"  stored="true" multiValued="true" />
@@ -686,11 +686,11 @@
     </fieldType>
 
     <!-- Indonesian -->
-    <fieldType name="text_id" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text_in" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_id.txt" enablePositionIncrements="true"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_in.txt" enablePositionIncrements="true"/>
         <!-- for a less aggressive approach (only inflectional suffixes), set stemDerivational to false -->
         <filter class="solr.IndonesianStemFilterFactory" stemDerivational="true"/>
       </analyzer>

@@ -54,9 +54,12 @@ public class DefaultSolrConfiguration implements SolrConfiguration
 
     /**
      * Default value for the available locales that support optimized indexing.
+     * <p>
+     * Old codes are used (<code>in</code> instead of <code>id</code> for example) because of
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6457127.
      */
     public static final List<String> DEFAULT_OPTIMIZABLE_LOCALES = Arrays.asList("ar", "bg", "ca", "cz", "da", "de",
-        "en", "el", "es", "eu", "fa", "fi", "fr", "ga", "gl", "hi", "hu", "hy", "id", "it", "ja", "lv", "nl", "no",
+        "en", "el", "es", "eu", "fa", "fi", "fr", "ga", "gl", "hi", "hu", "hy", "in", "it", "ja", "lv", "nl", "no",
         "pt", "ro", "ru", "sv", "th", "tr");
 
     /**

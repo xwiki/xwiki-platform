@@ -29,7 +29,11 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.*;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
@@ -144,14 +148,6 @@ public class CreateAction extends XWikiAction
             space = request.getParameter(SPACE);
             page = request.getParameter(PAGE);
         }
-        // Checking rights
-        SpaceReference spaceReference = doc.getDocumentReference().getSpaceReferences().get(0);
-        AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
-        if(!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)){
-            Object[] args = {doc.getFullName(), context.getUser()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                    "Access to document {0} has been denied to user {1}", null, args);
-        }
 
         // get the available templates, in the current space, to check if all conditions to create a new document are
         // met
@@ -167,6 +163,14 @@ public class CreateAction extends XWikiAction
 
         if (newDocRef != null) {
             XWikiDocument newDoc = context.getWiki().getDocument(newDocRef, context);
+            // Checking rights
+            SpaceReference spaceReference = newDocRef.getLastSpaceReference();
+            AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
+            if(!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)){
+                Object[] args = {newDoc.getFullName(), context.getUser()};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "Access to document {0} has been denied to user {1}", null, args);
+            }
             // if the document exists don't create it, put the exception on the context so that the template gets it and
             // re-requests the page and space, else create the document and redirect to edit
             if (!isEmptyDocument(newDoc)) {

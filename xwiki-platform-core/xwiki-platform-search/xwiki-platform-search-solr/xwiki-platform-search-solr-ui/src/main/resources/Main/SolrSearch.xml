@@ -613,6 +613,7 @@ blockquote.search-result-highlight {
 .search-facets-actions .clearfloats {
   /* Fix the horizontal scroll bar, caused by the fact that we use a SPAN element instead of a DIV. */
   display: block;
+  margin: 0;
 }
 
 .search-facet:last-of-type {

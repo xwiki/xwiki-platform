@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.api;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
@@ -59,7 +60,7 @@ public interface SolrConfiguration
      *         locale)
      * @see #getOptimizedLocales() for the selected locales
      */
-    List<String> getOptimizableLocales();
+    List<Locale> getOptimizableLocales();
 
     /**
      * Each locale has its particularities and needs to be handled specially in order to index and retrieve the best
@@ -69,7 +70,7 @@ public interface SolrConfiguration
      *         that are analyzed and queries with the analysis chain specific to the locale)
      * @see #getOptimizableLocales() for the full list of supported locales
      */
-    List<String> getOptimizedLocales();
+    List<Locale> getOptimizedLocales();
 
     /**
      * @return the list of multilingual fields for which to apply optimized indexing.

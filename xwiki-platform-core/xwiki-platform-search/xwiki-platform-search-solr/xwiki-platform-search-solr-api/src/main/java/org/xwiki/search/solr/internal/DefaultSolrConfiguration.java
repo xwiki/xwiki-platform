@@ -21,15 +21,18 @@ package org.xwiki.search.solr.internal;
 
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -149,18 +152,34 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         return this.configuration.getProperty(actualPropertyName, defaultValue);
     }
 
-    @Override
-    public List<String> getOptimizableLocales()
+    /**
+     * @param localeStrings the locales as {@link String}s
+     * @return the locales as {@link Locale}s
+     */
+    private List<Locale> toLocales(List<String> localeStrings)
     {
-        // Note: To avoid hardcoding the DEFAULT_OPTIMIZABLE_LOCALES value, we could try to read the default
-        // schema.xml file an look for "<fieldType name="text_XX"..." tags.
-        return this.configuration.getProperty("solr.multilingual.availableLocales", DEFAULT_OPTIMIZABLE_LOCALES);
+        List<Locale> locales = new ArrayList<Locale>(localeStrings.size());
+
+        for (String localeString : localeStrings) {
+            locales.add(LocaleUtils.toLocale(localeString));
+        }
+
+        return locales;
     }
 
     @Override
-    public List<String> getOptimizedLocales()
+    public List<Locale> getOptimizableLocales()
     {
-        return this.configuration.getProperty("solr.multilingual.activeLocales", DEFAULT_OPTIMIZED_LOCALES);
+        // Note: To avoid hardcoding the DEFAULT_OPTIMIZABLE_LOCALES value, we could try to read the default
+        // schema.xml file an look for "<fieldType name="text_XX"..." tags.
+        return toLocales(this.configuration.getProperty("solr.multilingual.availableLocales",
+            DEFAULT_OPTIMIZABLE_LOCALES));
+    }
+
+    @Override
+    public List<Locale> getOptimizedLocales()
+    {
+        return toLocales(this.configuration.getProperty("solr.multilingual.activeLocales", DEFAULT_OPTIMIZED_LOCALES));
     }
 
     @Override
@@ -172,7 +191,6 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public Map<String, URL> getHomeDirectoryConfiguration()
     {
-
         // Build the result
         Map<String, URL> result = new HashMap<String, URL>();
 
@@ -190,7 +208,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         }
 
         // Locale resources. All combinations.
-        for (String locale : this.getOptimizableLocales()) {
+        for (Locale locale : this.getOptimizableLocales()) {
             for (String localeFileName : LOCALES_RESOURCE_FILE_NAME_PREFIXES) {
                 String fileName = String.format("%s/lang/%s_%s.txt", CONF_DIRECTORY, localeFileName, locale);
                 String classPathLocation = String.format(CLASSPATH_LOCATION_PREFIX, fileName);

@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.script;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -169,7 +170,7 @@ public class SolrIndexScriptService implements ScriptService
      * @see SolrConfiguration#getOptimizableLocales()
      * @return the list of supported locale codes for which optimized indexing can be performed.
      */
-    public List<String> getOptimizableLocales()
+    public List<Locale> getOptimizableLocales()
     {
         clearException();
 
@@ -180,7 +181,7 @@ public class SolrIndexScriptService implements ScriptService
      * @see SolrConfiguration#getOptimizedLocales()
      * @return the list of locale codes for which to perform optimized indexing.
      */
-    public List<String> getOptimizedLocales()
+    public List<Locale> getOptimizedLocales()
     {
         clearException();
 

@@ -1325,11 +1325,15 @@ document.observe('xwiki:dom:loading', function() {
     }
     placeholderPolyfill = function(event) {
       var item = event.memo.element;
+      // Backup the initial input value because IE resets it when the default value is set.
+      var initialValue = item.value;
       if (item.readAttribute('placeholder')) {
         item.defaultValue = item.readAttribute('placeholder');
       } else if (item.hasClassName('useTitleAsTip')) {
         item.defaultValue = item.title;
       }
+      // Restore the initial input value;
+      item.value = initialValue;
       if (item.value == item.defaultValue) {
         // The 'empty' CSS class has two functions:
         // * display the placeholder value with a different color

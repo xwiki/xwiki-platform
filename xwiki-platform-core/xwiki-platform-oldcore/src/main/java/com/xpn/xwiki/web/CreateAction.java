@@ -162,15 +162,16 @@ public class CreateAction extends XWikiAction
             getNewDocumentReference(context, space, page, isSpace, templateProvider, availableTemplates);
 
         if (newDocRef != null) {
-            XWikiDocument newDoc = context.getWiki().getDocument(newDocRef, context);
             // Checking rights
             SpaceReference spaceReference = newDocRef.getLastSpaceReference();
             AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
             if(!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)){
-                Object[] args = {newDoc.getFullName(), context.getUser()};
+                Object[] args = {spaceReference.toString(), context.getUser()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        "Access to document {0} has been denied to user {1}", null, args);
+                        "The creation of a document into the space {0} has been denied to user {1}", null, args);
             }
+
+            XWikiDocument newDoc = context.getWiki().getDocument(newDocRef, context);
             // if the document exists don't create it, put the exception on the context so that the template gets it and
             // re-requests the page and space, else create the document and redirect to edit
             if (!isEmptyDocument(newDoc)) {

@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,8 @@ public class UsersClass extends ListClass
     @Override
     public List<String> getList(XWikiContext context)
     {
+        // TODO: Make this scale. If we have lots of users in the wiki it won't perform fast. One solution is to
+        // return an iterator instead that gets users by batches.
         try {
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedUsers(null, false, 0, 0, null, context);
@@ -88,7 +91,21 @@ public class UsersClass extends ListClass
     @Override
     public Map<String, ListItem> getMap(XWikiContext context)
     {
-        return Collections.emptyMap();
+        // TODO: Make this scale. If we have lots of users in the wiki it won't perform fast. One solution is to
+        // return an iterator instead that gets users by batches.
+        Map<String, ListItem> result;
+        List<String> users = getList(context);
+        if (users != null && users.size() > 0) {
+            result = new HashMap<String, ListItem>();
+            for (String userName : users) {
+                // Get the user name for pretty display
+                String prettyUserName = context.getWiki().getUserName(userName, null, false, context);
+                result.put(userName, new ListItem(userName, prettyUserName));
+            }
+        } else {
+            result = Collections.EMPTY_MAP;
+        }
+        return result;
     }
 
     /**

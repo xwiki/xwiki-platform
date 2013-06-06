@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
@@ -43,6 +44,8 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Create document action.
@@ -159,6 +162,15 @@ public class CreateAction extends XWikiAction
             getNewDocumentReference(context, space, page, isSpace, templateProvider, availableTemplates);
 
         if (newDocRef != null) {
+            // Checking rights
+            SpaceReference spaceReference = newDocRef.getLastSpaceReference();
+            AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
+            if (!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)) {
+                Object[] args = {spaceReference.toString(), context.getUser()};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "The creation of a document into the space {0} has been denied to user {1}", null, args);
+            }
+
             XWikiDocument newDoc = context.getWiki().getDocument(newDocRef, context);
             // if the document exists don't create it, put the exception on the context so that the template gets it and
             // re-requests the page and space, else create the document and redirect to edit

@@ -44,7 +44,12 @@ public interface Fields
     /**
      * Language of the document.
      */
-    String LANGUAGE = "lang";
+    String LANGUAGE = "language";
+    
+    /**
+     * Locale of the document.
+     */
+    String LOCALE = "locale";
 
     /**
      * Keyword field, holds the name of the virtual wiki a document belongs to.
@@ -87,6 +92,13 @@ public interface Fields
      * Version of the document (example: {@code 4.2}).
      */
     String VERSION = "version";
+    
+    /**
+     * For storing the comment associated to the version.
+     * <p/>
+     * Note: Multilingual and virtual field.
+     */
+    String COMMENT = "comment";
 
     /**
      * Type of a document. "DOCUMENT", "ATTACHMENT", "OBJECT" and "OBJECT_PROPERTY" are the used values corresponding to
@@ -98,6 +110,11 @@ public interface Fields
      * XWiki object class, only used for objects and properties.
      */
     String CLASS = "class";
+
+    /**
+     * XWiki object number, only used for objects and properties.
+     */
+    String NUMBER = "number";
 
     /**
      * XWiki object content. Used by objects to index their properties and by documents to index all the properties of
@@ -175,13 +192,6 @@ public interface Fields
      * Filename, only used for attachments.
      */
     String FILENAME = "filename";
-
-    /**
-     * For storing the comments.
-     * <p/>
-     * Note: Multilingual and virtual field.
-     */
-    String COMMENT = "comment";
 
     /**
      * For storing property name.

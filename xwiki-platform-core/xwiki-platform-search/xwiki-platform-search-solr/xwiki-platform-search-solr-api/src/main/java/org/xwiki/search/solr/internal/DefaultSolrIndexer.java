@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -41,12 +39,12 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
-import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
-import org.xwiki.search.solr.internal.reference.SolrDocumentReferenceResolver;
+import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
@@ -77,17 +75,90 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         public EntityReference reference;
 
         /**
+         * The query used to filter entries to delete.
+         */
+        public String deleteQuery;
+
+        /**
+         * The indexing operation to perform.
+         */
+        public IndexOperation operation;
+
+        /**
+         * @param indexReference the reference of the entity to index.
+         * @param operation the indexing operation to perform.
+         */
+        public IndexQueueEntry(EntityReference indexReference, IndexOperation operation)
+        {
+            this.reference = indexReference;
+            this.operation = operation;
+        }
+
+        /**
+         * @param deleteQuery the query used to filter entries to delete.
+         * @param operation the indexing operation to perform.
+         */
+        public IndexQueueEntry(String deleteQuery, IndexOperation operation)
+        {
+            this.deleteQuery = deleteQuery;
+            this.operation = operation;
+        }
+
+        @Override
+        public String toString()
+        {
+            String str;
+
+            switch (operation) {
+                case INDEX:
+                    str = "INDEX " + this.reference;
+                    break;
+                case DELETE:
+                    str = "DELETE " + this.deleteQuery;
+                    break;
+                case STOP:
+                    str = "STOP";
+                    break;
+                default:
+                    str = "";
+                    break;
+            }
+
+            return str;
+        }
+    }
+
+    /**
+     * Resolve queue entry.
+     * 
+     * @version $Id$
+     */
+    private static class ResolveQueueEntry
+    {
+        /**
+         * The reference of the entity to index.
+         */
+        public EntityReference reference;
+
+        /**
+         * Also apply operation to reference children.
+         */
+        public boolean recurse;
+
+        /**
          * The indexing operation to perform.
          */
         public IndexOperation operation;
 
         /**
          * @param reference the reference of the entity to index.
+         * @param recurse also apply operation to reference children.
          * @param operation the indexing operation to perform.
          */
-        public IndexQueueEntry(EntityReference reference, IndexOperation operation)
+        public ResolveQueueEntry(EntityReference reference, boolean recurse, IndexOperation operation)
         {
             this.reference = reference;
+            this.recurse = recurse;
             this.operation = operation;
         }
     }
@@ -105,40 +176,78 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             logger.debug("Start SOLR resolver thread");
 
             while (!Thread.interrupted()) {
-                IndexQueueEntry queueEntry;
+                ResolveQueueEntry queueEntry;
                 try {
                     queueEntry = resolveQueue.take();
                 } catch (InterruptedException e) {
                     logger.warn("The SOLR resolve thread has been interrupted", e);
 
-                    queueEntry = QUEUE_ENTRY_STOP;
+                    queueEntry = RESOLVE_ENTRY_STOP;
                 }
 
-                if (queueEntry == QUEUE_ENTRY_STOP) {
+                if (queueEntry == RESOLVE_ENTRY_STOP) {
                     break;
                 }
 
                 try {
-                    // FIXME: it's not very clean to load all the reference in memory in the case of the wiki for
-                    // example. Would be better to stream or cut that a bit instead.
-                    List<EntityReference> references = solrDocumentRefereceResolver.getReferences(queueEntry.reference);
+                    if (queueEntry.operation == IndexOperation.INDEX) {
+                        List<EntityReference> references;
+                        if (queueEntry.recurse) {
+                            // FIXME: it's not very clean to load all the reference in memory in the case of the wiki
+                            // for example. Would be better to stream or cut that a bit instead.
+                            references = solrRefereceResolver.getReferences(queueEntry.reference);
+                        } else {
+                            references = Arrays.asList(queueEntry.reference);
+                        }
 
-                    for (EntityReference reference : references) {
-                        indexQueue.offer(new IndexQueueEntry(reference, queueEntry.operation));
+                        for (EntityReference reference : references) {
+                            indexQueue.offer(new IndexQueueEntry(reference, queueEntry.operation));
+                        }
+                    } else {
+                        if (queueEntry.recurse) {
+                            indexQueue
+                                .offer(new IndexQueueEntry(getQuery(queueEntry.reference), IndexOperation.DELETE));
+                        } else {
+                            indexQueue.offer(new IndexQueueEntry(queueEntry.reference, IndexOperation.DELETE));
+                        }
                     }
                 } catch (Throwable e) {
-                    logger.warn("Failed to index root reference [{}]", queueEntry.reference, e);
+                    logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
+                        queueEntry.reference, e);
                 }
             }
 
             logger.debug("Stop SOLR resolver thread");
         }
+
+        /**
+         * @param reference the reference for which to extract the ID
+         * @return the query to find all the related entities
+         * @throws SolrIndexerException when failing to generate the query
+         */
+        private String getQuery(EntityReference reference) throws SolrIndexerException
+        {
+            String result = null;
+
+            if (reference != null) {
+                result = solrRefereceResolver.getQuery(reference);
+            } else {
+                result = "*:*";
+            }
+
+            return result;
+        }
     }
 
     /**
-     * Stop indexing thread.
+     * Stop index thread.
      */
-    private static final IndexQueueEntry QUEUE_ENTRY_STOP = new IndexQueueEntry(null, IndexOperation.STOP);
+    private static final IndexQueueEntry QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null, IndexOperation.STOP);
+
+    /**
+     * Stop resolve thread.
+     */
+    private static final ResolveQueueEntry RESOLVE_ENTRY_STOP = new ResolveQueueEntry(null, false, IndexOperation.STOP);
 
     /**
      * Logging framework.
@@ -168,7 +277,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      * Extract contained indexable references.
      */
     @Inject
-    private SolrDocumentReferenceResolver solrDocumentRefereceResolver;
+    private SolrReferenceResolver solrRefereceResolver;
 
     /**
      * The queue of index operation to perform.
@@ -178,7 +287,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     /**
      * The queue of resolve references and add them to the index queue.
      */
-    private BlockingQueue<IndexQueueEntry> resolveQueue;
+    private BlockingQueue<ResolveQueueEntry> resolveQueue;
 
     /**
      * Thread in which the indexUpdater will be executed.
@@ -209,7 +318,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
 
         // Initialize the queue
-        this.resolveQueue = new LinkedBlockingQueue<IndexQueueEntry>();
+        this.resolveQueue = new LinkedBlockingQueue<ResolveQueueEntry>();
         this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
     }
 
@@ -267,46 +376,39 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      */
     private void processBatch(IndexQueueEntry queueEntry)
     {
-        // To improve performance, we group contiguous index or delete operations and issue them only when a
-        // different type of operation is encountered.
-        List<SolrInputDocument> documentsToIndex = new LinkedList<SolrInputDocument>();
-        List<String> documentIDsToDelete = new LinkedList<String>();
-
-        IndexQueueEntry batchEntry = queueEntry;
-        IndexQueueEntry previousBatchEntry = null;
+        SolrInstance solrInstance = this.solrInstanceProvider.get();
 
         int length = 0;
         int size = 0;
 
-        for (; batchEntry != null; previousBatchEntry = batchEntry, batchEntry = this.indexQueue.poll()) {
-            EntityReference reference = batchEntry.reference;
+        for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
             IndexOperation operation = batchEntry.operation;
-
-            // Issue add/delete operations to the server in batches whenever the contiguity stops
-            checkContiguity(previousBatchEntry, operation, documentsToIndex, documentIDsToDelete);
 
             // For the current contiguous operations queue, group the changes
             try {
                 if (IndexOperation.INDEX.equals(operation)) {
-                    LengthSolrInputDocument solrDocument = getSolrDocument(reference);
+                    LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
                     if (solrDocument != null) {
-                        documentsToIndex.add(solrDocument);
+                        solrInstance.add(solrDocument);
                         length += solrDocument.getLength();
                         ++size;
                     }
                 } else if (IndexOperation.DELETE.equals(operation)) {
-                    String id = getId(reference);
-                    documentIDsToDelete.add(id);
+                    if (batchEntry.reference == null) {
+                        solrInstance.deleteByQuery(batchEntry.deleteQuery);
+                    } else {
+                        solrInstance.delete(this.solrRefereceResolver.getId(batchEntry.reference));
+                    }
+
                     ++size;
                 }
             } catch (Exception e) {
-                this.logger.error("Failed to process entity [{}] for the [{}] operation", reference, operation, e);
+                this.logger.error("Failed to process entry [{}]", batchEntry, e);
             }
 
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
             // the reason why we perform it at the end of the batch.
             if (shouldCommit(length, size)) {
-                flush(documentsToIndex, documentIDsToDelete);
                 commit();
                 length = 0;
                 size = 0;
@@ -315,7 +417,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
         // Commit what's left
         if (size > 0) {
-            flush(documentsToIndex, documentIDsToDelete);
             commit();
         }
     }
@@ -360,51 +461,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
-     * @param previousBatchEntry the previous batch entry
-     * @param operation the current operation
-     * @param documentsToIndex the documents stored for {@link IndexOperation#INDEX}
-     * @param documentIDsToDelete the documents stored for {@link IndexOperation#DELETE}
-     */
-    private void checkContiguity(IndexQueueEntry previousBatchEntry, IndexOperation operation,
-        List<SolrInputDocument> documentsToIndex, List<String> documentIDsToDelete)
-    {
-        if (previousBatchEntry != null) {
-            IndexOperation previousOperation = previousBatchEntry.operation;
-
-            if (previousOperation != operation) {
-                flush(documentsToIndex, documentIDsToDelete);
-            }
-        }
-    }
-
-    /**
-     * @param documentsToIndex the list of document to index
-     * @param documentIDsToDelete the list of documents to remove from the index
-     */
-    private void flush(List<SolrInputDocument> documentsToIndex, List<String> documentIDsToDelete)
-    {
-        try {
-            SolrInstance solrInstance = this.solrInstanceProvider.get();
-
-            if (!documentsToIndex.isEmpty()) {
-                solrInstance.add(documentsToIndex);
-
-                // Clear the just processed contiguous inner-batch.
-                documentsToIndex.clear();
-            }
-
-            if (!documentIDsToDelete.isEmpty()) {
-                solrInstance.delete(documentIDsToDelete);
-
-                // Clear the just processed contiguous inner-batch.
-                documentIDsToDelete.clear();
-            }
-        } catch (Exception e) {
-            this.logger.error("Failed to add/delete entities", e);
-        }
-    }
-
-    /**
      * @param reference the reference to extract metadata from.
      * @return the {@link SolrInputDocument} containing extracted metadata from the passed reference; {@code null} if
      *         the reference type is not supported.
@@ -440,60 +496,29 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         return result;
     }
 
-    /**
-     * @param reference the reference for which to extract the ID
-     * @return the ID of the entity, as it is used in the index
-     * @throws SolrIndexerException if problems occur
-     */
-    private String getId(EntityReference reference) throws SolrIndexerException
+    @Override
+    public void index(EntityReference reference, boolean recurse) throws SolrIndexerException
     {
-        String result = null;
-
-        SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
-        if (metadataExtractor != null) {
-            result = metadataExtractor.getId(reference);
-        }
-
-        return result;
+        addToQueue(reference, recurse, IndexOperation.INDEX);
     }
 
     @Override
-    public void index(EntityReference reference) throws SolrIndexerException
+    public void delete(EntityReference reference, boolean recurse) throws SolrIndexerException
     {
-        this.index(Arrays.asList(reference));
-    }
-
-    @Override
-    public void index(List<EntityReference> references) throws SolrIndexerException
-    {
-        addToQueue(references, IndexOperation.INDEX);
-    }
-
-    @Override
-    public void delete(EntityReference reference) throws SolrIndexerException
-    {
-        this.delete(Arrays.asList(reference));
-
-    }
-
-    @Override
-    public void delete(List<EntityReference> references) throws SolrIndexerException
-    {
-        addToQueue(references, IndexOperation.DELETE);
+        addToQueue(reference, recurse, IndexOperation.DELETE);
     }
 
     /**
      * Add a list of references to the index queue, all having the same operation.
      * 
-     * @param references the references to add
+     * @param reference the references to add
+     * @param recurse also apply operation to children
      * @param operation the operation to assign to the given references
      */
-    private void addToQueue(List<EntityReference> references, IndexOperation operation)
+    private void addToQueue(EntityReference reference, boolean recurse, IndexOperation operation)
     {
         if (!this.disposed) {
-            for (EntityReference reference : references) {
-                this.resolveQueue.offer(new IndexQueueEntry(reference, operation));
-            }
+            this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
         }
     }
 }

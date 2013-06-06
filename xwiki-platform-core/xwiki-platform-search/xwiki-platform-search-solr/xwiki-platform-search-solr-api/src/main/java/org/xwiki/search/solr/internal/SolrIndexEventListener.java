@@ -45,6 +45,13 @@ import com.xpn.xwiki.internal.event.AbstractAttachmentEvent;
 import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
 import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
 import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
+import com.xpn.xwiki.internal.event.EntityEvent;
+import com.xpn.xwiki.internal.event.XObjectAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
+import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 
 /**
  * Event listener that monitors changes in the wiki and updates the Solr index accordingly.
@@ -62,7 +69,9 @@ public class SolrIndexEventListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(),
         new DocumentCreatedEvent(), new DocumentDeletedEvent(), new AttachmentAddedEvent(),
-        new AttachmentDeletedEvent(), new AttachmentUpdatedEvent(), new WikiCreatedEvent(), new WikiDeletedEvent());
+        new AttachmentDeletedEvent(), new AttachmentUpdatedEvent(), new XObjectAddedEvent(), new XObjectDeletedEvent(),
+        new XObjectUpdatedEvent(), new XObjectPropertyAddedEvent(), new XObjectPropertyDeletedEvent(),
+        new XObjectPropertyUpdatedEvent(), new WikiCreatedEvent(), new WikiDeletedEvent());
 
     /**
      * Logging framework.
@@ -97,33 +106,49 @@ public class SolrIndexEventListener implements EventListener
             if (event instanceof DocumentUpdatedEvent || event instanceof DocumentCreatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                this.solrIndexer.get().index(document.getDocumentReference());
+                this.solrIndexer.get().index(document.getDocumentReference(), false);
             } else if (event instanceof DocumentDeletedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                this.solrIndexer.get().delete(document.getDocumentReference());
+                this.solrIndexer.get().delete(document.getDocumentReference(), false);
             } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();
                 XWikiAttachment attachment = document.getAttachment(fileName);
 
-                this.solrIndexer.get().index(attachment.getReference());
+                this.solrIndexer.get().index(attachment.getReference(), false);
             } else if (event instanceof AttachmentDeletedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();
                 XWikiAttachment attachment = document.getAttachment(fileName);
 
-                this.solrIndexer.get().delete(attachment.getReference());
+                this.solrIndexer.get().delete(attachment.getReference(), false);
+            } else if (event instanceof XObjectUpdatedEvent || event instanceof XObjectAddedEvent) {
+                EntityEvent entityEvent = (EntityEvent) event;
+
+                this.solrIndexer.get().index(entityEvent.getReference(), false);
+            } else if (event instanceof XObjectDeletedEvent) {
+                EntityEvent entityEvent = (EntityEvent) event;
+
+                this.solrIndexer.get().delete(entityEvent.getReference(), false);
+            } else if (event instanceof XObjectPropertyUpdatedEvent || event instanceof XObjectPropertyAddedEvent) {
+                EntityEvent entityEvent = (EntityEvent) event;
+
+                this.solrIndexer.get().index(entityEvent.getReference(), false);
+            } else if (event instanceof XObjectPropertyDeletedEvent) {
+                EntityEvent entityEvent = (EntityEvent) event;
+
+                this.solrIndexer.get().delete(entityEvent.getReference(), false);
             } else if (event instanceof WikiCreatedEvent) {
                 String wikiName = (String) source;
                 WikiReference wikiReference = new WikiReference(wikiName);
 
-                this.solrIndexer.get().index(wikiReference);
+                this.solrIndexer.get().index(wikiReference, false);
             } else if (event instanceof WikiDeletedEvent) {
                 String wikiName = (String) source;
                 WikiReference wikiReference = new WikiReference(wikiName);
 
-                this.solrIndexer.get().delete(wikiReference);
+                this.solrIndexer.get().delete(wikiReference, false);
             }
         } catch (Exception e) {
             logger.error("Failed to handle event [{}] with source [{}]", event, source, e);

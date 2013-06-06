@@ -24,13 +24,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 /**
@@ -42,14 +45,21 @@ import org.xwiki.search.solr.internal.api.SolrIndexerException;
 @Component
 @Named("space")
 @Singleton
-public class SpaceSolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
+public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
 {
     /**
      * Used to resolve document references.
      */
     @Inject
     @Named("document")
-    private SolrDocumentReferenceResolver documentResolver;
+    private Provider<SolrReferenceResolver> documentResolverProvider;
+
+    /**
+     * Used to resolve document references.
+     */
+    @Inject
+    @Named("wiki")
+    private Provider<SolrReferenceResolver> wikiResolverProvider;
 
     /**
      * Query manager used to perform queries on the XWiki model.
@@ -78,12 +88,29 @@ public class SpaceSolrDocumentReferenceResolver extends AbstractSolrDocumentRefe
             EntityReference documentReference = new EntityReference(documentName, EntityType.DOCUMENT, spaceReference);
 
             try {
-                result.addAll(this.documentResolver.getReferences(documentReference));
+                result.addAll(this.documentResolverProvider.get().getReferences(documentReference));
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for document [" + documentReference + "]", e);
             }
         }
 
         return result;
+    }
+
+    @Override
+    public String getQuery(EntityReference reference) throws SolrIndexerException
+    {
+        StringBuilder builder = new StringBuilder();
+
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+        builder.append(wikiResolverProvider.get().getQuery(wikiReference));
+
+        builder.append(QUERY_AND);
+
+        builder.append(Fields.SPACE);
+        builder.append(':');
+        builder.append(ClientUtils.escapeQueryChars(reference.getName()));
+
+        return builder.toString();
     }
 }

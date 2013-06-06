@@ -96,7 +96,8 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" />
-   <field name="lang" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="language" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="locale" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="wiki" type="string" indexed="true" stored="true" />
    <field name="space" type="text_general" indexed="true" stored="true" />
    <field name="space_exact" type="string" indexed="true" stored="false" />
@@ -200,6 +201,10 @@
   <copyField source="space" dest="space_exact"/>
   <copyField source="title_*" dest="title_sort"/>
   <copyField source="author_display" dest="author_display_sort"/>
+
+  <!-- Aliases -->
+  <!-- Retro compatibility with old Lucene module fields names -->
+  <copyField source="lang" dest="locale"/>
 
   <!--  The way we handle attachments/objects/properties requires that multiple attcontent_<language> fields are indexed for the same attachment Lucene document.
         This triggeres copyField each time and forces us to use multiValued="true" on attcontent, thus leading to useless storage overhead.

@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.api;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
@@ -51,25 +52,25 @@ public interface SolrConfiguration
     <T> T getInstanceConfiguration(String instanceType, String propertyName, T defaultValue);
 
     /**
-     * Each language has its particularities and needs to be handled specially in order to index and retrieve the best
+     * Each locale has its particularities and needs to be handled specially in order to index and retrieve the best
      * results.
      * 
-     * @return the list of supported language codes for which optimized indexing can be performed (using
-     *         language-code-suffixed fields that are analyzed and queries with the analysis chain specific to the
-     *         language)
-     * @see #getOptimizedLanguages() for the selected languages
+     * @return the list of supported locale codes for which optimized indexing can be performed (using
+     *         locale-code-suffixed fields that are analyzed and queries with the analysis chain specific to the
+     *         locale)
+     * @see #getOptimizedLocales() for the selected locales
      */
-    List<String> getOptimizableLanguages();
+    List<Locale> getOptimizableLocales();
 
     /**
-     * Each language has its particularities and needs to be handled specially in order to index and retrieve the best
+     * Each locale has its particularities and needs to be handled specially in order to index and retrieve the best
      * results.
      * 
-     * @return the list of language codes for which to perform optimized indexing (using language-code-suffixed fields
-     *         that are analyzed and queries with the analysis chain specific to the language)
-     * @see #getOptimizableLanguages() for the full list of supported languages
+     * @return the list of locale codes for which to perform optimized indexing (using locale-code-suffixed fields
+     *         that are analyzed and queries with the analysis chain specific to the locale)
+     * @see #getOptimizableLocales() for the full list of supported locales
      */
-    List<String> getOptimizedLanguages();
+    List<Locale> getOptimizedLocales();
 
     /**
      * @return the list of multilingual fields for which to apply optimized indexing.

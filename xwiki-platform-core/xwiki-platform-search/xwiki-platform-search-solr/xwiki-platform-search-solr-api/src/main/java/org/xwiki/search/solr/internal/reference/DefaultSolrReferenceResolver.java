@@ -39,7 +39,7 @@ import org.xwiki.search.solr.internal.api.SolrIndexerException;
  */
 @Component
 @Singleton
-public class DefaultSolrDocumentReferenceResolver implements SolrDocumentReferenceResolver
+public class DefaultSolrReferenceResolver implements SolrReferenceResolver
 {
     /**
      * Used to find the {@link SolrDocumentReferenceResolver}.
@@ -47,20 +47,41 @@ public class DefaultSolrDocumentReferenceResolver implements SolrDocumentReferen
     @Inject
     private ComponentManager componentManager;
 
-    @Override
-    public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
+    /**
+     * @param reference the reference
+     * @return the resolver associated to the reference type
+     * @throws SolrIndexerException when failed to find a resolve associated to the passed reference
+     */
+    private SolrReferenceResolver getResover(EntityReference reference) throws SolrIndexerException
     {
         EntityType type = reference.getType();
 
-        SolrDocumentReferenceResolver resolver;
+        SolrReferenceResolver resolver;
         try {
-            resolver =
-                this.componentManager.getInstance(SolrDocumentReferenceResolver.class, type.name().toLowerCase());
+            resolver = this.componentManager.getInstance(SolrReferenceResolver.class, type.name().toLowerCase());
         } catch (ComponentLookupException e) {
             throw new SolrIndexerException("Failed to get SolrDocumentReferenceResolver corresponding to entity type ["
                 + type + "]", e);
         }
 
-        return resolver.getReferences(reference);
+        return resolver;
+    }
+
+    @Override
+    public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
+    {
+        return getResover(reference).getReferences(reference);
+    }
+
+    @Override
+    public String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException
+    {
+        return getResover(reference).getId(reference);
+    }
+
+    @Override
+    public String getQuery(EntityReference reference) throws SolrIndexerException
+    {
+        return getResover(reference).getQuery(reference);
     }
 }

@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal.api;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
@@ -31,41 +29,31 @@ import org.xwiki.stability.Unstable;
  * is done to try to ensure consistency of the index.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 5.1M2
  */
 @Unstable
 @Role
 public interface SolrIndexer
 {
     /**
-     * Index an entity recursively.
+     * Index an entity.
+     * <p>
+     * Null reference means the whole farm.
      * 
      * @param reference the entity's reference.
+     * @param recurse indicate if children entities should be indexed too
      * @throws SolrIndexerException if problems occur.
      */
-    void index(EntityReference reference) throws SolrIndexerException;
+    void index(EntityReference reference, boolean recurse) throws SolrIndexerException;
 
     /**
-     * Index multiple entities, each recursively. This is a batch operation.
-     * 
-     * @param references the list of entity references.
-     * @throws SolrIndexerException if problems occur.
-     */
-    void index(List<EntityReference> references) throws SolrIndexerException;
-
-    /**
-     * Delete an indexed entity recursively.
+     * Delete an indexed entity.
+     * <p>
+     * Null reference means the whole farm.
      * 
      * @param reference the entity's reference.
+     * @param recurse indicate if children entities should be removed too
      * @throws SolrIndexerException if problems occur.
      */
-    void delete(EntityReference reference) throws SolrIndexerException;
-
-    /**
-     * Delete multiple entities, each recursively. This is a batch operation.
-     * 
-     * @param references the list of entity references.
-     * @throws SolrIndexerException if problems occur.
-     */
-    void delete(List<EntityReference> references) throws SolrIndexerException;
+    void delete(EntityReference reference, boolean recurse) throws SolrIndexerException;
 }

@@ -17,32 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal.reference;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexerException;
+package org.xwiki.search.solr.internal.api;
 
 /**
- * Resolve attachment references.
+ * Index component exception.
  * 
  * @version $Id$
  * @since 5.1M2
  */
-@Component
-@Named("attachment")
-@Singleton
-public class AttachmentSolrDocumentReferenceResolver extends AbstractSolrDocumentReferenceResolver
+public class SolrException extends Exception
 {
-    @Override
-    public List<EntityReference> getReferences(EntityReference attachmentReference) throws SolrIndexerException
+    /**
+     * Constructor.
+     * 
+     * @param message the exception message
+     * @param cause the exception that caused this exception
+     */
+    public SolrException(String message, Exception cause)
     {
-        return Arrays.asList(attachmentReference);
+        super(message, cause);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param message the exception message
+     */
+    public SolrException(String message)
+    {
+        super(message);
     }
 }

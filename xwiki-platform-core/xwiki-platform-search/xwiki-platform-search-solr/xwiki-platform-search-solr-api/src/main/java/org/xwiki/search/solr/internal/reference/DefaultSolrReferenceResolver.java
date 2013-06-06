@@ -19,9 +19,11 @@
  */
 package org.xwiki.search.solr.internal.reference;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -29,7 +31,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Dispatch to the proper {@link SolrDocumentReferenceResolver}.
@@ -46,6 +52,12 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
      */
     @Inject
     private ComponentManager componentManager;
+
+    /**
+     * Used to access the database.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * @param reference the reference
@@ -70,18 +82,45 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
     @Override
     public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
     {
-        return getResover(reference).getReferences(reference);
+        if (reference != null) {
+            return getResover(reference).getReferences(reference);
+        } else {
+            // All the document in the farm
+            XWikiContext xcontext = xcontextProvider.get();
+
+            List<String> wikis;
+            try {
+                wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            } catch (XWikiException e) {
+                throw new SolrIndexerException("Failed to get the list of wikis", e);
+            }
+
+            List<EntityReference> references = new LinkedList<EntityReference>();
+            for (String wiki : wikis) {
+                references.addAll(getReferences(new WikiReference(wiki)));
+            }
+
+            return references;
+        }
     }
 
     @Override
     public String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException
     {
-        return getResover(reference).getId(reference);
+        if (reference != null) {
+            return getResover(reference).getId(reference);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public String getQuery(EntityReference reference) throws SolrIndexerException
     {
-        return getResover(reference).getQuery(reference);
+        if (reference != null) {
+            return getResover(reference).getQuery(reference);
+        } else {
+            return "*:*";
+        }
     }
 }

@@ -26,7 +26,7 @@ package org.xwiki.search.solr.internal.api;
  * A multilingual and virtual/alias field, is not stored in the index with the specified name. It is only used at query
  * time and it is expanded automatically to the actual fields from the index.
  * <p/>
- * Example: "title" becomes "title_ml | title_en | title_ro | title_fr | etc..."
+ * Example: "title" becomes "title_ | title_en | title_ro | title_fr | etc..."
  * <p/>
  * <b>Note</b>: When indexing a field, the actual field name must be used instead of the virtual field name.
  * 
@@ -213,7 +213,7 @@ public interface Fields
     /**
      * Multilingual field suffix for the field of "text_general" type.
      */
-    String MULTILINGUAL = "ml";
+    String MULTILINGUAL = "";
 
     /**
      * Format string for multilingual fields.

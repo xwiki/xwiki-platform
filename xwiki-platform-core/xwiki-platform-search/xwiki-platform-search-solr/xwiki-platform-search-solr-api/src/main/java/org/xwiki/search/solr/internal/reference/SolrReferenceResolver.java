@@ -41,6 +41,7 @@ public interface SolrReferenceResolver
      * @return references for the indexable contained entities, including the given one (but only if it is indexable).
      * @throws SolrIndexerException if problems occur.
      */
+    // FIXME: this could be very painful for the memory when asking for big wiki or farm references...
     List<EntityReference> getReferences(EntityReference rootReference) throws SolrIndexerException;
 
     /**

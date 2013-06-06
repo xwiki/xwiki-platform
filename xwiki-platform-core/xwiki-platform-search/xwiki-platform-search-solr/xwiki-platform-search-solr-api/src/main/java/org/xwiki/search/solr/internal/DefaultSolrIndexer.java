@@ -193,8 +193,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                     if (queueEntry.operation == IndexOperation.INDEX) {
                         List<EntityReference> references;
                         if (queueEntry.recurse) {
-                            // FIXME: it's not very clean to load all the reference in memory in the case of the wiki
-                            // for example. Would be better to stream or cut that a bit instead.
                             references = solrRefereceResolver.getReferences(queueEntry.reference);
                         } else {
                             references = Arrays.asList(queueEntry.reference);
@@ -205,9 +203,9 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                         }
                     } else {
                         if (queueEntry.recurse) {
-                            indexQueue
-                                .offer(new IndexQueueEntry(getQuery(queueEntry.reference), IndexOperation.DELETE));
-                        } else {
+                            indexQueue.offer(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                                IndexOperation.DELETE));
+                        } else if (queueEntry.reference != null) {
                             indexQueue.offer(new IndexQueueEntry(queueEntry.reference, IndexOperation.DELETE));
                         }
                     }
@@ -218,24 +216,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             }
 
             logger.debug("Stop SOLR resolver thread");
-        }
-
-        /**
-         * @param reference the reference for which to extract the ID
-         * @return the query to find all the related entities
-         * @throws SolrIndexerException when failing to generate the query
-         */
-        private String getQuery(EntityReference reference) throws SolrIndexerException
-        {
-            String result = null;
-
-            if (reference != null) {
-                result = solrRefereceResolver.getQuery(reference);
-            } else {
-                result = "*:*";
-            }
-
-            return result;
         }
     }
 

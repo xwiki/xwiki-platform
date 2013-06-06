@@ -199,6 +199,16 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
 
     _onToggle: function(event) {
       this.container.toggle();
+
+      // Fix the height of the document content container (XWIKI-9189). The search filter is displayed with position
+      // absolute so that it floats over the search results (as a popup) and the document content container has
+      // overflow:auto to prevent long text/images/tables from overflowing outside of the content area. Because of this
+      // the content container is not resized when the search filter is displayed. Instead, when there are no search
+      // results, we get a vertical scroll bar.
+      var docContentContainer = $('xwikicontent');
+      docContentContainer &amp;&amp; docContentContainer.setStyle({
+        minHeight: this.container.visible() ? docContentContainer.scrollHeight + 'px' : ''
+      });
     }
   });
 

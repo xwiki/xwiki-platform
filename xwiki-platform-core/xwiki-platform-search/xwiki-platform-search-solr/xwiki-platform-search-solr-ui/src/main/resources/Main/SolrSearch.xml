@@ -947,7 +947,8 @@ blockquote.search-result-highlight {
                   #if (!$checked)
                     #set ($discard = $selectedValues.add($facetValue.name))
                   #end
-                  #extendQueryString($url {$facetRequestParameter: $selectedValues})
+                  ## Reset the pagination because the number of results can change when a facet is applied.
+                  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
                   &lt;a href="$url"&gt;
                     &lt;input type="checkbox"#if ($checked) checked="checked"#end /&gt;
                     &lt;span class="itemName"&gt;$escapetool.xml($facetValue.name)&lt;/span&gt;
@@ -1011,7 +1012,7 @@ blockquote.search-result-highlight {
   #set ($paginationParameters = {
     'url': $doc.getURL('view', "$!request.queryString.replaceAll('firstIndex=[0-9]*', '')"),
     'totalItems': $results.numFound,
-    'defaultItemsPerPage': 10,
+    'defaultItemsPerPage': $rows,
     'position': 'top'
   })
   {{html}}#pagination($paginationParameters){{/html}}
@@ -1176,8 +1177,8 @@ blockquote.search-result-highlight {
   #set ($query = $services.query.createQuery($queryString, 'solr'))
   ##
   ## Set query parameters.
-  #set ($discard = $query.setLimit($numbertool.integer($rows)))
-  #set ($discard = $query.setOffset($numbertool.integer($start)))
+  #set ($discard = $query.setLimit($rows))
+  #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
   #if ($boost != '')
     #set ($discard = $query.bindValue('qf', $boost))
@@ -1243,17 +1244,13 @@ blockquote.search-result-highlight {
   #set ($fileType = "$!request.fileType")
   #set ($boost = "$!request.boost")
   #set ($debug = "$!request.debug")
-  #set ($rows = $request.rows)
+  #set ($rows = $numbertool.integer($request.rows))
   #if ("$!rows" == '')
-    #set ($rows = '10')
+    #set ($rows = 10)
   #end
-  #set ($start = $request.firstIndex)
+  #set ($start = $numbertool.integer($request.firstIndex))
   #if ("$!start" == '')
-    #set ($start = '0')
-  #end
-  #set ($end = $request.end)
-  #if ("$!end" == '')
-    #set ($end = '0')
+    #set ($start = 0)
   #end
   #set ($sort = $request.sort)
   #if ("$!sort" == '')

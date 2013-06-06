@@ -212,6 +212,8 @@ public interface Fields
 
     /**
      * Multilingual field suffix for the field of "text_general" type.
+     * <p>
+     * Using empty string to make sure to not collide with an existing language.
      */
     String MULTILINGUAL = "";
 

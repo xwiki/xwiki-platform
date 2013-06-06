@@ -216,15 +216,29 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     initialize: function(container) {
       this.container = container;
 
-      this.container.select('.search-facet-header').each(function(facetHeader) {
-        facetHeader.observe('click', this._onToggle.bindAsEventListener(this));
-      }.bind(this))
-
+      // Add the global Expand/Collapse toggle.
       this.globalToggle = new Element('a', {href: '#', style: 'float:right'});
       this.globalToggle.observe('click', this._onGlobalToggle.bindAsEventListener(this));
       var clearFloats = new Element('span', {'class': 'clearfloats'});
       this.container.down('.search-facets-actions').down('p').insert(this.globalToggle).insert(clearFloats);
       this._updateGlobalToggleState();
+
+      // Add Expand/Collapse toggle for each facet.
+      this.container.select('.search-facet-header').each(function(facetHeader) {
+        facetHeader.observe('click', this._onToggle.bindAsEventListener(this));
+      }.bind(this))
+
+      // Add a check box before each facet value. We do this from JavaScript because the behaviour of a check box inside
+      // a link is not consistent across different browsers (some follow the link when the check box is clicked, others
+      // don't) and having the check box outside the facet value link requires JavaScript to synchronize them.
+      this.container.select('.search-facet-body a').each(function(facetValueAnchor) {
+        var checkBox = new Element('input', {type: 'checkbox'});
+        checkBox.checked = facetValueAnchor.hasClassName('selected');
+        checkBox.observe('click', facetValueAnchor.click.bind(facetValueAnchor));
+        facetValueAnchor.insert({before: checkBox});
+        // Remove the 'selected' class because the selected state is marked using the check box.
+        facetValueAnchor.removeClassName('selected');
+      });
     },
 
     _onToggle: function(event) {
@@ -674,19 +688,20 @@ blockquote.search-result-highlight {
   list-style: none;
   display: block;
   padding: 0.5em 0;
-  margin: 0px;
+  margin: 0;
 }
 
 .search-facet-body li {
   clear: both;
 }
 
-.search-facet-body li {
-  margin-left: -0.3em;
-}
-
 .search-facet-body input[type="checkbox"] {
   float: left;
+  margin-left: 0;
+}
+
+.search-facet-body a.selected {
+  font-weight: bolder;
 }
 
 .search-facet-body .itemName {
@@ -954,14 +969,13 @@ blockquote.search-result-highlight {
                   #if ($facetRequestValues)
                     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
                   #end
-                  #set ($checked = $selectedValues.remove($facetValue.name))
-                  #if (!$checked)
+                  #set ($selected = $selectedValues.remove($facetValue.name))
+                  #if (!$selected)
                     #set ($discard = $selectedValues.add($facetValue.name))
                   #end
                   ## Reset the pagination because the number of results can change when a facet is applied.
                   #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
-                  &lt;a href="$url"&gt;
-                    &lt;input type="checkbox"#if ($checked) checked="checked"#end /&gt;
+                  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
                     &lt;span class="itemName"&gt;$escapetool.xml($facetValue.name)&lt;/span&gt;
                     &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
                   &lt;/a&gt;

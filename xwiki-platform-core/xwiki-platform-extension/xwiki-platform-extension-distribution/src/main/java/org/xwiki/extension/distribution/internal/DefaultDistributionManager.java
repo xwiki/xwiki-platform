@@ -398,10 +398,13 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     public void copyPreviousWikiJobStatus(String sourceWiki, String targetWiki)
     {
         WikiDistributionJobStatus sourceStatus = getPreviousWikiJobStatus(sourceWiki);
-        WikiDistributionJobStatus targetStatus =
-            new WikiDistributionJobStatus(sourceStatus, this.observationManagerProvider.get(),
-                this.loggerManagerProvider.get());
 
-        this.jobStatusStorage.store(targetStatus);
+        if (sourceStatus != null) {
+            WikiDistributionJobStatus targetStatus =
+                new WikiDistributionJobStatus(sourceStatus, this.observationManagerProvider.get(),
+                    this.loggerManagerProvider.get());
+
+            this.jobStatusStorage.store(targetStatus);
+        }
     }
 }

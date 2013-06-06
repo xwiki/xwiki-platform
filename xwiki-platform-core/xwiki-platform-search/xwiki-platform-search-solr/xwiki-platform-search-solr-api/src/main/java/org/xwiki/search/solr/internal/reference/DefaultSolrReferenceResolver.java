@@ -19,13 +19,14 @@
  */
 package org.xwiki.search.solr.internal.reference;
 
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -48,6 +49,77 @@ import com.xpn.xwiki.XWikiException;
 public class DefaultSolrReferenceResolver implements SolrReferenceResolver
 {
     /**
+     * Lazily get reference one wiki at a time.
+     * 
+     * @version $Id$
+     */
+    class FarmIterator implements Iterator<EntityReference>
+    {
+        /**
+         * The current iterator.
+         */
+        private Iterator<EntityReference> currentIterator;
+
+        /**
+         * The current wiki.
+         */
+        private final Iterator<String> currentWiki;
+
+        /**
+         * @param wikis the wikis
+         */
+        public FarmIterator(List<String> wikis)
+        {
+            this.currentWiki = wikis.iterator();
+        }
+
+        @Override
+        public void remove()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            update();
+
+            return currentIterator != null;
+        }
+
+        @Override
+        public EntityReference next()
+        {
+            update();
+
+            return currentIterator != null ? currentIterator.next() : null;
+        }
+
+        /**
+         * Make sure to point the caret to the right element.
+         */
+        private void update()
+        {
+            if (currentIterator == null || !currentIterator.hasNext()) {
+                if (currentWiki.hasNext()) {
+                    String wiki = currentWiki.next();
+                    try {
+                        currentIterator = getReferences(new WikiReference(wiki)).iterator();
+                    } catch (SolrIndexerException e) {
+                        logger.error("Failed to get references for wiki [" + wiki + "]", e);
+                    }
+
+                    if (!currentIterator.hasNext()) {
+                        update();
+                    }
+                } else {
+                    currentIterator = null;
+                }
+            }
+        }
+    }
+
+    /**
      * Used to find the {@link SolrDocumentReferenceResolver}.
      */
     @Inject
@@ -58,6 +130,12 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
      */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * The logger.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * @param reference the reference
@@ -80,7 +158,7 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
     }
 
     @Override
-    public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
+    public Iterable<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
     {
         if (reference != null) {
             return getResover(reference).getReferences(reference);
@@ -88,19 +166,21 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
             // All the document in the farm
             XWikiContext xcontext = xcontextProvider.get();
 
-            List<String> wikis;
+            final List<String> wikis;
             try {
                 wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
             } catch (XWikiException e) {
                 throw new SolrIndexerException("Failed to get the list of wikis", e);
             }
 
-            List<EntityReference> references = new LinkedList<EntityReference>();
-            for (String wiki : wikis) {
-                references.addAll(getReferences(new WikiReference(wiki)));
-            }
-
-            return references;
+            return new Iterable<EntityReference>()
+            {
+                @Override
+                public Iterator<EntityReference> iterator()
+                {
+                    return new FarmIterator(wikis);
+                }
+            };
         }
     }
 

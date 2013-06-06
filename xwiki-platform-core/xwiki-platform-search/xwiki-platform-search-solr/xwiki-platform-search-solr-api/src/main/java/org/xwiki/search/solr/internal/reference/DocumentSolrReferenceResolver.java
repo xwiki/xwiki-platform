@@ -38,6 +38,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
+import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -141,7 +142,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
             AttachmentReference attachmentReference = attachment.getReference();
 
             try {
-                result.addAll(this.attachmentResolverProvider.get().getReferences(attachmentReference));
+                Iterables.addAll(result, this.attachmentResolverProvider.get().getReferences(attachmentReference));
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]", e);
             }
@@ -161,7 +162,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
                     BaseObjectReference objectReference = object.getReference();
 
                     try {
-                        result.addAll(this.objectResolverProvider.get().getReferences(objectReference));
+                        Iterables.addAll(result, this.objectResolverProvider.get().getReferences(objectReference));
                     } catch (Exception e) {
                         this.logger.error("Failed to resolve references for object [" + objectReference + "]", e);
                     }

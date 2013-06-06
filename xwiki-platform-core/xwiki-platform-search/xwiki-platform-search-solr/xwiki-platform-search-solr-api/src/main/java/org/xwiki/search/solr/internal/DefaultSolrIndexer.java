@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -191,7 +190,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
                 try {
                     if (queueEntry.operation == IndexOperation.INDEX) {
-                        List<EntityReference> references;
+                        Iterable<EntityReference> references;
                         if (queueEntry.recurse) {
                             references = solrRefereceResolver.getReferences(queueEntry.reference);
                         } else {

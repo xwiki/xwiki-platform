@@ -21,6 +21,8 @@ package org.xwiki.search.solr.internal.resolver;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.iterableWithSize;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -35,6 +37,7 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -378,60 +381,84 @@ public class SolrReferenceResolverTest
 
         // space 13
         when(documentsSpace13Query.execute()).thenReturn(Collections.EMPTY_LIST);
+
+        // farm
+        when(xwiki.getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList(wikiReference1.getName(), wikiReference2.getName()));
     }
 
     // getReferences
     @Test
-    public void getReferencesEmptyWiki() throws Exception
+    public void getReferencesFarm() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(wikiReference2);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(0, result.size());
-    }
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(null);
 
-    @Test
-    public void getReferencesWiki() throws Exception
-    {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(wikiReference1);
         Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(12));
 
         assertThat(
             result,
             containsInAnyOrder(classReference111, documentReference112, documentReference113, documentReference113RO,
                 documentReference121, attachmentReference1211, attachmentReference1212, documentReference122,
                 objectReference1221, objectReference1222, propertyReference12221, propertyReference12223));
-        Assert.assertFalse(result.contains(passwordPropertyReference12222));
+    }
+
+    @Test
+    public void getReferencesEmptyWiki() throws Exception
+    {
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(wikiReference2);
+
+        Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(0));
+    }
+
+    @Test
+    public void getReferencesWiki() throws Exception
+    {
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(wikiReference1);
+
+        Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(12));
+
+        assertThat(
+            result,
+            containsInAnyOrder(classReference111, documentReference112, documentReference113, documentReference113RO,
+                documentReference121, attachmentReference1211, attachmentReference1212, documentReference122,
+                objectReference1221, objectReference1222, propertyReference12221, propertyReference12223));
     }
 
     @Test
     public void getReferencesSpaceReference() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(spaceReference11);
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(spaceReference11);
+
         Assert.assertNotNull(result);
-        Assert.assertEquals(4, result.size());
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(4));
 
         assertThat(
             result,
             containsInAnyOrder((EntityReference) classReference111, (EntityReference) documentReference112,
                 (EntityReference) documentReference113, (EntityReference) documentReference113RO));
-        Assert.assertFalse(result.contains(passwordPropertyReference12222));
     }
 
     @Test
     public void getReferencesEmptyDocument() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference112);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(1, result.size());
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference112);
 
-        Assert.assertTrue(result.contains(documentReference112));
+        Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(1));
+
+        Assert.assertEquals(documentReference112, result.iterator().next());
     }
 
     @Test
     public void getReferencesTranslatedDocument() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference113);
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference113);
+
         Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(2));
 
         assertThat(result,
             containsInAnyOrder((EntityReference) documentReference113, (EntityReference) documentReference113RO));
@@ -440,10 +467,10 @@ public class SolrReferenceResolverTest
     @Test
     public void getReferencesDocumentWithAttachments() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference121);
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference121);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(3, result.size());
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(3));
 
         assertThat(result, containsInAnyOrder(documentReference121, attachmentReference1211, attachmentReference1212));
     }
@@ -451,65 +478,69 @@ public class SolrReferenceResolverTest
     @Test
     public void getReferencesDocumentWithObjects() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference122);
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(documentReference122);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(5, result.size());
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(5));
 
         assertThat(
             result,
             containsInAnyOrder(documentReference122, objectReference1221, propertyReference12221,
                 propertyReference12223, objectReference1222));
-        Assert.assertFalse(result.contains(passwordPropertyReference12222));
     }
 
     @Test
     public void getReferencesAttachment() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(attachmentReference1211);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(1, result.size());
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(attachmentReference1211);
 
-        Assert.assertTrue(result.contains(attachmentReference1211));
+        Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(1));
+
+        Assert.assertEquals(attachmentReference1211, result.iterator().next());
     }
 
     @Test
     public void getReferencesEmptyObject() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(objectReference1221);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(1, result.size());
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(objectReference1221);
 
-        Assert.assertTrue(result.contains(objectReference1221));
+        Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(1));
+
+        Assert.assertEquals(objectReference1221, result.iterator().next());
     }
 
     @Test
     public void getReferencesObject() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(objectReference1222);
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(objectReference1222);
+
         Assert.assertNotNull(result);
-        Assert.assertEquals(3, result.size());
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(3));
 
         assertThat(result, containsInAnyOrder(objectReference1222, propertyReference12221, propertyReference12223));
-        Assert.assertFalse(result.contains(passwordPropertyReference12222));
     }
 
     @Test
     public void getReferencesProperty() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(propertyReference12221);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(1, result.size());
+        Iterable<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(propertyReference12221);
 
-        Assert.assertTrue(result.contains(propertyReference12221));
+        Assert.assertNotNull(result);
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(1));
+
+        Assert.assertEquals(propertyReference12221, result.iterator().next());
     }
 
     @Test
     public void getReferencesRestrictedProperty() throws Exception
     {
-        List<EntityReference> result = this.defaultSolrReferenceResolver.getReferences(passwordPropertyReference12222);
+        Iterable<EntityReference> result =
+            this.defaultSolrReferenceResolver.getReferences(passwordPropertyReference12222);
+
         Assert.assertNotNull(result);
-        Assert.assertEquals(0, result.size());
+        assertThat(result, Matchers.<EntityReference> iterableWithSize(0));
     }
 
     // getId

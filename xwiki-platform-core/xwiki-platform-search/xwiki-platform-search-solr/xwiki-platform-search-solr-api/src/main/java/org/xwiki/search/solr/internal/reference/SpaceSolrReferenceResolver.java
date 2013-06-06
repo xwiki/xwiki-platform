@@ -36,6 +36,8 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
+import com.google.common.collect.Iterables;
+
 /**
  * Resolve space references.
  * 
@@ -88,7 +90,7 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
             EntityReference documentReference = new EntityReference(documentName, EntityType.DOCUMENT, spaceReference);
 
             try {
-                result.addAll(this.documentResolverProvider.get().getReferences(documentReference));
+                Iterables.addAll(result, this.documentResolverProvider.get().getReferences(documentReference));
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for document [" + documentReference + "]", e);
             }

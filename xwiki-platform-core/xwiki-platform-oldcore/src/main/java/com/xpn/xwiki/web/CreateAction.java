@@ -165,7 +165,7 @@ public class CreateAction extends XWikiAction
             // Checking rights
             SpaceReference spaceReference = newDocRef.getLastSpaceReference();
             AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
-            if(!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)){
+            if (!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)) {
                 Object[] args = {spaceReference.toString(), context.getUser()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                         "The creation of a document into the space {0} has been denied to user {1}", null, args);

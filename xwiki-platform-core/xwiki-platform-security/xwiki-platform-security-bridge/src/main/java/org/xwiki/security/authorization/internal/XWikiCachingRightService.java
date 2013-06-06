@@ -116,7 +116,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("objectsync", Right.EDIT)
             .putAction("rollback", Right.EDIT)
             .putAction("upload", Right.EDIT)
-            .putAction("create", Right.EDIT)
+            .putAction("create", Right.VIEW)
             .putAction("deleteversions", Right.ADMIN)
             .putAction("deletespace", Right.ADMIN)
             .putAction("temp", Right.VIEW);

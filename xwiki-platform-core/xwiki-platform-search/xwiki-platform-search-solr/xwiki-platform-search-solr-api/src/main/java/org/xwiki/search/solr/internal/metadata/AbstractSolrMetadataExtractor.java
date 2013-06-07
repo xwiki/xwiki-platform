@@ -28,7 +28,6 @@ import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -104,13 +103,13 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         try {
             LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
-            solrDocument.addField(Fields.ID, getResolver(entityReference).getId(documentReference));
+            solrDocument.setField(Fields.ID, getResolver(entityReference).getId(documentReference));
 
-            addDocumentFields(documentReference, solrDocument);
+            setDocumentFields(documentReference, solrDocument);
 
-            solrDocument.addField(Fields.TYPE, documentReference.getType().name());
+            solrDocument.setField(Fields.TYPE, documentReference.getType().name());
 
-            addFieldsInternal(solrDocument, entityReference);
+            setFieldsInternal(solrDocument, entityReference);
 
             return solrDocument;
         } catch (Exception e) {
@@ -124,7 +123,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param entityReference the reference of the entity
      * @throws Exception in case of errors
      */
-    protected abstract void addFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    protected abstract void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception;
 
     /**
@@ -188,19 +187,19 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param solrDocument the Solr document to which to add the fields.
      * @throws Exception if problems occur.
      */
-    protected void addDocumentFields(DocumentReference documentReference, SolrInputDocument solrDocument)
+    protected void setDocumentFields(DocumentReference documentReference, SolrInputDocument solrDocument)
         throws Exception
     {
-        solrDocument.addField(Fields.WIKI, documentReference.getWikiReference().getName());
-        solrDocument.addField(Fields.SPACE, documentReference.getLastSpaceReference().getName());
-        solrDocument.addField(Fields.NAME, documentReference.getName());
+        solrDocument.setField(Fields.WIKI, documentReference.getWikiReference().getName());
+        solrDocument.setField(Fields.SPACE, documentReference.getLastSpaceReference().getName());
+        solrDocument.setField(Fields.NAME, documentReference.getName());
 
         Locale locale = getLocale(documentReference);
-        solrDocument.addField(Fields.LOCALE, locale.toString());
-        solrDocument.addField(Fields.LANGUAGE, locale.getLanguage());
+        solrDocument.setField(Fields.LOCALE, locale.toString());
+        solrDocument.setField(Fields.LANGUAGE, locale.getLanguage());
 
         XWikiDocument document = getDocument(documentReference);
-        solrDocument.addField(Fields.HIDDEN, document.isHidden());
+        solrDocument.setField(Fields.HIDDEN, document.isHidden());
     }
 
     /**
@@ -236,7 +235,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document. In case of translations, this will obviously be different
      *            than the original document's locale.
      */
-    protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object, String locale)
+    protected void setObjectContent(SolrInputDocument solrDocument, BaseObject object, String locale)
     {
         if (object == null) {
             // Yes, the platform can return null objects.

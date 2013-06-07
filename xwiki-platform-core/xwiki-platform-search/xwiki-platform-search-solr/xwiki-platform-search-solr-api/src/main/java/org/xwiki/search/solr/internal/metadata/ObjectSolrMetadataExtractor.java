@@ -56,7 +56,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     private SolrReferenceResolver resolver;
 
     @Override
-    public void addFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         BaseObjectReference objectReference = new BaseObjectReference(entityReference);
@@ -67,13 +67,13 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
         BaseObject object = document.getXObject(objectReference);
 
-        solrDocument.addField(Fields.ID, resolver.getId(object.getReference()));
-        addDocumentFields(documentReference, solrDocument);
-        solrDocument.addField(Fields.TYPE, objectReference.getType().name());
-        solrDocument.addField(Fields.CLASS, localSerializer.serialize(classReference));
-        solrDocument.addField(Fields.NUMBER, objectReference.getObjectNumber());
+        solrDocument.setField(Fields.ID, resolver.getId(object.getReference()));
+        setDocumentFields(documentReference, solrDocument);
+        solrDocument.setField(Fields.TYPE, objectReference.getType().name());
+        solrDocument.setField(Fields.CLASS, localSerializer.serialize(classReference));
+        solrDocument.setField(Fields.NUMBER, objectReference.getObjectNumber());
 
-        addLocaleAndContentFields(documentReference, solrDocument, object);
+        setLocaleAndContentFields(documentReference, solrDocument, object);
     }
 
     /**
@@ -87,7 +87,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param object the object.
      * @throws Exception if problems occur.
      */
-    protected void addLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
+    protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
         BaseObject object) throws Exception
     {
         XWikiDocument originalDocument = getDocument(documentReference);
@@ -105,13 +105,14 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             if (!documentLocale.equals(originalDocumentLocale)) {
                 // The original document's locale is already set by the call to the addDocumentFields method.
                 solrDocument.addField(Fields.LOCALE, documentLocale);
+                solrDocument.addField(Fields.LANGUAGE, documentLocale.getLanguage());
             }
 
-            addObjectContent(solrDocument, object, documentLocale.toString());
+            setObjectContent(solrDocument, object, documentLocale.toString());
         }
 
         // We can`t rely on the schema's copyField here because we would trigger it for each locale. Doing the copy to
         // the text_general field manually.
-        addObjectContent(solrDocument, object, Fields.MULTILINGUAL);
+        setObjectContent(solrDocument, object, Fields.MULTILINGUAL);
     }
 }

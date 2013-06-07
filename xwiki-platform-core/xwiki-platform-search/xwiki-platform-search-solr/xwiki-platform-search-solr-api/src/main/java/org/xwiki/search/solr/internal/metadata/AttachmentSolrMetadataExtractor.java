@@ -67,17 +67,17 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     protected DocumentAccessBridge documentAccessBridge;
 
     @Override
-    public void addFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);
 
         DocumentReference documentReference = attachmentReference.getDocumentReference();
 
-        solrDocument.addField(Fields.FILENAME, attachmentReference.getName());
-        solrDocument.addField(Fields.MIME_TYPE, getMimeType(attachmentReference));
+        solrDocument.setField(Fields.FILENAME, attachmentReference.getName());
+        solrDocument.setField(Fields.MIME_TYPE, getMimeType(attachmentReference));
 
-        addLocaleAndContentFields(documentReference, solrDocument, attachmentReference);
+        setLocaleAndContentFields(documentReference, solrDocument, attachmentReference);
     }
 
     /**
@@ -91,7 +91,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
      * @param attachmentReference the attachment's reference.
      * @throws Exception if problems occur.
      */
-    protected void addLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
+    protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
         AttachmentReference attachmentReference) throws Exception
     {
         XWikiDocument originalDocument = getDocument(documentReference);
@@ -108,18 +108,19 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         // Do the work for each locale.
         for (Locale documentLocale : documentLocales) {
             if (!documentLocale.equals(originalDocumentLocale)) {
-                // The original document's locale is already set by the call to the addDocumentFields method.
-                solrDocument.addField(Fields.LOCALE, documentLocale);
+                // The original document's locale is already set by the call to the setDocumentFields method.
+                solrDocument.addField(Fields.LOCALE, documentLocale.toString());
+                solrDocument.addField(Fields.LANGUAGE, documentLocale.getLanguage());
             }
 
-            solrDocument.addField(
+            solrDocument.setField(
                 String.format(Fields.MULTILIGNUAL_FORMAT, Fields.ATTACHMENT_CONTENT, documentLocale.toString()),
                 attachmentTextContent);
         }
 
         // We can`t rely on the schema's copyField here because we would trigger it for each language. Doing the copy to
         // the text_general field manually.
-        solrDocument.addField(
+        solrDocument.setField(
             String.format(Fields.MULTILIGNUAL_FORMAT, Fields.ATTACHMENT_CONTENT, Fields.MULTILINGUAL),
             attachmentTextContent);
     }

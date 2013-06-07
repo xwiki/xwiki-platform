@@ -213,9 +213,9 @@ public interface Fields
     /**
      * Multilingual field suffix for the field of "text_general" type.
      * <p>
-     * Using empty string to make sure to not collide with an existing language.
+     * Underscore to make sure to not collide with an existing locale or root locale.
      */
-    String MULTILINGUAL = "";
+    String MULTILINGUAL = USCORE;
 
     /**
      * Format string for multilingual fields.

@@ -76,7 +76,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected EntityReferenceSerializer<String> serializer;
 
     @Override
-    public void addFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
@@ -86,7 +86,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
         Locale locale = getLocale(documentReference);
 
-        solrDocument.addField(Fields.FULLNAME, localSerializer.serialize(documentReference));
+        solrDocument.setField(Fields.FULLNAME, localSerializer.serialize(documentReference));
 
         // Convert the XWiki syntax of document to plain text.
         WikiPrinter printer = new DefaultWikiPrinter();
@@ -96,11 +96,11 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
         // Get the rendered plain text title.
-        solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, locale.toString()), plainTitle);
-        solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_CONTENT, locale),
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, locale.toString()), plainTitle);
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_CONTENT, locale),
             printer.toString());
-        solrDocument.addField(Fields.VERSION, translatedDocument.getVersion());
-        solrDocument.addField(Fields.COMMENT, translatedDocument.getComment());
+        solrDocument.setField(Fields.VERSION, translatedDocument.getVersion());
+        solrDocument.setField(Fields.COMMENT, translatedDocument.getComment());
 
         // Get both serialized user reference string and pretty user name (first_name last_name).
         String authorString = serializer.serialize(translatedDocument.getAuthorReference());
@@ -108,20 +108,20 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
         String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
 
-        solrDocument.addField(Fields.AUTHOR, authorString);
-        solrDocument.addField(Fields.AUTHOR_DISPLAY, authorDisplayString);
-        solrDocument.addField(Fields.CREATOR, creatorString);
-        solrDocument.addField(Fields.CREATOR_DISPLAY, creatorDisplayString);
+        solrDocument.setField(Fields.AUTHOR, authorString);
+        solrDocument.setField(Fields.AUTHOR_DISPLAY, authorDisplayString);
+        solrDocument.setField(Fields.CREATOR, creatorString);
+        solrDocument.setField(Fields.CREATOR_DISPLAY, creatorDisplayString);
 
         // Document dates.
-        solrDocument.addField(Fields.CREATIONDATE, translatedDocument.getCreationDate());
-        solrDocument.addField(Fields.DATE, translatedDocument.getContentUpdateDate());
+        solrDocument.setField(Fields.CREATIONDATE, translatedDocument.getCreationDate());
+        solrDocument.setField(Fields.DATE, translatedDocument.getContentUpdateDate());
 
         // Document translations have their own hidden fields
         solrDocument.setField(Fields.HIDDEN, translatedDocument.isHidden());
 
         // Add any extra fields (about objects, comments, etc.) that can improve the findability of the document.
-        addExtras(documentReference, solrDocument, locale);
+        setExtras(documentReference, solrDocument, locale);
     }
 
     /**
@@ -130,7 +130,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale of which to index the extra data.
      * @throws XWikiException if problems occur.
      */
-    protected void addExtras(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale)
+    protected void setExtras(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale)
         throws XWikiException
     {
         // Index the Comments and Objects in general. Use the original document to get the comment objects since the
@@ -141,7 +141,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiDocument originalDocument = getDocument(documentReference);
 
         // Objects
-        addObjects(solrDocument, locale, originalDocument);
+        setObjects(solrDocument, locale, originalDocument);
 
         // Note: Not indexing attachment contents at this point because they are considered first class search
         // results. Also, it's easy to see the source XWiki document from the UI.
@@ -152,11 +152,11 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale for which to index the objects.
      * @param originalDocument the original document where the objects come from.
      */
-    protected void addObjects(SolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
+    protected void setObjects(SolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
             for (BaseObject object : objects.getValue()) {
-                addObjectContent(solrDocument, object, locale.toString());
+                setObjectContent(solrDocument, object, locale.toString());
             }
         }
     }

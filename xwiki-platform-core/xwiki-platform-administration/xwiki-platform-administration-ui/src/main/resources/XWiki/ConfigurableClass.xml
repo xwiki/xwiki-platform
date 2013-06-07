@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1265775370000</creationDate>
-  <date>1299715500000</date>
-  <contentUpdateDate>1299715500000</contentUpdateDate>
+  <creationDate>1364502205000</creationDate>
+  <date>1364564976000</date>
+  <contentUpdateDate>1364564951000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.admin.configurable.title")</title>
-  <template/>
+  <title>$services.localization.render('xe.admin.configurable.title')</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -177,7 +176,8 @@ GTtdHeKRT1X9t1XLGvRhiPoWOX3fvn2/YUBe1t8x5DE56k88GgcT5wxhXpDLKFuRCdwg+HcYAUG8
 k+L7iSCr2StULgctABSkAODikwO4BWBfAV6mIQHdbw30uDdZN8eyb2vADeggW93fYlDtBdYfB+AU
 Gwhd1LjNaPADBjsFoL5hNK8Zoq63eab7BT3gZsSvFhuWJnWsQR1iGo4MgmQg/DioLQA2RN++NhyR
 iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
-/wpRrz9iAAAAAElFTkSuQmCC</content>
+/wpRrz9iAAAAAElFTkSuQmCC
+</content>
   </attachment>
   <class>
     <name>XWiki.ConfigurableClass</name>
@@ -406,7 +406,7 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
   }
 
   // Add a submit button for saving all sections at once.
-  var button = new Element('input', {'type':'submit', 'class':'button', 'value':'$msg.get("admin.save")', 'name':'formactionsac'});
+  var button = new Element('input', {'type':'submit', 'class':'button', 'value':'$services.localization.render("admin.save")', 'name':'formactionsac'});
   var wrapper = new Element('span', {'class':'buttonwrapper'});
   var adminButtons = new Element('p', {'class':'admin-buttons'});
   var bottomButtons = new Element('div', {'class':'bottombuttons'});
@@ -546,12 +546,12 @@ $doc.dropPermissions()##
     #if(!$userHasAccessToDocument)
       #showHeading($appName, $headingShowing)
 
-      {{error}}$msg.get('xe.admin.configurable.noPermissionThisApplication'){{/error}}
+      {{error}}{{translation key="xe.admin.configurable.noPermissionThisApplication"/}}{{/error}}
 
     #elseif(!$documentSavedByAuthorizedUser)
       #showHeading($appName, $headingShowing)
 
-      {{error}}$msg.get('xe.admin.configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+      {{error}}{{translation key="xe.admin.configurable.applicationAuthorNoAdmin" parameters="$app.Author"/}}{{/error}}
 
     ##
     ##------------------------------------------------------------------------------------------------------------
@@ -563,7 +563,7 @@ $doc.dropPermissions()##
       #end
       #showHeading($appName, $headingShowing)
 
-      {{error}}$msg.get('doclockedby') $app.getLockingUser() [[$msg.get('forcelock')&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
+      {{error}}{{translation key="doclockedby"/}} $app.getLockingUser() [[{{translation key="forcelock"/}}&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
 
     #else
       ## If the document is not already locked, attempt to acquire the lock.
@@ -573,7 +573,7 @@ $doc.dropPermissions()##
         {{html wiki=true}}
           &lt;noscript&gt;
 
-            {{warning}}$msg.get('xe.admin.configurable.cannotLockNoJavascript'){{/warning}}
+            {{warning}}{{translation key="xe.admin.configurable.cannotLockNoJavascript"/}}{{/warning}}
 
           &lt;/noscript&gt;
           &lt;script type="text/javascript"&gt;
@@ -640,7 +640,7 @@ $doc.dropPermissions()##
             #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
               #showHeading($appName, $headingShowing)
 
-              {{error}}$msg.get('xe.admin.configurable.configurationClassNonexistant'){{/error}}
+              {{error}}{{translation key="xe.admin.configurable.configurationClassNonexistant"/}}{{/error}}
 
             #else
               ## Use the first object from the document which is of the configuration class.
@@ -650,7 +650,7 @@ $doc.dropPermissions()##
                 #showHeading($appName, $headingShowing)
 
                 {{error}}
-                  $msg.get('xe.admin.configurable.noObjectOfConfigurationClassFound', [$objClass.getName(), $app.getFullName()])
+                  {{translation key="xe.admin.configurable.noObjectOfConfigurationClassFound" parameters="$objClass.getName(), $app.getFullName()"/}}
                 {{/error}}
 
               #else
@@ -699,9 +699,9 @@ $doc.dropPermissions()##
                 ## Text to display on the button. If there is a heading then this button should be labeled
                 ## that it is for saving this section. Otherwise it should be a generic "save" button.
                 #if($headingShowing)
-                  #set($buttonText = "$msg.get('admin.save') $escapedAppName")
+                  #set($buttonText = "$services.localization.render('admin.save') $escapedAppName")
                 #else
-                  #set($buttonText = "$msg.get('admin.save')")
+                  #set($buttonText = "$services.localization.render('admin.save')")
                 #end
                 &lt;input class="button" type="submit" name="action_saveandcontinue" value="$buttonText" /&gt;
               &lt;/span&gt;
@@ -819,22 +819,22 @@ $doc.dropPermissions()##
       #if($hasAccess)
         &lt;a href="$xwiki.getURL($currentDoc, $xcontext.getAction(), "$queryString$escapetool.url($sectionToAdd)")"&gt;
       #else
-        &lt;a title="$msg.get('xe.admin.configurable.sectionIconNoAccessTooltip')"&gt;
+        &lt;a title="$services.localization.render('xe.admin.configurable.sectionIconNoAccessTooltip')"&gt;
       #end
       &lt;span&gt;
       &lt;img src="$icon" alt="$escapetool.xml($sectionToAdd) icon"/&gt;
       ## Try to translate the names of the sections, build the key by adding an "admin." in front. 
       ## Not the best way to translate, but very inline with the way the translations are done in XWiki.AdminSheet for individual administration page titles.
       ## If there is no translation (translated message is equals to key), don't display the message key, but the section name instead.
-      #if($msg.get("admin.${sectionToAdd.toLowerCase()}") != "admin.${sectionToAdd.toLowerCase()}") 
-        #set($sectionDisplayName = $msg.get("admin.${sectionToAdd.toLowerCase()}")) 
+      #if($services.localization.get("admin.${sectionToAdd.toLowerCase()}")) 
+        #set($sectionDisplayName = $services.localization.render("admin.${sectionToAdd.toLowerCase()}")) 
       #else
         #set($sectionDisplayName = $sectionToAdd)
       #end
       $escapetool.xml($sectionDisplayName)
       &lt;/span&gt;
       #if(!$hasAccess)
-        &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;
+        &lt;br/&gt;&lt;span class="errormessage"&gt;$services.localization.render('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;
       #end
       &lt;/a&gt;
     &lt;/li&gt;
@@ -844,7 +844,7 @@ $doc.dropPermissions()##
   ## Finally we display an error message if there are any applications which we were unable to view.
   #if($appsUserCannotView.size() &gt; 0)
 
-    {{error}}$msg.get('xe.admin.configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+    {{error}}$services.localization.render('xe.admin.configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
 
   #end
 #end## If we should be looking at the main administration page.

@@ -7,7 +7,7 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection"><div id="mainContentArea">
-    #error("$msg.get('core.rename.nonexistingDocument')")
+    #error($services.localization.render('core.rename.nonexistingDocument'))
   </div></div>
   #template("endpage.vm")
 #else
@@ -32,18 +32,18 @@
       ## Do the rename. It's the form in renameStep1.vm page that calls this page with step=2.
       #if("$!{request.newPageName.trim()}" == '')
         $response.setStatus(400)
-        #error($msg.get('core.rename.emptyName'))
+        #error($services.localization.render('core.rename.emptyName'))
         #template("renameStep1.vm")
       #else
         #set($newDocReference = $services.model.createDocumentReference('', $!{request.newSpaceName}, $!{request.newPageName}))
         #set($newDocReferenceAsString = $services.model.serialize($newDocReference))
         #if($xwiki.exists($newDocReference))
           $response.setStatus(409)
-          #error($msg.get('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)}, $xwiki.getURL($newDocReference)]))
+          #error($services.localization.render('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)}, $xwiki.getURL($newDocReference)]))
           #template("renameStep1.vm")
         #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newDocReferenceAsString))
           $response.setStatus(403)
-          #error($msg.get('core.rename.targetNotWritable', [${escapetool.xml($newDocReferenceAsString)}]))
+          #error($services.localization.render('core.rename.targetNotWritable', [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')
         #else
           #set($backlinks = [])
@@ -59,7 +59,7 @@
           ## doc points to the new reference!
           #set ($oldDocReference = $doc.documentReference)
           $doc.rename($newDocReference, $backlinks, $children)
-          #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [${escapetool.xml($oldDocReference.name)}, ${escapetool.xml($doc.name)}, $doc.getURL(), ${escapetool.xml($oldDocReference.getLastSpaceReference().getName())}, ${escapetool.xml($doc.space)}])")
+          #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('core.rename.success', [${escapetool.xml($oldDocReference.name)}, ${escapetool.xml($doc.name)}, $doc.getURL(), ${escapetool.xml($oldDocReference.getLastSpaceReference().getName())}, ${escapetool.xml($doc.space)}]))
           #xwikimessageboxend()
         #end
       #end

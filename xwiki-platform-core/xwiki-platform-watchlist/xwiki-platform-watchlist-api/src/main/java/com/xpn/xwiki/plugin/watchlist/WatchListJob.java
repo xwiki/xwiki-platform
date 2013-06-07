@@ -22,8 +22,6 @@ package com.xpn.xwiki.plugin.watchlist;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.ServletException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -31,10 +29,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -105,24 +102,21 @@ public class WatchListJob extends AbstractJob implements Job
     /**
      * Initialize container context.
      * 
-     * @param context The XWiki context.
-     * @throws ServletException If the container initialization fails.
+     * @param xcontext the XWiki context
+     * @throws Exception if the execution context initialization fails
      */
-    protected void initializeComponents(XWikiContext context) throws ServletException
+    protected void initializeComponents(XWikiContext xcontext) throws Exception
     {
-        // Initialize the Container fields (request, response, session).
-        // Note that this is a bridge between the old core and the component architecture.
-        // In the new component architecture we use ThreadLocal to transport the request,
-        // response and session to components which require them.
-        // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
-        ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
-
         try {
-            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse());
-            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
-        } catch (ServletContainerException e) {
-            throw new ServletException("Failed to initialize Request/Response or Session", e);
+            ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+            ExecutionContext econtext = new ExecutionContext();
+
+            // Bridge with old XWiki Context, required for old code.
+            xcontext.declareInExecutionContext(econtext);
+
+            ecim.initialize(econtext);
+        } catch (Exception e) {
+            throw new Exception("Failed to initialize Execution Context", e);
         }
     }
 
@@ -131,14 +125,10 @@ public class WatchListJob extends AbstractJob implements Job
      */
     protected void cleanupComponents()
     {
-        Container container = Utils.getComponent(Container.class);
         Execution execution = Utils.getComponent(Execution.class);
 
-        // We must ensure we clean the ThreadLocal variables located in the Container and Execution
-        // components as otherwise we will have a potential memory leak.
-        container.removeRequest();
-        container.removeResponse();
-        container.removeSession();
+        // We must ensure we clean the ThreadLocal variables located in the Execution component as otherwise we will
+        // have a potential memory leak.
         execution.removeContext();
     }
 

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.SolrSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1369063635000</creationDate>
+  <date>1369655569000</date>
+  <contentUpdateDate>1369654393000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>Main.SolrTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>54715b8e-2403-4d0f-9b46-26f2b0e9e339</guid>
+    <property>
+      <scope>ON_DEMAND</scope>
+    </property>
+  </object>
+  <content>solr.sortBy=Sort by:
+solr.sortBy.score=Relevance
+solr.sortBy.title_sort=Title
+solr.sortBy.date=Date
+solr.sortBy.author_display_sort=Last Author
+solr.sortOrder.asc=Ascending
+solr.sortOrder.desc=Descending
+
+solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+solr.result.author=Modified by {0} on {1}
+solr.result.mediaType=File of type {0}
+solr.result.object=Object of type {0}
+solr.result.property=Property {0}#{1}
+
+solr.filter.title=Advanced Options
+solr.filter.hint=Select predefined filters that will be applied on your query.
+solr.filter.toggle=Toggle the search filter
+solr.filterBy.wiki=Wiki
+solr.filterBy.wiki.all=All wikis
+solr.filterBy.type=Type
+solr.filterBy.type.all=All types
+solr.filterBy.type.document=Document
+solr.filterBy.type.attachment=Attachment
+solr.filterBy.type.object=Object
+solr.filterBy.type.object_property=Object property
+solr.filterBy.language=Language
+solr.filterBy.language.all=All languages
+solr.filterBy.space=Space
+solr.filterBy.fileType=File type
+solr.filterBy.fileType.all=All file types
+solr.filterBy.fileType.image=Image
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Text
+solr.filter.queryBoost.label=Query boost
+solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5
+
+solr.facets.title=Refine your search
+solr.facets.hint=Select a category and activate filters on the current results
+solr.facets.resetAll=Reset all
+solr.facets.expandAll=Expand all
+solr.facets.collapseAll=Collapse all</content>
+</xwikidoc>

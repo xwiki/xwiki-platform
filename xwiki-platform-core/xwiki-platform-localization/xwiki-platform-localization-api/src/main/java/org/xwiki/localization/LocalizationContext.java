@@ -35,7 +35,7 @@ import org.xwiki.stability.Unstable;
 public interface LocalizationContext
 {
     /**
-     * @return the Locale to use by default in the current context
+     * @return the {@link Locale} to use by default in the current context
      */
     Locale getCurrentLocale();
 }

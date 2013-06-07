@@ -96,15 +96,16 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" />
-   <field name="lang" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="language" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="locale" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="wiki" type="string" indexed="true" stored="true" />
    <field name="space" type="text_general" indexed="true" stored="true" />
    <field name="space_exact" type="string" indexed="true" stored="false" />
    <field name="name" type="text_general" indexed="true" stored="true" />
    <field name="type" type="string" indexed="true" stored="true" />
-   <field name="title_ml" type="text_general" indexed="true" stored="true" />
+   <field name="title_" type="text_general" indexed="true" stored="true" />
    <field name="title_sort" type="lowercase" indexed="true" stored="false" />
-   <field name="doccontent_ml" type="text_general" indexed="true" stored="true" />
+   <field name="doccontent_" type="text_general" indexed="true" stored="true" />
    <field name="fullname" type="string" indexed="true" stored="true" />
    <field name="author" type="string" indexed="true" stored="true" />
    <field name="author_display" type="text_general" indexed="true" stored="true" />
@@ -115,14 +116,14 @@
    <field name="date" type="tdate" indexed="true" stored="true" />
    <field name="creationdate" type="tdate" indexed="true" stored="true" />
    <field name="hidden" type="boolean" indexed="true" stored="true" />
-   <field name="comment_ml" type="text_general" indexed="true" stored="true" multiValued="true" />
-   <field name="objcontent_ml" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="comment_" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="objcontent_" type="text_general" indexed="true" stored="true" multiValued="true" />
    <field name="class" type="string" indexed="true" stored="true" />
    <field name="propertyname" type="text_general" indexed="true" stored="true" />
-   <field name="propertyvalue_ml" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="propertyvalue_" type="text_general" indexed="true" stored="true" multiValued="true" />
    <field name="filename" type="text_general" indexed="true" stored="true" />
    <field name="mimetype" type="string" indexed="true" stored="true" />
-   <field name="attcontent_ml" type="text_general" indexed="true" stored="true" />
+   <field name="attcontent_" type="text_general" indexed="true" stored="true" />
 
    <!-- catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  -->
@@ -155,7 +156,7 @@
    <dynamicField name="*_hi"  type="text_hi"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_hu"  type="text_hu"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_hy"  type="text_hy"    indexed="true"  stored="true" multiValued="true" />
-   <dynamicField name="*_id"  type="text_id"    indexed="true"  stored="true" multiValued="true" />
+   <dynamicField name="*_in"  type="text_in"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_it"  type="text_it"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ja"  type="text_ja"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_lv"  type="text_lv"    indexed="true"  stored="true" multiValued="true" />
@@ -192,21 +193,25 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
   <!-- Copy optimized language fields to text_general indexed fields for generic usage. -->
-  <copyField source="title_*" dest="title_ml"/>
-  <copyField source="doccontent_*" dest="doccontent_ml"/>
-  <copyField source="comment_*" dest="comment_ml"/>
+  <copyField source="title_*" dest="title_"/>
+  <copyField source="doccontent_*" dest="doccontent_"/>
+  <copyField source="comment_*" dest="comment_"/>
 
   <!-- Copy values for fields that are needed for specific tasks like exact matching or sorting and can not use their tokenized (analyzed) versions. -->
   <copyField source="space" dest="space_exact"/>
   <copyField source="title_*" dest="title_sort"/>
   <copyField source="author_display" dest="author_display_sort"/>
 
+  <!-- Aliases -->
+  <!-- Retro compatibility with old Lucene module fields names -->
+  <copyField source="lang" dest="locale"/>
+
   <!--  The way we handle attachments/objects/properties requires that multiple attcontent_<language> fields are indexed for the same attachment Lucene document.
         This triggeres copyField each time and forces us to use multiValued="true" on attcontent, thus leading to useless storage overhead.
         To fix this, we are doing the copyField logic from the code, only once per attachment/object/property Lucene document.
-  <copyField source="objcontent_*" dest="objcontent_ml"/>
-  <copyField source="propertyvalue_*" dest="propertyvalue_ml"/>
-  <copyField source="attcontent_*" dest="attcontent_ml"/> -->
+  <copyField source="objcontent_*" dest="objcontent_"/>
+  <copyField source="propertyvalue_*" dest="propertyvalue_"/>
+  <copyField source="attcontent_*" dest="attcontent_"/> -->
 
   <types>
     <!-- field type definitions. The "name" attribute is
@@ -391,7 +396,7 @@
     </fieldType>
 
     <!-- Just like text_general except it reverses the characters of
-	 each token, to enable more efficient leading wildcard queries. -->
+         each token, to enable more efficient leading wildcard queries. -->
     <fieldType name="text_general_rev" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -681,11 +686,11 @@
     </fieldType>
 
     <!-- Indonesian -->
-    <fieldType name="text_id" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text_in" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_id.txt" enablePositionIncrements="true"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_in.txt" enablePositionIncrements="true"/>
         <!-- for a less aggressive approach (only inflectional suffixes), set stemDerivational to false -->
         <filter class="solr.IndonesianStemFilterFactory" stemDerivational="true"/>
       </analyzer>

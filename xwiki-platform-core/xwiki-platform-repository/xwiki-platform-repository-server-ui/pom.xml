@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-server-ui</artifactId>
   <name>XWiki Platform - Repository - Server UI</name>
@@ -46,6 +46,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-repository-server-api</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

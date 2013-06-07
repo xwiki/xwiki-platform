@@ -23,12 +23,18 @@ import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Scriptable API for easy handling of users. For the moment this API is very limited, containing
@@ -42,6 +48,14 @@ public class User extends Api
 {
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(User.class);
+    
+    /** User class reference. */
+    private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE));
+    
+    /** Reference resolver. */
+    private static final DocumentReferenceResolver<String> REFERENCE_RESOLVER = Utils.getComponent(
+            DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** The wrapped XWikiUser object. */
     private XWikiUser user;
@@ -136,4 +150,41 @@ public class User extends Api
             return null;
         }
     }
+    
+    /**
+     * Check if the password passed as argument is the user password. This method is used when a user
+     * wants to change its password. To make sure that it wouldn't be used to perform brute force attacks,
+     * we ensure that this is only used to check the current user password on its profile page.
+     * 
+     * @param password Password submitted.
+     * @return true if password is really the user password.
+     * @throws XWikiException error if authorization denied.
+     */
+    public boolean checkPassword(String password) throws XWikiException
+    {
+        EntityReference userReference = REFERENCE_RESOLVER.resolve(user.getUser());
+        EntityReference docReference = getXWikiContext().getDoc().getDocumentReference();
+        if (userReference.equals(getXWikiContext().getUserReference()) && userReference.equals(docReference)) {
+            try {
+                boolean result = false;
+                
+                XWikiDocument userDoc = getXWikiContext().getWiki().getDocument(userReference, getXWikiContext());
+                BaseObject obj = userDoc.getXObject(USERCLASS_REFERENCE);
+                // We only allow empty password from users having a XWikiUsers object.
+                if (obj != null) {
+                    final String stored = obj.getStringValue("password");
+                    result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
+                }
+
+                return result;
+            } catch (Throwable e) {
+                LOGGER.error("Failed to check password", e);
+                return false;
+            }
+        } else {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "You cannot use this method for checking another user password.", null);
+        }
+    }
+
 }

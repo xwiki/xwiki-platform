@@ -15,7 +15,7 @@
   <date>1320656877000</date>
   <contentUpdateDate>1320656877000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('platform.appwithinminutes.homePageTitle')</title>
+  <title>$services.localization.render('platform.appwithinminutes.homePageTitle')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -122,13 +122,13 @@
     </property>
   </object>
   <content>{{velocity}}
-$msg.get('platform.appwithinminutes.description')
+$services.localization.render('platform.appwithinminutes.description')
 
 #if($hasCreateSpace)
-  (% class="buttonwrapper" %)[[$msg.get('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
+  (% class="buttonwrapper" %)[[$services.localization.render('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
 
 #end
-= $msg.get('platform.appwithinminutes.appsLiveTableHeading') =##
+= $services.localization.render('platform.appwithinminutes.appsLiveTableHeading') =##
 #set($columnsProperties = {
   'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},
   'doc.author': {'type': 'text', 'link': 'author', 'size': 10, 'filterable': true, 'sortable': true},

@@ -105,15 +105,15 @@
       <category>Information</category>
     </property>
     <property>
-      <content>#panelheader($msg.get("wikimanager.widget.lastmodifications.title"))
+      <content>#panelheader($services.localization.render('wikimanager.widget.lastmodifications.title'))
   #includeInContext("WikiCode.LastWikiModificationsCode")
 #panelfooter()</content>
     </property>
     <property>
-      <description>Panel Description</description>
+      <description>Lists the last modifications made on all wikis.</description>
     </property>
     <property>
-      <name>LastWikiModificationsWidget</name>
+      <name>Recent modifications</name>
     </property>
     <property>
       <type>view</type>

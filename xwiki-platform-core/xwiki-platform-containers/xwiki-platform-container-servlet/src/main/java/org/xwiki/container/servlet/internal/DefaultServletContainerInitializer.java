@@ -19,10 +19,6 @@
  */
 package org.xwiki.container.servlet.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.ServletContext;
@@ -31,12 +27,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
-import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.container.servlet.ServletApplicationContext;
 import org.xwiki.container.servlet.ServletContainerException;
@@ -47,9 +41,6 @@ import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.url.InvalidURLException;
-import org.xwiki.url.XWikiURL;
-import org.xwiki.url.XWikiURLFactory;
 
 @Component
 @Singleton
@@ -116,30 +107,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
             }
         }
 
-        // 4) Extracts the XWiki URL from the original HTTP Request
-        // Note: Some URL Factories need to know the Servlet Context (since they can't guess it) and thus we're passing
-        // it as a parameter (which can be ignored by factories not using it).
-        try {
-            URL url = getURL(httpServletRequest);
-            XWikiURLFactory<URL> urlFactory = this.componentManager.getInstance(XWikiURLFactory.class);
-            XWikiURL xwikiURL =
-                urlFactory.createURL(url,
-                    Collections.<String, Object> singletonMap("ignorePrefix", httpServletRequest.getContextPath()));
-            this.container.getRequest().setProperty(Request.XWIKI_URL, xwikiURL);
-        } catch (MalformedURLException mue) {
-            // Happens if getURL() fails, shouldn't happen normally since the Servlet Container should always return
-            // valid URLs when getRequestURL() is called.
-            // TODO: However since we're still debugging this ignore errors FTM.
-            this.logger.debug("Failed to get URL from HTTP Request", mue);
-        } catch (ComponentLookupException cle) {
-            throw new ServletContainerException("Failed to locate URL Factory", cle);
-        } catch (InvalidURLException iue) {
-            // TODO: For the moment ignore any exception since we don't handle all types of URLs. This simply means
-            // that the XWiki URL won't be in the Request (and thus not in the Execution Context either).
-            this.logger.debug("Failed to extract XWiki URL", iue);
-        }
-
-        // 5) Call the request initializers to populate the Request further.
+        // 4) Call the request initializers to populate the Request further.
         try {
             RequestInitializerManager manager = this.componentManager.getInstance(RequestInitializerManager.class);
             manager.initializeRequest(this.container.getRequest());
@@ -147,7 +115,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
             throw new ServletContainerException("Failed to initialize request", e);
         }
 
-        // 6) Call Execution Context initializers to perform further Execution Context initializations
+        // 5) Call Execution Context initializers to perform further Execution Context initializations
         try {
             ExecutionContextManager manager = this.componentManager.getInstance(ExecutionContextManager.class);
             manager.initialize(this.execution.getContext());
@@ -172,23 +140,5 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     public void initializeSession(HttpServletRequest httpServletRequest)
     {
         this.container.setSession(new ServletSession(httpServletRequest));
-    }
-
-    /**
-     * Helper method to reconstruct a URL based on the HTTP Servlet Request (since this feature isn't offered by the
-     * Servlet specification).
-     * 
-     * @param httpServletRequest
-     * @return the URL as a real URL object
-     * @throws ServletContainerException if the original request isn't a valid URL (shouldn't happen)
-     */
-    private URL getURL(HttpServletRequest httpServletRequest) throws MalformedURLException
-    {
-        StringBuffer url = httpServletRequest.getRequestURL();
-        if (httpServletRequest.getQueryString() != null) {
-            url.append('?');
-            url.append(httpServletRequest.getQueryString());
-        }
-        return new URL(url.toString());
     }
 }

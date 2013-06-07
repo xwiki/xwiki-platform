@@ -28,7 +28,6 @@ import com.google.gwt.event.shared.EventHandler;
  */
 public interface PasteHandler extends EventHandler
 {
-
     /**
      * Called when a {@link PasteEvent} is fired.
      * 

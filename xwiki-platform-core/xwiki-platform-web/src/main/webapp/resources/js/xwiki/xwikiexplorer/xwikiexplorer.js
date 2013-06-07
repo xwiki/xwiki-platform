@@ -61,14 +61,14 @@ isc.ClassFactory.defineClass("XWEResultTree", isc.ResultTree);
 isc.XWEResultTree.addClassProperties({
     constants : {
         addNodeSuffix : "..new",
-        pageHint : "$msg.get('xwikiexplorer.page.hint')",
-        attachmentsTitle : "$msg.get('xwikiexplorer.attachments.title')",
-        attachmentsHint : "$msg.get('xwikiexplorer.attachments.hint')",
-        attachmentHint : "$msg.get('xwikiexplorer.attachment.hint')",
-        addPageTitle : "$msg.get('xwikiexplorer.addpage.title')",
-        addPageHint : "$msg.get('xwikiexplorer.addpage.hint')",
-        addAttachmentTitle : "$msg.get('xwikiexplorer.addattachment.title')",
-        addAttachmentHint : "$msg.get('xwikiexplorer.addattachment.hint')"
+        pageHint : "$services.localization.render('xwikiexplorer.page.hint')",
+        attachmentsTitle : "$services.localization.render('xwikiexplorer.attachments.title')",
+        attachmentsHint : "$services.localization.render('xwikiexplorer.attachments.hint')",
+        attachmentHint : "$services.localization.render('xwikiexplorer.attachment.hint')",
+        addPageTitle : "$services.localization.render('xwikiexplorer.addpage.title')",
+        addPageHint : "$services.localization.render('xwikiexplorer.addpage.hint')",
+        addAttachmentTitle : "$services.localization.render('xwikiexplorer.addattachment.title')",
+        addAttachmentHint : "$services.localization.render('xwikiexplorer.addattachment.hint')"
     }
 });
 
@@ -484,10 +484,12 @@ isc.XWEDataSource.addProperties({
      * Properties passed to the RPCManager when request are performed.
      */
     requestProperties : {
-        promptStyle: "cursor",
+        // Don't block the entire UI when data is being fetched (e.g. when the tree is loaded or when a node is expanded).
+        // See http://www.smartclient.com/smartgwt/javadoc/com/smartgwt/client/rpc/RPCManager.html#setShowPrompt(boolean)
+        showPrompt: false,
         // Prevent the RPCManager from displaying a warning message every time a request fails. This is especially
         // annoying when we try to open the tree to a page that doesn't exist.
-        // See http://www.smartclient.com/smartgwtee/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
+        // See http://www.smartclient.com/smartgwt/javadoc/com/smartgwt/client/rpc/RPCRequest.html#getWillHandleError()
         willHandleError: true
     },
 
@@ -567,7 +569,7 @@ isc.XWEWikiDataSource.addProperties({
 
 isc.XWEWikiDataSource.addMethods({
     init : function() {
-        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + this.wiki + "/spaces";
+        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + encodeURIComponent(this.wiki) + "/spaces";
         this.Super("init", arguments);
     },
 
@@ -621,15 +623,18 @@ isc.XWESpaceDataSource.addProperties({
 
 isc.XWESpaceDataSource.addMethods({
     init : function() {
-        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + this.wiki + "/spaces/"
-                + this.space + "/pages";
+        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + encodeURIComponent(this.wiki) + "/spaces/"
+                + encodeURIComponent(this.space) + "/pages";
         // Override transformRequest method to allow the insertion of a fake initial parent when
         // parent property is null. This fake initial parent is a regex that allow to retrieve only
         // pages without parent or with a parent outside of the current space.
         this.transformRequest = function (dsRequest) {
-            var prefixedSpace = this.wiki + XWiki.constants.wikiSpaceSeparator + this.space;
-            if (dsRequest.originalData.parentId == prefixedSpace || dsRequest.originalData.parentId == null) {
-                dsRequest.originalData.parentId = "^(?!" + prefixedSpace + "\.).*$";
+            var spaceReference = XWiki.Model.serialize(new XWiki.SpaceReference(this.wiki, this.space));
+            // The parent id is used as a regular expression so we must escape the special characters.
+            if (dsRequest.originalData.parentId == spaceReference || dsRequest.originalData.parentId == null) {
+                dsRequest.originalData.parentId = "^(?!" + RegExp.escape(spaceReference) + "\.).*$";
+            } else {
+                dsRequest.originalData.parentId = RegExp.escape(dsRequest.originalData.parentId);
             }
             return this.Super("transformRequest", arguments);
         };
@@ -685,8 +690,8 @@ isc.XWEPageDataSource.addProperties({
 
 isc.XWEPageDataSource.addMethods({
     init : function() {
-        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + this.wiki + "/spaces/" + this.space
-                + "/pages/" + this.page;
+        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + encodeURIComponent(this.wiki) + "/spaces/"
+            + encodeURIComponent(this.space) + "/pages/" + encodeURIComponent(this.page);
         this.Super("init", arguments);
     }
 });
@@ -723,9 +728,8 @@ isc.XWEAttachmentsDataSource.addProperties({
 
 isc.XWEAttachmentsDataSource.addMethods({
     init : function() {
-        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + this.wiki + "/spaces/"
-                + this.space + "/pages/"
-                + this.page + "/attachments";
+        this.dataURL = XWiki.constants.rest.baseRestURI + "wikis/" + encodeURIComponent(this.wiki) + "/spaces/"
+            + encodeURIComponent(this.space) + "/pages/" + encodeURIComponent(this.page) + "/attachments";
         this.Super("init", arguments);
     },
 
@@ -906,7 +910,8 @@ isc.XWETreeGrid.addMethods({
                 var fetchCallback = function(xmlDoc, xmlText, rpcResponse, rpcRequest) {
                     if (xmlDoc.httpResponseCode == 200) {
                         // XWiki.resource.get(reference) resolves the passed reference relative to the current document reference.
-                        var parentRes = xmlDoc.data[0].parentId ? XWiki.resource.get(xmlDoc.data[0].parentId) : { prefixedFullName: '', name: '' };
+                        var parentRes = xmlDoc.data[0].parentId ? XWiki.resource.get(xmlDoc.data[0].parentId,
+                            XWiki.EntityType.DOCUMENT) : { prefixedFullName: '', name: '' };
                         // Store the parent / child relationship in the cache to avoid the need of another request if this
                         // relationship is searched again.
                         rt.parentMap[resource.prefixedFullName] = parentRes;
@@ -1038,7 +1043,7 @@ isc.XWETreeGrid.addMethods({
     /**
      * Create a text input that will be used as a suggest for the tree.
      * The modifications on this input will be observed and the resource entered in the input,
-     * like Main.Dashboard for example, will be opened in the tree.
+     * like Dashboard.WebHome for example, will be opened in the tree.
      */
     drawInput : function() {
         var widthWithoutBorders = this.width - 6;
@@ -1056,7 +1061,7 @@ isc.XWETreeGrid.addMethods({
         if (this.displaySuggest) {
             input.className = "suggestDocuments";
             if (XWiki.domIsLoaded) {
-                // Activate the suggest input manually if the page has already been loaded 
+                // Activate the suggest input manually if the page has already been loaded
                 document.fire('xwiki:dom:updated', {elements: [this.htmlElement]});
             }
             // Call inputObserver for the first time when the first set of data arrives.

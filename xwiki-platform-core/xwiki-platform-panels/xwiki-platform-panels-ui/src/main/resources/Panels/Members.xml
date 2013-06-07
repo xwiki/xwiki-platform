@@ -106,14 +106,14 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('xe.panels.last.members'))
+#panelheader($services.localization.render('xe.panels.last.members'))
 #set ($list = $services.query.xwql('from doc.object(XWiki.XWikiUsers) as user order by doc.creationDate desc').addFilter('hidden').setLimit(5).setOffset(0).execute())
-|=(% scope="col" %)$msg.get('xe.panels.members.photo')|=(% scope="col" %)$msg.get('xe.panels.members.name')
+|=(% scope="col" %)$services.localization.render('xe.panels.members.photo')|=(% scope="col" %)$services.localization.render('xe.panels.members.name')
 #foreach ($user in $list)
   |{{html}}#smallUserAvatar($user){{/html}}|[[$xwiki.getUserName($user, false)&gt;&gt;$user]]
 #end
 
-[[$msg.get('xe.panels.members.viewall')&gt;&gt;Main.UserDirectory]]
+[[$services.localization.render('xe.panels.members.viewall')&gt;&gt;Main.UserDirectory]]
 #panelfooter()
 {{/velocity}}</content>
     </property>

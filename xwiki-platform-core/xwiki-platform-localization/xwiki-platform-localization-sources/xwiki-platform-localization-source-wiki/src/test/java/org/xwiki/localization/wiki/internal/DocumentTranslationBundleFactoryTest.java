@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
@@ -214,9 +214,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                         return null;
                     }
                 });
-
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(true));
 
                 allowing(mockXWiki).getStore();
                 will(returnValue(mockStore));

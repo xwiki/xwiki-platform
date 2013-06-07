@@ -19,8 +19,6 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -39,8 +37,8 @@ public class WikiSearchQueryResourceImpl extends BaseSearchResult implements Wik
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s",
-                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchQueryResource.class).build(wikiName)
-                            .toString(), QUERY_TEMPLATE_INFO));
+                Utils.createURI(uriInfo.getBaseUri(), WikiSearchQueryResource.class, wikiName).toString(),
+                QUERY_TEMPLATE_INFO));
 
             searchResults.getSearchResults().addAll(searchQuery(query, queryTypeString, wikiName, null,
                     Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(

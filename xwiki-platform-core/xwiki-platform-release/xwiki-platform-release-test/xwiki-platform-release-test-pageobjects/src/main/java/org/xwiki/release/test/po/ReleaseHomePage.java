@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents actions that can be done on the Release.WebHome page.
- *
+ * 
  * @version $Id$
  * @since 5.0M1
  */
@@ -70,12 +70,17 @@ public class ReleaseHomePage extends ViewPage
     }
 
     /**
-     * @return the Release livetable element
+     * @return the Release live table element
      */
     public LiveTableElement getReleaseLiveTable()
     {
-        LiveTableElement lt = new LiveTableElement("releases");
-        lt.waitUntilReady();
-        return lt;
+        return new LiveTableElement("releases");
+    }
+
+    @Override
+    public ReleaseHomePage waitUntilPageIsLoaded()
+    {
+        getReleaseLiveTable().waitUntilReady();
+        return this;
     }
 }

@@ -124,11 +124,8 @@ public abstract class AbstractCache<T> implements Cache<T>
             try {
                 ((DisposableCacheValue) value).dispose();
             } catch (Throwable e) {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn(
-                        "Error when trying to dispose a cache object of cache [" + configuration.getConfigurationId()
-                            + "]", e);
-                }
+                LOGGER.warn("Error when trying to dispose a cache object of cache [{}]",
+                    this.configuration.getConfigurationId(), e);
             }
         }
     }

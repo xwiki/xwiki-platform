@@ -26,13 +26,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jmock.Expectations;
 import org.jmock.lib.action.CustomAction;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -44,7 +43,7 @@ import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.test.RepositoryUtil;
+import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
@@ -59,6 +58,7 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -93,7 +93,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
     private ExtensionId localXarExtensiontId2;
 
-    private RepositoryUtil repositoryUtil;
+    private RepositoryUtils repositoryUtil;
 
     private JobManager jobManager;
 
@@ -113,7 +113,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.repositoryUtil = new RepositoryUtil(getComponentManager(), getMockery());
+        this.repositoryUtil = new RepositoryUtils(getComponentManager(), getMockery());
         this.repositoryUtil.setup();
 
         // mock
@@ -261,9 +261,6 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                         return classes.get(documentReference.getName());
                     }
                 });
-
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(true));
 
                 allowing(mockXWiki).getStore();
                 will(returnValue(mockStore));
@@ -607,6 +604,16 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
+        // Do some local modifications
+
+        XWikiDocument deletedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "deletedpage"), getContext());
+        XWikiDocument modifieddeletedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"), getContext());
+
+        this.mockXWiki.deleteDocument(deletedpage, getContext());
+        this.mockXWiki.deleteDocument(modifieddeletedpage, getContext());
+
         // upgrade
 
         install(this.localXarExtensiontId2, "wiki", this.contextUser);
@@ -632,6 +639,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
         Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
+        Assert.assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
+        Assert.assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
+        Assert.assertEquals("Wrong hidden", true, modifiedpage.isHidden());
+        Assert.assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
+
         BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
         Assert.assertEquals("property", baseClass.getField("property").getName());
@@ -648,14 +660,27 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         XWikiDocument newPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space2", "page2"), getContext());
 
-        Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", newPage.isNew());
+        Assert.assertFalse("Document wiki:space2.page2 has not been saved in the database", newPage.isNew());
 
         // space1.page1
 
         XWikiDocument removedPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
 
-        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", removedPage.isNew());
+        Assert.assertTrue("Document wiki:space1.page1 has not been removed from the database", removedPage.isNew());
+
+        // space.deletedpage
+
+        deletedpage = this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "deletedpage"), getContext());
+
+        Assert.assertTrue("Document wiki:space.deleted has been restored", deletedpage.isNew());
+
+        // space.modifieddeletedpage
+
+        modifieddeletedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"), getContext());
+
+        Assert.assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
     }
 
     @Test
@@ -675,6 +700,16 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         });
 
         install(this.localXarExtensiontId1, null, this.contextUser);
+
+        // Do some local modifications
+
+        XWikiDocument deletedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "deletedpage"), getContext());
+        XWikiDocument modifieddeletedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"), getContext());
+
+        this.mockXWiki.deleteDocument(deletedpage, getContext());
+        this.mockXWiki.deleteDocument(modifieddeletedpage, getContext());
 
         // upgrade
 
@@ -701,6 +736,11 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
         Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
+        Assert.assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
+        Assert.assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
+        Assert.assertEquals("Wrong hidden", true, modifiedpage.isHidden());
+        Assert.assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
+
         BaseClass baseClass = modifiedpage.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
         Assert.assertEquals("property", baseClass.getField("property").getName());
@@ -717,14 +757,27 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         XWikiDocument newPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki1", "space2", "page2"), getContext());
 
-        Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", newPage.isNew());
+        Assert.assertFalse("Document wiki:space2.page2 has not been saved in the database", newPage.isNew());
 
         // space1.page1
 
         XWikiDocument removedPage =
             this.mockXWiki.getDocument(new DocumentReference("wiki1", "space1", "page1"), getContext());
 
-        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", removedPage.isNew());
+        Assert.assertTrue("Document wiki:space1.page1 has not been removed from the database", removedPage.isNew());
+
+        // space.deletedpage
+
+        deletedpage = this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "deletedpage"), getContext());
+
+        Assert.assertTrue("Document wiki:space.deleted has been restored", deletedpage.isNew());
+
+        // space.modifieddeletedpage
+
+        modifieddeletedpage =
+            this.mockXWiki.getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"), getContext());
+
+        Assert.assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
     }
 
     @Test
@@ -963,6 +1016,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     public void testImportDocumentWithDifferentExistingMandatoryDocument() throws Throwable
     {
         XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        existingDocument.setSyntax(Syntax.XWIKI_2_0);
         this.mockXWiki.saveDocument(existingDocument, "", true, getContext());
 
         // register a mandatory document initializer

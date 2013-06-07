@@ -15,7 +15,7 @@
   <date>1297363233000</date>
   <contentUpdateDate>1297363233000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.index.attachmentsTrash")</title>
+  <title>$services.localization.render('platform.index.attachmentsTrash')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -139,8 +139,8 @@ XWiki.index.trash.attachments.displayEntry = function (row, i, table) {
     var delete_ = new Element('a', {
         'href' : row.deleteUrl,
         'class' : "tool delete",
-        'title' : "$msg.get('platform.index.trashAttachmentsActionsDeleteTooltip')"
-      }).update("$msg.get('platform.index.trashAttachmentsActionsDeleteText')");
+        'title' : "$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"
+      }).update("$services.localization.render('platform.index.trashAttachmentsActionsDeleteText')");
     actions.appendChild(delete_);
     delete_.observe('click', XWiki.index.trash.attachments.confirmDelete.bindAsEventListener(delete_, table, i));
   }
@@ -186,10 +186,10 @@ XWiki.index.trash.attachments.confirmDelete = function(event, table, rowIdx) {
       },
       /* Interaction parameters */
       {
-         confirmationText: "$msg.get('core.recyclebin.completelyDeleteConfirm')",
-         progressMessageText : "$msg.get('platform.index.trashAttachmentsDeleteInProgress')",
-         successMessageText : "$msg.get('platform.index.trashAttachmentsDeleteDone')",
-         failureMessageText : "$msg.get('platform.index.trashAttachmentsDeleteFailed')"
+         confirmationText: "$services.localization.render('core.recyclebin.completelyDeleteConfirm')",
+         progressMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteInProgress')",
+         successMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteDone')",
+         failureMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteFailed')"
       }
       );
   }
@@ -479,7 +479,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
   #set($deletedAttachments = $xwiki.search('select count(datt.id) from DeletedAttachment as datt').get(0))
   #if($deletedAttachments == 0)
 
-    {{info}}$msg.get('platform.index.trashAttachmentsEmpty'){{/info}}
+    {{info}}$services.localization.render('platform.index.trashAttachmentsEmpty'){{/info}}
 
   #else
   #macro(displayDeletedAttachment $id)
@@ -493,7 +493,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
       &lt;td&gt;$xwiki.getLocalUserName($datt.getDeleter())&lt;/td&gt;
       &lt;td class="itemActions"&gt;
         #if($datt.canDelete())
-          &lt;a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$msg.get('platform.index.trashAttachmentsActionsDeleteTooltip')"&gt;$msg.get('platform.index.trashAttachmentsDeleteText')&lt;/a&gt;
+          &lt;a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashAttachmentsDeleteText')&lt;/a&gt;
         #end
       &lt;/td&gt;
     &lt;/tr&gt;
@@ -512,11 +512,11 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
   #pagination($paginationParameters)
   &lt;table id="searchResults" class="xwiki-livetable xwiki-livetable-display"&gt;
     &lt;thead class="xwiki-livetable-display-header"&gt;&lt;tr&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$msg.get('platform.index.trashAttachments.datt.filename')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashAttachments.datt.docName')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashAttachments.datt.date')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashAttachments.datt.deleter')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashAttachments.actions')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$services.localization.render('platform.index.trashAttachments.datt.filename')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.datt.docName')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.datt.date')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.datt.deleter')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.actions')&lt;/th&gt;
     &lt;/tr&gt;&lt;/thead&gt;
     &lt;tbody class="xwiki-livetable-display-body"&gt;
     #foreach($item in $xwiki.search('select datt.id from DeletedAttachment as datt order by datt.filename asc', $paginationParameters.itemsPerPage, $paginationParameters.firstItem))

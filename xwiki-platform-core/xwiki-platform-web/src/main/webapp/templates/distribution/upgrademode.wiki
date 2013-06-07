@@ -1,0 +1,30 @@
+##syntax=xwiki/2.1
+{{velocity}}
+#if ("$!request.action" == '')
+  ## Display the step.
+  {{translation key="platform.extension.distributionWizard.upgrademodeStepSummary"/}}
+
+  (% class="xLabel" %)
+  {{translation key="platform.extension.distributionWizard.upgradeStepModeLabel"/}}
+
+  (% class="xHint" %)
+  {{translation key="platform.extension.distributionWizard.upgradeStepModeHint"/}}
+
+  (((
+    #set ($defaultUpgradeMode = $services.distribution.jobStatus.upgradeMode)
+    #foreach ($mode in ['WIKI', 'ALLINONE'])
+      {{html}}<label for="upgradeMode$mode">
+        <input type="radio" id="upgradeMode$mode" name="upgradeMode" value="$mode"
+          #if ($mode == $defaultUpgradeMode) checked="checked"#end />
+        $services.localization.render("platform.extension.distributionWizard.upgradeStep.mode.${mode}.label")
+      </label>{{/html}}
+
+    #end
+  )))
+
+  #set ($showCompleteStepButton = true)
+#elseif ($request.action == 'COMPLETE_STEP' && "$!request.upgradeMode" != '')
+  ## Set the upgrade mode before moving to the next step.
+  #set ($discard = $services.distribution.jobStatus.question.step.setUpgradeMode($request.upgradeMode))
+#end
+{{/velocity}}

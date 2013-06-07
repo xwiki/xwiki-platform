@@ -1,10 +1,10 @@
-#if ($type == 'edit')
+#if ($type == 'edit' || $type == 'search')
   #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
   #userPicker_import($isMultiSelect)
   #set($id = $escapetool.xml("${prefix}${name}"))
   <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
     class="suggestGroups#if ($isMultiSelect) multipleSelection#end" />
-#elseif ($type == 'view')
+#elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedGroups = [])
   #foreach ($value in $values)
@@ -33,7 +33,7 @@
         <div>
           <span class="user-alias">$escapetool.xml($groupReference.name)</span>
           ## Display the wiki only for local groups.
-          #if ($xwiki.isVirtualMode() && $groupReference.wikiReference.name != $xcontext.getMainWikiName())
+          #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
             <span class="user-wiki">$escapetool.xml($groupReference.wikiReference.name)</span>
           #end
         </div>

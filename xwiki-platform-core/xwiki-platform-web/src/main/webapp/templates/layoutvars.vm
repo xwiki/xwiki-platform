@@ -88,5 +88,8 @@
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)
 
+#set ($displayQuickSearch = true)
+#set ($displayLanguageChoice = true)
+
 ## To let custom skins easily override layout variables, we evaluate a template that is empty by default.
 #template("layoutExtraVars.vm")

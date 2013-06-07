@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-workspace</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-workspace-ui</artifactId>
   <packaging>xar</packaging>
@@ -84,6 +84,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+        <version>${project.version}</version>
         <executions>
           <execution>
             <phase>process-resources</phase>
@@ -110,6 +111,7 @@
           <plugin>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+            <version>${project.version}</version>
             <dependencies>
               <dependency>
                 <groupId>com.cenqua.clover</groupId>

@@ -32,6 +32,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 /**
  * Action used for saving and proceeding to view the saved page.
+ * <p>
  * Used as a generic action for saving documents.
  * 
  * @version $Id$
@@ -57,9 +58,6 @@ public class SaveAction extends PreviewAction
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
 
-        // This is pretty useless, since contexts aren't shared between threads.
-        // It just slows down execution.
-        String title = doc.getTitle();
         // Check save session
         int sectionNumber = 0;
         if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
@@ -78,17 +76,19 @@ public class SaveAction extends PreviewAction
         XWikiDocument tdoc;
 
         if (doc.isNew() || (language == null) || (language.equals("")) || (language.equals("default"))
-            || (language.equals(doc.getDefaultLanguage())))
-        {
+            || (language.equals(doc.getDefaultLanguage()))) {
+            // Saving the default document translation.
             // Need to save parent and defaultLanguage if they have changed
             tdoc = doc;
         } else {
             tdoc = doc.getTranslatedDocument(language, context);
             if ((tdoc == doc) && xwiki.isMultiLingual(context)) {
+                // Saving a new document translation.
                 tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(language);
                 tdoc.setStore(doc.getStore());
             } else if (tdoc != doc) {
+                // Saving an existing document translation (but not the default one).
                 // Same as above, clone the object retrieved from the store cache.
                 tdoc = tdoc.clone();
             }
@@ -117,7 +117,6 @@ public class SaveAction extends PreviewAction
             String sectionContent = sectionDoc.getContent() + "\n";
             String content = tdoc.updateDocumentSection(sectionNumber, sectionContent);
             tdoc.setContent(content);
-            tdoc.setTitle(title);
             tdoc.setComment(sectionDoc.getComment());
             tdoc.setMinorEdit(sectionDoc.isMinorEdit());
         } else {

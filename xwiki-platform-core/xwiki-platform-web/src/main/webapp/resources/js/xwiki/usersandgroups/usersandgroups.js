@@ -2,7 +2,7 @@
 MSCheckbox = Class.create({
   /**
     * @todo Make confirmations generic.
-    * @todo msg.get
+    * @todo L10N
     * @todo Send the state number, or a generic map {state => sendValue}
     * @todo Configuration: automatic save, or just change the value.
     * @todo "Busy" icon when saving.
@@ -91,9 +91,9 @@ MSCheckbox = Class.create({
       // 1. The current user is clearing / denying himself any right.
       if (self.currentUorG == window.currentUser) {
         if (nxtst == 2) {
-          var denymessage = '$escapetool.javascript($msg.get("rightsmanager.denyrightforcurrentuser"))'.replace('__right__', self.right);
+          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforcurrentuser'))".replace('__right__', self.right);
           if (!confirm(denymessage)) {
-            var clearmessage = '$escapetool.javascript($msg.get("rightsmanager.clearrightforcurrentuserinstead"))'.replace('__right__', self.right);
+            var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforcurrentuserinstead'))".replace('__right__', self.right);
             if (confirm(clearmessage)) {
               action = "clear";
               self.state = 2;
@@ -103,7 +103,7 @@ MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = '$escapetool.javascript($msg.get("rightsmanager.clearrightforcurrentuser"))'.replace('__right__', self.right);
+          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforcurrentuser'))".replace('__right__', self.right);
           if (!confirm(clearmessage)) {
             return;
           }
@@ -112,10 +112,10 @@ MSCheckbox = Class.create({
       // 2. The current user is clearing / denying any rights for a group he belongs to.
       else if (self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
         if (nxtst == 2) {
-          var denymessage = '$escapetool.javascript($msg.get("rightsmanager.denyrightforgroup"))'.replace(/__right__/g, self.right);
+          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforgroup'))".replace(/__right__/g, self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
-            var clearmessage = '$escapetool.javascript($msg.get("rightsmanager.clearrightforgroupinstead"))'.replace(/__right__/g, self.right);
+            var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforgroupinstead'))".replace(/__right__/g, self.right);
             clearmessage = clearmessage.replace('__name__', self.currentUorG);
             if (confirm(clearmessage)) {
               action = "clear";
@@ -126,7 +126,7 @@ MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = '$escapetool.javascript($msg.get("rightsmanager.clearrightforgroup"))'.replace(/__right__/g, self.right);
+          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforgroup'))".replace(/__right__/g, self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -136,13 +136,13 @@ MSCheckbox = Class.create({
       // 3. The current user is is clearing / denying admin right for any user / group.
       else if (self.right == "admin") {
         if (nxtst == 2) {
-          var denymessage = '$escapetool.javascript($msg.get("rightsmanager.denyrightforuorg"))'.replace('__right__', self.right);
+          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforuorg'))".replace('__right__', self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
             return;
           }
         } else if (nxtst == 0) {
-          var clearmessage = '$escapetool.javascript($msg.get("rightsmanager.clearrightforuorg"))'.replace('__right__', self.right);
+          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforuorg'))".replace('__right__', self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -172,13 +172,13 @@ MSCheckbox = Class.create({
             //if an error occurred while trying to save a right rule, display an alert
             // and refresh the page, since probably the user does not have the right to perform
             // that action
-            alert("$msg.get('platform.core.rightsManagement.saveFailure')");
+            alert("$services.localization.render('platform.core.rightsManagement.saveFailure')");
             var rURL = unescape(window.location.pathname);
             window.location.href = rURL;
           }
         },
         onFailure: function() {
-          alert("$msg.get('platform.core.rightsManagement.ajaxFailure')");
+          alert("$services.localization.render('platform.core.rightsManagement.ajaxFailure')");
         },
         onComplete: function() {
           delete self.req;
@@ -233,7 +233,7 @@ function displayUsers(row, i, table, form_token)
     //edit user
     var edit = document.createElement('img');
     edit.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/edit.png")';
-    edit.title = "$msg.get('edit')";
+    edit.title = "$services.localization.render('edit')";
     Event.observe(edit, 'click', editUserOrGroup(userinlineurl, usersaveurl, docurl));
     edit.className = 'icon-manage';
     manage.appendChild(edit);
@@ -249,7 +249,7 @@ function displayUsers(row, i, table, form_token)
       Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "user", form_token));
       del.className = 'icon-manage';
     }
-    del.title = "$msg.get('delete')";
+    del.title = "$services.localization.render('delete')";
     manage.appendChild(del);
   }
 
@@ -295,14 +295,14 @@ function displayGroups(row, i, table, form_token)
     //delete group
     var del = document.createElement('img');
     del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clear.png")';
-    del.title = "$msg.get('delete')";
+    del.title = "$services.localization.render('delete')";
     Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "group", form_token));
     del.className = 'icon-manage';
 
     //edit user
     var edit = document.createElement('img');
     edit.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/edit.png")';
-    edit.title = "$msg.get('edit')";
+    edit.title = "$services.localization.render('edit')";
     Event.observe(edit, 'click', editUserOrGroup(userinlineurl, usersaveurl, docurl));
     edit.className = 'icon-manage';
 
@@ -348,7 +348,7 @@ function displayMembers(row, i, table, form_token)
       Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl, form_token));
       del.className = 'icon-manage';
     }
-    del.title = "$msg.get('delete')";
+    del.title = "$services.localization.render('delete')";
     membermanage.appendChild(del);
     tr.appendChild(membermanage);
   }
@@ -425,7 +425,7 @@ function deleteUserOrGroup(i, table, docname, uorg, form_token)
         url += "&form_token=" + form_token;
     }
     if (uorg == "user") {
-      if (confirm('$escapetool.javascript($msg.get("rightsmanager.confirmdeleteuser"))'.replace('__name__', docname))) {
+      if (confirm("$escapetool.javascript($services.localization.render('rightsmanager.confirmdeleteuser'))".replace('__name__', docname))) {
         new Ajax.Request(url, {
           method: 'get',
           onSuccess: function(transport) {
@@ -434,7 +434,7 @@ function deleteUserOrGroup(i, table, docname, uorg, form_token)
         });
       }
     } else {
-      if (confirm('$escapetool.javascript($msg.get("rightsmanager.confirmdeletegroup"))'.replace('__name__', docname))) {
+      if (confirm("$escapetool.javascript($services.localization.render('rightsmanager.confirmdeletegroup'))".replace('__name__', docname))) {
         new Ajax.Request(url, {
           method: 'get',
           onSuccess: function(transport) {
@@ -454,7 +454,7 @@ function deleteMember(i, table, docname, docurl, form_token)
     if (form_token != undefined) {
       url += "&form_token=" + form_token;
     }
-    if (confirm('$escapetool.javascript($msg.get("rightsmanager.confirmdeletemember"))')) {
+    if (confirm("$escapetool.javascript($services.localization.render('rightsmanager.confirmdeletemember'))")) {
       new Ajax.Request(url, {
         method: 'get',
         onSuccess: function(transport) {

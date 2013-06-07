@@ -62,7 +62,6 @@
 # Wiki Manager translation page
 wikimanager.wikimanager=Wiki Manager
 wikimanager.pluginnotenabled=The Wiki Manager plugin is not enabled. This page will not work properly. Make sure &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; is listed in &lt;tt&gt;xwiki.plugins&lt;/tt&gt; parameter in &lt;tt&gt;xwiki.cfg&lt;/tt&gt; file.
-wikimanager.notinvirtualmode=The wiki is not in virtual mode. This means you can only access main wiki. Make sure you have &lt;tt&gt;xwiki.virtual=1&lt;/tt&gt; in &lt;tt&gt;xwiki.cfg&lt;/tt&gt; file.
 wikimanager.wikinameneeded=A name for the wiki is necessary
 
 # CONF

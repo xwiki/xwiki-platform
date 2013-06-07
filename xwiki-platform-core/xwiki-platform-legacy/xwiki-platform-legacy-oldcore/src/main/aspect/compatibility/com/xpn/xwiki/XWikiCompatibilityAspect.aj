@@ -32,6 +32,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.XMLUtils;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.url.XWikiEntityURL;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.EntityType;
 
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
@@ -48,6 +54,7 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -59,6 +66,9 @@ public privileged aspect XWikiCompatibilityAspect
     private static Map XWiki.threadMap = new HashMap();
 
     private XWikiNotificationManager XWiki.notificationManager;
+
+    private EntityReferenceResolver<EntityReference> XWiki.defaultReferenceEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.TYPE_REFERENCE);
 
     /**
      * Transform a text in a URL compatible text
@@ -623,5 +633,114 @@ public privileged aspect XWikiCompatibilityAspect
     public File XWiki.getWorkDirectory(XWikiContext context)
     {
         return this.environment.getPermanentDirectory();
+    }
+
+    /**
+     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.XWikiURLFactory} instead
+     */
+    @Deprecated
+    public XWikiDocument XWiki.getDocumentFromPath(String path, XWikiContext context) throws XWikiException
+    {
+        return getDocument(getDocumentReferenceFromPath(path, context), context);
+    }
+
+    /**
+     * @since 2.3M1
+     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.XWikiURLFactory} instead
+     */
+    @Deprecated
+    public DocumentReference XWiki.getDocumentReferenceFromPath(String path, XWikiContext context)
+    {
+        // TODO: Remove this and use XWikiURLFactory instead in XWikiAction and all entry points.
+        List<String> segments = new ArrayList<String>();
+        for (String segment : path.split("/", -1)) {
+            segments.add(Util.decodeURI(segment, context));
+        }
+        // Remove the first segment if it's empty to cater for cases when the path starts with "/"
+        if (segments.size() > 0 && segments.get(0).length() == 0) {
+            segments.remove(0);
+        }
+
+        XWikiEntityURL entityURL = buildEntityURLFromPathSegments(new WikiReference(context.getDatabase()), segments);
+
+        return new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
+    }
+
+    /**
+     * @deprecated since 2.3M1 use {@link #getDocumentReferenceFromPath(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWiki.getDocumentNameFromPath(String path, XWikiContext context)
+    {
+        return this.localStringEntityReferenceSerializer.serialize(getDocumentReferenceFromPath(path, context));
+    }
+
+    /**
+     * @deprecated since 2.3M1 use {@link #getDocumentReferenceFromPath(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWiki.getDocumentName(XWikiRequest request, XWikiContext context)
+    {
+        return this.localStringEntityReferenceSerializer.serialize(getDocumentReference(request, context));
+    }
+
+    /**
+     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.XWikiURLFactory} instead
+     */
+    @Deprecated
+    private XWikiEntityURL XWiki.buildEntityURLFromPathSegments(WikiReference wikiReference, List<String> pathSegments)
+    {
+        XWikiEntityURL entityURL;
+
+        // Rules based on counting the url segments:
+        // - 0 segments (e.g. ""): default document reference, "view" action
+        // - 1 segment (e.g. "/", "/Document"): default space, specified document (and default if empty), "view" action
+        // - 2 segments (e.g. "/Space/", "/Space/Document"): specified space, document (and default doc if empty),
+        //   "view" action
+        // - 3 segments (e.g. "/action/Space/Document"): specified space, document (and default doc if empty),
+        //   specified action
+        // - 4 segments (e.g. "/download/Space/Document/attachment"): specified space, document and attachment (and
+        //   default doc if empty), "download" action
+        // - 4 segments or more (e.g. "/action/Space/Document/whatever/else"): specified space, document (and default
+        //     doc if empty), specified "action" (if action != "download"), trailing segments ignored
+
+        String spaceName = null;
+        String pageName = null;
+        String attachmentName = null;
+        String action = "view";
+
+        if (pathSegments.size() == 1) {
+            pageName = pathSegments.get(0);
+        } else if (pathSegments.size() == 2) {
+            spaceName = pathSegments.get(0);
+            pageName = pathSegments.get(1);
+        } else if (pathSegments.size() >= 3) {
+            action = pathSegments.get(0);
+            spaceName = pathSegments.get(1);
+            pageName = pathSegments.get(2);
+            if (action.equals("download") && pathSegments.size() >= 4) {
+                attachmentName = pathSegments.get(3);
+            }
+        }
+
+        // Normalize the extracted space/page to resolve empty/null values and replace them with default values.
+        EntityReference reference = wikiReference;
+        EntityType entityType = EntityType.DOCUMENT;
+        if (!StringUtils.isEmpty(spaceName)) {
+            reference = new EntityReference(spaceName, EntityType.SPACE, reference);
+        }
+        if (!StringUtils.isEmpty(pageName)) {
+            reference = new EntityReference(pageName, EntityType.DOCUMENT, reference);
+        }
+        if (!StringUtils.isEmpty(attachmentName)) {
+            reference = new EntityReference(attachmentName, EntityType.ATTACHMENT, reference);
+            entityType = EntityType.ATTACHMENT;
+        }
+        reference = this.defaultReferenceEntityReferenceResolver.resolve(reference, entityType);
+
+        entityURL = new XWikiEntityURL(reference);
+        entityURL.setAction(action);
+
+        return entityURL;
     }
 }

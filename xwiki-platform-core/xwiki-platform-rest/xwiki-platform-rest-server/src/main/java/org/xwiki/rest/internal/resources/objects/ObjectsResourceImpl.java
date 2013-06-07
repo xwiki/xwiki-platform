@@ -24,7 +24,6 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
@@ -124,11 +123,10 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             doc.save();
 
-            return Response.created(UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName,
-                    spaceName, pageName, object.getClassName(), objectNumber))
-                    .entity(DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                            componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager), false))
-                    .build();
+            return Response.created(Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaceName,
+                pageName, object.getClassName(), objectNumber)).entity(DomainObjectFactory.createObject(objectFactory,
+                    uriInfo.getBaseUri(), Utils.getXWikiContext(componentManager), doc, xwikiObject, false,
+                    Utils.getXWikiApi(componentManager), false)).build();
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

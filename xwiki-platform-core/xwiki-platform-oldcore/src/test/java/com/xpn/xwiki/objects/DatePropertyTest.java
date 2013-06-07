@@ -27,7 +27,7 @@ import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link DateProperty}.

@@ -342,7 +342,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassDocument(XWikiContext context) throws XWikiException
+    protected void checkClassDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClass) {
             return;
@@ -361,10 +361,13 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc = new XWikiDocument();
                 doc.setSpace(getClassSpace());
                 doc.setName(getClassName());
-                doc.setParent(DEFAULT_XWIKICLASS_PARENT);
                 doc.setCreator(XWikiRightService.SUPERADMIN_USER);
                 doc.setAuthor(doc.getCreator());
                 needsUpdate = true;
+            }
+
+            if (doc.isNew()) {
+                doc.setParent(DEFAULT_XWIKICLASS_PARENT);
             }
 
             this.baseClass = doc.getXClass();
@@ -372,7 +375,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             needsUpdate |= updateBaseClass(this.baseClass);
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class document", context);
             }
         } finally {
             this.checkingClass = false;
@@ -425,7 +428,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassSheetDocument(XWikiContext context) throws XWikiException
+    protected void checkClassSheetDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClassSheet) {
             return;
@@ -444,7 +447,6 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc = new XWikiDocument();
                 doc.setSpace(getClassSheetSpace());
                 doc.setName(getClassSheetName());
-                doc.setParent(getClassFullName());
                 needsUpdate = true;
             }
 
@@ -454,10 +456,11 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 String content = getResourceDocumentContent(documentContentPath);
                 doc.setContent(content != null ? content : getClassSheetDefaultContent());
                 doc.setSyntax(Syntax.XWIKI_1_0);
+                doc.setParent(getClassFullName());
             }
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class sheet document", context);
             }
         } finally {
             this.checkingClassSheet = false;
@@ -476,7 +479,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassTemplateDocument(XWikiContext context) throws XWikiException
+    protected void checkClassTemplateDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClassTemplate) {
             return;
@@ -517,7 +520,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             needsUpdate |= updateClassTemplateDocument(doc);
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class template document", context);
             }
         } finally {
             this.checkingClassTemplate = false;

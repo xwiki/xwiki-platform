@@ -15,7 +15,7 @@
   <date>1307710513000</date>
   <contentUpdateDate>1307710513000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('platform.workspace.workspaceUsersTitle')</title>
+  <title>$services.localization.render('platform.workspace.workspaceUsersTitle')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -122,10 +122,10 @@
         editgrouptable.clearCache();
         editgrouptable.getRows(start, end, start, end);
         // Show notification message.
-        new XWiki.widgets.Notification("$msg.get('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
       },
       onFailure: function(response) {
-        new XWiki.widgets.Notification("$msg.get('xe.admin.groups.addFailure')" + response.statusText, 'error', {timeout: 5});
+        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" + response.statusText, 'error', {timeout: 5});
       }
     });
   }
@@ -321,25 +321,25 @@
         #set ($newUserObject = $groupDoc.newObject($xwikiGroupsClass))
         #set ($temp = $newUserObject.set('member', $candidateMember.userName))
       #end
-      #set ($notificationMessage = $msg.get('platform.workspace.joinRequestAcceptedNotification', $workspacePrettyName))
+      #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestAcceptedNotification', [$workspacePrettyName]))
     #elseif ($request.rejectUser)
       #set ($temp = $candidateMember.set('status', 'rejected'))
-      #set ($notificationMessage = $msg.get('platform.workspace.joinRequestRejectedNotification', $workspacePrettyName))
+      #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestRejectedNotification', [$workspacePrettyName]))
     #end
     ## Save changes.
-    #set ($temp = $groupDoc.save($msg.get('platform.workspace.candidateHandledSaveComment', [$candidateNumber, $candidateMember.userName]), true))
+    #set ($temp = $groupDoc.save($services.localization.render('platform.workspace.candidateHandledSaveComment', [$candidateNumber, $candidateMember.userName]), true))
     ## Notify the user.
     #if ("$!{request.reviewerComment}" != '')
       ## FIXME: replace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
       #set ($notificationMessage = "${notificationMessage}
-$msg.get('platform.workspace.candidateHandledComment') ${request.reviewerComment}")
+$services.localization.render('platform.workspace.candidateHandledComment') ${request.reviewerComment}")
     #end
     #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userName))
     #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
     #if ($request.acceptUser)
-      {{info}}$msg.get('platform.workspace.candidateAcceptedSuccess'){{/info}}
+      {{info}}{{translation key="platform.workspace.candidateAcceptedSuccess"/}}{{/info}}
     #else
-      {{info}}$msg.get('platform.workspace.candidateRejectedSuccess'){{/info}}
+      {{info}}{{translation key="platform.workspace.candidateRejectedSuccess"/}}{{/info}}
     #end
   #end
 #elseif($hasAdmin &amp;&amp; $request.inviteUser)
@@ -356,7 +356,7 @@ $msg.get('platform.workspace.candidateHandledComment') ${request.reviewerComment
   #foreach ($name in $names)
     #if ($groupDoc.getObject($xwikiGroupsClass, 'member', $name))
       #set ($discard = $alreadyMembers.add($name))
-      {{error}}$msg.get('platform.workspace.inviteUserAlreadyMember', [$xwiki.getUserName($name, false)]){{/error}}
+      {{error}}$services.localization.render('platform.workspace.inviteUserAlreadyMember', [$xwiki.getUserName($name, false)]){{/error}}
     #end
   #end
   #set ($discard = $names.removeAll($alreadyMembers))
@@ -370,7 +370,7 @@ $msg.get('platform.workspace.candidateHandledComment') ${request.reviewerComment
         #if ($candidateMember.getProperty('type').getValue() == 'request')
           #set ($errorMessageKey = 'platform.workspace.inviteRequestAlreadyExists')
         #end
-        {{error}}$msg.get($errorMessageKey, [$xwiki.getUserName($name, false)]){{/error}}
+        {{error}}$services.localization.render($errorMessageKey, [$xwiki.getUserName($name, false)]){{/error}}
         #set ($discard = $alreadyInvited.add($name))
         #break
       #end
@@ -388,17 +388,17 @@ $msg.get('platform.workspace.candidateHandledComment') ${request.reviewerComment
     #set ($temp = $newInvitationObject.set('userName', $userName))
     ##set ($temp = $newInvitationObject.set('reviewerPrivateComment', "$!{request.reviewerPrivateComment}"))
     ## Save the invitation.
-    #set ($temp = $groupDoc.save($msg.get('platform.workspace.inviteSaveComment', $userName), true))
+    #set ($temp = $groupDoc.save($services.localization.render('platform.workspace.inviteSaveComment', [$userName]), true))
     ## Notify the user.
-    #set ($notificationMessage = $msg.get('platform.workspace.inviteNotification', $workspacePrettyName))
+    #set ($notificationMessage = $services.localization.render('platform.workspace.inviteNotification', [$workspacePrettyName]))
     #if ("$!message" != '')
       ## FIXME: remplace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
       #set ($notificationMessage = "$notificationMessage
-$msg.get('platform.workspace.candidateHandledComment') $message")
+$services.localization.render('platform.workspace.candidateHandledComment') $message")
     #end
     #set ($userDocumentReference = $services.model.resolveDocument($userName))
     #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-    {{info}}$msg.get('platform.workspace.inviteSuccess', [$xwiki.getUserName($userName, false)]){{/info}}
+    {{info}}$services.localization.render('platform.workspace.inviteSuccess', [$xwiki.getUserName($userName, false)]){{/info}}
   #end
 #elseif ($hasAdmin &amp;&amp; $request.cancelInvitation)
   ##
@@ -409,12 +409,12 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
     ## Remove the invitation
     #set ($temp = $groupDoc.removeObject($candidateMember))
     ## Save changes.
-    #set ($temp = $groupDoc.save($msg.get('platform.workspace.invitationCancelSaveComment', [$candidateNumber, $candidateMember.userName]), true))
+    #set ($temp = $groupDoc.save($services.localization.render('platform.workspace.invitationCancelSaveComment', [$candidateNumber, $candidateMember.userName]), true))
     ## Notify the user.
-    #set ($notificationMessage = $msg.get('platform.workspace.invitationCancelNotification'))
+    #set ($notificationMessage = $services.localization.render('platform.workspace.invitationCancelNotification'))
     #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userName))
     #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-    {{info}}$msg.get('platform.workspace.invitationCancelSuccess'){{/info}}
+    {{info}}{{translation key="platform.workspace.invitationCancelSuccess"/}}{{/info}}
   #end
 #end
 
@@ -426,19 +426,19 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
 #set ($discard = $xwiki.ssx.use('XWiki.WorkspaceUsers'))
 #set ($discard = $xwiki.jsx.use('XWiki.WorkspaceUsers'))
 &lt;form id='inviteUserForm' class='xform half'&gt;
-  &lt;h2&gt;$msg.get('workspacemanager.member.add')&lt;/h2&gt;
+  &lt;h2&gt;$services.localization.render('workspacemanager.member.add')&lt;/h2&gt;
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for='userInput'&gt;$msg.get('platform.workspace.inviteUserNameLabel')&lt;/label&gt;
-      &lt;span class='xHint'&gt;$msg.get('platform.workspace.inviteUserNameHint')&lt;/span&gt;
+      &lt;label for='userInput'&gt;$services.localization.render('platform.workspace.inviteUserNameLabel')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('platform.workspace.inviteUserNameHint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
       ## The workspace can accept only global users.
       &lt;input type="text" id="userInput" name="name" class="suggestUsers multipleSelection global" /&gt;
     &lt;/dd&gt;
     &lt;dt&gt;
-      &lt;label for='message'&gt;$msg.get('platform.workspace.inviteMessageLabel')&lt;/label&gt;
-      &lt;span class='xHint'&gt;$msg.get('platform.workspace.inviteMessageHint')&lt;/span&gt;
+      &lt;label for='message'&gt;$services.localization.render('platform.workspace.inviteMessageLabel')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('platform.workspace.inviteMessageHint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
       &lt;textarea name='message'&gt;&lt;/textarea&gt;
@@ -446,10 +446,10 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
   &lt;/dl&gt;
   &lt;p class="buttons"&gt;
     &lt;span class='buttonwrapper'&gt;
-      &lt;input type="submit" id="addMembers" class="button" value="$msg.get('xe.admin.groups.addUser.submit')" /&gt;
+      &lt;input type="submit" id="addMembers" class="button" value="$services.localization.render('xe.admin.groups.addUser.submit')" /&gt;
     &lt;/span&gt;
     &lt;span class='buttonwrapper'&gt;
-      &lt;input id='inviteUserButton' type='submit' class='button' name='inviteUser' value="$msg.get('platform.workspace.inviteInviteButtonLabel')"/&gt;
+      &lt;input id='inviteUserButton' type='submit' class='button' name='inviteUser' value="$services.localization.render('platform.workspace.inviteInviteButtonLabel')"/&gt;
     &lt;/span&gt;
   &lt;/p&gt;
   &lt;div class="hidden"&gt;
@@ -485,8 +485,8 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
 ##
 {{html}}
 &lt;div id='candidates' class='xform'&gt;
-&lt;h2&gt;$msg.get('platform.workspace.candidatesLabel')&lt;/h2&gt;
-&lt;div class='xHint'&gt;$msg.get('platform.workspace.candidatesHint')&lt;/div&gt;
+&lt;h2&gt;$services.localization.render('platform.workspace.candidatesLabel')&lt;/h2&gt;
+&lt;div class='xHint'&gt;$services.localization.render('platform.workspace.candidatesHint')&lt;/div&gt;
 #set ($candidateMembers = $groupDoc.getObjects($candidateClass))
 #foreach ($candidateMember in $candidateMembers)
   #set ($userFullName = $candidateMember.userName)
@@ -507,19 +507,19 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
         #end
       &lt;/div&gt;
       &lt;div class='candidateStatus'&gt;
-        &lt;label&gt;$msg.get('platform.workspace.candidateStatusLabel')&lt;/label&gt; $candidateMember.status
+        &lt;label&gt;$services.localization.render('platform.workspace.candidateStatusLabel')&lt;/label&gt; $candidateMember.status
       &lt;/div&gt;
       &lt;div class='candidateType'&gt;
-        &lt;label&gt;$msg.get('platform.workspace.candidateTypeLabel')&lt;/label&gt; $candidateMember.type
+        &lt;label&gt;$services.localization.render('platform.workspace.candidateTypeLabel')&lt;/label&gt; $candidateMember.type
       &lt;/div&gt;
       #if ($status != 'pending' || $type == 'invitation')
       &lt;div class='reviewer'&gt;
-        &lt;label&gt;$msg.get('platform.workspace.candidateReviewerLabel')&lt;/label&gt; $xwiki.getUserName($candidateMember.reviewer)
+        &lt;label&gt;$services.localization.render('platform.workspace.candidateReviewerLabel')&lt;/label&gt; $xwiki.getUserName($candidateMember.reviewer)
       &lt;/div&gt;
       #end
       &lt;div class='reviewerComment'&gt;
         &lt;label&gt;
-            $msg.get('platform.workspace.candidateReviewerMessageLabel')
+            $services.localization.render('platform.workspace.candidateReviewerMessageLabel')
         &lt;/label&gt; 
         #if($status == 'pending' &amp;&amp; $type == 'request')
           &lt;textarea name='reviewerComment'/&gt;
@@ -528,7 +528,7 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
         #end
       &lt;/div&gt;
       &lt;div class='reviewerPrivateComment'&gt;
-        &lt;label&gt;$msg.get('platform.workspace.candidateReviewerPrivateComment')&lt;/label&gt;
+        &lt;label&gt;$services.localization.render('platform.workspace.candidateReviewerPrivateComment')&lt;/label&gt;
         #if($status == 'pending' &amp;&amp; $type == 'request')
           &lt;textarea name='reviewerPrivateComment'/&gt;
         #else
@@ -543,15 +543,15 @@ $msg.get('platform.workspace.candidateHandledComment') $message")
       &lt;div class='reviewerActions'&gt;
         #if ($status == 'pending' &amp;&amp; $type == 'request')
         &lt;span class='buttonwrapper acceptUserButton'&gt;
-          &lt;input type='submit' class='button' value="$msg.get('platform.workspace.candidateAcceptLabel')" name='acceptUser'/&gt;
+          &lt;input type='submit' class='button' value="$services.localization.render('platform.workspace.candidateAcceptLabel')" name='acceptUser'/&gt;
         &lt;/span&gt;
         &lt;/span class='buttonwrapper rejectUserButton'&gt;
-          &lt;input type='submit' class='button secondary' value="$msg.get('platform.workspace.candidateRejectLabel')" name='rejectUser'/&gt;
+          &lt;input type='submit' class='button secondary' value="$services.localization.render('platform.workspace.candidateRejectLabel')" name='rejectUser'/&gt;
         &lt;/span&gt;
         #end
         #if ($status == 'pending' &amp;&amp; $type == 'invitation')
         &lt;/span class='buttonwrapper cancelInvitationButton'&gt;
-          &lt;input type='submit' class='button' value="$msg.get('platform.workspace.invitationCancelLabel')" name='cancelInvitation'/&gt;
+          &lt;input type='submit' class='button' value="$services.localization.render('platform.workspace.invitationCancelLabel')" name='cancelInvitation'/&gt;
         &lt;/span&gt;
         #end
       &lt;/div&gt;

@@ -250,4 +250,69 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
         dblc.setSort("value");
         assertEquals("Items were not ordered by value.", "[a, b, d, c]", dblc.getList(getContext()).toString());
     }
+
+    public void testReturnColWithOneColumn()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("select doc.fullName from XWikiDocument as doc", true));
+        assertEquals("-", dblc.returnCol("select doc.fullName from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithOneColumnAndExtraWhitespace()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("select   doc.fullName   from XWikiDocument as doc", true));
+        assertEquals("-", dblc.returnCol("select   doc.fullName   from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithOneColumnAndUppercaseTokens()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("SELECT doc.fullName FROM XWikiDocument as doc", true));
+        assertEquals("-", dblc.returnCol("SELECT doc.fullName FROM XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithTwoColumns()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("select doc.fullName, doc.title from XWikiDocument as doc", true));
+        assertEquals("doc.title", dblc.returnCol("select doc.fullName, doc.title from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithTwoColumnsAndExtraWhitespace()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName",
+            dblc.returnCol("select   doc.fullName  ,  doc.title  from XWikiDocument as doc", true));
+        assertEquals("doc.title",
+            dblc.returnCol("select   doc.fullName  ,  doc.title  from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithTwoColumnsAndUppercaseTokens()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("SELECT doc.fullName, doc.title FROM XWikiDocument as doc", true));
+        assertEquals("doc.title", dblc.returnCol("SELECT doc.fullName, doc.title FROM XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithNullQuery()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("-", dblc.returnCol(null, true));
+        assertEquals("-", dblc.returnCol(null, false));
+    }
+
+    public void testReturnColWithEmptyQuery()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("-", dblc.returnCol("", true));
+        assertEquals("-", dblc.returnCol("", false));
+    }
+
+    public void testReturnColWithInvalidQuery()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("-", dblc.returnCol("do something", true));
+        assertEquals("-", dblc.returnCol("do something", false));
+    }
 }

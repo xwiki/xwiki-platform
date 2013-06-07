@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.objects;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.dom4j.Element;
 import org.junit.Test;

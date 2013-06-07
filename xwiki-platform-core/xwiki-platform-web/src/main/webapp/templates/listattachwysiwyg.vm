@@ -4,18 +4,18 @@
 #foreach ($attachment in $attachments)
   #if ((!$request.images) || $attachment.isImage())
     #if (!$hasAttachments)
-      <p><strong>$msg.get('listofallattachments') :</strong></p>
+      <p><strong>$services.localization.render('listofallattachments'):</strong></p>
       <ul>
       #set ($hasAttachments = true)
     #end
     <li><a href="#" onclick="document.forms[0].attach_file.value='$escapetool.xml($escapetool.javascript($attachment.filename))'; return false;">$escapetool.xml($attachment.filename)</a>
-    $msg.get('attachedby') $xwiki.getUserName($attachment.author) $msg.get('lastmodifiedon') $xwiki.formatDate($attachment.date)
+    $services.localization.render('attachedby') $xwiki.getUserName($attachment.author) $services.localization.render('lastmodifiedon') $xwiki.formatDate($attachment.date)
     </li>
   #end
 #end
 #if ($hasAttachments)
   </ul>
 #else
-  $msg.get('noattachmentsonthispage')
+  $services.localization.render('noattachmentsonthispage')
 #end
 </div>## xwikiattachmentscontent

@@ -25,7 +25,7 @@
   <hidden>true</hidden>
   <content>#set($AppManager = $services.applicationmanager)
 #if(!$AppManager)
-  #error($msg.get("xapp.pluginnotenabled"))
+  #error($services.localization.render('xapp.pluginnotenabled'))
 #end
 ##
 #set($Exception = $AppManager.DefaultException)
@@ -37,21 +37,21 @@
 ##
 #############################################################################
 ##
-1 $msg.get("xapp.createapplication")
+1 $services.localization.render('xapp.createapplication')
 ##
 #if($action)
   #if($action == "create")
     #set($result = $AppManager.createApplication($appdocument, true))
     #if ($result == $Exception.ERROR_NOERROR)
       &lt;font color=green&gt;
-        $msg.get("xapp.successcreateapp", [$appdocument.appname, $appdocument.getFullName()])
+        $services.localization.render('xapp.successcreateapp', [$appdocument.appname, $appdocument.getFullName()])
       &lt;/font&gt;
     #else
       &lt;font color=red&gt;
         #if ($result == $Exception.ERROR_AM_APPDOCALREADYEXISTS)
-          $msg.get("xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS", [$appdocument.appname])
+          $services.localization.render('xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS', [$appdocument.appname])
         #else
-          $msg.get("xapp.errorcreateapp", [$appdocument.appname, $result])
+          $services.localization.render('xapp.errorcreateapp', [$appdocument.appname, $result])
         #end
       &lt;/font&gt;
     #end
@@ -63,16 +63,16 @@
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="action" value="create" /&gt;
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_appname"&gt;$msg.get("xapp.appname")&lt;/label&gt;&lt;/dt&gt;
+      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_appname"&gt;$services.localization.render('xapp.appname')&lt;/label&gt;&lt;/dt&gt;
       &lt;dd&gt;$appdocument.display("appname", "edit")&lt;/dd&gt;
-      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_description"&gt;$msg.get("xapp.description")&lt;/label&gt;&lt;/dt&gt;
+      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_description"&gt;$services.localization.render('xapp.description')&lt;/label&gt;&lt;/dt&gt;
       &lt;dd&gt;$appdocument.display("description", "edit")&lt;/dd&gt;
-      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_appversion"&gt;$msg.get("version")&lt;/label&gt;&lt;/dt&gt;
+      &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_appversion"&gt;$services.localization.render('version')&lt;/label&gt;&lt;/dt&gt;
       &lt;dd&gt;$appdocument.display("appversion", "edit")&lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
   &lt;p&gt;
-    &lt;input class="button" type="submit" value="$msg.get("create")" /&gt;
+    &lt;input class="button" type="submit" value="$services.localization.render('create')" /&gt;
   &lt;/p&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

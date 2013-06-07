@@ -22,11 +22,13 @@ package com.xpn.xwiki.render;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
 import org.junit.Assert;
+import org.xwiki.localization.LocalizationContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -57,6 +59,9 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
         XWikiConfig config = new XWikiConfig();
 
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+        
         Mock mockServletContext = mock(ServletContext.class);
         ByteArrayInputStream bais = new ByteArrayInputStream("code=wiki:code:type:content".getBytes("UTF-8"));
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.txt"))

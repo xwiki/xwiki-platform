@@ -23,7 +23,8 @@ import org.xwiki.model.reference.DocumentReference;
 
 /**
  * A user is represented internally in the authorization module by a UserSecurityReference corresponding
- * to the DocumentReference of the user's profile document.
+ * to the DocumentReference of the user's profile document. By inheritance, the null user is represented by
+ * the main wiki reference but with a null original reference.
  *
  * @see {@link SecurityReferenceFactory}
  * @version $Id$
@@ -47,6 +48,16 @@ public class UserSecurityReference extends SecurityReference
     @Override
     public DocumentReference getOriginalReference()
     {
-        return (DocumentReference) super.getOriginalReference();
+        return super.getOriginalDocumentReference();
+    }
+
+    /**
+     * @return true for global user
+     * @since 5.0M2
+     */
+    public boolean isGlobal()
+    {
+        DocumentReference ref = this.getOriginalReference();
+        return (ref == null) || ref.getWikiReference().equals(mainWikiReference.getOriginalWikiReference());
     }
 }

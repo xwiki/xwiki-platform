@@ -648,7 +648,7 @@ XWiki.Annotation = Class.create({
     if (!this.annotatedElement) {
       // and show a warning if the annotations should be shown by default
       if (this.displayedByDefault) {
-        new XWiki.widgets.Notification("$msg.get('annotations.annotated.error.noannotatedelement')", 'warning');
+        new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.noannotatedelement')", 'warning');
       }
       return;
     }
@@ -680,7 +680,7 @@ XWiki.Annotation = Class.create({
         this.fetchAnnotations(true);
       } else {
         // if the document syntax is 1.0, and annotations should be displayed by default, display a warning, and not display annotations
-        new XWiki.widgets.Notification("$msg.get('annotations.annotated.error.wrongsyntax')", 'warning');
+        new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.wrongsyntax')", 'warning');
       }
     }
   },
@@ -703,7 +703,7 @@ XWiki.Annotation = Class.create({
       // create the annotations button
       var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
       var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-      annLink.update("&lt;strong&gt;$msg.get('annotations.title')&lt;/strong&gt;");
+      annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
       annContainer.insert({top: annLink});
       rightMenu.insert({bottom: annContainer});
 
@@ -733,7 +733,7 @@ XWiki.Annotation = Class.create({
           // disable the button
           menu.disabled = true;
           // show nice loading message at page bottom
-          menu._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.menu.loading')", 'inprogress');
+          menu._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.menu.loading')", 'inprogress');
         },
 
         onSuccess: function(response) {
@@ -759,7 +759,7 @@ XWiki.Annotation = Class.create({
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          menu._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.menu.loaderror')" + failureReason, 'error', {timeout : 5}));
+          menu._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.menu.loaderror')" + failureReason, 'error', {timeout : 5}));
         },
 
         on0: function (response) {
@@ -890,7 +890,7 @@ XWiki.Annotation = Class.create({
       parameters: this.prepareRequestParameters(new Hash()), 
       onCreate: function() {
         // show nice loading message at page bottom
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.annotated.loading')", 'inprogress');
+        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loading')", 'inprogress');
       }.bind(this),
 
       onSuccess: function(response) {
@@ -915,7 +915,7 @@ XWiki.Annotation = Class.create({
           failureReason = 'Server not responding';
         }
         // show the error message at the bottom
-        this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
+        this._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
         if (this.displayAnnotationsCheckbox) {
           this.displayAnnotationsCheckbox.checked = false;
         }
@@ -947,7 +947,7 @@ XWiki.Annotation = Class.create({
       if (response.responseJSON) {
         response.statusText = response.responseJSON.responseMessage;
       } else {
-        response.statusText = "$msg.get('annotations.annotated.loaderror.wrongresponse')";
+        response.statusText = "$services.localization.render('annotations.annotated.loaderror.wrongresponse')";
       }
       response.request.options.onFailure(response);
       return true;
@@ -1053,10 +1053,10 @@ XWiki.Annotation = Class.create({
           },
           /* Interaction parameters */
           {
-             confirmationText: "$msg.get('annotations.action.delete.confirm')",
-             progressMessageText : "$msg.get('annotations.action.delete.inProgress')",
-             successMessageText : "$msg.get('annotations.action.delete.done')",
-             failureMessageText : "$msg.get('annotations.action.delete.failed')"
+             confirmationText: "$services.localization.render('annotations.action.delete.confirm')",
+             progressMessageText : "$services.localization.render('annotations.action.delete.inProgress')",
+             successMessageText : "$services.localization.render('annotations.action.delete.done')",
+             failureMessageText : "$services.localization.render('annotations.action.delete.failed')"
           }
         );
       }
@@ -1071,8 +1071,8 @@ XWiki.Annotation = Class.create({
       this.updateAnnotationAsync(container, id, inBubble, item.href, 'POST', 
         new Hash({'state' : 'SAFE', 'originalSelection' : ''}),
         {
-          successText : "$msg.get('annotations.action.validate.success')",
-          failureText : "$msg.get('annotations.action.validate.loaderror')"
+          successText : "$services.localization.render('annotations.action.validate.success')",
+          failureText : "$services.localization.render('annotations.action.validate.loaderror')"
         });
     }.bindAsEventListener(this));
   },
@@ -1111,7 +1111,7 @@ XWiki.Annotation = Class.create({
               failureReason = 'Server not responding';
             }
             // show the error message at the bottom
-            this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.form.loaderror')" + failureReason, 'error', {timeout : 5});
+            this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.edit.form.loaderror')" + failureReason, 'error', {timeout : 5});
             // load the original content of the container
             this.fillViewPanel(container, container.originalContentHTML, id, inBubble);
           }.bind(this),
@@ -1192,7 +1192,7 @@ XWiki.Annotation = Class.create({
         // hide the loading bubble
         this.hideBubble(newBubble);
         // show the error message at the bottom
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.view.form.loaderror')" + failureReason, 'error', {timeout : 5});
+        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.view.form.loaderror')" + failureReason, 'error', {timeout : 5});
       }.bind(this),
 
       on0: function (response) {
@@ -1279,8 +1279,8 @@ XWiki.Annotation = Class.create({
     // aaand update
     this.updateAnnotationAsync(container, annotationId, inBubble, form.action, form.method, formData, 
       {
-        successText : "$msg.get('annotations.action.edit.success')",
-        failureText : "$msg.get('annotations.action.edit.loaderror')"
+        successText : "$services.localization.render('annotations.action.edit.success')",
+        failureText : "$services.localization.render('annotations.action.edit.loaderror')"
       });
   },
 
@@ -1468,7 +1468,7 @@ XWiki.Annotation = Class.create({
   onAddAnnotationShortcut : function() {
     // if the document is in 1.0 syntax, prevent the create dialog to be displayed, display a warning and stop everything
     if (XWiki.docsyntax == 'xwiki/1.0') {
-      new XWiki.widgets.Notification("$msg.get('annotations.action.create.error.wrongsyntax')", 'warning');
+      new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.error.wrongsyntax')", 'warning');
       return;
     }
     // parse the selection
@@ -1476,7 +1476,7 @@ XWiki.Annotation = Class.create({
     var selectionText = this.selectionService.selectionText;
     if (!selectionText) {
       // show an 'invalid selection message'. Shorter time here, otherwise it's a bit confusing...
-      new XWiki.widgets.Notification("$msg.get('annotations.action.create.selection.invalid')", 'error', {timeout : 5});
+      new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.selection.invalid')", 'error', {timeout : 5});
     } else {
       this.selectionService.computeContext();
       // fetch the creation for this annotation and display it at the position of the selection
@@ -1506,7 +1506,7 @@ XWiki.Annotation = Class.create({
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, 'error', {timeout : 5});
+          this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.form.loaderror')" + failureReason, 'error', {timeout : 5});
           // and hide the create form panel
           this.hideAnnotationCreationForm();
         }.bind(this),
@@ -1576,7 +1576,7 @@ XWiki.Annotation = Class.create({
         }
         this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
         this.fetchedAnnotations = true;
-        form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", 'done');
+        form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
         // and hide the create bubble, skipping selection highlight clear
         this.hideAnnotationCreationForm(true);
       }.bind(this),
@@ -1586,7 +1586,7 @@ XWiki.Annotation = Class.create({
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
         }
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
+        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
       }.bind(this),
       on0 : function (response) {
         response.request.options.onFailure(response);

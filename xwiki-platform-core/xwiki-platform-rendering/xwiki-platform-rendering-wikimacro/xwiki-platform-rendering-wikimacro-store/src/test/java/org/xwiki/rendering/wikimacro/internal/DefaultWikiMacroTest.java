@@ -126,8 +126,6 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
                 allowing(mockXWiki).getDocument(with(equal(wikiMacroDocumentReference)), with(any(XWikiContext.class)));
                 will(returnValue(wikiMacroDocument));
 
-                allowing(mockXWiki).isVirtualMode();
-                will(returnValue(false));
                 allowing(mockXWiki).isReadOnly();
                 will(returnValue(false));
                 allowing(mockXWiki).getLanguagePreference(with(any(XWikiContext.class)));

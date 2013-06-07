@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.security.internal.XWikiConstants;
 
 /**
  * Specialized version of {@link org.xwiki.model.reference.DocumentReferenceResolver<String>} which ensure the
@@ -48,14 +49,14 @@ public class UserAndGroupReferenceResolver implements DocumentReferenceResolver<
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
         if (parameters.length > 0 && !(parameters[0] instanceof EntityReference)) {
-            throw new IllegalArgumentException("The settler parameter is not a WikiReference.");
+            throw new IllegalArgumentException("This resolver accept only a single parameter of type WikiReference.");
         }
         EntityReference defaultSpace;
         if (parameters.length > 0) {
             EntityReference defaultWiki = ((EntityReference) parameters[0]).extractReference(EntityType.WIKI);
-            defaultSpace = new EntityReference(XWikiConstants.WIKI_SPACE, EntityType.SPACE, defaultWiki);
+            defaultSpace = new EntityReference(XWikiConstants.XWIKI_SPACE, EntityType.SPACE, defaultWiki);
         } else {
-            defaultSpace = resolver.resolve(XWikiConstants.WIKI_SPACE, EntityType.SPACE);
+            defaultSpace = resolver.resolve(XWikiConstants.XWIKI_SPACE, EntityType.SPACE);
         }
         return new DocumentReference(resolver.resolve(documentReferenceRepresentation,
                                                       EntityType.DOCUMENT,

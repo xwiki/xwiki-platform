@@ -21,12 +21,14 @@ package com.xpn.xwiki.plugin.applicationmanager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
@@ -53,6 +55,11 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
      */
     private ApplicationManager applicationManager;
 
+    /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -65,12 +72,14 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     public ApplicationManagerPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     @Override
     public void init(XWikiContext context)
     {
-        this.applicationManager = new ApplicationManager(ApplicationManagerMessageTool.getDefault(context));
+        this.applicationManager = new ApplicationManager();
 
         String database = context.getDatabase();
         try {
@@ -81,7 +90,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
             this.applicationManager.init(context);
         } catch (XWikiException e) {
             LOGGER.error(
-                ApplicationManagerMessageTool.getDefault(context).get(
+                this.localizationManager.getTranslationPlain(
                     ApplicationManagerMessageTool.LOG_REFRESHALLTRANSLATIONS), e);
         } finally {
             context.setDatabase(database);

@@ -4,7 +4,7 @@
 $xwiki.jsfx.use('uicomponents/viewers/code.js', true)##
 $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', true)##
 $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
-<div id="document-title"><h1>$msg.get('core.viewers.code.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()])</h1></div>
+<div id="document-title"><h1>$services.localization.render('core.viewers.code.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()])</h1></div>
 ## ----------------------------
 ## Display the shortcuts
 ## ----------------------------
@@ -18,7 +18,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($ln = "$!request.getParameter('showlinenumbers')")
 <div>
 #if($ln != '0')
-  <a href="$doc.getURL('view', "viewer=code&amp;showlinenumbers=0&amp;$!docvariant")" id="toggleLineNumbers">$msg.get('core.viewers.code.hideLineNumbers')</a>
+  <a href="$doc.getURL('view', "viewer=code&amp;showlinenumbers=0&amp;$!docvariant")" id="toggleLineNumbers">$services.localization.render('core.viewers.code.hideLineNumbers')</a>
   #set($contentLines = $escapedcontent.split($util.newline))
   #set($lineCount = $contentLines.size())
   #set($p = 1)
@@ -34,7 +34,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 $doc.name.format("%${positions}d:", $velocityCount) $line
 #end</textarea>
 #else
-  <a href="$doc.getURL('view', "viewer=code&amp;showlinenumbers=1&amp;$!docvariant")" id="toggleLineNumbers">$msg.get('core.viewers.code.showLineNumbers')</a>
+  <a href="$doc.getURL('view', "viewer=code&amp;showlinenumbers=1&amp;$!docvariant")" id="toggleLineNumbers">$services.localization.render('core.viewers.code.showLineNumbers')</a>
   <textarea readonly="readonly" class="wiki-code" rows="25" cols="80">$escapedcontent</textarea>
 #end
 </div>

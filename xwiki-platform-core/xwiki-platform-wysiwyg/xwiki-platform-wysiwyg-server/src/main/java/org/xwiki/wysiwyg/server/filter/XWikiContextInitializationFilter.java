@@ -144,7 +144,8 @@ public class XWikiContextInitializationFilter implements Filter
             if (user != null) {
                 DocumentReferenceResolver<String> documentReferenceResolver =
                     Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-                SpaceReference defaultUserSpace = new SpaceReference("XWiki", new WikiReference("xwiki"));
+                SpaceReference defaultUserSpace =
+                    new SpaceReference(XWiki.SYSTEM_SPACE, new WikiReference(context.getDatabase()));
                 DocumentReference userReference = documentReferenceResolver.resolve(user.getUser(), defaultUserSpace);
                 context.setUserReference(XWikiRightService.GUEST_USER.equals(userReference.getName()) ? null
                     : userReference);

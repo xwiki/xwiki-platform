@@ -119,7 +119,7 @@ public class TemporaryChartImageWriter implements ChartImageWriter
         try {
             String currentWiki = URLEncoder.encode(getCurrentWiki(), DEFAULT_ENCODING);
             // TODO: We need to decide if it's ok to use the the hardcoded "space/page" or if we want to use the
-            // current document in which caase we need to extract it from the XDOM. The reason I haven't done it
+            // current document in which case we need to extract it from the XDOM. The reason I haven't done it
             // by default is because it takes more time and the image id seems unique enough to not cause collisions.
             directory = new File(this.environment.getTemporaryDirectory(),
                 String.format("temp/%s/%s/%s/%s", MODULE_NAME, currentWiki, SPACE, PAGE));
@@ -147,9 +147,9 @@ public class TemporaryChartImageWriter implements ChartImageWriter
     }
 
     @Override
-    public String getURL(ImageId imageId)
+    public String getURL(ImageId imageId) throws MacroExecutionException
     {
-        DocumentReference reference = new DocumentReference("unused", SPACE, PAGE);
+        DocumentReference reference = new DocumentReference(getCurrentWiki(), SPACE, PAGE);
         String prefix = this.documentAccessBridge.getDocumentURL(reference, "temp", null, null);
         return String.format("%s/%s/%s.png", prefix, MODULE_NAME, imageId.getId());
     }

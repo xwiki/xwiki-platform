@@ -1728,12 +1728,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 @Override
                 public String doInHibernate(Session session) throws HibernateException
                 {
-                    Query query = session.createSQLQuery("SHOW CREATE TABLE xwikidoc");
+                    Query query = session.createSQLQuery("SHOW TABLE STATUS like 'xwikidoc'");
                     return (String) ((Object[]) query.uniqueResult())[1];
                 }
             });
 
-        this.isMySQLMyISAM = (createTable != null && createTable.contains("ENGINE=MyISAM"));
+        this.isMySQLMyISAM = (createTable != null && createTable.equals("MyISAM"));
     }
 
     @Override

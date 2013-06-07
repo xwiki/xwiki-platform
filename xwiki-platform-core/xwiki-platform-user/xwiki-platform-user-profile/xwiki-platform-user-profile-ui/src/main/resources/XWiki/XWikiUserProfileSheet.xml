@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiUserProfileSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiUserSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1262856167000</creationDate>
+  <date>1262856167000</date>
+  <contentUpdateDate>1262856167000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.XWikiUserProfileSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>69c76935-fbd0-4167-af11-8ad356c88ba9</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.activity-follow {
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.activity-follow .unfollow {
+  background: transparent 0 center url("$xwiki.getSkinFile('icons/silk/cross.png')") no-repeat;
+  color: $theme.notificationErrorColor;
+  display: inline-block;
+  overflow: hidden;
+  font-size: 83.3%;
+  text-indent: 17px;
+  vertical-align: middle;
+  width: 16px;
+}
+.activity-follow .unfollow:hover {
+  overflow: visible;
+  text-decoration: none;
+  width: auto;
+}
+
+.activity-follow .follow, .activity-follow .following {
+  background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.png')") no-repeat;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  color: $theme.menuAddEntryLinkColor !important;
+  display: inline-block;
+  font-size: 83.3%;
+  line-height: 1.6em;
+  min-height: 16px;
+  padding: 3px 6px 3px 22px;
+}
+.activity-follow .follow {
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
+}</code>
+    </property>
+    <property>
+      <name>'Follow' css</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <content>{{velocity}}
+#set ($discard = $xwiki.ssx.use('XWiki.XWikiUserSheet'))
+##
+#set ($inEditMode = $xcontext.action == 'edit' || $xcontext.action == 'inline')
+#set ($xwikiUsersClassName = 'XWiki.XWikiUsers')
+#set ($obj = $doc.getObject($xwikiUsersClassName))
+##
+#if (!$obj)
+= $services.localization.render('xe.admin.users.sheet') =
+
+{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
+
+#else
+## Make sure we only care about properties of the user object and don't get polluted by other objects that might be in the user's profile page.
+#set ($discard = $doc.use($obj))
+##
+#set ($sheetDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'AdminUserProfileSheet'))
+#set ($sheetDocument = $xwiki.getDocument($sheetDocumentReference))
+#set ($xwikiUsersClass = $xwiki.getClass($xwikiUsersClassName))
+##
+#set ($sectionsObjectClassName = 'XWiki.UserProfileSectionsClass')
+#set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
+##
+{{html clean='false' wiki='true'}}
+#set($username = $xwiki.getUserName($doc.fullName, false))
+= $services.localization.render('platform.core.profile.title', [$username]) =
+
+#if (!$inEditMode)
+  &lt;div class="vcard"&gt;
+  &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
+#end
+  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column xform"&gt;
+    &lt;div class='userInfo'&gt;
+    #if($context.action == 'view' &amp;&amp; $hasEdit)
+      &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+    #end
+    ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
+    #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
+    #set ($sectionsToDisplayString = $sectionsObject.getProperty('sections').value)
+    #set ($sectionsToDisplay = $sectionsToDisplayString.split('\s+'))
+    #foreach ($sectionId in $sectionsToDisplay)
+      #set ($sectionObject = $sheetDocument.getObject($sectionObjectClassName, 'id', $sectionId))
+      #set ($sectionName = "$!sectionObject.getProperty('name').value")
+      ## The section name will be evaluated. The admin can specify a static string or a call to $msg(...) to provide internationalization support.
+      #set ($sectionName = "#evaluate($!sectionName)")
+      ## If there is no section name specified, use the default translations prefix for the user profile, maybe we get lucky.
+      #if ("$!sectionName" == '')
+        #set ($sectionName = $services.localization.render("platform.core.profile.section.${sectionId}"))
+      #end
+      ## If that does not work either, just display the sectionID.
+      #if ("$!sectionName" == "platform.core.profile.section.${sectionId}")
+        #set ($sectionName = $sectionId)
+      #end
+      #set ($sectionPropertiesString = $sectionObject.getProperty('properties').value)
+      #set ($sectionProperties = $sectionPropertiesString.split('\s+'))
+      #if ($sectionProperties &amp;&amp; $sectionProperties.size() &gt; 0)
+        &lt;h1&gt;$sectionName&lt;/h1&gt;
+        &lt;dl&gt;
+        #foreach ($sectionProperty in $sectionProperties)
+          #set ($vCardData = $sectionProperty.split(':'))
+          #set ($vCardProperty = '')
+          #if ($vCardData.size() == 2)
+            #set ($vCardProperty = $vCardData[0])
+            #set ($sectionProperty = $vCardData[1])
+          #end
+          #if ("$!sectionProperty" != '' &amp;&amp; $xwikiUsersClass.get($sectionProperty))
+          &lt;dt class='label'&gt;
+            &lt;label #if($inEditMode)for="${xwikiUsersClassName}_${obj.number}_${sectionProperty}"#{end}&gt;$doc.displayPrettyName("${sectionProperty}")&lt;/label&gt;
+          &lt;/dt&gt;
+          &lt;dd #if("$!vCardProperty" != '' &amp;&amp; !$inEditMode)class="$vCardProperty"#{end}&gt;$doc.display($sectionProperty)&lt;/dd&gt;
+          #end
+        #end
+        &lt;/dl&gt;
+      #end
+    #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+  #if (!$inEditMode)
+    &lt;div class='half column'&gt;
+      #if (!$isGuest)
+      &lt;div class='userMessage profile-section'&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.sendMessage')&lt;/h1&gt;
+
+          {{messageSender /}}
+
+      &lt;/div&gt;
+      #end
+      &lt;div class='userRecentChanges'&gt;
+      #if ($context.user == $doc.fullName)
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h1&gt;
+      #else
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
+        #if ($hasWatch)
+        $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
+        &lt;div class='activity-follow'&gt;
+          #set ($xredirect = $doc.getURL($context.action, $request.queryString))
+          #if ($xwiki.watchlist.isUserWatched(${doc.prefixedFullName}))
+          &lt;span class='following'&gt;$services.localization.render('xe.activity.messages.following')&lt;/span&gt;
+          &lt;a class='action unfollow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
+          #else
+          &lt;a class='action follow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.follow')&lt;/a&gt;
+          #end
+        &lt;/div&gt;
+        #end
+      #end
+{{/html}}
+
+{{activity authors="${doc.fullName},${doc.prefixedFullName}" /}}
+
+{{html clean='false'}}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  #end
+  &lt;div class='clearfloats'&gt;&amp;nbsp;&lt;/div&gt;
+#if(!$inEditMode)
+  ## Close the vcard
+  &lt;/div&gt;
+#end
+{{/html}}##
+#end
+{{/velocity}}</content>
+</xwikidoc>

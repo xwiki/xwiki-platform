@@ -163,33 +163,16 @@ public final class RightsManagerListener implements EventListener
     private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         boolean user, XWikiContext context) throws XWikiException
     {
-        if (!context.getWiki().isVirtualMode()) {
-            cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
-        } else {
-            List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
+        List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
 
-            String database = context.getDatabase();
-            try {
-                boolean foundMainWiki = false;
-
-                for (String wikiName : wikiList) {
-                    if (context.isMainWiki(wikiName)) {
-                        foundMainWiki = true;
-                    }
-
-                    context.setDatabase(wikiName);
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-                        context);
-                }
-
-                if (!foundMainWiki) {
-                    context.setDatabase(context.getMainXWiki());
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-                        context);
-                }
-            } finally {
-                context.setDatabase(database);
+        String database = context.getDatabase();
+        try {
+            for (String wikiName : wikiList) {
+                context.setDatabase(wikiName);
+                cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
             }
+        } finally {
+            context.setDatabase(database);
         }
     }
 }

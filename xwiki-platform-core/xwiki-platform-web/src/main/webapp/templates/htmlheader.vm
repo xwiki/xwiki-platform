@@ -31,6 +31,16 @@
     #end
     <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------
+    ## Favicons
+    ## Legacy, for IE
+    <link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" />
+    ## Present, HTML5
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" />
+    ## The future, scalable icons
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" />
+    ## For smart phones and tablets
+    <link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" />
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Define the default scripting language that is used for intrinsic events (e.g. onmouseover attributes).
     ## ---------------------------------------------------------------------------------------------------------------
     <meta http-equiv="Content-Script-Type" content="text/javascript" />
@@ -76,7 +86,6 @@
     ## ---------------------------------------------------------------------------------------------------------------
     <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
     #template("stylesheets.vm")
-    #template("analytics.vm")
     #template("javascript.vm")
   </head>
   #set($bodyTagName = 'body')

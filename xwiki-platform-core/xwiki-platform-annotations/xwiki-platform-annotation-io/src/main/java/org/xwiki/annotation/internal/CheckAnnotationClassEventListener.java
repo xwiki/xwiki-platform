@@ -115,19 +115,21 @@ public class CheckAnnotationClassEventListener implements EventListener
             XWikiContext deprecatedContext = getXWikiContext();
             XWiki xwiki = deprecatedContext.getWiki();
 
-            if (xwiki.isVirtualMode() && event instanceof ApplicationReadyEvent) {
+            if (event instanceof ApplicationReadyEvent) {
                 // Application started. Need to go trough all subwikis and ensure validity.
                 String currentDatabase = deprecatedContext.getDatabase();
 
-                for (String wikiName : xwiki.getVirtualWikisDatabaseNames(deprecatedContext)) {
-                    // Change the context wiki.
-                    deprecatedContext.setDatabase(wikiName);
-                    // Do the work for the wiki.
-                    ensureAnnotationClassIsValid();
+                try {
+                    for (String wikiName : xwiki.getVirtualWikisDatabaseNames(deprecatedContext)) {
+                        // Change the context wiki.
+                        deprecatedContext.setDatabase(wikiName);
+                        // Do the work for the wiki.
+                        ensureAnnotationClassIsValid();
+                    }
+                } finally {
+                    // Restore the original wiki.
+                    deprecatedContext.setDatabase(currentDatabase);
                 }
-
-                // Restore the original wiki.
-                deprecatedContext.setDatabase(currentDatabase);
             } else {
                 // Config document of the current wiki got modified.
                 ensureAnnotationClassIsValid();
@@ -186,7 +188,7 @@ public class CheckAnnotationClassEventListener implements EventListener
             }
         } catch (Exception e) {
             throw new AnnotationServiceException(String.format("Failed to update the configured annotation class [%s]",
-                    annotationClassReference.toString()), e);
+                annotationClassReference.toString()), e);
         }
     }
 

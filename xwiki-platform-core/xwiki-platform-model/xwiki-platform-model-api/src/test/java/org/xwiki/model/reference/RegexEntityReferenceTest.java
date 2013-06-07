@@ -21,7 +21,7 @@ package org.xwiki.model.reference;
 
 import java.util.regex.Pattern;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.xwiki.model.EntityType;

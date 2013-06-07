@@ -26,11 +26,9 @@ import javax.inject.Inject;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
@@ -44,11 +42,6 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
 public abstract class AbstractSolrInstance implements SolrInstance
 {
     /**
-     * Solr CoreContainer.
-     */
-    protected CoreContainer container;
-
-    /**
      * Solr server instance corresponding, depending on the subclass.
      */
     protected SolrServer server;
@@ -60,73 +53,52 @@ public abstract class AbstractSolrInstance implements SolrInstance
     protected Logger logger;
 
     @Override
-    public void shutDown()
-    {
-        if (this.server != null) {
-            ((EmbeddedSolrServer) this.server).shutdown();
-        }
-        if (this.container != null) {
-            container.shutdown();
-        }
-    }
-
-    @Override
     public void add(SolrInputDocument solrDocument) throws SolrServerException, IOException
     {
-        server.add(solrDocument);
+        this.server.add(solrDocument);
     }
 
     @Override
     public void add(List<SolrInputDocument> solrDocuments) throws SolrServerException, IOException
     {
-        server.add(solrDocuments);
+        this.server.add(solrDocuments);
     }
 
     @Override
     public void delete(String id) throws SolrServerException, IOException
     {
-        server.deleteById(id);
+        this.server.deleteById(id);
     }
 
     @Override
     public void delete(List<String> ids) throws SolrServerException, IOException
     {
-        server.deleteById(ids);
+        this.server.deleteById(ids);
     }
 
     @Override
     public void deleteByQuery(String query) throws SolrServerException, IOException
     {
-        server.deleteByQuery(query);
+        this.server.deleteByQuery(query);
     }
 
     @Override
     public void commit() throws SolrServerException, IOException
     {
-        server.commit();
+        this.server.commit();
     }
 
     @Override
     public void rollback() throws SolrServerException, IOException
     {
-        server.rollback();
+        this.server.rollback();
     }
 
     @Override
     public QueryResponse query(SolrParams solrParams) throws SolrServerException
     {
-        QueryResponse result = server.query(solrParams);
+        QueryResponse result = this.server.query(solrParams);
         return result;
-    }
-
-    /**
-     * Useful when testing.
-     * 
-     * @return the container
-     */
-    protected CoreContainer getContainer()
-    {
-        return container;
     }
 
     /**
@@ -136,6 +108,6 @@ public abstract class AbstractSolrInstance implements SolrInstance
      */
     protected SolrServer getServer()
     {
-        return server;
+        return this.server;
     }
 }

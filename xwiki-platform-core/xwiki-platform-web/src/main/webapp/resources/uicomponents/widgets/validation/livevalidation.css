@@ -9,7 +9,7 @@
 .LV_valid {
   color: $theme.notificationSuccessColor;
 }
-	
+
 .LV_invalid {
   color: $theme.notificationErrorColor;
 }

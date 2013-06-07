@@ -28,27 +28,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.localization.LocalizationManager;
-import org.xwiki.localization.Translation;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -99,12 +87,8 @@ public class XWikiMessageTool
     /**
      * The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading documents.
      */
+    @Deprecated
     protected XWikiContext context;
-
-    /**
-     * Used to access the current XWikiContext.
-     */
-    protected Provider<XWikiContext> xcontextProvider;
 
     /**
      * Cache properties loaded from the document bundles for maximum efficiency. The map is of type (Long, Properties)
@@ -129,36 +113,16 @@ public class XWikiMessageTool
     /**
      * The localization manager.
      */
-    private LocalizationManager localization;
-
-    /**
-     * Used to get the proper renderer.
-     */
-    private ComponentManager componentManager;
+    private ContextualLocalizationManager localization;
 
     /**
      * @param localization the localization manager
      * @param componentManager used to get the proper renderer
      * @param context the XWiki context
      */
-    public XWikiMessageTool(LocalizationManager localization, ComponentManager componentManager,
-        Provider<XWikiContext> xcontextProvider)
+    public XWikiMessageTool(ContextualLocalizationManager localization)
     {
         this.localization = localization;
-        this.componentManager = componentManager;
-        this.xcontextProvider = xcontextProvider;
-    }
-
-    /**
-     * @param localization the localization manager
-     * @param componentManager used to get the proper renderer
-     * @param context the XWiki context
-     */
-    public XWikiMessageTool(LocalizationManager localization, ComponentManager componentManager, XWikiContext context)
-    {
-        this.localization = localization;
-        this.componentManager = componentManager;
-        this.context = context;
     }
 
     /**
@@ -174,7 +138,7 @@ public class XWikiMessageTool
 
     protected XWikiContext getXWikiContext()
     {
-        return this.xcontextProvider != null ? this.xcontextProvider.get() : this.context;
+        return this.context;
     }
 
     /**
@@ -234,27 +198,8 @@ public class XWikiMessageTool
     {
         String translation;
         if (this.localization != null) {
-            XWikiContext context = getXWikiContext();
-            String language = context.getWiki().getLanguagePreference(context);
-            Locale locale = StringUtils.isEmpty(language) ? Locale.ROOT : LocaleUtils.toLocale(language);
-            Translation translations = this.localization.getTranslation(key, locale);
-            if (translations != null) {
-                Block block = translations.render(locale, params);
-
-                BlockRenderer renderer;
-                try {
-                    renderer = this.componentManager.getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
-
-                    DefaultWikiPrinter wikiprinter = new DefaultWikiPrinter();
-                    renderer.render(block, wikiprinter);
-
-                    translation = wikiprinter.toString();
-                } catch (ComponentLookupException e) {
-                    LOGGER.debug("Failed to find a plain text renderer", e);
-
-                    translation = key;
-                }
-            } else {
+            translation = this.localization.getTranslationPlain(key, params);
+            if (translation == null) {
                 translation = key;
             }
         } else {

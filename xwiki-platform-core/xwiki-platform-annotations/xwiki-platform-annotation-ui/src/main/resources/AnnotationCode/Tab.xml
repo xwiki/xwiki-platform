@@ -58,7 +58,7 @@
     #end
     &lt;/div&gt;
   #else
-    &lt;p class="noitems"&gt;$msg.get("annotations.tab.info.noannotations")&lt;/p&gt;
+    &lt;p class="noitems"&gt;$services.localization.render('annotations.tab.info.noannotations')&lt;/p&gt;
   #end
 {{/html}}
 {{/velocity}}</content>

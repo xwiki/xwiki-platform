@@ -106,7 +106,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($msg.get('workspacemanager.panel.title'))
+#panelheader($services.localization.render('workspacemanager.panel.title'))
 #set ($currentWiki = $xcontext.database)
 #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
 #set ($WorkspaceManager = $services.workspace)
@@ -115,20 +115,20 @@
 ##
 #set ($workspace = $WorkspaceManager.getWorkspace($currentWiki))
 #if (!$workspace)
-  {{error}}$msg.get('platform.workspace.wikiNotWorkspace'){{/error}}
+  {{error}}{{translation key="platform.workspace.wikiNotWorkspace"/}}{{/error}}
 #else
   #set($wikiDescriptor = $workspace.wikiDescriptor)
-  **$msg.get('platform.workspace.panelInformationNameLabel')**
+  **{{translation key="platform.workspace.panelInformationNameLabel"/}}**
   $wikiDescriptor.wikiPrettyName
   #set ($workspaceDescription = $wikiDescriptor.description)
   #if ("$!workspaceDescription" != '')
-    **$msg.get('platform.workspace.panelInformationDescriptionLabel')**
+    **{{translation key="platform.workspace.panelInformationDescriptionLabel"/}}**
     $workspaceDescription
   #end
   ----
   ## Join/Leave
   #if ($isGuest)
-    $msg.get('platform.workspace.joinNeedToLogIn')
+    {{translation key="platform.workspace.joinNeedToLogIn"/}}
   #else
     #set ($hasOwner = ($wikiDescriptor.owner.equals($currentUser)))
     #set ($workspaceGroupDocument = $workspace.groupDocument)
@@ -155,18 +155,18 @@
       #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}"))
       #if ($existingInvitationOrRequest)
         #if ("$!{existingInvitationOrRequest.getProperty('type').value}" == 'invitation')
-          #set ($joinText = $msg.get('platform.workspace.invitationPendingForCurrentWorkspace'))
-          #set ($actionLabel = $msg.get('platform.workspace.invitationActionViewLabel'))
+          #set ($joinText = $services.localization.render('platform.workspace.invitationPendingForCurrentWorkspace'))
+          #set ($actionLabel = $services.localization.render('platform.workspace.invitationActionViewLabel'))
         #else
-          #set ($joinText = $msg.get('platform.workspace.joinRequestPendingForCurrentWorkspace'))
-          #set ($actionLabel = $msg.get('platform.workspace.joinRequestActionCancelLabel'))
+          #set ($joinText = $services.localization.render('platform.workspace.joinRequestPendingForCurrentWorkspace'))
+          #set ($actionLabel = $services.localization.render('platform.workspace.joinRequestActionCancelLabel'))
           #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;cancelJoinRequest=1"))
         #end
       #else
         #if ($membershipType == 'request')
-          #set ($actionLabel = $msg.get('platform.workspace.joinRequestActionRequestLabel'))
+          #set ($actionLabel = $services.localization.render('platform.workspace.joinRequestActionRequestLabel'))
         #elseif ($membershipType == 'open')
-          #set ($actionLabel = $msg.get('platform.workspace.joinActionJoinLabel'))
+          #set ($actionLabel = $services.localization.render('platform.workspace.joinActionJoinLabel'))
         #end
       #end
       ## Display
@@ -175,16 +175,16 @@
         (% class='buttonwrapper' %)[[$actionLabel&gt;&gt;path:$actionUrl||class='button']](%%)
       #end
     #elseif (!$hasOwner)
-      $msg.get('platform.workspace.currentUserIsMember')
+      {{translation key="platform.workspace.currentUserIsMember"/}}
       #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${wikiDescriptor.wikiPrettyName}"))
-      (% class='buttonwrapper' %)[[$msg.get('platform.workspace.leaveWorkspace')&gt;&gt;path:$leaveUrl||class='button']](%%)
+      (% class='buttonwrapper' %)[[{{translation key="platform.workspace.leaveWorkspace"/}}&gt;&gt;path:$leaveUrl||class='button']](%%)
     #else
-      $msg.get('platform.workspace.currentUserIsOwner')
+      {{translation key="platform.workspace.currentUserIsOwner"/}}
     #end
   #end
   ----
-  **$msg.get('platform.workspace.panelInformationMembersLabel')**
+  **{{translation key="platform.workspace.panelInformationMembersLabel"/}}**
   #set ($workspaceGroupDocument = $workspace.groupDocument)
   #set ($workspaceGroupMemberObjects = $workspaceGroupDocument.getObjects('XWiki.XWikiGroups'))
   #set ($totalNrOfUsers = $workspaceGroupMemberObjects.size())

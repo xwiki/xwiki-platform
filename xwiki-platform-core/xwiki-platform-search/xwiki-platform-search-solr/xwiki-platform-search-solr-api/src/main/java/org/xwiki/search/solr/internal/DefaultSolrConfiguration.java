@@ -21,15 +21,18 @@ package org.xwiki.search.solr.internal;
 
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -50,16 +53,19 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String DEFAULT_SOLR_TYPE = "embedded";
 
     /**
-     * Default value for the available languages that support optimized indexing.
+     * Default value for the available locales that support optimized indexing.
+     * <p>
+     * Old codes are used (<code>in</code> instead of <code>id</code> for example) because of
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6457127.
      */
-    public static final List<String> DEFAULT_OPTIMIZABLE_LANGUAGES = Arrays.asList("ar", "bg", "ca", "cz", "da", "de",
-        "en", "el", "es", "eu", "fa", "fi", "fr", "ga", "gl", "hi", "hu", "hy", "id", "it", "ja", "lv", "nl", "no",
+    public static final List<String> DEFAULT_OPTIMIZABLE_LOCALES = Arrays.asList("ar", "bg", "ca", "cz", "da", "de",
+        "en", "el", "es", "eu", "fa", "fi", "fr", "ga", "gl", "hi", "hu", "hy", "in", "it", "ja", "lv", "nl", "no",
         "pt", "ro", "ru", "sv", "th", "tr");
 
     /**
-     * Default value for the languages that are have optimized indexing activated.
+     * Default value for the locales that are have optimized indexing activated.
      */
-    public static final List<String> DEFAULT_OPTIMIZED_LANGUAGES = DEFAULT_OPTIMIZABLE_LANGUAGES;
+    public static final List<String> DEFAULT_OPTIMIZED_LOCALES = DEFAULT_OPTIMIZABLE_LOCALES;
 
     /**
      * Default list of multilingual fields.
@@ -88,16 +94,46 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String[] HOME_DIRECTORY_FILE_NAMES = {"solr.xml"};
 
     /**
-     * Solr conf directory file names (including default language resources).
+     * Solr conf directory file names (including default locale resources).
      */
     public static final String[] CONF_DIRECTORY_FILE_NAMES = {"solrconfig.xml", "schema.xml", "elevate.xml",
         "protwords.txt", "stopwords.txt", "synonyms.txt"};
 
     /**
-     * Solr language analysis resource file names.
+     * Solr locale analysis resource file names.
      */
-    public static final String[] LANGUAGE_RESOURCE_FILE_NAME_PREFIXES = {"contractions", "hyphenations", "stemdict",
+    public static final String[] LOCALES_RESOURCE_FILE_NAME_PREFIXES = {"contractions", "hyphenations", "stemdict",
         "stoptags", "stopwords", "synonyms", "userdict"};
+
+    /**
+     * The name of the configuration property containing the batch size.
+     */
+    public static final String SOLR_INDEXER_BATCH_SIZE_PROPERTY = "solr.indexer.batch.size";
+
+    /**
+     * The default size of the batch.
+     */
+    public static final int SOLR_INDEXER_BATCH_SIZE_DEFAULT = 50;
+
+    /**
+     * The name of the configuration property containing the batch maximum length.
+     */
+    public static final String SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY = "solr.indexer.batch.maxLength";
+
+    /**
+     * The default length of the data above which the batch is sent without waiting.
+     */
+    public static final int SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT = 10000;
+
+    /**
+     * The name of the configuration property containing the batch size.
+     */
+    public static final String SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY = "solr.indexer.queue.capacity";
+
+    /**
+     * The default size of the batch.
+     */
+    public static final int SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT = 10000;
 
     /**
      * The Solr configuration source.
@@ -119,18 +155,34 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         return this.configuration.getProperty(actualPropertyName, defaultValue);
     }
 
-    @Override
-    public List<String> getOptimizableLanguages()
+    /**
+     * @param localeStrings the locales as {@link String}s
+     * @return the locales as {@link Locale}s
+     */
+    private List<Locale> toLocales(List<String> localeStrings)
     {
-        // Note: To avoid hardcoding the DEFAULT_OPTIMIZABLE_LANGUAGES value, we could try to read the default
-        // schema.xml file an look for "<fieldType name="text_XX"..." tags.
-        return this.configuration.getProperty("solr.multilingual.availableLanguages", DEFAULT_OPTIMIZABLE_LANGUAGES);
+        List<Locale> locales = new ArrayList<Locale>(localeStrings.size());
+
+        for (String localeString : localeStrings) {
+            locales.add(LocaleUtils.toLocale(localeString));
+        }
+
+        return locales;
     }
 
     @Override
-    public List<String> getOptimizedLanguages()
+    public List<Locale> getOptimizableLocales()
     {
-        return this.configuration.getProperty("solr.multilingual.activeLanguages", DEFAULT_OPTIMIZED_LANGUAGES);
+        // Note: To avoid hardcoding the DEFAULT_OPTIMIZABLE_LOCALES value, we could try to read the default
+        // schema.xml file an look for "<fieldType name="text_XX"..." tags.
+        return toLocales(this.configuration.getProperty("solr.multilingual.availableLocales",
+            DEFAULT_OPTIMIZABLE_LOCALES));
+    }
+
+    @Override
+    public List<Locale> getOptimizedLocales()
+    {
+        return toLocales(this.configuration.getProperty("solr.multilingual.activeLocales", DEFAULT_OPTIMIZED_LOCALES));
     }
 
     @Override
@@ -142,7 +194,6 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public Map<String, URL> getHomeDirectoryConfiguration()
     {
-
         // Build the result
         Map<String, URL> result = new HashMap<String, URL>();
 
@@ -159,15 +210,15 @@ public class DefaultSolrConfiguration implements SolrConfiguration
             result.put(fileName, classPathURL);
         }
 
-        // Language resources. All combinations.
-        for (String language : this.getOptimizableLanguages()) {
-            for (String languageFileName : LANGUAGE_RESOURCE_FILE_NAME_PREFIXES) {
-                String fileName = String.format("%s/lang/%s_%s.txt", CONF_DIRECTORY, languageFileName, language);
+        // Locale resources. All combinations.
+        for (Locale locale : this.getOptimizableLocales()) {
+            for (String localeFileName : LOCALES_RESOURCE_FILE_NAME_PREFIXES) {
+                String fileName = String.format("%s/lang/%s_%s.txt", CONF_DIRECTORY, localeFileName, locale);
                 String classPathLocation = String.format(CLASSPATH_LOCATION_PREFIX, fileName);
                 URL classPathURL = this.getClass().getResource(classPathLocation);
                 try {
                     URLConnection testConnection = classPathURL.openConnection();
-                    // Attempt a connection, since most of the combinations ("fileName_language.txt") will not be valid.
+                    // Attempt a connection, since most of the combinations ("fileName_locale.txt") will not be valid.
                     testConnection.connect();
                     result.put(fileName, classPathURL);
                 } catch (Exception e) {
@@ -177,5 +228,24 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         }
 
         return result;
+    }
+
+    @Override
+    public int getIndexerBatchSize()
+    {
+        return this.configuration.getProperty(SOLR_INDEXER_BATCH_SIZE_PROPERTY, SOLR_INDEXER_BATCH_SIZE_DEFAULT);
+    }
+
+    @Override
+    public int getIndexerBatchMaxLengh()
+    {
+        return this.configuration.getProperty(SOLR_INDEXER_BATCH_SIZE_PROPERTY, SOLR_INDEXER_BATCH_SIZE_DEFAULT);
+    }
+
+    @Override
+    public int getIndexerQueueCapacity()
+    {
+        return this.configuration
+            .getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY, SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
     }
 }

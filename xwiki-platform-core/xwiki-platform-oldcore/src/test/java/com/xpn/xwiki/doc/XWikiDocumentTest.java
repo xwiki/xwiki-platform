@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
@@ -169,7 +169,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(2L));
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
         this.mockXWiki.stubs().method("evaluateTemplate").will(returnValue(""));
 

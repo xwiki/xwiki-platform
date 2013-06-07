@@ -12,7 +12,7 @@
 .resultsNo .currentResultsNo, .resultsNo .totalResultsNo, .pagination .currentPage {
   color: $theme.textColor;
   font-weight: bold;
-} 
+}
 .pagination {
   float: right;
   margin-right: 10px;

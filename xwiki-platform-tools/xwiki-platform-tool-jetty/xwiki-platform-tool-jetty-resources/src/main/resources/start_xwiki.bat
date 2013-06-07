@@ -25,7 +25,6 @@ set JETTY_STOP_PORT=8079
 set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 
 REM Location where XWiki stores generated data and where database files are.
-## ${xwikiDataDir} is a Velocity variable interpolated at build time, not a scripting variable.
 set XWIKI_DATA_DIR=${xwikiDataDir}
 set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir=%XWIKI_DATA_DIR%
 

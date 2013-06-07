@@ -22,8 +22,6 @@ package org.xwiki.rest.internal.resources.tags;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -56,8 +54,8 @@ public class TagsResourceImpl extends XWikiResource implements TagsResource
                 Tag tag = objectFactory.createTag();
                 tag.setName(tagName);
 
-                String tagUri = UriBuilder.fromUri(uriInfo.getBaseUri()).path(PagesForTagsResource.class).build(
-                        wikiName, tagName).toString();
+                String tagUri =
+                    Utils.createURI(uriInfo.getBaseUri(), PagesForTagsResource.class, wikiName, tagName).toString();
                 Link tagLink = objectFactory.createLink();
                 tagLink.setHref(tagUri);
                 tagLink.setRel(Relations.TAG);

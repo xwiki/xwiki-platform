@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AnnotationCode</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1264862667000</creationDate>
+  <date>1271949711000</date>
+  <contentUpdateDate>1271949711000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+admin.annotations=Anmerkungen
+annotations.title=Anmerkung
+</content>
+</xwikidoc>

@@ -5,7 +5,7 @@
     <div>
         <table width="100%" border="0" cellspacing="4" cellpadding="0">
             <tr>
-                <td class="title" nowrap="nowrap">$msg.get("choosemacro")</td>
+                <td class="title" nowrap="nowrap">$services.localization.render('choosemacro')</td>
             </tr>
             <tr>
                 <td >
@@ -46,7 +46,7 @@
                         #set($macroparam = $paramnum)
                         <div>
                         <fieldset style="border: 1px solid #d3e3f5;">
-                            <legend>$msg.get("macro") $macroname</legend>
+                            <legend>$services.localization.render('macro') $macroname</legend>
                             <table width="100%" border="0" cellspacing="4" cellpadding="0">
                                 #foreach ($infoMacro in $infoArr)
                                     #if ($counter == 2)

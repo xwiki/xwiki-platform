@@ -24,8 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +38,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
+import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.internal.installed.DefaultInstalledExtension;
 import org.xwiki.extension.repository.internal.local.DefaultLocalExtension;
@@ -50,6 +50,7 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
@@ -118,6 +119,16 @@ public class JARTranslationBundleFactoryTest
         getObservationManager().notify(new ExtensionInstalledEvent(extensionId, namespace), installedExtension);
     }
 
+    private void mockUpgradeExtension(ExtensionId previousExtensionId, ExtensionId newExtensionId, String namespace)
+        throws ComponentLookupException
+    {
+        DefaultInstalledExtension previousInstalledExtension = mockInstalledExtension(previousExtensionId, namespace);
+        DefaultInstalledExtension newInstalledExtension = mockInstalledExtension(newExtensionId, namespace);
+
+        getObservationManager().notify(new ExtensionUpgradedEvent(newExtensionId, namespace), newInstalledExtension,
+            Arrays.asList(previousInstalledExtension));
+    }
+
     private void mockUninstallExtension(ExtensionId extensionId, String namespace) throws ComponentLookupException
     {
         DefaultInstalledExtension installedExtension = mockInstalledExtension(extensionId, namespace);
@@ -165,6 +176,26 @@ public class JARTranslationBundleFactoryTest
     }
 
     @Test
+    public void upgradeJar() throws ComponentLookupException
+    {
+        ExtensionId previousExtensionId = new ExtensionId("jar", "1.0");
+
+        mockInstallExtension(previousExtensionId, null);
+
+        assertTranslation("test.key", "default translation", Locale.ROOT);
+        assertTranslation("test.key", "en translation", Locale.ENGLISH);
+        assertTranslation("test.key", "en_US translation", Locale.US);
+
+        ExtensionId newExtensionId = new ExtensionId("jar", "2.0");
+
+        mockUpgradeExtension(previousExtensionId, newExtensionId, null);
+
+        assertTranslation("test.key", "default translation 2.0", Locale.ROOT);
+        assertTranslation("test.key", "default translation 2.0", Locale.ENGLISH);
+        assertTranslation("test.key", "default translation 2.0", Locale.US);
+    }
+
+    @Test
     public void uninstallExtension() throws ComponentLookupException
     {
         ExtensionId extensionId = new ExtensionId("jar", "1.0");
@@ -187,7 +218,7 @@ public class JARTranslationBundleFactoryTest
             Arrays.<InstalledExtension> asList(mockInstalledExtension(extensionId, null)));
 
         // Trigger initialization
-        getObservationManager();
+        this.componentManager.getInstance(EventListener.class, JARTranslationBundleFactoryListener.NAME);
 
         assertTranslation("test.key", "default translation", Locale.ROOT);
         assertTranslation("test.key", "en translation", Locale.ENGLISH);

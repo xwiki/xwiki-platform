@@ -26,7 +26,7 @@ package org.xwiki.search.solr.internal.api;
  * A multilingual and virtual/alias field, is not stored in the index with the specified name. It is only used at query
  * time and it is expanded automatically to the actual fields from the index.
  * <p/>
- * Example: "title" becomes "title_ml | title_en | title_ro | title_fr | etc..."
+ * Example: "title" becomes "title_ | title_en | title_ro | title_fr | etc..."
  * <p/>
  * <b>Note</b>: When indexing a field, the actual field name must be used instead of the virtual field name.
  * 
@@ -44,7 +44,12 @@ public interface Fields
     /**
      * Language of the document.
      */
-    String LANGUAGE = "lang";
+    String LANGUAGE = "language";
+    
+    /**
+     * Locale of the document.
+     */
+    String LOCALE = "locale";
 
     /**
      * Keyword field, holds the name of the virtual wiki a document belongs to.
@@ -67,7 +72,7 @@ public interface Fields
     String NAME = "name";
 
     /**
-     * FullName of the document (example : Main.WebHome).
+     * FullName of the document (example: {@code Main.WebHome}).
      */
     String FULLNAME = "fullname";
 
@@ -84,9 +89,16 @@ public interface Fields
     String TITLE_SORT = "title_sort";
 
     /**
-     * Version of the document.
+     * Version of the document (example: {@code 4.2}).
      */
     String VERSION = "version";
+    
+    /**
+     * For storing the comment associated to the version.
+     * <p/>
+     * Note: Multilingual and virtual field.
+     */
+    String COMMENT = "comment";
 
     /**
      * Type of a document. "DOCUMENT", "ATTACHMENT", "OBJECT" and "OBJECT_PROPERTY" are the used values corresponding to
@@ -98,6 +110,11 @@ public interface Fields
      * XWiki object class, only used for objects and properties.
      */
     String CLASS = "class";
+
+    /**
+     * XWiki object number, only used for objects and properties.
+     */
+    String NUMBER = "number";
 
     /**
      * XWiki object content. Used by objects to index their properties and by documents to index all the properties of
@@ -177,13 +194,6 @@ public interface Fields
     String FILENAME = "filename";
 
     /**
-     * For storing the comments.
-     * <p/>
-     * Note: Multilingual and virtual field.
-     */
-    String COMMENT = "comment";
-
-    /**
      * For storing property name.
      */
     String PROPERTY_NAME = "propertyname";
@@ -202,8 +212,10 @@ public interface Fields
 
     /**
      * Multilingual field suffix for the field of "text_general" type.
+     * <p>
+     * Using empty string to make sure to not collide with an existing language.
      */
-    String MULTILINGUAL = "ml";
+    String MULTILINGUAL = "";
 
     /**
      * Format string for multilingual fields.

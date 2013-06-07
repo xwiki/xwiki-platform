@@ -30,7 +30,7 @@
 #macro(displayProperty $property $indentation)
 ${indentation}; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;##
 #if ("$!property.hint" != '')${escapetool.h}${escapetool.h}
-${indentation}  (% class="xHint" %)${escapetool.d}msg.get('$property.hint')
+${indentation}  (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
 #else
 
 #end
@@ -44,7 +44,7 @@ ${indentation}: ${escapetool.d}doc.display('$property.name')
   ${escapetool.h}if (${escapetool.d}context.display == 'edit')
     ; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}doc.display('$property.name')${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;
 #if ("$!property.hint" != '')
-    : (% class="xHint" %)${escapetool.d}msg.get('$property.hint')
+    : (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
 #end
   ${escapetool.h}else
 #displayProperty($property '    ')

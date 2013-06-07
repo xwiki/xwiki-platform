@@ -73,18 +73,18 @@
   <content>{{velocity}}
 #set($annotationsConfigClass = $xwiki.getDocument("AnnotationCode.AnnotationConfig").xWikiClass)
 #set($configObj = $doc.getObject($doc.fullName))
-= $msg.get('annotations.config.activate.title') =
-$msg.get('annotations.config.activate.explanation')
+= $services.localization.render('annotations.config.activate.title') =
+$services.localization.render('annotations.config.activate.explanation')
 
 **$annotationsConfigClass.get("activated").prettyName**: $doc.display("activated")
 **$annotationsConfigClass.get("exceptionSpaces").prettyName**: #if($xcontext.action == "inline") $doc.display("exceptionSpaces")#else#foreach($space in $configObj.getProperty("exceptionSpaces").value)#if($velocityCount &gt; 1), #end[[$space&gt;&gt;${space}.WebHome]]#end#end
 
-= $msg.get('annotations.config.display.title') =
+= $services.localization.render('annotations.config.display.title') =
 **$annotationsConfigClass.get("displayed").prettyName**: $doc.display("displayed")
 **$annotationsConfigClass.get("displayHighlight").prettyName**: $doc.display("displayHighlight")
 
-= $msg.get('annotations.config.type.title') =
-$msg.get('annotations.config.type.explanation')
+= $services.localization.render('annotations.config.type.title') =
+$services.localization.render('annotations.config.type.explanation')
 
 **$annotationsConfigClass.get("annotationClass").prettyName**: #if ($xcontext.action == "inline") $doc.display("annotationClass") #else [[$doc.display("annotationClass")&gt;&gt;$doc.display("annotationClass")]] #end
 {{/velocity}}</content>

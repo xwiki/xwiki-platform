@@ -123,7 +123,7 @@ public abstract class AbstractPlugin implements Plugin
      */
     protected void saveRegistrations(List<HandlerRegistration> registrations)
     {
-        registrations.addAll(registrations);
+        this.registrations.addAll(registrations);
     }
 
     @Override

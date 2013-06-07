@@ -54,9 +54,9 @@
   <content>{{velocity output="false"}}
 #macro(displayPanelProperty $obj $propName)
   ; #if ($xcontext.action == 'inline')
-    {{html}}&lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$msg.get("${class.getName()}_${propName}")&lt;/label&gt;{{/html}}
+    {{html}}&lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$services.localization.render("${class.getName()}_${propName}")&lt;/label&gt;{{/html}}
   #else
-    $msg.get("${class.getName()}_${propName}")
+    $services.localization.render("${class.getName()}_${propName}")
   #end
   : $doc.display($propName, $obj)
 #end

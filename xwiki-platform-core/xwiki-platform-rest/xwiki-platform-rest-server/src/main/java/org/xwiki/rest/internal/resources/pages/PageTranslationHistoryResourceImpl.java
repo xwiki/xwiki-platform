@@ -53,9 +53,10 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
         try {
             Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-            String query = String.format(
-                    "select doc.space, doc.name, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and doc.space=:space and doc.name=:name and doc.language=:language order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
-                    order, order, order);
+            String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
+                + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
+                + " doc.space = :space and doc.name = :name and doc.language = :language"
+                + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", order, order, order);
 
             List<Object> queryResult = null;
             queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceName).bindValue("name",
@@ -68,10 +69,11 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
                 Timestamp timestamp = (Timestamp) fields[3];
                 Date modified = new Date(timestamp.getTime());
                 String modifier = (String) fields[4];
+                String comment = (String) fields[5];
 
                 HistorySummary historySummary = DomainObjectFactory.createHistorySummary(objectFactory,
                         uriInfo.getBaseUri(), wikiName, spaceName, pageName, language, nodeId.getVersion(), modifier,
-                        modified, Utils.getXWikiApi(componentManager), withPrettyNames);
+                        modified, comment, Utils.getXWikiApi(componentManager), withPrettyNames);
 
                 history.getHistorySummaries().add(historySummary);
             }

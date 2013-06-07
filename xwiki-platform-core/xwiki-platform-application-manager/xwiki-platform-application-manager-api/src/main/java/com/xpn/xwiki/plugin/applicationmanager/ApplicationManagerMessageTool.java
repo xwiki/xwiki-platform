@@ -23,8 +23,11 @@ package com.xpn.xwiki.plugin.applicationmanager;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Application Manager plugin translation messages manager.
@@ -34,7 +37,9 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  * 
  * @version $Id$
  * @since 1.1
+ * @deprecated since 5.0M1 use {@link org.xwiki.localization.LocalizationManager} instead
  */
+@Deprecated
 public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
 {
     /**
@@ -166,11 +171,18 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     private static final ApplicationManagerMessageTool DEFAULTMESSAGETOOL = new ApplicationManagerMessageTool();
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system {@link Locale}.
      */
     private ApplicationManagerMessageTool()
     {
         super(ResourceBundle.getBundle(ApplicationManagerPlugin.PLUGIN_NAME + "/ApplicationResources"));
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -185,6 +197,20 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     ApplicationManagerMessageTool(Locale locale, ApplicationManagerPlugin plugin, XWikiContext context)
     {
         super(locale, plugin, context);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
+    }
+
+    @Override
+    public String get(String key)
+    {
+        return this.localizationManager.getTranslationPlain(key);
+    }
+
+    @Override
+    public String get(String key, Object... params)
+    {
+        return this.localizationManager.getTranslationPlain(key, params);
     }
 
     /**

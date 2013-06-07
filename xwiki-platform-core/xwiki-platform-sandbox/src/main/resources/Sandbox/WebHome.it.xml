@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>it</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>L'area test o sandbox è una parte del wiki che si può modificare liberamente. Il suo scopo è quello di aiutarvi nell'imparare a fare modifiche. Si scoprirà come è possibile modificare le pagine e come crearne di nuove. Cliccate **Modifica** per iniziare!
+
+{{info}}Non preoccupatevi di sovrascrivere o cancellare qualcosa nella pagina, è sempre possibile tornare indietro alla versione originale della pagina attraverso la scheda "Cronologia" in fondo alla pagina.{{/info}}
+
+Se si vuole dare un'occhiata alla [[Sintassi di XWiki&gt;&gt;XWiki.XWikiSyntax]] che sta al di sotto del contenuto visualizzato, cliccare "Codice Wiki" nel menu "Mostra" o cliccare la scheda "Sorgente" quando si sta modificando la pagina.
+
+Ecco un elenco di pagine liberamente modificabili con cui esercitarsi:
+
+* [[Sandbox Test Page 1&gt;&gt;Sandbox.TestPage1]]
+* [[Sandbox Test Page 2&gt;&gt;Sandbox.TestPage2]]
+* [[Sandbox Test Page 3&gt;&gt;Sandbox.TestPage3]]
+
+Di seguito una dimostrazione della [[Sintassi di XWiki&gt;&gt;XWiki.XWikiSyntax]] che è possibile usare nelle pagine wiki (titoli, immagini, tabelle).
+
+= Titolo 1 =
+XWiki dispone di sei livelli di titoli. È possibile usarli per strutturare le pagine.
+
+== Titolo 2 ==
+
+=== Titolo 3 ===
+
+==== Titolo 4 ====
+
+===== Titolo 5 ======
+
+====== Titolo 6 ======
+
+= Stili =
+In XWiki sono supportati i seguenti stili di base:
+
+* **Testo in Grassetto**
+* //Testo in Corsivo//
+* __Testo Sottolineato__
+* --Testo Barrato--
+* Testo ,,pedice,,
+* Testo ^^apice^^
+
+= Elenchi = 
+È possibile creare vari tipi di elenchi nelle pagine del wiki:
+
+== Elenco puntato ==
+* Livello 1
+** Livello 2
+*** Livello 3
+** Livello 2
+* Livello 1
+
+== Elenco numerato ==
+1. Voce
+11. Voce livello 2
+111. Voce livello 3
+1. Voce
+
+== Elenco misto ==
+1. Voce 1
+11. Voce 2
+11*. Voce 3
+11*. Voce 4
+1. Voce 5
+
+= Tabelle =
+Si possono creare delle semplici tabelle direttamente nelle pagine del wiki:
+
+== Tabella semplice ==
+| cella 1 | cella 2 | cella 3
+| cella 4 | cella 5 | cella 6
+| cella 7 | cella 8 | cella 9
+
+== Tabella con riga d'intestazione ==
+|= intestazione |= intestazione |= intestazione 
+| cella | cella | cella
+| cella | cella | cella
+
+== Tabella con riga e colonna d'intestazione ==
+|= intestazione |= intestazione |= intestazione 
+|= intestazione | cella | cella
+|= intestazione | cella | cella
+
+
+= Link o Collegamenti =
+XWIki permette di inserire dei link ad altre pagine del wiki o collegamenti a pagine nel web:
+
+* [[WebHome]] -&gt; è un link alla homepage dello spazio corrente
+* [[Sandbox Home&gt;&gt;WebHome]] -&gt; i link possono avere delle etichette
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; un link può usare il formato SpaceName.PageName per collegarsi ad una pagina che si trova in un altro spazio
+* [[http://www.xwiki.org]] -&gt; ci si può collegare a pagine del wiki o a siti web esterni
+* [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; le etichette sui collegamenti funzionano anche per i collegamenti esterni
+
+= Immagini =
+Nelle pagine del wiki si possono inserire delle immagini:
+
+[[image:XWikiLogo.png]]
+
+= Macro =
+Le Macro permettono di dare un aspetto migliore al contenuto delle pagine e aggiungere ulteriori caratteristiche. Ecco due esempi di come usare le macro nelle pagine wiki:
+
+== Macro Avviso (Warning macro)==
+Questa Macro consente di attirare l'attenzione del lettore su una specifica informazione:
+
+{{warning}}Ciao Mondo!{{/warning}}
+
+== Indice della pagina (Toc) ==
+Questa Macro genera automaticamente l'indice della pagina in base ai livelli dei titoli:
+
+{{toc/}}</content>
+</xwikidoc>

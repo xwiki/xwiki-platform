@@ -578,7 +578,7 @@
 #set($joinLink = "float:left;")
 #set($declineLink = "color:#f88;float:right;text-decoration:none;")
 
-$msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiName])
+$services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])
 
 {{html clean=false}}
 #if("$!messageBody" != "")
@@ -588,19 +588,19 @@ $msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $
 #end
 &lt;p style="margin-top:30px"&gt;
 &lt;a href="${guestActionsURL}?doAction_accept=y&amp;amp;messageID=$messageID" style="$bigText$joinLink$linkStyle"&gt;
-$msg.get("xe.invitation.emailContent.joinLink")
+$services.localization.render('xe.invitation.emailContent.joinLink')
 &lt;/a&gt;
 &lt;a href="${guestActionsURL}?doAction_decline=y&amp;amp;messageID=$messageID" style="$bigText$declineLink"&gt;
- $msg.get("xe.invitation.emailContent.declineLink")
+ $services.localization.render('xe.invitation.emailContent.declineLink')
 &lt;/a&gt;&lt;/p&gt;
 &lt;hr style="clear:both" /&gt;
-$msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.getQ()${guestActionsURL}?doAction_report=y&amp;amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;", "&lt;/a&gt;"])
+$services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;a href=$escapetool.getQ()${guestActionsURL}?doAction_report=y&amp;amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;", "&lt;/a&gt;"])
 {{/html}}
 {{/velocity}}</messageBodyTemplate>
     </property>
     <property>
       <messageBodyTemplatePlain>{{velocity}}
-#set($userName = $xwiki.getUserName($xcontext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get("guestsActionsPage")).getExternalURL())$msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiName])#if("$!messageBody" != "")  $messageBody#end$msg.get("xe.invitation.emailContent.joinLink")${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$msg.get("xe.invitation.emailContent.declineLink")${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID$msg.get("xe.invitation.emailContent.reportMessage", ["", "$util.getNewline()${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID"]){{/velocity}}</messageBodyTemplatePlain>
+#set($userName = $xwiki.getUserName($xcontext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"))#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get('guestsActionsPage')).getExternalURL())$services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])#if("$!messageBody" != '')  $messageBody#end$services.localization.render('xe.invitation.emailContent.joinLink')${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.declineLink')${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID$services.localization.render('xe.invitation.emailContent.reportMessage', ['', "$util.getNewline()${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID"]){{/velocity}}</messageBodyTemplatePlain>
     </property>
     <property>
       <smtp_port>25</smtp_port>
@@ -615,7 +615,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
       <smtp_server_username/>
     </property>
     <property>
-      <subjectLineTemplate>{{velocity}}$msg.get("xe.invitation.emailContent.subjectLine", [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
+      <subjectLineTemplate>{{velocity}}$services.localization.render('xe.invitation.emailContent.subjectLine', [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
     </property>
     <property>
       <usersMayPersonalizeMessage>1</usersMayPersonalizeMessage>
@@ -645,7 +645,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
   {{info}}testLoadInvitationConfig{{/info}}
   #testLoadInvitationConfig()
 #elseif($doc.getName() == 'InvitationCommon')
-  {{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}
+  {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##
 #*
@@ -668,7 +668,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
 
   {{html wiki=false clean=false}}
   &lt;div id="invitation-displaymessage" class="invitation"&gt;
-   &lt;strong&gt;$msg.get('xe.invitation.previewLabel')&lt;/strong&gt;
+   &lt;strong&gt;$services.localization.render('xe.invitation.previewLabel')&lt;/strong&gt;
    &lt;div class="invitation invitation-preview"&gt;
     #set($recips = [])
     #set($invalid = [])
@@ -687,7 +687,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
     #end
     ## Print the email addresses to be sent to.
     ## To:
-    &lt;strong&gt;$msg.get('xe.invitation.toLabel')&lt;/strong&gt;
+    &lt;strong&gt;$services.localization.render('xe.invitation.toLabel')&lt;/strong&gt;
     &lt;div id="preview-to-field" class="invitation-preview field"&gt;
      #foreach($recip in $recips)
        #if($invalid.contains($recip))
@@ -698,7 +698,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
        #end
      #end
      #foreach($recip in $invalid)
-       &lt;span class="invalid-address"&gt;$!escapetool.xml($!recip)&lt;/span&gt; ##       
+       &lt;span class="invalid-address"&gt;$!escapetool.xml($!recip)&lt;/span&gt; ##
      #end
      &amp;nbsp; ## used to make the field the correct size if it's empty.
     &lt;/div&gt;
@@ -708,24 +708,24 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
        &lt;span class="errormessage"&gt;
         #if($recips.size() == 1)
           ## The email address given is invalid and will not be sent to.
-          $msg.get('xe.invitation.displayMessage.theAddressIsInvalid')
+          $services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid')
         #else
           #if($invalid.size() &gt; 1)
-            $msg.get('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()])
+            $services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()])
           #else
-            $msg.get('xe.invitation.displayMessage.anAddressesIsInvalid')
+            $services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid')
           #end
         #end
        &lt;/span&gt;
       &lt;/p&gt;
     #end
      ## Subject:
-     &lt;strong&gt;$msg.get('xe.invitation.subjectLabel')&lt;/strong&gt;
+     &lt;strong&gt;$services.localization.render('xe.invitation.subjectLabel')&lt;/strong&gt;
     &lt;div id="preview-subjectline-field" class="invitation-preview field"&gt;
      $escapetool.xml($mail.getProperty('subjectLine').getValue())
     &lt;/div&gt;
     ## Message:
-    &lt;strong&gt;$msg.get('xe.invitation.contentLabel')&lt;/strong&gt;
+    &lt;strong&gt;$services.localization.render('xe.invitation.contentLabel')&lt;/strong&gt;
     &lt;div id="preview-messagebody-field" class="invitation-preview field"&gt;
      $mail.getProperty('messageBody').getValue()
     &lt;/div&gt;
@@ -774,7 +774,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
         $config.put($element.getName(), $defaultConfigObj.getProperty($element.getName()).getValue())
       #end
       ##
-      #set($configDocContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.internalDocument", ["'
+      #set($configDocContent = '{{velo' + 'city}}{{info}}$services.localization.render(''xe.invitation.internalDocument'', ["'
                                + "$!config.get('mainPage')" + '"]){{/info}}{{/velo' + 'city}}')
       $configDoc.setContent($configDocContent)
       $configDoc.setParent($configClassNameInternal)
@@ -792,7 +792,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
       $cfgable.set('propertiesToShow', $propsToShow)
       #set($cfgable = $configDoc.newObject('XWiki.ConfigurableClass'))
       $cfgable.set('displayInSection', 'Invitation')
-      $cfgable.set('heading', '$msg.get("xe.invitation.configuration.smtpHeading")')
+      $cfgable.set('heading', '$services.localization.render(''xe.invitation.configuration.smtpHeading'')')
       $cfgable.set('configurationClass', $configClassNameInternal)
       $cfgable.set('configureGlobally', 1)
       $cfgable.set('propertiesToShow',
@@ -862,7 +862,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
 #macro(loadInvitationMail, $config, $emailContainer, $mail)
   ## If this doesn't already exist, it's created.
   #if($emailContainer.isNew())
-    #set($emailContainerContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.internalDocument", ["'
+    #set($emailContainerContent = '{{velo' + 'city}}{{info}}$services.localization.render(''xe.invitation.internalDocument'', ["'
                                   + "$config.get('emailContainer')" + '"]){{/info}}{{/velo' + 'city}}')
     #set($discard = $emailContainer.setContent($emailContainerContent))
     #set($discard = $emailContainer.setHidden(true))
@@ -1012,23 +1012,23 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
  *###
 #macro(messageStatusForCode, $status)
   #if($status == 'unsent')
-    $msg.get('xe.invitation.messageStatus.unsent')##
+    $services.localization.render('xe.invitation.messageStatus.unsent')##
   #elseif($status == 'pending')
-    $msg.get('xe.invitation.messageStatus.pending')##
+    $services.localization.render('xe.invitation.messageStatus.pending')##
   #elseif($status == 'accepted')
-    $msg.get('xe.invitation.messageStatus.accepted')##
+    $services.localization.render('xe.invitation.messageStatus.accepted')##
   #elseif($status == 'declined')
-    $msg.get('xe.invitation.messageStatus.declined')##
+    $services.localization.render('xe.invitation.messageStatus.declined')##
   #elseif($status == 'canceled')
-    $msg.get('xe.invitation.messageStatus.canceled')##
+    $services.localization.render('xe.invitation.messageStatus.canceled')##
   #elseif($status == 'reported')
-    $msg.get('xe.invitation.messageStatus.reported')##
+    $services.localization.render('xe.invitation.messageStatus.reported')##
   #elseif($status == 'notSpam')
-    $msg.get('xe.invitation.messageStatus.investigated')##
+    $services.localization.render('xe.invitation.messageStatus.investigated')##
   #elseif($status == 'sendingFailed')
-    $msg.get('xe.invitation.messageStatus.sendingFailed')##
+    $services.localization.render('xe.invitation.messageStatus.sendingFailed')##
   #else
-    $msg.get('xe.invitation.messageStatus.unknown', [$escapetool.xml($status)])##
+    $services.localization.render('xe.invitation.messageStatus.unknown', [$escapetool.xml($status)])##
   #end
 #end
 {{/velocity}}</content>

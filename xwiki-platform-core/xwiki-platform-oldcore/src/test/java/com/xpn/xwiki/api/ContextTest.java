@@ -28,6 +28,7 @@ import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
@@ -41,7 +42,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link Context}.
@@ -131,8 +132,6 @@ public class ContextTest extends AbstractComponentTestCase
             // Decide that there's no custom Displayer for the String field
             allowing(xwiki).exists(new DocumentReference("testwiki", "XWiki", "StringDisplayer"), xcontext);
             will(returnValue(false));
-            allowing(xwiki).isVirtualMode();
-            will(returnValue(false));
             allowing(xwiki).evaluateTemplate("displayer_string.vm", xcontext);
             will(returnValue(""));
         }});
@@ -141,6 +140,10 @@ public class ContextTest extends AbstractComponentTestCase
         BaseObject obj = (BaseObject) document.getXClass().newObject(xcontext);
         obj.setStringValue("prop", "value");
         document.addXObject(obj);
+
+        // Tie together Execution Context and old XWiki Context
+        Execution execution = getComponentManager().getInstance(Execution.class);
+        execution.getContext().setProperty("xwikicontext", xcontext);
 
         Context context = new Context(xcontext);
         context.setDisplayMode("edit");

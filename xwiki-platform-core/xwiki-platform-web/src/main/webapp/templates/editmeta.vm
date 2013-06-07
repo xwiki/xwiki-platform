@@ -9,20 +9,20 @@
 ##--------------------------------------------------------------------------
 ## Title and parent
 ##
-  <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$msg.get('core.editors.content.parentField.edit.title')">[$msg.get('core.editors.content.parentField.edit')]</a></div>
+  <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a></div>
   <div id="parentinput">
-    <label for="xwikidocparentinput">$msg.get('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$msg.get('core.editors.content.parentField.edit.hide')</a>
+    <label for="xwikidocparentinput">$services.localization.render('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$services.localization.render('core.editors.content.parentField.edit.hide')</a>
     <input type="text" id="xwikidocparentinput" name="parent" value="$!{escapetool.xml("$!docParent")}" size="30" class="suggestDocuments"/></label>
   </div>
   #if ($editor != 'inline')
   <div id="titleinput">
-    <label for="xwikidoctitleinput">$msg.get('core.editors.content.titleField.label')
+    <label for="xwikidoctitleinput">$services.localization.render('core.editors.content.titleField.label')
     <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" #if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)class="required"#end/></label>
   </div>
   #end
 
 #if($editor == 'wiki')
   <div id="contentMeta">
-    <label for="content">$msg.get('core.editors.content.contentField.label')</label>
+    <label for="content">$services.localization.render('core.editors.content.contentField.label')</label>
   </div>
 #end

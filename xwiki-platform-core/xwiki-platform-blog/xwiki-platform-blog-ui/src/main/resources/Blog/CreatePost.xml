@@ -25,10 +25,15 @@
   <hidden>true</hidden>
   <content>{{include document="Blog.BlogCode"/}}
 
-{{velocity filter="none"}}
+{{velocity}}
 {{html clean="false" wiki="true"}}
 #set($name = "$!request.entryTitle")
 #if($name == '')
+  ## If there's also a form_token passed it means the user has entered an empty blog post title, let the user know about it!
+  #if ("$!request.form_token" != '')
+    {{error}}$services.localization.render('xe.blog.post.titleEmptyError'){{/error}}
+
+  #end
   ## First step, display the create form
   #if($hasEdit)
   $xwiki.jsx.use($blogScriptsDocumentName)##
@@ -36,14 +41,14 @@
   #if($space == '')
     #set($space = $doc.space)
   #end
-  &lt;form action="${xwiki.getURL('Blog.CreatePost', 'view', 'xpage=plain')}" id="newBlogPost" method="post" class="xformInline"&gt;
+  &lt;form action='' id="newBlogPost" method="post" class="xformInline"&gt;
   &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="entrySpace" value="$!{escapetool.xml($space)}"/&gt;
     #if($doc.getObject($blogCategoryClassname))
       &lt;input type="hidden" name="category" value="${escapetool.xml(${doc.fullName})}"/&gt;
     #end
-    &lt;label class="createPost" for="entryTitle"&gt;$msg.get('xe.blog.post.createpost') &lt;/label&gt;&lt;input type="text" id="entryTitle" name="entryTitle" value="$msg.get('xe.blog.post.title')" class="withTip" size="30" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="${escapetool.xml($msg.get('xe.blog.post.create'))}" class="button"/&gt;&lt;/span&gt;
+    &lt;label class="createPost" for="entryTitle"&gt;$services.localization.render('xe.blog.post.createpost') &lt;/label&gt;&lt;input type="text" id="entryTitle" name="entryTitle" value="$services.localization.render('xe.blog.post.title')" class="withTip" size="30" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="${escapetool.xml($services.localization.render('xe.blog.post.create'))}" class="button"/&gt;&lt;/span&gt;
   &lt;/div&gt;
   &lt;/form&gt;
   #elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted

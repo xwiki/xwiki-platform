@@ -90,22 +90,25 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     {
         boolean needsUpdate = false;
 
-        if (StringUtils.isBlank(document.getCreator())) {
+        if (document.getCreatorReference() == null) {
             needsUpdate = true;
             document.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
-        if (StringUtils.isBlank(document.getAuthor())) {
+        if (document.getAuthorReference() == null) {
             needsUpdate = true;
-            document.setAuthor(document.getCreator());
+            document.setAuthorReference(document.getCreatorReference());
         }
+
         if (StringUtils.isBlank(document.getParent())) {
             needsUpdate = true;
             document.setParent("XWiki.XWikiClasses");
         }
+
         if (StringUtils.isBlank(document.getTitle())) {
             needsUpdate = true;
             document.setTitle(title);
         }
+
         if (!document.isHidden()) {
             needsUpdate = true;
             document.setHidden(true);

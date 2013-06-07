@@ -21,7 +21,7 @@
     #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
   #end
   #set($tmpmsg = "${tmpmsg}</ul><p class='xwikimessage'>")
-  #set($tmpmsg = $msg.get('core.delete.backlinksWarning', [$tmpmsg]))
+  #set($tmpmsg = $services.localization.render('core.delete.backlinksWarning', [$tmpmsg]))
   #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
   #set($hasInlinks = true)
 #end
@@ -32,24 +32,24 @@
     #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
   #end
   #set($tmpmsg = "${tmpmsg}</ul><p class='xwikimessage'>")
-  #set($tmpmsg = $msg.get('core.delete.orphansWarning', [$tmpmsg]))
+  #set($tmpmsg = $services.localization.render('core.delete.orphansWarning', [$tmpmsg]))
   #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
   #set($hasInlinks = true)
 #end
 #if($xwiki.hasRecycleBin())
   #if($hasInlinks)
-    #set($fullmsg = "${fullmsg}${msg.get('core.recyclebin.confirmWithInlinks')}")
+    #set($fullmsg = "${fullmsg}${services.localization.render('core.recyclebin.confirmWithInlinks')}")
   #else
-    #set($fullmsg = $msg.get('core.recyclebin.confirm'))
+    #set($fullmsg = $services.localization.render('core.recyclebin.confirm'))
   #end
 #else
   #if($hasInlinks)
-    #set($fullmsg = "${fullmsg}${msg.get('core.delete.confirmWithInlinks')}")
+    #set($fullmsg = "${fullmsg}${services.localization.render('core.delete.confirmWithInlinks')}")
   #else
-    #set($fullmsg = $msg.get('core.delete.confirm'))
+    #set($fullmsg = $services.localization.render('core.delete.confirm'))
   #end
 #end
-  #xwikimessageboxstart($msg.get('core.delete') $fullmsg)
+  #xwikimessageboxstart($services.localization.render('core.delete') $fullmsg)
     <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
       <div class="hidden">
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -58,17 +58,17 @@
           <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
         #end
       </div>
-      <div class="buttonwrapper"><input type="submit" class="button" value="$msg.get('yes')"/></div>
+      <div class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('yes')"/></div>
       #if("$!{request.xredirect}" != '')
         #set($cancelUrl = "$request.xredirect")
       #else
         #set($cancelUrl = $doc.getURL())
       #end
-      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$msg.get('no')</a></div>
+      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a></div>
     </form>
   #xwikimessageboxend()
 #else ## request.id
-  #xwikimessageboxstart($msg.get('core.delete') $msg.get('core.recyclebin.completelyDeleteConfirm'))
+  #xwikimessageboxstart($services.localization.render('core.delete') $services.localization.render('core.recyclebin.completelyDeleteConfirm'))
     <form action="" method="post">
       <div class="hidden">
         ## CSRF prevention
@@ -79,13 +79,13 @@
           <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
         #end
       </div>
-      <div class="buttonwrapper"><input type="submit" class="button" value="$msg.get('yes')"/></div>
+      <div class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('yes')"/></div>
       #if("$!{request.xredirect}" != '')
         #set($cancelUrl = "$request.xredirect")
       #else
         #set($cancelUrl = $doc.getURL())
       #end
-      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$msg.get('no')</a></div>
+      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a></div>
     </form>
   #xwikimessageboxend()
 #end

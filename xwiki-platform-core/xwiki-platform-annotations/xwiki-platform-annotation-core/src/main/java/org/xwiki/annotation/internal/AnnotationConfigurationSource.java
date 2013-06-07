@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Provides configuration from the Annotation Application's configuration document, for the current wiki. Clients of
@@ -41,6 +42,11 @@ import org.xwiki.model.reference.DocumentReference;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class AnnotationConfigurationSource extends AbstractDocumentConfigurationSource
 {
+    /**
+     * The local reference of the class containing space preferences.
+     */
+    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(
+        AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME, AnnotationConfiguration.CONFIGURATION_PAGE_NAME);
 
     @Override
     protected DocumentReference getDocumentReference()
@@ -50,9 +56,8 @@ public class AnnotationConfigurationSource extends AbstractDocumentConfiguration
     }
 
     @Override
-    protected DocumentReference getClassReference()
+    protected LocalDocumentReference getClassReference()
     {
-        return getDocumentReference();
+        return CLASS_REFERENCE;
     }
-
 }

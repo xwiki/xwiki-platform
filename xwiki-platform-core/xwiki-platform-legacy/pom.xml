@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy</artifactId>
   <name>XWiki Platform - Legacy</name>
@@ -38,11 +38,13 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-legacy-oldcore</module>
-    <module>xwiki-platform-legacy-observation</module>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-legacy-annotation</module>
     <module>xwiki-platform-legacy-model</module>
+    <module>xwiki-platform-legacy-observation</module>
     <module>xwiki-platform-legacy-office-importer</module>
+    <module>xwiki-platform-legacy-oldcore</module>
+    <module>xwiki-platform-legacy-url</module>
   </modules>
   <build>
     <pluginManagement>

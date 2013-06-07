@@ -1,1 +1,2 @@
 org.xwiki.url.internal.XWikiURLExecutionContextInitializer
+org.xwiki.url.internal.XWikiURLRequestInitializer

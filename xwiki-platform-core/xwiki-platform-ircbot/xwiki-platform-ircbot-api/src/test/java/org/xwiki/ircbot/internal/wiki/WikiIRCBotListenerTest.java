@@ -47,7 +47,7 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link WikiIRCBotListener}.

@@ -64,7 +64,7 @@ public abstract class AbstractCacheConfigurationLoader
     }
 
     /**
-     * @return the patch of the temporary local folder based on configuration identifier.
+     * @return the path of the temporary local folder based on configuration identifier
      */
     protected String createTempDir()
     {

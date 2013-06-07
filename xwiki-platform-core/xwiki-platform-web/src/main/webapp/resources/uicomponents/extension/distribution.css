@@ -8,28 +8,13 @@
   width: 800px;
 }
 #distributionWizard .xdialog-header {
-  background-image: url("header.png");
+  #if ("$!theme.headerBackgroundImage" != '')
+    background-image: $theme.headerBackgroundImage;
+  #else
+    background-image: url("header.png");
+  #end
   border-radius: 4px 4px 0 0;
   margin: -1px;
-}
-#distributionWizard .xdialog-header img {
-  margin-left: -10px;
-}
-#distributionWizard .xdialog-content > .ui-progress {
-  margin-bottom: .5em;
-}
-#distributionWizard .xdialog-content > .extension-body-progress {
-  display: block;
-}
-#distributionWizard .xLabel {
-  font-weight: 700;
-  margin: 1.2em 0 0.3em 0;
-  text-transform: uppercase;
-}
-#distributionWizard .xHint {
-  color: $theme.textSecondaryColor;
-  font-size: smaller;
-  margin: 0.3em 0;
 }
 #distributionWizard .errormessage, #distributionWizard .warningmessage, #distributionWizard .infomessage {
   background-color: transparent;

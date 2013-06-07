@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1306878414000</creationDate>
-  <date>1306885344000</date>
-  <contentUpdateDate>1306885344000</contentUpdateDate>
+  <creationDate>1364502208000</creationDate>
+  <date>1364568439000</date>
+  <contentUpdateDate>1364568439000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.admin.skin")</title>
-  <template/>
+  <title>$services.localization.render('xe.admin.skin')</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -55,8 +54,8 @@
   #end
 #else
   ## Call getDefaultEditMode() for backward compatibility with existing skins.
-  * [[$msg.get('xe.admin.skin.editskin')&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
-  * [[$msg.get('xe.admin.skin.testskin')&gt;&gt;Main.WebHome||queryString="skin=${doc.fullName}"]]
+  * [[{{translation key="xe.admin.skin.editskin"/}}&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
+  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;$services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))||queryString="skin=${doc.fullName}"]]
 #end
 {{/velocity}}</content>
 </xwikidoc>

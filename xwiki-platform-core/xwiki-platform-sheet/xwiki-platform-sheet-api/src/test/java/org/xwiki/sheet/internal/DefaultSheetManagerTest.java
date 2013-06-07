@@ -22,7 +22,7 @@ package org.xwiki.sheet.internal;
 import java.util.Arrays;
 import java.util.Collections;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.jmock.Sequence;

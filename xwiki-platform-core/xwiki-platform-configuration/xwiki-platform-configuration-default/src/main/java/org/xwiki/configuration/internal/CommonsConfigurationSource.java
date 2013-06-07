@@ -114,7 +114,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
     public List<String> getKeys()
     {
         List<String> keysList = new ArrayList<String>();
-        Iterator<String> keys = (Iterator<String>) getConfiguration().getKeys();
+        Iterator<String> keys = getConfiguration().getKeys();
         while (keys.hasNext()) {
             keysList.add(keys.next());
         }

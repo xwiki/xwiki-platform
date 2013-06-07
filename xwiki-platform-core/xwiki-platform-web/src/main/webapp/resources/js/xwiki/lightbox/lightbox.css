@@ -59,12 +59,12 @@
 }
 
 #lb {
-	position: absolute;
-	left: 50%;
-	top:  50px;
-	margin-left: -450px;
-	z-index: 100005;
-	width: 900px;
+  position: absolute;
+  left: 50%;
+  top:  50px;
+  margin-left: -450px;
+  z-index: 100005;
+  width: 900px;
 }
 
 .lb-content {
@@ -124,18 +124,18 @@
 
 
 #close-wrap {
-	position: relative;
-	top: 18px;
-	right: 7px;
-	text-align: right;
-	cursor: default;
+  position: relative;
+  top: 18px;
+  right: 7px;
+  text-align: right;
+  cursor: default;
 }
 
 #lb-close {
-	margin-left: auto;
-	margin-right: 10px;
-	width: 30px;
-	cursor: pointer;
-	background-image: url("$xwiki.getSkinFile("js/xwiki/lightbox/btnClose.png")");
-	background-repeat: no-repeat;
+  margin-left: auto;
+  margin-right: 10px;
+  width: 30px;
+  cursor: pointer;
+  background-image: url("$xwiki.getSkinFile('js/xwiki/lightbox/btnClose.png')");
+  background-repeat: no-repeat;
 }

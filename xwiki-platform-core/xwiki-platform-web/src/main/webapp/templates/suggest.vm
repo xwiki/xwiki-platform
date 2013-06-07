@@ -38,7 +38,7 @@ $response.setContentType("text/xml")
     #set($hibquery = $hibquery.concat($like))
   #else
     #set($whereidx = $whereidx + 5)
-    #set($like = " lower("+ $firCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ? and")
+    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ? and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
   #set($results = $xwiki.search($hibquery, 30, 0, ["%${input}%"]))

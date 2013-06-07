@@ -1,4 +1,7 @@
-// script.aculo.us effects.js v1.9.0, Thu Dec 23 16:54:48 -0500 2010
+// script.aculo.us effects.js v1.9.0-patched, Thu Dec 23 16:54:48 -0500 2010
+
+// NOTE: This file includes the following patches:
+// * http://jira.xwiki.org/browse/XWIKI-8497
 
 // Copyright (c) 2005-2010 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
 // Contributors:
@@ -357,6 +360,15 @@ Effect.Opacity = Class.create(Effect.Base, {
       from: this.element.getOpacity() || 0.0,
       to:   1.0
     }, arguments[1] || { });
+    // The signature of Element#getOpacity() specifies a return value of type String which means we have to make sure the
+    // values of 'to' and 'from' parameters that define the opacity transition are numbers.
+    // See http://prototypejs.org/doc/latest/dom/Element/prototype/getOpacity
+    // The bug is described here https://prototype.lighthouseapp.com/projects/8886/tickets/1278-ie-detection-and-opacity#ticket-1278-4
+    // XWiki issue: http://jira.xwiki.org/browse/XWIKI-8497
+    // ----- Start fix -----
+    options.from = parseFloat(options.from);
+    options.to = parseFloat(options.to);
+    // ----- End fix -----
     this.start(options);
   },
   update: function(position) {

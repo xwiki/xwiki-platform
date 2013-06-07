@@ -24,12 +24,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.stub.VoidStub;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -69,6 +71,9 @@ public class ImportTest extends AbstractPackageTest
         getContext().setWiki(this.xwiki);
         this.xwiki.setConfig(new XWikiConfig());
 
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+        
         // mock a store that would also handle translations
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
@@ -164,7 +169,7 @@ public class ImportTest extends AbstractPackageTest
         // mock the right service
         this.mockRightService = mock(XWikiRightService.class);
         this.mockRightService.stubs().method("checkAccess").will(returnValue(true));
-        this.mockRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockRightService.stubs().method("hasWikiAdminRights").will(returnValue(true));
         this.mockRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
         this.xwiki.setRightService((XWikiRightService) this.mockRightService.proxy());
     }

@@ -80,7 +80,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 @ComponentList({
     DefaultModelContext.class,

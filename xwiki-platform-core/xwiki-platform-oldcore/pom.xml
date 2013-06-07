@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -38,7 +38,7 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>27.80</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>29.15</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -457,7 +457,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-default</artifactId>
+      <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -480,8 +480,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-captcha</artifactId>
       <version>${project.version}</version>
-      <!-- Core does not depend on this to run so it shouldn't be pulled in unless it is a dependency somewhere else. -->
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -567,6 +565,11 @@
       <artifactId>xwiki-platform-localization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -630,6 +633,12 @@
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
+    <!--dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency-->
   </dependencies>
   <build>
     <plugins>
@@ -766,6 +775,7 @@
               **/objects/PropertyInterface.java,
               **/objects/StringListProperty.java,
               **/pdf/impl/PdfExportImpl.java,
+              **/pdf/impl/PdfURLFactory.java,
               **/plugin/image/ImagePlugin.java,
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/diff/DiffPluginApi.java,
@@ -990,17 +1000,6 @@
               <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
               **/stats/impl/xwiki/XWikiStatsReader.java,
           </excludes>
-        </configuration>
-      </plugin>
-      <!-- Since oldcore doesn't follow the "internal" package rule (for legacy reasons) we only run CLIRR on "api"
-           packages -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/api/**</include>
-          </includes>
         </configuration>
       </plugin>
     </plugins>

@@ -23,7 +23,10 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +44,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.id.SequenceGenerator;
 import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.jdbc.Work;
@@ -67,6 +71,11 @@ public class XWikiHibernateBaseStore implements Initializable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateBaseStore.class);
 
+    /**
+     * @see #isInSchemaMode()
+     */
+    private static final String VIRTUAL_MODE_SCHEMA = "schema";
+
     private Map<String, String> connections = new ConcurrentHashMap<String, String>();
 
     private int nbConnections = 0;
@@ -82,7 +91,7 @@ public class XWikiHibernateBaseStore implements Initializable
     @Named("hibernate")
     private DataMigrationManager dataMigrationManager;
 
-    /** Need to get the xcontext to get the path tho the hibernate.cfg.xml. */
+    /** Need to get the xcontext to get the path to the hibernate.cfg.xml. */
     @Inject
     private Execution execution;
 
@@ -210,22 +219,6 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         getConfiguration().configure(getPath());
 
-        XWiki wiki = context.getWiki();
-        if (wiki != null && wiki.Param("xwiki.db") != null && !wiki.isVirtualMode()) {
-            // substitute default db name to configured.
-            // note, that we can't call getSchemaFromWikiName() here,
-            // because it ask getDatabaseProduct() which use connection
-            // which must be opened. But here (before connection init)
-            // we have no opened connections yet.
-            String schemaName = getSchemaFromWikiName(context.getDatabase(), null, context);
-
-            String dialect = getConfiguration().getProperty(Environment.DIALECT);
-            if ("org.hibernate.dialect.MySQLDialect".equals(dialect)) {
-                getConfiguration().setProperty(Environment.DEFAULT_CATALOG, schemaName);
-            } else {
-                getConfiguration().setProperty(Environment.DEFAULT_SCHEMA, schemaName);
-            }
-        }
         if (this.sessionFactory == null) {
             this.sessionFactory = Utils.getComponent(HibernateSessionFactory.class);
         }
@@ -338,24 +331,19 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         // We don't update the schema if the XWiki hibernate config parameter says not to update
         if ((!force) && (context.getWiki() != null)
-            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Schema update deactivated for wiki [" + context.getDatabase() + "]");
-            }
+            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
+        {
+            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getDatabase());
             return;
         }
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Updating schema update for wiki [" + context.getDatabase() + "]...");
-        }
+        LOGGER.info("Updating schema for wiki [{}]...", context.getDatabase());
 
         try {
             String[] sql = getSchemaUpdateScript(getConfiguration(), context);
             updateSchema(sql, context);
         } finally {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Schema update for wiki [" + context.getDatabase() + "] done");
-            }
+            LOGGER.info("Schema update for wiki [{}] done", context.getDatabase());
         }
     }
 
@@ -440,7 +428,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @return the database/schema name.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    protected String getSchemaFromWikiName(XWikiContext context)
+    public String getSchemaFromWikiName(XWikiContext context)
     {
         return getSchemaFromWikiName(context.getDatabase(), context);
     }
@@ -478,7 +466,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 || databaseProduct == DatabaseProduct.HSQLDB
                 || databaseProduct == DatabaseProduct.DERBY
                 || databaseProduct == DatabaseProduct.DB2
-                || databaseProduct == DatabaseProduct.POSTGRESQL)
+                || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()))
             {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
@@ -492,6 +480,15 @@ public class XWikiHibernateBaseStore implements Initializable
             meta = new DatabaseMetadata(connection, dialect);
             stmt = connection.createStatement();
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
+
+            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createSequence for details), we need
+            // to ensure that Hibernate will create the "hibernate_sequence" sequence.
+            // Note: We only add the sequence if there are some SQL to execute in the passed schema SQL parameter.
+            // This is to protect against several calls to update the schema (for the same schema name).
+            if (schemaSQL.length > 0) {
+                schemaSQL = addHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
+            }
+
         } catch (Exception e) {
             throw new HibernateException("Failed creating schema update script", e);
         } finally {
@@ -510,6 +507,46 @@ public class XWikiHibernateBaseStore implements Initializable
         }
 
         return schemaSQL;
+    }
+
+    /**
+     * In the Hibernate mapping file for XWiki we use a "native" generator for some tables (deleted document and
+     * deleted attachments for example - The reason we use generated ids and not custom computed ones is because
+     * we don't need to address rows from these tables). For a lot of database the Dialect uses an Identity
+     * Generator (when the DB supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to
+     * a Sequence Generate which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
+     * create such a sequence automatically when updating the schema (see #getSchemaUpdateScript).
+     * However the problem is that Hibernate maintains a cache of sequence names per catalog and will only
+     * generate the sequence creation SQL if the sequence is not in this cache. Since the main wiki is updated
+     * first the sequence named "hibernate_sequence" will be put in this cache, thus preventing subwikis to
+     * automatically create sequence with the same name (see also
+     * https://hibernate.atlassian.net/browse/HHH-1672). As a workaround, we create the required sequence here.
+     *
+     * @param schemaSQL the list of SQL commands to execute to update the schema and to which we're adding the sequence
+     *        creation if need be (only for DBs using a SequenceGenerator)
+     * @param schemaName the schema name corresponding to the subwiki being updated
+     * @param session the Hibernate session, used to get the Dialect object
+     * @since 5.0RC1
+     */
+    protected String[] addHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
+    {
+        String[] result = schemaSQL;
+
+        // There's no issue when in database mode, only in schema mode.
+        if (isInSchemaMode()) {
+            Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
+            if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
+                List<String> sql = new ArrayList<String>();
+                Collections.addAll(sql, schemaSQL);
+                String sequenceSQL = String.format("create sequence %s.hibernate_sequence", schemaName);
+                if (!sql.contains(sequenceSQL)) {
+                    sql.add(sequenceSQL);
+                }
+                result = sql.toArray(new String[sql.size()]);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -611,6 +648,7 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Checks if this xwiki setup is virtual meaning if multiple wikis can be accessed using the same database pool
      * 
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
      */
@@ -633,33 +671,30 @@ public class XWikiHibernateBaseStore implements Initializable
     public void setDatabase(Session session, XWikiContext context) throws XWikiException
     {
         try {
-            if (isVirtual(context)) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Switch database to [{}]", context.getDatabase());
-                }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Switch database to [{}]", context.getDatabase());
+            }
 
-                if (context.getDatabase() != null) {
-                    String schemaName = getSchemaFromWikiName(context);
-                    String escapedSchemaName = escapeSchema(schemaName, context);
+            if (context.getDatabase() != null) {
+                String schemaName = getSchemaFromWikiName(context);
+                String escapedSchemaName = escapeSchema(schemaName, context);
 
-                    DatabaseProduct databaseProduct = getDatabaseProductName();
-                    if (DatabaseProduct.ORACLE == databaseProduct) {
-                        executeSQL("alter session set current_schema = " + escapedSchemaName, session);
-                    } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
-                        || DatabaseProduct.DB2 == databaseProduct)
-                    {
-                        executeSQL("SET SCHEMA " + escapedSchemaName, session);
-                    } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
-                        executeSQL("SET search_path TO " + escapedSchemaName, session);
-                    } else {
-                        String catalog = session.connection().getCatalog();
-                        catalog = (catalog == null) ? null : catalog.replace('_', '-');
-                        if (!schemaName.equals(catalog)) {
-                            session.connection().setCatalog(schemaName);
-                        }
+                DatabaseProduct databaseProduct = getDatabaseProductName();
+                if (DatabaseProduct.ORACLE == databaseProduct) {
+                    executeSQL("alter session set current_schema = " + escapedSchemaName, session);
+                } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
+                    || DatabaseProduct.DB2 == databaseProduct) {
+                    executeSQL("SET SCHEMA " + escapedSchemaName, session);
+                } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
+                    executeSQL("SET search_path TO " + escapedSchemaName, session);
+                } else {
+                    String catalog = session.connection().getCatalog();
+                    catalog = (catalog == null) ? null : catalog.replace('_', '-');
+                    if (!schemaName.equals(catalog)) {
+                        session.connection().setCatalog(schemaName);
                     }
-                    setCurrentDatabase(context, context.getDatabase());
                 }
+                setCurrentDatabase(context, context.getDatabase());
             }
 
             this.dataMigrationManager.checkDatabase();
@@ -1245,7 +1280,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             } catch (Exception e) {
                 if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exeption while close transaction", e);
+                    LOGGER.error("Exception while close transaction", e);
                 }
             }
         }
@@ -1368,6 +1403,22 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     protected boolean isInSchemaMode()
     {
-        return StringUtils.equals(getConfiguration().getProperty("xwiki.virtual_mode"), "schema");
+        String virtualModePropertyValue = getConfiguration().getProperty("xwiki.virtual_mode");
+        if (virtualModePropertyValue == null) {
+            virtualModePropertyValue = VIRTUAL_MODE_SCHEMA;
+        }
+        return StringUtils.equals(virtualModePropertyValue, VIRTUAL_MODE_SCHEMA);
+    }
+
+    /**
+     * We had to add this method because the Component Manager doesn't inject a field in the base class if a derived
+     * class defines a field with the same name.
+     * 
+     * @return the execution
+     * @since 5.1M1
+     */
+    protected Execution getExecution()
+    {
+        return execution;
     }
 }

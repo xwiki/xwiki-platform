@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
@@ -38,7 +40,7 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  */
 @Component
 @Singleton
-public class SolrInstanceProvider implements Provider<SolrInstance>
+public class SolrInstanceProvider implements Provider<SolrInstance>, Initializable
 {
     /**
      * Logging framework.
@@ -58,18 +60,24 @@ public class SolrInstanceProvider implements Provider<SolrInstance>
     @Inject
     private ComponentManager componentManager;
 
+    /** The Solr instance configured. Since the configuration is read only once at startup, it can be cached. */
+    private SolrInstance configuredInstance;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        String type = this.configuration.getServerType();
+        try {
+            this.configuredInstance = this.componentManager.getInstance(SolrInstance.class, type);
+        } catch (ComponentLookupException e) {
+            this.logger.error("", e);
+            throw new InitializationException("Failed to lookup configured Solr instance type [" + type + "]");
+        }
+    }
+
     @Override
     public SolrInstance get()
     {
-        String type = configuration.getServerType();
-
-        SolrInstance newInstance = null;
-        try {
-            newInstance = componentManager.getInstance(SolrInstance.class, type);
-        } catch (ComponentLookupException e) {
-            logger.error("Failed to lookup Solr instance", e);
-        }
-
-        return newInstance;
+        return this.configuredInstance;
     }
 }

@@ -7,7 +7,7 @@
  *         new XWiki.widgets.XListItem( "A second element", {'value' : '10'} ),
  *         "A third item passed as string content",
  *         new Element("blink").update('An hip-hop item passed as DOM element')
- *      ], 
+ *      ],
  *      { // options
  *         numbered: false,
  *         icon: "$xwiki.getSkinFile('icons/silk/sport_basketball.png')",
@@ -16,7 +16,7 @@
  *         eventListeners : {
  *           // Event listeners defined for each of this list items.
  *           // listeners call backs are bound to the list item object (XWiki.widgets.XListItem) from which they emerge
- *           'click' : function() { console.log('clicked !', this); }, 
+ *           'click' : function() { console.log('clicked !', this); },
  *           'mouseover' : function() { console.log('mouse over !', this); }
  *         }
  *      });
@@ -36,9 +36,9 @@
  */
 
 var XWiki = function(XWiki){
-    
+
     var widgets = XWiki.widgets = XWiki.widgets || {};
-    
+
     widgets.XList = Class.create({
         initialize: function(items, options) {
           this.items = items || [];
@@ -67,13 +67,13 @@ var XWiki = function(XWiki){
           if (this.options.icon && !this.options.icon.blank()) {
             item.setIcon(this.options.icon, this.options.overrideItemIcon);
           }
-          item.list = this; // associate list item to this XList 
+          item.list = this; // associate list item to this XList
         },
         getElement: function() {
           return this.listElement;
         }
     });
-    
+
     widgets.XListItem = Class.create({
         initialize: function(content, options) {
           this.options = options || {};
@@ -121,7 +121,7 @@ var XWiki = function(XWiki){
           }
         }
     });
-    
+
     return XWiki;
-    
+
 }(XWiki || {});

@@ -21,7 +21,6 @@ package org.xwiki.rest.internal.resources.objects;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
@@ -64,8 +63,8 @@ public class ObjectPropertiesResourceImpl extends BaseObjectsResource implements
             Properties properties = objectFactory.createProperties();
             properties.getProperties().addAll(object.getProperties());
 
-            String objectUri = UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(doc.getWiki(),
-                    doc.getSpace(), doc.getName(), object.getClassName(), object.getNumber()).toString();
+            String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, doc.getWiki(),
+                doc.getSpace(), doc.getName(), object.getClassName(), object.getNumber()).toString();
             Link objectLink = objectFactory.createLink();
             objectLink.setHref(objectUri);
             objectLink.setRel(Relations.OBJECT);

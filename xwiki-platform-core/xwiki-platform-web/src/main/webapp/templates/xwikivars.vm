@@ -14,11 +14,13 @@
 #set ($reservedSpaceName = 'SpaceReservedForInternalXWikiUsagejDGER5nj3KOE5ouUFUc7OYru')
 #set ($reservedDocumentName = 'DocumentReservedForInternalXWikiUsageMK9DxecV0XcDGnIeqzNDB4K')
 #set ($hasCreateSpace = $xwiki.hasAccessLevel('edit', "${reservedSpaceName}.DocumentReservedForInternalXWikiUsage"))
-#set ($hasCreatePage = $xwiki.hasAccessLevel('edit', "${doc.space}.${reservedDocumentName}"))
+#set ($reservedDocumentReference = $services.model.createDocumentReference($doc.wiki, $doc.space, $reservedDocumentName))
+#set ($hasCreatePage = $xwiki.hasAccessLevel('edit', $services.model.serialize($reservedDocumentReference, 'default')))
 #set ($hasGlobalAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
 ## Note: The document name is not internally used to determine if a user has programming access level. We pass XWiki.XWikiPreferences for consistency with the call for global admin
 #set ($hasProgramming = $xwiki.hasAccessLevel('programming', $xcontext.user, 'XWiki.XWikiPreferences'))
-#set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${doc.space}.WebPreferences"))
+#set ($spacePreferencesDocumentReference = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+#set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, $services.model.serialize($spacePreferencesDocumentReference, 'default')))
 #set ($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
 #set ($hasDashboard = $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'Dashboard', 'XWikiUserDashboardSheet'), 'local')))
 ##

@@ -21,7 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.stub.CustomStub;
@@ -129,8 +129,6 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
                                            ANYTHING).will(returnValue(false));
 
         final Mock mockXWiki = mock(XWiki.class);
-        mockXWiki.stubs().method("isVirtualMode")
-        .will(returnValue(false));
         mockXWiki.stubs().method("getRightService")
             .will(returnValue(mockRightService.proxy()));
         mockXWiki.expects(once()).method("saveDocument").with(ANYTHING, ANYTHING, ANYTHING, ANYTHING)

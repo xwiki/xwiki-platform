@@ -21,9 +21,11 @@ package org.xwiki.search.solr.internal.api;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides configuration for Solr.
@@ -31,6 +33,7 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @since 4.5M1
  */
+@Unstable
 @Role
 public interface SolrConfiguration
 {
@@ -49,25 +52,25 @@ public interface SolrConfiguration
     <T> T getInstanceConfiguration(String instanceType, String propertyName, T defaultValue);
 
     /**
-     * Each language has its particularities and needs to be handled specially in order to index and retrieve the best
+     * Each locale has its particularities and needs to be handled specially in order to index and retrieve the best
      * results.
      * 
-     * @return the list of supported language codes for which optimized indexing can be performed (using
-     *         language-code-suffixed fields that are analyzed and queries with the analysis chain specific to the
-     *         language).
-     * @see #getOptimizedLanguages() for the selected languages.
+     * @return the list of supported locale codes for which optimized indexing can be performed (using
+     *         locale-code-suffixed fields that are analyzed and queries with the analysis chain specific to the
+     *         locale)
+     * @see #getOptimizedLocales() for the selected locales
      */
-    List<String> getOptimizableLanguages();
+    List<Locale> getOptimizableLocales();
 
     /**
-     * Each language has its particularities and needs to be handled specially in order to index and retrieve the best
+     * Each locale has its particularities and needs to be handled specially in order to index and retrieve the best
      * results.
      * 
-     * @return the list of language codes for which to perform optimized indexing (using language-code-suffixed fields
-     *         that are analyzed and queries with the analysis chain specific to the language).
-     * @see #getOptimizableLanguages() for the full list of supported languages.
+     * @return the list of locale codes for which to perform optimized indexing (using locale-code-suffixed fields
+     *         that are analyzed and queries with the analysis chain specific to the locale)
+     * @see #getOptimizableLocales() for the full list of supported locales
      */
-    List<String> getOptimizedLanguages();
+    List<Locale> getOptimizedLocales();
 
     /**
      * @return the list of multilingual fields for which to apply optimized indexing.
@@ -75,9 +78,29 @@ public interface SolrConfiguration
     List<String> getMultilingualFields();
 
     /**
-     * Retrieves the the configuration files required by the Solr instance's home directory in order to initialize.
+     * Retrieves the configuration files required by the Solr instance's home directory in order to initialize.
      * 
      * @return a map of (fileName, fileURL) to be used to initialize the Solr instance.
      */
     Map<String, URL> getHomeDirectoryConfiguration();
+
+    // Indexer
+
+    /**
+     * @return the size of the batch when indexing enqueued entities
+     * @since 5.1M2
+     */
+    int getIndexerBatchSize();
+
+    /**
+     * @return the size of the batch when indexing enqueued entities
+     * @since 5.1M2
+     */
+    int getIndexerBatchMaxLengh();
+
+    /**
+     * @return the maximum size of the indexer queue
+     * @since 5.1M2
+     */
+    int getIndexerQueueCapacity();
 }

@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po.editor.wysiwyg;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -53,7 +54,7 @@ public class RichTextAreaElement extends BaseElement
     {
         String windowHandle = getDriver().getWindowHandle();
         try {
-            return getDriver().switchTo().frame(iframe).switchTo().activeElement().getText();
+            return getActiveElement().getText();
         } finally {
             getDriver().switchTo().window(windowHandle);
         }
@@ -66,7 +67,7 @@ public class RichTextAreaElement extends BaseElement
     {
         String windowHandle = getDriver().getWindowHandle();
         try {
-            getDriver().switchTo().frame(iframe).switchTo().activeElement().clear();
+            getActiveElement().clear();
         } finally {
             getDriver().switchTo().window(windowHandle);
         }
@@ -79,7 +80,7 @@ public class RichTextAreaElement extends BaseElement
     {
         String windowHandle = getDriver().getWindowHandle();
         try {
-            getDriver().switchTo().frame(iframe).switchTo().activeElement().click();
+            getActiveElement().click();
         } finally {
             getDriver().switchTo().window(windowHandle);
         }
@@ -95,7 +96,7 @@ public class RichTextAreaElement extends BaseElement
         if (keysToSend.length > 0) {
             String windowHandle = getDriver().getWindowHandle();
             try {
-                getDriver().switchTo().frame(iframe).switchTo().activeElement().sendKeys(keysToSend);
+                getActiveElement().sendKeys(keysToSend);
             } finally {
                 getDriver().switchTo().window(windowHandle);
             }
@@ -114,7 +115,7 @@ public class RichTextAreaElement extends BaseElement
     {
         String windowHandle = getDriver().getWindowHandle();
         try {
-            getDriver().switchTo().frame(iframe).switchTo().activeElement();
+            getActiveElement();
             return ((JavascriptExecutor) getDriver()).executeScript(script.toString(), arguments);
         } finally {
             getDriver().switchTo().window(windowHandle);
@@ -137,5 +138,24 @@ public class RichTextAreaElement extends BaseElement
     public void setContent(String content)
     {
         executeScript("document.body.innerHTML = arguments[0];", content);
+    }
+
+    /**
+     * @return the HTML element that has the focus in the Rich editor
+     */
+    private WebElement getActiveElement()
+    {
+        // Switch to the iframe containing the rich text area content.
+        //
+        // Note: ATM this line doesn't work with Ghostdriver 1.0.3/PhantomJS 1.9, see
+        // https://github.com/detro/ghostdriver/issues/226
+        // Current workaround: WebDriver frameDriver = getDriver().switchTo().frame(1);
+        WebDriver frameDriver = getDriver().switchTo().frame(iframe);
+
+        // Select the locator allowing us to find the current active element (element with the focus).
+        WebDriver.TargetLocator locator = frameDriver.switchTo();
+
+        // Return the active element
+        return locator.activeElement();
     }
 }

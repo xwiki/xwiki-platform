@@ -20,14 +20,14 @@
 package org.xwiki.officeimporter.internal.script;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.artofsolving.jodconverter.document.DocumentFamily;
+import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -39,12 +39,13 @@ import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
+import org.xwiki.officeimporter.server.OfficeServer;
+import org.xwiki.officeimporter.server.OfficeServer.ServerState;
+import org.xwiki.officeimporter.server.OfficeServerConfiguration;
+import org.xwiki.officeimporter.server.OfficeServerException;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.script.service.ScriptService;
@@ -60,11 +61,6 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class OfficeImporterScriptService implements ScriptService
 {
-    /**
-     * File extensions corresponding to slide presentations.
-     */
-    public static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "pptx", "odp");
-
     /**
      * The key used to place any error messages while importing office documents.
      */
@@ -96,16 +92,16 @@ public class OfficeImporterScriptService implements ScriptService
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
-     * Used to query openoffice server status.
+     * Used to query office server status.
      */
     @Inject
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
     /**
-     * Used to query the OpenOffice server configuration.
+     * Used to query the office server configuration.
      */
     @Inject
-    private OpenOfficeConfiguration officeConfiguration;
+    private OfficeServerConfiguration officeServerConfiguration;
 
     /**
      * Used for building {@link XHTMLOfficeDocument} instances from office documents.
@@ -414,26 +410,26 @@ public class OfficeImporterScriptService implements ScriptService
     }
 
     /**
-     * Checks if the connection to the OpenOffice server has been established. If the OpenOffice server has been
-     * configured to start automatically then we make an attempt to start it (usually this means that the OpenOffice
-     * server failed to start when XE started and so we try one more time to connect).
+     * Checks if the connection to the office server has been established. If the office server has been configured to
+     * start automatically then we make an attempt to start it (usually this means that the office server failed to
+     * start when XE started and so we try one more time to connect).
      * 
-     * @throws OfficeImporterException if the connection to the OpenOffice server is not established
-     * @throws OpenOfficeManagerException if the attempt to start the OpenOffice server failed
+     * @throws OfficeImporterException if the connection to the office server is not established
+     * @throws OfficeServerException if the attempt to start the office server failed
      */
-    private void assertConnected() throws OfficeImporterException, OpenOfficeManagerException
+    private void assertConnected() throws OfficeImporterException, OfficeServerException
     {
-        boolean connected = this.officeManager.getState().equals(ManagerState.CONNECTED);
+        boolean connected = this.officeServer.getState().equals(ServerState.CONNECTED);
         if (!connected) {
-            // Check if the OpenOffice server was configured to start automatically.
-            if (this.officeConfiguration.isAutoStart()) {
-                // The OpenOffice server probably failed to start automatically when XE started. Try one more time to
+            // Check if the office server was configured to start automatically.
+            if (this.officeServerConfiguration.isAutoStart()) {
+                // The office server probably failed to start automatically when XE started. Try one more time to
                 // connect.
-                this.officeManager.start();
-                connected = this.officeManager.getState().equals(ManagerState.CONNECTED);
+                this.officeServer.start();
+                connected = this.officeServer.getState().equals(ServerState.CONNECTED);
             }
             if (!connected) {
-                throw new OfficeImporterException("OpenOffice server unavailable.");
+                throw new OfficeImporterException("Office server unavailable.");
             }
         }
     }
@@ -447,7 +443,12 @@ public class OfficeImporterScriptService implements ScriptService
     private boolean isPresentation(String officeFileName)
     {
         String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
-        return PRESENTATION_FORMAT_EXTENSIONS.contains(extension);
+        OfficeConverter officeConverter = officeServer.getConverter();
+        if (officeConverter != null) {
+            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
+            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+        }
+        return false;
     }
 
     /**

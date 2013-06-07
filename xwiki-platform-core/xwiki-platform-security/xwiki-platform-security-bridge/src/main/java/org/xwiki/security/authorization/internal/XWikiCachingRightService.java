@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,6 +30,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -66,7 +66,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("imagecaptcha", Right.LOGIN)
             .putAction("view", Right.VIEW)
             .putAction(DELETE_ACTION, Right.DELETE)
-            .putAction("distribution", Right.ADMIN)
+            .putAction("distribution", Right.VIEW)
             .putAction("admin", Right.ADMIN)
             .putAction("programing", Right.PROGRAM)
             .putAction("edit", Right.EDIT)
@@ -116,7 +116,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("objectsync", Right.EDIT)
             .putAction("rollback", Right.EDIT)
             .putAction("upload", Right.EDIT)
-            .putAction("create", Right.EDIT)
+            .putAction("create", Right.VIEW)
             .putAction("deleteversions", Right.ADMIN)
             .putAction("deletespace", Right.ADMIN)
             .putAction("temp", Right.VIEW);
@@ -125,7 +125,7 @@ public class XWikiCachingRightService implements XWikiRightService
     /** Resolver for document references. */
     @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> documentReferenceResolver
-        = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+        = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** Resolver for user and group document references. */
     @SuppressWarnings("unchecked")
@@ -216,46 +216,37 @@ public class XWikiCachingRightService implements XWikiRightService
     }
 
     /**
-     * @param right Right to authenticate.
-     * @param entityReference Document that is being accessed.
-     * @param context current {@link XWikiContext}
-     * @return a {@link DocumentReference} that uniquely identifies
-     * the user, if the authentication was successful.  {@code null}
-     * on failure.
+     * @param context Current XWikiContext
+     * @return reference to the currently authenticated user
      */
-    private DocumentReference authenticateUser(Right right, EntityReference entityReference, XWikiContext context)
+    private DocumentReference getCurrentUser(XWikiContext context)
     {
-        XWikiUser user = context.getXWikiUser();
-        boolean needsAuth;
-        if (user == null) {
-            needsAuth = needsAuth(right, context);
-            try {
-                if (context.getMode() != XWikiContext.MODE_XMLRPC) {
-                    user = context.getWiki().checkAuth(context);
-                } else {
-                    user = new XWikiUser(XWikiConstants.GUEST_USER_FULLNAME);
-                }
+        DocumentReference contextUserReference = context.getUserReference();
+        DocumentReference userReference = contextUserReference;
 
-                if ((user == null) && (needsAuth)) {
-                    LOGGER.info("Authentication needed for right {} and entity {}.", right, entityReference);
-                    return null;
+        if (userReference == null && context.getMode() != XWikiContext.MODE_XMLRPC) {
+            try {
+                XWikiUser user = context.getWiki().checkAuth(context);
+                if (user != null) {
+                    userReference = resolveUserName(user.getUser(), new WikiReference(context.getDatabase()));
                 }
             } catch (XWikiException e) {
                 LOGGER.error("Caught exception while authenticating user.", e);
             }
-
-            String username;
-            if (user == null) {
-                username = XWikiConstants.GUEST_USER_FULLNAME;
-            } else {
-                username = user.getUser();
-            }
-            context.setUser(username);
-            return resolveUserName(username, new WikiReference(context.getDatabase()));
-        } else {
-            return resolveUserName(user.getUser(), new WikiReference(context.getDatabase()));
         }
 
+        if (userReference != null && XWikiConstants.GUEST_USER.equals(userReference.getName())) {
+            // Public users (not logged in) should be passed as null in the new API. It may happen that badly
+            // design code, and poorly written API does not take care, so we prevent security issue here.
+            userReference = null;
+        }
+
+        if (userReference != contextUserReference
+            && (userReference == null || !userReference.equals(contextUserReference))) {
+            context.setUserReference(userReference);
+        }
+
+        return userReference;
     }
 
     /**
@@ -273,8 +264,7 @@ public class XWikiCachingRightService implements XWikiRightService
                     return true;
                 }
             } catch (NumberFormatException e) {
-                Formatter f = new Formatter();
-                LOGGER.warn(f.format("Failed to parse preference value: '%s'", value).toString());
+                LOGGER.warn("Failed to parse the authenticate_* preference value [{}]", value);
             }
         }
         return null;
@@ -311,10 +301,11 @@ public class XWikiCachingRightService implements XWikiRightService
         Right right = actionToRight(action);
         EntityReference entityReference = doc.getDocumentReference();
 
-        LOGGER.debug("checkAccess for action {} on entity {}.", right, entityReference);
+        LOGGER.debug("checkAccess for action [{}] on entity [{}].", right, entityReference);
 
-        DocumentReference userReference = authenticateUser(right, entityReference, context);
-        if (userReference == null) {
+        DocumentReference userReference = getCurrentUser(context);
+
+        if (userReference == null && needsAuth(right, context)) {
             showLogin(context);
             return false;
         }
@@ -329,8 +320,8 @@ public class XWikiCachingRightService implements XWikiRightService
         // implementation, so code that simply want to verify if a user can delete (but is not actually deleting)
         // has to call checkAccess. This happen really often, and this why we should not redirect to login on failed
         // delete, since it would prevent most user to do anything.
-        if (context.getUserReference() == null && !DELETE_ACTION.equals(action) && !LOGIN_ACTION.equals(action)) {
-            LOGGER.debug("Redirecting guest user to login, since it have been denied {} on {}.",
+        if (userReference == null && !DELETE_ACTION.equals(action) && !LOGIN_ACTION.equals(action)) {
+            LOGGER.debug("Redirecting unauthenticated user to login, since it have been denied [{}] on [{}].",
                          right, entityReference);
             showLogin(context);
         }
@@ -344,8 +335,13 @@ public class XWikiCachingRightService implements XWikiRightService
     {
         WikiReference wikiReference = new WikiReference(context.getDatabase());
         DocumentReference document = resolveDocumentName(docname, wikiReference);
-        LOGGER.debug("Resolved '{}' into {}", docname, document);
+        LOGGER.debug("hasAccessLevel() resolved document named [{}] into reference [{}]", docname, document);
         DocumentReference user = resolveUserName(username, wikiReference);
+
+        if (XWikiConstants.GUEST_USER.equals(user.getName())) {
+            // Public users (not logged in) should be passed as null in the new API
+            user = null;
+        }
 
         return authorizationManager.hasAccess(Right.toRight(right), user, document);
     }
@@ -353,6 +349,11 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
+        // Once dropPermissions has been called, the document in the
+        // context cannot have programming permission.
+        if (context.hasDroppedPermissions()) {
+            return false;
+        }
         XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
         return hasProgrammingRights((sdoc != null) ? sdoc : context.getDoc(), context);
     }
@@ -371,14 +372,31 @@ public class XWikiCachingRightService implements XWikiRightService
             wiki = new WikiReference(context.getDatabase());
         }
 
+        if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
+            // Public users (not logged in) should be passed as null in the new API. It may happen that badly
+            // design code, and poorly written API does not take care, so we prevent security issue here.
+            user = null;
+        }
+
         return authorizationManager.hasAccess(Right.PROGRAM, user, wiki);
     }
 
     @Override
     public boolean hasAdminRights(XWikiContext context)
     {
+        XWikiDocument doc = context.getDoc();
+        if (doc == null) {
+            return hasWikiAdminRights(context);
+        }
         DocumentReference user = context.getUserReference();
-        DocumentReference document = context.getDoc().getDocumentReference();
+        DocumentReference document = doc.getDocumentReference();
+
+        if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
+            // Public users (not logged in) should be passed as null in the new API. It may happen that badly
+            // design code, and poorly written API does not take care, so we prevent security issue here.
+            user = null;
+        }
+
         return authorizationManager.hasAccess(Right.ADMIN, user, document);
     }
 
@@ -387,6 +405,13 @@ public class XWikiCachingRightService implements XWikiRightService
     {
         DocumentReference user = context.getUserReference();
         WikiReference wiki = new WikiReference(context.getDatabase());
+
+        if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
+            // Public users (not logged in) should be passed as null in the new API. It may happen that badly
+            // design code, and poorly written API does not take care, so we prevent security issue here.
+            user = null;
+        }
+
         return authorizationManager.hasAccess(Right.ADMIN, user, wiki);
     }
 

@@ -97,6 +97,21 @@
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
+
+## Note: This is starting the line in order not to put extra spaces when generated
+#if ($xwikiDbVirtualMode)
+    <property name="xwiki.virtual_mode">$xwikiDbVirtualMode</property>
+#end
+## Note: This is starting the line in order not to put extra spaces when generated
+#if ($xwikiDb == 'pgsql' || $xwikiDb == 'oracle')
+    <property name="jdbc.use_streams_for_binary">false</property>
+#end
+## Note: This is starting the line in order not to put extra spaces when generated
+#if ($xwikiDb == 'oracle')
+    <property name="connection.SetBigStringTryClob">true</property>
+    <property name="jdbc.batch_size">0</property>
+#end
+
     <mapping resource="$xwikiDbHbmXwiki"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -111,7 +126,8 @@
 
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
-    <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</property>
+
+    <property name="connection.url">jdbc:mysql://localhost/xwiki</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
@@ -131,6 +147,7 @@
 
     <!-- HSQLDB configuration.
          Uncomment if you want to use HSQLDB and comment out other database configurations.
+
     <property name="connection.url">jdbc:hsqldb:file:/some/path/xwikidb;shutdown=true</property>
     <property name="connection.username">sa</property>
     <property name="connection.password"></property>
@@ -206,6 +223,7 @@
 
     <!-- Derby configuration.
          Uncomment if you want to use Derby and comment out other database configurations.
+
     <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
     <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
     <property name="dialect">org.hibernate.dialect.DerbyDialect</property>

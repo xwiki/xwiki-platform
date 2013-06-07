@@ -2,6 +2,6 @@
 ### Information page in the "view" mode
 ###
 ###
-<div id="document-title"><h1>$msg.get('core.viewers.information.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
+<div id="document-title"><h1>$services.localization.render('core.viewers.information.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
 #template("shortcuts.vm")
 #template("informationinline.vm")

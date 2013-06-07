@@ -15,7 +15,7 @@
   <date>1301566279000</date>
   <contentUpdateDate>1301566279000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.index.documentsTrash")</title>
+  <title>$services.localization.render('platform.index.documentsTrash')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -138,24 +138,24 @@ XWiki.index.trash.documents.displayEntry = function (row, i, table) {
       var restore = new Element('a', {
           'href' : row.restoreUrl,
           'class' : 'tool restore',
-          'title' : "$msg.get('platform.index.trashDocumentsActionsRestoreTooltip')"
-        }).update("$msg.get('platform.index.trashDocumentsActionsRestoreText')");
+          'title' : "$services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip')"
+        }).update("$services.localization.render('platform.index.trashDocumentsActionsRestoreText')");
       actions.appendChild(restore);
     }
   } else {
     var restore = new Element('a', {
         'href' : row.originalUrl,
         'class' : "tool cannot-restore",
-        'title' : "$msg.get('platform.index.trashDocumentsActionsCannotRestoreTooltip')"
-      }).update("$msg.get('platform.index.trashDocumentsActionsCannotRestoreText')");
+        'title' : "$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreTooltip')"
+      }).update("$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')");
     actions.appendChild(restore);
   }
   if(row.canDelete) {
     var delete_ = new Element('a', {
         'href' : row.deleteUrl,
         'class' : "tool delete",
-        'title' : "$msg.get('platform.index.trashDocumentsActionsDeleteTooltip')"
-      }).update("$msg.get('platform.index.trashDocumentsActionsDeleteText')");
+        'title' : "$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"
+      }).update("$services.localization.render('platform.index.trashDocumentsActionsDeleteText')");
     actions.appendChild(document.createTextNode(' '));
     actions.appendChild(delete_);
     delete_.observe('click', XWiki.index.trash.documents.confirmDelete.bindAsEventListener(delete_, table, i));
@@ -202,10 +202,10 @@ XWiki.index.trash.documents.confirmDelete = function(event, table, rowIdx) {
       },
       /* Interaction parameters */
       {
-         confirmationText: "$msg.get('core.recyclebin.completelyDeleteConfirm')",
-         progressMessageText : "$msg.get('platform.index.trashDocumentsDeleteInProgress')",
-         successMessageText : "$msg.get('platform.index.trashDocumentsDeleteDone')",
-         failureMessageText : "$msg.get('platform.index.trashDocumentsDeleteFailed')"
+         confirmationText: "$services.localization.render('core.recyclebin.completelyDeleteConfirm')",
+         progressMessageText : "$services.localization.render('platform.index.trashDocumentsDeleteInProgress')",
+         successMessageText : "$services.localization.render('platform.index.trashDocumentsDeleteDone')",
+         failureMessageText : "$services.localization.render('platform.index.trashDocumentsDeleteFailed')"
       }
       );
   }
@@ -496,7 +496,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
   #set($deletedDocuments = $xwiki.search('select count(ddoc.id) from XWikiDeletedDocument as ddoc').get(0))
   #if($deletedDocuments == 0)
 
-    {{info}}$msg.get('platform.index.trashDocumentsEmpty'){{/info}}
+    {{info}}$services.localization.render('platform.index.trashDocumentsEmpty'){{/info}}
 
   #else
   #macro(displayDeletedDoc $id)
@@ -510,13 +510,13 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
       &lt;td class="itemActions"&gt;
         #if($xwiki.getDocument($ddoc.fullName).isNew())
           #if($ddoc.canUndelete())
-            &lt;a href="${originalDocument.getURL('undelete', "id=${id}")}" class="tool restore" title="$msg.get('platform.index.trashDocumentsActionsRestoreTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsRestoreText')&lt;/a&gt;
+            &lt;a href="${originalDocument.getURL('undelete', "id=${id}")}" class="tool restore" title="$services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsRestoreText')&lt;/a&gt;
           #end
         #else
-          &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$msg.get('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
+          &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
         #end
         #if($ddoc.canDelete())
-          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$msg.get('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$msg.get('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
+          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
         #end
       &lt;/td&gt;
     &lt;/tr&gt;
@@ -535,11 +535,11 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
   #pagination($paginationParameters)
   &lt;table id="searchResults" class="xwiki-livetable xwiki-livetable-display"&gt;
     &lt;thead class="xwiki-livetable-display-header"&gt;&lt;tr&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$msg.get('platform.index.trashDocuments.ddoc.fullName')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.ddoc.title')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.ddoc.date')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.ddoc.deleter')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$msg.get('platform.index.trashDocuments.actions')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.fullName')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.title')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.date')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.deleter')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.actions')&lt;/th&gt;
     &lt;/tr&gt;&lt;/thead&gt;
     &lt;tbody class="xwiki-livetable-display-body"&gt;
     #foreach($item in $xwiki.search('select ddoc.id from XWikiDeletedDocument as ddoc order by ddoc.fullName asc', $paginationParameters.itemsPerPage, $paginationParameters.firstItem))

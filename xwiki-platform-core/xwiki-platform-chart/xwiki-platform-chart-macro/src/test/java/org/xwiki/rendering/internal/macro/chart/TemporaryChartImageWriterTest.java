@@ -21,7 +21,8 @@ package org.xwiki.rendering.internal.macro.chart;
 
 import java.io.File;
 
-import org.jmock.Expectations;
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
@@ -29,10 +30,9 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import junit.framework.Assert;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link TemporaryChartImageWriter}.
@@ -40,25 +40,23 @@ import junit.framework.Assert;
  * @version $Id$
  * @since 4.2M3
  */
-@MockingRequirement(TemporaryChartImageWriter.class)
-public class TemporaryChartImageWriterTest extends AbstractMockingComponentTestCase<ChartImageWriter>
+public class TemporaryChartImageWriterTest
 {
+    @Rule
+    public MockitoComponentMockingRule<TemporaryChartImageWriter> componentManager =
+        new MockitoComponentMockingRule<TemporaryChartImageWriter>(TemporaryChartImageWriter.class);
+
     @Test
     public void getStorageLocation() throws Exception
     {
-        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
-        final WikiReference currentWikiReference = new WikiReference("wiki");
+        WikiReference currentWikiReference = new WikiReference("wiki");
+        ModelContext modelContext = this.componentManager.getInstance(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
 
-        final Environment environment = getComponentManager().getInstance(Environment.class);
+        Environment environment = this.componentManager.getInstance(Environment.class);
+        when(environment.getTemporaryDirectory()).thenReturn(new File("/tmpdir"));
 
-        getMockery().checking(new Expectations() {{
-            oneOf(modelContext).getCurrentEntityReference();
-                will(returnValue(currentWikiReference));
-            oneOf(environment).getTemporaryDirectory();
-                will(returnValue(new File("/tmpdir")));
-        }});
-
-        File location = ((TemporaryChartImageWriter) getMockedComponent()).getStorageLocation(
+        File location = this.componentManager.getComponentUnderTest().getStorageLocation(
             new ImageId(new ChartMacroParameters()));
         Assert.assertTrue("Got: " + location.toString(),
             location.toString().matches("/tmpdir/temp/chart/wiki/space/page/.*\\.png"));
@@ -67,13 +65,15 @@ public class TemporaryChartImageWriterTest extends AbstractMockingComponentTestC
     @Test
     public void getURL() throws Exception
     {
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(dab).getDocumentURL(new DocumentReference("unused", "space", "page"), "temp", null, null);
-                will(returnValue("temp/Space/Page"));
-        }});
+        WikiReference currentWikiReference = new WikiReference("wiki");
+        ModelContext modelContext = this.componentManager.getInstance(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
 
-        String location = getMockedComponent().getURL(new ImageId(new ChartMacroParameters()));
+        DocumentAccessBridge dab = this.componentManager.getInstance(DocumentAccessBridge.class);
+        when(dab.getDocumentURL(new DocumentReference("wiki", "space", "page"), "temp", null, null)).thenReturn(
+            "temp/Space/Page");
+
+        String location = this.componentManager.getComponentUnderTest().getURL(new ImageId(new ChartMacroParameters()));
         Assert.assertTrue("Got: " + location, location.toString().matches("temp/Space/Page/chart/.*\\.png"));
     }
 }

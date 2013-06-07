@@ -28,7 +28,7 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * UI tests for the FAQ application.

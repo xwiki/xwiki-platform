@@ -27,9 +27,9 @@
 #set ($parameterName = 'workspaceName')
 #set ($workspaceNames = $request.getParameterValues($parameterName))
 #if ("$!workspaceNames" == '' || $workspaceNames.size() == 0)
-  $msg.get('platform.workspace.activityHint')
+  {{translation key="platform.workspace.activityHint"/}}
 
-  {{error}}$msg.get('platform.workspace.oneParameterNotSpecified', $parameterName) $msg.get('platform.workspace.parameterAcceptsMultipleValues'){{/error}}
+  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="$parameterName"/}} {{translation key="platform.workspace.parameterAcceptsMultipleValues"/}}{{/error}}
 #else
   #set ($wikiNames = '')
   #foreach ($workspaceName in $workspaceNames)
@@ -38,7 +38,7 @@
     #end
   #end
   #set ($wikiNames = $wikiNames.replaceAll(',\s$',''))
-  = #if ($workspaceNames.size() == 1)$msg.get('platform.workspace.activityTitle', $wikiNames)#{else}$msg.get('platform.workspace.activityMultipleTitle', $wikiNames)#end =
+  = #if ($workspaceNames.size() == 1)$services.localization.render('platform.workspace.activityTitle', [$wikiNames])#{else}$services.localization.render('platform.workspace.activityMultipleTitle', [$wikiNames])#end =
   {{activity wikis="$wikiNames"}}
 #end
 {{/velocity}}</content>

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="any wiki">
+      <user name="userA" />
+      <user name="userB" />
+      <space name="space" alt="any space">
+        <document name="userAdoc" creator="userA" alt="document created by userA"/>
+        <document name="userBdoc" creator="userB" alt="document created by userB"/>
+      </space>
+  </wiki>
+</wikis>

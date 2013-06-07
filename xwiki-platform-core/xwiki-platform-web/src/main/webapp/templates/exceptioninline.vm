@@ -1,14 +1,14 @@
 #set($message = $xwiki.parseMessage())
 #if($message)
-  #xwikimessageboxstart($msg.get('notice') $message)
+  #xwikimessageboxstart($services.localization.render('notice') $message)
   #xwikimessageboxend()
 #else
-  #xwikimessageboxstart($msg.get('notice') $msg.get('problemoccured'))
+  #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('problemoccured'))
   #xwikimessageboxend()
 #end
 <br/><br/>
 #if($exp)
-  $msg.get("detailedinformation"):<br/>
+  $services.localization.render('detailedinformation'):<br/>
   <pre class="xwikierror">
     $escapetool.xml($exp.getFullMessage())
   </pre>

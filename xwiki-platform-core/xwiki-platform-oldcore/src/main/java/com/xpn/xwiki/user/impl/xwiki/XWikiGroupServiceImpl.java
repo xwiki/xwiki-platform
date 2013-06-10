@@ -670,6 +670,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         parameterValues.put("groupdocname", groupFullName);
         parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);
 
+        // Note: We should normally be able to use the 3-argument trim() function which defaults to the whitesapce
+        // char to be trimmed. However because of https://hibernate.atlassian.net/browse/HHH-8295 this raises a
+        // warning in the XWiki console. Once this is fixed in Hibernate we can start using the 3-argument function
+        // again.
         queryString.append(" and (trim(both ' ' from field.value)<>'' or "
             + "(trim(both ' ' from field.value) is not null and '' is null))");
 

@@ -31,9 +31,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1364502205000</creationDate>
-  <date>1364567133000</date>
-  <contentUpdateDate>1364567133000</contentUpdateDate>
+  <creationDate>1309440660000</creationDate>
+  <date>1370851601000</date>
+  <contentUpdateDate>1370851601000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('admin.analytics')</title>
   <defaultTemplate/>
@@ -252,6 +252,27 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </account>
+    <method>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>method</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Tracking method</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>universal=Universal Analytics|classic=Classic Analytics</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </method>
   </class>
   <object>
     <class>
@@ -482,6 +503,7 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
     <property>
       <code>#set($analyticsDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
 #set($analyticsObj = $analyticsDoc.getObject('XWiki.GoogleAnalyticsCode'))
+#set($method = $analyticsObj.getProperty('method').value)
 #set($accounts = [])
 #if("$!analyticsObj" != "" &amp;&amp; "$!analyticsObj.account" != "")
 #foreach($aObj in $analyticsObj.account.split(' '))
@@ -491,6 +513,23 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
 #end
 #end
 #if($accounts.size() &gt; 0)
+#if($method == 'universal')
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+#foreach($account in $accounts)
+#set($analyticsPrefix = '')
+#if($velocityCount &gt; 1)
+#set($analyticsPrefix = 't' + $velocityCount + '.')
+  ga('create', '$account', {'name': 'analyticsPrefix'});
+#else
+  ga('create', '$account');
+#end
+  ga('${analyticsPrefix}send', 'pageview');
+#end
+#else
   var _gaq = _gaq || [];
 #foreach($account in $accounts)
 #set($analyticsPrefix = '')
@@ -499,13 +538,14 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
 #end
   _gaq.push(['${analyticsPrefix}_setAccount', '$account']);
   _gaq.push(['${analyticsPrefix}_trackPageview']);
-  #end 
+#end
 
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
+#end
 #end</code>
     </property>
     <property>
@@ -519,12 +559,13 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
     </property>
   </object>
   <content>{{velocity output="false"}}
-#macro(saveGoogleAccount $account)
+#macro(saveGoogleAccount $account $method)
 	#set($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
 	#set($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))
 	#set($analyticsObj = $analyticsConfigDoc.getObject('XWiki.GoogleAnalyticsCode', true))
 	#set($jsObj = $analyticsCodeDoc.getObject('XWiki.JavaScriptExtension'))
 	#set($discard = $analyticsObj.set('account', $!account))
+        #set($discard = $analyticsObj.set('method', $!method))
 	$analyticsConfigDoc.save()
 	#if ("$!jsObj" != "") 
 		#if ("$!account" != "")
@@ -553,19 +594,20 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
 
 {{velocity}}
 #if ($doc.name != 'XWikiPreferences' &amp;&amp; $xcontext.action == 'view')
-$response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics')) 
+  $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics')) 
 #end
 #set($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
 #set($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))##
 #set($analyticsObj = $analyticsConfigDoc.getObject('XWiki.GoogleAnalyticsCode', true))##
 #set($analyticsCodeClass = $analyticsCodeDoc.xWikiClass)##
 #set($accountPropertyClass = $analyticsCodeClass.account)##
+#set($methodPropertyClass = $analyticsCodeClass.method)##
 #if($hasAdmin)##
-#if($request.action == 'save')##
-#saveGoogleAccount($request.get('analytics_account'))##
-#end## save action
+  #if($request.action == 'save')##
+    #saveGoogleAccount($request.get('analytics_account') $request.get('analytics_method'))##
+  #end## save action
 #else## !hasAdmin
-{{error}}{{translation key="needadminrights"/}}.{{/error}}
+  {{error}}{{translation key="needadminrights"/}}.{{/error}}
 #end##
 #displayAnalyticsStatus()
 
@@ -573,8 +615,15 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
 &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform half"&gt;
 	&lt;dl&gt;
 		&lt;dt&gt;
+			&lt;label for="analytics_method"&gt;$!methodPropertyClass.prettyName&lt;/label&gt;
+			&lt;span class="xHint"&gt;$services.localization.render('admin.analytics.method.description', 'xhtml/1.0')&lt;/span&gt;
+		&lt;/dt&gt;
+		&lt;dd&gt;
+			$analyticsConfigDoc.displayEdit($methodPropertyClass, 'analytics_', $analyticsObj)
+		&lt;/dd&gt;
+		&lt;dt&gt;
 			&lt;label for="analytics_account"&gt;$!accountPropertyClass.prettyName&lt;/label&gt;
-			&lt;span class="xHint"&gt;$services.localization.render("admin.analytics.sectiondesc")&lt;/span&gt;
+			&lt;span class="xHint"&gt;$services.localization.render('admin.analytics.account.description', 'xhtml/1.0')&lt;/span&gt;
 		&lt;/dt&gt;
 		&lt;dd&gt;
 			$analyticsConfigDoc.displayEdit($accountPropertyClass, 'analytics_', $analyticsObj)

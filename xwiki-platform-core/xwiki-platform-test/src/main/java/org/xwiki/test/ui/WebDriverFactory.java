@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -46,6 +47,11 @@ public class WebDriverFactory
             FirefoxProfile profile = new FirefoxProfile();
             profile.setEnableNativeEvents(true);
             driver = new FirefoxDriver(profile);
+
+            // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can
+            // prevent buttons or links from being clicked when they are beneath it and native events are used.
+            // See https://groups.google.com/forum/#!msg/selenium-users/gBozOynEjs8/XDxxQNmUSCsJ
+            driver.switchTo().activeElement().sendKeys(Keys.chord(Keys.CONTROL, "/"));
         } else if (browserName.startsWith("*iexplore")) {
             driver = new InternetExplorerDriver();
         } else if (browserName.startsWith("*chrome")) {

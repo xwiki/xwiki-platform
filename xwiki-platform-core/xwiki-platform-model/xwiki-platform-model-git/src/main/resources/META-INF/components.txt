@@ -1,0 +1,2 @@
+org.xwiki.model.internal.GitEntityManager
+org.xwiki.model.internal.DefaultGitStore

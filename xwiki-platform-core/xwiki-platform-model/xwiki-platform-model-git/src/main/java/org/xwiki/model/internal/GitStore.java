@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,24 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.model.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>5.1-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-model</artifactId>
-  <name>XWiki Platform - Model - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Model (Wiki, Space, Document, etc)</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-model-api</module>
-    <module>xwiki-platform-model-bridge</module>
-    <module>xwiki-platform-model-git</module>
-  </modules>
-</project>
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.xwiki.component.annotation.Role;
+
+@Role
+public interface GitStore
+{
+    void addFile(String directory, String fileName, InputStream content) throws IOException, GitAPIException;
+
+    InputStream getContent(String revSpec, String filePath) throws IOException;
+}

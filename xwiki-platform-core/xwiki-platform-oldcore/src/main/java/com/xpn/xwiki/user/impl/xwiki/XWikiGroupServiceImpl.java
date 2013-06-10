@@ -670,8 +670,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         parameterValues.put("groupdocname", groupFullName);
         parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);
 
-        queryString.append(" and (trim(both from field.value)<>'' or "
-            + "(trim(both from field.value) is not null and '' is null))");
+        queryString.append(" and (trim(both ' ' from field.value)<>'' or "
+            + "(trim(both ' ' from field.value) is not null and '' is null))");
 
         if (matchField != null) {
             queryString.append(" and lower(field.value) like :matchfield");

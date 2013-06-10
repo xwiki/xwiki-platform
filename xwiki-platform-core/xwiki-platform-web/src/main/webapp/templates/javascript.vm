@@ -9,7 +9,7 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 ## In order to make it easy to debug Javascript in browsers, allow the request parameter "minify=false" to be passed to
 ## avoid using the minified versions of JS/CSS.
 ##
-###if ("$!request.minify" == 'false')
+#if ("$!request.minify" == 'false')
   $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})
   $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
   $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})
@@ -24,10 +24,10 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
   $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
   $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})
   $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)
-###else
-##  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})
-##  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})
-###end
+#else
+  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})
+  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})
+#end
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
   ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
@@ -74,7 +74,16 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
 <script type="text/javascript">
 // <![CDATA[
-require.config({paths:{jquery: "$xwiki.getSkinFile('resources/js/amd/jquery-1.9.1', true)"}, baseUrl: '/'});
+require.config({
+  paths: {
+    // Load from CDN if possible, otherwise load local file.
+    jquery: [
+      '//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min',
+      "$xwiki.getSkinFile('js/amd/')jquery"
+    ],
+    jQueryNoConflict: "$xwiki.getSkinFile('js/amd/')jQueryNoConflict"
+  }
+});
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.contextPath = "${request.contextPath}";

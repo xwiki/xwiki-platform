@@ -32,8 +32,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1309440660000</creationDate>
-  <date>1370851601000</date>
-  <contentUpdateDate>1370851601000</contentUpdateDate>
+  <date>1370883185000</date>
+  <contentUpdateDate>1370883185000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('admin.analytics')</title>
   <defaultTemplate/>
@@ -520,21 +520,22 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 #foreach($account in $accounts)
-#set($analyticsPrefix = '')
-#if($velocityCount &gt; 1)
-#set($analyticsPrefix = 't' + $velocityCount + '.')
-  ga('create', '$account', {'name': 'analyticsPrefix'});
+#set($accountName = '')
+#if($foreach.index &gt; 0)
+#set($accountName = 't' + $foreach.index)
+  ga('create', '$account', {'name': '$accountName'});
+  ga('${accountName}.send', 'pageview');
 #else
   ga('create', '$account');
+  ga('send', 'pageview');
 #end
-  ga('${analyticsPrefix}send', 'pageview');
 #end
 #else
   var _gaq = _gaq || [];
 #foreach($account in $accounts)
 #set($analyticsPrefix = '')
-#if($velocityCount &gt; 1)
-#set($analyticsPrefix = 't' + $velocityCount + '.')
+#if($foreach.index &gt; 0)
+#set($analyticsPrefix = 't' + $foreach.index + '.')
 #end
   _gaq.push(['${analyticsPrefix}_setAccount', '$account']);
   _gaq.push(['${analyticsPrefix}_trackPageview']);

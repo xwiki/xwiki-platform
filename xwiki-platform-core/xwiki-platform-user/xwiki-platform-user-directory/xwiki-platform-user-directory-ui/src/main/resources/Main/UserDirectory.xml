@@ -130,7 +130,7 @@ icon=icon:group</parameters>
 ## Guests and superadmin don't have an user profile and, therefore, no preferences. Offer default.
 #if ($isGuest || $isSuperAdmin)
   #if ($isGuest)
-    {{info}}$services.localization.render('xe.userdirectory.canCustomizeInfoGuest', "path:$doc.getURL('login')"){{/info}}
+    {{info}}$services.localization.render('xe.userdirectory.canCustomizeInfoGuest', ["path:$doc.getURL('login')"]){{/info}}
   #end
   ## Use the default columns for guests or superadmin.
   #set ($discard = $columns.addAll($defaultColumns))

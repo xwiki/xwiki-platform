@@ -132,7 +132,7 @@ public class BridgedEntityManagerTest
     }
 
     @Test
-    public void getEntityForWikiThatDoesntExists() throws Exception
+    public void getEntityForWikiThatDoesntExist() throws Exception
     {
         WikiReference wikiReference = new WikiReference("wiki");
         when(this.xwiki.getServerURL(eq("wiki"), any(XWikiContext.class))).thenReturn(null);
@@ -189,7 +189,7 @@ public class BridgedEntityManagerTest
     }
 
     @Test
-    public void getEntityForObjectThatDoesntExists() throws Exception
+    public void getEntityForObjectThatDoesntExist() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         ObjectReference objectReference = new ObjectReference("object", documentReference);
@@ -204,7 +204,7 @@ public class BridgedEntityManagerTest
     }
 
     @Test
-    public void getEntityForObjectWhenDocumentDoesntExists() throws Exception
+    public void getEntityForObjectWhenDocumentDoesntExist() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         ObjectReference objectReference = new ObjectReference("object", documentReference);
@@ -249,5 +249,23 @@ public class BridgedEntityManagerTest
             new UniqueReference(propertyReference));
         Assert.assertNotNull(objectPropertyEntity);
         Assert.assertFalse(objectPropertyEntity.isNew());
+    }
+
+    @Test
+    public void getEntityForObjectPropertyThatDoesntExist() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        ObjectReference objectReference = new ObjectReference("object", documentReference);
+        ObjectPropertyReference propertyReference = new ObjectPropertyReference("property", objectReference);
+
+        XWikiDocument xdoc = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(xdoc);
+        BaseObject baseObject = mock(BaseObject.class);
+        when(xdoc.getXObject(objectReference)).thenReturn(baseObject);
+        when(baseObject.get("property")).thenReturn(null);
+
+        ObjectPropertyEntity objectPropertyEntity = this.componentManager.getComponentUnderTest().getEntity(
+            new UniqueReference(propertyReference));
+        Assert.assertNull(objectPropertyEntity);
     }
 }

@@ -50,6 +50,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 
 /**
  * @since 5.0M1
@@ -134,10 +135,15 @@ public class BridgedEntityManager implements EntityManager, Initializable
                 BaseObject xobject = getXWikiObject(reference.getParent());
                 if (xobject != null) {
                     try {
-                        BridgedObjectPropertyEntity bop = new BridgedObjectPropertyEntity(
-                            (BaseProperty) xobject.get(reference.getName()), getXWikiContext());
-                        bop.setNew(false);
-                        result = (T) bop;
+                        PropertyInterface property = xobject.get(reference.getName());
+                        if (property != null) {
+                            BridgedObjectPropertyEntity bop = new BridgedObjectPropertyEntity(
+                                (BaseProperty) property, getXWikiContext());
+                            bop.setNew(false);
+                            result = (T) bop;
+                        } else {
+                            result = null;
+                        }
                     } catch (XWikiException e) {
                         throw new ModelRuntimeException("Failed to retrieve object property [%s]", e, reference);
                     }

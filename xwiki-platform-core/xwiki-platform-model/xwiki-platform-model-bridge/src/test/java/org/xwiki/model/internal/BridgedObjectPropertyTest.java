@@ -21,12 +21,11 @@ package org.xwiki.model.internal;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseProperty;
-
-import junit.framework.Assert;
 
 /**
  * Unit tests for {@link BridgedObjectPropertyEntity}.
@@ -43,6 +42,6 @@ public class BridgedObjectPropertyTest
         when(property.getValue()).thenReturn("test");
 
         BridgedObjectPropertyEntity bop = new BridgedObjectPropertyEntity(property, mock(XWikiContext.class));
-        Assert.assertEquals("test", bop.getValue());
+        assertEquals("test", bop.getValue());
     }
 }

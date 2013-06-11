@@ -27,16 +27,20 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ObjectPropertyEntity;
+import org.xwiki.model.UniqueReference;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -71,7 +75,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
      * Used to get the user avatar picture from his profile.
      */
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private EntityManager entityManager;
 
     /**
      * Used to get the default avatar picture when the user doesn't exist.
@@ -115,30 +119,45 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     public List<Block> execute(UserAvatarMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference userReference =
-            this.currentDocumentReferenceResolver.resolve(parameters.getUsername(), new EntityReference(USER_SPACE,
-                EntityType.SPACE));
+        // Transform the user reference passed in parameter into a Document Reference, resolving against the current
+        // wiki if the user has not specified the wiki part (e.g. {{useravatar username="VincentMassol"/}} or
+        // {{useravatar username="XWiki.VincentMassol"/}}). Note that if the user has specified a space other than
+        // "XWiki" then it's ignored and the "XWiki" space will be used. The reason is that currently all users are
+        // located in the "XWiki" space.
+        DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(
+            parameters.getUsername(), new EntityReference(USER_SPACE, EntityType.SPACE));
 
-        // Find the avatar attachment name or null if not defined or an error happened when locating it
-        String fileName = null;
-        if (this.documentAccessBridge.exists(userReference)) {
-            Object avatarProperty =
-                this.documentAccessBridge.getProperty(userReference, new DocumentReference(userReference
-                    .getWikiReference().getName(), USER_SPACE, "XWikiUsers"), "avatar");
-            if (avatarProperty != null) {
-                fileName = avatarProperty.toString();
+        // Find the avatar attachment name or null if not defined or an error happened when locating it.
+        // Raises an error if the user doesn't exist.
+        String avatarAttachmentFileName = null;
+        if (this.entityManager.hasEntity(new UniqueReference(userReference))) {
+
+            DocumentReference xwikiUsersClassReference = new DocumentReference(
+                userReference.getWikiReference().getName(), USER_SPACE, "XWikiUsers");
+
+            // TODO: Find a way to be able to address an object by its xclass directly...
+            //BaseObjectReference objectReference = new BaseObjectReference(xwikiUsersClassReference, 0, userReference);
+            ObjectReference objectReference = new ObjectReference(
+                this.compactWikiEntityReferenceSerializer.serialize(xwikiUsersClassReference), userReference);
+
+            ObjectPropertyReference propertyReference = new ObjectPropertyReference("avatar", objectReference);
+
+            ObjectPropertyEntity<String> avatarPropertyEntity =
+                this.entityManager.getEntity(new UniqueReference(propertyReference));
+
+            if (avatarPropertyEntity != null) {
+                avatarAttachmentFileName = avatarPropertyEntity.getValue();
             }
         } else {
-            throw new MacroExecutionException("User ["
-                + this.compactWikiEntityReferenceSerializer.serialize(userReference)
-                + "] is not registered in this wiki");
+            throw new MacroExecutionException(String.format("User [%s] is not registered in this wiki",
+                this.compactWikiEntityReferenceSerializer.serialize(userReference)));
         }
 
         ResourceReference imageReference;
-        if (StringUtils.isBlank(fileName)) {
+        if (avatarAttachmentFileName == null) {
             imageReference = new ResourceReference(this.skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
         } else {
-            AttachmentReference attachmentReference = new AttachmentReference(fileName, userReference);
+            AttachmentReference attachmentReference = new AttachmentReference(avatarAttachmentFileName, userReference);
             imageReference =
                 new ResourceReference(this.compactWikiEntityReferenceSerializer.serialize(attachmentReference),
                     ResourceType.ATTACHMENT);

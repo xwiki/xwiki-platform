@@ -25,19 +25,23 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.model.EntityManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ObjectPropertyEntity;
+import org.xwiki.model.UniqueReference;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
@@ -62,23 +66,32 @@ public class IntegrationTests
             allowing(mockSkinAccessBridge).getSkinFile("noavatar.png"); will(returnValue("/xwiki/noavatar.png"));
         }});
 
-        // Document Access Bridge Mock
+        // Entity Manager Mock
+        final EntityManager mockEntityManager =
+            registerMockComponent(componentManager, mockery, EntityManager.class, "bridge");
         final DocumentReference adminUserReference = new DocumentReference("wiki", "XWiki", "Admin");
         final DocumentReference userWithoutAvatarReference =
             new DocumentReference("wiki", "XWiki", "ExistingUserWithoutAvatar");
         final DocumentReference userNotExistingReference = new DocumentReference("wiki", "XWiki", "UserNotExisting");
         final DocumentReference userClassReference = new DocumentReference("wiki", "XWiki", "XWikiUsers");
-        final DocumentAccessBridge mockDocumentAccessBridge =
-            registerMockComponent(componentManager, mockery, DocumentAccessBridge.class);
+        final ObjectPropertyReference avatarPropertyReference = new ObjectPropertyReference("avatar",
+            new ObjectReference("XWiki.XWikiUsers", adminUserReference));
+        final ObjectPropertyReference avatarNotExistPropertyReference = new ObjectPropertyReference("avatar",
+            new ObjectReference("XWiki.XWikiUsers", userWithoutAvatarReference));
+        final ObjectPropertyEntity<String> mockAvatarProperty = mockery.mock(ObjectPropertyEntity.class);
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).exists(adminUserReference); will(returnValue(true));
-            allowing(mockDocumentAccessBridge).exists(userWithoutAvatarReference); will(returnValue(true));
-            allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(false));
-            allowing(mockDocumentAccessBridge).exists(userNotExistingReference); will(returnValue(false));
-            allowing(mockDocumentAccessBridge).getProperty(adminUserReference, userClassReference, "avatar");
+            allowing(mockEntityManager).hasEntity(new UniqueReference(adminUserReference));
+                will(returnValue(true));
+            allowing(mockEntityManager).getEntity(new UniqueReference(avatarPropertyReference));
+                will(returnValue(mockAvatarProperty));
+            allowing(mockAvatarProperty).getValue();
                 will(returnValue("mockAvatar.png"));
-            allowing(mockDocumentAccessBridge).getProperty(userWithoutAvatarReference, userClassReference,
-                "avatar"); will(returnValue(null));
+            allowing(mockEntityManager).hasEntity(new UniqueReference(userWithoutAvatarReference));
+                will(returnValue(true));
+            allowing(mockEntityManager).getEntity(new UniqueReference(avatarNotExistPropertyReference));
+                will(returnValue(null));
+            allowing(mockEntityManager).hasEntity(new UniqueReference(userNotExistingReference));
+                will(returnValue(false));
         }});
 
         // Document Resolver Mock
@@ -105,6 +118,8 @@ public class IntegrationTests
                 will(returnValue("XWiki.Admin@mockAvatar.png"));
             allowing(mockEntityReferenceSerializer).serialize(userNotExistingReference);
                 will(returnValue("XWiki.UserNotExisting"));
+            allowing(mockEntityReferenceSerializer).serialize(userClassReference);
+                will(returnValue("XWiki.XWikiUsers"));
         }});
 
         // Entity Reference Serializer Mock

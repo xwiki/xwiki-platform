@@ -38,9 +38,16 @@
     <xwiki.extension.name>User Avatar Macro</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- Used to get access to Skin resources, namely the noavatar image to use when the user doesn't have any
+         avatar defined. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

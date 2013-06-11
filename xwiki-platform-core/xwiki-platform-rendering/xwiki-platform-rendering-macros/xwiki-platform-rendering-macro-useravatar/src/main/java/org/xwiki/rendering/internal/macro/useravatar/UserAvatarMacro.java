@@ -136,6 +136,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
                 userReference.getWikiReference().getName(), USER_SPACE, "XWikiUsers");
 
             // TODO: Find a way to be able to address an object by its xclass directly...
+            // See http://markmail.org/thread/2pfzgyem43he5qn7
             //BaseObjectReference objectReference = new BaseObjectReference(xwikiUsersClassReference, 0, userReference);
             ObjectReference objectReference = new ObjectReference(
                 this.compactWikiEntityReferenceSerializer.serialize(xwikiUsersClassReference), userReference);

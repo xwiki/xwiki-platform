@@ -159,13 +159,21 @@ public class LucenePlugin extends XWikiDefaultPlugin
     @Override
     protected void finalize() throws Throwable
     {
-        LOGGER.error("Lucene plugin will exit!");
+        LOGGER.debug("Lucene plugin is exiting");
 
-        if (this.indexUpdater != null) {
-            this.indexUpdater.doExit();
+        // Note: There's no guarantee that this method will be called when the LucenePlugin object is garbage-collected
+        // This is just a best effort. A better implementation would be to implement this as a component and have that
+        // component implement Disposable which would guarantee that it's called when the XWiki application stops.
+        // Since we're now deprecating the Lucene module in favor of the SOLR module it's not worth it to rewrite this
+        // module with components at this stage...
+        try {
+            // Stop the indexing so that it can close properly and not leave open indexes.
+            if (this.indexUpdater != null) {
+                this.indexUpdater.doExit();
+            }
+        } finally {
+            super.finalize();
         }
-
-        super.finalize();
     }
 
     public int rebuildIndex(XWikiContext context)

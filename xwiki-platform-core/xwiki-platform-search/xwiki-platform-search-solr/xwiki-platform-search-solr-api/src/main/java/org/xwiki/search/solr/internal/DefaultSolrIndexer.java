@@ -288,11 +288,13 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     {
         // Launch the resolve thread that runs the indexUpdater.
         this.resolveThread = new Thread(new Resolver());
+        this.resolveThread.setName("XWiki Solr resolve thread");
         this.resolveThread.start();
         this.resolveThread.setPriority(Thread.NORM_PRIORITY - 1);
 
         // Launch the index thread that runs the indexUpdater.
         this.indexThread = new Thread(this);
+        this.indexThread.setName("XWiki Solr index thread");
         this.indexThread.start();
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
 

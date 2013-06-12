@@ -45,11 +45,17 @@ public interface Fields
      * Language of the document.
      */
     String LANGUAGE = "language";
-    
+
     /**
      * Locale of the document.
      */
     String LOCALE = "locale";
+
+    /**
+     * The list of Locales covered by this entity. Dynamically determined from the list of enabled Locales and the
+     * various Locales of the associated wiki document.
+     */
+    String LOCALES = "locales";
 
     /**
      * Keyword field, holds the name of the virtual wiki a document belongs to.
@@ -92,7 +98,7 @@ public interface Fields
      * Version of the document (example: {@code 4.2}).
      */
     String VERSION = "version";
-    
+
     /**
      * For storing the comment associated to the version.
      * <p/>
@@ -170,11 +176,16 @@ public interface Fields
     String SCORE = "score";
 
     /**
-     * Fulltext content, not stored (and can therefore not be restored from the index).
+     * Fulltext plain rendered content.
      * <p/>
      * Note: Multilingual and virtual field.
      */
-    String DOCUMENT_CONTENT = "doccontent";
+    String DOCUMENT_RENDERED_CONTENT = "doccontent";
+
+    /**
+     * Raw content.
+     */
+    String DOCUMENT_RAW_CONTENT = "doccontentraw";
 
     /**
      * Attachment content.
@@ -182,6 +193,11 @@ public interface Fields
      * Note: Multilingual and virtual field.
      */
     String ATTACHMENT_CONTENT = "attcontent";
+
+    /**
+     * Attachment version.
+     */
+    String ATTACHMENT_VERSION = "attversion";
 
     /**
      * For storing mimetype of the attachments.

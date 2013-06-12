@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -31,15 +30,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -60,24 +59,22 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     @Named("attachment")
     protected SolrReferenceResolver resolver;
 
-    /**
-     * DocumentAccessBridge component.
-     */
-    @Inject
-    protected DocumentAccessBridge documentAccessBridge;
-
     @Override
     public void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);
 
-        DocumentReference documentReference = attachmentReference.getDocumentReference();
+        XWikiDocument document = getDocument(attachmentReference.getDocumentReference());
+        XWikiAttachment attachment = document.getAttachment(attachmentReference.getName());
 
-        solrDocument.setField(Fields.FILENAME, attachmentReference.getName());
-        solrDocument.setField(Fields.MIME_TYPE, getMimeType(attachmentReference));
+        XWikiContext xcontext = xcontextProvider.get();
 
-        setLocaleAndContentFields(documentReference, solrDocument, attachmentReference);
+        solrDocument.setField(Fields.FILENAME, attachment.getFilename());
+        solrDocument.setField(Fields.MIME_TYPE, attachment.getMimeType(xcontext));
+        solrDocument.setField(Fields.ATTACHMENT_VERSION, attachment.getVersion());
+
+        setLocaleAndContentFields(attachment, solrDocument);
     }
 
     /**
@@ -86,31 +83,22 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
      * <p/>
      * Also, index the content with each locale so that the right analyzer is used.
      * 
-     * @param documentReference the original document's reference.
+     * @param attachment the attachment.
      * @param solrDocument the Solr document where to add the fields.
-     * @param attachmentReference the attachment's reference.
      * @throws Exception if problems occur.
      */
-    protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
-        AttachmentReference attachmentReference) throws Exception
+    protected void setLocaleAndContentFields(XWikiAttachment attachment, SolrInputDocument solrDocument)
+        throws Exception
     {
-        XWikiDocument originalDocument = getDocument(documentReference);
+        Locale defaultDocumentLocale = getLocale(attachment.getDoc().getDocumentReference());
 
-        // Get all the locales in which the document is available.
-        List<Locale> documentLocales = originalDocument.getTranslationLocales(this.xcontextProvider.get());
-        // Make sure that the original document's locale is there as well.
-        Locale originalDocumentLocale = getLocale(documentReference);
-        if (!documentLocales.contains(originalDocumentLocale)) {
-            documentLocales.add(originalDocumentLocale);
-        }
+        String attachmentTextContent = getContentAsText(attachment);
 
-        String attachmentTextContent = getContentAsText(attachmentReference);
         // Do the work for each locale.
-        for (Locale documentLocale : documentLocales) {
-            if (!documentLocale.equals(originalDocumentLocale)) {
+        for (Locale documentLocale : getLocales(attachment.getDoc(), null)) {
+            if (!documentLocale.equals(defaultDocumentLocale)) {
                 // The original document's locale is already set by the call to the setDocumentFields method.
-                solrDocument.addField(Fields.LOCALE, documentLocale.toString());
-                solrDocument.addField(Fields.LANGUAGE, documentLocale.getLanguage());
+                solrDocument.addField(Fields.LOCALES, documentLocale.toString());
             }
 
             solrDocument.setField(
@@ -128,19 +116,19 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     /**
      * Tries to extract text indexable content from a generic attachment.
      * 
-     * @param attachment reference to the attachment.
+     * @param attachment attachment.
      * @return the text representation of the attachment's content.
      * @throws SolrIndexerException if problems occur.
      */
-    protected String getContentAsText(AttachmentReference attachment) throws SolrIndexerException
+    protected String getContentAsText(XWikiAttachment attachment) throws SolrIndexerException
     {
         try {
             Tika tika = new Tika();
 
             Metadata metadata = new Metadata();
-            metadata.set(Metadata.RESOURCE_NAME_KEY, attachment.getName());
+            metadata.set(Metadata.RESOURCE_NAME_KEY, attachment.getFilename());
 
-            InputStream in = this.documentAccessBridge.getAttachmentContent(attachment);
+            InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
 
             try {
                 String result = StringUtils.lowerCase(tika.parseToString(in, metadata));

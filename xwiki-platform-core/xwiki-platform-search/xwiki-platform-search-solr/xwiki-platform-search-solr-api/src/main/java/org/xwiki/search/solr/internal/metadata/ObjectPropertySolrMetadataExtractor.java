@@ -19,7 +19,6 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -93,22 +92,13 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
     protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
         BaseProperty<ObjectPropertyReference> objectProperty) throws Exception
     {
-        XWikiDocument originalDocument = getDocument(documentReference);
-
-        // Get all the locales in which the document is available.
-        List<Locale> documentLocales = originalDocument.getTranslationLocales(this.xcontextProvider.get());
-        // Make sure that the original document's locale is there as well.
-        Locale originalDocumentLocale = getLocale(documentReference);
-        if (!documentLocales.contains(originalDocumentLocale)) {
-            documentLocales.add(originalDocumentLocale);
-        }
+        Locale defaultDocumentLocale = getLocale(documentReference);
 
         // Do the work for each locale.
-        for (Locale documentLocale : documentLocales) {
-            if (!documentLocale.equals(originalDocumentLocale)) {
+        for (Locale documentLocale : getLocales(documentReference, null)) {
+            if (!documentLocale.equals(defaultDocumentLocale)) {
                 // The original document's locale is already set by the call to the addDocumentFields method.
-                solrDocument.addField(Fields.LOCALE, documentLocale);
-                solrDocument.addField(Fields.LANGUAGE, documentLocale.getLanguage());
+                solrDocument.addField(Fields.LOCALES, documentLocale);
             }
 
             solrDocument.setField(

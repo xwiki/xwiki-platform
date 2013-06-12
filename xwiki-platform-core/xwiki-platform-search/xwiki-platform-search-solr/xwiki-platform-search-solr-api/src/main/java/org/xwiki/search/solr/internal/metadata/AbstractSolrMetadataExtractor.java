@@ -19,8 +19,10 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -202,6 +204,59 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         solrDocument.setField(Fields.HIDDEN, document.isHidden());
     }
 
+    protected Set<Locale> getLocales(DocumentReference documentReference, Locale entityLocale) throws XWikiException,
+        SolrIndexerException
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        return getLocales(xcontext.getWiki().getDocument(documentReference, xcontext), entityLocale);
+    }
+
+    protected Set<Locale> getLocales(XWikiDocument xdocument, Locale entityLocale) throws XWikiException,
+        SolrIndexerException
+    {
+        Set<Locale> locales = new HashSet<Locale>();
+
+        String entityLocaleString = entityLocale != null ? entityLocale.toString() : null;
+
+        // 1) Add entity locale
+        if (entityLocale != null) {
+            locales.add(entityLocale);
+        }
+
+        XWikiContext xcontext = xcontextProvider.get();
+
+        // 2) Add locales from the document
+
+        List<Locale> documentLocales = xdocument.getTranslationLocales(this.xcontextProvider.get());
+
+        // If entityLocale is null it means that it's an entity without the support for translations
+        // (objects/attachments)
+        if (entityLocale == null) {
+            for (Locale locale : documentLocales) {
+                locales.add(locale);
+            }
+        }
+
+        // 3) Add locales from preferences
+
+        List<Locale> availableLocales = xcontext.getWiki().getAvailableLocales(xcontext);
+
+        for (Locale locale : availableLocales) {
+            // Add locale only if there is no explicit translation for it
+            if (!documentLocales.contains(locale)) {
+                if (entityLocale == null || locale.toString().startsWith(entityLocaleString)) {
+                    locales.add(locale);
+                }
+            }
+        }
+
+        // 4) Make sure that the original document's locale is there as well.
+        documentLocales.add(getLocale(xdocument.getDocumentReference()));
+
+        return locales;
+    }
+
     /**
      * @param documentReference reference to the document.
      * @return the locale code of the referenced document.
@@ -232,8 +287,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param solrDocument the document where to add the properties.
      * @param object the object whose properties to add.
-     * @param locale the locale of the indexed document. In case of translations, this will obviously be different
-     *            than the original document's locale.
+     * @param locale the locale of the indexed document. In case of translations, this will obviously be different than
+     *            the original document's locale.
      */
     protected void setObjectContent(SolrInputDocument solrDocument, BaseObject object, String locale)
     {

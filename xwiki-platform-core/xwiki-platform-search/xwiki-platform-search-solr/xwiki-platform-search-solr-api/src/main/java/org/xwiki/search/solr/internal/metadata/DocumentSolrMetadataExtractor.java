@@ -22,6 +22,7 @@ package org.xwiki.search.solr.internal.metadata;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -88,19 +89,30 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
         solrDocument.setField(Fields.FULLNAME, localSerializer.serialize(documentReference));
 
-        // Convert the XWiki syntax of document to plain text.
-        WikiPrinter printer = new DefaultWikiPrinter();
-        renderer.render(translatedDocument.getXDOM(), printer);
-
         // Same for document title
         String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
-        // Get the rendered plain text title.
+        // Rendered title.
         solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, locale.toString()), plainTitle);
-        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_CONTENT, locale),
-            printer.toString());
+
+        // Raw Content
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_RAW_CONTENT, locale),
+            translatedDocument.getContent());
+
+        // Rendered content
+        WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
+        this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_RENDERED_CONTENT, locale),
+            plainContentPrinter.toString());
+
         solrDocument.setField(Fields.VERSION, translatedDocument.getVersion());
         solrDocument.setField(Fields.COMMENT, translatedDocument.getComment());
+
+        // Add locale inheritance
+        Set<Locale> locales = getLocales(translatedDocument, locale);
+        for (Locale childLocale : locales) {
+            solrDocument.addField(Fields.LOCALES, childLocale.toString());
+        }
 
         // Get both serialized user reference string and pretty user name (first_name last_name).
         String authorString = serializer.serialize(translatedDocument.getAuthorReference());
@@ -120,7 +132,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // Document translations have their own hidden fields
         solrDocument.setField(Fields.HIDDEN, translatedDocument.isHidden());
 
-        // Add any extra fields (about objects, comments, etc.) that can improve the findability of the document.
+        // Add any extra fields (about objects, etc.) that can improve the findability of the document.
         setExtras(documentReference, solrDocument, locale);
     }
 

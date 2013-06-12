@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 
 import javax.inject.Provider;
 
@@ -104,11 +103,13 @@ public class DocumentSolrMetadataExtractorTest
 
     private String documentReferenceLocalString;
 
-    private String language;
+    private String languageENUS;
 
-    private Locale locale;
+    private Locale localeENUS;
 
     private String renderedContent;
+
+    private String rawContent;
 
     private String title;
 
@@ -156,9 +157,10 @@ public class DocumentSolrMetadataExtractorTest
         this.documentReferenceLocalString = localSerializer.serialize(this.documentReference);
         this.documentReferenceFrench = new DocumentReference(this.documentReference, Locale.FRENCH);
 
-        this.locale = Locale.US;
-        this.language = this.locale.getLanguage();
+        this.localeENUS = Locale.US;
+        this.languageENUS = this.localeENUS.getLanguage();
         this.renderedContent = "content";
+        this.rawContent = "raw content";
         this.title = "title";
         this.version = "1.1";
         this.comment = "1.1 comment";
@@ -195,10 +197,14 @@ public class DocumentSolrMetadataExtractorTest
         when(this.xcontext.getWiki()).thenReturn(this.mockXWiki);
         when(this.mockXWiki.getDocument(this.documentReference, this.xcontext)).thenReturn(this.mockDocument);
 
+        when(this.mockDocument.getDocumentReference()).thenReturn(this.documentReference);
+
         when(this.mockDocument.getTranslatedDocument(org.mockito.Matchers.isNull(Locale.class), eq(this.xcontext)))
             .thenReturn(this.mockDocument);
 
         when(this.mockDab.getDocument(this.documentReference)).thenReturn(this.mockDocument);
+
+        when(this.mockDocument.getContent()).thenReturn(this.rawContent);
 
         BlockRenderer mockPlainRenderer = this.mocker.getInstance(BlockRenderer.class, "plain/1.0");
         doAnswer(new Answer<Object>()
@@ -232,7 +238,7 @@ public class DocumentSolrMetadataExtractorTest
 
         when(this.mockDocument.isHidden()).thenReturn(this.hidden);
 
-        when(this.mockDocument.getRealLocale()).thenReturn(this.locale);
+        when(this.mockDocument.getRealLocale()).thenReturn(this.localeENUS);
     }
 
     @Test
@@ -241,7 +247,6 @@ public class DocumentSolrMetadataExtractorTest
         // Mock
 
         // No objects (and no comments).
-        when(this.mockDocument.getComments()).thenReturn(new Vector<BaseObject>());
         when(this.mockDocument.getXObjects()).thenReturn(new HashMap<DocumentReference, List<BaseObject>>());
 
         // Call
@@ -252,7 +257,7 @@ public class DocumentSolrMetadataExtractorTest
 
         // Assert and verify
 
-        Assert.assertEquals(String.format("%s_%s", this.documentReferenceString, this.locale),
+        Assert.assertEquals(String.format("%s_%s", this.documentReferenceString, this.localeENUS),
             solrDocument.getFieldValue(Fields.ID));
 
         Assert.assertEquals(this.documentReference.getWikiReference().getName(),
@@ -261,18 +266,20 @@ public class DocumentSolrMetadataExtractorTest
             solrDocument.getFieldValue(Fields.SPACE));
         Assert.assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(Fields.NAME));
 
-        Assert.assertEquals(this.locale.toString(), solrDocument.getFieldValue(Fields.LOCALE));
-        Assert.assertEquals(this.language, solrDocument.getFieldValue(Fields.LANGUAGE));
+        Assert.assertEquals(this.localeENUS.toString(), solrDocument.getFieldValue(Fields.LOCALE));
+        Assert.assertEquals(this.languageENUS, solrDocument.getFieldValue(Fields.LANGUAGE));
+        Assert.assertEquals(Arrays.asList(this.localeENUS.toString()), solrDocument.getFieldValues(Fields.LOCALES));
         Assert.assertEquals(this.hidden, solrDocument.getFieldValue(Fields.HIDDEN));
         Assert.assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(Fields.TYPE));
 
         Assert.assertEquals(this.documentReferenceLocalString, solrDocument.getFieldValue(Fields.FULLNAME));
 
         Assert.assertEquals(this.title,
-            solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, this.locale)));
-        Assert
-            .assertEquals(this.renderedContent, solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT,
-                Fields.DOCUMENT_CONTENT, this.locale)));
+            solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, this.localeENUS)));
+        Assert.assertEquals(this.rawContent, solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT,
+            Fields.DOCUMENT_RAW_CONTENT, this.localeENUS)));
+        Assert.assertEquals(this.renderedContent, solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT,
+            Fields.DOCUMENT_RENDERED_CONTENT, this.localeENUS)));
 
         Assert.assertEquals(this.version, solrDocument.getFieldValue(Fields.VERSION));
         Assert.assertEquals(this.comment, solrDocument.getFieldValue(Fields.COMMENT));
@@ -353,12 +360,6 @@ public class DocumentSolrMetadataExtractorTest
 
         BaseObject mockComment = mock(BaseObject.class);
 
-        // When handled as a comment
-        Vector<BaseObject> comments = new Vector<BaseObject>();
-        comments.add(mockComment);
-        comments.add(null);
-        when(this.mockDocument.getComments()).thenReturn(comments);
-
         when(mockComment.getStringValue("comment")).thenReturn(commentContent);
         when(mockComment.getStringValue("author")).thenReturn(commentAuthor);
         when(mockComment.getDateValue("date")).thenReturn(commentDate);
@@ -384,7 +385,8 @@ public class DocumentSolrMetadataExtractorTest
         // Assert and verify
 
         Collection<Object> objectProperties =
-            solrDocument.getFieldValues(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, this.locale));
+            solrDocument.getFieldValues(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT,
+                this.localeENUS));
         MatcherAssert.assertThat(objectProperties, Matchers.containsInAnyOrder((Object) ("comment:" + commentContent),
             (Object) ("author:" + commentAuthor), (Object) ("date:" + commentDate.toString()),
             (Object) ("list:" + commentList.get(0)), (Object) ("list:" + commentList.get(1))));

@@ -46,6 +46,7 @@ import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.resources.pages.PageResource;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -82,8 +83,14 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
             // adding rendered content
             if (withRenderedContent) {
                 try {
-                    XWikiDocument mydoc = doc.getDocument();
-                     
+                    XWikiContext context = getXWikiContext();
+                    XWikiDocument mydoc = context.getWiki().getDocument(doc.getDocumentReference(), context);
+
+                    // adding context documents
+                    context.put("doc", mydoc);
+                    context.put("tdoc", mydoc);
+                    context.setAction("view");
+
                     DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                     parameters.setTransformationContextIsolated(true);
                     // Display the document standalone. This will force the sheet to be applied, if there is one.
@@ -100,7 +107,8 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
                     blockRenderer.render(content, printer);
                     page.setRenderedContent(printer.toString());
                 } catch (Exception e) {
-                    page.setRenderedContent("Exception " + e.getMessage());      
+                    page.setRenderedContent("Exception " + e.getMessage());  
+                    e.printStackTrace();
                 }
             }
             

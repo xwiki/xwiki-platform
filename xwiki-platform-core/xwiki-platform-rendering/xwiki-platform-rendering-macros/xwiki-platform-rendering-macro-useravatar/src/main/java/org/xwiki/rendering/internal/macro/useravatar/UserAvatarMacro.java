@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityManager;
@@ -127,17 +126,23 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(
             parameters.getUsername(), new EntityReference(USER_SPACE, EntityType.SPACE));
 
-        // Find the avatar attachment name or null if not defined or an error happened when locating it.
+        // Find the avatar attachment name. Its value will be null if not defined or an error happened when locating it.
+        // If this happens we'll use a default avatar image.
         // Raises an error if the user doesn't exist.
         String avatarAttachmentFileName = null;
+
+        // TODO: Provide an API in the user module to check if a user exists, by passing directly the user string. This
+        // Removes the need to create the userReference above too (the fact that a user is stored in the wiki becomes an
+        // implementation detail).
         if (this.entityManager.hasEntity(new UniqueReference(userReference))) {
 
+            // TODO: Replace all this code by using the user API module to get a User object and to get the avatar
+            // property for that user!
             DocumentReference xwikiUsersClassReference = new DocumentReference(
                 userReference.getWikiReference().getName(), USER_SPACE, "XWikiUsers");
 
-            // TODO: Find a way to be able to address an object by its xclass directly...
-            // See http://markmail.org/thread/2pfzgyem43he5qn7
-            //BaseObjectReference objectReference = new BaseObjectReference(xwikiUsersClassReference, 0, userReference);
+            // TODO1: Replace this by a search when it's implemented.
+            // TODO2: Once we have named objects in the UI, access directly the XWikiUsers object named "user" (for ex)
             ObjectReference objectReference = new ObjectReference(
                 this.compactWikiEntityReferenceSerializer.serialize(xwikiUsersClassReference), userReference);
 
@@ -150,8 +155,9 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
                 avatarAttachmentFileName = avatarPropertyEntity.getValue();
             }
         } else {
-            throw new MacroExecutionException(String.format("User [%s] is not registered in this wiki",
-                this.compactWikiEntityReferenceSerializer.serialize(userReference)));
+            throw new MacroExecutionException(
+                String.format("User [%s] (resolved as [%s]) is not registered in this wiki",
+                parameters.getUsername(), userReference));
         }
 
         ResourceReference imageReference;

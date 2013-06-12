@@ -765,6 +765,9 @@ public class BaseSearchResult extends XWikiResource
 
         String database = Utils.getXWikiContext(componentManager).getDatabase();
 
+        // Set database as it is null at this point
+        getXWikiContext().setDatabase((defaultWikiName==null) ? "xwiki" : defaultWikiName);
+
         /* This try is just needed for executing the finally clause. */
         try {
             List<SearchResult> result = new ArrayList<SearchResult>();

@@ -45,6 +45,9 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         assertAccessLevelTrue("User from another wiki has right on a local wiki", "view",
             "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+
+        assertAccessLevelTrue("User from another wiki has right on a local wiki", "view",
+            "XWiki.user", "wiki2:Space.Page", ctx);
     }
 
     @Test
@@ -59,6 +62,9 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
             "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
 
+        assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
+            "view", "XWiki.user", "wiki2:Space.Page", ctx);
+        
         ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
@@ -222,5 +228,43 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         assertAccessLevelTrue("Groups from global wiki should have right on local wiki through local group", "view",
             "wiki:XWiki.group", "wiki2:Space.Page", ctx);
+    }
+
+    @Test
+    public void testRelativeDocumentReference() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("denieddocument.xml", true);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setDatabase("wiki");
+        testWiki.setDoc("wiki:Space.Page");
+
+        // view
+
+        assertAccessLevelFalse("User has right on the denied document", "view",
+            "wiki:XWiki.user", "wiki:Space.Page", ctx);
+
+        assertAccessLevelFalse("User has right on the denied document", "view",
+            "wiki:XWiki.user", "Space.Page", ctx);
+
+        assertAccessLevelFalse("User has right on the denied document", "view",
+            "wiki:XWiki.user", "Page", ctx);
+
+        assertAccessLevelTrue("User does not have right on the document space", "view",
+            "wiki:XWiki.user", "", ctx);
+
+        // edit
+
+        assertAccessLevelFalse("User has right on the denied document", "edit",
+            "XWiki.user", "wiki:Space.Page", ctx);
+
+        assertAccessLevelFalse("User has right on the denied document", "edit",
+            "XWiki.user", "Space.Page", ctx);
+
+        assertAccessLevelFalse("User has right on the denied document", "edit",
+            "XWiki.user", "Page", ctx);
+
+        assertAccessLevelTrue("User does not have right on the document space", "edit",
+            "XWiki.user", "", ctx);
     }
 }

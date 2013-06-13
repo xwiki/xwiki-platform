@@ -33,6 +33,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
@@ -46,6 +47,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Singleton
 public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
+    /**
+     * The name of the field containing the user email.
+     */
+    private static final String FIEDL_EMAIL = "email";
+
     /**
      * Used to bind a class to a document sheet.
      */
@@ -84,7 +90,11 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
 
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
-        needsUpdate |= bclass.addEmailField("email", "e-Mail", 30);
+        if (!(bclass.getField(FIEDL_EMAIL) instanceof EmailClass)) {
+            bclass.removeField(FIEDL_EMAIL);
+            bclass.addEmailField(FIEDL_EMAIL, "e-Mail", 30);
+            needsUpdate = true;
+        }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);
         needsUpdate |= bclass.addPasswordField("validkey", "Validation Key", 10);
         needsUpdate |= bclass.addBooleanField("active", "Active", "active");

@@ -62,7 +62,7 @@ document.observe('xwiki:dom:loaded', function() {
     #if(!$isValidPassword)
       #set($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
       #set($discard = $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true))
-      $services.localization.render('platform.core.profile.passwd.intructions')
+      $services.localization.render('platform.core.profile.passwd.instructions')
 
   <form class="xform third" action="" method="post" autocomplete="off">
     ## CSRF prevention

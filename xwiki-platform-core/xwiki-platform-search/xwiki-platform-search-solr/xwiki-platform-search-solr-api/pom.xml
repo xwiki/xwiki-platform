@@ -36,7 +36,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
     <solr.version>${lucene.version}</solr.version>
-    <xwiki.jacoco.instructionRatio>49.50</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>49.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Solr -->

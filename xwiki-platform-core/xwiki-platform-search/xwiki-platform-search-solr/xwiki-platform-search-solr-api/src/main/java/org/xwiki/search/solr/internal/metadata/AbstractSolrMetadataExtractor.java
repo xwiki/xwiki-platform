@@ -267,7 +267,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         Locale locale = null;
 
         try {
-            if (documentReference.getLocale() != null) {
+            if (documentReference.getLocale() != null && !documentReference.getLocale().equals(Locale.ROOT)) {
                 locale = documentReference.getLocale();
             } else {
                 XWikiContext xcontext = this.xcontextProvider.get();

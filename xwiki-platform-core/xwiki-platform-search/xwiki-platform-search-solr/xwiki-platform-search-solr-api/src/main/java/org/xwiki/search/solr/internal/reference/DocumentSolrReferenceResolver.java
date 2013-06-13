@@ -91,13 +91,10 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
             // Document itself
             result.add(documentReference);
 
-            // FIXME: Naive assumption that the original document does not have the locale set in the reference.
-            // http://jira.xwiki.org/browse/XWIKI-8349 should make things clearer at some point, but for now we are
-            // using what we have.
-            // FIXME: Second assumption - Only original documents contain objects and attachments, because objects are
+            // FIXME: Assumption - Only original documents contain objects and attachments, because objects are
             // not translatable.
             // http://jira.xwiki.org/browse/XWIKI-69 is the long standing issue on which the second assumption relies.
-            if (documentReference.getLocale() == null) {
+            if (documentReference.getLocale() == null || documentReference.getLocale().equals(Locale.ROOT)) {
                 XWikiDocument document;
                 try {
                     document = getDocument(documentReference);
@@ -196,7 +193,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
         Locale locale = null;
 
         try {
-            if (documentReference.getLocale() != null) {
+            if (documentReference.getLocale() != null && !documentReference.getLocale().equals(Locale.ROOT)) {
                 locale = documentReference.getLocale();
             } else {
                 XWikiContext xcontext = this.xcontextProvider.get();

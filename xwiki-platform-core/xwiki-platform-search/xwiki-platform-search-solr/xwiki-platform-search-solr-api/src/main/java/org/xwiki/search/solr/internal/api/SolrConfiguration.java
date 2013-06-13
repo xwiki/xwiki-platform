@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal.api;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
@@ -49,11 +48,6 @@ public interface SolrConfiguration
      * @param <T> the type of the default parameter.
      */
     <T> T getInstanceConfiguration(String instanceType, String propertyName, T defaultValue);
-
-    /**
-     * @return the list of multilingual fields for which to apply optimized indexing.
-     */
-    List<String> getMultilingualFields();
 
     /**
      * Retrieves the configuration files required by the Solr instance's home directory in order to initialize.

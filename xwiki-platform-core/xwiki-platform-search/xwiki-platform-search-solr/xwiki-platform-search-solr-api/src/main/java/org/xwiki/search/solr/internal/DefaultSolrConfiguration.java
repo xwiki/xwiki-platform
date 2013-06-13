@@ -143,12 +143,6 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     }
 
     @Override
-    public List<String> getMultilingualFields()
-    {
-        return this.configuration.getProperty("solr.multilingual.fields", DEFAULT_MULTILINGUAL_FIELDS);
-    }
-
-    @Override
     public Map<String, URL> getHomeDirectoryConfiguration()
     {
         // Build the result

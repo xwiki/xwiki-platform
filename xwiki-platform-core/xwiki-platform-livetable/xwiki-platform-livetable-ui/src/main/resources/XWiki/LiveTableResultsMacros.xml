@@ -205,7 +205,7 @@
   #if (!$limit)
     #set ($limit = 15)
   #end
-  #set($query = $services.query.hql($sql).addFilter('hidden').addFilter('unique').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #set($query = $services.query.hql($sql).addFilter('currentlanguage').addFilter('hidden').setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))
   #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
@@ -226,35 +226,58 @@
  * @param $rows stores the JSON in memory so that it can be adjusted before serialization
  *#
 #macro(gridresult_buildRowJSON $item $rows)
-  #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${item}"))
+  ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where only the document name is returned
+  #if ($item.class.name == 'java.lang.String')
+    #set($docName = $item)
+    #set($docLanguage = '')
+  #else
+    ## Extract doc name and doc language from $item
+    #set($docName = $item[0])
+    #set($docLanguage = $item[1])
+  #end
+  #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${docName}"))
   #set($row = {'doc_viewable': $viewable})
   #if(!$viewable)
     #set($discard = $row.put('doc_fullName', "${context.database}:${item}"))
   #else
-    #set($itemDoc = $xwiki.getDocument($item))
-    #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
-    #set($discard = $itemDoc.use($className))
-    #set($discard = $row.put('doc_name', $itemDoc.name))
+    #set($mainDoc = $xwiki.getDocument($docName))
+    ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
+    ## result is a translation.
+    #if ("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+      #set($translatedDoc = $mainDoc.getTranslatedDocument($docLanguage))
+      #set($isTranslation = true)
+    #else
+      #set($translatedDoc = $mainDoc)
+      #set($isTranslation = false)
+    #end
+    #set($fullname = $services.model.serialize($mainDoc.documentReference, 'default'))
+    #set($discard = $mainDoc.use($className))
+    #if ($isTranslation)
+      ## Display the language after the document name so that not all translated documents have the same name displayed
+      #set($discard = $row.put('doc_name', "$mainDoc.name ($docLanguage)"))
+    #else
+      #set($discard = $row.put('doc_name', $mainDoc.name))
+    #end
     #set($discard = $row.put('doc_fullName', $fullname))
-    #set($discard = $row.put('doc_space', $itemDoc.space))
-    #set($discard = $row.put('doc_url', $xwiki.getURL($item)))
-    #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
-    #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
-    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
+    #set($discard = $row.put('doc_space', $mainDoc.space))
+    #set($discard = $row.put('doc_url', $xwiki.getURL($docName)))
+    #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!mainDoc.wiki, $!mainDoc.space, 'WebHome'))))
+    #set($discard = $row.put('doc_wiki', $mainDoc.wiki))
+    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $mainDoc.documentReference.extractReference('WIKI')))))
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $context.user, $fullname)))
     #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $context.user, $fullname)))
-    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
-    #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
-    #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
-    #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
-    #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
-    #set($discard = $row.put('doc_author_url', $xwiki.getURL($itemDoc.author)))
-    #set($discard = $row.put('doc_date', $xwiki.formatDate($itemDoc.date)))
-    #set($discard = $row.put('doc_title', $escapetool.xml($itemDoc.plainTitle)))
-    #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($itemDoc.author, false)))
-    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($itemDoc.creationDate)))
-    #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($itemDoc.creator, false)))
+    #set($discard = $row.put('doc_edit_url', $mainDoc.getURL($mainDoc.defaultEditMode)))
+    #set($discard = $row.put('doc_copy_url', $mainDoc.getURL('view', 'xpage=copy')))
+    #set($discard = $row.put('doc_delete_url', $mainDoc.getURL('delete')))
+    #set($discard = $row.put('doc_rename_url', $mainDoc.getURL('view', 'xpage=rename&amp;step=1')))
+    #set($discard = $row.put('doc_rights_url', $mainDoc.getURL('edit', 'editor=rights')))
+    #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
+    #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+    #set($discard = $row.put('doc_title', $escapetool.xml($translatedDoc.plainTitle)))
+    #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($translatedDoc.author, false)))
+    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+    #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($translatedDoc.creator, false)))
     #foreach($colname in $collist)
       #gridresult_buildColumnJSON($colname $row)
     #end

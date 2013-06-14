@@ -254,15 +254,15 @@
     #set($discard = $itemDoc.use($className))
     #if ($isTranslation)
       ## Display the language after the document name so that not all translated documents have the same name displayed
-      #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+      #set($discard = $row.put('doc_name', $escapetool.xml("$itemDoc.name ($docLanguage)")))
     #else
-      #set($discard = $row.put('doc_name', $itemDoc.name))
+      #set($discard = $row.put('doc_name', $escapetool.xml($itemDoc.name)))
     #end
-    #set($discard = $row.put('doc_fullName', $fullname))
-    #set($discard = $row.put('doc_space', $itemDoc.space))
+    #set($discard = $row.put('doc_fullName', $escapetool.xml($fullname)))
+    #set($discard = $row.put('doc_space', $escapetool.xml($itemDoc.space)))
     #set($discard = $row.put('doc_url', $xwiki.getURL($docName)))
     #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
-    #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
+    #set($discard = $row.put('doc_wiki', $escapetool.xml($itemDoc.wiki)))
     #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $context.user, $fullname)))

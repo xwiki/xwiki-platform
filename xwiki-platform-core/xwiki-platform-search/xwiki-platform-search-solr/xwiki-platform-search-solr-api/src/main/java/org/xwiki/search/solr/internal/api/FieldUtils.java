@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.solr.internal.api;
 
+import java.util.Locale;
+
 /**
  * Contains constants naming the Solr/Lucene index fields used by this module for indexing entities. Also contains
  * additional constants used for composing field names on multilingual fields.
@@ -31,96 +33,96 @@ package org.xwiki.search.solr.internal.api;
  * <b>Note</b>: When indexing a field, the actual field name must be used instead of the virtual field name.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 5.1M2
  */
-public interface Fields
+public final class FieldUtils
 {
     /**
      * Keyword field, holds a string uniquely identifying a document across the index. this is used for finding old
      * versions of a document to be indexed.
      */
-    String ID = "id";
+    public static final String ID = "id";
 
     /**
      * Language of the document.
      */
-    String LANGUAGE = "language";
+    public static final String LANGUAGE = "language";
 
     /**
      * Locale of the document.
      */
-    String LOCALE = "locale";
+    public static final String LOCALE = "locale";
 
     /**
      * The list of Locales covered by this entity. Dynamically determined from the list of enabled Locales and the
      * various Locales of the associated wiki document.
      */
-    String LOCALES = "locales";
+    public static final String LOCALES = "locales";
 
     /**
      * Keyword field, holds the name of the virtual wiki a document belongs to.
      */
-    String WIKI = "wiki";
+    public static final String WIKI = "wiki";
 
     /**
      * Name of the space the document belongs to.
      */
-    String SPACE = "space";
+    public static final String SPACE = "space";
 
     /**
      * Unanalyzed and not stored version of the document's space.
      */
-    String SPACE_EXACT = "space_exact";
+    public static final String SPACE_EXACT = "space_exact";
 
     /**
      * Name of the document.
      */
-    String NAME = "name";
+    public static final String NAME = "name";
 
     /**
      * FullName of the document (example: {@code Main.WebHome}).
      */
-    String FULLNAME = "fullname";
+    public static final String FULLNAME = "fullname";
 
     /**
      * Title of the document.
      * <p/>
      * Note: Multilingual and virtual field.
      */
-    String TITLE = "title";
+    public static final String TITLE = "title";
 
     /**
      * Lowercased, unanalyzed and not stored version of the document's title, used for sorting.
      */
-    String TITLE_SORT = "title_sort";
+    public static final String TITLE_SORT = "title_sort";
 
     /**
      * Version of the document (example: {@code 4.2}).
      */
-    String VERSION = "version";
+    public static final String VERSION = "version";
 
     /**
      * For storing the comment associated to the version.
      * <p/>
      * Note: Multilingual and virtual field.
      */
-    String COMMENT = "comment";
+    public static final String COMMENT = "comment";
 
     /**
      * Type of a document. "DOCUMENT", "ATTACHMENT", "OBJECT" and "OBJECT_PROPERTY" are the used values corresponding to
      * the values from {@link org.xwiki.model.EntityType}.
      */
-    String TYPE = "type";
+    public static final String TYPE = "type";
 
     /**
      * XWiki object class, only used for objects and properties.
      */
-    String CLASS = "class";
+    public static final String CLASS = "class";
 
     /**
      * XWiki object number, only used for objects and properties.
      */
-    String NUMBER = "number";
+    public static final String NUMBER = "number";
 
     /**
      * XWiki object content. Used by objects to index their properties and by documents to index all the properties of
@@ -128,113 +130,130 @@ public interface Fields
      * <p/>
      * Note: Multilingual and virtual field.
      */
-    String OBJECT_CONTENT = "objcontent";
+    public static final String OBJECT_CONTENT = "objcontent";
 
     /**
      * Last modifier.
      */
-    String AUTHOR = "author";
+    public static final String AUTHOR = "author";
 
     /**
      * Last modifier, in its display version (i.e., "first_name last_name").
      */
-    String AUTHOR_DISPLAY = "author_display";
+    public static final String AUTHOR_DISPLAY = "author_display";
 
     /**
      * Lowercased, unanalyzed and not stored version of the document's last author display version, used for sorting.
      */
-    String AUTHOR_DISPLAY_SORT = "author_display_sort";
+    public static final String AUTHOR_DISPLAY_SORT = "author_display_sort";
 
     /**
      * Creator of the document.
      */
-    String CREATOR = "creator";
+    public static final String CREATOR = "creator";
 
     /**
      * Creator of the document, in its display version (i.e., "first_name last_name").
      */
-    String CREATOR_DISPLAY = "creator_display";
+    public static final String CREATOR_DISPLAY = "creator_display";
 
     /**
      * Date of last modification.
      */
-    String DATE = "date";
+    public static final String DATE = "date";
 
     /**
      * Date of creation.
      */
-    String CREATIONDATE = "creationdate";
+    public static final String CREATIONDATE = "creationdate";
 
     /**
      * Document hidden flag.
      */
-    String HIDDEN = "hidden";
+    public static final String HIDDEN = "hidden";
 
     /**
      * Document score, not an actual field. It's only computed at query time.
      */
-    String SCORE = "score";
+    public static final String SCORE = "score";
 
     /**
      * Fulltext plain rendered content.
      * <p/>
      * Note: Multilingual and virtual field.
      */
-    String DOCUMENT_RENDERED_CONTENT = "doccontent";
+    public static final String DOCUMENT_RENDERED_CONTENT = "doccontent";
 
     /**
      * Raw content.
      */
-    String DOCUMENT_RAW_CONTENT = "doccontentraw";
+    public static final String DOCUMENT_RAW_CONTENT = "doccontentraw";
 
     /**
      * Attachment content.
      * <p/>
      * Note: Multilingual and virtual field.
      */
-    String ATTACHMENT_CONTENT = "attcontent";
+    public static final String ATTACHMENT_CONTENT = "attcontent";
 
     /**
      * Attachment version.
      */
-    String ATTACHMENT_VERSION = "attversion";
+    public static final String ATTACHMENT_VERSION = "attversion";
 
     /**
      * For storing mimetype of the attachments.
      */
-    String MIME_TYPE = "mimetype";
+    public static final String MIME_TYPE = "mimetype";
 
     /**
      * Filename, only used for attachments.
      */
-    String FILENAME = "filename";
+    public static final String FILENAME = "filename";
 
     /**
      * For storing property name.
      */
-    String PROPERTY_NAME = "propertyname";
+    public static final String PROPERTY_NAME = "propertyname";
 
     /**
      * For storing property value.
      * <p/>
      * Note: Multilingual and virtual field.
      */
-    String PROPERTY_VALUE = "propertyvalue";
+    public static final String PROPERTY_VALUE = "propertyvalue";
 
     /**
      * Underscore character, used to separate the field name from the suffix.
      */
-    String USCORE = "_";
+    public static final String USCORE = "_";
 
     /**
-     * Multilingual field suffix for the field of "text_general" type.
-     * <p>
-     * Underscore to make sure to not collide with an existing locale or root locale.
+     * Utility class.
      */
-    String MULTILINGUAL = USCORE;
+    private FieldUtils()
+    {
+    }
 
     /**
      * Format string for multilingual fields.
+     * 
+     * @param field the field name
+     * @param locale the locale of the content of the field
+     * @return the localized version of the field name
      */
-    String MULTILIGNUAL_FORMAT = "%s_%s";
+    public static String getFieldName(String field, Locale locale)
+    {
+        StringBuilder builder = new StringBuilder(field);
+
+        builder.append(USCORE);
+
+        if (locale != null && !locale.equals(Locale.ROOT)) {
+            builder.append(locale);
+        } else {
+            builder.append(USCORE);
+        }
+
+        return builder.toString();
+    }
 }

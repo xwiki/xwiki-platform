@@ -597,6 +597,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         specialAnalyzers.put(IndexFields.DOCUMENT_WIKI, preserve);
         specialAnalyzers.put(IndexFields.DOCUMENT_TYPE, preserve);
         specialAnalyzers.put(IndexFields.DOCUMENT_LANGUAGE, preserve);
+        specialAnalyzers.put(IndexFields.DOCUMENT_HIDDEN, preserve);
         this.analyzer = new PerFieldAnalyzerWrapper(this.analyzer, specialAnalyzers);
 
         LOGGER.debug("Assigning index updater: {}", indexUpdater);

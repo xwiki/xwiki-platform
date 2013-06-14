@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-help</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.1-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-help-ui</artifactId>
   <name>XWiki Platform - Help - UI</name>

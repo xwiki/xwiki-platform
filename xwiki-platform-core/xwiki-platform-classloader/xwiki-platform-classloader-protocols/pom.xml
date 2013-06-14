@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-classloader</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.1-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-classloader-protocols</artifactId>
   <name>XWiki Platform - ClassLoader - Protocols - Parent POM</name>

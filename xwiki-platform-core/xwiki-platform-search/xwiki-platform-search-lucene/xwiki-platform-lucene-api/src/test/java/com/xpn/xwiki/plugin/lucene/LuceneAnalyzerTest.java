@@ -64,7 +64,7 @@ import static junit.framework.Assert.assertTrue;
 @AllComponents
 public class LuceneAnalyzerTest extends AbstractMockingComponentTestCase<ExecutionContextManager>
 {
-    private final static String INDEXDIR = "target/luceneanalyzertest";
+    private final static String INDEXDIR = System.getProperty("java.io.tmpdir") + File.separator + "luceneanalyzertest";
 
     private XWikiDocument document;
 

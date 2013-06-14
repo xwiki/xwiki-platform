@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -69,11 +69,11 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
         BaseProperty<ObjectPropertyReference> objectProperty = document.getXObjectProperty(objectPropertyReference);
 
         // Object
-        solrDocument.setField(FieldUtils.CLASS, localSerializer.serialize(classReference));
-        solrDocument.setField(FieldUtils.NUMBER, objectReference.getObjectNumber());
+        solrDocument.setField(Fields.CLASS, localSerializer.serialize(classReference));
+        solrDocument.setField(Fields.NUMBER, objectReference.getObjectNumber());
 
         // Property
-        solrDocument.setField(FieldUtils.PROPERTY_NAME, objectReference.getName());
+        solrDocument.setField(Fields.PROPERTY_NAME, objectReference.getName());
 
         setLocaleAndContentFields(documentReference, solrDocument, objectProperty);
     }
@@ -98,15 +98,17 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
         for (Locale documentLocale : getLocales(documentReference, null)) {
             if (!documentLocale.equals(defaultDocumentLocale)) {
                 // The original document's locale is already set by the call to the addDocumentFields method.
-                solrDocument.addField(FieldUtils.LOCALES, documentLocale);
+                solrDocument.addField(Fields.LOCALES, documentLocale);
             }
 
-            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.PROPERTY_VALUE, documentLocale),
+            solrDocument.setField(
+                String.format(Fields.MULTILIGNUAL_FORMAT, Fields.PROPERTY_VALUE, documentLocale.toString()),
                 objectProperty.getValue());
         }
 
         // We can`t rely on the schema's copyField here because we would trigger it for each locale. Doing the copy to
         // the text_general field manually.
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.PROPERTY_VALUE, null), objectProperty.getValue());
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.PROPERTY_VALUE, Fields.MULTILINGUAL),
+            objectProperty.getValue());
     }
 }

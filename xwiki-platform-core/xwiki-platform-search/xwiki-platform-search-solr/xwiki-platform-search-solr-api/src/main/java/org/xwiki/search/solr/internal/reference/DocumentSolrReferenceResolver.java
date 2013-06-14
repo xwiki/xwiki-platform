@@ -35,7 +35,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.google.common.collect.Iterables;
@@ -178,7 +178,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
         // Document IDs also contain the locale code to differentiate between them.
         // Objects, attachments, etc. don`t need this because the only thing that is translated in an XWiki document
         // right now is the document title and content. Objects and attachments are not translated.
-        result += FieldUtils.USCORE + getLocale(documentReference);
+        result += Fields.USCORE + getLocale(documentReference);
 
         return result;
     }
@@ -217,7 +217,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         builder.append(QUERY_AND);
 
-        builder.append(FieldUtils.NAME);
+        builder.append(Fields.NAME);
         builder.append(':');
         builder.append(ClientUtils.escapeQueryChars(reference.getName()));
 

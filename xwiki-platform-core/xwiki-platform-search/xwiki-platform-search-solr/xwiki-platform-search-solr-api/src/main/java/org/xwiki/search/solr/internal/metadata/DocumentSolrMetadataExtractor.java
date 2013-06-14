@@ -37,7 +37,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
@@ -87,31 +87,31 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
         Locale locale = getLocale(documentReference);
 
-        solrDocument.setField(FieldUtils.FULLNAME, localSerializer.serialize(documentReference));
+        solrDocument.setField(Fields.FULLNAME, localSerializer.serialize(documentReference));
 
         // Same for document title
         String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
         // Rendered title.
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, locale.toString()), plainTitle);
 
         // Raw Content
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, locale),
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_RAW_CONTENT, locale),
             translatedDocument.getContent());
 
         // Rendered content
         WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
         this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
+        solrDocument.setField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_RENDERED_CONTENT, locale),
             plainContentPrinter.toString());
 
-        solrDocument.setField(FieldUtils.VERSION, translatedDocument.getVersion());
-        solrDocument.setField(FieldUtils.COMMENT, translatedDocument.getComment());
+        solrDocument.setField(Fields.VERSION, translatedDocument.getVersion());
+        solrDocument.setField(Fields.COMMENT, translatedDocument.getComment());
 
         // Add locale inheritance
         Set<Locale> locales = getLocales(translatedDocument, locale);
         for (Locale childLocale : locales) {
-            solrDocument.addField(FieldUtils.LOCALES, childLocale.toString());
+            solrDocument.addField(Fields.LOCALES, childLocale.toString());
         }
 
         // Get both serialized user reference string and pretty user name (first_name last_name).
@@ -120,17 +120,17 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
         String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
 
-        solrDocument.setField(FieldUtils.AUTHOR, authorString);
-        solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
-        solrDocument.setField(FieldUtils.CREATOR, creatorString);
-        solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
+        solrDocument.setField(Fields.AUTHOR, authorString);
+        solrDocument.setField(Fields.AUTHOR_DISPLAY, authorDisplayString);
+        solrDocument.setField(Fields.CREATOR, creatorString);
+        solrDocument.setField(Fields.CREATOR_DISPLAY, creatorDisplayString);
 
         // Document dates.
-        solrDocument.setField(FieldUtils.CREATIONDATE, translatedDocument.getCreationDate());
-        solrDocument.setField(FieldUtils.DATE, translatedDocument.getContentUpdateDate());
+        solrDocument.setField(Fields.CREATIONDATE, translatedDocument.getCreationDate());
+        solrDocument.setField(Fields.DATE, translatedDocument.getContentUpdateDate());
 
         // Document translations have their own hidden fields
-        solrDocument.setField(FieldUtils.HIDDEN, translatedDocument.isHidden());
+        solrDocument.setField(Fields.HIDDEN, translatedDocument.isHidden());
 
         // Add any extra fields (about objects, etc.) that can improve the findability of the document.
         setExtras(documentReference, solrDocument, locale);
@@ -168,7 +168,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
             for (BaseObject object : objects.getValue()) {
-                setObjectContent(solrDocument, object, locale);
+                setObjectContent(solrDocument, object, locale.toString());
             }
         }
     }

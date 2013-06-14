@@ -34,7 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.google.common.collect.Iterables;
@@ -126,14 +126,14 @@ public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         builder.append(QUERY_AND);
 
-        builder.append(FieldUtils.CLASS);
+        builder.append(Fields.CLASS);
         builder.append(':');
         builder
             .append(ClientUtils.escapeQueryChars(this.localSerializer.serialize(objectReference.getXClassReference())));
 
         builder.append(QUERY_AND);
 
-        builder.append(FieldUtils.NUMBER);
+        builder.append(Fields.NUMBER);
         builder.append(':');
         builder.append(ClientUtils.escapeQueryChars(String.valueOf(objectReference.getObjectNumber())));
 

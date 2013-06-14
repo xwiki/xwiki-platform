@@ -33,7 +33,7 @@ import org.apache.tika.metadata.Metadata;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.Fields;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
@@ -70,9 +70,9 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
 
         XWikiContext xcontext = xcontextProvider.get();
 
-        solrDocument.setField(FieldUtils.FILENAME, attachment.getFilename());
-        solrDocument.setField(FieldUtils.MIME_TYPE, attachment.getMimeType(xcontext));
-        solrDocument.setField(FieldUtils.ATTACHMENT_VERSION, attachment.getVersion());
+        solrDocument.setField(Fields.FILENAME, attachment.getFilename());
+        solrDocument.setField(Fields.MIME_TYPE, attachment.getMimeType(xcontext));
+        solrDocument.setField(Fields.ATTACHMENT_VERSION, attachment.getVersion());
 
         setLocaleAndContentFields(attachment, solrDocument);
     }
@@ -98,16 +98,19 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         for (Locale documentLocale : getLocales(attachment.getDoc(), null)) {
             if (!documentLocale.equals(defaultDocumentLocale)) {
                 // The original document's locale is already set by the call to the setDocumentFields method.
-                solrDocument.addField(FieldUtils.LOCALES, documentLocale.toString());
+                solrDocument.addField(Fields.LOCALES, documentLocale.toString());
             }
 
-            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.ATTACHMENT_CONTENT, documentLocale),
+            solrDocument.setField(
+                String.format(Fields.MULTILIGNUAL_FORMAT, Fields.ATTACHMENT_CONTENT, documentLocale.toString()),
                 attachmentTextContent);
         }
 
         // We can`t rely on the schema's copyField here because we would trigger it for each language. Doing the copy to
         // the text_general field manually.
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.ATTACHMENT_CONTENT, null), attachmentTextContent);
+        solrDocument.setField(
+            String.format(Fields.MULTILIGNUAL_FORMAT, Fields.ATTACHMENT_CONTENT, Fields.MULTILINGUAL),
+            attachmentTextContent);
     }
 
     /**

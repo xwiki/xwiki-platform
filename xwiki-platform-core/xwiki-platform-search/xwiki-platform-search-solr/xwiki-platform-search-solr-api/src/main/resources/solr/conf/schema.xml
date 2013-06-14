@@ -105,11 +105,11 @@
    <field name="name" type="text_general" indexed="true" stored="true" />
    <field name="type" type="string" indexed="true" stored="true" />
    <field name="hidden" type="boolean" indexed="true" stored="true" />
-   <field name="title" type="text_general" indexed="true" stored="true" />
+   <field name="title__" type="text_general" indexed="true" stored="true" />
    <field name="title_sort" type="lowercase" indexed="true" stored="true" />
-   <field name="comment" type="text_general" indexed="true" stored="true" />
-   <field name="doccontent" type="text_general" indexed="true" stored="true" />
-   <field name="doccontentraw" type="text_general" indexed="true" stored="true" />
+   <field name="comment__" type="text_general" indexed="true" stored="true" />
+   <field name="doccontent__" type="text_general" indexed="true" stored="true" />
+   <field name="doccontentraw__" type="text_general" indexed="true" stored="true" />
    <field name="fullname" type="string" indexed="true" stored="true" />
    <field name="author" type="string" indexed="true" stored="true" />
    <field name="author_display" type="text_general" indexed="true" stored="true" />
@@ -119,14 +119,14 @@
    <field name="version" type="string" indexed="true" stored="true" />
    <field name="date" type="tdate" indexed="true" stored="true" />
    <field name="creationdate" type="tdate" indexed="true" stored="true" />
-   <field name="objcontent" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="objcontent__" type="text_general" indexed="true" stored="true" multiValued="true" />
    <field name="class" type="string" indexed="true" stored="true" />
    <field name="propertyname" type="text_general" indexed="true" stored="true" />
-   <field name="propertyvalue" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="propertyvalue__" type="text_general" indexed="true" stored="true" multiValued="true" />
    <field name="filename" type="text_general" indexed="true" stored="true" />
    <field name="mimetype" type="string" indexed="true" stored="true" />
    <field name="attversion" type="string" indexed="true" stored="true" />
-   <field name="attcontent" type="text_general" indexed="true" stored="false" />
+   <field name="attcontent__" type="text_general" indexed="true" stored="false" />
 
    <!-- The list of locales covered by this entry. Dynamically determined from the list of enabled locales and the various locales of the document -->
    <field name="locales" type="string" indexed="true" stored="true" multiValued="true" />
@@ -148,7 +148,6 @@
        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)
        RESTRICTION: the glob-like pattern in the name attribute must have
        a "*" only at the start or the end.  -->
-   <dynamicField name="*__"  type="text_general"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ar"  type="text_ar"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_bg"  type="text_bg"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ca"  type="text_ca"    indexed="true"  stored="true" multiValued="true" />
@@ -167,9 +166,9 @@
    <dynamicField name="*_hi"  type="text_hi"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_hu"  type="text_hu"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_hy"  type="text_hy"    indexed="true"  stored="true" multiValued="true" />
-   <dynamicField name="*_id"  type="text_id"    indexed="true"  stored="true" multiValued="true" />
    <!-- "in" is the former code for "id". See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6457127 -->
    <dynamicField name="*_in"  type="text_id"    indexed="true"  stored="true" multiValued="true" />
+   <dynamicField name="*_id"  type="text_id"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_it"  type="text_it"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ja"  type="text_ja"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_lv"  type="text_lv"    indexed="true"  stored="true" multiValued="true" />
@@ -206,10 +205,10 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
   <!-- Copy optimized language fields to text_general indexed fields for generic usage. -->
-  <copyField source="title_*" dest="title"/>
-  <copyField source="doccontent_*" dest="doccontent"/>
-  <copyField source="doccontentraw_*" dest="doccontentraw"/>
-  <copyField source="comment_*" dest="comment"/>
+  <copyField source="title_*" dest="title__"/>
+  <copyField source="doccontent_*" dest="doccontent__"/>
+  <copyField source="doccontentraw_*" dest="doccontentraw__"/>
+  <copyField source="comment_*" dest="comment__"/>
 
   <!-- Copy values for fields that are needed for specific tasks like exact matching or sorting and can not use their tokenized (analyzed) versions. -->
   <copyField source="space" dest="space_exact"/>
@@ -223,9 +222,9 @@
   <!--  The way we handle attachments/objects/properties requires that multiple attcontent_<language> fields are indexed for the same attachment Lucene document.
         This triggeres copyField each time and forces us to use multiValued="true" on attcontent, thus leading to useless storage overhead.
         To fix this, we are doing the copyField logic from the code, only once per attachment/object/property Lucene document.
-  <copyField source="objcontent_*" dest="objcontent"/>
-  <copyField source="propertyvalue_*" dest="propertyvalue"/>
-  <copyField source="attcontent_*" dest="attcontent"/> -->
+  <copyField source="objcontent_*" dest="objcontent__"/>
+  <copyField source="propertyvalue_*" dest="propertyvalue__"/>
+  <copyField source="attcontent_*" dest="attcontent__"/> -->
 
   <types>
     <!-- field type definitions. The "name" attribute is

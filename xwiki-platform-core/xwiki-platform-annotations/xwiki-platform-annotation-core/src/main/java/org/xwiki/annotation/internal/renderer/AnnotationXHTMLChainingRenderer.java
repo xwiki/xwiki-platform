@@ -68,7 +68,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     public AnnotationXHTMLChainingRenderer(XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
         ListenerChain listenerChain)
     {
-        super(linkRenderer, imageRenderer, listenerChain);
+        super(linkRenderer, imageRenderer, listenerChain, "default");
     }
 
     /**

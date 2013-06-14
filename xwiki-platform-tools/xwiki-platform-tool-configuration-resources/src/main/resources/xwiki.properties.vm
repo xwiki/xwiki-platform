@@ -141,6 +141,12 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
+#-# [Since 5.1M2]
+#-# In order to prevent XSS attacks with the wiki syntax, you can switch to a more secure mode by setting the following 
+#-# parameter with "secure". In this case, non-authorized tags would be deleted, and values of src or href attributes
+#-# would have to start with "http", "/" (for internal links), "#" or "mailto".
+rendering.xhtmlWikiPrinter = default
+
 #-------------------------------------------------------------------------------------
 # Rendering Transformations
 #-------------------------------------------------------------------------------------

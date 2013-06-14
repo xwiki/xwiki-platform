@@ -98,4 +98,10 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     {
         return this.configuration.getProperty(PREFIX + "transformations", Arrays.asList("macro", "icon"));
     }
+    
+    @Override
+    public String getXHTMLWikiPrinterHint()
+    {
+        return this.configuration.getProperty(PREFIX + "xhtmlWikiPrinter", "default");
+    }
 }

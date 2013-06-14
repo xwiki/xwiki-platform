@@ -27,8 +27,8 @@ import java.util.SortedMap;
 
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.renderer.AnnotationEvent;
+import org.xwiki.rendering.renderer.printer.DefaultXHTMLWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
  * XHTML Printer to handle printing annotations markers in the rendered XHTML. It is able to generate the annotation
@@ -41,7 +41,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  * @version $Id$
  * @since 2.3M1
  */
-public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
+public class AnnotationMarkersXHTMLPrinter extends DefaultXHTMLWikiPrinter
 {
 
     /**

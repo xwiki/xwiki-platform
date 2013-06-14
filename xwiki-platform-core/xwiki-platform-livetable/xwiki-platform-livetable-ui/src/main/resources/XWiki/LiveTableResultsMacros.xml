@@ -261,7 +261,7 @@
     #set($discard = $row.put('doc_fullName', $fullname))
     #set($discard = $row.put('doc_space', $itemDoc.space))
     #set($discard = $row.put('doc_url', $xwiki.getURL($docName)))
-    #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!mainDoc.wiki, $!mainDoc.space, 'WebHome'))))
+    #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
     #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
     #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
@@ -319,8 +319,8 @@
     #if($listtool.contains($propClass.getPropertyNames(), $colname))
       #set($propType = "$!propClass.get($colname).type")
     #end
-    #set($fieldValue = "$!mainDoc.getValue($colname)")
-    #set($fieldDisplayValue = "$!mainDoc.display($colname, 'view')")
+    #set($fieldValue = "$!itemDoc.getValue($colname)")
+    #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
     #if($fieldDisplayValue == '')
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end

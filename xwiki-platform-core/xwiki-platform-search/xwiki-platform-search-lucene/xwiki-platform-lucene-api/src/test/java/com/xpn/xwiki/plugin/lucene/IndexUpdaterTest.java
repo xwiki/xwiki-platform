@@ -60,7 +60,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private final static String INDEXDIR = "target/lucenetest";
+    private final static String INDEXDIR = System.getProperty("java.io.tmpdir") + File.separator + "lucenetest";
 
     private final Semaphore rebuildDone = new Semaphore(0);
 
@@ -271,7 +271,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals(1, t.totalHits);
 
-        SearchResults results = plugin.getSearchResultsFromIndexes("Ipsum", "target/lucenetest", null, getContext());
+        SearchResults results = plugin.getSearchResultsFromIndexes("Ipsum", INDEXDIR, null, getContext());
 
         assertEquals(1, results.getTotalHitcount());
     }

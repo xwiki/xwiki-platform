@@ -62,7 +62,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
 
     @Inject
     @Named("context")
-    private Provider<ComponentManager> componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -175,12 +175,12 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         MandatoryDocumentInitializer initializer;
         try {
             initializer =
-                this.componentManager.get().getInstance(MandatoryDocumentInitializer.class,
+                this.componentManagerProvider.get().getInstance(MandatoryDocumentInitializer.class,
                     this.serializer.serialize(documentReference));
         } catch (ComponentLookupException e) {
             try {
                 initializer =
-                    this.componentManager.get().getInstance(MandatoryDocumentInitializer.class,
+                    this.componentManagerProvider.get().getInstance(MandatoryDocumentInitializer.class,
                         this.localSerializer.serialize(documentReference));
             } catch (ComponentLookupException e1) {
                 initializer = null;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.repository;
+package org.xwiki.extension.xar.internal.handler.internal.repository;
 
 import org.junit.Assert;
 
@@ -27,6 +27,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtils;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 public class XarInstalledExtensionRepositoryTest extends AbstractComponentTestCase

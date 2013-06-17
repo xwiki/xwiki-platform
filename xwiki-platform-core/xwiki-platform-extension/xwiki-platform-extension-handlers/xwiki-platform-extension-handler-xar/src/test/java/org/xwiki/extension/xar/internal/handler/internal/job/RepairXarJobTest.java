@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.job;
+package org.xwiki.extension.xar.internal.handler.internal.job;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +27,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
+import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
 

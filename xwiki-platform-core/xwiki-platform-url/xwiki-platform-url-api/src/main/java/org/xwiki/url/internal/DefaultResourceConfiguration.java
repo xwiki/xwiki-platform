@@ -28,20 +28,22 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.url.ResourceConfiguration;
 
 /**
+ * Default implementation reading data from the {@code xwiki.properties} file.
+ *
  * @version $Id$
- * @since 2.3M1
+ * @since 5.2M1
  */
 @Component
 @Singleton
 public class DefaultResourceConfiguration implements ResourceConfiguration
 {
     /**
-     * Prefix for configuration keys for the Core module.
+     * Prefix for configuration keys for the Resource module.
      */
-    private static final String PREFIX = "url.";
+    private static final String PREFIX = "url";
 
     /**
-     * Defines from where to read the rendering configuration data.
+     * Defines from where to read the Resource configuration data.
      */
     @Inject
     @Named("xwikiproperties")
@@ -50,7 +52,7 @@ public class DefaultResourceConfiguration implements ResourceConfiguration
     @Override
     public String getURLFormatId()
     {
-        // Note: the format corresponds to the component hint for the XWikiURLFactory implementation to use.
+        // Note: the format corresponds to the component hint for the Resource Factory implementation to use.
         return this.configuration.getProperty(PREFIX + "format", "standard");
     }
 }

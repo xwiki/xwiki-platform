@@ -100,6 +100,7 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
@@ -122,10 +123,11 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.resource.EntityResource;
+import org.xwiki.resource.Resource;
+import org.xwiki.resource.ResourceFactory;
+import org.xwiki.resource.ResourceManager;
 import org.xwiki.stability.Unstable;
-import org.xwiki.url.XWikiEntityURL;
-import org.xwiki.url.XWikiURL;
-import org.xwiki.url.XWikiURLManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.api.Api;
@@ -352,7 +354,7 @@ public class XWiki implements EventListener
     private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils
         .getComponent(PrivilegedTemplateRenderer.class);
 
-    private XWikiURLManager urlManager = Utils.getComponent((Type) XWikiURLManager.class);
+    private ResourceManager resourceManager = Utils.getComponent((Type) ResourceManager.class);
 
     /**
      * Used to get the temporary and permanent directory.
@@ -489,7 +491,11 @@ public class XWiki implements EventListener
     {
         XWiki xwiki = getMainXWiki(context);
 
-        String wikiName = xwiki.getRequestWikiName(context);
+        // Extract Entity Resource from URL and put it in the Execution Context
+        EntityResource entityResource = initializeResourceFromURL(context);
+
+        // Get the wiki name
+        String wikiName = entityResource.getEntityReference().extractReference(EntityType.WIKI).getName();
         if (wikiName.equals(context.getMainXWiki())) {
             // The main wiki was requested.
             return xwiki;
@@ -527,6 +533,28 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to upgrade database: " + wikiName, ex);
         }
         return xwiki;
+    }
+
+    private static EntityResource initializeResourceFromURL(XWikiContext context) throws XWikiException
+    {
+        // Extract the Entity Resource from the URL
+        // TODO: This code should be put in an ExecutionContextInitializer but we couldn't do yet since this code
+        // requires that the XWiki object be initialized first (the line above). Thus we'll be able to to move it only
+        // after the XWiki init is done also in an ExecutionContextInitializer (and with priorities).
+        ResourceFactory<URL, Resource> urlFactory = Utils.getComponent(ResourceFactory.TYPE_URL_RESOURCE);
+        URL url = context.getURL();
+        EntityResource entityResource;
+        try {
+            entityResource = (EntityResource) urlFactory.createResource(url,
+                Collections.<String, Object>singletonMap("ignorePrefix", context.getRequest().getContextPath()));
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
+                String.format("Failed to extract Entity Resource from URL [%s]", url), e);
+        }
+        Utils.getComponent(Execution.class).getContext().setProperty(ResourceManager.RESOURCE_CONTEXT_PROPERTY,
+            entityResource);
+
+        return entityResource;
     }
 
     /**
@@ -4676,26 +4704,20 @@ public class XWiki implements EventListener
                 new DocumentReference(context.getDatabase(), context.getDoc().getDocumentReference()
                     .getLastSpaceReference().getName(), context.getDoc().getDocumentReference().getName());
         } else {
-            String action = context.getAction();
-            if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
-                reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
-            } else {
-                XWikiURL xwikiURL = this.urlManager.getXWikiURL();
-                if (xwikiURL instanceof XWikiEntityURL) {
-                    // TODO: Handle references not pointing to a document...
-                    EntityReference entityReference =
-                        ((XWikiEntityURL) xwikiURL).getEntityReference().extractReference(EntityType.DOCUMENT);
-                    // TODO: Since the URL module doesn't yet handle wiki aliases, we currently use
-                    // context.getDatabase() as the wiki name since that was set properly beforehand in getXWiki()
-                    // which calls XWiki.getRequestWikiName() which handles correctly aliases.
-                    // Remove this once the URL module properly handles wiki aliases.
-                    reference =
-                        new DocumentReference(context.getDatabase(), entityReference.extractReference(EntityType.SPACE)
-                            .getName(), entityReference.getName());
+            Resource resource = this.resourceManager.getResource();
+            if (resource instanceof EntityResource) {
+                EntityResource entityResource = (EntityResource) resource;
+                String action = entityResource.getAction();
+                if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
+                    reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
                 } else {
-                    // Big problem we don't have an Entity URL!
-                    throw new RuntimeException(String.format("URL [%s] that doesn't point to an Entity!", xwikiURL));
+                    reference = new DocumentReference(
+                        entityResource.getEntityReference().extractReference(EntityType.DOCUMENT));
                 }
+            } else {
+                // TODO: Handle references not pointing to a document...
+                // Big problem we don't have an Entity URL!
+                throw new RuntimeException(String.format("Resource [%s] is not an Entity!", resource));
             }
         }
 

@@ -113,7 +113,9 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
         // large as the max # of wikis being used at once.
         if (descriptor == null) {
             DocumentReference reference = findXWikiServerClassDocumentReference(wikiAlias);
-            descriptor = set(getDocument(reference));
+            if (reference != null) {
+                descriptor = set(getDocument(reference));
+            }
         }
 
         return descriptor;

@@ -28,47 +28,48 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.url.ResourceFactory;
-import org.xwiki.url.URLConfiguration;
-import org.xwiki.url.URLCreationException;
-import org.xwiki.url.UnsupportedURLException;
-import org.xwiki.url.Resource;
+import org.xwiki.resource.Resource;
+import org.xwiki.resource.ResourceCreationException;
+import org.xwiki.resource.ResourceFactory;
+import org.xwiki.resource.UnsupportedResourceException;
+import org.xwiki.url.ResourceConfiguration;
 
 /**
- * URL Factory that delegates the work to the URL Factory specified in the XWiki Configuration
- * (see {@link org.xwiki.url.URLConfiguration#getURLFormatId()}.
+ * Resource Factory that delegates the work to the Resource Factory specified in the XWiki Configuration
+ * (see {@link org.xwiki.url.ResourceConfiguration#getURLFormatId()}.
  *
  * @version $Id$
- * @since 3.0M3
+ * @since 5.2M1
  */
 @Component
 @Singleton
 public class DefaultResourceFactory implements ResourceFactory<URL, Resource>
 {
     /**
-     * Used to get the hint of the {@link org.xwiki.url.ResourceFactory} to use.
+     * Used to get the hint of the {@link ResourceFactory} to use.
      */
     @Inject
-    private URLConfiguration configuration;
+    private ResourceConfiguration configuration;
 
     /**
-     * Used to lookup the correct {@link org.xwiki.url.ResourceFactory} component.
+     * Used to lookup the correct {@link ResourceFactory} component.
      */
     @Inject
     private ComponentManager componentManager;
 
     @Override
-    public Resource createURL(URL urlRepresentation, Map<String, Object> parameters)
-        throws URLCreationException, UnsupportedURLException
+    public Resource createResource(URL urlRepresentation, Map<String, Object> parameters)
+        throws ResourceCreationException, UnsupportedResourceException
     {
         ResourceFactory factory;
         try {
-            factory = this.componentManager.getInstance(ResourceFactory.TYPE_URL_XWIKIURL,
+            factory = this.componentManager.getInstance(ResourceFactory.TYPE_URL_RESOURCE,
                 this.configuration.getURLFormatId());
         } catch (ComponentLookupException e) {
-            throw new URLCreationException(String.format("Invalid configuration hint [%s]. Cannot create XWiki URL.",
-                this.configuration.getURLFormatId()), e);
+            throw new ResourceCreationException(
+                String.format("Invalid configuration hint [%s]. Cannot create Resource for [%s].",
+                    this.configuration.getURLFormatId(), urlRepresentation), e);
         }
-        return factory.createURL(urlRepresentation, parameters);
+        return factory.createResource(urlRepresentation, parameters);
     }
 }

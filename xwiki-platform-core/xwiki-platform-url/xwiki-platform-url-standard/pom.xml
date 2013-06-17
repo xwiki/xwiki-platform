@@ -38,14 +38,19 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-descriptor-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

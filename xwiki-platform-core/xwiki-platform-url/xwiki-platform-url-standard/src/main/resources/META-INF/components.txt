@@ -1,7 +1,5 @@
-org.xwiki.url.internal.standard.URLXWikiURLSerializer
-org.xwiki.url.internal.standard.StandardXWikiURLFactory
-org.xwiki.url.internal.standard.DefaultStandardURLConfiguration
-org.xwiki.url.internal.standard.DomainWikiReferenceResolver
-org.xwiki.url.internal.standard.PathBasedWikiReferenceResolver
+org.xwiki.url.internal.standard.URLResourceSerializer
+org.xwiki.url.internal.standard.StandardResourceFactory
+org.xwiki.url.internal.standard.DefaultStandardResourceConfiguration
 org.xwiki.url.internal.standard.DefaultWikiReferenceExtractor
-org.xwiki.url.internal.standard.ExtendedURLXWikiEntityURLFactory
+org.xwiki.url.internal.standard.ExtendedURLEntityResourceFactory

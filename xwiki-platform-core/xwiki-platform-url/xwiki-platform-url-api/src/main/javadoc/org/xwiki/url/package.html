@@ -21,8 +21,8 @@
 -->
 
 <body>
-  <p>Offers APIs to convert URLs into XWiki URL objects and vice-versa.</p>
-  <p>All XWiki modules should use this API when they need to manipulate URLs and should not manipualte the JDK's
+  <p>Offers APIs to convert URLs into Resource objects and vice-versa.</p>
+  <p>All XWiki modules should use this API when they need to manipulate URLs and should not manipulate the JDK's
      URL class. The reasons are:
      <ul>
        <li>reduce bugs: this module is well-tested, handles escaping and encoding properly, and more. It's likely
@@ -32,7 +32,7 @@
      </ul>
   </p>
   <p>The only places where it's allowed to see the JDK's URL class is in system boundary code, in code accepting an
-     external URL and transforming it into a XWiki URL and in code generating a URL from a XWiki URL for outside
-     processes.
+     external URL and transforming it into a XWiki Resource and in code generating a URL from a XWiki Resource for
+     outside processes.
   </p>
 </body>

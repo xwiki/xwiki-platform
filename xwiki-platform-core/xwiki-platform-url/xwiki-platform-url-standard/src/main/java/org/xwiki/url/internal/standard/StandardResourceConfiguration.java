@@ -23,10 +23,10 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Configuration options specific to the "Standard" URL implementation scheme.
+ * Configuration options specific to the {@code standard} URL implementation scheme.
  *
  * @version $Id$
- * @since 2.3M1
+ * @since 5.2M1
  */
 @Role
 @Unstable

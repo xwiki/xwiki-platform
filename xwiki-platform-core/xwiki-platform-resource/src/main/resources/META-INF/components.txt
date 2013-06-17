@@ -1,3 +1,1 @@
-org.xwiki.url.internal.DefaultResourceConfiguration
-org.xwiki.url.internal.DefaultResourceFactory
 org.xwiki.resource.internal.DefaultResourceManager

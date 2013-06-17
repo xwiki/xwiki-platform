@@ -31,11 +31,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.url.EntityResource;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 
@@ -636,7 +636,7 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.XWikiURLFactory} instead
+     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.ResourceFactory} instead
      */
     @Deprecated
     public XWikiDocument XWiki.getDocumentFromPath(String path, XWikiContext context) throws XWikiException
@@ -646,7 +646,7 @@ public privileged aspect XWikiCompatibilityAspect
 
     /**
      * @since 2.3M1
-     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.XWikiURLFactory} instead
+     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.ResourceFactory} instead
      */
     @Deprecated
     public DocumentReference XWiki.getDocumentReferenceFromPath(String path, XWikiContext context)
@@ -661,7 +661,7 @@ public privileged aspect XWikiCompatibilityAspect
             segments.remove(0);
         }
 
-        XWikiEntityURL entityURL = buildEntityURLFromPathSegments(new WikiReference(context.getDatabase()), segments);
+        EntityResource entityURL = buildEntityURLFromPathSegments(new WikiReference(context.getDatabase()), segments);
 
         return new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
     }
@@ -685,12 +685,12 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.XWikiURLFactory} instead
+     * @deprecated starting with 5.1M1 use {@link org.xwiki.url.ResourceFactory} instead
      */
     @Deprecated
-    private XWikiEntityURL XWiki.buildEntityURLFromPathSegments(WikiReference wikiReference, List<String> pathSegments)
+    private EntityResource XWiki.buildEntityURLFromPathSegments(WikiReference wikiReference, List<String> pathSegments)
     {
-        XWikiEntityURL entityURL;
+        EntityResource entityURL;
 
         // Rules based on counting the url segments:
         // - 0 segments (e.g. ""): default document reference, "view" action
@@ -738,7 +738,7 @@ public privileged aspect XWikiCompatibilityAspect
         }
         reference = this.defaultReferenceEntityReferenceResolver.resolve(reference, entityType);
 
-        entityURL = new XWikiEntityURL(reference);
+        entityURL = new EntityResource(reference);
         entityURL.setAction(action);
 
         return entityURL;

@@ -20,7 +20,7 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.stability.Unstable;
-import org.xwiki.url.XWikiURLType;
+import org.xwiki.resource.ResourceType;
 import org.xwiki.url.internal.ExtendedURL;
 
 /**
@@ -41,7 +41,7 @@ public class URLParsingState
     /**
      * @see 1#getURLType()
      */
-    private XWikiURLType urlType;
+    private ResourceType urlType;
 
     /**
      * @return the URL that we're parsing (its state is changed during the parsing process)
@@ -63,16 +63,16 @@ public class URLParsingState
      * @return the type of URL being parsed (Entity URL, Resource URL, etc) or null if the type has not been recognized
      *         yet
      */
-    public XWikiURLType getURLType()
+    public ResourceType getURLType()
     {
         return this.urlType;
     }
 
     /**
-     * @param xWikiURLType see {@link #getURLType()}
+     * @param resourceType see {@link #getURLType()}
      */
-    public void setURLType(XWikiURLType xWikiURLType)
+    public void setURLType(ResourceType resourceType)
     {
-        this.urlType = xWikiURLType;
+        this.urlType = resourceType;
     }
 }

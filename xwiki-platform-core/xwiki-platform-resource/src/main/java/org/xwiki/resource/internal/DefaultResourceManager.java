@@ -25,11 +25,11 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.url.Resource;
-import org.xwiki.url.ResourceManager;
+import org.xwiki.resource.Resource;
+import org.xwiki.resource.ResourceManager;
 
 /**
- * Allow getting the {@link org.xwiki.url.Resource} object from the Execution Context.
+ * Allow getting the {@link org.xwiki.resource.Resource} object from the Execution Context.
  *
  * @version $Id$
  * @since 5.2M1

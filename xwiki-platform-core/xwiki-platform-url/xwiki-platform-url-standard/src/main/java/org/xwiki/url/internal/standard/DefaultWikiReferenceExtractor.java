@@ -22,14 +22,19 @@ package org.xwiki.url.internal.standard;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.url.internal.ExtendedURL;
+import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.WikiDescriptorException;
+import org.xwiki.wiki.WikiDescriptorManager;
 
 /**
  * Handles both path-based and domain-based multiwiki configurations when extracting the wiki reference from the passed
@@ -43,31 +48,30 @@ import org.xwiki.url.internal.ExtendedURL;
 public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
 {
     /**
-     * Host resolver to generate {@link WikiReference} for path-based configurations.
-     */
-    @Inject
-    @Named("path")
-    private WikiReferenceResolver pathBasedWikiReferenceResolver;
-
-    /**
-     * Host resolver to generate {@link WikiReference} for domain-based configurations.
-     */
-    @Inject
-    @Named("domain")
-    private WikiReferenceResolver domainWikiReferenceResolver;
-
-    /**
      * To find out how what type of multiwiki is configured (path-based or domain-based).
      */
     @Inject
-    private StandardURLConfiguration configuration;
+    private StandardResourceConfiguration configuration;
+
+    /**
+     * Used to get the main wiki name.
+     * @todo replace that with a proper API to get the main wiki reference
+     */
+    @Inject
+    private EntityReferenceValueProvider entityReferenceValueProvider;
+
+    /**
+     * Used to get wiki descriptors based on alias or wiki id.
+     */
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     /**
      * {@inheritDoc}
      * <p/>
      * For domain-based multiwiki setups we ask a resolver to resolve the URL's host name.
      * For path-based multiwiki setup we get the path segment after the first segment, if this first segment has the
-     * predefined {@link StandardURLConfiguration#getWikiPathPrefix()} value. If not then we
+     * predefined {@link StandardResourceConfiguration#getWikiPathPrefix()} value. If not then we
      * fall-back to domain-based multiwiki setups and resolve with the URL's host name.
      *
      * @return the wiki the URL is pointing to, returned as a {@link WikiReference}.
@@ -77,20 +81,113 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
     {
         boolean isActuallyPathBased = false;
 
-        WikiReference wikiReference = null;
+        String wikiId = null;
         if (this.configuration.isPathBasedMultiWiki()) {
             List<String> segments = url.getSegments();
             // If the first path element isn't the value of the wikiPathPrefix configuration value then we fall back
             // to the host name. This also allows the main wiki URL to be domain-based even for a path-based multiwiki.
             if (segments.get(0).equalsIgnoreCase(this.configuration.getWikiPathPrefix())) {
-                wikiReference = this.pathBasedWikiReferenceResolver.resolve(segments.get(1));
+                wikiId = resolvePathBasedWikiReference(segments.get(1));
                 isActuallyPathBased = true;
             }
         }
-        if (wikiReference == null) {
-            wikiReference = this.domainWikiReferenceResolver.resolve(url.getURI().getHost());
+        if (wikiId == null) {
+            wikiId = resolveDomainBasedWikiReference(url.getURI().getHost());
         }
 
-        return new ImmutablePair(wikiReference, isActuallyPathBased);
+        if (StringUtils.isEmpty(wikiId)) {
+            wikiId = getMainWikiId();
+        }
+
+        return new ImmutablePair(new WikiReference(wikiId.toLowerCase()), isActuallyPathBased);
+    }
+
+    private String resolvePathBasedWikiReference(String alias)
+    {
+        String wikiId;
+
+        // Look for a Wiki Descriptor
+        WikiDescriptor wikiDescriptor = getWikiDescriptorByAlias(alias);
+        if (wikiDescriptor != null) {
+            // Get the wiki id from the wiki descriptor
+            wikiId = wikiDescriptor.getWikiId();
+        } else {
+            wikiId = normalizeWikiIdForNonExistentWikiDescriptor(alias);
+        }
+
+        return wikiId;
+    }
+
+    private String resolveDomainBasedWikiReference(String alias)
+    {
+        String wikiId;
+
+        // Look for a Wiki Descriptor
+        WikiDescriptor wikiDescriptor = getWikiDescriptorByAlias(alias);
+        if (wikiDescriptor != null) {
+            // Get the wiki id from the wiki descriptor
+            wikiId = wikiDescriptor.getWikiId();
+        } else {
+            // Fallback: No definition found based on the full domain name, consider the alias as a
+            // domain name and try to use the first part of the domain name as the wiki name.
+            String domainAlias = StringUtils.substringBefore(alias, ".");
+
+            // As a convenience, we do not require the creation of an XWiki.XWikiServerXwiki page for the main
+            // wiki and automatically go to the main wiki in certain cases:
+            // - "www.<rest of domain name>"
+            // - "localhost"
+            // - IP address
+            if ("www".equals(domainAlias) || "localhost".equals(alias)
+                || alias.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}"))
+            {
+                wikiId = getMainWikiId();
+            } else {
+                wikiId = normalizeWikiIdForNonExistentWikiDescriptor(domainAlias);
+            }
+        }
+
+        return wikiId;
+    }
+
+    /**
+     * Check if there's a descriptor for the passed wiki and if not and the configuration option to redirect to
+     * the main wiki is enabled then return the main wiki.
+     */
+    private String normalizeWikiIdForNonExistentWikiDescriptor(String wikiId)
+    {
+        String normalizedWikiId = wikiId;
+        String mainWiki = getMainWikiId();
+        if (!mainWiki.equals(normalizedWikiId)
+            && this.configuration.getWikiNotFoundBehavior() == WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI)
+        {
+            if (getWikiDescriptorById(normalizedWikiId) == null) {
+                // Fallback on main wiki
+                normalizedWikiId = mainWiki;
+            }
+        }
+        return normalizedWikiId;
+    }
+
+    private WikiDescriptor getWikiDescriptorByAlias(String alias)
+    {
+        try {
+            return this.wikiDescriptorManager.getByWikiAlias(alias);
+        } catch (WikiDescriptorException e) {
+            throw new RuntimeException(String.format("Failed to located wiki descriptor for alias [{}]", alias), e);
+        }
+    }
+
+    private WikiDescriptor getWikiDescriptorById(String wikiId)
+    {
+        try {
+            return this.wikiDescriptorManager.getByWikiId(wikiId);
+        } catch (WikiDescriptorException e) {
+            throw new RuntimeException(String.format("Failed to located wiki descriptor for wiki [{}]", wikiId), e);
+        }
+    }
+
+    private String getMainWikiId()
+    {
+        return this.entityReferenceValueProvider.getDefaultValue(EntityType.WIKI);
     }
 }

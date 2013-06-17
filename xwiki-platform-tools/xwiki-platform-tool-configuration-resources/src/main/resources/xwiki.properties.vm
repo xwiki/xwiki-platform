@@ -557,4 +557,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # url.standard.multiwiki.wikiPathPrefix=wiki
 
+#-# [Since 5.2M1]
+#-# What to do when the requested wiki does not exist:
+#-# - 0: (default) serve the main wiki
+#-# - 1: display an error (customizable through wikidoesnotexist.vm or xwiki:XWiki.WikiDoesNotExist)
+# url.standard.multiwiki.notFoundBehavior=0
+
 $!xwikiPropertiesAdditionalProperties

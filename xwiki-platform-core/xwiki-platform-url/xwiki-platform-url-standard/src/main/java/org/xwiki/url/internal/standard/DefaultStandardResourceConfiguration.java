@@ -27,22 +27,22 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Configuration options specific to the "Standard" URL implementation scheme.
+ * Default implementation reading data from the {@code xwiki.properties} file.
  *
  * @version $Id$
- * @since 2.3M1
+ * @since 5.2M1
  */
 @Component
 @Singleton
 public class DefaultStandardResourceConfiguration implements StandardResourceConfiguration
 {
     /**
-     * Prefix for configuration keys for the Core module.
+     * Prefix for configuration keys for the Resource module.
      */
     private static final String PREFIX = "url.standard.";
 
     /**
-     * Defines from where to read the URL configuration data.
+     * Defines from where to read the Resource configuration data.
      */
     @Inject
     @Named("xwikiproperties")

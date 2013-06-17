@@ -377,6 +377,8 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Young API that has been refactored to introduce the new Resource module -->
+            <exclude>org/xwiki/url/*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -445,6 +447,7 @@
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-repository</module>
+    <module>xwiki-platform-resource</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-sandbox</module>
     <module>xwiki-platform-scheduler</module>
@@ -464,6 +467,7 @@
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>
+    <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wiki-manager</module>
     <module>xwiki-platform-workspace</module>
     <module>xwiki-platform-wysiwyg</module>

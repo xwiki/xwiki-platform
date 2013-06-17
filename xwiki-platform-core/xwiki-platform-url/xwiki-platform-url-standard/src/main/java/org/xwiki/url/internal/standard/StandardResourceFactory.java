@@ -20,11 +20,11 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.url.URLCreationException;
-import org.xwiki.url.UnsupportedURLException;
-import org.xwiki.url.EntityResource;
-import org.xwiki.url.Resource;
-import org.xwiki.url.ResourceFactory;
+import org.xwiki.resource.EntityResource;
+import org.xwiki.resource.Resource;
+import org.xwiki.resource.ResourceCreationException;
+import org.xwiki.resource.ResourceFactory;
+import org.xwiki.resource.UnsupportedResourceException;
 import org.xwiki.url.internal.ExtendedURL;
 
 import java.net.URL;
@@ -35,11 +35,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * Parses a URL written in the "standard" format and generate a {@link org.xwiki.url.Resource} out of it. The "standard" format is
- * defined in {@link ExtendedURLXWikiEntityURLFactory}.
+ * Parses a URL written in the "standard" format and generate a {@link org.xwiki.resource.Resource} out of it.
+ * The "standard" format is defined in {@link ExtendedURLEntityResourceFactory}.
  *
  * @version $Id$
- * @since 2.3M1
+ * @since 5.2M1
  */
 @Component
 @Named("standard")
@@ -47,22 +47,22 @@ import javax.inject.Singleton;
 public class StandardResourceFactory implements ResourceFactory<URL, Resource>
 {
     /**
-     * @see #createURL(java.net.URL, java.util.Map)
+     * @see #createResource(java.net.URL, java.util.Map)
      */
     private static final String IGNORE_PREFIX_KEY = "ignorePrefix";
 
     /**
-     * Used to parse a URL representing an Entity URL.
+     * Used to parse a URL representing a Resource Entity.
      */
     @Inject
     @Named("standard")
-    private ResourceFactory<ExtendedURL, EntityResource> entityURLFactory;
+    private ResourceFactory<ExtendedURL, EntityResource> entityResourceFactory;
 
     /**
      * Used to know if the wiki is in path-based configuration or not.
      */
     @Inject
-    private StandardURLConfiguration configuration;
+    private StandardResourceConfiguration configuration;
 
     /**
      * {@inheritDoc}
@@ -75,13 +75,13 @@ public class StandardResourceFactory implements ResourceFactory<URL, Resource>
      *       Example: "/xwiki".</li> 
      * </ul>
      *
-     * @see org.xwiki.url.ResourceFactory#createURL(Object, java.util.Map)
+     * @see org.xwiki.resource.ResourceFactory#createResource(Object, java.util.Map)
      */
     @Override
-    public Resource createURL(URL url, Map<String, Object> parameters)
-        throws URLCreationException, UnsupportedURLException
+    public Resource createResource(URL url, Map<String, Object> parameters)
+        throws ResourceCreationException, UnsupportedResourceException
     {
-        Resource xwikiURL;
+        Resource resource;
 
         // Step 1: Use an Extended URL in to get access to the URL path segments.
         // Note that we also remove the passed ignore prefix from the segments if it has been specified.
@@ -94,11 +94,11 @@ public class StandardResourceFactory implements ResourceFactory<URL, Resource>
         // Step2: Find out what type of URL we have and call the appropriate factories
         String type = extendedURL.getSegments().get(0);
         if (type.equals("bin") || type.equals(this.configuration.getWikiPathPrefix())) {
-            xwikiURL = this.entityURLFactory.createURL(extendedURL, parameters);
+            resource = this.entityResourceFactory.createResource(extendedURL, parameters);
         } else {
-            throw new UnsupportedURLException(String.format("URL type [%s] are not yet supported!", type));
+            throw new UnsupportedResourceException(String.format("URL type [%s] are not yet supported!", type));
         }
 
-        return xwikiURL;
+        return resource;
     }
 }

@@ -26,28 +26,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-wysiwyg-test</artifactId>
     <version>5.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wysiwyg</artifactId>
-  <name>XWiki Platform - WYSIWYG Editor - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Parent POM for the WYSIWYG editor modules</description>
-  <modules>
-    <module>xwiki-platform-wysiwyg-client</module>
-    <module>xwiki-platform-wysiwyg-plugin-api</module>
-    <module>xwiki-platform-wysiwyg-server</module>
-    <module>xwiki-platform-wysiwyg-test</module>
-    <module>xwiki-platform-wysiwyg-ui</module>
-    <module>xwiki-platform-wysiwyg-war</module>
-  </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
+  <name>XWiki Platform - WYSIWYG Editor - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - WYSIWYG Editor - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

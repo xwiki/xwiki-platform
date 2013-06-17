@@ -17,40 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po.editor.wysiwyg;
+package org.xwiki.wysiwyg.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * Models the image selection wizard step that is accessible when inserting or editing an attached image with the
- * WYSIWYG content editor.
+ * Models a wizard step used by the WYSIWYG content editor.
  * 
  * @version $Id$
  * @since 3.2M3
  */
-public class AttachedImageSelectPane extends WizardStepElement
+public class WizardStepElement extends BaseElement
 {
-    @FindBy(xpath = "//div[@class = 'xSelectorAggregatorStep']//div[. = 'Current page']")
-    private WebElement currentPageTab;
-
-    @Override
-    public AttachedImageSelectPane waitToLoad()
-    {
-        super.waitToLoad();
-        waitUntilElementIsVisible(By.className("xSelectorAggregatorStep"));
-        return this;
-    }
-
     /**
-     * Selects the tab that lists the images attached to the current page.
+     * Waits for this wizard step to load.
      * 
-     * @return the pane used to select an image from those attached to the edited page
+     * @return a reference to this wizard step for easy method chaining
      */
-    public CurrentPageImageSelectPane selectFromCurrentPage()
+    public WizardStepElement waitToLoad()
     {
-        currentPageTab.click();
-        return new CurrentPageImageSelectPane().waitToLoad();
+        waitUntilElementIsVisible(By
+            .xpath("//div[contains(@class, 'xDialogBody') and not(contains(@class, 'loading'))]"));
+        return this;
     }
 }

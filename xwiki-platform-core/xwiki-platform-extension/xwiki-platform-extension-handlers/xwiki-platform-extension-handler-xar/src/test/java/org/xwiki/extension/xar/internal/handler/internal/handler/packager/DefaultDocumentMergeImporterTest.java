@@ -242,6 +242,8 @@ public class DefaultDocumentMergeImporterTest
         this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
+        verify(this.jobStatus, times(2)).ask(anyObject());
+
         verifyZeroInteractions(this.xwiki, this.xcontext);
     }
 
@@ -265,6 +267,7 @@ public class DefaultDocumentMergeImporterTest
         this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
+        verify(this.jobStatus, times(2)).ask(anyObject());
         verify(this.xwiki, times(2)).saveDocument(same(this.nextDocument), eq("comment"), eq(false),
             same(this.xcontext));
     }
@@ -289,6 +292,7 @@ public class DefaultDocumentMergeImporterTest
         this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
+        verify(this.jobStatus, times(2)).ask(anyObject());
         verify(this.xwiki, times(2)).saveDocument(same(this.mergedDocument), eq("comment"), eq(false),
             same(this.xcontext));
     }
@@ -313,6 +317,7 @@ public class DefaultDocumentMergeImporterTest
         this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
+        verify(this.jobStatus, times(2)).ask(anyObject());
         verify(this.xwiki, times(2)).saveDocument(same(this.previousDocument), eq("comment"), eq(false),
             same(this.xcontext));
     }

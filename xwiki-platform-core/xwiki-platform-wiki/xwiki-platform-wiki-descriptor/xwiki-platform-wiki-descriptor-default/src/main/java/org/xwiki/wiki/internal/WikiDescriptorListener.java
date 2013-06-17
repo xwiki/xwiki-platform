@@ -86,10 +86,12 @@ public class WikiDescriptorListener implements EventListener
         List<BaseObject> serverClassObjects = document.getXObjects(SERVER_CLASS);
         if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
             WikiDescriptor descriptor = this.builder.build(serverClassObjects, document, context);
-            if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
-                this.wikiDescriptorManager.set(descriptor);
-            } else {
-                this.wikiDescriptorManager.remove(descriptor);
+            if (descriptor != null) {
+                if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
+                    this.wikiDescriptorManager.set(descriptor);
+                } else {
+                    this.wikiDescriptorManager.remove(descriptor);
+                }
             }
         }
     }

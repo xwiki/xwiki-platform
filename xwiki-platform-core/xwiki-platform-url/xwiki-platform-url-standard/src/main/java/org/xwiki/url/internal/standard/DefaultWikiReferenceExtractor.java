@@ -144,6 +144,10 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
             } else {
                 wikiId = normalizeWikiIdForNonExistentWikiDescriptor(domainAlias);
             }
+
+            // Create a virtual descriptor and save it so that next call will resolve to it directly without needing
+            // to query the entity store.
+            this.wikiDescriptorManager.set(new WikiDescriptor(wikiId, alias));
         }
 
         return wikiId;

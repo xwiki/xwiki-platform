@@ -53,8 +53,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 {
-    private static final WikiDescriptor EMPTY_DESCRIPTOR = new WikiDescriptor(null, null);
-
     @Inject
     private CacheFactory cacheFactory;
 
@@ -78,7 +76,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public WikiDescriptor getByWikiAlias(String wikiAlias) throws WikiDescriptorException
     {
-        WikiDescriptor descriptor;
+        WikiDescriptor descriptor = this.wikiAliasCache.get(wikiAlias);
 
         // If not found in the cache then query the wiki and add to the cache if found.
         //
@@ -87,18 +85,10 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         // subwikis we only cache the most used one. This allows inactive wikis to not take up any memory for example.
         // Note that In order for performance to be maximum it also means we need to have a cache size at least as
         // large as the max # of wikis being used at once.
-        if (this.wikiAliasCache.containsKey(wikiAlias)) {
-            descriptor = this.wikiAliasCache.get(wikiAlias);
-            if (descriptor.equals(EMPTY_DESCRIPTOR)) {
-                descriptor = null;
-            }
-        } else {
+        if (descriptor == null) {
             DocumentReference reference = findXWikiServerClassDocumentReference(wikiAlias);
             if (reference != null) {
                 descriptor = set(getDocument(reference));
-            } else {
-                descriptor = null;
-                this.wikiAliasCache.put(wikiAlias, EMPTY_DESCRIPTOR);
             }
         }
 
@@ -108,23 +98,15 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public WikiDescriptor getByWikiId(String wikiId) throws WikiDescriptorException
     {
-        WikiDescriptor descriptor;
+        WikiDescriptor descriptor = this.wikiIdCache.get(wikiId);
 
-        if (this.wikiIdCache.containsKey(wikiId)) {
-            descriptor = this.wikiIdCache.get(wikiId);
-            if (descriptor.equals(EMPTY_DESCRIPTOR)) {
-                descriptor = null;
-            }
-        } else {
+        if (descriptor == null) {
             // Try to load a page named XWiki.XWikiServer<wikiId>
             XWikiDocument document = getDocument(new EntityReference(
                 String.format("XWikiServer%s", StringUtils.capitalize(wikiId)), EntityType.DOCUMENT,
                 new EntityReference("XWiki", EntityType.SPACE)));
             if (!document.isNew()) {
                 descriptor = set(document);
-            } else {
-                descriptor = null;
-                this.wikiIdCache.put(wikiId, EMPTY_DESCRIPTOR);
             }
         }
 

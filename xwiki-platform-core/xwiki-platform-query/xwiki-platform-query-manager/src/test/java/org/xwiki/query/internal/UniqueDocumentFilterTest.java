@@ -59,7 +59,7 @@ public class UniqueDocumentFilterTest
             filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
 
         List<String> items = Arrays.asList("doc1", "doc2");
-        assertThat(filter.filterResults(items), is(items));
+        assertThat((List<String>) filter.filterResults(items), is(items));
     }
 
     @Test

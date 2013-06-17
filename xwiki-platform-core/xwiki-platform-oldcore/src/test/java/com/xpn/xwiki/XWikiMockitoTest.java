@@ -37,8 +37,8 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.resource.ResourceManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.url.ResourceManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;

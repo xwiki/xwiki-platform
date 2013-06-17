@@ -26,9 +26,6 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
@@ -65,18 +62,10 @@ public class DefaultWikiDescriptorManagerTest
     @Test
     public void getByWikiAliasWhenNotInCacheButExists() throws Exception
     {
-        // Not in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
-        CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
-            wikiIdCache);
-        when(wikiAliasCache.get("wikialias")).thenReturn(null);
-
         // Return "space.page" document name when querying the DB for a XWiki.XWikiServerClass matching the alias
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
-        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = ':wikiAlias'", Query.XWQL))
+        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = :wikiAlias", Query.XWQL))
             .thenReturn(new DefaultQuery("statement", "language", queryExecutor));
         when(queryExecutor.<String>execute(any(Query.class))).thenReturn(Arrays.asList("space.page"));
 
@@ -109,21 +98,21 @@ public class DefaultWikiDescriptorManagerTest
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
 
-        // Now verify that calling getByWikiId() doesn't need any database calls since getByWikiAlias() has put the
-        // descriptor in the wikiid cache too.
-        verify(wikiAliasCache).set("wikialias", descriptor);
-        verify(wikiIdCache).set("wikiid", descriptor);
+        // Verify that calling getByWikiId() doesn't call XWiki.getDocument() since getByWikiAlias should have put the
+        // descriptor in the wikiId cache too.
+        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
+
+        EntityReference er = new EntityReference("XWikiServerWikiid", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE));
+        verify(xwiki, never()).getDocument(eq(er), any(XWikiContext.class));
     }
 
     @Test
     public void getByWikiAliasWhenInCache() throws Exception
     {
         // Descriptor is in cache...
-        Cache<WikiDescriptor> cache = mock(Cache.class);
-        CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(cache);
         WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
-        when(cache.get("wikialias")).thenReturn(descriptor);
+        this.mocker.getComponentUnderTest().set(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
     }
@@ -131,16 +120,10 @@ public class DefaultWikiDescriptorManagerTest
     @Test
     public void getByWikiAliasWhenNotInCacheAndItDoesntExist() throws Exception
     {
-        // Not in cache...
-        Cache<WikiDescriptor> cache = mock(Cache.class);
-        CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(cache);
-        when(cache.get("wikialias")).thenReturn(null);
-
         // No result when querying the DB for a XWiki.XWikiServerClass matching the alias
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
-        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = ':wikiAlias'", Query.XWQL))
+        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = :wikiAlias", Query.XWQL))
             .thenReturn(new DefaultQuery("statement", "language", queryExecutor));
         when(queryExecutor.<String>execute(any(Query.class))).thenReturn(Collections.EMPTY_LIST);
 
@@ -150,14 +133,6 @@ public class DefaultWikiDescriptorManagerTest
     @Test
     public void getByWikiIdWhenNotInCacheButExists() throws Exception
     {
-        // Not in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
-        CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
-            wikiIdCache);
-        when(wikiAliasCache.get("wikiid")).thenReturn(null);
-
         // Get the XWikiDocument for the Document Reference
         Execution execution = this.mocker.getInstance(Execution.class);
         XWikiContext xcontext = mock(XWikiContext.class);
@@ -184,21 +159,18 @@ public class DefaultWikiDescriptorManagerTest
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
 
-        // Now verify that calling getByWikiId() doesn't need any database calls since getByWikiAlias() has put the
-        // descriptor in the wikiid cache too.
-        verify(wikiAliasCache).set("wikialias", descriptor);
-        verify(wikiIdCache).set("wikiid", descriptor);
+        // Verify that calling getByWikiAlias() doesn't need any database calls (since we don't mock the Query Manager
+        // if it were calling it we would get an error) since getByWikiId() has put the descriptor in the wikiAlias
+        // cache too.
+        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
     }
 
     @Test
     public void getByWikiIdWhenInCache() throws Exception
     {
         // Descriptor is in cache...
-        Cache<WikiDescriptor> cache = mock(Cache.class);
-        CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(cache);
         WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
-        when(cache.get("wikiid")).thenReturn(descriptor);
+        this.mocker.getComponentUnderTest().set(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
     }
@@ -206,12 +178,6 @@ public class DefaultWikiDescriptorManagerTest
     @Test
     public void getByWikiIdWhenNotInCacheAndItDoesntExist() throws Exception
     {
-        // Not in cache...
-        Cache<WikiDescriptor> cache = mock(Cache.class);
-        CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(cache);
-        when(cache.get("wikiid")).thenReturn(null);
-
         // Get the XWikiDocument for the Document Reference but mark it as new (meaning that it doesn't exist)
         Execution execution = this.mocker.getInstance(Execution.class);
         XWikiContext xcontext = mock(XWikiContext.class);
@@ -232,13 +198,6 @@ public class DefaultWikiDescriptorManagerTest
     @Test
     public void getAll() throws Exception
     {
-        // Cache setup
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
-        CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
-            wikiIdCache);
-
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
         when(queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor", Query.XWQL))
@@ -282,9 +241,9 @@ public class DefaultWikiDescriptorManagerTest
         assertEquals(2, descriptors.size());
 
         // Verify all descriptors were put in cache
-        verify(wikiAliasCache).set("wikialias1", descriptor1);
-        verify(wikiAliasCache).set("wikialias2", descriptor2);
-        verify(wikiIdCache).set("wikiid1", descriptor1);
-        verify(wikiIdCache).set("wikiid2", descriptor2);
+        assertEquals(descriptor1, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias1"));
+        assertEquals(descriptor2, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias2"));
+        assertEquals(descriptor1, this.mocker.getComponentUnderTest().getByWikiId("wikiid1"));
+        assertEquals(descriptor2, this.mocker.getComponentUnderTest().getByWikiId("wikiid2"));
     }
 }

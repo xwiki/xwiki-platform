@@ -22,19 +22,16 @@ package org.xwiki.wiki.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -54,8 +51,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
 @Singleton
-public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Initializable
+public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 {
+    private static final WikiDescriptor EMPTY_DESCRIPTOR = new WikiDescriptor(null, null);
+
     @Inject
     private CacheFactory cacheFactory;
 
@@ -72,37 +71,14 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     @Inject
     private Execution execution;
 
-    private Cache<WikiDescriptor> wikiAliasCache;
+    private Map<String, WikiDescriptor> wikiAliasCache = new ConcurrentHashMap<String, WikiDescriptor>();
 
-    private Cache<WikiDescriptor> wikiIdCache;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.wikiAliasCache = createCache("wiki.descriptor.cache.wikiAlias");
-        this.wikiIdCache = createCache("wiki.descriptor.cache.wikiId");
-    }
-
-    private Cache<WikiDescriptor> createCache(String cacheId) throws InitializationException
-    {
-        Cache<WikiDescriptor> cache;
-
-        CacheConfiguration configuration = new CacheConfiguration(cacheId);
-
-        try {
-            cache = this.cacheFactory.newCache(configuration);
-        } catch (CacheException e) {
-            throw new InitializationException(String.format("Failed to initialize wiki descriptor caches [%s]",
-                configuration.getConfigurationId()), e);
-        }
-
-        return cache;
-    }
+    private Map<String, WikiDescriptor> wikiIdCache = new ConcurrentHashMap<String, WikiDescriptor>();
 
     @Override
     public WikiDescriptor getByWikiAlias(String wikiAlias) throws WikiDescriptorException
     {
-        WikiDescriptor descriptor = this.wikiAliasCache.get(wikiAlias);
+        WikiDescriptor descriptor;
 
         // If not found in the cache then query the wiki and add to the cache if found.
         //
@@ -111,10 +87,18 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
         // subwikis we only cache the most used one. This allows inactive wikis to not take up any memory for example.
         // Note that In order for performance to be maximum it also means we need to have a cache size at least as
         // large as the max # of wikis being used at once.
-        if (descriptor == null) {
+        if (this.wikiAliasCache.containsKey(wikiAlias)) {
+            descriptor = this.wikiAliasCache.get(wikiAlias);
+            if (descriptor.equals(EMPTY_DESCRIPTOR)) {
+                descriptor = null;
+            }
+        } else {
             DocumentReference reference = findXWikiServerClassDocumentReference(wikiAlias);
             if (reference != null) {
                 descriptor = set(getDocument(reference));
+            } else {
+                descriptor = null;
+                this.wikiAliasCache.put(wikiAlias, EMPTY_DESCRIPTOR);
             }
         }
 
@@ -124,15 +108,23 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     @Override
     public WikiDescriptor getByWikiId(String wikiId) throws WikiDescriptorException
     {
-        WikiDescriptor descriptor = this.wikiIdCache.get(wikiId);
+        WikiDescriptor descriptor;
 
-        if (descriptor == null) {
+        if (this.wikiIdCache.containsKey(wikiId)) {
+            descriptor = this.wikiIdCache.get(wikiId);
+            if (descriptor.equals(EMPTY_DESCRIPTOR)) {
+                descriptor = null;
+            }
+        } else {
             // Try to load a page named XWiki.XWikiServer<wikiId>
             XWikiDocument document = getDocument(new EntityReference(
                 String.format("XWikiServer%s", StringUtils.capitalize(wikiId)), EntityType.DOCUMENT,
                 new EntityReference("XWiki", EntityType.SPACE)));
             if (!document.isNew()) {
                 descriptor = set(document);
+            } else {
+                descriptor = null;
+                this.wikiIdCache.put(wikiId, EMPTY_DESCRIPTOR);
             }
         }
 
@@ -155,7 +147,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
 
         try {
             Query query = this.queryManager.createQuery(
-                "where doc.object(XWiki.XWikiServerClass).server = ':wikiAlias'", Query.XWQL);
+                "where doc.object(XWiki.XWikiServerClass).server = :wikiAlias", Query.XWQL);
             query.bindValue("wikiAlias", wikiAlias);
             List<String> documentNames = query.execute();
 
@@ -176,12 +168,12 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     public void set(WikiDescriptor descriptor)
     {
         // Update the wiki name cache
-        this.wikiIdCache.set(descriptor.getWikiId(), descriptor);
+        this.wikiIdCache.put(descriptor.getWikiId(), descriptor);
 
         // Update the wiki alias cache
-        this.wikiAliasCache.set(descriptor.getWikiAlias(), descriptor);
+        this.wikiAliasCache.put(descriptor.getWikiAlias(), descriptor);
         for (WikiDescriptorAlias alias : descriptor.getDescriptorAliases()) {
-            this.wikiAliasCache.set(alias.getWikiAlias(), descriptor);
+            this.wikiAliasCache.put(alias.getWikiAlias(), descriptor);
         }
     }
 
@@ -194,7 +186,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
         // Remove from the wiki alias cache
         this.wikiAliasCache.remove(descriptor.getWikiAlias());
         for (WikiDescriptorAlias alias : descriptor.getDescriptorAliases()) {
-            this.wikiAliasCache.set(alias.getWikiAlias(), descriptor);
+            this.wikiAliasCache.remove(alias.getWikiAlias());
         }
     }
 

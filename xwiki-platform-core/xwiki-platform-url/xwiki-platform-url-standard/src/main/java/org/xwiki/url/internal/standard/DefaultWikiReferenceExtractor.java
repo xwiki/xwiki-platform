@@ -173,7 +173,7 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
         try {
             return this.wikiDescriptorManager.getByWikiAlias(alias);
         } catch (WikiDescriptorException e) {
-            throw new RuntimeException(String.format("Failed to located wiki descriptor for alias [{}]", alias), e);
+            throw new RuntimeException(String.format("Failed to located wiki descriptor for alias [%s]", alias), e);
         }
     }
 
@@ -182,7 +182,7 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
         try {
             return this.wikiDescriptorManager.getByWikiId(wikiId);
         } catch (WikiDescriptorException e) {
-            throw new RuntimeException(String.format("Failed to located wiki descriptor for wiki [{}]", wikiId), e);
+            throw new RuntimeException(String.format("Failed to located wiki descriptor for wiki [%s]", wikiId), e);
         }
     }
 

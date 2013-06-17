@@ -118,7 +118,9 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         WikiDescriptor descriptor = this.wikiDescriptorBuilder.build(
             document.getXObjects(WikiDescriptorListener.SERVER_CLASS), document, getXWikiContext());
         // Add to the cache
-        set(descriptor);
+        if (descriptor != null) {
+            set(descriptor);
+        }
         return descriptor;
     }
 
@@ -129,7 +131,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
         try {
             Query query = this.queryManager.createQuery(
-                "where doc.object(XWiki.XWikiServerClass).server = :wikiAlias", Query.XWQL);
+                "where doc.object(XWiki.XWikiServerClass).server = :wikiAlias and doc.name like 'XWikiServer%'",
+                Query.XWQL);
             query.bindValue("wikiAlias", wikiAlias);
             List<String> documentNames = query.execute();
 
@@ -178,7 +181,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
 
         try {
-            Query query = this.queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor",
+            Query query = this.queryManager.createQuery(
+                "from doc.object(XWiki.XWikiServerClass) as descriptor and doc.name like 'XWikiServer%'",
                 Query.XWQL);
             List<String> documentNames = query.execute();
 

@@ -36,24 +36,22 @@ import org.xwiki.stability.Unstable;
 public interface SolrIndexer
 {
     /**
-     * Index an entity.
+     * Add an entity to the queue of entities to index.
      * <p>
      * Null reference means the whole farm.
      * 
      * @param reference the entity's reference.
      * @param recurse indicate if children entities should be indexed too
-     * @throws SolrIndexerException if problems occur.
      */
-    void index(EntityReference reference, boolean recurse) throws SolrIndexerException;
+    void index(EntityReference reference, boolean recurse);
 
     /**
-     * Delete an indexed entity.
+     * Add an entity to the queue of entities to delete.
      * <p>
      * Null reference means the whole farm.
      * 
      * @param reference the entity's reference.
      * @param recurse indicate if children entities should be removed too
-     * @throws SolrIndexerException if problems occur.
      */
-    void delete(EntityReference reference, boolean recurse) throws SolrIndexerException;
+    void delete(EntityReference reference, boolean recurse);
 }

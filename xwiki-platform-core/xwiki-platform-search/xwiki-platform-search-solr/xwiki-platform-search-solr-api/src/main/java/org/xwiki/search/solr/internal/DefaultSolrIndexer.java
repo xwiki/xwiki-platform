@@ -478,13 +478,13 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     @Override
-    public void index(EntityReference reference, boolean recurse) throws SolrIndexerException
+    public void index(EntityReference reference, boolean recurse)
     {
         addToQueue(reference, recurse, IndexOperation.INDEX);
     }
 
     @Override
-    public void delete(EntityReference reference, boolean recurse) throws SolrIndexerException
+    public void delete(EntityReference reference, boolean recurse)
     {
         addToQueue(reference, recurse, IndexOperation.DELETE);
     }

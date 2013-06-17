@@ -33,7 +33,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.google.common.collect.Iterables;
@@ -109,7 +109,7 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         builder.append(QUERY_AND);
 
-        builder.append(Fields.SPACE);
+        builder.append(FieldUtils.SPACE);
         builder.append(':');
         builder.append(ClientUtils.escapeQueryChars(reference.getName()));
 

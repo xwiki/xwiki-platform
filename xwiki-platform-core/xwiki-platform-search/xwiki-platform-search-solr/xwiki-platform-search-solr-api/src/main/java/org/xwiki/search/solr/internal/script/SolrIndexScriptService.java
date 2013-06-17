@@ -19,9 +19,9 @@
  */
 package org.xwiki.search.solr.internal.script;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -226,8 +226,7 @@ public class SolrIndexScriptService implements ScriptService
     }
 
     /**
-     * Check the current user's access to alter the index of the wikis owning the given referenced entities. This is an
-     * optimized method that only checks one reference for each distinct wiki.
+     * Check the current user's access to alter the index of the wikis owning the given referenced entities.
      * 
      * @param references the references whose owning wikis to check.
      * @throws IllegalAccessException if the user is not allowed for at least one of the passed references or if
@@ -235,18 +234,13 @@ public class SolrIndexScriptService implements ScriptService
      */
     private void checkAccessToWikiIndex(List<EntityReference> references) throws IllegalAccessException
     {
-        // Build a map of representatives for each wiki to avoid checking every reference.
-        Map<EntityReference, EntityReference> representatives = new HashMap<EntityReference, EntityReference>();
+        Set<EntityReference> representatives = new HashSet<EntityReference>();
         for (EntityReference reference : references) {
             EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
-            if (!representatives.containsKey(wikiReference)) {
-                representatives.put(wikiReference, reference);
+            if (!representatives.contains(wikiReference)) {
+                checkAccessToWikiIndex(wikiReference);
+                representatives.add(wikiReference);
             }
-        }
-
-        // Check only the representatives for each wiki.
-        for (EntityReference reference : representatives.values()) {
-            checkAccessToWikiIndex(reference);
         }
     }
 }

@@ -25,6 +25,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -236,6 +237,11 @@ public class DefaultDocumentMergeImporterTest
         this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
+        // another try
+
+        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
         verifyZeroInteractions(this.xwiki, this.xcontext);
     }
 
@@ -253,6 +259,14 @@ public class DefaultDocumentMergeImporterTest
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.nextDocument), eq("comment"), eq(false), same(this.xcontext));
+
+        // another try
+
+        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        verify(this.xwiki, times(2)).saveDocument(same(this.nextDocument), eq("comment"), eq(false),
+            same(this.xcontext));
     }
 
     @Test
@@ -269,6 +283,14 @@ public class DefaultDocumentMergeImporterTest
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
+
+        // another try
+
+        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        verify(this.xwiki, times(2)).saveDocument(same(this.mergedDocument), eq("comment"), eq(false),
+            same(this.xcontext));
     }
 
     @Test
@@ -285,6 +307,40 @@ public class DefaultDocumentMergeImporterTest
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.previousDocument), eq("comment"), eq(false), same(this.xcontext));
+
+        // another try
+
+        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        verify(this.xwiki, times(2)).saveDocument(same(this.previousDocument), eq("comment"), eq(false),
+            same(this.xcontext));
+    }
+
+    @Test
+    public void testMergeInteractiveChangesConflictAnswerPreviousAlways() throws ComponentLookupException, Exception
+    {
+        this.configuration.setInteractive(true);
+
+        this.mergeResult.setModified(true);
+        this.mergeResult.getLog().error("error");
+
+        answerGlobalAction(GlobalAction.PREVIOUS, true);
+
+        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        verify(this.xwiki).saveDocument(same(this.previousDocument), eq("comment"), eq(false), same(this.xcontext));
+
+        // another try
+
+        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+            this.nextDocument, this.configuration);
+
+        // Make sure we don't ask the job status this time
+        verify(this.jobStatus, times(1)).ask(anyObject());
+        verify(this.xwiki, times(2)).saveDocument(same(this.previousDocument), eq("comment"), eq(false),
+            same(this.xcontext));
     }
 
     // No merge

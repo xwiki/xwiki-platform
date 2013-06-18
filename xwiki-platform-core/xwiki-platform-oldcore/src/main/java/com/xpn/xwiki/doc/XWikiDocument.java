@@ -2171,7 +2171,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         BaseObject object = getXObject((ObjectReference) objectPropertyReference.getParent());
 
-        return (BaseProperty<ObjectPropertyReference>) object.getField(objectPropertyReference.getName());
+        if (object != null) {
+            return (BaseProperty<ObjectPropertyReference>) object.getField(objectPropertyReference.getName());
+        }
+
+        return null;
     }
 
     /**
@@ -2188,11 +2192,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(DocumentReference classReference, int nb)
     {
-        try {
-            return getXObjects().get(classReference).get(nb);
-        } catch (Exception e) {
-            return null;
+        List<BaseObject> objects = getXObjects().get(classReference);
+
+        if (objects != null && objects.size() > nb) {
+            return objects.get(nb);
         }
+
+        return null;
     }
 
     /**

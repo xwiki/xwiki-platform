@@ -60,13 +60,16 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     protected SolrReferenceResolver resolver;
 
     @Override
-    public void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);
 
         XWikiDocument document = getDocument(attachmentReference.getDocumentReference());
         XWikiAttachment attachment = document.getAttachment(attachmentReference.getName());
+        if (attachment == null) {
+            return false;
+        }
 
         XWikiContext xcontext = xcontextProvider.get();
 
@@ -75,6 +78,8 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         solrDocument.setField(FieldUtils.ATTACHMENT_VERSION, attachment.getVersion());
 
         setLocaleAndContentFields(attachment, solrDocument);
+
+        return true;
     }
 
     /**

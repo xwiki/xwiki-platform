@@ -77,7 +77,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected EntityReferenceSerializer<String> serializer;
 
     @Override
-    public void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
@@ -85,6 +85,10 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         XWikiContext xcontext = this.xcontextProvider.get();
 
         XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
+        if (translatedDocument == null) {
+            return false;
+        }
+
         Locale locale = getLocale(documentReference);
 
         solrDocument.setField(FieldUtils.FULLNAME, localSerializer.serialize(documentReference));
@@ -134,6 +138,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
         // Add any extra fields (about objects, etc.) that can improve the findability of the document.
         setExtras(documentReference, solrDocument, locale);
+
+        return true;
     }
 
     /**

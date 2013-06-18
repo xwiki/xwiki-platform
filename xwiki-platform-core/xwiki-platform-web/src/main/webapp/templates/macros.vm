@@ -1567,7 +1567,7 @@ function (row, i, table) {
         #if($colprop.html && $colprop.html==true)
           link.innerHTML = row["${jscolname}"];
         #else
-          link.update((row["${jscolname}"] || '').escapeHTML());
+          row["${jscolname}"] != undefined && link.update((row["${jscolname}"] + '').escapeHTML());
         #end
         td.appendChild(link);
         tr.appendChild(td);
@@ -1607,7 +1607,7 @@ function (row, i, table) {
         #if($colprop.html && $colprop.html==true)
           fieldel.innerHTML = row["${jscolname}"];
         #else
-          fieldel.update((row["${jscolname}"] || '').escapeHTML());
+          row["${jscolname}"] != undefined && fieldel.update((row["${jscolname}"] + '').escapeHTML());
         #end
         tr.appendChild(fieldel);
       #end

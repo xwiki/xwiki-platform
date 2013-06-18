@@ -26,8 +26,8 @@
   <content>{{velocity}}
 #set($columns = [ 'link', 'page', 'code', 'date'])
 #set($columnsProperties = {
-    'link' : { 'type' : 'text', 'sortable' : false },
-    'page' : { 'type' : 'text', 'sortable' : false },
+    'link' : { 'type' : 'text', 'sortable' : false, 'link' : 'field' },
+    'page' : { 'type' : 'text', 'sortable' : false, 'link' : 'field' },
     'code' : { 'type' : 'text', 'sortable' : false },
     'date' : { 'type' : 'text', 'sortable' : false }
 })

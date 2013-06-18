@@ -33,10 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -102,9 +100,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
         if (descriptor == null) {
             // Try to load a page named XWiki.XWikiServer<wikiId>
-            XWikiDocument document = getDocument(new EntityReference(
-                String.format("XWikiServer%s", StringUtils.capitalize(wikiId)), EntityType.DOCUMENT,
-                new EntityReference("XWiki", EntityType.SPACE)));
+            XWikiDocument document = getDocument(new DocumentReference(getXWikiContext().getMainXWiki(),"XWiki",
+                String.format("XWikiServer%s", StringUtils.capitalize(wikiId))));
             if (!document.isNew()) {
                 descriptor = set(document);
             }
@@ -134,6 +131,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 "where doc.object(XWiki.XWikiServerClass).server = :wikiAlias and doc.name like 'XWikiServer%'",
                 Query.XWQL);
             query.bindValue("wikiAlias", wikiAlias);
+            query.setWiki(getXWikiContext().getMainXWiki());
             List<String> documentNames = query.execute();
 
             // Resolve the document name into a references
@@ -184,6 +182,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             Query query = this.queryManager.createQuery(
                 "from doc.object(XWiki.XWikiServerClass) as descriptor and doc.name like 'XWikiServer%'",
                 Query.XWQL);
+            query.setWiki(getXWikiContext().getMainXWiki());
             List<String> documentNames = query.execute();
 
             if (documentNames != null && !documentNames.isEmpty()) {
@@ -199,7 +198,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         return result;
     }
 
-    private XWikiDocument getDocument(EntityReference reference) throws WikiDescriptorException
+    private XWikiDocument getDocument(DocumentReference reference) throws WikiDescriptorException
     {
         XWikiContext context = getXWikiContext();
         com.xpn.xwiki.XWiki xwiki = context.getWiki();

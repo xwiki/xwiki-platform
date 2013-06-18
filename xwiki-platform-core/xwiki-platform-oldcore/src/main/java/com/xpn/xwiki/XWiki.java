@@ -128,6 +128,9 @@ import org.xwiki.resource.Resource;
 import org.xwiki.resource.ResourceFactory;
 import org.xwiki.resource.ResourceManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.WikiDescriptorException;
+import org.xwiki.wiki.WikiDescriptorManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.api.Api;
@@ -494,44 +497,38 @@ public class XWiki implements EventListener
         // Extract Entity Resource from URL and put it in the Execution Context
         EntityResource entityResource = initializeResourceFromURL(context);
 
-        // Get the wiki name
-        String wikiName = entityResource.getEntityReference().extractReference(EntityType.WIKI).getName();
-        if (wikiName.equals(context.getMainXWiki())) {
+        // Get the wiki id
+        String wikiId = entityResource.getEntityReference().extractReference(EntityType.WIKI).getName();
+        if (wikiId.equals(context.getMainXWiki())) {
             // The main wiki was requested.
             return xwiki;
         }
 
-        // Get the wiki descriptor for the requested wiki
-        DocumentReference wikiDescriptorReference =
-            new DocumentReference(context.getMainXWiki(), XWiki.SYSTEM_SPACE, String.format("XWikiServer%s",
-                StringUtils.capitalize(wikiName.toLowerCase())));
-        XWikiDocument wikiDescriptorDocument = xwiki.getDocument(wikiDescriptorReference, context);
-
-        // Check if this wiki descriptor exists in the database
-        XWikiDocument doc = xwiki.getDocument(wikiDescriptorDocument, context);
-        if (doc.isNew()) {
+        // Check if the wiki exists by checking if a descriptor exists for the wiki id.
+        WikiDescriptorManager wikiDescriptorManager = Utils.getComponent(WikiDescriptorManager.class);
+        WikiDescriptor descriptor;
+        try {
+            descriptor = wikiDescriptorManager.getByWikiId(wikiId);
+        } catch (WikiDescriptorException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_STORE_MISC,
+                String.format("Failed find wiki descriptor for wiki id [%s]", wikiId), e);
+        }
+        if (descriptor == null) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                String.format("The wiki [%s] does not exist", wikiName));
+                String.format("The wiki [%s] does not exist", wikiId));
         }
 
-        // Set the wiki owner
-        String wikiOwner = wikiDescriptorDocument.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
-        if (wikiOwner.indexOf(':') == -1) {
-            wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
-        }
-        context.setWikiOwner(wikiOwner);
-        context.setWikiServer(wikiDescriptorDocument);
-
-        context.setDatabase(wikiName);
-        context.setOriginalDatabase(wikiName);
+        context.setDatabase(wikiId);
+        context.setOriginalDatabase(wikiId);
 
         try {
             // Let's make sure the virtual wikis are upgraded to the latest database version
-            xwiki.updateDatabase(wikiName, false, context);
-        } catch (HibernateException ex) {
+            xwiki.updateDatabase(wikiId, false, context);
+        } catch (HibernateException e) {
             // Just report it, hopefully the database is in a good enough state
-            LOGGER.error("Failed to upgrade database: " + wikiName, ex);
+            LOGGER.error("Failed to upgrade database [{}]", wikiId, e);
         }
+
         return xwiki;
     }
 

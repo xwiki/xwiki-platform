@@ -65,14 +65,15 @@ public class DefaultWikiDescriptorManagerTest
         // Return "space.page" document name when querying the DB for a XWiki.XWikiServerClass matching the alias
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
-        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = :wikiAlias", Query.XWQL))
-            .thenReturn(new DefaultQuery("statement", "language", queryExecutor));
+        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = :wikiAlias and "
+            + "doc.name like 'XWikiServer%'", Query.XWQL)).thenReturn(
+            new DefaultQuery("statement", "language", queryExecutor));
         when(queryExecutor.<String>execute(any(Query.class))).thenReturn(Arrays.asList("space.page"));
 
         // Convert the returned document name represented as a String into a Document Reference
         DocumentReferenceResolver<String> resolver =
             this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        DocumentReference reference = new DocumentReference("xwiki", "space", "page");
         when(resolver.resolve("space.page")).thenReturn(reference);
 
         // Get the XWikiDocument for the Document Reference
@@ -80,11 +81,12 @@ public class DefaultWikiDescriptorManagerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
+        when(xcontext.getMainXWiki()).thenReturn("xwiki");
         ExecutionContext ec = new ExecutionContext();
         ec.setProperty("xwikicontext", xcontext);
         when(execution.getContext()).thenReturn(ec);
         XWikiDocument document = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq((EntityReference) reference), any(XWikiContext.class))).thenReturn(document);
+        when(xwiki.getDocument(eq(reference), any(XWikiContext.class))).thenReturn(document);
 
         // Get all XWiki.XWikiServerClass XObjects to pass to the Wiki Descriptor Builder
         List<BaseObject> baseObjects = Arrays.asList(mock(BaseObject.class));
@@ -102,9 +104,8 @@ public class DefaultWikiDescriptorManagerTest
         // descriptor in the wikiId cache too.
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
 
-        EntityReference er = new EntityReference("XWikiServerWikiid", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
-        verify(xwiki, never()).getDocument(eq(er), any(XWikiContext.class));
+        DocumentReference dr = new DocumentReference("xwiki", "XWiki", "XWikiServerWikiid");
+        verify(xwiki, never()).getDocument(eq(dr), any(XWikiContext.class));
     }
 
     @Test
@@ -123,9 +124,18 @@ public class DefaultWikiDescriptorManagerTest
         // No result when querying the DB for a XWiki.XWikiServerClass matching the alias
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
-        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = :wikiAlias", Query.XWQL))
-            .thenReturn(new DefaultQuery("statement", "language", queryExecutor));
+        when(queryManager.createQuery("where doc.object(XWiki.XWikiServerClass).server = :wikiAlias and "
+            + "doc.name like 'XWikiServer%'", Query.XWQL)).thenReturn(
+            new DefaultQuery("statement", "language", queryExecutor));
         when(queryExecutor.<String>execute(any(Query.class))).thenReturn(Collections.EMPTY_LIST);
+
+        // Get the main wiki
+        Execution execution = this.mocker.getInstance(Execution.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getMainXWiki()).thenReturn("xwiki");
+        ExecutionContext ec = new ExecutionContext();
+        ec.setProperty("xwikicontext", xcontext);
+        when(execution.getContext()).thenReturn(ec);
 
         assertNull(this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
     }
@@ -138,12 +148,12 @@ public class DefaultWikiDescriptorManagerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
+        when(xcontext.getMainXWiki()).thenReturn("xwiki");
         ExecutionContext ec = new ExecutionContext();
         ec.setProperty("xwikicontext", xcontext);
         when(execution.getContext()).thenReturn(ec);
         XWikiDocument document = mock(XWikiDocument.class);
-        EntityReference reference = new EntityReference("XWikiServerWikiid", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
+        DocumentReference reference = new DocumentReference("xwiki", "XWiki", "XWikiServerWikiid");
         when(xwiki.getDocument(eq(reference), any(XWikiContext.class))).thenReturn(document);
         when(document.isNew()).thenReturn(false);
 
@@ -183,12 +193,12 @@ public class DefaultWikiDescriptorManagerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
+        when(xcontext.getMainXWiki()).thenReturn("xwiki");
         ExecutionContext ec = new ExecutionContext();
         ec.setProperty("xwikicontext", xcontext);
         when(execution.getContext()).thenReturn(ec);
         XWikiDocument document = mock(XWikiDocument.class);
-        EntityReference reference = new EntityReference("XWikiServerWikiid", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
+        DocumentReference reference = new DocumentReference("xwiki", "XWiki", "XWikiServerWikiid");
         when(xwiki.getDocument(eq(reference), any(XWikiContext.class))).thenReturn(document);
         when(document.isNew()).thenReturn(true);
 
@@ -200,16 +210,17 @@ public class DefaultWikiDescriptorManagerTest
     {
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
-        when(queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor", Query.XWQL))
-            .thenReturn(new DefaultQuery("statement", "language", queryExecutor));
+        when(queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor and "
+            + "doc.name like 'XWikiServer%'", Query.XWQL)).thenReturn(
+            new DefaultQuery("statement", "language", queryExecutor));
         when(queryExecutor.<String>execute(any(Query.class))).thenReturn(Arrays.asList("space1.page1", "space2.page2"));
 
         // Convert the returned document names represented as Strings into Document References
         DocumentReferenceResolver<String> resolver =
             this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-        DocumentReference reference1 = new DocumentReference("wiki1", "space1", "page1");
+        DocumentReference reference1 = new DocumentReference("xwiki", "space1", "page1");
         when(resolver.resolve("space1.page1")).thenReturn(reference1);
-        DocumentReference reference2 = new DocumentReference("wiki2", "space2", "page2");
+        DocumentReference reference2 = new DocumentReference("xwiki", "space2", "page2");
         when(resolver.resolve("space2.page2")).thenReturn(reference2);
 
         // Get the XWikiDocuments for the Document References
@@ -217,13 +228,14 @@ public class DefaultWikiDescriptorManagerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
+        when(xcontext.getMainXWiki()).thenReturn("xwiki");
         ExecutionContext ec = new ExecutionContext();
         ec.setProperty("xwikicontext", xcontext);
         when(execution.getContext()).thenReturn(ec);
         XWikiDocument document1 = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq((EntityReference) reference1), any(XWikiContext.class))).thenReturn(document1);
+        when(xwiki.getDocument(eq(reference1), any(XWikiContext.class))).thenReturn(document1);
         XWikiDocument document2 = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq((EntityReference) reference2), any(XWikiContext.class))).thenReturn(document2);
+        when(xwiki.getDocument(eq(reference2), any(XWikiContext.class))).thenReturn(document2);
 
         // Get all XWiki.XWikiServerClass XObjects to pass to the Wiki Descriptor Builder
         List<BaseObject> baseObjects = Arrays.asList(mock(BaseObject.class));

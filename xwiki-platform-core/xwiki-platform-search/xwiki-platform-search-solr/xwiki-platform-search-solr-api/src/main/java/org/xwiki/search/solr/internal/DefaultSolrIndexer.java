@@ -261,11 +261,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      */
     private Thread resolveThread;
 
-    /**
-     * Indicate of the component has been disposed.
-     */
-    private boolean disposed;
-
     @Override
     public void initialize() throws InitializationException
     {
@@ -459,8 +454,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      */
     private void addToQueue(EntityReference reference, boolean recurse, IndexOperation operation)
     {
-        if (!this.disposed) {
-            this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
-        }
+        this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
     }
 }

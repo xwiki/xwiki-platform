@@ -17,51 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po.editor.wysiwyg;
+package org.xwiki.wysiwyg.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Models the wizard step that allows us to select an image from those attached to the selected page. This wizard step
- * is aggregated by the image selection wizard step which is accessible when inserting or editing an image with the
+ * Models the image selection wizard step that is accessible when inserting or editing an attached image with the
  * WYSIWYG content editor.
  * 
  * @version $Id$
  * @since 3.2M3
  */
-public class CurrentPageImageSelectPane extends WizardStepElement
+public class AttachedImageSelectPane extends WizardStepElement
 {
-    /**
-     * The select button.
-     */
-    @FindBy(xpath = "//button[. = 'Select']")
-    private WebElement selectButton;
-
-    /**
-     * The option to upload a new image to the current document.
-     */
-    @FindBy(className = "xNewImagePreview")
-    private WebElement uploadNewImageOption;
+    @FindBy(xpath = "//div[@class = 'xSelectorAggregatorStep']//div[. = 'Current page']")
+    private WebElement currentPageTab;
 
     @Override
-    public CurrentPageImageSelectPane waitToLoad()
+    public AttachedImageSelectPane waitToLoad()
     {
         super.waitToLoad();
-        waitUntilElementIsVisible(By.className("xImagesSelector"));
+        waitUntilElementIsVisible(By.className("xSelectorAggregatorStep"));
         return this;
     }
 
     /**
-     * Moves forward to the upload image wizard step.
+     * Selects the tab that lists the images attached to the current page.
      * 
-     * @return the pane used to upload a new image to the selected document
+     * @return the pane used to select an image from those attached to the edited page
      */
-    public UploadImagePane uploadImage()
+    public CurrentPageImageSelectPane selectFromCurrentPage()
     {
-        uploadNewImageOption.click();
-        selectButton.click();
-        return new UploadImagePane().waitToLoad();
+        currentPageTab.click();
+        return new CurrentPageImageSelectPane().waitToLoad();
     }
 }

@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -92,6 +92,6 @@ public abstract class AbstractSolrReferenceResolver implements SolrReferenceReso
     @Override
     public String getQuery(EntityReference reference) throws IllegalArgumentException, SolrIndexerException
     {
-        return Fields.ID + ':' + ClientUtils.escapeQueryChars(getId(reference));
+        return FieldUtils.ID + ':' + ClientUtils.escapeQueryChars(getId(reference));
     }
 }

@@ -50,7 +50,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
     /**
      * The name of the field containing the user email.
      */
-    private static final String FIEDL_EMAIL = "email";
+    private static final String FIELD_EMAIL = "email";
 
     /**
      * Used to bind a class to a document sheet.
@@ -90,9 +90,9 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
 
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
-        if (!(bclass.getField(FIEDL_EMAIL) instanceof EmailClass)) {
-            bclass.removeField(FIEDL_EMAIL);
-            bclass.addEmailField(FIEDL_EMAIL, "e-Mail", 30);
+        if (!(bclass.getField(FIELD_EMAIL) instanceof EmailClass)) {
+            bclass.removeField(FIELD_EMAIL);
+            bclass.addEmailField(FIELD_EMAIL, "e-Mail", 30);
             needsUpdate = true;
         }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);

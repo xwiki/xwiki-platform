@@ -19,26 +19,26 @@
  */
 package org.xwiki.search.solr.internal.script;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Script service exposing interaction with the {@link SolrIndex}. Queries on the index are performed using XWiki's <a
@@ -58,28 +58,28 @@ public class SolrIndexScriptService implements ScriptService
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
 
     /**
-     * The Solr configuration.
-     */
-    @Inject
-    protected SolrConfiguration configuration;
-
-    /**
-     * Execution context.
-     */
-    @Inject
-    protected Execution execution;
-
-    /**
      * Logging framework.
      */
     @Inject
-    protected Logger logger;
+    private Logger logger;
 
     /**
      * Wrapped {@link SolrIndex} component.
      */
     @Inject
-    protected SolrIndexer solrIndex;
+    private SolrIndexer solrIndex;
+
+    /**
+     * Used to check rights.
+     */
+    @Inject
+    private AuthorizationManager authorization;
+
+    /**
+     * Used to access the current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Index an entity and all it's contained entities recursively.
@@ -181,7 +181,7 @@ public class SolrIndexScriptService implements ScriptService
 
         this.logger.error(errorMessageToLog, e);
 
-        getXWikiContext().put(CONTEXT_LASTEXCEPTION, e);
+        this.xcontextProvider.get().put(CONTEXT_LASTEXCEPTION, e);
     }
 
     /**
@@ -200,18 +200,7 @@ public class SolrIndexScriptService implements ScriptService
      */
     private void clearException()
     {
-        getXWikiContext().remove(CONTEXT_LASTEXCEPTION);
-    }
-
-    /**
-     * @return the XWikiContext
-     */
-    protected XWikiContext getXWikiContext()
-    {
-        ExecutionContext executionContext = this.execution.getContext();
-        XWikiContext context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-
-        return context;
+        this.xcontextProvider.get().remove(CONTEXT_LASTEXCEPTION);
     }
 
     /**
@@ -223,29 +212,21 @@ public class SolrIndexScriptService implements ScriptService
     private void checkAccessToWikiIndex(EntityReference reference) throws IllegalAccessException
     {
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
-        String wikiName = wikiReference.getName();
 
-        XWikiContext context = getXWikiContext();
-        XWikiRightService rightService = context.getWiki().getRightService();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
-        String currentDatabase = context.getDatabase();
-        try {
-            // RightService works only on the current wiki, so we need to change the context wiki.
-            context.setDatabase(wikiName);
-            if (!rightService.hasWikiAdminRights(context) || !rightService.hasProgrammingRights(context)) {
-                throw new IllegalAccessException(String.format(
-                    "The user '%s' is not allowed to alter the index for the entity '%s'", getXWikiContext()
-                        .getUserReference(), reference));
-            }
-        } finally {
-            // Restore the context wiki
-            context.setDatabase(currentDatabase);
+        DocumentReference userReference = xcontext.getUserReference();
+        DocumentReference programmingUserReference = xcontext.getDoc().getContentAuthorReference();
+
+        if (!this.authorization.hasAccess(Right.ADMIN, userReference, wikiReference)
+            || !this.authorization.hasAccess(Right.PROGRAM, programmingUserReference, wikiReference)) {
+            throw new IllegalAccessException(String.format(
+                "The user '%s' is not allowed to alter the index for the entity '%s'", userReference, reference));
         }
     }
 
     /**
-     * Check the current user's access to alter the index of the wikis owning the given referenced entities. This is an
-     * optimized method that only checks one reference for each distinct wiki.
+     * Check the current user's access to alter the index of the wikis owning the given referenced entities.
      * 
      * @param references the references whose owning wikis to check.
      * @throws IllegalAccessException if the user is not allowed for at least one of the passed references or if
@@ -253,18 +234,13 @@ public class SolrIndexScriptService implements ScriptService
      */
     private void checkAccessToWikiIndex(List<EntityReference> references) throws IllegalAccessException
     {
-        // Build a map of representatives for each wiki to avoid checking every reference.
-        Map<EntityReference, EntityReference> representatives = new HashMap<EntityReference, EntityReference>();
+        Set<EntityReference> representatives = new HashSet<EntityReference>();
         for (EntityReference reference : references) {
             EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
-            if (!representatives.containsKey(wikiReference)) {
-                representatives.put(wikiReference, reference);
+            if (!representatives.contains(wikiReference)) {
+                checkAccessToWikiIndex(wikiReference);
+                representatives.add(wikiReference);
             }
-        }
-
-        // Check only the representatives for each wiki.
-        for (EntityReference reference : representatives.values()) {
-            checkAccessToWikiIndex(reference);
         }
     }
 }

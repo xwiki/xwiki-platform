@@ -58,7 +58,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.DocumentSolrReferenceResolver;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -258,39 +258,39 @@ public class DocumentSolrMetadataExtractorTest
         // Assert and verify
 
         Assert.assertEquals(String.format("%s_%s", this.documentReferenceString, this.localeENUS),
-            solrDocument.getFieldValue(Fields.ID));
+            solrDocument.getFieldValue(FieldUtils.ID));
 
         Assert.assertEquals(this.documentReference.getWikiReference().getName(),
-            solrDocument.getFieldValue(Fields.WIKI));
+            solrDocument.getFieldValue(FieldUtils.WIKI));
         Assert.assertEquals(this.documentReference.getLastSpaceReference().getName(),
-            solrDocument.getFieldValue(Fields.SPACE));
-        Assert.assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(Fields.NAME));
+            solrDocument.getFieldValue(FieldUtils.SPACE));
+        Assert.assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(FieldUtils.NAME));
 
-        Assert.assertEquals(this.localeENUS.toString(), solrDocument.getFieldValue(Fields.LOCALE));
-        Assert.assertEquals(this.languageENUS, solrDocument.getFieldValue(Fields.LANGUAGE));
-        Assert.assertEquals(Arrays.asList(this.localeENUS.toString()), solrDocument.getFieldValues(Fields.LOCALES));
-        Assert.assertEquals(this.hidden, solrDocument.getFieldValue(Fields.HIDDEN));
-        Assert.assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(Fields.TYPE));
+        Assert.assertEquals(this.localeENUS.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
+        Assert.assertEquals(this.languageENUS, solrDocument.getFieldValue(FieldUtils.LANGUAGE));
+        Assert.assertEquals(Arrays.asList(this.localeENUS.toString()), solrDocument.getFieldValues(FieldUtils.LOCALES));
+        Assert.assertEquals(this.hidden, solrDocument.getFieldValue(FieldUtils.HIDDEN));
+        Assert.assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(FieldUtils.TYPE));
 
-        Assert.assertEquals(this.documentReferenceLocalString, solrDocument.getFieldValue(Fields.FULLNAME));
+        Assert.assertEquals(this.documentReferenceLocalString, solrDocument.getFieldValue(FieldUtils.FULLNAME));
 
         Assert.assertEquals(this.title,
-            solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, this.localeENUS)));
-        Assert.assertEquals(this.rawContent, solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT,
-            Fields.DOCUMENT_RAW_CONTENT, this.localeENUS)));
-        Assert.assertEquals(this.renderedContent, solrDocument.getFieldValue(String.format(Fields.MULTILIGNUAL_FORMAT,
-            Fields.DOCUMENT_RENDERED_CONTENT, this.localeENUS)));
+            solrDocument.getFieldValue(FieldUtils.getFieldName(FieldUtils.TITLE, this.localeENUS)));
+        Assert.assertEquals(this.rawContent,
+            solrDocument.getFieldValue(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, this.localeENUS)));
+        Assert.assertEquals(this.renderedContent,
+            solrDocument.getFieldValue(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, this.localeENUS)));
 
-        Assert.assertEquals(this.version, solrDocument.getFieldValue(Fields.VERSION));
-        Assert.assertEquals(this.comment, solrDocument.getFieldValue(Fields.COMMENT));
+        Assert.assertEquals(this.version, solrDocument.getFieldValue(FieldUtils.VERSION));
+        Assert.assertEquals(this.comment, solrDocument.getFieldValue(FieldUtils.COMMENT));
 
-        Assert.assertEquals(this.authorString, solrDocument.getFieldValue(Fields.AUTHOR));
-        Assert.assertEquals(this.authorDisplay, solrDocument.getFieldValue(Fields.AUTHOR_DISPLAY));
-        Assert.assertEquals(this.creatorString, solrDocument.getFieldValue(Fields.CREATOR));
-        Assert.assertEquals(this.creatorDisplay, solrDocument.getFieldValue(Fields.CREATOR_DISPLAY));
+        Assert.assertEquals(this.authorString, solrDocument.getFieldValue(FieldUtils.AUTHOR));
+        Assert.assertEquals(this.authorDisplay, solrDocument.getFieldValue(FieldUtils.AUTHOR_DISPLAY));
+        Assert.assertEquals(this.creatorString, solrDocument.getFieldValue(FieldUtils.CREATOR));
+        Assert.assertEquals(this.creatorDisplay, solrDocument.getFieldValue(FieldUtils.CREATOR_DISPLAY));
 
-        Assert.assertEquals(this.creationDate, solrDocument.getFieldValue(Fields.CREATIONDATE));
-        Assert.assertEquals(this.date, solrDocument.get(Fields.DATE).getValue());
+        Assert.assertEquals(this.creationDate, solrDocument.getFieldValue(FieldUtils.CREATIONDATE));
+        Assert.assertEquals(this.date, solrDocument.get(FieldUtils.DATE).getValue());
     }
 
     @Test
@@ -385,8 +385,7 @@ public class DocumentSolrMetadataExtractorTest
         // Assert and verify
 
         Collection<Object> objectProperties =
-            solrDocument.getFieldValues(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT,
-                this.localeENUS));
+            solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, this.localeENUS));
         MatcherAssert.assertThat(objectProperties, Matchers.containsInAnyOrder((Object) ("comment:" + commentContent),
             (Object) ("author:" + commentAuthor), (Object) ("date:" + commentDate.toString()),
             (Object) ("list:" + commentList.get(0)), (Object) ("list:" + commentList.get(1))));

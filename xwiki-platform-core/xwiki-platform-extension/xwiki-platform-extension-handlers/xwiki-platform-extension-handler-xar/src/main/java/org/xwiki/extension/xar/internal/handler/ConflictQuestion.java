@@ -22,7 +22,6 @@ package org.xwiki.extension.xar.internal.handler;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * 
  * @version $Id$
  * @since 4.0M2
  */
@@ -52,6 +51,8 @@ public class ConflictQuestion
     private XWikiDocument nextDocument;
 
     private XWikiDocument mergedDocument;
+
+    private boolean always;
 
     public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
         XWikiDocument mergedDocument)
@@ -109,5 +110,25 @@ public class ConflictQuestion
     {
         this.customDocument = customDocument;
         this.globalAction = GlobalAction.CUSTOM;
+    }
+
+    /**
+     * @return if true apply the same answer to following conflict. Does nothing if the answer is
+     *         {@link GlobalAction#CUSTOM}.
+     * @since 5.1RC1
+     */
+    public boolean isAlways()
+    {
+        return this.always;
+    }
+
+    /**
+     * @param always if true apply the same answer to following conflict. Does nothing if the answer is
+     *            {@link GlobalAction#CUSTOM}.
+     * @since 5.1RC1
+     */
+    public void setAlways(boolean always)
+    {
+        this.always = always;
     }
 }

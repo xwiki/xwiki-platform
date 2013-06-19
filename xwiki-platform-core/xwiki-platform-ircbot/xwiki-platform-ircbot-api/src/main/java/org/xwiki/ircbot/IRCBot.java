@@ -147,4 +147,9 @@ public interface IRCBot
       * @return the current ListenerManager
       */
     ListenerManager<? extends PircBotX> getListenerManager();
+
+    /**
+     * @return the wiki id of the wiki in which the Bot has been started
+     */
+    String getWikiId();
 }

@@ -456,4 +456,10 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     {
         this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
     }
+
+    @Override
+    public int getQueueSize()
+    {
+        return this.indexQueue.size() + this.resolveQueue.size();
+    }
 }

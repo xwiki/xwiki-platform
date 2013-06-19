@@ -54,4 +54,9 @@ public interface SolrIndexer
      * @param recurse indicate if children entities should be removed too
      */
     void delete(EntityReference reference, boolean recurse);
+
+    /**
+     * @return the number of element in the index/delete queue
+     */
+    int getQueueSize();
 }

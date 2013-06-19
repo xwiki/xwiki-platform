@@ -67,7 +67,7 @@ public class SolrIndexScriptService implements ScriptService
      * Wrapped {@link SolrIndex} component.
      */
     @Inject
-    private SolrIndexer solrIndex;
+    private SolrIndexer solrIndexer;
 
     /**
      * Used to check rights.
@@ -95,7 +95,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(reference);
 
-            this.solrIndex.index(reference, true);
+            this.solrIndexer.index(reference, true);
         } catch (Exception e) {
             error(e);
         }
@@ -116,7 +116,7 @@ public class SolrIndexScriptService implements ScriptService
             checkAccessToWikiIndex(references);
 
             for (EntityReference reference : references) {
-                this.solrIndex.index(reference, true);
+                this.solrIndexer.index(reference, true);
             }
         } catch (Exception e) {
             error(e);
@@ -137,7 +137,7 @@ public class SolrIndexScriptService implements ScriptService
         try {
             checkAccessToWikiIndex(reference);
 
-            this.solrIndex.delete(reference, true);
+            this.solrIndexer.delete(reference, true);
         } catch (Exception e) {
             error(e);
         }
@@ -158,11 +158,19 @@ public class SolrIndexScriptService implements ScriptService
             checkAccessToWikiIndex(references);
 
             for (EntityReference reference : references) {
-                this.solrIndex.delete(reference, true);
+                this.solrIndexer.delete(reference, true);
             }
         } catch (Exception e) {
             error(e);
         }
+    }
+
+    /**
+     * @return the size of the index/delete queue
+     */
+    public int getQueueSize()
+    {
+        return this.solrIndexer.getQueueSize();
     }
 
     /**

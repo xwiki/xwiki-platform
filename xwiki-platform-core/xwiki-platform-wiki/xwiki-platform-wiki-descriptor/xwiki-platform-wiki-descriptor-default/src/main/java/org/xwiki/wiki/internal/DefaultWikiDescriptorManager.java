@@ -202,6 +202,11 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     @Override
     public Collection<WikiDescriptor> getAll() throws WikiDescriptorException
     {
+        // Note: Ideally to improve performance we could imagine loading all XWikiServerClasses at initialization time
+        // (in initialize()) and thereafter only use the cache. The problem with this approach is that our Cache will
+        // need to be unbounded which is not the case right now. This would mean being able to put all descriptors in
+        // the cache and thus it might not scale if there were a very large number of wikis.
+
         List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
 
         try {

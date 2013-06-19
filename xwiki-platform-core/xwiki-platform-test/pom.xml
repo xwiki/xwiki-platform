@@ -105,7 +105,7 @@
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs</artifactId>
+      <artifactId>jsr311-api</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>

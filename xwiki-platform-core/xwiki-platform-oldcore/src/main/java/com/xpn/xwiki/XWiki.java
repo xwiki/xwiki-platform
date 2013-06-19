@@ -2536,7 +2536,7 @@ public class XWiki implements EventListener
             try {
                 defaultLocale = LocaleUtils.toLocale(Util.normalizeLanguage(defaultLanguage));
             } catch (Exception e) {
-                LOGGER.error("Invalid locale [{}] set as default locale in the preferences", defaultLanguage, e);
+                LOGGER.warn("Invalid locale [{}] set as default locale in the preferences", defaultLanguage);
                 defaultLocale = Locale.ENGLISH;
             }
         }
@@ -2562,7 +2562,7 @@ public class XWiki implements EventListener
                 try {
                     locales.add(LocaleUtils.toLocale(language));
                 } catch (Exception e) {
-                    LOGGER.error("Invalid locale [{}] listed as available in the preferences", language, e);
+                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences", language, e);
                 }
             }
         }

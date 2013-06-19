@@ -911,30 +911,21 @@ public class XWiki implements EventListener
      */
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
-        String database = context.getDatabase();
         List<String> databaseNames = new ArrayList<String>();
+        WikiDescriptorManager descriptorManager = Utils.getComponent(WikiDescriptorManager.class);
         try {
-            context.setDatabase(context.getMainXWiki());
-
-            String query =
-                ", BaseObject as obj where doc.space = 'XWiki' and obj.name=doc.fullName"
-                    + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' ";
-            List<DocumentReference> documents = getStore().searchDocumentReferences(query, context);
-            ((ArrayList<String>) databaseNames).ensureCapacity(documents.size());
-
-            int prefixLength = "XWikiServer".length();
-            for (DocumentReference document : documents) {
-                if (document.getName().startsWith("XWikiServer")) {
-                    databaseNames.add(document.getName().substring(prefixLength).toLowerCase());
-                }
+            for (WikiDescriptor descriptor : descriptorManager.getAll()) {
+                databaseNames.add(descriptor.getWikiId());
             }
-        } finally {
-            context.setDatabase(database);
+        } catch (WikiDescriptorException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to get the list of wikis", e);
         }
 
         // Make sure to include the main wiki in the result.
-        if (!databaseNames.contains(context.getMainXWiki())) {
-            databaseNames.add(context.getMainXWiki());
+        String mainWiki = context.getMainXWiki();
+        if (!databaseNames.contains(mainWiki)) {
+            databaseNames.add(mainWiki);
         }
 
         return databaseNames;
@@ -947,45 +938,6 @@ public class XWiki implements EventListener
     public Cache<DocumentReference> getVirtualWikiCache()
     {
         return this.virtualWikiMap;
-    }
-
-    /**
-     * Searches for the document containing the definition of the virtual wiki corresponding to the specified hostname.
-     * 
-     * @param host the hostname, as specified in the request (for example: {@code forge.xwiki.org})
-     * @param context the current context
-     * @return the name of the document containing the wiki definition, or {@code null} if no wiki corresponds to the
-     *         hostname
-     * @throws XWikiException if a problem occurs while searching the storage
-     */
-    private DocumentReference findWikiServer(String host, XWikiContext context) throws XWikiException
-    {
-        this.ensureVirtualWikiMapExists();
-        DocumentReference wikiName = this.virtualWikiMap.get(host);
-
-        if (wikiName == null) {
-            // Not loaded yet, search for it in the main wiki
-            String hql =
-                ", BaseObject as obj, StringProperty as prop WHERE obj.name=doc.fullName"
-                    + " AND doc.space='XWiki' AND doc.name LIKE 'XWikiServer%'"
-                    + " AND obj.className='XWiki.XWikiServerClass' AND prop.id.id = obj.id"
-                    + " AND prop.id.name = 'server' AND prop.value=?";
-            List<String> parameters = new ArrayList<String>(1);
-            parameters.add(host);
-            try {
-                List<DocumentReference> list =
-                    context.getWiki().getStore().searchDocumentReferences(hql, parameters, context);
-                if ((list != null) && (list.size() > 0)) {
-                    wikiName = list.get(0);
-                }
-
-                this.virtualWikiMap.set(host, wikiName);
-            } catch (XWikiException e) {
-                LOGGER.warn("Error when searching for wiki name from URL host [" + host + "]", e);
-            }
-        }
-
-        return wikiName;
     }
 
     private void ensureVirtualWikiMapExists() throws XWikiException

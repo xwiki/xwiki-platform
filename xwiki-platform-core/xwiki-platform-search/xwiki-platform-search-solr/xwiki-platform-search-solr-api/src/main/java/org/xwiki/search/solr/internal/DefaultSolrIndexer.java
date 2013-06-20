@@ -29,8 +29,10 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
@@ -57,7 +59,7 @@ import com.xpn.xwiki.util.AbstractXWikiRunnable;
  */
 @Component
 @Singleton
-public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrIndexer, Initializable
+public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrIndexer, Initializable, Disposable
 {
     /**
      * Index queue entry.
@@ -212,6 +214,11 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
+     * Stop index thread.
+     */
+    private static final IndexQueueEntry QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null, IndexOperation.STOP);
+
+    /**
      * Logging framework.
      */
     @Inject
@@ -261,6 +268,11 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      */
     private Thread resolveThread;
 
+    /**
+     * Indicate of the component has been disposed.
+     */
+    private boolean disposed;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -284,6 +296,18 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // Mark the component as disposed
+        this.disposed = true;
+
+        // Empty the queue
+        this.indexQueue.clear();
+
+        this.indexQueue.add(QUEUE_ENTRY_STOP);
+    }
+
+    @Override
     protected void runInternal()
     {
         this.logger.debug("Start SOLR indexer thread");
@@ -295,6 +319,11 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                 queueEntry = this.indexQueue.take();
             } catch (InterruptedException e) {
                 this.logger.warn("The SOLR index thread has been interrupted", e);
+
+                queueEntry = QUEUE_ENTRY_STOP;
+            }
+
+            if (queueEntry == QUEUE_ENTRY_STOP) {
                 break;
             }
 
@@ -454,7 +483,9 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      */
     private void addToQueue(EntityReference reference, boolean recurse, IndexOperation operation)
     {
-        this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
+        if (!this.disposed) {
+            this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
+        }
     }
 
     @Override

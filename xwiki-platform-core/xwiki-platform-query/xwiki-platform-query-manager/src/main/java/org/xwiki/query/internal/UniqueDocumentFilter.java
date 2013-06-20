@@ -22,14 +22,14 @@ package org.xwiki.query.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.query.Query;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Query filter making sure unique results are retrieved by a {@link org.xwiki.query.Query}. This transformation only
@@ -125,7 +125,8 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
                         newResult[j++] = actualResult[i];
                     }
                 }
-                filteredResults.add(newResult);
+                // Return the column value when there is only one column.
+                filteredResults.add(newResult.length == 1 ? newResult[0] : newResult);
             }
 
             return filteredResults;

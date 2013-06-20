@@ -118,6 +118,8 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.xml.XMLUtils;
 
@@ -7942,8 +7944,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     protected static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
+        /*boolean hasPR = false;
+        AuthorizationManager am = Utils.getComponent(AuthorizationManager.class);
+        if (am.hasAccess(Right.PROGRAM, this.getAuthorReference(), this.documentReference)) {
+            hasPR = true;
+        }*/
         try {
-            BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, targetSyntax.toIdString());
+            BlockRenderer renderer;
+            String targetSyntaxId = targetSyntax.toIdString();
+            if("xhtml/1.0".equals(targetSyntaxId) || "annotatedxhtml/1.0".equals(targetSyntaxId)) {
+                renderer = Utils.getComponent(BlockRenderer.class, "secure" + targetSyntaxId);
+            } else {
+                renderer = Utils.getComponent(BlockRenderer.class, targetSyntaxId);
+            }
             WikiPrinter printer = new DefaultWikiPrinter();
             renderer.render(content, printer);
             return printer.toString();

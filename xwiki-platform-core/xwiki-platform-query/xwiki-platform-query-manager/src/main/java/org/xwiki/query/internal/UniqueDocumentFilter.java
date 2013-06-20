@@ -22,13 +22,14 @@ package org.xwiki.query.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.query.Query;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.query.Query;
 
 /**
  * Query filter making sure unique results are retrieved by a {@link org.xwiki.query.Query}. This transformation only
@@ -39,7 +40,7 @@ import javax.inject.Singleton;
  */
 @Component
 @Named("unique")
-@Singleton
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class UniqueDocumentFilter extends AbstractQueryFilter
 {
     /**
@@ -47,6 +48,14 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
      */
     @Inject
     private Logger logger;
+
+    /**
+     * Used to mark columns positions of columns that we add to the select clause in order to support Group By.
+     * Indeed in HQL, if you use Group by combined with "distinct" you need to have the group by element present in
+     * the select clause. We use this list when we filter out results in order to remove extra data added by these
+     * extra columns since they shouldn't be returned to the user.
+     */
+    private List<Integer> columnsToRemove = new ArrayList<Integer>();
 
     /**
      * @param statement statement to filter.
@@ -70,11 +79,13 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
             builder.append("select distinct doc.fullName");
 
             // Put back original select columns.
+            int columnPosition = 1;
             List<String> selectColumns = getSelectColumns(statement);
             for (String column : selectColumns) {
                 if (!FULLNAME_COLUMN.equals(column)) {
                     builder.append(prettySeparator);
                     builder.append(column);
+                    columnPosition++;
                 }
             }
             // Put the order by columns in the select clause to circumvent HQL limitations (distinct+order by).
@@ -82,6 +93,9 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
                 if (!FULLNAME_COLUMN.equals(column) && !selectColumns.contains(column)) {
                     builder.append(prettySeparator);
                     builder.append(column);
+                    // Mark these columns as special so that we can remove them later on in #filterResults
+                    this.columnsToRemove.add(columnPosition);
+                    columnPosition++;
                 }
             }
             builder.append(" ");
@@ -101,10 +115,18 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
     {
         // If we had to put multiple columns in the select we need to remove them.
         if (results.size() > 0 && results.get(0).getClass().isArray()) {
-            List filteredResults = new ArrayList<Object>();
+            List filteredResults = new ArrayList();
             for (Object result : results) {
                 Object[] actualResult = (Object[]) result;
-                filteredResults.add(actualResult[0]);
+                Object[] newResult = new Object[actualResult.length - this.columnsToRemove.size()];
+                int j = 0;
+                for (int i = 0; i < actualResult.length; i++) {
+                    if (!this.columnsToRemove.contains(i)) {
+                        newResult[j++] = actualResult[i];
+                    }
+                }
+                // Return the column value when there is only one column.
+                filteredResults.add(newResult.length == 1 ? newResult[0] : newResult);
             }
 
             return filteredResults;

@@ -2171,7 +2171,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         BaseObject object = getXObject((ObjectReference) objectPropertyReference.getParent());
 
-        return (BaseProperty<ObjectPropertyReference>) object.getField(objectPropertyReference.getName());
+        if (object != null) {
+            return (BaseProperty<ObjectPropertyReference>) object.getField(objectPropertyReference.getName());
+        }
+
+        return null;
     }
 
     /**
@@ -2188,11 +2192,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(DocumentReference classReference, int nb)
     {
-        try {
-            return getXObjects().get(classReference).get(nb);
-        } catch (Exception e) {
-            return null;
+        List<BaseObject> objects = getXObjects().get(classReference);
+
+        if (objects != null && objects.size() > nb) {
+            return objects.get(nb);
         }
+
+        return null;
     }
 
     /**
@@ -5954,6 +5960,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 String saveMessage =
                     context.getMessageTool().get("core.comment.renameParent",
                         Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+                childDocument.setAuthorReference(context.getUserReference());
                 xwiki.saveDocument(childDocument, saveMessage, true, context);
             }
         }
@@ -5993,6 +6000,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             String saveMessage =
                 context.getMessageTool().get("core.comment.renameLink",
                     Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+            backlinkDocument.setAuthorReference(context.getUserReference());
             xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
@@ -6028,6 +6036,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Set new content and save document if needed
             if (modified) {
                 newDocument.setContent(newDocumentXDOM);
+                newDocument.setAuthorReference(context.getUserReference());
                 xwiki.saveDocument(newDocument, context);
             }
         }

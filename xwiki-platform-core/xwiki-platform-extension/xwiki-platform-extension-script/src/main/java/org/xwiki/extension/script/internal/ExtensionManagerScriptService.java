@@ -691,7 +691,7 @@ public class ExtensionManagerScriptService implements ScriptService
 
         Job job = null;
         try {
-            job = this.jobManager.executeJob(UninstallPlanJob.JOBTYPE, uninstallRequest);
+            job = this.jobManager.addJob(UninstallPlanJob.JOBTYPE, uninstallRequest);
         } catch (JobException e) {
             setError(e);
         }

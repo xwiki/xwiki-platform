@@ -46,8 +46,7 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
 @ComponentList({ContextComponentManagerProvider.class})
 public class LocalizationScriptServiceTest extends AbstractMockingComponentTestCase<LocalizationScriptService>
 {
-    @Test
-    public void render() throws Exception
+    public void prepareRenderTest() throws Exception
     {
         final BlockRenderer renderer = registerMockComponent(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
 
@@ -80,8 +79,38 @@ public class LocalizationScriptServiceTest extends AbstractMockingComponentTestC
                 will(returnValue(Locale.ROOT));
             }
         });
+    }
+
+    @Test
+    public void render() throws Exception
+    {
+        prepareRenderTest();
+
+        Assert.assertEquals("print result", getMockedComponent().render("key"));
+    }
+
+    @Test
+    public void renderWithSyntax() throws Exception
+    {
+        prepareRenderTest();
+
+        Assert.assertEquals("print result", getMockedComponent().render("key", Syntax.PLAIN_1_0));
+    }
+
+    @Test
+    public void renderWithSyntaxAndParameters() throws Exception
+    {
+        prepareRenderTest();
 
         Assert.assertEquals("print result", getMockedComponent().render("key", Syntax.PLAIN_1_0, Arrays.asList()));
+    }
+
+    @Test
+    public void renderWithParameters() throws Exception
+    {
+        prepareRenderTest();
+
+        Assert.assertEquals("print result", getMockedComponent().render("key", Arrays.asList()));
     }
 
     @Test

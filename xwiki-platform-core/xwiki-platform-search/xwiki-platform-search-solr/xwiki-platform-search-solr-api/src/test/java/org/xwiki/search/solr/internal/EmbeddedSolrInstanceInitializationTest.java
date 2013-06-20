@@ -65,7 +65,7 @@ public class EmbeddedSolrInstanceInitializationTest
     @After
     public void tearDown() throws Exception
     {
-        FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
+        //FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
     }
 
     @Test

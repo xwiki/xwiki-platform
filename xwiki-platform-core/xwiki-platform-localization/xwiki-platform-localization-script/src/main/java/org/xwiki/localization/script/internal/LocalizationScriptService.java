@@ -130,6 +130,17 @@ public class LocalizationScriptService implements ScriptService
     /**
      * @param key the translation key
      * @param syntax the syntax in which to render the translation message
+     * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
+     * @since 5.1M2
+     */
+    public String render(String key, Syntax syntax)
+    {
+        return render(key, syntax, Collections.EMPTY_LIST);
+    }
+
+    /**
+     * @param key the translation key
+     * @param syntax the syntax in which to render the translation message
      * @param parameters the translation parameters
      * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
      */

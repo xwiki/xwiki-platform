@@ -35,9 +35,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
+import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -90,13 +91,10 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
             // Document itself
             result.add(documentReference);
 
-            // FIXME: Naive assumption that the original document does not have the locale set in the reference.
-            // http://jira.xwiki.org/browse/XWIKI-8349 should make things clearer at some point, but for now we are
-            // using what we have.
-            // FIXME: Second assumption - Only original documents contain objects and attachments, because objects are
+            // FIXME: Assumption - Only original documents contain objects and attachments, because objects are
             // not translatable.
             // http://jira.xwiki.org/browse/XWIKI-69 is the long standing issue on which the second assumption relies.
-            if (documentReference.getLocale() == null) {
+            if (documentReference.getLocale() == null || documentReference.getLocale().equals(Locale.ROOT)) {
                 XWikiDocument document;
                 try {
                     document = getDocument(documentReference);
@@ -141,7 +139,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
             AttachmentReference attachmentReference = attachment.getReference();
 
             try {
-                result.addAll(this.attachmentResolverProvider.get().getReferences(attachmentReference));
+                Iterables.addAll(result, this.attachmentResolverProvider.get().getReferences(attachmentReference));
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]", e);
             }
@@ -161,7 +159,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
                     BaseObjectReference objectReference = object.getReference();
 
                     try {
-                        result.addAll(this.objectResolverProvider.get().getReferences(objectReference));
+                        Iterables.addAll(result, this.objectResolverProvider.get().getReferences(objectReference));
                     } catch (Exception e) {
                         this.logger.error("Failed to resolve references for object [" + objectReference + "]", e);
                     }
@@ -180,7 +178,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
         // Document IDs also contain the locale code to differentiate between them.
         // Objects, attachments, etc. don`t need this because the only thing that is translated in an XWiki document
         // right now is the document title and content. Objects and attachments are not translated.
-        result += Fields.USCORE + getLocale(documentReference);
+        result += FieldUtils.USCORE + getLocale(documentReference);
 
         return result;
     }
@@ -195,7 +193,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
         Locale locale = null;
 
         try {
-            if (documentReference.getLocale() != null) {
+            if (documentReference.getLocale() != null && !documentReference.getLocale().equals(Locale.ROOT)) {
                 locale = documentReference.getLocale();
             } else {
                 XWikiContext xcontext = this.xcontextProvider.get();
@@ -219,7 +217,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         builder.append(QUERY_AND);
 
-        builder.append(Fields.NAME);
+        builder.append(FieldUtils.NAME);
         builder.append(':');
         builder.append(ClientUtils.escapeQueryChars(reference.getName()));
 

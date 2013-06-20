@@ -40,7 +40,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
-import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
 /**
@@ -140,8 +140,8 @@ public class SolrQueryExecutor implements QueryExecutor
         for (SolrDocument result : new ArrayList<SolrDocument>(results)) {
             try {
                 DocumentReference resultDocumentReference =
-                    new DocumentReference((String) result.get(Fields.WIKI), (String) result.get(Fields.SPACE),
-                        (String) result.get(Fields.NAME));
+                    new DocumentReference((String) result.get(FieldUtils.WIKI), (String) result.get(FieldUtils.SPACE),
+                        (String) result.get(FieldUtils.NAME));
 
                 if (!documentAccessBridge.exists(resultDocumentReference)
                     || !documentAccessBridge.isDocumentViewable(resultDocumentReference)) {

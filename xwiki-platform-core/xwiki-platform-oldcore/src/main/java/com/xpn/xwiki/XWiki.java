@@ -71,6 +71,7 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -2506,14 +2507,73 @@ public class XWiki implements EventListener
         return result;
     }
 
-    public String getDefaultLanguage(XWikiContext context)
+    /**
+     * @deprecated since 5.1M2 use {@link #getDefaultLocale(XWikiContext)} instead
+     */
+    @Deprecated
+    public String getDefaultLanguage(XWikiContext xcontext)
+    {
+        return getDefaultLocale(xcontext).toString();
+    }
+
+    /**
+     * The default locale in the preferences.
+     * 
+     * @param xcontext the XWiki context.
+     * @return the default locale
+     * @since 5.1M2
+     */
+    public Locale getDefaultLocale(XWikiContext xcontext)
     {
         // Find out what is the default language from the XWiki preferences settings.
-        String defaultLanguage = context.getWiki().getXWikiPreference("default_language", "", context);
+        String defaultLanguage = xcontext.getWiki().getXWikiPreference("default_language", "", xcontext);
+
+        Locale defaultLocale;
+
         if (StringUtils.isBlank(defaultLanguage)) {
-            defaultLanguage = "en";
+            defaultLocale = Locale.ENGLISH;
+        } else {
+            try {
+                defaultLocale = LocaleUtils.toLocale(Util.normalizeLanguage(defaultLanguage));
+            } catch (Exception e) {
+                LOGGER.warn("Invalid locale [{}] set as default locale in the preferences", defaultLanguage);
+                defaultLocale = Locale.ENGLISH;
+            }
         }
-        return Util.normalizeLanguage(defaultLanguage);
+
+        return defaultLocale;
+    }
+
+    /**
+     * Get the available locales according to the preferences.
+     * 
+     * @param xcontext the XWiki context
+     * @return all the available locales
+     * @since 5.1M2
+     */
+    public List<Locale> getAvailableLocales(XWikiContext xcontext)
+    {
+        String[] languages = StringUtils.split(xcontext.getWiki().getXWikiPreference("languages", xcontext), ", |");
+
+        List<Locale> locales = new ArrayList<Locale>(languages.length);
+
+        for (String language : languages) {
+            if (StringUtils.isNotBlank(language)) {
+                try {
+                    locales.add(LocaleUtils.toLocale(language));
+                } catch (Exception e) {
+                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences", language, e);
+                }
+            }
+        }
+
+        // Add default language in case it's not listed as available (which is wrong but it happen)
+        Locale defaultocale = getDefaultLocale(xcontext);
+        if (!locales.contains(defaultocale)) {
+            locales.add(defaultocale);
+        }
+
+        return locales;
     }
 
     public String getDocLanguagePreferenceNew(XWikiContext context)

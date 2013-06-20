@@ -43,9 +43,9 @@ public class LengthSolrInputDocument extends SolrInputDocument
     }
 
     @Override
-    public void addField(String name, Object value, float boost)
+    public void setField(String name, Object value, float boost)
     {
-        super.addField(name, value, boost);
+        super.setField(name, value, boost);
 
         if (value instanceof String) {
             this.length += ((String) value).length();

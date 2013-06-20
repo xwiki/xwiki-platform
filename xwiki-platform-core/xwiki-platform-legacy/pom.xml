@@ -45,6 +45,7 @@
     <module>xwiki-platform-legacy-office-importer</module>
     <module>xwiki-platform-legacy-oldcore</module>
     <module>xwiki-platform-legacy-url</module>
+    <module>xwiki-platform-legacy-web</module>
   </modules>
   <build>
     <pluginManagement>

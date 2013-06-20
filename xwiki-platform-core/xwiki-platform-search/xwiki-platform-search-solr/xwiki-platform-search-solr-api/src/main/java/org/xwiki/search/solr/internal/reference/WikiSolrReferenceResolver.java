@@ -33,8 +33,10 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Resolve wiki references.
@@ -81,7 +83,7 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
             SpaceReference spaceReference = new SpaceReference(space, wikiReference);
 
             try {
-                result.addAll(this.spaceResolverProvider.get().getReferences(spaceReference));
+                Iterables.addAll(result, this.spaceResolverProvider.get().getReferences(spaceReference));
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for space [" + spaceReference + "]", e);
             }
@@ -93,6 +95,6 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Override
     public String getQuery(EntityReference reference)
     {
-        return Fields.WIKI + ':' + ClientUtils.escapeQueryChars(reference.getName());
+        return FieldUtils.WIKI + ':' + ClientUtils.escapeQueryChars(reference.getName());
     }
 }

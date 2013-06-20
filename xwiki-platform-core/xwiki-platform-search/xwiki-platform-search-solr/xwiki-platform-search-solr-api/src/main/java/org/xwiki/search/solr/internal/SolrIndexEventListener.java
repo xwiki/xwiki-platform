@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,9 +32,9 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -71,7 +72,7 @@ public class SolrIndexEventListener implements EventListener
         new DocumentCreatedEvent(), new DocumentDeletedEvent(), new AttachmentAddedEvent(),
         new AttachmentDeletedEvent(), new AttachmentUpdatedEvent(), new XObjectAddedEvent(), new XObjectDeletedEvent(),
         new XObjectUpdatedEvent(), new XObjectPropertyAddedEvent(), new XObjectPropertyDeletedEvent(),
-        new XObjectPropertyUpdatedEvent(), new WikiCreatedEvent(), new WikiDeletedEvent());
+        new XObjectPropertyUpdatedEvent(), new WikiDeletedEvent());
 
     /**
      * Logging framework.
@@ -103,14 +104,26 @@ public class SolrIndexEventListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         try {
-            if (event instanceof DocumentUpdatedEvent || event instanceof DocumentCreatedEvent) {
+            if (event instanceof DocumentUpdatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
                 this.solrIndexer.get().index(document.getDocumentReference(), false);
+            } else if (event instanceof DocumentCreatedEvent) {
+                XWikiDocument document = (XWikiDocument) source;
+
+                if (!Locale.ROOT.equals(document.getLocale())) {
+                    // If a new translation is added reindex the whole document (could be optimized a bit by reindexing
+                    // only the parent locales but that would always include objets and attachments anyway)
+                    this.solrIndexer.get().index(new DocumentReference(document.getDocumentReference(), null), true);
+                } else {
+                    this.solrIndexer.get().index(
+                        new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
+                }
             } else if (event instanceof DocumentDeletedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                this.solrIndexer.get().delete(document.getDocumentReference(), false);
+                this.solrIndexer.get().delete(
+                    new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
             } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();
@@ -139,11 +152,6 @@ public class SolrIndexEventListener implements EventListener
                 EntityEvent entityEvent = (EntityEvent) event;
 
                 this.solrIndexer.get().delete(entityEvent.getReference(), false);
-            } else if (event instanceof WikiCreatedEvent) {
-                String wikiName = (String) source;
-                WikiReference wikiReference = new WikiReference(wikiName);
-
-                this.solrIndexer.get().index(wikiReference, false);
             } else if (event instanceof WikiDeletedEvent) {
                 String wikiName = (String) source;
                 WikiReference wikiReference = new WikiReference(wikiName);
@@ -153,5 +161,8 @@ public class SolrIndexEventListener implements EventListener
         } catch (Exception e) {
             logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
         }
+
+        // TODO: if a ne language is added to the list of avaibale locales in preferences, reindex all the entries
+        // associated to parent locales
     }
 }

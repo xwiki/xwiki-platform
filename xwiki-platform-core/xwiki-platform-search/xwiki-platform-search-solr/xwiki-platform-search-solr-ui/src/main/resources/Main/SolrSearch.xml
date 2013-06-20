@@ -199,6 +199,16 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
 
     _onToggle: function(event) {
       this.container.toggle();
+
+      // Fix the height of the document content container (XWIKI-9189). The search filter is displayed with position
+      // absolute so that it floats over the search results (as a popup) and the document content container has
+      // overflow:auto to prevent long text/images/tables from overflowing outside of the content area. Because of this
+      // the content container is not resized when the search filter is displayed. Instead, when there are no search
+      // results, we get a vertical scroll bar.
+      var docContentContainer = $('xwikicontent');
+      docContentContainer &amp;&amp; docContentContainer.setStyle({
+        minHeight: this.container.visible() ? docContentContainer.scrollHeight + 'px' : ''
+      });
     }
   });
 
@@ -206,15 +216,29 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     initialize: function(container) {
       this.container = container;
 
-      this.container.select('.search-facet-header').each(function(facetHeader) {
-        facetHeader.observe('click', this._onToggle.bindAsEventListener(this));
-      }.bind(this))
-
+      // Add the global Expand/Collapse toggle.
       this.globalToggle = new Element('a', {href: '#', style: 'float:right'});
       this.globalToggle.observe('click', this._onGlobalToggle.bindAsEventListener(this));
       var clearFloats = new Element('span', {'class': 'clearfloats'});
       this.container.down('.search-facets-actions').down('p').insert(this.globalToggle).insert(clearFloats);
       this._updateGlobalToggleState();
+
+      // Add Expand/Collapse toggle for each facet.
+      this.container.select('.search-facet-header').each(function(facetHeader) {
+        facetHeader.observe('click', this._onToggle.bindAsEventListener(this));
+      }.bind(this))
+
+      // Add a check box before each facet value. We do this from JavaScript because the behaviour of a check box inside
+      // a link is not consistent across different browsers (some follow the link when the check box is clicked, others
+      // don't) and having the check box outside the facet value link requires JavaScript to synchronize them.
+      this.container.select('.search-facet-body a').each(function(facetValueAnchor) {
+        var checkBox = new Element('input', {type: 'checkbox'});
+        checkBox.checked = facetValueAnchor.hasClassName('selected');
+        checkBox.observe('click', facetValueAnchor.click.bind(facetValueAnchor));
+        facetValueAnchor.insert({before: checkBox});
+        // Remove the 'selected' class because the selected state is marked using the check box.
+        facetValueAnchor.removeClassName('selected');
+      });
     },
 
     _onToggle: function(event) {
@@ -419,6 +443,8 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
 
 .search-filter, .search-facets {
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  /* Leave space for the bottom shadow. */
+  margin-bottom: 2px;
 }
 
 .search-filter-header {
@@ -603,6 +629,7 @@ blockquote.search-result-highlight {
 .search-facets-actions .clearfloats {
   /* Fix the horizontal scroll bar, caused by the fact that we use a SPAN element instead of a DIV. */
   display: block;
+  margin: 0;
 }
 
 .search-facet:last-of-type {
@@ -663,19 +690,20 @@ blockquote.search-result-highlight {
   list-style: none;
   display: block;
   padding: 0.5em 0;
-  margin: 0px;
+  margin: 0;
 }
 
 .search-facet-body li {
   clear: both;
 }
 
-.search-facet-body li {
-  margin-left: -0.3em;
-}
-
 .search-facet-body input[type="checkbox"] {
   float: left;
+  margin-left: 0;
+}
+
+.search-facet-body a.selected {
+  font-weight: bolder;
 }
 
 .search-facet-body .itemName {
@@ -943,13 +971,13 @@ blockquote.search-result-highlight {
                   #if ($facetRequestValues)
                     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
                   #end
-                  #set ($checked = $selectedValues.remove($facetValue.name))
-                  #if (!$checked)
+                  #set ($selected = $selectedValues.remove($facetValue.name))
+                  #if (!$selected)
                     #set ($discard = $selectedValues.add($facetValue.name))
                   #end
-                  #extendQueryString($url {$facetRequestParameter: $selectedValues})
-                  &lt;a href="$url"&gt;
-                    &lt;input type="checkbox"#if ($checked) checked="checked"#end /&gt;
+                  ## Reset the pagination because the number of results can change when a facet is applied.
+                  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+                  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
                     &lt;span class="itemName"&gt;$escapetool.xml($facetValue.name)&lt;/span&gt;
                     &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
                   &lt;/a&gt;
@@ -1011,7 +1039,7 @@ blockquote.search-result-highlight {
   #set ($paginationParameters = {
     'url': $doc.getURL('view', "$!request.queryString.replaceAll('firstIndex=[0-9]*', '')"),
     'totalItems': $results.numFound,
-    'defaultItemsPerPage': 10,
+    'defaultItemsPerPage': $rows,
     'position': 'top'
   })
   {{html}}#pagination($paginationParameters){{/html}}
@@ -1176,8 +1204,8 @@ blockquote.search-result-highlight {
   #set ($query = $services.query.createQuery($queryString, 'solr'))
   ##
   ## Set query parameters.
-  #set ($discard = $query.setLimit($numbertool.integer($rows)))
-  #set ($discard = $query.setOffset($numbertool.integer($start)))
+  #set ($discard = $query.setLimit($rows))
+  #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
   #if ($boost != '')
     #set ($discard = $query.bindValue('qf', $boost))
@@ -1243,17 +1271,13 @@ blockquote.search-result-highlight {
   #set ($fileType = "$!request.fileType")
   #set ($boost = "$!request.boost")
   #set ($debug = "$!request.debug")
-  #set ($rows = $request.rows)
+  #set ($rows = $numbertool.integer($request.rows))
   #if ("$!rows" == '')
-    #set ($rows = '10')
+    #set ($rows = 10)
   #end
-  #set ($start = $request.firstIndex)
+  #set ($start = $numbertool.integer($request.firstIndex))
   #if ("$!start" == '')
-    #set ($start = '0')
-  #end
-  #set ($end = $request.end)
-  #if ("$!end" == '')
-    #set ($end = '0')
+    #set ($start = 0)
   #end
   #set ($sort = $request.sort)
   #if ("$!sort" == '')

@@ -51,6 +51,11 @@
   margin-top: 5px;
 }
 
+.xPageChooser select {
+  margin-right: .5em;
+  max-width: 30%;
+}
+
 .xImagesSelector .xListBox {
   overflow: auto;
 }

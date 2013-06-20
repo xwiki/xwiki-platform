@@ -90,30 +90,26 @@
 ## ==========
 ## JSON Generation
 ## ==========
-{
-"totalrows": $filteredList.size(),
-"matchingtags": {},
-"tags" : [],
-"returnedrows":  ${resultList.size()},
-"offset": $mathtool.add($offset, 1),
-"reqNo": $mathtool.toInteger($request.reqNo),
-"rows": [
+#set ($json = {
+  'totalrows': $filteredList.size(),
+  'matchingtags': {},
+  'tags': [],
+  'returnedrows':  $resultList.size(),
+  'offset': $mathtool.add($offset, 1),
+  'reqNo': $mathtool.toInteger($request.reqNo),
+  'rows': []
+})
 #foreach ($entry in $resultList)
-  #if($velocityCount &gt; 1) , #end
-  {
-    "doc_viewable" : true,
-    #set ($url = $entry.get('link'))
-    #set ($linkHTML = "&lt;a href='$url'&gt;$entry.get('link')&lt;/a&gt;")
-    "link" : "$escapetool.javascript($linkHTML)",
-    #set ($url = $xwiki.getURL($entry.get('page')))
-    #set ($pageHTML = "&lt;a href='$url'&gt;$entry.get('page')&lt;/a&gt;")
-    "page" : "$escapetool.javascript($pageHTML)",
-    "code" : "$escapetool.javascript($entry.get("code"))",
-    "date" : "$escapetool.javascript($entry.get("date"))"
-  }
+  #set ($discard = $json.rows.add({
+    'doc_viewable': true,
+    'link': $entry.get('link'),
+    'link_url': $entry.get('link'),
+    'page': $entry.get('page'),
+    'page_url': $xwiki.getURL($entry.get('page')),
+    'code': $entry.get("code"),
+    'date': $entry.get("date")
+  }))
 #end
-]
-}
-{{/velocity}}
-</content>
+$jsontool.serialize($json)
+{{/velocity}}</content>
 </xwikidoc>

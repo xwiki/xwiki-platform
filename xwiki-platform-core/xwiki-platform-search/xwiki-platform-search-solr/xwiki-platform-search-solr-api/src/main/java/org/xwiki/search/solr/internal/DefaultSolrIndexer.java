@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -181,20 +180,13 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                     queueEntry = resolveQueue.take();
                 } catch (InterruptedException e) {
                     logger.warn("The SOLR resolve thread has been interrupted", e);
-
-                    queueEntry = RESOLVE_ENTRY_STOP;
-                }
-
-                if (queueEntry == RESOLVE_ENTRY_STOP) {
                     break;
                 }
 
                 try {
                     if (queueEntry.operation == IndexOperation.INDEX) {
-                        List<EntityReference> references;
+                        Iterable<EntityReference> references;
                         if (queueEntry.recurse) {
-                            // FIXME: it's not very clean to load all the reference in memory in the case of the wiki
-                            // for example. Would be better to stream or cut that a bit instead.
                             references = solrRefereceResolver.getReferences(queueEntry.reference);
                         } else {
                             references = Arrays.asList(queueEntry.reference);
@@ -205,9 +197,9 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                         }
                     } else {
                         if (queueEntry.recurse) {
-                            indexQueue
-                                .offer(new IndexQueueEntry(getQuery(queueEntry.reference), IndexOperation.DELETE));
-                        } else {
+                            indexQueue.offer(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                                IndexOperation.DELETE));
+                        } else if (queueEntry.reference != null) {
                             indexQueue.offer(new IndexQueueEntry(queueEntry.reference, IndexOperation.DELETE));
                         }
                     }
@@ -219,35 +211,12 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
             logger.debug("Stop SOLR resolver thread");
         }
-
-        /**
-         * @param reference the reference for which to extract the ID
-         * @return the query to find all the related entities
-         * @throws SolrIndexerException when failing to generate the query
-         */
-        private String getQuery(EntityReference reference) throws SolrIndexerException
-        {
-            String result = null;
-
-            if (reference != null) {
-                result = solrRefereceResolver.getQuery(reference);
-            } else {
-                result = "*:*";
-            }
-
-            return result;
-        }
     }
 
     /**
      * Stop index thread.
      */
     private static final IndexQueueEntry QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null, IndexOperation.STOP);
-
-    /**
-     * Stop resolve thread.
-     */
-    private static final ResolveQueueEntry RESOLVE_ENTRY_STOP = new ResolveQueueEntry(null, false, IndexOperation.STOP);
 
     /**
      * Logging framework.
@@ -307,13 +276,17 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     @Override
     public void initialize() throws InitializationException
     {
-        // Launch the resolve thread that runs the indexUpdater.
+        // Launch the resolve thread
         this.resolveThread = new Thread(new Resolver());
+        this.resolveThread.setName("XWiki Solr resolve thread");
+        this.resolveThread.setDaemon(true);
         this.resolveThread.start();
         this.resolveThread.setPriority(Thread.NORM_PRIORITY - 1);
 
-        // Launch the index thread that runs the indexUpdater.
+        // Launch the index thread
         this.indexThread = new Thread(this);
+        this.indexThread.setName("XWiki Solr index thread");
+        this.indexThread.setDaemon(true);
         this.indexThread.start();
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
 
@@ -332,13 +305,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         this.indexQueue.clear();
 
         this.indexQueue.add(QUEUE_ENTRY_STOP);
-
-        // Wait until the thread actually die
-        try {
-            this.indexThread.join();
-        } catch (InterruptedException e) {
-            this.logger.error("The index thread was unexpectedly interrupted", e);
-        }
     }
 
     @Override
@@ -497,13 +463,13 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     @Override
-    public void index(EntityReference reference, boolean recurse) throws SolrIndexerException
+    public void index(EntityReference reference, boolean recurse)
     {
         addToQueue(reference, recurse, IndexOperation.INDEX);
     }
 
     @Override
-    public void delete(EntityReference reference, boolean recurse) throws SolrIndexerException
+    public void delete(EntityReference reference, boolean recurse)
     {
         addToQueue(reference, recurse, IndexOperation.DELETE);
     }
@@ -520,5 +486,11 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         if (!this.disposed) {
             this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
         }
+    }
+
+    @Override
+    public int getQueueSize()
+    {
+        return this.indexQueue.size() + this.resolveQueue.size();
     }
 }

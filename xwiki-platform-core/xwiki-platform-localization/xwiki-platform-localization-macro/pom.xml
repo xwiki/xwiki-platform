@@ -32,7 +32,11 @@
   <artifactId>xwiki-platform-localization-macro</artifactId>
   <name>XWiki Platform - Localization - Macro</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Localization - Macro</description>
+  <description>Allow to insert a translation message in a content</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Translation Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -44,7 +48,6 @@
       <artifactId>xwiki-rendering-transformation-macro</artifactId>
       <version>${rendering.version}</version>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

@@ -187,10 +187,10 @@
 #macro (displayJobProgressBar $jobStatus)
   <div class="ui-progress">
     <div class="ui-progress-background">
-      #set ($percent = 0)
-      ## The job status is null after the job is created, until the job is scheduled.
-      #if ($jobStatus)
-        #set ($percent = $jobStatus.progress.offset)
+      #set ($percent = $jobStatus.progress.offset)
+      ## There is no progress information if the job was scheduled but hasn't started yet.
+      #if (!$percent)
+        #set ($percent = 0)
       #end
       #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
       <div class="ui-progress-bar green" style="width:${percent}%"></div>
@@ -1000,7 +1000,9 @@ $status##
   #elseif (!$jobStatusForFarm)
     #setVariable ("$return" $jobStatusForWiki)
   ## Return the most recent job status.
-  #elseif ($jobStatusForFarm.startDate.after($jobStatusForWiki.startDate))
+  ## No start date means the job was scheduled but hasn't started yet.
+  #elseif (!$jobStatusForFarm.startDate || ($jobStatusForWiki.startDate
+    && $jobStatusForFarm.startDate.after($jobStatusForWiki.startDate)))
     #setVariable ("$return" $jobStatusForFarm)
   #else
     #setVariable ("$return" $jobStatusForWiki)
@@ -1040,7 +1042,8 @@ $status##
   #elseif (!$_plan)
     #setVariable ("$return" $_jobStatus)
   ## Return the most recent one between the job status and the plan.
-  #elseif ($_jobStatus.startDate.after($_plan.startDate))
+  ## No start date means the job/plan was scheduled but hasn't started yet.
+  #elseif (!$_jobStatus.startDate || ($_plan.startDate && $_jobStatus.startDate.after($_plan.startDate)))
     #setVariable ("$return" $_jobStatus)
   #else
     #setVariable ("$return" $_plan)

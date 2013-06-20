@@ -487,10 +487,10 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
     #set($originalAttachment = $datt.getAttachment())
     #set($originalDocument = $xwiki.getDocument($datt.docName))
     &lt;tr&gt;
-      &lt;td&gt;&lt;a href="$originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, "rid=${datt.id}").replaceAll('&amp;', '&amp;amp;')"&gt;$datt.filename&lt;/a&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;a href="$originalDocument.getURL()"&gt;$originalDocument.displayTitle (${originalDocument.fullName})&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;a href="$originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, "rid=${datt.id}").replaceAll('&amp;', '&amp;amp;')"&gt;$escapetool.xml($datt.filename)&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;a href="$originalDocument.getURL()"&gt;$escapetool.xml($originalDocument.plainTitle) ($escapetool.xml(${originalDocument.fullName}))&lt;/a&gt;&lt;/td&gt;
       &lt;td&gt;$xwiki.formatDate($datt.getDate(), $dateFormat)&lt;/td&gt;
-      &lt;td&gt;$xwiki.getLocalUserName($datt.getDeleter())&lt;/td&gt;
+      &lt;td&gt;$xwiki.getUserName($datt.getDeleter())&lt;/td&gt;
       &lt;td class="itemActions"&gt;
         #if($datt.canDelete())
           &lt;a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashAttachmentsDeleteText')&lt;/a&gt;
@@ -592,9 +592,9 @@ $response.setContentType('application/json')
   {
     #set($originalAttachment = $datt.getAttachment())
     #set($originalDocument = $xwiki.getDocument($datt.docName))
-    "filename"  : "$datt.filename",
-    "docName"  : "$datt.docName",
-    "title"  : "$originalDocument.displayTitle",
+    "filename"  : "$escapetool.javascript($datt.filename)",
+    "docName"  : "$escapetool.javascript($datt.docName)",
+    "title"  : "$escapetool.javascript($originalDocument.plainTitle)",
     "url" : "$originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, "rid=${datt.id}")",
     "documentUrl" : "$originalDocument.getURL()",
     "canDelete" : $datt.canDelete(),
@@ -603,8 +603,8 @@ $response.setContentType('application/json')
     "alreadyExists" : #if($originalDocument.getAttachment($datt.filename)) true #else false #end,
     "restoreUrl" : "$originalDocument.getAttachmentURL($datt.filename)",
     "date" : "$xwiki.formatDate($datt.date, $dateFormat)",
-    "deleter" : "$datt.deleter",
-    "deletername" : "$xwiki.getUserName($datt.deleter, false)",
+    "deleter" : "$escapetool.javascript($datt.deleter)",
+    "deletername" : "$escapetool.javascript($xwiki.getUserName($datt.deleter, false))",
     "deleterurl" : "$xwiki.getURL($datt.deleter, 'view')"
   }
 #end

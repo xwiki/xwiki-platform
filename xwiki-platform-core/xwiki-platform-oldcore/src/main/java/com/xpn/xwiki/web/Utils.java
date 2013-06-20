@@ -160,6 +160,9 @@ public class Utils
         enablePlaceholders(context);
         String content = "";
         try {
+            // Note: This line below can change the state of the response. For example a vm file can have a call to
+            // sendRedirect. In this case we need to be careful to not write to the output stream since it's already
+            // been committed. This is why we do a check below before calling response.getOutputStream().write().
             content = context.getWiki().evaluateTemplate(template + ".vm", context);
             // Replace all placeholders with the protected values
             content = replacePlaceholders(content, context);
@@ -189,7 +192,11 @@ public class Utils
             }
 
             // We only write if the caller has asked.
-            if (write) {
+            // We also make sure to verify that there hasn't been a call to sendRedirect before since it would mean the
+            // response has already been written to and we shouldn't try to write in it.
+            if (write && ((response instanceof XWikiServletResponse)
+                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND))
+            {
                 try {
                     try {
                         response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));

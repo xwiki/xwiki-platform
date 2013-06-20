@@ -44,53 +44,33 @@
 }
 
 /* gadget handles on the dashboard */
-.gadget .gadget-title .settings-menu .action {
-  border-top: solid 1px $theme.borderColor;
+.gadget .action {
   background-repeat: no-repeat;
   background-position: center;
   cursor: pointer;
-  width: 30px;
+  display: inline-block;
   height: 24px;
+  margin-right: 6px;
+  width: 16px;
 }
 
-.gadget .gadget-title .settings-menu .remove {
+.gadget .remove.action {
   background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
-.gadget .gadget-title .settings-menu .edit {
+.gadget .edit.action {
   background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 
-.gadget .gadget-title .settings {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 4px 4px 0 0;
-  border-width: 1px 1px 0 1px;
-  border-color: $theme.borderColor;
-  border-style: solid;
-  cursor: pointer;
-  height: 24px;
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  width: 30px;
-}
-
-.gadget .gadget-title .settings-open {
-  background-color: $theme.backgroundSecondaryColor;
-}
-
-.gadget .gadget-title .settings-menu {
-  background-color: $theme.backgroundSecondaryColor;
-  background-color: $theme.backgroundSecondaryColor;
-  border-radius: 0 0 4px 4px;
-  border-width: 0 1px 1px;
-  border-color: $theme.borderColor;
-  border-style: solid;
+.gadget .gadget-actions {
+  display: none;
   position: absolute;
   right: 0;
-  top: 24px;
+  top: 0;
+}
+
+.gadget:hover .gadget-actions {
+  display: block;
 }
 
 /* Drag & drop effects */

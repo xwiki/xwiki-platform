@@ -37,6 +37,8 @@
     <module>xwiki-platform-wysiwyg-client</module>
     <module>xwiki-platform-wysiwyg-plugin-api</module>
     <module>xwiki-platform-wysiwyg-server</module>
+    <module>xwiki-platform-wysiwyg-test</module>
+    <module>xwiki-platform-wysiwyg-ui</module>
     <module>xwiki-platform-wysiwyg-war</module>
   </modules>
   <build>

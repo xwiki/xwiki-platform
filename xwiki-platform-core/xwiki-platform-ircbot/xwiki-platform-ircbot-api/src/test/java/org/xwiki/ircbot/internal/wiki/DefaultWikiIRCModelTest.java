@@ -28,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.internal.BotData;
 import org.xwiki.ircbot.internal.BotListenerData;
@@ -83,12 +84,11 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
         this.xwiki = mock(XWiki.class);
 
         this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setDatabase("somewiki");
         this.xwikiContext.setWiki(this.xwiki);
 
         context.setProperty("xwikicontext", this.xwikiContext);
 
-        final DocumentReference configDocReference = new DocumentReference("somewiki", "IRC", "IRCConfiguration");
+        DocumentReference configDocReference = new DocumentReference("botwiki", "IRC", "IRCConfiguration");
         this.configDoc = mock(XWikiDocument.class);
 
         when(execution.getContext()).thenReturn(context);
@@ -99,11 +99,15 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
     @Test
     public void loadBotDataWhenNoConfigDataInConfigDocument() throws Exception
     {
+        // Simulate the the IRC Bot is started in the "botwiki" wiki.
+        IRCBot bot = this.componentManager.getInstance(IRCBot.class);
+        when(bot.getWikiId()).thenReturn("botwiki");
+
         try {
             this.componentManager.getComponentUnderTest().loadBotData();
             Assert.fail("Should have thrown an exception");
         } catch (IRCBotException expected) {
-            Assert.assertEquals("Cannot find the IRC Configuration object in the [somewiki:IRC.IRCConfiguration] "
+            Assert.assertEquals("Cannot find the IRC Configuration object in the [botwiki:IRC.IRCConfiguration] "
                 + "document", expected.getMessage());
         }
     }
@@ -111,6 +115,10 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
     @Test
     public void loadBotData() throws Exception
     {
+        // Simulate the the IRC Bot is started in the "botwiki" wiki.
+        IRCBot bot = this.componentManager.getInstance(IRCBot.class);
+        when(bot.getWikiId()).thenReturn("botwiki");
+
         BaseObject botDataObject = mock(BaseObject.class);
 
         when(configDoc.getXObject(WIKI_BOT_CONFIGURATION_CLASS)).thenReturn(botDataObject);
@@ -148,15 +156,22 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
     }
 
     /**
-     * Verify that if there's no configuration document in the current wiki then we'll look into the main wiki.
+     * Verify that if there's no configuration document in the Bot wiki then we'll look into the main wiki.
      */
     @Test
     public void getConfigurationDocumentWhenLocatedInMainWiki() throws Exception
     {
+        // Simulate the the IRC Bot is started in the "botwiki" wiki.
+        IRCBot bot = this.componentManager.getInstance(IRCBot.class);
+        when(bot.getWikiId()).thenReturn("botwiki");
+
+        // No config in the "botwiki" wiki
         when(this.configDoc.isNew()).thenReturn(true);
+
+        // Config in main wiki
+        DocumentReference mainConfigDocReference = new DocumentReference("xwiki", "IRC", "IRCConfiguration");
         XWikiDocument mainConfigDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference("xwiki", "IRC", "IRCConfiguration"), this.xwikiContext))
-            .thenReturn(mainConfigDoc);
+        when(this.xwiki.getDocument(mainConfigDocReference, this.xwikiContext)).thenReturn(mainConfigDoc);
 
         Assert.assertSame(mainConfigDoc, this.componentManager.getComponentUnderTest().getConfigurationDocument());
     }

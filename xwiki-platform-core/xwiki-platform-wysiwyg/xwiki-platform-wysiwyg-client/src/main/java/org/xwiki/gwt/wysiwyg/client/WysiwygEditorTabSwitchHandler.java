@@ -473,9 +473,12 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
      */
     private void restoreDOMSelection()
     {
-        // Focus the rich text area.
-        editor.getRichTextEditor().getTextArea().setFocus(true);
-        // Restore the DOM selection.
+        if (domSelectionPreserver.hasSelection()) {
+            // Focus the rich text area only if there is a previously saved selection (otherwise we steal the focus).
+            editor.getRichTextEditor().getTextArea().setFocus(true);
+        }
+        // Restore the DOM selection. Puts the caret at the beginning of the document if there is no saved selection
+        // (otherwise the caret would be at the end, see XWIKI-6672).
         domSelectionPreserver.restoreSelection();
         // Notify action listeners that the WYSIWYG tab was loaded. We fire the action event here because this method is
         // called both when the rich text area is reloaded and when it is just redisplayed.

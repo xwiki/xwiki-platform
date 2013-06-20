@@ -19,8 +19,10 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,7 +30,6 @@ import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -36,7 +37,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.search.solr.internal.api.Fields;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
@@ -104,13 +105,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         try {
             LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
-            solrDocument.addField(Fields.ID, getResolver(entityReference).getId(documentReference));
+            solrDocument.setField(FieldUtils.ID, getResolver(entityReference).getId(documentReference));
 
-            addDocumentFields(documentReference, solrDocument);
+            if (!setDocumentFields(documentReference, solrDocument)) {
+                return null;
+            }
 
-            solrDocument.addField(Fields.TYPE, documentReference.getType().name());
+            solrDocument.setField(FieldUtils.TYPE, documentReference.getType().name());
 
-            addFieldsInternal(solrDocument, entityReference);
+            if (!setFieldsInternal(solrDocument, entityReference)) {
+                return null;
+            }
 
             return solrDocument;
         } catch (Exception e) {
@@ -122,9 +127,10 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     /**
      * @param solrDocument the {@link LengthSolrInputDocument} to modify
      * @param entityReference the reference of the entity
+     * @return false if the entity should not be indexed (generally mean it does not exist), true otherwise
      * @throws Exception in case of errors
      */
-    protected abstract void addFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    protected abstract boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception;
 
     /**
@@ -135,7 +141,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected SolrReferenceResolver getResolver(EntityReference entityReference) throws SolrIndexerException
     {
         try {
-            return componentManager.getInstance(SolrReferenceResolver.class, entityReference.getType().toString()
+            return this.componentManager.getInstance(SolrReferenceResolver.class, entityReference.getType().toString()
                 .toLowerCase());
         } catch (ComponentLookupException e) {
             throw new SolrIndexerException("Faile to find solr reference redolver for type reference ["
@@ -170,13 +176,24 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     {
         try {
             XWikiDocument document = getDocument(documentReference);
-            XWikiDocument translatedDocument =
-                document.getTranslatedDocument(documentReference.getLocale(), this.xcontextProvider.get());
-            return translatedDocument;
+            Locale locale = documentReference.getLocale();
+
+            if (locale == null || locale.equals(Locale.ROOT)) {
+                return document;
+            }
+
+            XWikiDocument translatedDocument = document.getTranslatedDocument(locale, this.xcontextProvider.get());
+
+            // XWikiDocument#getTranslatedDocument returns the default document when the locale does not exist
+            if (translatedDocument.getRealLocale().equals(locale)) {
+                return translatedDocument;
+            }
         } catch (Exception e) {
             throw new SolrIndexerException(String.format("Failed to get translated document for '%s'",
                 documentReference), e);
         }
+
+        return null;
     }
 
     /**
@@ -186,21 +203,81 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param documentReference reference to document.
      * @param solrDocument the Solr document to which to add the fields.
+     * @return false if the document does not exist, true otherwise
      * @throws Exception if problems occur.
      */
-    protected void addDocumentFields(DocumentReference documentReference, SolrInputDocument solrDocument)
+    protected boolean setDocumentFields(DocumentReference documentReference, SolrInputDocument solrDocument)
         throws Exception
     {
-        solrDocument.addField(Fields.WIKI, documentReference.getWikiReference().getName());
-        solrDocument.addField(Fields.SPACE, documentReference.getLastSpaceReference().getName());
-        solrDocument.addField(Fields.NAME, documentReference.getName());
+        XWikiDocument document = getDocument(documentReference);
+        if (document.isNew()) {
+            return false;
+        }
+
+        solrDocument.setField(FieldUtils.HIDDEN, document.isHidden());
+
+        solrDocument.setField(FieldUtils.WIKI, documentReference.getWikiReference().getName());
+        solrDocument.setField(FieldUtils.SPACE, documentReference.getLastSpaceReference().getName());
+        solrDocument.setField(FieldUtils.NAME, documentReference.getName());
 
         Locale locale = getLocale(documentReference);
-        solrDocument.addField(Fields.LOCALE, locale.toString());
-        solrDocument.addField(Fields.LANGUAGE, locale.getLanguage());
+        solrDocument.setField(FieldUtils.LOCALE, locale.toString());
+        solrDocument.setField(FieldUtils.LANGUAGE, locale.getLanguage());
 
-        XWikiDocument document = getDocument(documentReference);
-        solrDocument.addField(Fields.HIDDEN, document.isHidden());
+        return true;
+    }
+
+    protected Set<Locale> getLocales(DocumentReference documentReference, Locale entityLocale) throws XWikiException,
+        SolrIndexerException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return getLocales(xcontext.getWiki().getDocument(documentReference, xcontext), entityLocale);
+    }
+
+    protected Set<Locale> getLocales(XWikiDocument xdocument, Locale entityLocale) throws XWikiException,
+        SolrIndexerException
+    {
+        Set<Locale> locales = new HashSet<Locale>();
+
+        String entityLocaleString = entityLocale != null ? entityLocale.toString() : null;
+
+        // 1) Add entity locale
+        if (entityLocale != null) {
+            locales.add(entityLocale);
+        }
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        // 2) Add locales from the document
+
+        List<Locale> documentLocales = xdocument.getTranslationLocales(this.xcontextProvider.get());
+
+        // If entityLocale is null it means that it's an entity without the support for translations
+        // (objects/attachments)
+        if (entityLocale == null) {
+            for (Locale locale : documentLocales) {
+                locales.add(locale);
+            }
+        }
+
+        // 3) Add locales from preferences
+
+        List<Locale> availableLocales = xcontext.getWiki().getAvailableLocales(xcontext);
+
+        for (Locale locale : availableLocales) {
+            // Add locale only if there is no explicit translation for it
+            if (!documentLocales.contains(locale)) {
+                if (entityLocale == null || locale.toString().startsWith(entityLocaleString)) {
+                    locales.add(locale);
+                }
+            }
+        }
+
+        // 4) Make sure that the original document's locale is there as well.
+        documentLocales.add(getLocale(xdocument.getDocumentReference()));
+
+        return locales;
     }
 
     /**
@@ -213,7 +290,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         Locale locale = null;
 
         try {
-            if (documentReference.getLocale() != null) {
+            if (documentReference.getLocale() != null && !documentReference.getLocale().equals(Locale.ROOT)) {
                 locale = documentReference.getLocale();
             } else {
                 XWikiContext xcontext = this.xcontextProvider.get();
@@ -233,17 +310,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param solrDocument the document where to add the properties.
      * @param object the object whose properties to add.
-     * @param locale the locale of the indexed document. In case of translations, this will obviously be different
-     *            than the original document's locale.
+     * @param locale the locale of the indexed document. In case of translations, this will obviously be different than
+     *            the original document's locale.
      */
-    protected void addObjectContent(SolrInputDocument solrDocument, BaseObject object, String locale)
+    protected void setObjectContent(SolrInputDocument solrDocument, BaseObject object, Locale locale)
     {
         if (object == null) {
             // Yes, the platform can return null objects.
             return;
         }
 
-        String fieldName = String.format(Fields.MULTILIGNUAL_FORMAT, Fields.OBJECT_CONTENT, locale);
+        String fieldName = FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, locale);
 
         XWikiContext xcontext = this.xcontextProvider.get();
 

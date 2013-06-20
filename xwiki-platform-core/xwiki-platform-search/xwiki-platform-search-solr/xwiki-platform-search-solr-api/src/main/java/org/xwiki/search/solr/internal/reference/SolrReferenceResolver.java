@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal.reference;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
@@ -41,7 +39,7 @@ public interface SolrReferenceResolver
      * @return references for the indexable contained entities, including the given one (but only if it is indexable).
      * @throws SolrIndexerException if problems occur.
      */
-    List<EntityReference> getReferences(EntityReference rootReference) throws SolrIndexerException;
+    Iterable<EntityReference> getReferences(EntityReference rootReference) throws SolrIndexerException;
 
     /**
      * @param reference reference to an entity.

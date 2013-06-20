@@ -59,12 +59,7 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 ##
 ## Hooks for inserting JavaScript skin extensions
 ##
-## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
-<!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
-## - Skin file extension hook.
-<!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
-## - Skin extension hook
-<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+#javaScriptExtensionHooks
 ##
 ## Compatibility "aspect" file for deprecated code.
 ## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.

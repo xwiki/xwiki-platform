@@ -2431,3 +2431,35 @@ $services.display.title($doc, {'displayerHint': 'default'})##
 Recursive title display detected!##
 #end##
 #end
+
+#**
+ * Outputs the skin extension hooks, for both Stylesheet and JavaScript extensions. This is useful when the HTML response
+ * of an AJAX request needs to pull some CSS and JavaScript resources. The code that makes the AJAX request should move
+ * the 'includes' (i.e. the link and script tags) to the head of the HTML page after receiving the HTML response.
+ *#
+#macro (skinExtensionHooks)
+  #styleSheetExtensionHooks
+  #javaScriptExtensionHooks
+#end
+
+#**
+ * Hook for inserting CSS skin extensions.
+ *#
+#macro (styleSheetExtensionHooks)
+  ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+  <!-- com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin -->
+  <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
+  <!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin -->
+#end
+
+#**
+ * Hooks for inserting JavaScript skin extensions.
+ *#
+#macro (javaScriptExtensionHooks)
+  ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+  <!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
+  ## - Skin file extension hook.
+  <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
+  ## - Skin extension hook
+  <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+#end

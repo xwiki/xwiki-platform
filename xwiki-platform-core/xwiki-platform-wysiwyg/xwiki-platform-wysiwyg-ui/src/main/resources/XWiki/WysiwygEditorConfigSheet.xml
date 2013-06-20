@@ -204,7 +204,17 @@ XWiki.HSortableListWithInput = Class.create(XWiki.HSortableList, {
     if (possibleValues) {
       this.suggestions = new Element('div', {'class': 'suggestions'}).hide();
       this.addButton.insert({'after': this.suggestions});
-      new Autocompleter.Local(this.textInput, this.suggestions, possibleValues, {minChars: 0, choices: possibleValues.length});
+      new Autocompleter.Local(this.textInput, this.suggestions, possibleValues, {
+        minChars: 0,
+        choices: possibleValues.length,
+        // We handle the display of the suggestions because Autocompleter uses by default Element#clonePosition() from
+        // Prototype.js which is buggy (it doesn't work right neither in Firefox/Chrome nor in Internet Explorer).
+        onShow: function(textInput, suggestions) {
+          // Clear the in-line style. Calling Element#show() is not enough because the fade effect used on hide leaves
+          // the opacity set.
+          suggestions.writeAttribute('style', '');
+        }
+      });
     }
   },
   attachTo : function(parent) {
@@ -1371,7 +1381,6 @@ ul.hSortable li .separator {
  * Input Suggest.
  */
 .hSortableWrapper {
-  /* Workaround for a bug in Element#clonePosition() from Prototype.js which affects the Autocompleter from Scriptaculous. */
   position: relative;
 }
 
@@ -1379,7 +1388,9 @@ ul.hSortable li .separator {
   background-color: white;
   border: 1px solid $theme.borderColor;
   max-height: 9.7em;
+  min-width: 15em;
   overflow: auto;
+  position: absolute;
   z-index: 100;
 }
 

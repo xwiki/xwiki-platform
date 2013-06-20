@@ -21,11 +21,11 @@ XWiki.Dashboard = Class.create( {
     this.addGadgetsHandlers();
     this.addNewGadgetHandler();
     this.addNewContainerHandler();
-    
+
     // add save listener, to save the dashboard before submit of the form
     document.observe("xwiki:actions:save", this.saveChanges.bindAsEventListener(this));
   },
-  
+
   /**
    * Reads the dashboard metadata from the HTML of the dashboard.
    */
@@ -34,13 +34,13 @@ XWiki.Dashboard = Class.create( {
     this.editURL = this.element.down('.metadata .editurl').readAttribute('href');
     this.removeURL = this.element.down('.metadata .removeurl').readAttribute('href');
     this.addURL = this.element.down('.metadata .addurl').readAttribute('href');
-    
+
     this.sourcePage = this.element.down('.metadata .sourcepage').innerHTML;
     this.sourceSpace = this.element.down('.metadata .sourcespace').innerHTML;
     this.sourceWiki = this.element.down('.metadata .sourcewiki').innerHTML;
     this.sourceURL = this.element.down('.metadata .sourceurl').readAttribute('href');
   },
-  
+
   /**
    * Displays a warning at the top of the dashboard, if the source of the dashboard is not the current document, 
    * telling the users that they're editing something else that might impact other dashboards as well.
@@ -58,33 +58,33 @@ XWiki.Dashboard = Class.create( {
       warningElt.insert(information);
       warningElt.insert(link);
       warningElt.insert(warning);
-      
+
       this.element.insert({'top' : warningElt});
     }
   },
-  
+
   /**
    * @param container the container to get the id of 
    * @return the original container id, parsed from the HTML id of this container. 
    *         This is used to be able to have unique ids of containers in the HTML, and at the same time be able to match 
    *         containers ids to the model.
-   * FIXME: this will cause issues with multiple dashboards, add the name of the dashboard to the ids         
+   * FIXME: this will cause issues with multiple dashboards, add the name of the dashboard to the ids.
    */
   _getContainerId : function (container) {
     // the gadget container id is of the form gadgetcontainer_<containerId>, so parse it back
     return container.readAttribute('id').substring(16);
   },
-  
+
   /**
    * @param gadget the gadget to get the id of 
    * @return the original gadget id, parsed from the HTML id of this gadget. 
    *         This is used to be able to have unique ids of gadgets in the HTML, and at the same time be able to match 
    *         gadgets ids to the model.
-   * FIXME: this will cause issues with multiple dashboards, add the name of the dashboard to the ids         
-   */  
+   * FIXME: this will cause issues with multiple dashboards, add the name of the dashboard to the ids.
+   */
   _getGadgetId : function(gadget) {
     // gadget ids are of the form gadget_<id>
-    return gadget.readAttribute('id').substring(7);    
+    return gadget.readAttribute('id').substring(7);
   },
 
   /**
@@ -110,7 +110,7 @@ XWiki.Dashboard = Class.create( {
       return null;
     }
   },
-  
+
   /*
    * Drag & drop decorators functions, to display nice placeholders when dragging & dropping.
    */
@@ -134,7 +134,7 @@ XWiki.Dashboard = Class.create( {
   },
   _doOnEndDrag: function() {
     this.containers.each(this._removePlaceholder);
-  },  
+  },
 
   /**
    * Creates drag and drops for the gadgets inside the gadget containers.
@@ -145,7 +145,7 @@ XWiki.Dashboard = Class.create( {
     this.containers.each(function(container) {
       containerIds.push(container.readAttribute('id'));
     });
-    
+
     // create a sortable for each gadget container
     containerIds.each(function(containerId) {
       this.makeSortable(containerId, containerIds, this.onMoveGadget.bind(this));
@@ -157,7 +157,7 @@ XWiki.Dashboard = Class.create( {
     Draggables.addObserver({
         onStart: doOnStartDrag,
         onEnd: doOnEndDrag
-    });    
+    });
   },
 
   /**
@@ -169,13 +169,13 @@ XWiki.Dashboard = Class.create( {
    */
   makeSortable : function(containerId, containerIds, onMove) {
     Sortable.create(containerId, {
-      tag: 'div', 
-      only: 'gadget', 
-      handle: 'gadget-title', 
-      overlap: 'vertical', 
-      scroll: window, 
-      containment: containerIds, 
-      dropOnEmpty: true, 
+      tag: 'div',
+      only: 'gadget',
+      handle: 'gadget-title',
+      overlap: 'vertical',
+      scroll: window,
+      containment: containerIds,
+      dropOnEmpty: true,
       constraint: false,
       ghosting: false,
       hoverclass: 'gadget-container-hover-highlight',
@@ -215,7 +215,7 @@ XWiki.Dashboard = Class.create( {
         // and add a class to the item menu, to be able to color it properly
         itemMenu.toggleClassName('settings-open');
       });
-      
+
       // display the link remove link only when the gadget is hovered
       gadget.observe('mouseover', function() {
         itemMenu.show();
@@ -232,7 +232,7 @@ XWiki.Dashboard = Class.create( {
       });
     }.bind(this));
   },
-  
+
   /**
    * Adds the handler to add the new gadget on the dashboard, the "Add" button at the top.
    */
@@ -264,12 +264,12 @@ XWiki.Dashboard = Class.create( {
         this.gadgetWizard = new XWiki.GadgetWizard();
       }
       this.gadgetWizard.add(this.onAddGadgetComplete.bind(this));
-    }.bind(this));    
+    }.bind(this));
   },
 
   /**
    * Handles the command to actually add the gadget, after the user has filled in the wizard
-   * 
+   *
    * @param gadgetConfig the object representing the gadget instance, with the following fields: 'title', the title of 
    *                     the gadget, and 'content' the macroCall, to wrap in an XHTML comment and set as the value of 
    *                     the wysiwyg edited gadget content field. 
@@ -317,19 +317,19 @@ XWiki.Dashboard = Class.create( {
         }.bind(this),
         on0: function (response) {
           response.request.options.onFailure(response);
-        }.bind(this)        
+        }.bind(this)
       }
     );
   },
-  
+
   /**
    * Handles the click on the edit gadget button: parses gadget metadata and starts the edit gadget wizard.
-   * 
+   *
    * @param event the click event on the edit gadget button 
    */
   onEditGadgetClick : function(event) {
     var gadget = event.element().up('.gadget');
-    
+
     if (gadget) {
       // check if it is a macro
       var gadgetMetadata = gadget.down('.metadata');
@@ -352,7 +352,7 @@ XWiki.Dashboard = Class.create( {
           var macroComment = macroCommentMetadata.innerHTML;
           macroCall = this._parseMacroCallComment(macroComment);
         }
-        
+
         // and finally start the wizard with all this data
         Wysiwyg.onModuleLoad(function() {
           if (!this.gadgetWizard) {
@@ -361,7 +361,7 @@ XWiki.Dashboard = Class.create( {
           this.gadgetWizard.edit(macroCall, title, function(gadgetInstance) {
             this.onEditGadgetComplete(gadgetId, gadgetInstance);
           }.bind(this));
-        }.bind(this));            
+        }.bind(this));
       } else {
         // this is not a macro, cannot be edited with wysiwyg macro dialog. Display a message, pointing the user to 
         // object editor.
@@ -372,19 +372,19 @@ XWiki.Dashboard = Class.create( {
         );
         dialog.showDialog();
       }
-    }    
+    }
   },
 
   /**
    * Handles the command to actually edit the gadget's parameters, sends the ajax request to the edit url, after the 
    * user has completed the wizard.
-   * 
+   *
    * @param gadgetId the id of the gadget to edit
    * @param gadgetConfig the object representing the gadget instance, with the following fields: 'title', the title of 
    *                     the gadget, and 'content' the macroCall, to wrap in an XHTML comment and set as the value of 
    *                     the wysiwyg edited gadget content field.
    */
-  onEditGadgetComplete : function(gadgetId, gadgetConfig) {    
+  onEditGadgetComplete : function(gadgetId, gadgetConfig) {
     // compose the parameters for the object edit action
     // compose the html comment for the contentField
     var contentField = this._getMacroCallComment(gadgetConfig.content);
@@ -432,7 +432,7 @@ XWiki.Dashboard = Class.create( {
 
   /**
    * Removes the gadget passed by its id.
-   * 
+   *
    * @param event the click event on the remove button for a gadget  
    */
   onRemoveGadget : function(event) {
@@ -469,7 +469,7 @@ XWiki.Dashboard = Class.create( {
          progressMessageText : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.inProgress'))",
          successMessageText : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.done'))",
          failureMessageText : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.failed'))"
-      }      
+      }
     );
   },
 
@@ -489,7 +489,7 @@ XWiki.Dashboard = Class.create( {
   /**
    * Adds a column in this dashboard.
    * FIXME: this is columns layout specific, need to find a way to generate this on the server
-   * 
+   *
    * @param event the click event, on the 'add column' button.
    */
   onAddColumn : function(event) {
@@ -497,9 +497,9 @@ XWiki.Dashboard = Class.create( {
     var lastContainer = this.containers.last();
     var currentlyLastContainerId = this._getContainerId(lastContainer);
     var newIdNumber = 1 + parseInt(currentlyLastContainerId, 10);
-    var newId = 'gadgetcontainer_' + newIdNumber; 
+    var newId = 'gadgetcontainer_' + newIdNumber;
     // create the container
-    var newContainer = new Element('div', {'class' : lastContainer.readAttribute('class'), 
+    var newContainer = new Element('div', {'class' : lastContainer.readAttribute('class'),
       'id' : newId});
     // update the other containers - this is now the last column
     lastContainer.removeClassName('last-column');
@@ -511,13 +511,13 @@ XWiki.Dashboard = Class.create( {
     this.containers.each(function(container) {
       containerIds.push(container.readAttribute('id'));
     });
-    // recreate the drag & drops, to take into account the new added container as well. Re-create all because they all 
+    // recreate the drag & drops, to take into account the new added container as well. Re-create all because they all
     // need to take into account the new one
     this.createDragAndDrops();
     // insert the css element in the head of this document, to update the columns css to one more column
-    var linkElement = new Element('link', 
-        {'href' : '$xwiki.getSkinFile("uicomponents/container/columns.css", true)' + '?columns=' + this.containers.length, 
-         'type' : 'text/css', 
+    var linkElement = new Element('link',
+        {'href' : '$xwiki.getSkinFile("uicomponents/container/columns.css", true)' + '?columns=' + this.containers.length,
+         'type' : 'text/css',
          'rel' : 'stylesheet'}
     );
     // get the head element and insert the new css link element at the end
@@ -527,12 +527,12 @@ XWiki.Dashboard = Class.create( {
 
   /**
    * Actually performs the gadget edits, calling the onComplete callback when the edit is done.
-   * 
+   *
    * @param onComplete callback to notify when all the requests have finished
    */
   doEditGadgets : function(onComplete) {
     var editParameters = this.prepareEditParameters();
-    // add the ajax parameter to the edit, to not get redirected after the call 
+    // add the ajax parameter to the edit, to not get redirected after the call
     editParameters.set('ajax', '1');
     // steal the form token from the edit form to be able to submit valid form data on the server
     var formToken = this.getFormToken();
@@ -558,15 +558,15 @@ XWiki.Dashboard = Class.create( {
               "$escapetool.javascript($services.localization.render('dashboard.actions.edit.failed'))" + failureReason, "error", {timeout : 5});
           if (onComplete) {
             onComplete();
-          }          
+          }
         }.bind(this),
         on0: function (response) {
           response.request.options.onFailure(response);
-        }.bind(this)        
+        }.bind(this)
       }
     );
   },
-  
+
   /**
    * Function called when a gadget has been moved from a container to another.
    * 
@@ -576,24 +576,24 @@ XWiki.Dashboard = Class.create( {
     // just flag that the dashboard was edited, actual changes were performed when the save button will be clicked
     this.edited = true;
   },
-  
+
   /**
-   * Saves the changes on the dashboard in this document: perform all removes and injects the object edit fields in the 
-   * inline edit form.  
+   * Saves the changes on the dashboard in this document: perform all removes and injects the object edit fields in the
+   * inline edit form.
    */
   saveChanges : function(event) {
     // if there are no changes, don't do anything
     if (!this.edited) {
       return;
     }
-    
-    // if there are changes, stop the save event, send an ajax request to the source of the dashboard to save it, 
+
+    // if there are changes, stop the save event, send an ajax request to the source of the dashboard to save it,
     // and then, when it's done, refire the save event
-    
+
     // stop the event, so that it doesn't actually send the request just yet, we'll send it when we're done with saving
     event.stop();
     event.memo.originalEvent.stop();
-    
+
     // get the element of the event
     var eventElt = event.memo.originalEvent.element();
 
@@ -632,19 +632,19 @@ XWiki.Dashboard = Class.create( {
         var gadgetId = this._getGadgetId(gadget);
         // the position field name as in the inline form edit XWiki.GadgetClass_0_position
         var positionFieldName = this.gadgetsClass + '_' + gadgetId + '_' + 'position';
-        // compose the position field value as container, index (1 based, though)        
+        // compose the position field value as container, index (1 based, though)
         var positionFieldValue = containerId + ', ' + (index + 1);
         // and put these in the prepared hash
         parameters.set(positionFieldName, positionFieldValue);
       }, this);
     }, this);
-    
+
     return parameters;
   },
-  
+
   /**
    * Gets the form token from the underlying xwiki edit inline form, to be able to submit a valid form on the server.
-   * @return the form token of the form where the dashboard element appears in (the inline edit form), or empty string 
+   * @return the form token of the form where the dashboard element appears in (the inline edit form), or empty string
    *         if such form does not exist
    */
   getFormToken : function() {
@@ -678,4 +678,3 @@ function init() {
 //End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
-

@@ -151,12 +151,10 @@ XWiki.Dashboard = Class.create( {
       this.makeSortable(containerId, containerIds, this.onMoveGadget.bind(this));
     }.bind(this));
 
-    // add the decorators to the gadgets on drag & drop
-    var doOnStartDrag = this._doOnStartDrag.bind(this);
-    var doOnEndDrag = this._doOnEndDrag.bind(this);
+    // Add the decorators to the gadgets on drag & drop.
     Draggables.addObserver({
-        onStart: doOnStartDrag,
-        onEnd: doOnEndDrag
+      onStart: this._doOnStartDrag.bind(this),
+      onEnd: this._doOnEndDrag.bind(this)
     });
   },
 
@@ -184,53 +182,31 @@ XWiki.Dashboard = Class.create( {
   },
 
   /**
-   * Adds handlers to the gadgets on the dashboard, the remove.
+   * Adds handlers to the gadgets on the dashboard: the edit and remove gadget actions.
    */
   addGadgetsHandlers : function() {
-    // iterate through all the gadgets and add settings handlers
-    this.element.select('.gadget').each(function(gadget){
-      // create a settings menu button and add it to the gadget-title
-      var itemMenu = new Element('div', {'class' : 'settings', 'title' : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.tooltip'))"});
-      var gadgetTitle = gadget.down('.gadget-title');
-      if (!gadgetTitle) {
-        return;
-      }
-      // create a remove button in the settings menu
-      var removeLink = new Element('div', {'class' : 'remove action', 'title' : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.tooltip'))"});
-      removeLink.observe('click', this.onRemoveGadget.bindAsEventListener(this));
-      // create an edit button in the settings menu
-      var editLink = new Element('div', {'class' : 'edit action', 'title' : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.edit.tooltip'))"});
-      editLink.observe('click', this.onEditGadgetClick.bindAsEventListener(this));
-      var actionsContainer = new Element('div', {'class' : 'settings-menu'})
-      actionsContainer.hide();
-      actionsContainer.insert(editLink);
-      actionsContainer.insert(removeLink);
-      itemMenu.hide();
-      gadgetTitle.insert(itemMenu);
-      gadgetTitle.insert(actionsContainer);
-      // and listen to the click to open the menu
-      itemMenu.observe('click', function(event){
-        // toggle actions container
-        actionsContainer.toggle();
-        // and add a class to the item menu, to be able to color it properly
-        itemMenu.toggleClassName('settings-open');
-      });
+    // Iterate through all the gadgets and add handlers.
+    this.element.select('.gadget').each(this.addGadgetHandlers.bind(this));
+  },
 
-      // display the link remove link only when the gadget is hovered
-      gadget.observe('mouseover', function() {
-        itemMenu.show();
-      });
-      gadget.observe('mouseout', function(event) {
-        var relatedTarget = event.relatedTarget || event.toElement;
-        if ((event.element() == gadget || event.element().up('.gadget')) && (relatedTarget == null || relatedTarget.up('.gadget') == null)) {
-          // enough propagation
-          event.stop();
-          itemMenu.hide();
-          actionsContainer.hide();
-          itemMenu.removeClassName('settings-open');
-        }
-      });
-    }.bind(this));
+  /**
+   * Adds gadget action buttons on the gadget title bar, visible when hovering the gadget.
+   *
+   * @param gadget the gadget to add the action buttons to
+   */
+  addGadgetHandlers : function(gadget) {
+    var removeIcon = new Element('span', {'class' : 'remove action', 'title' :
+      "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.tooltip'))"});
+    removeIcon.observe('click', this.onRemoveGadget.bindAsEventListener(this));
+
+    var editIcon = new Element('span', {'class' : 'edit action', 'title' :
+      "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.edit.tooltip'))"});
+    editIcon.observe('click', this.onEditGadgetClick.bindAsEventListener(this));
+
+    var actionsContainer = new Element('div', {'class' : 'gadget-actions'})
+    actionsContainer.insert(editIcon);
+    actionsContainer.insert(removeIcon);
+    gadget.insert(actionsContainer);
   },
 
   /**

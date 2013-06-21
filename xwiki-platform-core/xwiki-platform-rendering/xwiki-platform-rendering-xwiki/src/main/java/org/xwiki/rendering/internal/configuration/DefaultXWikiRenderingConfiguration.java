@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -100,8 +101,8 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     }
     
     @Override
-    public String getXHTMLWikiPrinterHint()
+    public List<String> getExtraAttributes()
     {
-        return this.configuration.getProperty(PREFIX + "xhtmlWikiPrinter", "default");
+        return this.configuration.getProperty(PREFIX + "extraAttributes", new ArrayList<String>());
     }
 }

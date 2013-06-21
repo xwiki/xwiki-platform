@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.syntax.Syntax;
@@ -850,5 +853,72 @@ public privileged aspect XWikiCompatibilityAspect
         }
 
         return wikiName;
+    }
+
+    /**
+     * Searches for the document containing the definition of the virtual wiki corresponding to the specified hostname.
+     *
+     * @param host the hostname, as specified in the request (for example: {@code forge.xwiki.org})
+     * @param context the current context
+     * @return the name of the document containing the wiki definition, or {@code null} if no wiki corresponds to the
+     *         hostname
+     * @throws XWikiException if a problem occurs while searching the storage
+     */
+    private DocumentReference XWiki.findWikiServer(String host, XWikiContext context) throws XWikiException
+    {
+        ensureVirtualWikiMapExists();
+        DocumentReference wikiName = this.virtualWikiMap.get(host);
+
+        if (wikiName == null) {
+            // Not loaded yet, search for it in the main wiki
+            String hql =
+                ", BaseObject as obj, StringProperty as prop WHERE obj.name=doc.fullName"
+                    + " AND doc.space='XWiki' AND doc.name LIKE 'XWikiServer%'"
+                    + " AND obj.className='XWiki.XWikiServerClass' AND prop.id.id = obj.id"
+                    + " AND prop.id.name = 'server' AND prop.value=?";
+            List<String> parameters = new ArrayList<String>(1);
+            parameters.add(host);
+            try {
+                List<DocumentReference> list =
+                    context.getWiki().getStore().searchDocumentReferences(hql, parameters, context);
+                if ((list != null) && (list.size() > 0)) {
+                    wikiName = list.get(0);
+                }
+
+                this.virtualWikiMap.set(host, wikiName);
+            } catch (XWikiException e) {
+                LOGGER.warn("Error when searching for wiki name from URL host [" + host + "]", e);
+            }
+        }
+
+        return wikiName;
+    }
+
+    private void XWiki.ensureVirtualWikiMapExists() throws XWikiException
+    {
+        synchronized (this) {
+            if (this.virtualWikiMap == null) {
+                int iCapacity = 1000;
+                try {
+                    String capacity = Param("xwiki.virtual.cache.capacity");
+                    if (capacity != null) {
+                        iCapacity = Integer.parseInt(capacity);
+                    }
+                } catch (Exception e) {
+                }
+                try {
+                    CacheConfiguration configuration = new CacheConfiguration();
+                    configuration.setConfigurationId("xwiki.virtualwikimap");
+                    LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+                    lru.setMaxEntries(iCapacity);
+                    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+                    this.virtualWikiMap = getCacheFactory().newCache(configuration);
+                } catch (CacheException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE,
+                        XWikiException.ERROR_CACHE_INITIALIZING, "Failed to create new cache", e);
+                }
+            }
+        }
     }
 }

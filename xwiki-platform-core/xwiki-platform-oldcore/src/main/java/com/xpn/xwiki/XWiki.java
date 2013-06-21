@@ -940,34 +940,6 @@ public class XWiki implements EventListener
         return this.virtualWikiMap;
     }
 
-    private void ensureVirtualWikiMapExists() throws XWikiException
-    {
-        synchronized (this) {
-            if (this.virtualWikiMap == null) {
-                int iCapacity = 1000;
-                try {
-                    String capacity = Param("xwiki.virtual.cache.capacity");
-                    if (capacity != null) {
-                        iCapacity = Integer.parseInt(capacity);
-                    }
-                } catch (Exception e) {
-                }
-                try {
-                    CacheConfiguration configuration = new CacheConfiguration();
-                    configuration.setConfigurationId("xwiki.virtualwikimap");
-                    LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-                    lru.setMaxEntries(iCapacity);
-                    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-
-                    this.virtualWikiMap = getCacheFactory().newCache(configuration);
-                } catch (CacheException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE,
-                        XWikiException.ERROR_CACHE_INITIALIZING, "Failed to create new cache", e);
-                }
-            }
-        }
-    }
-
     /**
      * Get the reference of the owner for the provider wiki.
      * 

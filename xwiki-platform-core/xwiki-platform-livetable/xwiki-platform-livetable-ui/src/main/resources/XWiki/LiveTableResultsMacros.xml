@@ -226,14 +226,15 @@
  * @param $rows stores the JSON in memory so that it can be adjusted before serialization
  *#
 #macro(gridresult_buildRowJSON $item $rows)
-  ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where only the document name is returned
-  #if ($item.class.name == 'java.lang.String')
-    #set($docName = $item)
-    #set($docLanguage = '')
-  #else
+  ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
+  ## only the document name is returned. When more than the document name is returned the $item variable is a list.
+  #if ($item.size())
     ## Extract doc name and doc language from $item
     #set($docName = $item[0])
     #set($docLanguage = $item[1])
+  #else
+    #set($docName = $item)
+    #set($docLanguage = '')
   #end
   #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${docName}"))
   #set($row = {'doc_viewable': $viewable})

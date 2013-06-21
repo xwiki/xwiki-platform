@@ -2408,7 +2408,12 @@ public class XWiki implements EventListener
         if (StringUtils.isBlank(defaultLanguage)) {
             defaultLocale = Locale.ENGLISH;
         } else {
-            defaultLocale = LocaleUtils.toLocale(Util.normalizeLanguage(defaultLanguage));
+            try {
+                defaultLocale = LocaleUtils.toLocale(Util.normalizeLanguage(defaultLanguage));
+            } catch (Exception e) {
+                LOGGER.warn("Invalid locale [{}] set as default locale in the preferences", defaultLanguage);
+                defaultLocale = Locale.ENGLISH;
+            }
         }
 
         return defaultLocale;
@@ -2428,10 +2433,12 @@ public class XWiki implements EventListener
         List<Locale> locales = new ArrayList<Locale>(languages.length);
 
         for (String language : languages) {
-            try {
-                locales.add(LocaleUtils.toLocale(language));
-            } catch (Exception e) {
-                LOGGER.error("Invalid locale [{}] listed as available in the preferences", language, e);
+            if (StringUtils.isNotBlank(language)) {
+                try {
+                    locales.add(LocaleUtils.toLocale(language));
+                } catch (Exception e) {
+                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences", language, e);
+                }
             }
         }
 

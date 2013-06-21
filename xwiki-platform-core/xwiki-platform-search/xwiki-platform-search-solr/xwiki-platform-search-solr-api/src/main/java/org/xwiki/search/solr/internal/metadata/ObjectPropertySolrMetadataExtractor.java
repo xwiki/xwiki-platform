@@ -56,7 +56,7 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
     private SolrReferenceResolver resolver;
 
     @Override
-    public void setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference(entityReference);
@@ -67,7 +67,10 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
 
         XWikiDocument document = getDocument(documentReference);
         BaseProperty<ObjectPropertyReference> objectProperty = document.getXObjectProperty(objectPropertyReference);
-
+        if (objectProperty == null) {
+            return false;
+        }
+        
         // Object
         solrDocument.setField(FieldUtils.CLASS, localSerializer.serialize(classReference));
         solrDocument.setField(FieldUtils.NUMBER, objectReference.getObjectNumber());
@@ -76,6 +79,8 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
         solrDocument.setField(FieldUtils.PROPERTY_NAME, objectReference.getName());
 
         setLocaleAndContentFields(documentReference, solrDocument, objectProperty);
+
+        return true;
     }
 
     /**

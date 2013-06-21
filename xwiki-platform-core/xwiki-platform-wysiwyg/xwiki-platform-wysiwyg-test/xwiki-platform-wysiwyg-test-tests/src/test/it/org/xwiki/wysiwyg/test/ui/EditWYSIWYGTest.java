@@ -19,6 +19,8 @@
  */
 package org.xwiki.wysiwyg.test.ui;
 
+import java.net.URLDecoder;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.Keys;
@@ -50,13 +52,18 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
     })
-    public void testUploadImageAfterPreview()
+    public void testUploadImageAfterPreview() throws Exception
     {
         this.editPage.clickPreview().clickBackToEdit();
         // Recreate the page object because the page has been reloaded.
         this.editPage = new WYSIWYGEditPage().waitUntilPageIsLoaded();
         UploadImagePane uploadImagePane = this.editPage.insertAttachedImage().selectFromCurrentPage().uploadImage();
-        uploadImagePane.setImageToUpload(this.getClass().getResource("/image.png").getPath());
+        // URL#getPath() returns the path URL-encoded and the file upload input doesn't expect this. Normally we
+        // shouldn't have special characters in the path but some CI jobs have spaces in their names
+        // (e.g. "xwiki-platform Quality Checks") which are encoded as %20. The file upload hangs if we pass the path
+        // with encoded spaces.
+        String path = URLDecoder.decode(this.getClass().getResource("/image.png").getPath(), "UTF-8");
+        uploadImagePane.setImageToUpload(path);
         // Fails if the image configuration step doesn't load in a decent amount of time.
         uploadImagePane.configureImage();
     }

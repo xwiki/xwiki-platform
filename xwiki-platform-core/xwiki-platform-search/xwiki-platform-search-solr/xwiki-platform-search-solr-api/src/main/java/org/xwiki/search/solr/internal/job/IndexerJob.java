@@ -129,8 +129,6 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
             if (getRequest().isRemoveMissing()) {
                 // Remove from Solr entities not in DB anymore
                 removeMissing();
-
-                notifyStepPropress();
             }
 
             // Add in Solr entities in DB and not in Solr
@@ -249,8 +247,15 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                 XWikiContext xcontext = this.xcontextProvider.get();
 
                 List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
-                for (String wiki : wikis) {
-                    addMissing(wiki);
+
+                notifyPushLevelProgress(wikis.size());
+
+                try {
+                    for (String wiki : wikis) {
+                        addMissing(wiki);
+                    }
+                } finally {
+                    notifyPopLevelProgress();
                 }
             } else {
                 EntityReference wikiReference = rootReference.extractReference(EntityType.WIKI);

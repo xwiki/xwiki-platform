@@ -22,7 +22,6 @@ package org.xwiki.search.solr.internal.metadata;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -112,11 +111,10 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.setField(FieldUtils.VERSION, translatedDocument.getVersion());
         solrDocument.setField(FieldUtils.COMMENT, translatedDocument.getComment());
 
+        solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, translatedDocument.getLocale().toString());
+
         // Add locale inheritance
-        Set<Locale> locales = getLocales(translatedDocument, locale);
-        for (Locale childLocale : locales) {
-            solrDocument.addField(FieldUtils.LOCALES, childLocale.toString());
-        }
+        addLocales(translatedDocument, locale, solrDocument);
 
         // Get both serialized user reference string and pretty user name (first_name last_name).
         String authorString = serializer.serialize(translatedDocument.getAuthorReference());

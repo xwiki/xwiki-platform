@@ -238,6 +238,7 @@ public class DocumentSolrMetadataExtractorTest
 
         when(this.mockDocument.isHidden()).thenReturn(this.hidden);
 
+        when(this.mockDocument.getLocale()).thenReturn(Locale.ROOT);
         when(this.mockDocument.getRealLocale()).thenReturn(this.localeENUS);
     }
 

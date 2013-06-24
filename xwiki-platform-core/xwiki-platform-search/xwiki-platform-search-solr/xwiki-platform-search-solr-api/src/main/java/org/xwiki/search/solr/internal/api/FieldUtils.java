@@ -49,9 +49,15 @@ public final class FieldUtils
     public static final String LANGUAGE = "language";
 
     /**
-     * Locale of the document.
+     * The real/calculated locale of the document (the default locale in default document entry case).
      */
     public static final String LOCALE = "locale";
+
+    /**
+     * Technical locale of the document (emty for the default document entry). Not indexed, mostly used to find the
+     * document in database.
+     */
+    public static final String DOCUMENT_LOCALE = "doclocale";
 
     /**
      * The list of Locales covered by this entity. Dynamically determined from the list of enabled Locales and the

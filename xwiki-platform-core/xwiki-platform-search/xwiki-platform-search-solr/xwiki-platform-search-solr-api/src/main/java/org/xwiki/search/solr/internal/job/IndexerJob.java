@@ -156,8 +156,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         // Clean existing index
         SolrQuery solrQuery = new SolrQuery(this.solrResolver.getQuery(getRequest().getRootReference()));
         solrQuery.setRows(100);
-        solrQuery.setFields(FieldUtils.NAME, FieldUtils.SPACE, FieldUtils.WIKI, FieldUtils.LOCALE);
-        solrQuery.set(FieldUtils.TYPE, EntityType.DOCUMENT.toString().toLowerCase());
+        solrQuery.setFields(FieldUtils.NAME, FieldUtils.SPACE, FieldUtils.WIKI, FieldUtils.DOCUMENT_LOCALE);
+        solrQuery.set(FieldUtils.TYPE, EntityType.DOCUMENT.name());
 
         // TODO: be nicer with the memory when there is a lot of indexed documents and do smaller batches or stream the
         // results
@@ -172,7 +172,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                 DocumentReference reference =
                     createDocumentReference((String) solrDocument.get(FieldUtils.WIKI),
                         (String) solrDocument.get(FieldUtils.SPACE), (String) solrDocument.get(FieldUtils.NAME),
-                        (String) solrDocument.get(FieldUtils.LOCALE));
+                        (String) solrDocument.get(FieldUtils.DOCUMENT_LOCALE));
                 try {
                     if (!exists(reference)) {
                         this.indexer.delete(reference, true);

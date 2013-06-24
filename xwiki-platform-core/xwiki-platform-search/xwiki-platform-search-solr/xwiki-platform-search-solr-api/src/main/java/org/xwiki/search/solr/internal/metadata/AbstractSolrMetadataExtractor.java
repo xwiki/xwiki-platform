@@ -280,6 +280,15 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         return locales;
     }
 
+    protected void addLocales(XWikiDocument xdocument, Locale entityLocale, SolrInputDocument solrDocument)
+        throws SolrIndexerException, XWikiException
+    {
+        Set<Locale> locales = getLocales(xdocument, entityLocale);
+        for (Locale childLocale : locales) {
+            solrDocument.addField(FieldUtils.LOCALES, childLocale.toString());
+        }
+    }
+
     /**
      * @param documentReference reference to the document.
      * @return the locale code of the referenced document.

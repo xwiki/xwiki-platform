@@ -7947,7 +7947,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         try {
             BlockRenderer renderer;
             String targetSyntaxId = targetSyntax.toIdString();
-            if("xhtml/1.0".equals(targetSyntaxId) || "annotatedxhtml/1.0".equals(targetSyntaxId)) {
+            // If a secure renderer exists, let's use it.
+            if (Utils.getComponentManager().hasComponent(BlockRenderer.class, "secure" + targetSyntaxId)) {
                 renderer = Utils.getComponent(BlockRenderer.class, "secure" + targetSyntaxId);
             } else {
                 renderer = Utils.getComponent(BlockRenderer.class, targetSyntaxId);

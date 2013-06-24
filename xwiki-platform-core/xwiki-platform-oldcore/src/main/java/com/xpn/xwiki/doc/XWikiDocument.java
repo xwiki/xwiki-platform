@@ -7944,11 +7944,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     protected static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
-        /*boolean hasPR = false;
-        AuthorizationManager am = Utils.getComponent(AuthorizationManager.class);
-        if (am.hasAccess(Right.PROGRAM, this.getAuthorReference(), this.documentReference)) {
-            hasPR = true;
-        }*/
         try {
             BlockRenderer renderer;
             String targetSyntaxId = targetSyntax.toIdString();

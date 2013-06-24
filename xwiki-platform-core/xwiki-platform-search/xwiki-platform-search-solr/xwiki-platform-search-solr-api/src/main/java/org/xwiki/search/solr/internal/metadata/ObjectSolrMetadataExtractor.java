@@ -76,7 +76,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.setField(FieldUtils.NUMBER, objectReference.getObjectNumber());
 
         setLocaleAndContentFields(documentReference, solrDocument, object);
-        
+
         return true;
     }
 
@@ -94,14 +94,9 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
         BaseObject object) throws Exception
     {
-        Locale defaultDocumentLocale = getLocale(documentReference);
-
         // Do the work for each locale.
         for (Locale documentLocale : getLocales(documentReference, null)) {
-            if (!documentLocale.equals(defaultDocumentLocale)) {
-                // The original document's locale is already set by the call to the addDocumentFields method.
-                solrDocument.addField(FieldUtils.LOCALES, documentLocale);
-            }
+            solrDocument.addField(FieldUtils.LOCALES, documentLocale);
 
             setObjectContent(solrDocument, object, documentLocale);
         }

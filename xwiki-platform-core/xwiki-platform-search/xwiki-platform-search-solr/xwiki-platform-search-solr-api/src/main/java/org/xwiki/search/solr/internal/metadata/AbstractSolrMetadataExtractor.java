@@ -99,19 +99,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
-        DocumentReference documentReference =
-            new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT));
-
         try {
             LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
-            solrDocument.setField(FieldUtils.ID, getResolver(entityReference).getId(documentReference));
+            solrDocument.setField(FieldUtils.ID, getResolver(entityReference).getId(entityReference));
 
-            if (!setDocumentFields(documentReference, solrDocument)) {
+            if (!setDocumentFields(new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT)),
+                solrDocument)) {
                 return null;
             }
 
-            solrDocument.setField(FieldUtils.TYPE, documentReference.getType().name());
+            solrDocument.setField(FieldUtils.TYPE, entityReference.getType().name());
 
             if (!setFieldsInternal(solrDocument, entityReference)) {
                 return null;
@@ -119,7 +117,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
             return solrDocument;
         } catch (Exception e) {
-            String message = String.format("Failed to get input document for '%s'", documentReference);
+            String message = String.format("Failed to get input Solr document for entity '%s'", entityReference);
             throw new SolrIndexerException(message, e);
         }
     }

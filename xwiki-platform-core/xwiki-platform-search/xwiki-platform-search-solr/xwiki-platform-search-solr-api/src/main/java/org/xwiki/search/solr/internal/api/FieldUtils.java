@@ -259,10 +259,12 @@ public final class FieldUtils
 
         builder.append(USCORE);
 
-        if (locale != null && !locale.equals(Locale.ROOT)) {
-            builder.append(locale);
-        } else {
-            builder.append(USCORE);
+        if (locale != null) {
+            if (locale.equals(Locale.ROOT)) {
+                builder.append(USCORE);
+            } else {
+                builder.append(locale);
+            }
         }
 
         return builder.toString();

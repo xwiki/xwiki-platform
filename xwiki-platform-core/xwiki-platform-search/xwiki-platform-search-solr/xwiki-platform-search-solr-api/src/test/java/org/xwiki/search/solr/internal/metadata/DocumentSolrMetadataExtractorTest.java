@@ -309,7 +309,7 @@ public class DocumentSolrMetadataExtractorTest
         try {
             extractor.getSolrDocument(reference);
         } catch (SolrIndexerException ex) {
-            Assert.assertEquals("Failed to get input document for '" + this.documentReferenceFrench + "'",
+            Assert.assertEquals("Failed to get input Solr document for entity '" + this.documentReferenceFrench + "'",
                 ex.getMessage());
             Assert.assertSame(thrown, ex.getCause());
             return;

@@ -5175,23 +5175,20 @@ public class XWiki implements EventListener
 
     public boolean exists(DocumentReference documentReference, XWikiContext context)
     {
-        String server = null, database = null;
+        String currentWiki = context.getDatabase();
+
         try {
             XWikiDocument doc = new XWikiDocument(documentReference);
-            server = doc.getDocumentReference().getWikiReference().getName();
+            // TODO: remove that when XWikiDocument merge reference and locale
+            doc.setLocale(documentReference.getLocale());
 
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
-            }
+            context.setDatabase(documentReference.getWikiReference().getName());
 
             return getStore().exists(doc, context);
         } catch (XWikiException e) {
             return false;
         } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
+            context.setDatabase(currentWiki);
         }
     }
 

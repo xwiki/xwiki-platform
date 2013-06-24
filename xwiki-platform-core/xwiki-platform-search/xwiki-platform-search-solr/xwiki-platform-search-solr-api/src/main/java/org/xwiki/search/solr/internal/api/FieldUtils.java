@@ -80,6 +80,11 @@ public final class FieldUtils
     public static final String NAME = "name";
 
     /**
+     * Unanalyzed and not stored version of the document's space.
+     */
+    public static final String NAME_EXACT = "name_exact";
+
+    /**
      * FullName of the document (example: {@code Main.WebHome}).
      */
     public static final String FULLNAME = "fullname";

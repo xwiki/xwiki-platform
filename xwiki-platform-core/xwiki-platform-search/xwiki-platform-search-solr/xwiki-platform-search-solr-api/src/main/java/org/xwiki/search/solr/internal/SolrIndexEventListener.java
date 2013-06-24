@@ -61,7 +61,7 @@ import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
  * @since 5.1M2
  */
 @Component
-@Named("solr")
+@Named("solr.update")
 @Singleton
 public class SolrIndexEventListener implements EventListener
 {

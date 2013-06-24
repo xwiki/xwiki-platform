@@ -20,8 +20,99 @@
 package org.xwiki.search.solr.internal.job;
 
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.Request;
+import org.xwiki.model.reference.EntityReference;
 
+/**
+ * The request used to configure {@link IndexerJob}.
+ * 
+ * @version $Id$
+ * @since 5.1RC1
+ */
 public class IndexerRequest extends AbstractRequest
 {
-    
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * @see #getRootReference()
+     */
+    private EntityReference rootReference;
+
+    /**
+     * @see #isOverwrite()
+     */
+    private boolean overwrite;
+
+    /**
+     * @see #isRemoveMissing()
+     */
+    private boolean removeMissing = true;
+
+    /**
+     * The default constructor.
+     */
+    public IndexerRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     */
+    public IndexerRequest(Request request)
+    {
+        super(request);
+    }
+
+    /**
+     * @return the reference from which to work
+     */
+    public EntityReference getRootReference()
+    {
+        return this.rootReference;
+    }
+
+    /**
+     * @param rootReference the reference from which to work
+     */
+    public void setRootReference(EntityReference rootReference)
+    {
+        this.rootReference = rootReference;
+    }
+
+    /**
+     * @return if false documents are indexed only if they don't already exist in Solr index (version is taken into
+     *         account), if true all documents are sent and overwrite what's already in Solr if any
+     */
+    public boolean isOverwrite()
+    {
+        return this.overwrite;
+    }
+
+    /**
+     * @param overwrite if false documents are indexed only if they don't already exist in Solr index (version is taken
+     *            into account), if true all documents are sent and overwrite what's already in Solr if any
+     */
+    public void setOverwrite(boolean overwrite)
+    {
+        this.overwrite = overwrite;
+    }
+
+    /**
+     * @return if true the Solr document not in database anymore are cleaned, if false nothing is checked
+     */
+    public boolean isRemoveMissing()
+    {
+        return this.removeMissing;
+    }
+
+    /**
+     * @param removeMissing if true the Solr document not in database anymore are cleaned, if false nothing is checked
+     */
+    public void setRemoveMissing(boolean removeMissing)
+    {
+        this.removeMissing = removeMissing;
+    }
 }

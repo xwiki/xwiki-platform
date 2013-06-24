@@ -96,17 +96,21 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" />
+
    <field name="wiki" type="string" indexed="true" stored="true" />
    <field name="space" type="text_general" indexed="true" stored="true" />
-   <field name="space_exact" type="string" indexed="true" stored="true" />
+   <field name="space_exact" type="string" indexed="true" stored="false" />
+   <field name="name" type="text_general" indexed="true" stored="true" />
+   <field name="name_exact" type="string" indexed="true" stored="false" />
+
    <field name="locale" type="string" indexed="true" stored="true" />
    <!-- Contains only the language part of the locale -->
    <field name="language" type="string" indexed="true" stored="true" />
-   <field name="name" type="text_general" indexed="true" stored="true" />
+
    <field name="type" type="string" indexed="true" stored="true" />
    <field name="hidden" type="boolean" indexed="true" stored="true" />
    <field name="title" type="text_general" indexed="true" stored="true" />
-   <field name="title_sort" type="lowercase" indexed="true" stored="true" />
+   <field name="title_sort" type="lowercase" indexed="true" stored="false" />
    <field name="comment" type="text_general" indexed="true" stored="true" />
    <field name="doccontent" type="text_general" indexed="true" stored="true" />
    <field name="doccontentraw" type="text_general" indexed="true" stored="true" />
@@ -129,11 +133,11 @@
    <field name="attcontent" type="text_general" indexed="true" stored="false" />
 
    <!-- The list of locales covered by this entry. Dynamically determined from the list of enabled locales and the various locales of the document -->
-   <field name="locales" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="locales" type="string" indexed="true" stored="false" multiValued="true" />
 
    <!-- Aliases -->
    <!-- Retro compatibility with old Lucene module fields names -->
-   <field name="lang" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="lang" type="string" indexed="true" stored="false" multiValued="true" />
 
    <!-- catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  -->
@@ -213,6 +217,7 @@
 
   <!-- Copy values for fields that are needed for specific tasks like exact matching or sorting and can not use their tokenized (analyzed) versions. -->
   <copyField source="space" dest="space_exact"/>
+  <copyField source="name" dest="name_exact"/>
   <copyField source="title_*" dest="title_sort"/>
   <copyField source="author_display" dest="author_display_sort"/>
 

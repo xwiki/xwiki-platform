@@ -199,6 +199,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     private boolean exists(DocumentReference documentReference) throws QueryException
     {
         XWikiDocument document = new XWikiDocument(documentReference);
+        document.setLocale(documentReference.getLocale());
 
         Query query = this.queryManager.createQuery("select doc.id from Document doc where doc.id=:id", Query.XWQL);
         query.setWiki(documentReference.getWikiReference().getName());

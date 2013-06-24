@@ -103,8 +103,9 @@
    <field name="name" type="text_general" indexed="true" stored="true" />
    <field name="name_exact" type="string" indexed="true" stored="false" />
 
-   <field name="doclocale" type="string" indexed="false" stored="true" />
    <field name="locale" type="string" indexed="true" stored="true" />
+   <!-- Contains the technical locale of the document (i.e. empty for default entry) -->
+   <field name="doclocale" type="string" indexed="false" stored="true" />
    <!-- Contains only the language part of the locale -->
    <field name="language" type="string" indexed="true" stored="true" />
 

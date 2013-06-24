@@ -390,7 +390,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
 
                     ++size;
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 this.logger.error("Failed to process entry [{}]", batchEntry, e);
             }
 

@@ -14,14 +14,17 @@
  * NOTE: the $document.display*(something, ...) methods are very difficult to use correctly, because they sometimes generate (unescaped) HTML
  *#
 #macro(displayObject $obj $class $props $firstField)
+  #set($canAccess = $class.canAccess())
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   #getFieldSummary($obj $firstField $firstFieldSummary)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
     <h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstField): $firstFieldSummary#end
+      ##if($canAccess)
         <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
         #if (!$hasCustomObject)
           <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
         #end
+      ##end
     </h3>
   </div>
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
@@ -36,57 +39,7 @@
     #end
     #foreach ($prop in $properties)
       <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}">${escapetool.xml($prop.translatedPrettyName)}</label></dt>
-      <dd#if ($prop.isDisabled()) class="disabled"#end>$doc.display($prop.name, "edit", $obj)</dd>
-    #end
-    </dl>
-    #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
-    #if ($deprecatedProperties.size() > 0)
-    <div class="box warningmessage deprecatedProperties">
-      <strong>$services.localization.render('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
-      <dl>
-      #foreach ($prop in $deprecatedProperties)
-        <dt class="label disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
-        <dd class="disabled">${escapetool.xml($prop.value)}</dd>
-      #end
-      </dl>
-      <div>
-        <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
-           title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.link')</a>
-      </div>
-    </div>
-    #end
-  </div></div>## xobject-content
-  </div>## xobject
-#end
-##
-#*
- * Display an object in view mode
- * NOTE: the $document.display*(something, ...) methods are very difficult to use correctly, because they sometimes generate (unescaped) HTML
- *#
-#macro(displayViewObject $obj $class $props $firstField)
-  <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
-  #getFieldSummary($obj $firstField $firstFieldSummary)
-  <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
-    <h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstField): $firstFieldSummary#end
-        <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
-        #if (!$hasCustomObject)
-          <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
-        #end
-    </h3>
-  </div>
-  <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
-    <dl>
-    #if ($hasCustomField)
-      #set ($properties = [])
-      #foreach ($propName in $customField.split(','))
-        #set ($discard = $properties.add($class.get($propName)))
-      #end
-    #else
-      #set ($properties = $class.properties)
-    #end
-    #foreach ($prop in $properties)
-      <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}">${escapetool.xml($prop.translatedPrettyName)}</label></dt>
-      <dd#if ($prop.isDisabled()) class="disabled"#end>$doc.display($prop.name, "view", $obj)</dd>
+      <dd#if ($prop.isDisabled()) class="disabled"#end>#if ($canAccess) $doc.display($prop.name, "edit", $obj)#else $doc.display($prop.name, "view", $obj) #end</dd>
     #end
     </dl>
     #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
@@ -156,6 +109,7 @@
  *#
 #macro(displayClass $class)
   #set ($props = $class.getProperties())
+  #set($canAccess = $class.canAccess())
   #getTitleField($props)
   <div id="xclass_${escapetool.xml($class.name)}" class="xclass">
     #if ($hasCustomObject)
@@ -163,7 +117,7 @@
       #if ($object)
         <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>${escapetool.xml($class.name)}</h2></div>
         <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
-        #if ($class.canAccess())
+        #if ($canAccess)
           #displayObject($object $class $props $titleField)
         #else
           #displayViewObject($object $class $props $titleField)
@@ -180,7 +134,9 @@
       #foreach ($object in $objects)
         #displayObject($object $class $props $titleField)
       #end
-      #displayAddObject($class)
+      #if ($canAccess)
+        #displayAddObject($class)
+      #end
       </div></div>
     #end
   </div>

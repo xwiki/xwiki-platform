@@ -114,7 +114,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, translatedDocument.getLocale().toString());
 
         // Add locale inheritance
-        addLocales(translatedDocument, locale, solrDocument);
+        addLocales(translatedDocument, translatedDocument.getLocale(), solrDocument);
 
         // Get both serialized user reference string and pretty user name (first_name last_name).
         String authorString = serializer.serialize(translatedDocument.getAuthorReference());

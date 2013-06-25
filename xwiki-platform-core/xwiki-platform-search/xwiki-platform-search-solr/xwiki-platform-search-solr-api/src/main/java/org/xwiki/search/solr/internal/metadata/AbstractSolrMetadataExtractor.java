@@ -273,7 +273,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         }
 
         // 4) Make sure that the original document's locale is there as well.
-        documentLocales.add(getLocale(xdocument.getDocumentReference()));
+        locales.add(getLocale(xdocument.getDocumentReference()));
 
         return locales;
     }

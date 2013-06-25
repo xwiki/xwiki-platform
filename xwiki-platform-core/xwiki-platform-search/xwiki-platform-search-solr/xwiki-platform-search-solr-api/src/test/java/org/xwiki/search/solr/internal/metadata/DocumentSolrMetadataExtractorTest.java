@@ -269,7 +269,8 @@ public class DocumentSolrMetadataExtractorTest
 
         Assert.assertEquals(this.localeENUS.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
         Assert.assertEquals(this.languageENUS, solrDocument.getFieldValue(FieldUtils.LANGUAGE));
-        Assert.assertEquals(Arrays.asList(this.localeENUS.toString()), solrDocument.getFieldValues(FieldUtils.LOCALES));
+        Assert.assertEquals(Arrays.asList("", this.localeENUS.toString()),
+            solrDocument.getFieldValues(FieldUtils.LOCALES));
         Assert.assertEquals(this.hidden, solrDocument.getFieldValue(FieldUtils.HIDDEN));
         Assert.assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(FieldUtils.TYPE));
 

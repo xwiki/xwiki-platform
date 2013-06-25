@@ -112,8 +112,9 @@ public class SolrIndexEventListener implements EventListener
                 XWikiDocument document = (XWikiDocument) source;
 
                 if (!Locale.ROOT.equals(document.getLocale())) {
-                    // If a new translation is added reindex the whole document (could be optimized a bit by reindexing
-                    // only the parent locales but that would always include objets and attachments anyway)
+                    // If a new translation is added to a document reindex the whole document (could be optimized a bit
+                    // by reindexing only the parent locales but that would always include objects and attachments
+                    // anyway)
                     this.solrIndexer.get().index(new DocumentReference(document.getDocumentReference(), null), true);
                 } else {
                     this.solrIndexer.get().index(

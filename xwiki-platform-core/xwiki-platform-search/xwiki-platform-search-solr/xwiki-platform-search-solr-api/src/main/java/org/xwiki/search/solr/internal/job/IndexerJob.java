@@ -29,6 +29,7 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
@@ -155,9 +156,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
         // Clean existing index
         SolrQuery solrQuery = new SolrQuery(this.solrResolver.getQuery(getRequest().getRootReference()));
-        solrQuery.setRows(100);
         solrQuery.setFields(FieldUtils.NAME, FieldUtils.SPACE, FieldUtils.WIKI, FieldUtils.DOCUMENT_LOCALE);
-        solrQuery.set(FieldUtils.TYPE, EntityType.DOCUMENT.name());
+        solrQuery.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
 
         // TODO: be nicer with the memory when there is a lot of indexed documents and do smaller batches or stream the
         // results
@@ -254,6 +254,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                 try {
                     for (String wiki : wikis) {
                         addMissing(wiki);
+                        return;
                     }
                 } finally {
                     notifyPopLevelProgress();
@@ -318,8 +319,9 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         try {
             for (Object[] document : documents) {
                 addMissing(wiki, document, solrInstance);
+                return;
 
-                notifyStepPropress();
+                // notifyStepPropress();
             }
         } finally {
             notifyPopLevelProgress();
@@ -346,10 +348,11 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
         DocumentReference reference = createDocumentReference(wiki, space, name, localeString);
 
-        SolrQuery solrQuery = new SolrQuery();
+        SolrQuery solrQuery =
+            new SolrQuery(FieldUtils.ID + ':' + ClientUtils.escapeQueryChars(this.solrResolver.getId(reference)));
+        solrQuery.addFilterQuery(FieldUtils.VERSION + ':' + ClientUtils.escapeQueryChars(version));
         solrQuery.setFields(FieldUtils.ID);
-        solrQuery.set(FieldUtils.ID, this.solrResolver.getId(reference));
-        solrQuery.set(FieldUtils.VERSION, version);
+
         QueryResponse response = solrInstance.query(solrQuery);
         if (response.getResults().getNumFound() == 0) {
             this.indexer.index(reference, true);

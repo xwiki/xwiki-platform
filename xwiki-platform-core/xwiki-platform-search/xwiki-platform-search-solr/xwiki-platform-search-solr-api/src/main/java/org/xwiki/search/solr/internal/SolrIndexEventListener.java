@@ -121,7 +121,7 @@ public class SolrIndexEventListener implements EventListener
                         new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
                 }
             } else if (event instanceof DocumentDeletedEvent) {
-                XWikiDocument document = (XWikiDocument) source;
+                XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
 
                 this.solrIndexer.get().delete(
                     new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
@@ -132,7 +132,7 @@ public class SolrIndexEventListener implements EventListener
 
                 this.solrIndexer.get().index(attachment.getReference(), false);
             } else if (event instanceof AttachmentDeletedEvent) {
-                XWikiDocument document = (XWikiDocument) source;
+                XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
                 String fileName = ((AbstractAttachmentEvent) event).getName();
                 XWikiAttachment attachment = document.getAttachment(fileName);
 

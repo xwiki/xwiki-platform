@@ -254,7 +254,6 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                 try {
                     for (String wiki : wikis) {
                         addMissing(wiki);
-                        return;
                     }
                 } finally {
                     notifyPopLevelProgress();
@@ -319,9 +318,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         try {
             for (Object[] document : documents) {
                 addMissing(wiki, document, solrInstance);
-                return;
 
-                // notifyStepPropress();
+                notifyStepPropress();
             }
         } finally {
             notifyPopLevelProgress();

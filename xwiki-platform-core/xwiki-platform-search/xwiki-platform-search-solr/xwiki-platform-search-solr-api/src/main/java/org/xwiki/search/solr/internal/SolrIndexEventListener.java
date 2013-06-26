@@ -160,10 +160,7 @@ public class SolrIndexEventListener implements EventListener
                 this.solrIndexer.get().delete(wikiReference, false);
             }
         } catch (Exception e) {
-            logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
+            this.logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
         }
-
-        // TODO: if a ne language is added to the list of avaibale locales in preferences, reindex all the entries
-        // associated to parent locales
     }
 }

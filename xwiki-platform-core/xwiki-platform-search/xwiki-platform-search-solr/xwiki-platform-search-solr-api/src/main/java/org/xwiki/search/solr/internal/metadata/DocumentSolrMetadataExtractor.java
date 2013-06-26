@@ -93,20 +93,28 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.setField(FieldUtils.FULLNAME, localSerializer.serialize(documentReference));
 
         // Same for document title
-        String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
+        try {
+            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
-        // Rendered title.
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+            // Rendered title.
+            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+        } catch (Throwable e) {
+            this.logger.error("Failed to render title for document [{}]", entityReference);
+        }
 
         // Raw Content
         solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, locale),
             translatedDocument.getContent());
 
         // Rendered content
-        WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
-        this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
-            plainContentPrinter.toString());
+        try {
+            WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
+            this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
+            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
+                plainContentPrinter.toString());
+        } catch (Throwable e) {
+            this.logger.error("Failed to render content for document [{}]", entityReference);
+        }
 
         solrDocument.setField(FieldUtils.VERSION, translatedDocument.getVersion());
         solrDocument.setField(FieldUtils.COMMENT, translatedDocument.getComment());
@@ -116,16 +124,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // Add locale inheritance
         addLocales(translatedDocument, translatedDocument.getLocale(), solrDocument);
 
-        // Get both serialized user reference string and pretty user name (first_name last_name).
-        String authorString = serializer.serialize(translatedDocument.getAuthorReference());
-        String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
-        String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
-        String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
-
-        solrDocument.setField(FieldUtils.AUTHOR, authorString);
-        solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
-        solrDocument.setField(FieldUtils.CREATOR, creatorString);
-        solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
+        // Get both serialized user reference string and pretty user name
+        setAuthors(solrDocument, translatedDocument, entityReference);
 
         // Document dates.
         solrDocument.setField(FieldUtils.CREATIONDATE, translatedDocument.getCreationDate());
@@ -138,6 +138,35 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         setExtras(documentReference, solrDocument, locale);
 
         return true;
+    }
+
+    /**
+     * @param solrDocument the Solr document
+     * @param translatedDocument the XWiki document
+     * @param entityReference the document reference
+     */
+    private void setAuthors(LengthSolrInputDocument solrDocument, XWikiDocument translatedDocument,
+        EntityReference entityReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        String authorString = serializer.serialize(translatedDocument.getAuthorReference());
+        solrDocument.setField(FieldUtils.AUTHOR, serializer.serialize(translatedDocument.getAuthorReference()));
+        try {
+            String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
+            solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
+        } catch (Throwable e) {
+            this.logger.error("Failed to get author display name for document [{}]", entityReference);
+        }
+
+        String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
+        solrDocument.setField(FieldUtils.CREATOR, creatorString);
+        try {
+            String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
+            solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
+        } catch (Throwable e) {
+            this.logger.error("Failed to get creator display name for document [{}]", entityReference);
+        }
     }
 
     /**

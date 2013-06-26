@@ -105,7 +105,7 @@
 
    <field name="locale" type="string" indexed="true" stored="true" />
    <!-- Contains the technical locale of the document (i.e. empty for default entry) -->
-   <field name="doclocale" type="string" indexed="false" stored="true" />
+   <field name="doclocale" type="string" indexed="true" stored="true" />
    <!-- Contains only the language part of the locale -->
    <field name="language" type="string" indexed="true" stored="true" />
 
@@ -136,7 +136,7 @@
    <field name="attcontent_" type="text_general" indexed="true" stored="false" />
 
    <!-- The list of locales covered by this entry. Dynamically determined from the list of enabled locales and the various locales of the document -->
-   <field name="locales" type="string" indexed="true" stored="false" multiValued="true" />
+   <field name="locales" type="string" indexed="true" stored="true" multiValued="true" />
 
    <!-- Aliases -->
    <!-- Retro compatibility with old Lucene module fields names -->

@@ -25,11 +25,10 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import junit.framework.Assert;
-
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -37,8 +36,6 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.localization.LocalizationManager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
@@ -417,15 +414,6 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     @Test
     public void getEmptyWikiTranslation() throws XWikiException
     {
-        addWikiTranslation("wiki.translation", "", Locale.ROOT);
-
-        Assert.assertEquals("", this.tool.get("wiki.translation"));
-    }
-
-    @Test
-    public void getDuplicatedTranslation() throws XWikiException
-    {
-        
         addWikiTranslation("wiki.translation", "", Locale.ROOT);
 
         Assert.assertEquals("", this.tool.get("wiki.translation"));

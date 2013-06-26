@@ -421,4 +421,13 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("", this.tool.get("wiki.translation"));
     }
+
+    @Test
+    public void getDuplicatedTranslation() throws XWikiException
+    {
+        
+        addWikiTranslation("wiki.translation", "", Locale.ROOT);
+
+        Assert.assertEquals("", this.tool.get("wiki.translation"));
+    }
 }

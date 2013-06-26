@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
@@ -70,9 +71,15 @@ public class DefaultLocalizationManager implements LocalizationManager
     {
         for (TranslationBundle bundle : this.bundleContext.getBundles()) {
             Translation translation = bundle.getTranslation(key, locale);
-            if (translation != null) {
+            if (translation != null && translation.getLocale().equals(locale)) {
                 return translation;
             }
+        }
+
+        // Try parent locale
+        Locale parentLocale = LocaleUtils.getParentLocale(locale);
+        if (parentLocale != null) {
+            return getTranslation(key, parentLocale);
         }
 
         return null;

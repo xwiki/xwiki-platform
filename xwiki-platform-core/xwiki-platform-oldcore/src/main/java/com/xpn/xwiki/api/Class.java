@@ -297,8 +297,10 @@ public class Class extends Collection
     }
     
     /**
+     * Get the restriction level
      * 
      * @return the level of restriction for this class
+     * @since 5.1
      */
     public String getRestriction()
     {
@@ -306,8 +308,11 @@ public class Class extends Collection
     }
     
     /**
+     * Set the restriction level of this class.
      * 
-     * @param level right necessary for creating objects from this class
+     * @param level right necessary for creating and modifying 
+     * objects from this class
+     * @since 5.1
      */
     public void setRestriction(String level)
     {
@@ -315,10 +320,12 @@ public class Class extends Collection
     }
     
     /**
+     * Checks if the current user has access to this class.
      * 
-     * @param docname
-     * @return
-     * @throws XWikiException
+     * @return true if the current user has the right to add and modify objects
+     * from this class
+     * @throws XWikiException exception
+     * @since 5.1
      */
     public boolean canAccess() throws XWikiException
     {

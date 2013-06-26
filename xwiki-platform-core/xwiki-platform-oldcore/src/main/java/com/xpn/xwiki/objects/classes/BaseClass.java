@@ -1400,14 +1400,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
     
     /**
+     * Set the access level needed for creating and modifying objects from this class.
      * 
-     * @param level Level of access required to use this class
+     * @param level Access level required to use this class
+     * @since 5.1
      */
     public void setRestriction (String level)
     {
         this.restriction = level;
     }
     
+    /**
+     * Get the restriction level of this class
+     * 
+     * @return the restriction level of the class or "" if there is no restriction.
+     * @since 5.1
+     */
     public String getRestriction()
     {
         if (this.restriction == null) {
@@ -1416,14 +1424,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return this.restriction;
     }
     
-    public boolean isRestricted()
-    {
-        if (this.restriction == null) {
-            return false;
-        }
-        return true;
-    }
-    
+    /**
+     * Checks whether the current user can access objects from this class.
+     * 
+     * @param context the current context
+     * @return true if the current user has access rights to the object
+     */
     public boolean canAccess(XWikiContext context)
     {
         String level = getRestriction();

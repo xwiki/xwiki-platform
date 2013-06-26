@@ -441,6 +441,7 @@
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-observation</module>

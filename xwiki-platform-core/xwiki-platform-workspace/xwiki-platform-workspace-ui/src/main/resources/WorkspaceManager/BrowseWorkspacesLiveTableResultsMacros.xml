@@ -381,11 +381,6 @@
             #if($fieldUrl == '')
               #if ($colname == 'wikiprettyname')
                 #set ($fieldUrl = $itemWikiDescriptor.homePageUrl)
-              #elseif ($colname == 'owner')
-                #set ($userDocument = $xwiki.getDocument($fieldValue))
-                #set ($fieldUrl = $userDocument.URL)
-                ## Override display value with first_name last_name
-                #set ($fieldDisplayValue = "${userDocument.first_name} ${userDocument.last_name}")
               #end
             #end
             "$escapetool.javascript(${colname})" : "$escapetool.javascript($fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", ''))",

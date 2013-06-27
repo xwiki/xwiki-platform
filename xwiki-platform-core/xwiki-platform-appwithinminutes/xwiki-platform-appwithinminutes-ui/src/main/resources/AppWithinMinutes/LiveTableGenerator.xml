@@ -32,6 +32,7 @@
     #set ($field = $xclass.get($column))
     #if ($field.getProperty('customDisplay').value == '{{include reference="AppWithinMinutes.Title"/}}')
       ## This field is a place-holder for the document title.
+      #set ($titleDisplayNamePlaceHolder = $field.translatedPrettyName)
       #set ($field = $NULL)
       #set ($column = 'doc.title')
       #set ($discard = $columns.set($mathtool.sub($velocityCount, 1), $column))
@@ -57,6 +58,10 @@
       #set ($properties = {'type': 'text', 'size': 10})
       #if ($column == 'doc.title')
         #set ($discard = $properties.put('size', 20))
+        #if ("$!titleDisplayNamePlaceHolder" != '')
+          #set ($discard = $properties.put('displayName', $titleDisplayNamePlaceHolder))
+          #set ($titleDisplayNamePlaceHolder = $NULL)
+        #end
       #end
       #if ($column == 'doc.creator' || $column == 'doc.author')
         #set ($discard = $properties.put('link', 'author'))

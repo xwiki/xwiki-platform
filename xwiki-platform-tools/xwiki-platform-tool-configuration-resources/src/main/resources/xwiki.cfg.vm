@@ -36,7 +36,7 @@
 #-# Available syntaxes are: 
 #-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
 #-#    html/4.01, plain/1.0, docbook/4.4, markdown/1.0, apt/1.0
-xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0, xwiki/2.1
+xwiki.rendering.syntaxes = xwiki/2.0, xwiki/2.1
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
 #-# document names.
@@ -312,7 +312,13 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 #-# The authentication management class.
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl
 
-#-# The authorization management class.
+#-# (Deprecated) The authorization management class.
+#-# [Since 5.0M2] The default right service is now org.xwiki.security.authorization.internal.XWikiCachingRightService
+#-# which is a bridge to the new security authorization component. It provides increased security and performance, but
+#-# its right policies differ sightly from the old Right Service implementation. In rare situation, you may want to
+#-# switch back to the old unmaintained implementation by uncommenting the following line. However, only old
+#-# implementation, still using a bridged RightService will be impacted by this parameter. Customization of the new
+#-# security authorization component should be done in the new xwiki.properties configuration (security.*).
 # xwiki.authentication.rightsclass=com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl
 
 #-# If an unauthenticated user (guest) tries to perform a restricted action, by default the wiki redirects to the login
@@ -617,10 +623,9 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# [Since 2.0RC1]
 #-# Activity Stream plugin. 
-#-# The Activity Stream plugin stores data in a dedicated table in the database. In virtual mode each wiki has its own 
-#-# database. The plugin can be configured to store its data into the database corresponding to the wiki, into the main 
-#-# database (default: xwiki) or both. If the wiki is not running in virtual mode these options will not have any 
-#-# effect. These options should not be both set to 0 (in this case the local store will be forced).
+#-# The Activity Stream plugin stores data in a dedicated table in the database. Each wiki has its own database.
+#-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
+#-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
 #-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
 #-#
 #-# Default: 1 

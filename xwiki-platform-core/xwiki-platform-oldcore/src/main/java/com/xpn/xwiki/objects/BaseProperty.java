@@ -333,7 +333,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     {
         isValueDirty = valueDirty;
         if (valueDirty && ownerDocument != null) {
-            ownerDocument.setContentDirty(true);
+            ownerDocument.setMetaDataDirty(true);
         }
     }
 
@@ -347,7 +347,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     {
         this.ownerDocument = ownerDocument;
         if (ownerDocument != null && isValueDirty) {
-            ownerDocument.setContentDirty(true);
+            ownerDocument.setMetaDataDirty(true);
         }
     }
 }

@@ -83,7 +83,19 @@ public class XWikiAuthentication extends ChallengeAuthenticator
         /* By default set XWiki.Guest as the user that is sending the request. */
         xwikiContext.setUser("XWiki.XWikiGuest");
 
+        /*
+         * After performing the authentication we should add headers to the response
+         * to allow applications to verify if the authentication is still valid
+         * We are also adding the XWiki version at the same moment.
+         */
         Form headers = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        Form responseHeaders = (Form) response.getAttributes().get("org.restlet.http.headers");
+        if (responseHeaders == null) {
+            responseHeaders = new Form();
+            response.getAttributes().put("org.restlet.http.headers", responseHeaders);
+        }
+        responseHeaders.add("XWiki-User", xwikiContext.getUser());
+        responseHeaders.add("XWiki-Version", xwikiContext.getWiki().getVersion());
 
         if (headers.getValues(HeaderConstants.HEADER_AUTHORIZATION) == null) {
             /*
@@ -101,6 +113,9 @@ public class XWikiAuthentication extends ChallengeAuthenticator
             } catch (XWikiException e) {
                 getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
             }
+
+            // the user has changed so we need to reset the header
+            responseHeaders.set("XWiki-User", xwikiContext.getUser());
 
             /*
              * If we are here, either the xwikiContext contained good credentials for a previously authenticated user or

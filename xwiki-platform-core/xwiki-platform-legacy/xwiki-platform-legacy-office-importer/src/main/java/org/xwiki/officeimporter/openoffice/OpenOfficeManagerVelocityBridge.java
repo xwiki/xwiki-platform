@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.openoffice;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
-import org.xwiki.officeimporter.internal.office.script.OfficeManagerScriptService;
+import org.xwiki.officeimporter.internal.server.script.OfficeServerScriptService;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -64,9 +64,9 @@ public class OpenOfficeManagerVelocityBridge
      * 
      * @return the actual implementation of the script service
      */
-    private OfficeManagerScriptService getScriptService()
+    private OfficeServerScriptService getScriptService()
     {
-        return (OfficeManagerScriptService) scriptService;
+        return (OfficeServerScriptService) scriptService;
     }
 
     /**

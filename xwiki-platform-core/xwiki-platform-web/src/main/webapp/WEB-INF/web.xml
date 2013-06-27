@@ -29,12 +29,10 @@
   <display-name>XWiki</display-name>
   <description>XWiki Application</description>
   
-  <!-- Restlet Application class name -->
+  <!-- Main Restlet Application using Restlet's JAX-RS extension. -->
   <context-param>
     <param-name>org.restlet.application</param-name>
-    <param-value>
-      org.xwiki.rest.internal.XWikiRestletJaxRsApplication
-    </param-value>
+    <param-value>org.xwiki.rest.internal.XWikiRestletJaxRsApplication</param-value>
   </context-param> 
   
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
@@ -60,10 +58,10 @@
     </init-param>
   </filter>
 
-  <!-- A filter that allows requests to be saved and reused later. For example when the current request contains an expired
-       authentication token, and the authorization module redirects to the login page, all the information sent by the
-       client would be lost; this filter allows to save all that information, and after a successful login, injects the
-       saved data in the new request. -->
+  <!-- A filter that allows requests to be saved and reused later. For example when the current request contains an
+       expired authentication token, and the authorization module redirects to the login page, all the information sent
+       by the client would be lost; this filter allows to save all that information, and after a successful login,
+       injects the saved data in the new request. -->
   <filter>
     <filter-name>RequestRestorer</filter-name>
     <filter-class>org.xwiki.container.servlet.filters.internal.SavedRequestRestorerFilter</filter-class>
@@ -106,7 +104,8 @@
     </init-param>
   </filter>
 
-  <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
+  <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
+       request data. -->
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
     <url-pattern>/*</url-pattern>
@@ -161,6 +160,9 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>    
 
+  <!-- TODO: This should be fixed. It's not normal that the REST module depends on the WYSIWYG module.
+       "XWikiXmlRpcContextInitializationFilter" points to
+       org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter -->
   <filter-mapping>
     <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
     <servlet-name>RestletServlet</servlet-name>

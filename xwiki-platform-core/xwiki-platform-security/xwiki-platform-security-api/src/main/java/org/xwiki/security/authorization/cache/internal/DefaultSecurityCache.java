@@ -48,7 +48,6 @@ import org.xwiki.security.authorization.SecurityEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
-import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 
 /**
@@ -105,8 +104,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         try {
             return cacheManager.createNewCache(cacheConfig);
         } catch (Exception e) {
-            throw new InitializationException("Unable to create the security cache with a capacity of "
-                + lru.getMaxEntries(), e);
+            throw new InitializationException(
+                String.format("Unable to create the security cache with a capacity of [%d] entries",
+                    lru.getMaxEntries()), e);
         }
     }
 
@@ -571,9 +571,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 return;
             }
             cache.set(key, newSecurityCacheEntry(entry, groups));
-            if (logger.isDebugEnabled()) {
-                logger.debug("Added rule/shadow entry [{}] into the cache.", key);
-            }
+
+            logger.debug("Added rule/shadow entry [{}] into the cache.", key);
         } finally {
             writeLock.unlock();
         }
@@ -641,9 +640,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 return;
             }
             cache.set(key, new SecurityCacheEntry(entry, wiki));
-            if (logger.isDebugEnabled()) {
-                logger.debug("Added access entry [{}] into the cache.", key);
-            }
+
+            logger.debug("Added access entry [{}] into the cache.", key);
         } finally {
             writeLock.unlock();
         }

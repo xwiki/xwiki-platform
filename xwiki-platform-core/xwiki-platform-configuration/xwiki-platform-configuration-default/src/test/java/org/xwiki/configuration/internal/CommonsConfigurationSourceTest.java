@@ -154,4 +154,14 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
         Assert.assertTrue(source.getProperty("unknown", Properties.class).isEmpty());
     }
+
+    @Test
+    public void testIsEmpty()
+    {
+        Assert.assertTrue(configuration.isEmpty());
+
+        configuration.addProperty("properties", "key2=value2");
+
+        Assert.assertFalse(configuration.isEmpty());
+    }
 }

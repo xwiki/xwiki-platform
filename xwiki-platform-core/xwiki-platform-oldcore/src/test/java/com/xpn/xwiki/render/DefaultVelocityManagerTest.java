@@ -42,7 +42,7 @@ import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;

@@ -15,7 +15,7 @@
   <date>1251108485000</date>
   <contentUpdateDate>1251108485000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('xe.themes.colors.template.title')</title>
+  <title>$services.localization.render('xe.themes.colors.template.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

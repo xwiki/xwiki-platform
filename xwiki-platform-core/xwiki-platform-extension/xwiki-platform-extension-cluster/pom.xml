@@ -27,12 +27,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-cluster</artifactId>
   <name>XWiki Platform - Extension - Cluster</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Cluster</description>
+  <description>Makes the Extension Manager work properly in a cluster environment.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

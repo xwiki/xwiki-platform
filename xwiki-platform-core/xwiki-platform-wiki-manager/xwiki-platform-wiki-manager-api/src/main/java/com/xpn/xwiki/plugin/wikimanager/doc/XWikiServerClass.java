@@ -27,6 +27,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocumentDoesNotExistException;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
@@ -34,8 +35,8 @@ import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager XClassManager} implementation for
- * XWiki.XWikiServerClass class.
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager XClassManager} implementation
+ * for XWiki.XWikiServerClass class.
  * 
  * @version $Id$
  * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
@@ -292,11 +293,24 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         try {
             context.setDatabase(context.getMainXWiki());
 
+            // Ensure that the baseClass private variable of the AbstractXClassManager extended class is properly
+            // initialized. Here we are assuming that the new XWikiServerClassDocumentInitializer already took care of
+            // initializing the class document in the database.
+            super.checkClassDocument(context);
+
             // Ensure that the template document exists.
             super.checkClassTemplateDocument(context);
         } finally {
             context.setDatabase(database);
         }
+    }
+
+    @Override
+    protected boolean updateBaseClass(BaseClass baseClass)
+    {
+        // We make sure that the default implementation is not called and that we always use the database version of the
+        // class, as initialized by super.checkClassDocument(context) above.
+        return false;
     }
 
     @Override

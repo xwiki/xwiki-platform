@@ -41,6 +41,7 @@
   <modules>
     <module>dependency</module>
     <module>package</module>
+    <module>package-xwiki-8960</module>
   </modules>
   <build>
     <extensions>

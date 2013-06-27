@@ -1,19 +1,19 @@
 var XWiki = (function (XWiki) {
-  
+
   /**
    * The search suggest hooks itself on the search input and provide live results as the user types.
    * Search form validation is not affected (user can still type enter and get to the regular search result page)
    */
   XWiki.SearchSuggest = Class.create({
-    
-     /** 
-      * Constructor. Prepares a light modal container on the same model as the modalPopup 
+
+     /**
+      * Constructor. Prepares a light modal container on the same model as the modalPopup
       * and registers event listerners.
       */
     initialize: function(searchInput, sources){
-        
+
       this.sources = sources;
-        
+
       this.searchInput = $(searchInput);
       if (!this.searchInput) {
         return;
@@ -22,12 +22,12 @@ var XWiki = (function (XWiki) {
       this.searchInput.observe("keyup", this.onKeyUp.bindAsEventListener(this));
 
       document.observe("xwiki:suggest:clearSuggestions", this.onClearSuggestions.bindAsEventListener(this));
-      document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this)); 
+      document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this));
       document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
-    
+
       this.createSuggest();
     },
-      
+
     /**
      * Callback triggered when the original suggest clears its suggestions.
      */
@@ -37,7 +37,7 @@ var XWiki = (function (XWiki) {
         this.searchInput.setStyle({'borderBottomStyle' : this.searchInputBorderBottomSavedStyle});
       }
     },
-      
+
     /**
      * Callback triggered when the original suggest has created its results container.
      */
@@ -78,14 +78,14 @@ var XWiki = (function (XWiki) {
             .insert(new Element('span', {'class':'suggestValue'}))
             .insert(new Element('span', {'class':'suggestInfo'}))
       var allResultsNode = new XWiki.widgets.XList([
-        new XWiki.widgets.XListItem( "$msg.get('core.widgets.suggest.showResults')", {
+        new XWiki.widgets.XListItem( "$services.localization.render('core.widgets.suggest.showResults')", {
           'containerClasses': 'suggestItem',
           'classes': 'showAllResuts',
           'eventCallbackScope' : this,
           'noHighlight' : true,
           'value' : valueNode
         } ),
-      ], 
+      ],
       {
         'classes' : 'suggestList',
         'eventListeners' : {
@@ -105,7 +105,7 @@ var XWiki = (function (XWiki) {
         className: 'searchSuggest horizontalLayout',
         fadeOnClear:false,
         align: "right",
-        minchars: 3,    
+        minchars: 3,
         sources : this.sources,
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
         displayValue:true,
@@ -118,7 +118,7 @@ var XWiki = (function (XWiki) {
         shownoresults:false
       });
     },
-    
+
    /**
     * Callback triggered when a key has been typed on the virtual input.
     */
@@ -131,9 +131,9 @@ var XWiki = (function (XWiki) {
            this.searchInput.up('form').submit();
          }
      }
-   } 
-    
-  });   
+   }
+
+  });
 
   function init(){
     var sources = [

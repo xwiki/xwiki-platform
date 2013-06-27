@@ -33,6 +33,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
@@ -46,6 +47,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Singleton
 public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
+    /**
+     * The name of the field containing the user email.
+     */
+    private static final String FIELD_EMAIL = "email";
+
     /**
      * Used to bind a class to a document sheet.
      */
@@ -84,26 +90,9 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
 
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
-        needsUpdate |= bclass.addTextField("email", "e-Mail", 30);
-        // Email field custom display (email obfuscation).
-        PropertyClass emailProperty = (PropertyClass) bclass.get("email");
-        if (!emailProperty.isCustomDisplayed(xcontext)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{{velocity}}\n");
-            builder.append("#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')\n");
-            // Line broken in 2 because it was too long.
-            builder.append("  {{html}}<input id='$prefix$name' type='text'");
-            builder.append(" name='$prefix$name' value='$value' />{{/html}}\n");
-            builder.append("#else\n");
-            builder.append("  ## Allow $obfuscateEmail to be set in some other place.\n");
-            builder.append("  #if(\"$obfuscateEmail\" == 'false')\n");
-            builder.append("    $!value\n");
-            builder.append("  #else\n");
-            builder.append("    $!value.replaceAll('@.*', '@ xxxxxx')\n");
-            builder.append("  #end\n");
-            builder.append("#end\n");
-            builder.append("{{/velocity}}");
-            emailProperty.setCustomDisplay(builder.toString());
+        if (!(bclass.getField(FIELD_EMAIL) instanceof EmailClass)) {
+            bclass.removeField(FIELD_EMAIL);
+            bclass.addEmailField(FIELD_EMAIL, "e-Mail", 30);
             needsUpdate = true;
         }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);
@@ -130,7 +119,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
             builder.append("    #if($xwiki.jodatime)\n");
             builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
             builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$msg.get('XWiki.XWikiPreferences_timezone_default')</option>\n");
+                + "$services.localization.render('XWiki.XWikiPreferences_timezone_default')</option>\n");
             builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
             builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
                 + "$tz</option>\n");

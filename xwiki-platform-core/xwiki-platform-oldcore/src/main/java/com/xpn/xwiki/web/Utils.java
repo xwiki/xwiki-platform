@@ -106,6 +106,17 @@ public class Utils
     {
         XWikiResponse response = context.getResponse();
 
+        // If a Redirect has already been sent then don't process the template since it means and we shouldn't write
+        // anymore to the servlet output stream!
+        // See: http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#sendRedirect(String)
+        // "After using this method, the response should be considered to be committed and should not be written
+        // to."
+        if ((response instanceof XWikiServletResponse)
+            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND)
+        {
+            return;
+        }
+
         // Set content-type and encoding (this can be changed later by pages themselves)
         response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
 
@@ -149,6 +160,9 @@ public class Utils
         enablePlaceholders(context);
         String content = "";
         try {
+            // Note: This line below can change the state of the response. For example a vm file can have a call to
+            // sendRedirect. In this case we need to be careful to not write to the output stream since it's already
+            // been committed. This is why we do a check below before calling response.getOutputStream().write().
             content = context.getWiki().evaluateTemplate(template + ".vm", context);
             // Replace all placeholders with the protected values
             content = replacePlaceholders(content, context);
@@ -177,13 +191,11 @@ public class Utils
                 }
             }
 
-            // We only write if the caller has asked and if the response isn't 302 which signify that a send redirect
-            // has already been called and thus we shouldn't write anymore to the servlet output stream!
-            // See: http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#sendRedirect(String)
-            // "After using this method, the response should be considered to be committed and should not be written
-            // to."
-            if (write && (!(response instanceof XWikiServletResponse) || ((response instanceof XWikiServletResponse)
-                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND)))
+            // We only write if the caller has asked.
+            // We also make sure to verify that there hasn't been a call to sendRedirect before since it would mean the
+            // response has already been written to and we shouldn't try to write in it.
+            if (write && ((response instanceof XWikiServletResponse)
+                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND))
             {
                 try {
                     try {

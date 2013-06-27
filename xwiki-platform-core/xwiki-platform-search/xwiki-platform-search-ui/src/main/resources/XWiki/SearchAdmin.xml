@@ -292,7 +292,7 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
   <content>{{include document='XWiki.SearchCode' /}}
 
 (% id='Hsearch.admin.configuration.title' %)
-= {{velocity}}$msg.get('search.admin.configuration.title'){{/velocity}} =
+= {{velocity}}$services.localization.render('search.admin.configuration.title'){{/velocity}} =
 
 {{velocity}}
 #set ($searchEnginePropertyClass = $searchConfigClass.engine)
@@ -307,7 +307,7 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
 
     &lt;dt&gt;
       &lt;label&gt;$searchEnginePropertyClass.translatedPrettyName&lt;/label&gt;
-      &lt;span class='xHint'&gt;$msg.get('search.admin.configuration.seexwikicfg')&lt;/span&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('search.admin.configuration.seexwikicfg')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
       &lt;select name='XWiki.SearchConfigClass_0_engine'&gt;
@@ -319,7 +319,7 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
 
     &lt;dt&gt;
       &lt;span class='buttonwrapper'&gt;
-        &lt;input value="$msg.get('search.admin.configuration.button')" class='button' type='submit'&gt;
+        &lt;input value="$services.localization.render('search.admin.configuration.button')" class='button' type='submit'&gt;
       &lt;/span&gt;
     &lt;/dt&gt;
   &lt;/dl&gt;

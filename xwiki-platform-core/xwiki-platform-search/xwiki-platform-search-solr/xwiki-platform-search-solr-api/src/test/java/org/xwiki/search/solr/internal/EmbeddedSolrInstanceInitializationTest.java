@@ -19,49 +19,45 @@
  */
 package org.xwiki.search.solr.internal;
 
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.net.URL;
-
-import junit.framework.Assert;
+import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.core.CoreContainer;
-import org.jmock.Expectations;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 /**
  * Test the initialization of the Solr instance.
  * 
  * @version $Id$
  */
-public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTestCase
+@AllComponents
+public class EmbeddedSolrInstanceInitializationTest
 {
-    protected File PERMANENT_DIRECTORY = new File(System.getProperty("java.io.tmpdir"), "data");
+    @Rule
+    public final MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        final Environment mockEnvironment =
-            getComponentManager().registerMockComponent(getMockery(), Environment.class);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockEnvironment).getPermanentDirectory();
-                will(returnValue(PERMANENT_DIRECTORY));
-            }
-        });
-    }
+    protected File PERMANENT_DIRECTORY = new File("target", "data-" + new Date().getTime());
 
     @Before
     public void setup() throws Exception
     {
+        Environment mockEnvironment = this.mocker.registerMockComponent(Environment.class);
+
+        when(mockEnvironment.getPermanentDirectory()).thenReturn(PERMANENT_DIRECTORY);
+
         FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
         PERMANENT_DIRECTORY.mkdirs();
     }
@@ -69,12 +65,7 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
     @After
     public void tearDown() throws Exception
     {
-        EmbeddedSolrInstance instance = getComponentManager().getInstance(SolrInstance.class, "embedded");
-        instance.shutDown();
-
-        super.tearDown();
-
-        FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
+        //FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
     }
 
     @Test
@@ -113,7 +104,7 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
      */
     private void getInstanceAndAssertHomeDirectory(String expected) throws ComponentLookupException, Exception
     {
-        SolrInstance instance = getComponentManager().getInstance(SolrInstance.class, "embedded");
+        SolrInstance instance = mocker.getInstance(SolrInstance.class, "embedded");
         Assert.assertNotNull(instance);
 
         EmbeddedSolrInstance implementation = ((EmbeddedSolrInstance) instance);
@@ -122,6 +113,7 @@ public class EmbeddedSolrInstanceInitializationTest extends AbstractComponentTes
         if (expected == null) {
             expected = implementation.getDefaultHomeDirectory();
         }
+
         Assert.assertEquals(expected + File.separator, container.getSolrHome());
         Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
             "schema.xml").exists());

@@ -21,7 +21,7 @@ package com.xpn.xwiki.doc;
 
 import org.junit.Test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Unit test for {@link AttachmentDiff}.

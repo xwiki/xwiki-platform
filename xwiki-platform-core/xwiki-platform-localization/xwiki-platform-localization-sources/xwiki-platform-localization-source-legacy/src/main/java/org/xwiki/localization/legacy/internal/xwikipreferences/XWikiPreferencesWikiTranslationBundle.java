@@ -33,6 +33,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.internal.AbstractTranslationBundle;
@@ -174,9 +175,15 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
     {
         for (TranslationBundle bundle : this.bundles.values()) {
             Translation translation = bundle.getTranslation(key, locale);
-            if (translation != null) {
+            if (translation != null && translation.getLocale().equals(locale)) {
                 return translation;
             }
+        }
+
+        // Try parent locale
+        Locale parentLocale = LocaleUtils.getParentLocale(locale);
+        if (parentLocale != null) {
+            return getTranslation(key, parentLocale);
         }
 
         return null;

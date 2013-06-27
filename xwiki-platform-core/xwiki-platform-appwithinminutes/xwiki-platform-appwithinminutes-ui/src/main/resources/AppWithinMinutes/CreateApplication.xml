@@ -15,7 +15,7 @@
   <date>1322394814000</date>
   <contentUpdateDate>1322394814000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('platform.appwithinminutes.appNamePageTitle')</title>
+  <title>$services.localization.render('platform.appwithinminutes.appNamePageTitle')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -170,7 +170,7 @@ XWiki.AppNameValidator = Class.create({
   onUpdate : function() {
     if (this.input.value == '') {
       this._onValidate({
-        responseText: '&lt;span class="xErrorMsg"&gt;$escapetool.javascript($msg.get('platform.appwithinminutes.appNameEmptyError'))&lt;/span&gt;'
+        responseText: '&lt;span class="xErrorMsg"&gt;$escapetool.javascript($services.localization.render('platform.appwithinminutes.appNameEmptyError'))&lt;/span&gt;'
       });
     } else {
       this.preview.addClassName('loading');
@@ -340,16 +340,16 @@ return XWiki;
   #appWizardHeader(1)
   (% class="wizard-help" %)
   (((
-    **$msg.get('platform.appwithinminutes.wizardStepHelpTitle')** $msg.get('platform.appwithinminutes.wizardStepHelpDescription')
+    **$services.localization.render('platform.appwithinminutes.wizardStepHelpTitle')** $services.localization.render('platform.appwithinminutes.wizardStepHelpDescription')
     (% class="steps vertical" %)
     #foreach($index in [1, 2, 3])
-      * (% class="number" %)$index(%%) (% class="name" %)$msg.get("platform.appwithinminutes.wizardStep${index}Name")(%%)
-        (% class="description" %)$msg.get("platform.appwithinminutes.wizardStep${index}Description")
+      * (% class="number" %)$index(%%) (% class="name" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Name")(%%)
+        (% class="description" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Description")
     #end
   )))
   &lt;form action="" method="post" class="xform wizard-body"&gt;
-    ; &lt;label for="appName"&gt;$msg.get('platform.appwithinminutes.appNameLabel')&lt;/label&gt;
-      (% class="xHint" %)$msg.get('platform.appwithinminutes.appNameHint')
+    ; &lt;label for="appName"&gt;$services.localization.render('platform.appwithinminutes.appNameLabel')&lt;/label&gt;
+      (% class="xHint" %)$services.localization.render('platform.appwithinminutes.appNameHint')
     : &lt;input type="text" id="appName" name="appName" /&gt;
     #appWizardFooter(1)
   &lt;/form&gt;
@@ -397,21 +397,21 @@ return XWiki;
     ## Create a new application.
     #set($className = "#toXMLName($appName)")
     #if($className == '')
-      (% class="xErrorMsg" %)$msg.get('platform.appwithinminutes.appNameInvalidClassNameError')
+      (% class="xErrorMsg" %)$services.localization.render('platform.appwithinminutes.appNameInvalidClassNameError')
     #end
     #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
     #set($appClassRef = $services.model.createDocumentReference($doc.wiki, $appName, "$!{className}Class"))
   #end
   #set($appHomeURL = $stringtool.removeEnd($xwiki.getDocument($appHomeRef).getExternalURL(), 'WebHome'))
-  ; $msg.get('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
+  ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
   : {{{$!appHomeURL}}}
-  ; $msg.get('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
+  ; $services.localization.render('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
   : {{{$doc.wiki}}} » {{{$appName}}}
-  ; $msg.get('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
+  ; $services.localization.render('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
   : {{{$appClassRef.wikiReference.name}}} » {{{$appClassRef.lastSpaceReference.name}}} » {{{$appClassRef.name}}}
   #if($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
 
-    {{warning}}$msg.get('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
+    {{warning}}$services.localization.render('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
   #end
 #end
 {{/velocity}}

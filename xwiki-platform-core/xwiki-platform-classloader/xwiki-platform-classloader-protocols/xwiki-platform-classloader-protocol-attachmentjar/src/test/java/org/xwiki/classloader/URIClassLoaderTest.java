@@ -26,7 +26,7 @@ import java.net.URLStreamHandlerFactory;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Test;

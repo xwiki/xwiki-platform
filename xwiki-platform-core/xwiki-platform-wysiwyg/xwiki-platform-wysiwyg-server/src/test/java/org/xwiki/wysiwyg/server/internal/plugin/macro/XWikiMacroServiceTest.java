@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;

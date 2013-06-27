@@ -27,22 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user</artifactId>
   <name>XWiki Platform - User - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - User - Parent POM</description>
   <modules>
-    <module>xwiki-platform-user-ui</module>
+    <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-user-directory</module>
+    <module>xwiki-platform-user-profile</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-user-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>
        

@@ -103,9 +103,11 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
                 LocalExtension extension = (LocalExtension) source;
                 if (extension.getType().equals(XarExtensionHandler.TYPE)) {
                     updateXarExtension(extension);
-                    
+
                     if (data != null) {
-                        updateXarExtension((LocalExtension) data);
+                        for (InstalledExtension installedExtension : (Collection<InstalledExtension>) data) {
+                            updateXarExtension(installedExtension);
+                        }
                     }
                 }
             }

@@ -141,13 +141,13 @@ XWiki.WebDAV = {
       try {
         editor = new window.ActiveXObject("SharePoint.OpenDocuments");
       } catch (err) {
-        window.alert("$msg.get('xe.webdav.initialize.activex')");
+        window.alert("$services.localization.render('xe.webdav.initialize.activex')");
         return;
       }
       if (editor) {
         editor.EditDocument(davURL);
       } else {
-        window.alert("$msg.get('xe.webdav.initialize.error')");
+        window.alert("$('xe.webdav.initialize.error')");
         return;
       }
     } else if (window.InstallTrigger) {
@@ -160,15 +160,15 @@ XWiki.WebDAV = {
         evt.initEvent("FoXWikiDomEvent", true, false);
         element.dispatchEvent(evt);
         if (element.getAttribute("foxwiki") == "false") {
-          if (window.confirm("$msg.get('xe.webdav.install.foxwiki')")) {
+          if (window.confirm("$services.localization.render('xe.webdav.install.foxwiki')")) {
             window.InstallTrigger.install( {"FoXWiki" :"https://addons.mozilla.org/en-US/firefox/downloads/file/39674/foxwiki-1.0b-fx.xpi"});
           }
         }
       } else {
-        window.alert("$msg.get('xe.webdav.error')");
+        window.alert("$services.localization.render('xe.webdav.error')");
       }
     } else {
-      window.alert("$msg.get('xe.webdav.sorry')");
+      window.alert("$services.localization.render('xe.webdav.sorry')");
     }
   }
 };
@@ -186,5 +186,5 @@ return XWiki;
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{info}}{{velocity}}$msg.get('xe.webdav.info'){{/velocity}}{{/info}}</content>
+  <content>{{info}}{{velocity}}$services.localization.render('xe.webdav.info'){{/velocity}}{{/info}}</content>
 </xwikidoc>

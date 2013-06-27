@@ -21,7 +21,6 @@ package org.xwiki.rest.internal.resources.classes;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
@@ -60,8 +59,8 @@ public class ClassPropertyResourceImpl extends XWikiResource implements ClassPro
 
             for (Property property : clazz.getProperties()) {
                 if (property.getName().equals(propertyName)) {
-                    String classUri = UriBuilder.fromUri(uriInfo.getBaseUri()).path(ClassResource.class)
-                            .build(wikiName, xwikiClass.getName()).toString();
+                    String classUri = Utils.createURI(uriInfo.getBaseUri(), ClassResource.class, wikiName,
+                        xwikiClass.getName()).toString();
                     Link classLink = objectFactory.createLink();
                     classLink.setHref(classUri);
                     classLink.setRel(Relations.CLASS);

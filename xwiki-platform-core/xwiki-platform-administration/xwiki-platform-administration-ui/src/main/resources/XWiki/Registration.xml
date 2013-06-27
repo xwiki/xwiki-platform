@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1264306181000</creationDate>
-  <date>1352726663000</date>
-  <contentUpdateDate>1352726663000</contentUpdateDate>
+  <creationDate>1364502205000</creationDate>
+  <date>1364565599000</date>
+  <contentUpdateDate>1364565599000</contentUpdateDate>
   <version>1.1</version>
   <title>Registration</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -193,16 +192,16 @@
       <groups>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>groups</name>
         <number>1</number>
+        <picker>1</picker>
         <prettyName>Groups</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
       </groups>
       <levels>
@@ -222,16 +221,16 @@
       <users>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>users</name>
         <number>3</number>
+        <picker>1</picker>
         <prettyName>Users</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
@@ -378,7 +377,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ## The first name field, no checking.
 #set($field = 
   {'name' : 'register_first_name',
-    'label' : $msg.get('core.register.firstName'),
+    'label' : $services.localization.render('core.register.firstName'),
     'params' : { 
       'type' : 'text', 
       'size' : '60' 
@@ -389,7 +388,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ## The last name field, no checking.
 #set($field = 
   {'name' : 'register_last_name',
-    'label' : $msg.get('core.register.lastName'),
+    'label' : $services.localization.render('core.register.lastName'),
     'params' : { 
       'type' : 'text', 
       'size' : '60' 
@@ -400,7 +399,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
 #set($field = 
   {'name' : 'xwikiname',
-    'label' : $msg.get('core.register.username'),
+    'label' : $services.localization.render('core.register.username'),
     'params' : {
       'type' : 'text',
       'onfocus' : 'prepareName(document.forms.register);',
@@ -408,11 +407,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('core.validation.required.message') 
+        'failureMessage' : $services.localization.render('core.validation.required.message') 
       },
       'programmaticValidation' : {
         'code' : '#nameAvailable($request.get("xwikiname"))',
-        'failureMessage' : $msg.get('core.register.userAlreadyExists')
+        'failureMessage' : $services.localization.render('core.register.userAlreadyExists')
       }
     }
   })
@@ -428,7 +427,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ##The password field, mandatory and must be at least 6 characters long.
 #set($field = 
   {'name' : 'register_password',
-    'label' : $msg.get('core.register.password'),
+    'label' : $services.localization.render('core.register.password'),
     'params' : {
       'type' : 'password',
       'autocomplete' : 'off',
@@ -436,11 +435,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('core.validation.required.message') 
+        'failureMessage' : $services.localization.render('core.validation.required.message') 
       },
       'regex' : {
         'pattern' : '/.{6,}/',
-        'failureMessage' : $msg.get('xe.admin.registration.passwordTooShort')
+        'failureMessage' : $services.localization.render('xe.admin.registration.passwordTooShort')
       }
     }
   })
@@ -449,7 +448,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ##The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
 #set($field = 
   {'name' : 'register2_password',
-    'label' : $msg.get('core.register.passwordRepeat'),
+    'label' : $services.localization.render('core.register.passwordRepeat'),
     'params' : {
       'type' : 'password',
       'autocomplete' : 'off',
@@ -457,15 +456,15 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('core.validation.required.message') 
+        'failureMessage' : $services.localization.render('core.validation.required.message') 
       },
       'mustMatch' : {
         'name' : 'register_password',
-        'failureMessage' : $msg.get('xe.admin.registration.passwordMismatch')
+        'failureMessage' : $services.localization.render('xe.admin.registration.passwordMismatch')
       },
       'regex' : {
         'pattern' : '/.{6,}/',
-        'failureMessage' : $msg.get('xe.admin.registration.passwordTooShort')
+        'failureMessage' : $services.localization.render('xe.admin.registration.passwordTooShort')
       }
     }
   })
@@ -474,7 +473,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ## The email address field, regex checked with an email pattern.
 #set($field = 
   {'name' : 'register_email',
-    'label' : $msg.get('core.register.email'),
+    'label' : $services.localization.render('core.register.email'),
     'params' : { 
       'type' : 'text', 
       'size' : '60' 
@@ -482,7 +481,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     'validate' : {
       'regex' : {
         'pattern' : '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/',
-        'failureMessage' : $msg.get('xe.admin.registration.invalidEmail')
+        'failureMessage' : $services.localization.render('xe.admin.registration.invalidEmail')
       }
     }
   })
@@ -502,7 +501,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     },
     'validate' : {
       'mandatory' : {
-        'failureMessage' : $msg.get('core.validation.required.message')
+        'failureMessage' : $services.localization.render('core.validation.required.message')
       },
       'regex' : {
         'pattern' : '/^green$/',
@@ -534,11 +533,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   ## Empty 'name' field overriddes name="captcha_image" with "" so name is not specified at all.
   #set($field = 
     {'name' : 'captcha_image',
-      'label' : "&lt;span class='hidden'&gt;$msg.get('core.captcha.image.label')&lt;/span&gt;",
+      'label' : "&lt;span class='hidden'&gt;$services.localization.render('core.captcha.image.label')&lt;/span&gt;",
       'tag' : 'img',
       'params' : {
         'src' : $doc.getURL('imagecaptcha'),
-        'alt' : $msg.get('core.captcha.image.alternateText', [$msg.get('core.register.submit')]),
+        'alt' : $services.localization.render('core.captcha.image.alternateText', [$services.localization.render('core.register.submit')]),
         'name' : ''
       }
     })
@@ -549,19 +548,19 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   ## and not filled back in if there is an error ('noReturn')
   #set($field = 
     {'name' : 'captcha_answer',
-      'label' : $msg.get('core.captcha.image.instruction'),
+      'label' : $services.localization.render('core.captcha.image.instruction'),
       'params' : { 
         'type' : 'text', 
         'size' : '60' 
       },
       'validate' : {
         'mandatory' : {
-          'failureMessage' : $msg.get('core.captcha.captchaAnswerIsWrong'),
+          'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong'),
           'noscript' : true
         },
         'programmaticValidation' : {
           'code' : '#checkCaptcha($request, $request.get("captcha_answer"))',
-          'failureMessage' : $msg.get('core.captcha.captchaAnswerIsWrong')
+          'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong')
         }
       },
       'noReturn' : true
@@ -686,12 +685,12 @@ $heading
       &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin --&gt;
       &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin --&gt;
       ##
-      &lt;input class="button" type="submit" value="$msg.get('save')" onclick="window.lb.lbSaveForm();"/&gt;
+      &lt;input class="button" type="submit" value="$services.localization.render('save')" onclick="window.lb.lbSaveForm();"/&gt;
       &lt;/span&gt;#* End ButtonWrapper then start another...*#&lt;span class="buttonwrapper"&gt;
-      &lt;input class="button secondary" type="submit" value="$msg.get("cancel")" onclick="Form.disable(window.lb.form); window.lb.lbClose();"/&gt;
+      &lt;input class="button secondary" type="submit" value="$services.localization.render("cancel")" onclick="Form.disable(window.lb.form); window.lb.lbClose();"/&gt;
     #else
       ## Not using the LightBox
-      &lt;input type="submit" value="$msg.get('core.register.submit')" class="button"/&gt;
+      &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;
     #end
     &lt;/span&gt;## ButtonWrapper
     &lt;/div&gt;
@@ -704,8 +703,8 @@ $heading
   ##
   ## Allow permitted users to configure this application.
   #if($xcontext.getUser() != 'XWiki.XWikiGuest' &amp;&amp; $xcontext.hasAccessLevel("edit", $documentName))
-    [[$msg.get('xe.admin.registration.youCanConfigureRegistrationHere')&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]]
-    {{html}}&lt;a href="$xwiki.getURL($documentName, 'edit', 'editor=wiki')"&gt;$msg.get('xe.admin.registration.youCanConfigureRegistrationFieldsHere')&lt;/a&gt;{{/html}}
+    [[{{translation key="xe.admin.registration.youCanConfigureRegistrationHere"/}}&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]]
+    {{html}}&lt;a href="$xwiki.getURL($documentName, 'edit', 'editor=wiki')"&gt;$services.localization.render('xe.admin.registration.youCanConfigureRegistrationFieldsHere')&lt;/a&gt;{{/html}}
   #end
 ## If the registration is done (successful) and we detect the Lightbox simply send the user back to the original page.
 #elseif($assumeLightbox)
@@ -837,14 +836,14 @@ $heading
   #if($reg &amp;&amp; $reg &lt;= 0)
     {{error}}
     #if($reg == -2)
-      $msg.get('core.register.passwordMismatch')
+      {{translation key="core.register.passwordMismatch"/}}
     ## -3 means username taken, -8 means username is superadmin name
     #elseif($reg == -3 || $reg == -8)
-      $msg.get('core.register.userAlreadyExists')
+      {{translation key="core.register.userAlreadyExists"/}}
     #elseif($reg == -4)
-      $msg.get('core.register.invalidUsername')
+      {{translation key="core.register.invalidUsername"/}}
     #else
-      $msg.get('core.register.registerFailed', [$reg])
+      {{translation key="core.register.registerFailed" parameters="$reg"/}}
     #end
     {{/error}}
   #elseif($reg)
@@ -887,7 +886,7 @@ $heading
           &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.xml($!password)" /&gt;
           &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.xml($redirect)" /&gt;
           &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
+            &lt;input type="submit" value="$services.localization.render('login')" class="button"/&gt;
           &lt;/span&gt;
           &lt;/div&gt;
         &lt;/form&gt;
@@ -928,7 +927,7 @@ $heading
           #foreach($entry in $fieldMandatoryStar.entrySet())
             $entry.getKey()="$entry.getValue()" ##
           #end
-          &gt;$msg.get('core.validation.required')&lt;/span&gt;
+          &gt;$services.localization.render('core.validation.required')&lt;/span&gt;
         #end
           &lt;/label&gt;
         &lt;/dt&gt;
@@ -1059,14 +1058,14 @@ $heading
   #set($configDocument = $xwiki.getDocument($configDocumentName))
   #if(!$configDocument || !$configDocument.getObject($documentName))
     ## No config document, load defaults.
-    #set($heading = "$msg.get('core.register.title')")
-    #set($welcomeMessage = "$msg.get('core.register.welcome')")
+    #set($heading = "$services.localization.render('core.register.title')")
+    #set($welcomeMessage = "$services.localization.render('core.register.welcome')")
     #set($useLiveValidation = true)
-    #set($defaultFieldOkayMessage = "$msg.get('core.validation.valid.message')")
+    #set($defaultFieldOkayMessage = "$services.localization.render('core.validation.valid.message')")
     #set($loginButton = true)
     #set($defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
     #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
-    #set($registrationSuccessMessage = '{{info}}$msg.get("core.register.successful", ["[[${userFullName}&gt;&gt;${userSpace}${userName}]]", ${userName}]){{/info}}')
+    #set($registrationSuccessMessage = '{{info}}$services.localization.render("core.register.successful", ["[[${userFullName}&gt;&gt;${userSpace}${userName}]]", ${userName}]){{/info}}')
   #else
     #set($configObject = $configDocument.getObject($documentName))
     #if ($context.action == 'register')

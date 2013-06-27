@@ -15,7 +15,7 @@
   <date>1297363148000</date>
   <contentUpdateDate>1297363148000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.index.attachmentsResults")</title>
+  <title>$services.localization.render('platform.index.attachmentsResults')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -163,7 +163,7 @@
     "spaceurl" : "$xwiki.getURL("${document.space}.WebHome")",
     "date" : "$xwiki.formatDate($attach.date, $formatDate)",
     "author" : "$!escapetool.javascript($attach.author)",
-    "authorname" : "$!escapetool.javascript($xwiki.getDocument($attach.author).name)",
+    "authorname" : "$!escapetool.javascript($xwiki.getUserName($attach.author, false))",
     "authorurl" : "$xwiki.getURL($attach.author)",
     "type" : "$!escapetool.javascript($attach.getMimeType())"
   #else

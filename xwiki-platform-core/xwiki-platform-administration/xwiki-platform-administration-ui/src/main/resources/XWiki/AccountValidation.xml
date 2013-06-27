@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1219859029000</creationDate>
-  <date>1219860006000</date>
-  <contentUpdateDate>1219860006000</contentUpdateDate>
+  <creationDate>1364502208000</creationDate>
+  <date>1364565086000</date>
+  <contentUpdateDate>1364565086000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -47,9 +46,9 @@
 #if("$!{request.validkey}" != '' &amp;&amp; "$!{request.xwikiname}" != '')
   #if($xwiki.validateUser(true) == 0)
     #set($loginURL = $xwiki.getURL('XWiki.XWikiLogin', 'login'))
-    {{info}}{{html clean="false"}}$msg.get('xe.admin.accountvalidation.success', [${loginURL}]){{/html}}{{/info}}
+    {{info}}{{html clean="false"}}$services.localization.render('xe.admin.accountvalidation.success', [${loginURL}]){{/html}}{{/info}}
   #else
-    {{warning}}$msg.get('xe.admin.accountvalidation.failure'){{/warning}}
+    {{warning}}{{translation key="xe.admin.accountvalidation.failure"/}}{{/warning}}
   #end
 #else
   $response.sendRedirect($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))

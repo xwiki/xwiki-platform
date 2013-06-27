@@ -19,7 +19,8 @@
  */
 package org.xwiki.url;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Transforms a XWiki URL instance into some other representation.
@@ -28,7 +29,8 @@ import org.xwiki.component.annotation.ComponentRole;
  * @since 2.0M1
  * @param <T> the output type
  */
-@ComponentRole
+@Role
+@Unstable
 public interface XWikiURLSerializer<T>
 {
     /**

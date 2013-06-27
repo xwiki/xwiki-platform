@@ -107,7 +107,7 @@
     <property>
       <content>{{velocity}}
 #if ($xwiki.isMultiLingual() || $showEmptyPanels)
-  #largepanelheader($msg.get('panels.translation.title'))
+  #largepanelheader($services.localization.render('panels.translation.title'))
   #if ($request.language &amp;&amp; $request.language != 'default' &amp;&amp; $doc.defaultLanguage != $request.language)
     #set ($forcetrans = $request.language)
     #set ($rlanguage = $request.language)
@@ -117,10 +117,10 @@
   #end
   #if ((!$tdoc.language || $tdoc.language == '' || $tdoc.language == $doc.defaultLanguage) &amp;&amp; ($forcetrans == ''))
     (% class="important" %)
-    **$msg.get('panels.translation.editingOriginal', [${doc.defaultLanguage}])**
+    **$services.localization.render('panels.translation.editingOriginal', [${doc.defaultLanguage}])**
     #if ($!doc.translationList.size() &gt; 0)
 
-      $msg.get('panels.translation.existingTranslations')##
+      $services.localization.render('panels.translation.existingTranslations')##
       #foreach ($translation in $doc.translationList) ##
         [[$translation&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${translation}")]]##
       #end
@@ -128,12 +128,12 @@
     #end
   #else
     (% class="important" %)
-    **$msg.get('panels.translation.editingTranslation', [${rlanguage}])**
+    **$services.localization.render('panels.translation.editingTranslation', [${rlanguage}])**
 
-    $msg.get('panels.translation.editOriginalLanguage', ["[[${doc.defaultLanguage}&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLanguage}"")]]"])
+    $services.localization.render('panels.translation.editOriginalLanguage', ["[[${doc.defaultLanguage}&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLanguage}"")]]"])
     #if ($doc.translationList.size() &gt; 1)
 
-      $msg.get('panels.translation.otherTranslations')##
+      $services.localization.render('panels.translation.otherTranslations')##
       #foreach ($translation in $doc.translationList)
         #if ($translation != $tdoc.language) ##
           [[$translation&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${translation}")]]##
@@ -151,7 +151,7 @@
   #end
   #if ($extraTranslations != '')
 
-    $msg.get('panels.translation.translate') $extraTranslations
+    $services.localization.render('panels.translation.translate') $extraTranslations
   #end
   #panelfooter()
 #end

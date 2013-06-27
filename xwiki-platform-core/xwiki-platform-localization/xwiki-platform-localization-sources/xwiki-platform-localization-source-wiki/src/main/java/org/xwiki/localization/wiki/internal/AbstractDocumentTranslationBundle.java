@@ -71,11 +71,6 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
      */
     public static int DEFAULTPRIORITY_WIKI = DEFAULTPRIORITY - 100;
 
-    /**
-     * The prefix to use in all wiki document based translations.
-     */
-    public static final String ID_PREFIX = "document:";
-
     protected TranslationBundleContext bundleContext;
 
     protected EntityReferenceSerializer<String> serializer;
@@ -90,9 +85,16 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
     protected DocumentReference documentReference;
 
-    public AbstractDocumentTranslationBundle(DocumentReference reference, ComponentManager componentManager,
-        TranslationMessageParser translationMessageParser) throws ComponentLookupException
+    /**
+     * The prefix to use when generating the bundle unique identifier.
+     */
+    protected String idPrefix;
+
+    public AbstractDocumentTranslationBundle(String idPrefix, DocumentReference reference,
+        ComponentManager componentManager, TranslationMessageParser translationMessageParser)
+        throws ComponentLookupException
     {
+        this.idPrefix = idPrefix;
         this.bundleContext = componentManager.getInstance(TranslationBundleContext.class);
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.contextProvider =
@@ -125,7 +127,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     {
         this.documentReference = reference;
 
-        setId(ID_PREFIX + this.serializer.serialize(reference));
+        setId(this.idPrefix + this.serializer.serialize(reference));
     }
 
     protected LocalizedTranslationBundle loadDocumentLocaleBundle(Locale locale) throws Exception
@@ -134,7 +136,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
         XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
 
-        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
+        if (locale != null && !locale.equals(Locale.ROOT)) {
             XWikiDocument tdocument = document.getTranslatedDocument(locale, context);
 
             if (tdocument == document) {

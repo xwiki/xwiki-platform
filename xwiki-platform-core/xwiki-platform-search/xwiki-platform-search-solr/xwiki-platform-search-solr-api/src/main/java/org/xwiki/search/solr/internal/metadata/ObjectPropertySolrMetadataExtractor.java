@@ -19,17 +19,19 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.util.List;
+import java.util.Locale;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObjectReference;
@@ -43,77 +45,68 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 @Component
 @Named("object_property")
+@Singleton
 public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
+    /**
+     * The Solr reference resolver.
+     */
+    @Inject
+    @Named("object_property")
+    private SolrReferenceResolver resolver;
+
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
-        IllegalArgumentException
+    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+        throws Exception
     {
         ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference(entityReference);
 
-        try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+        BaseObjectReference objectReference = new BaseObjectReference(objectPropertyReference.getParent());
+        DocumentReference classReference = objectReference.getXClassReference();
+        DocumentReference documentReference = new DocumentReference(objectReference.getParent());
 
-            BaseObjectReference objectReference = new BaseObjectReference(objectPropertyReference.getParent());
-            DocumentReference classReference = objectReference.getXClassReference();
-            DocumentReference documentReference = new DocumentReference(objectReference.getParent());
-
-            XWikiDocument document = getDocument(documentReference);
-            BaseProperty<ObjectPropertyReference> objectProperty = document.getXObjectProperty(objectPropertyReference);
-
-            solrDocument.addField(Fields.ID, getId(objectPropertyReference));
-            addDocumentFields(documentReference, solrDocument);
-            solrDocument.addField(Fields.TYPE, objectPropertyReference.getType().name());
-            solrDocument.addField(Fields.CLASS, localSerializer.serialize(classReference));
-            solrDocument.addField(Fields.PROPERTY_NAME, objectProperty.getName());
-
-            addLanguageAndContentFields(documentReference, solrDocument, objectProperty);
-
-            return solrDocument;
-        } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'",
-                serializer.serialize(objectPropertyReference)), e);
+        XWikiDocument document = getDocument(documentReference);
+        BaseProperty<ObjectPropertyReference> objectProperty = document.getXObjectProperty(objectPropertyReference);
+        if (objectProperty == null) {
+            return false;
         }
+
+        // Object
+        solrDocument.setField(FieldUtils.CLASS, localSerializer.serialize(classReference));
+        solrDocument.setField(FieldUtils.NUMBER, objectReference.getObjectNumber());
+
+        // Property
+        solrDocument.setField(FieldUtils.PROPERTY_NAME, objectReference.getName());
+
+        setLocaleAndContentFields(documentReference, solrDocument, objectProperty);
+
+        return true;
     }
 
     /**
-     * Set the language to all the translations that the owning document has. This ensures that this entity is found for
+     * Set the locale to all the translations that the owning document has. This ensures that this entity is found for
      * all the translations of a document, not just the original document.
      * <p/>
-     * Also, index the content with each language so that the right analyzer is used.
+     * Also, index the content with each locale so that the right analyzer is used.
      * 
      * @param documentReference the original document's reference.
      * @param solrDocument the Solr document where to add the fields.
      * @param objectProperty the object property.
      * @throws Exception if problems occur.
      */
-    protected void addLanguageAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
+    protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
         BaseProperty<ObjectPropertyReference> objectProperty) throws Exception
     {
-        XWikiDocument originalDocument = getDocument(documentReference);
+        // Do the work for each locale.
+        for (Locale documentLocale : getLocales(documentReference, null)) {
+            solrDocument.addField(FieldUtils.LOCALES, documentLocale);
 
-        // Get all the languages in which the document is available.
-        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
-        // Make sure that the original document's language is there as well.
-        String originalDocumentLanguage = getLanguage(documentReference);
-        if (!documentLanguages.contains(originalDocumentLanguage)) {
-            documentLanguages.add(originalDocumentLanguage);
-        }
-
-        // Do the work for each language.
-        for (String documentLanguage : documentLanguages) {
-            if (!documentLanguage.equals(originalDocumentLanguage)) {
-                // The original document's language is already set by the call to the addDocumentFields method.
-                solrDocument.addField(Fields.LANGUAGE, documentLanguage);
-            }
-
-            solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.PROPERTY_VALUE, documentLanguage),
+            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.PROPERTY_VALUE, documentLocale),
                 objectProperty.getValue());
         }
 
-        // We can`t rely on the schema's copyField here because we would trigger it for each language. Doing the copy to
+        // We can`t rely on the schema's copyField here because we would trigger it for each locale. Doing the copy to
         // the text_general field manually.
-        solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.PROPERTY_VALUE, Fields.MULTILINGUAL),
-            objectProperty.getValue());
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.PROPERTY_VALUE, null), objectProperty.getValue());
     }
 }

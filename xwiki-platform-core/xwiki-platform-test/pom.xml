@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test</artifactId>
   <name>XWiki Platform - Test Framework</name>
@@ -66,6 +66,22 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.detro.ghostdriver</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>1.0.3</version>
+      <!-- Exclude since we want to use our version of Selenium and not the one brought by ghostdriver -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-server</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-remote-driver</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
     <!-- Make it easy to debug flickering tests by repeating them.
          See http://tempus-fugit.googlecode.com/svn/site/documentation/annotations.html#aRepeating -->
@@ -89,7 +105,7 @@
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs</artifactId>
+      <artifactId>jsr311-api</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>

@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.parser.pygments;
 import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -72,15 +71,9 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
     @Override
     public void format(String tokenType, String value, Map<String, Object> style)
     {
-        if (value == null || value.length() == 0) {
-            return;
-        }
-
         List<Block> blockList;
 
-        if (StringUtils.isEmpty(value)) {
-            blockList = Collections.emptyList();
-        } else {
+        if (StringUtils.isNotEmpty(value)) {
             try {
                 blockList = this.plainTextParser.parse(new StringReader(value)).getChildren().get(0).getChildren();
             } catch (ParseException e) {
@@ -88,9 +81,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
                 // String.
                 throw new RuntimeException("Failed to parse [" + value + "] as plain text.", e);
             }
-        }
 
-        if (!blockList.isEmpty()) {
             String styleParameter = formatStyle(style);
 
             FormatBlock formatBlock = null;
@@ -99,7 +90,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
                 formatBlock.setParameter("style", styleParameter);
                 this.blocks.add(formatBlock);
             } else {
-                blocks.addAll(blockList);
+                this.blocks.addAll(blockList);
             }
         }
     }

@@ -38,7 +38,7 @@ import org.xwiki.uiextension.internal.filter.SortByIdFilter;
 import org.xwiki.uiextension.internal.scripting.UIExtensionScriptService;
 import static org.mockito.Mockito.*;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class UIExtensionScriptServiceTest implements WikiUIExtensionConstants
 {

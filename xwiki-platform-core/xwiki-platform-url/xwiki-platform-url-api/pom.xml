@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-api</artifactId>
   <name>XWiki Platform - URL - API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - URL - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>37</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -57,7 +57,6 @@
         <configuration>
           <excludes>
             org/xwiki/url/AbstractXWikiURL.java,
-            org/xwiki/url/InvalidURLException.java,
             org/xwiki/url/XWikiEntityURL.java,
             org/xwiki/url/XWikiURL.java,
             org/xwiki/url/XWikiURLType.java

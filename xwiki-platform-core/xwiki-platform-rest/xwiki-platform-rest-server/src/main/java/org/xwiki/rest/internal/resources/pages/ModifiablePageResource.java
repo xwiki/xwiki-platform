@@ -64,7 +64,7 @@ public class ModifiablePageResource extends XWikiResource
         }
 
         if (save) {
-            doc.save();
+            doc.save(page.getComment());
 
             page =
                 DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,

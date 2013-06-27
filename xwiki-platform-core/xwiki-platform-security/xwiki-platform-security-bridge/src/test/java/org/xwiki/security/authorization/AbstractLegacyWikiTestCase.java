@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authorization;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.xwiki.security.authorization.internal.XWikiCachingRightService;
 import org.xwiki.test.annotation.AllComponents;
@@ -28,6 +26,8 @@ import org.xwiki.test.annotation.AllComponents;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
+
+import org.junit.Assert;
 
 /**
  * Abstract class that should be inherited when writing tests for comparing the result of different right service
@@ -127,6 +127,19 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
      * @param message A message explaining the assertion.
      * @param ctx The context.
      */
+    protected void assertAdminRightsFalseExpectedDifference(String message, XWikiContext ctx) throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasAdminRights(ctx));
+
+        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasAdminRights(ctx));
+    }
+
+    /**
+     * @param message A message explaining the assertion.
+     * @param ctx The context.
+     */
     protected void assertWikiAdminRightsTrue(String message, XWikiContext ctx) throws Exception
     {
         setContext(ctx);
@@ -145,6 +158,19 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
         setContext(ctx);
 
         Assert.assertFalse("Old implementation: " + message, this.legacyImpl.hasWikiAdminRights(ctx));
+
+        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasWikiAdminRights(ctx));
+    }
+
+    /**
+     * @param message A message explaining the assertion.
+     * @param ctx The context.
+     */
+    protected void assertWikiAdminRightsFalseExpectedDifference(String message, XWikiContext ctx) throws Exception
+    {
+        setContext(ctx);
+
+        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasWikiAdminRights(ctx));
 
         Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasWikiAdminRights(ctx));
     }

@@ -34,14 +34,16 @@ import org.xwiki.model.reference.DocumentReference;
 public class DefaultDocumentTranslationBundle extends AbstractDocumentTranslationBundle
 {
     /**
+     * @param idPrefix the prefix to use when generating the bundle unique identifier
      * @param documentReference the document reference
      * @param componentManager used to lookup components needed to manipulate wiki documents
      * @param translationMessageParser the parser to use for each message
      * @throws ComponentLookupException failed to lookup some required components
      */
-    public DefaultDocumentTranslationBundle(DocumentReference documentReference, ComponentManager componentManager,
-        TranslationMessageParser translationMessageParser) throws ComponentLookupException
+    public DefaultDocumentTranslationBundle(String idPrefix, DocumentReference documentReference,
+        ComponentManager componentManager, TranslationMessageParser translationMessageParser)
+        throws ComponentLookupException
     {
-        super(documentReference, componentManager, translationMessageParser);
+        super(idPrefix, documentReference, componentManager, translationMessageParser);
     }
 }

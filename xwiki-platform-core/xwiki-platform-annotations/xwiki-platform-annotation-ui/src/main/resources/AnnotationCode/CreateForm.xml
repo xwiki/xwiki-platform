@@ -47,13 +47,13 @@
 
 {{velocity}}
 #if("$!{request.wiki}" == "" || "$!{request.space}" == "" || "$!{request.page}" == "")
-  {{warning}}$msg.get('annotations.action.create.error.notarget'){{/warning}}
+  {{warning}}$services.localization.render('annotations.action.create.error.notarget'){{/warning}}
 #else
 ## pretty dirtish but it's so gonna do the job: don't display this form to users which don't have the right to create annotations, instead send a nice unauthorized message
 #if(!$services.annotations.canAddAnnotation("$!{request.wiki}", "$!{request.space}", "$!{request.page}"))
-  #set($message = $msg.get("annotations.action.create.error.unauthorized"))
+  #set($message = $services.localization.render('annotations.action.create.error.unauthorized'))
   #if ($xcontext.user.equals("XWiki.XWikiGuest"))
-    #set($message = $msg.get("annotations.action.create.error.unauthorizedguest"))
+    #set($message = $services.localization.render('annotations.action.create.error.unauthorizedguest'))
   #end
   ## unauthorized, with a nice i18n message
   $response.sendError(401, $message)

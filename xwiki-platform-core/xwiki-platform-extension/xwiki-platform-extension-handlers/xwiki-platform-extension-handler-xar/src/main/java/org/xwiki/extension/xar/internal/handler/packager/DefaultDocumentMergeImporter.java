@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
 import org.xwiki.logging.LogLevel;
@@ -52,12 +53,16 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 @Singleton
 public class DefaultDocumentMergeImporter implements DocumentMergeImporter
 {
+    static final String PROP_ALWAYS_MERGE = "extension.xar.packager.conflict.always.merge";
+
+    static final String PROP_ALWAYS_NOMERGE = "extension.xar.packager.conflict.always.nomerge";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     @Named("context")
-    private Provider<ComponentManager> componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -65,6 +70,9 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localSerializer;
+
+    @Inject
+    private Execution execution;
 
     @Inject
     private Logger logger;
@@ -93,7 +101,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
                     // 3 ways merge
                     mergeResult = merge(comment, currentDocument, mandatoryDocument, nextDocument, configuration);
                 } else {
-                    // already existing document in database but without previous version
+                    // Already existing document in database but without previous version
                     if (!currentDocument.equalsData(nextDocument)) {
                         XWikiDocument documentToSave;
                         if (configuration.isInteractive()) {
@@ -115,7 +123,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
                     }
                 }
             }
-        } else {
+        } else if (previousDocument == null) {
             saveDocument(nextDocument, comment, true, configuration);
         }
 
@@ -167,12 +175,12 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         MandatoryDocumentInitializer initializer;
         try {
             initializer =
-                this.componentManager.get().getInstance(MandatoryDocumentInitializer.class,
+                this.componentManagerProvider.get().getInstance(MandatoryDocumentInitializer.class,
                     this.serializer.serialize(documentReference));
         } catch (ComponentLookupException e) {
             try {
                 initializer =
-                    this.componentManager.get().getInstance(MandatoryDocumentInitializer.class,
+                    this.componentManagerProvider.get().getInstance(MandatoryDocumentInitializer.class,
                         this.localSerializer.serialize(documentReference));
             } catch (ComponentLookupException e1) {
                 initializer = null;
@@ -194,6 +202,20 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         return mandatoryDocument;
     }
 
+    private GlobalAction getMergeConflictAnswer(XWikiDocument currentDocument, XWikiDocument previousDocument,
+        XWikiDocument nextDocument)
+    {
+        return (GlobalAction) this.execution.getContext().getProperty(
+            previousDocument != null ? PROP_ALWAYS_MERGE : PROP_ALWAYS_NOMERGE);
+    }
+
+    private void setMergeConflictAnswer(XWikiDocument currentDocument, XWikiDocument previousDocument,
+        XWikiDocument nextDocument, GlobalAction action)
+    {
+        this.execution.getContext().setProperty(previousDocument != null ? PROP_ALWAYS_MERGE : PROP_ALWAYS_NOMERGE,
+            action);
+    }
+
     private XWikiDocument askDocumentToSave(XWikiDocument currentDocument, XWikiDocument previousDocument,
         XWikiDocument nextDocument, XWikiDocument mergedDocument, PackageConfiguration configuration)
     {
@@ -206,10 +228,19 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         }
 
         if (configuration != null && configuration.getJobStatus() != null) {
-            try {
-                configuration.getJobStatus().ask(question);
-            } catch (InterruptedException e) {
-                // TODO: log something ?
+            GlobalAction contextAction = getMergeConflictAnswer(currentDocument, previousDocument, nextDocument);
+            if (contextAction != null) {
+                question.setGlobalAction(contextAction);
+            } else {
+                try {
+                    configuration.getJobStatus().ask(question);
+                    if (question.isAlways()) {
+                        setMergeConflictAnswer(currentDocument, previousDocument, nextDocument,
+                            question.getGlobalAction());
+                    }
+                } catch (InterruptedException e) {
+                    // TODO: log something ?
+                }
             }
         }
 

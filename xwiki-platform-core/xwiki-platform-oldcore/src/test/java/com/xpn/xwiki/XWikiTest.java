@@ -40,6 +40,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.bridge.event.DocumentRolledBackEvent;
+import org.xwiki.bridge.event.DocumentRollingBackEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
@@ -291,24 +295,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, getContext()));
     }
 
-    public void testGetDocumentNameFromPath()
-    {
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("", getContext()));
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/Space/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/view/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/some/ignored/paths",
-            getContext()));
-
-        // Test URL encoding and verify an encoded forward slash ("/" - encoded as %2F) works too.
-        assertEquals("My Space.My/Document",
-            this.xwiki.getDocumentNameFromPath("/My%20Space/My%2FDocument", getContext()));
-    }
-
     /**
      * We only verify here that the saveDocument API calls the Observation component.
      */
@@ -523,5 +509,40 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         xwiki.getPrefsClass(getContext());
         xwiki.getPrefsClass(getContext());
+    }
+
+    /**
+     * Unit test for {@link XWiki#rollback(XWikiDocument, String, XWikiContext)}.
+     */
+    public void testRollback() throws Exception
+    {
+        Mock mockListener = mock(EventListener.class);
+        mockListener.stubs().method("getName").will(returnValue("TestListener"));
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        mockListener.expects(once()).method("getEvents").will(returnValue(Arrays.asList(
+            new DocumentUpdatingEvent(documentReference), new DocumentUpdatedEvent(documentReference),
+            new DocumentRollingBackEvent(documentReference), new DocumentRolledBackEvent(documentReference))));
+
+        ObservationManager om = getComponentManager().getInstance(ObservationManager.class);
+        om.addListener((EventListener) mockListener.proxy());
+
+        XWikiDocument document = new XWikiDocument(documentReference);
+        // This is set as the original document for the rolled back document and it needs to be "saved" in order for the
+        // save method to trigger update events (see below). Otherwise the save method triggers creation events.
+        document.setNew(false);
+        XWikiDocument documentRevision = new XWikiDocument(documentReference);
+        mockXWikiVersioningStore.stubs().method("loadXWikiDoc").will(returnValue(documentRevision));
+
+        // Ensure that the onEvent method has been called before and after the rollback.
+        mockListener.expects(once()).method("onEvent")
+            .with(isA(DocumentRollingBackEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent")
+            .with(isA(DocumentUpdatingEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent")
+            .with(isA(DocumentUpdatedEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent")
+            .with(isA(DocumentRolledBackEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
+
+        xwiki.rollback(document, "3.5", getContext());
     }
 }

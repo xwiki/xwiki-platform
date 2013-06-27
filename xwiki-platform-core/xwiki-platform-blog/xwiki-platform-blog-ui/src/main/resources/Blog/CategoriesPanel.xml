@@ -108,13 +108,13 @@
       <content>{{include document="Blog.CategoriesCode"/}}
 
 {{velocity}}
-#panelheader($msg.get('xe.blog.categories.paneltitle'))
+#panelheader($services.localization.render('xe.blog.categories.paneltitle'))
 #getCategoriesHierarchy('Blog' $tree)
 {{html wiki="true"}}
 #displayCategoriesHierarchy($tree 'simple')
 {{/html}}
 #if($xwiki.hasAdminRights())
-  (% class="edit-categories" %)(((~([[$msg.get('xe.blog.categories.edit')&gt;&gt;Blog.ManageCategories]]~))))
+  (% class="edit-categories" %)(((~([[$services.localization.render('xe.blog.categories.edit')&gt;&gt;Blog.ManageCategories]]~))))
 #end
 #panelfooter()
 {{/velocity}}</content>

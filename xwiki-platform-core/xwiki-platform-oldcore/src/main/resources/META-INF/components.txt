@@ -15,6 +15,7 @@ com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
 com.xpn.xwiki.internal.display.scripting.DisplayScriptService
 com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
+com.xpn.xwiki.internal.localization.XWikiLocalizationContext
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.SheetClassDocumentInitializer
@@ -48,6 +49,7 @@ com.xpn.xwiki.internal.template.DefaultPrivilegedTemplateRenderer
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
+com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
 com.xpn.xwiki.internal.sheet.scripting.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder

@@ -15,7 +15,7 @@
   <date>1329088048000</date>
   <contentUpdateDate>1329088048000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("platform.index.spaceIndex")</title>
+  <title>$services.localization.render('platform.index.spaceIndex')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -164,8 +164,8 @@
     #set ($remaining = $mathtool.sub($docCount, $limit))
     #if ($remaining &gt; 0)
     (% class="documentListMore" %) (((
-    // $msg.get('xe.dashboard.space.remainingDocumentsInSpace', [$remaining, $spaceParam])
-       [[$msg.get('xe.dashboard.space.visitSpaceIndex')&gt;&gt;Main.SpaceIndex?space=${escapetool.url($spaceParam)}]] //
+    // $services.localization.render('xe.dashboard.space.remainingDocumentsInSpace', [$remaining, $spaceParam])
+       [[$services.localization.render('xe.dashboard.space.visitSpaceIndex')&gt;&gt;Main.SpaceIndex?space=${escapetool.url($spaceParam)}]] //
     )))
     #end
   #end
@@ -176,7 +176,7 @@
   #if ($hasCreatePage)
   {{html}}
     &lt;ul class="xlist"&gt;
-      &lt;li class="page create"&gt;&lt;a href="$doc.getURL('create')"&gt;$msg.get('platform.index.spaceIndexDocumentListCreate')&lt;/a&gt;&lt;/li&gt;
+      &lt;li class="page create"&gt;&lt;a href="$doc.getURL('create')"&gt;$services.localization.render('platform.index.spaceIndexDocumentListCreate')&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   {{/html}}
   #end
@@ -342,7 +342,7 @@
   </object>
   <content>{{velocity}}
 #if("$!request.space" != "") #set($space=$request.space) #else #set($space = $doc.space) #end
-$msg.get('platform.index.spaceIndexDescription', [$space])
+$services.localization.render('platform.index.spaceIndexDescription', [$space])
 
 {{documents space="$space.replaceAll('["~]', '~$0')" id="spaceindex"/}}
 {{/velocity}}

@@ -21,7 +21,6 @@ package org.xwiki.rest.internal.resources.objects;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
@@ -72,9 +71,9 @@ public class ObjectPropertyAtPageVersionResourceImpl extends XWikiResource imple
 
             for (Property property : object.getProperties()) {
                 if (property.getName().equals(propertyName)) {
-                    String objectUri = UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectAtPageVersionResource.class)
-                            .build(doc.getWiki(), doc.getSpace(), doc.getName(), version, object.getClassName(),
-                                    object.getNumber()).toString();
+                    String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectAtPageVersionResource.class,
+                        doc.getWiki(), doc.getSpace(), doc.getName(), version, object.getClassName(),
+                        object.getNumber()).toString();
                     Link objectLink = objectFactory.createLink();
                     objectLink.setHref(objectUri);
                     objectLink.setRel(Relations.OBJECT);

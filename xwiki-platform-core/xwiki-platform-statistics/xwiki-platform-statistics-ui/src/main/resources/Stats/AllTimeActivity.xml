@@ -100,7 +100,7 @@
     </property>
     <property>
       <content>{{include document="Stats.Macros" /}}((({{velocity}}
-#panelheader($msg.get('xe.statistics.alltime.caps'))
+#panelheader($services.localization.render('xe.statistics.alltime.caps'))
 {{html wiki="true"}}
 #if ($xwiki.statsService.enabledForCurrentWiki)
   #if (not $chartWidth)
@@ -119,7 +119,7 @@
         source="xdom"
         height="$chartHeight"
         width="$chartWidth"
-        title="${msg.get('xe.statistics.alltime.caps')}"
+        title="${services.localization.render('xe.statistics.alltime.caps')}"
         params="document:Stats.ActivityData;
                 table:table_statistics_alltime;
                 range:B2-C.;

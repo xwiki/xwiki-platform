@@ -15,7 +15,7 @@
   <date>1252454400000</date>
   <contentUpdateDate>1252454400000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.rss.tags.feed")</title>
+  <title>$services.localization.render("xe.rss.tags.feed")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -30,12 +30,12 @@
   ##
   #if("$!request.tag" != '')
     #set($sql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' and lower('$request.tag') = lower(item)")
-    #set ($title = $msg.get('xe.tag.rss.tag.title', [$request.tag]))
-    #set ($description = $msg.get('xe.tag.rss.tag.description', [$request.tag]))
+    #set ($title = $services.localization.render('xe.tag.rss.tag.title', [$request.tag]))
+    #set ($description = $services.localization.render('xe.tag.rss.tag.description', [$request.tag]))
   #else
     #set($sql = ", BaseObject as obj, DBStringListProperty as prop where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' and size(prop.list) &gt; 0")
-    #set ($title = $msg.get('xe.tag.rss.tags.title'))
-    #set ($description = $msg.get('xe.tag.rss.tags.description'))
+    #set ($title = $services.localization.render('xe.tag.rss.tags.title'))
+    #set ($description = $services.localization.render('xe.tag.rss.tags.description'))
   #end
   ##
   ## Build feed.

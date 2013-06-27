@@ -11,18 +11,17 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1252454400000</creationDate>
-  <date>1300377394000</date>
-  <contentUpdateDate>1300377394000</contentUpdateDate>
+  <creationDate>1364502176000</creationDate>
+  <date>1364560703000</date>
+  <contentUpdateDate>1364560203000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.activity")</title>
-  <template/>
+  <title>$services.localization.render('xe.activity')</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.JavaScriptExtension</name>
@@ -139,7 +138,7 @@ XWiki.Activity = Class.create({
       updateURL, {
         onCreate: function() {
           // NOTE: Do we need any progress/success notification at this level or do we do it only in the "calling" component?
-          //activityContainer._notification = new XWiki.widgets.Notification("$msg.get('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');
+          //activityContainer._notification = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');
         },
         onSuccess: function() {
           if (activityContainer &amp;&amp; activityContainer._notification) {
@@ -157,7 +156,7 @@ XWiki.Activity = Class.create({
             if (activityContainer._notification) {
               activityContainer._notification.hide();
             }
-            activityContainer._notification = new XWiki.widgets.Notification("$msg.get('core.widgets.confirmationBox.notification.failed')" + failureReason, 'error');
+            activityContainer._notification = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, 'error');
           }
         },
         on1223 : function(response) { /*SUCCESS*/
@@ -214,7 +213,7 @@ XWiki.Activity = Class.create({
           },
           /* Interaction parameters */
           {
-            confirmationText: "$msg.get('xe.activity.messages.delete.confirm')"
+            confirmationText: "$services.localization.render('xe.activity.messages.delete.confirm')"
           }
         );
       }
@@ -1090,13 +1089,13 @@ $xwiki.ssx.use('Main.Activity')##
       ##
       ## Few seconds ago
       ## ---------------------------------------------------------------
-      #set ($timeAgoMsg = $msg.get('timeAgo.minutesAgo', [$eventTimeDiff.getMinuteOfHour()]))
+      #set ($timeAgoMsg = $services.localization.render('timeAgo.minutesAgo', [$eventTimeDiff.getMinuteOfHour()]))
     #else
       ##
       ## Number of minutes ago
       ## ---------------------------------------------------------------
       #set ($hoursAgo = $eventTimeDiff.getHourOfDay() - 2)
-      #set ($timeAgoMsg = $msg.get('timeAgo.hoursAgo', [$hoursAgo]))
+      #set ($timeAgoMsg = $services.localization.render('timeAgo.hoursAgo', [$hoursAgo]))
     #end
     #set ($isToday = true)
   #end
@@ -1285,7 +1284,7 @@ $xwiki.ssx.use('Main.Activity')##
   * Display the delete tool for own event messages
   *#
 #macro(toolDelete $eventID)
-  &lt;a class='toolDelete' href="$doc.getURL($context.action, "$!{request.queryString}&amp;amp;xaction=deleteMessage&amp;amp;id=$eventID&amp;amp;xredirect=$escapetool.url($doc.getURL($context.action, $request.queryString))")" title="$msg.get('xe.activity.messages.delete')"&gt;x&lt;/a&gt;
+  &lt;a class='toolDelete' href="$doc.getURL($context.action, "$!{request.queryString}&amp;amp;xaction=deleteMessage&amp;amp;id=$eventID&amp;amp;xredirect=$escapetool.url($doc.getURL($context.action, $request.queryString))")" title="$services.localization.render('xe.activity.messages.delete')"&gt;x&lt;/a&gt;
 #end
 #**
   * Display RSS URL
@@ -1301,7 +1300,7 @@ $xwiki.ssx.use('Main.Activity')##
   #end
   #set ($rssURL = $xwiki.getURL('Main.WebRss', 'view', $parameters))
   &lt;div class="rssURL"&gt;
-    &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.png')" alt="RSS icon"/&gt;$msg.get('xe.activity.rssfeed')&lt;/a&gt;
+    &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.png')" alt="RSS icon"/&gt;$services.localization.render('xe.activity.rssfeed')&lt;/a&gt;
   &lt;/div&gt;
 #end
 #**
@@ -1358,7 +1357,7 @@ $xwiki.ssx.use('Main.Activity')##
     #else
       #smallUserAvatar("$!eventUser")
     #end
-    &lt;img class="activityActionAvatar" src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$msg.get("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$msg.get("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
+    &lt;img class="activityActionAvatar" src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
   &lt;/span&gt;
 #end
 #**
@@ -1454,12 +1453,12 @@ $xwiki.ssx.use('Main.Activity')##
       &lt;span class="activityAction"&gt;
         #isAttachmentEvent($event)
         #if ($isPageEntryExpandable)## display entry summary
-          $!msg.get('xe.activity.action.summary', [$events.size(), $eventUsers.size()])
+          $!services.localization.render('xe.activity.action.summary', [$events.size(), $eventUsers.size()])
         #else
-          $!msg.get("xe.activity.action.${event.type}", [$relatedEventsNo])
+          $!services.localization.render("xe.activity.action.${event.type}", [$relatedEventsNo])
           #if ($event.type == 'update' &amp;&amp; $event.version != '1.1')
             #set ($pageFullName = "$!{event.wiki}:$!{pageName}")
-            &amp;#183; &lt;a href="$xwiki.getDocument($pageFullName).getURL('view', "viewer=changes&amp;rev2=${event.version}")"&gt;$msg.get('xe.activity.action.seechanges')&lt;/a&gt;
+            &amp;#183; &lt;a href="$xwiki.getDocument($pageFullName).getURL('view', "viewer=changes&amp;rev2=${event.version}")"&gt;$services.localization.render('xe.activity.action.seechanges')&lt;/a&gt;
           #end
         #end
       &lt;/span&gt;
@@ -1501,7 +1500,7 @@ $xwiki.ssx.use('Main.Activity')##
       #else
         #set ($closeList = true)## a new list will be opened
       #end
-      &lt;h2&gt;$msg.get('timeAgo.today')&lt;/h2&gt;&lt;ul class='activityList'&gt;  ## display 'Today' message
+      &lt;h2&gt;$services.localization.render('timeAgo.today')&lt;/h2&gt;&lt;ul class='activityList'&gt;  ## display 'Today' message
       #set ($displayToday = false)
     #elseif ($isYesterday &amp;&amp; $displayYesterday)## display 'Yesterday' message
       #if ($closeList)## there are events today
@@ -1509,7 +1508,7 @@ $xwiki.ssx.use('Main.Activity')##
       #else
         #set ($closeList = true)## a new list will be opened
       #end
-      &lt;h2&gt;$msg.get('timeAgo.yesterday')&lt;/h2&gt;&lt;ul class='activityList'&gt;
+      &lt;h2&gt;$services.localization.render('timeAgo.yesterday')&lt;/h2&gt;&lt;ul class='activityList'&gt;
       #set ($displayYesterday = false)
     #elseif (!$isToday &amp;&amp; !$isYesterday &amp;&amp; $iterationDate != $displayDate)## display date message
       #set ($displayDate = $iterationDate)
@@ -1596,7 +1595,7 @@ $xwiki.ssx.use('Main.Activity')##
       &lt;/ul&gt;
     #end
   #else
-    &lt;span class="noitems"&gt;$msg.get('xe.activity.noentries')&lt;/span&gt;
+    &lt;span class="noitems"&gt;$services.localization.render('xe.activity.noentries')&lt;/span&gt;
   #end
   ##
   ## Display RSS URL
@@ -1627,20 +1626,20 @@ $xwiki.ssx.use('Main.Activity')##
         #if (!$services.messageStream.deleteMessage(${request.id}))
           #if ($request.xpage == 'plain')
             $response.setStatus(403)## Forbidden
-            $msg.get('xe.activity.messages.delete.failed')
+            {{translation key="xe.activity.messages.delete.failed"/}}
           #elseif ("$!{request.xredirect}" != '')
             ## Pass the error message in the xredirect so that we display it in the calling page and not in the macro page.
-            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $msg.get('xe.activity.messages.delete.failed'))
+            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $services.localization.render('xe.activity.messages.delete.failed'))
             $response.sendRedirect($request.xredirect)
           #else
-            {{error}}$msg.get('xe.activity.messages.delete.failed'){{/error}}
+            {{error}}{{translation key="xe.activity.messages.delete.failed"/}}{{/error}}
 
           #end
         #elseif ("$!{request.xredirect}" != '')
           $response.sendRedirect(${request.xredirect})
         #elseif ($request.xpage == 'plain')
           ## Just print something for confirmation.
-          $msg.get('xe.activity.messages.delete.success')
+          {{translation key="xe.activity.messages.delete.success"/}}
         #end
         ## Suppress the UI to avoid useless DB or network access.
         #if ($request.xpage == 'plain' || "$!{request.xredirect}" != '')
@@ -1652,14 +1651,14 @@ $xwiki.ssx.use('Main.Activity')##
         &lt;form action="$doc.getURL($context.action, $!request.queryString))"&gt;
           &lt;div class='xdialog-box xdialog-box-confirmation'&gt;
             &lt;div class='xdialog-content'&gt;
-              &lt;div class='question'&gt;$msg.get('xe.activity.messages.delete.confirm')&lt;/div&gt;
+              &lt;div class='question'&gt;$services.localization.render('xe.activity.messages.delete.confirm')&lt;/div&gt;
               &lt;div class='buttons'&gt;
                 &lt;input type='hidden' name='confirm' value='1'/&gt;
                 &lt;input type='hidden' name='xaction' value='deleteMessage'/&gt;
                 &lt;input type='hidden' name='id' value="$!request.id"/&gt;
                 &lt;input type='hidden' name='xredirect' value="$!request.xredirect"/&gt;
-                &lt;span class='xbuttonwrapper'&gt;&lt;input type='submit' value="$msg.get('core.widgets.confirmationBox.button.yes')" class='button'/&gt;&lt;/span&gt;
-                &lt;a class='secondary button' href="$!request.xredirect"/&gt;$msg.get('core.widgets.confirmationBox.button.no')&lt;/a&gt;
+                &lt;span class='xbuttonwrapper'&gt;&lt;input type='submit' value="$services.localization.render('core.widgets.confirmationBox.button.yes')" class='button'/&gt;&lt;/span&gt;
+                &lt;a class='secondary button' href="$!request.xredirect"/&gt;$services.localization.render('core.widgets.confirmationBox.button.no')&lt;/a&gt;
               &lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt;

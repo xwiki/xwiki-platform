@@ -19,16 +19,18 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.util.List;
+import java.util.Locale;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,73 +44,65 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  */
 @Component
 @Named("object")
+@Singleton
 public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
+    /**
+     * The Solr reference resolver.
+     */
+    @Inject
+    @Named("object")
+    private SolrReferenceResolver resolver;
+
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
-        IllegalArgumentException
+    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+        throws Exception
     {
         BaseObjectReference objectReference = new BaseObjectReference(entityReference);
 
-        try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+        DocumentReference classReference = objectReference.getXClassReference();
+        DocumentReference documentReference = new DocumentReference(objectReference.getParent());
 
-            DocumentReference classReference = objectReference.getXClassReference();
-            DocumentReference documentReference = new DocumentReference(objectReference.getParent());
-            XWikiDocument document = getDocument(documentReference);
-
-            BaseObject object = document.getXObject(objectReference);
-
-            solrDocument.addField(Fields.ID, getId(object.getReference()));
-            addDocumentFields(documentReference, solrDocument);
-            solrDocument.addField(Fields.TYPE, objectReference.getType().name());
-            solrDocument.addField(Fields.CLASS, localSerializer.serialize(classReference));
-
-            addLanguageAndContentFields(documentReference, solrDocument, object);
-
-            return solrDocument;
-        } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get Solr document for '%s'",
-                serializer.serialize(objectReference)), e);
+        XWikiDocument document = getDocument(documentReference);
+        BaseObject object = document.getXObject(objectReference);
+        if (object == null) {
+            return false;
         }
+
+        solrDocument.setField(FieldUtils.ID, resolver.getId(object.getReference()));
+        setDocumentFields(documentReference, solrDocument);
+        solrDocument.setField(FieldUtils.TYPE, objectReference.getType().name());
+        solrDocument.setField(FieldUtils.CLASS, localSerializer.serialize(classReference));
+        solrDocument.setField(FieldUtils.NUMBER, objectReference.getObjectNumber());
+
+        setLocaleAndContentFields(documentReference, solrDocument, object);
+
+        return true;
     }
 
     /**
-     * Set the language to all the translations that the owning document has. This ensures that this entity is found for
+     * Set the locale to all the translations that the owning document has. This ensures that this entity is found for
      * all the translations of a document, not just the original document.
      * <p/>
-     * Also, index the content with each language so that the right analyzer is used.
+     * Also, index the content with each locale so that the right analyzer is used.
      * 
      * @param documentReference the original document's reference.
      * @param solrDocument the Solr document where to add the fields.
      * @param object the object.
      * @throws Exception if problems occur.
      */
-    protected void addLanguageAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
+    protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
         BaseObject object) throws Exception
     {
-        XWikiDocument originalDocument = getDocument(documentReference);
+        // Do the work for each locale.
+        for (Locale documentLocale : getLocales(documentReference, null)) {
+            solrDocument.addField(FieldUtils.LOCALES, documentLocale);
 
-        // Get all the languages in which the document is available.
-        List<String> documentLanguages = originalDocument.getTranslationList(getXWikiContext());
-        // Make sure that the original document's language is there as well.
-        String originalDocumentLanguage = getLanguage(documentReference);
-        if (!documentLanguages.contains(originalDocumentLanguage)) {
-            documentLanguages.add(originalDocumentLanguage);
+            setObjectContent(solrDocument, object, documentLocale);
         }
 
-        // Do the work for each language.
-        for (String documentLanguage : documentLanguages) {
-            if (!documentLanguage.equals(originalDocumentLanguage)) {
-                // The original document's language is already set by the call to the addDocumentFields method.
-                solrDocument.addField(Fields.LANGUAGE, documentLanguage);
-            }
-
-            addObjectContent(solrDocument, object, documentLanguage);
-        }
-
-        // We can`t rely on the schema's copyField here because we would trigger it for each language. Doing the copy to
+        // We can`t rely on the schema's copyField here because we would trigger it for each locale. Doing the copy to
         // the text_general field manually.
-        addObjectContent(solrDocument, object, Fields.MULTILINGUAL);
+        setObjectContent(solrDocument, object, null);
     }
 }

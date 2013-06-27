@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,13 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     // TODO: use real css parser
     private static Pattern CSSIMPORT = Pattern.compile("^\\s*@import\\s*\"(.*)\"\\s*;$", Pattern.MULTILINE);
+
+    /**
+     * When there are relative links to resources inside CSS files they are resolved based on the location of the CSS
+     * file itself. When we export we put all resources and attachments in the root of the exported directory and thus
+     * in order to have valid relative links we need to make them match. We use this variable to do this.
+     */
+    private Stack cssPathAdjustementStack = new Stack();
 
     /**
      * Pages for which to convert URL to local.
@@ -156,6 +164,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             newpath.append("file://");
 
+            // Adjust path for links inside CSS files.
+            if (!this.cssPathAdjustementStack.empty()) {
+                newpath.append(this.cssPathAdjustementStack.peek());
+            }
+
             newpath.append("skins/");
             newpath.append(skin);
 
@@ -170,9 +183,31 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     @Override
+    public URL createSkinURL(String filename, String web, String name, XWikiContext context)
+    {
+        return createSkinURL(filename, web, name, null, context, false);
+    }
+
+    public URL createSkinURL(String filename, String web, String name, XWikiContext context, boolean skipSkinDirectory)
+    {
+        return createSkinURL(filename, web, name, null, context, skipSkinDirectory);
+    }
+
+    @Override
     public URL createSkinURL(String fileName, String web, String name, String wikiId, XWikiContext context)
     {
-        URL skinURL = super.createSkinURL(fileName, web, name, wikiId, context);
+        return createSkinURL(fileName, web, name, wikiId, context, false);
+    }
+
+    public URL createSkinURL(String fileName, String web, String name, String wikiId, XWikiContext context,
+        boolean skipSkinDirectory)
+    {
+        URL skinURL;
+        if (wikiId == null) {
+            skinURL = super.createSkinURL(fileName, web, name, context);
+        } else {
+            skinURL = super.createSkinURL(fileName, web, name, wikiId, context);
+        }
 
         if (!"skins".equals(web)) {
             return skinURL;
@@ -182,9 +217,12 @@ public class ExportURLFactory extends XWikiServletURLFactory
             getNeededSkins().add(name);
 
             StringBuffer filePathBuffer = new StringBuffer();
-            filePathBuffer.append("skins/");
-            filePathBuffer.append(name);
-            addFileName(filePathBuffer, fileName, false, context);
+            if (!skipSkinDirectory) {
+                filePathBuffer.append("skins/");
+                filePathBuffer.append(name);
+                filePathBuffer.append("/");
+            }
+            filePathBuffer.append(fileName);
 
             String filePath = filePathBuffer.toString();
 
@@ -206,12 +244,22 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     XWikiServletResponseStub response = new XWikiServletResponseStub();
                     response.setOutpuStream(fos);
                     context.setResponse(response);
-                    context.setDatabase(wikiId);
+                    if (wikiId != null) {
+                        context.setDatabase(wikiId);
+                    }
 
-                    SKINACTION.render(skinURL.getPath(), context);
+                    // Adjust path for links inside CSS files.
+                    this.cssPathAdjustementStack.push(StringUtils.repeat("../", StringUtils.countMatches(filePath, "/")));
+                    try {
+                        SKINACTION.render(skinURL.getPath(), context);
+                    } finally {
+                        this.cssPathAdjustementStack.pop();
+                    }
                 } finally {
                     fos.close();
-                    context.setDatabase(database);
+                    if (wikiId != null) {
+                        context.setDatabase(database);
+                    }
                 }
 
                 followCssImports(file, web, name, wikiId, context);
@@ -219,6 +267,12 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             StringBuffer newpath = new StringBuffer();
             newpath.append("file://");
+
+            // Adjust path for links inside CSS files.
+            if (!this.cssPathAdjustementStack.empty()) {
+                newpath.append(this.cssPathAdjustementStack.peek());
+            }
+
             newpath.append(filePath);
 
             skinURL = new URL(newpath.toString());
@@ -249,7 +303,16 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 while (matcher.find()) {
                     String fileName = matcher.group(1);
 
-                    createSkinURL(fileName, web, name, wikiId, context);
+                    // Adjust path for links inside CSS files.
+                    while(fileName.startsWith("../")) {
+                        fileName = StringUtils.removeStart(fileName, "../");
+                    }
+
+                    if (wikiId == null) {
+                        createSkinURL(fileName, web, name, context, true);
+                    } else {
+                        createSkinURL(fileName, web, name, wikiId, context, true);
+                    }
                 }
             } finally {
                 fis.close();
@@ -264,6 +327,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
             StringBuffer newpath = new StringBuffer();
 
             newpath.append("file://");
+
+            // Adjust path for links inside CSS files.
+            if (!this.cssPathAdjustementStack.empty()) {
+                newpath.append(this.cssPathAdjustementStack.peek());
+            }
 
             newpath.append("resources");
 
@@ -341,6 +409,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
             FileOutputStream fos = new FileOutputStream(file);
             IOUtils.copy(attachment.getContentInputStream(context), fos);
             fos.close();
+        }
+
+        // Adjust path for links inside CSS files.
+        if (!this.cssPathAdjustementStack.empty()) {
+            path = this.cssPathAdjustementStack.peek() + path;
         }
 
         return new URI("file://" + path.replace(" ", "%20")).toURL();

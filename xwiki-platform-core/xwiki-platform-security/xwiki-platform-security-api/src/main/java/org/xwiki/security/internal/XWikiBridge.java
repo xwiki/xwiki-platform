@@ -21,7 +21,6 @@ package org.xwiki.security.internal;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.UserSecurityReference;
 
 /**
  * Temporary interface to access XWiki information without depending on oldcore.
@@ -41,11 +40,4 @@ public interface XWikiBridge
      * @return {@code true} if the XWiki server is in read-only maintenance mode.
      */
     boolean isWikiReadOnly();
-
-    /**
-     * @param user the user reference to check.
-     * @param wikiReference the wiki reference to be checked.
-     * @return {@code true} if the user is the owner of the given wiki.
-     */
-    boolean isWikiOwner(UserSecurityReference user, WikiReference wikiReference);
 }

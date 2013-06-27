@@ -15,7 +15,7 @@
   <date>1300321645000</date>
   <contentUpdateDate>1300321645000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if($request.docname)$xwiki.getDocument($request.docname).displayTitle ($request.docname): #end$msg.get("xe.attachmentSelector.gallery.title")</title>
+  <title>#if ($request.docname)$xwiki.getDocument($request.docname).plainTitle ($request.docname): #end$services.localization.render('xe.attachmentSelector.gallery.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -159,10 +159,10 @@
         var hasErrors = false;
         uploadForm.select('input.attachment').each(function(fileInput) {
           if (fileInput.value == '') {
-            new XWiki.widgets.Notification("$msg.get('xe.attachmentSelector.upload.error.noFile')", 'error');
+            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.noFile')", 'error');
             hasErrors = true;
           } else if (fileInput.__allowedExtensions &amp;&amp; fileInput.__allowedExtensions.indexOf(this.getFileExtension(fileInput.value)) == -1) {
-            new XWiki.widgets.Notification("$msg.get('xe.attachmentSelector.upload.error.badExtension')", 'error');
+            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
             hasErrors = true;
           }
         }.bind(this));
@@ -176,7 +176,7 @@
             // this.property.down('input').value = uploadForm.down('.attachment').value;
             // uploadForm.xredirect.value = window.location.pathname;
             document.observe('xwiki:document:saved', function() {
-              new XWiki.widgets.Notification("$msg.get('xe.attachmentSelector.upload.inProgress')", 'inprogress');
+              new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
               uploadForm.submit();
             })
             document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
@@ -234,10 +234,10 @@
             }
           },
           {
-            confirmationText: "$msg.get('core.viewers.attachments.delete.confirm')",
-            progressMessageText : "$msg.get('core.viewers.attachments.delete.inProgress')",
-            successMessageText : "$msg.get('core.viewers.attachments.delete.done')",
-            failureMessageText : "$msg.get('core.viewers.attachments.delete.failed')"
+            confirmationText: "$services.localization.render('core.viewers.attachments.delete.confirm')",
+            progressMessageText : "$services.localization.render('core.viewers.attachments.delete.inProgress')",
+            successMessageText : "$services.localization.render('core.viewers.attachments.delete.done')",
+            failureMessageText : "$services.localization.render('core.viewers.attachments.delete.failed')"
           }
         );
       }
@@ -264,7 +264,7 @@
           new Ajax.Request(event.element().href, {
             onCreate : function() {
               targetElement.disabled = true;
-              targetElement._x_notif = new XWiki.widgets.Notification("$msg.get('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');
+              targetElement._x_notif = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');
             },
             onSuccess : function () {
               targetElement._x_notif.hide();
@@ -278,7 +278,7 @@
                 failureReason = 'Server not responding';
               }
               if (targetElement._x_notif) {
-                targetElement._x_notif.replace(new XWiki.widgets.Notification("$msg.get('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
+                targetElement._x_notif.replace(new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
               } else {
                 new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
               }
@@ -370,7 +370,7 @@
         loading, {}, {
           'verticalPosition' : 'top',
           'removeOnClose' : true,
-          'title' : "$msg.get('xe.attachmentSelector.gallery.title')"
+          'title' : "$services.localization.render('xe.attachmentSelector.gallery.title')"
         }
       );
       dialog.shortcuts.close.keys = [];
@@ -1028,7 +1028,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 
 #set ($buttontext = "$!{xcontext.macro.params.buttontext}")
 #if ($buttontext == '')
-  #set ($buttontext = $msg.get('xe.attachmentSelector.selectFile'))
+  #set ($buttontext = $services.localization.render('xe.attachmentSelector.selectFile'))
 #end
 
 #set ($savemode = "$!{xcontext.macro.params.savemode}")
@@ -1502,7 +1502,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
       <defaultValue/>
     </property>
     <property>
-      <description>Text of the button that triggers the picker. Defaults to $msg.get('xe.attachmentSelector.selectFile').</description>
+      <description>Text of the button that triggers the picker. Defaults to $services.localization.render('xe.attachmentSelector.selectFile').</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -2146,8 +2146,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #else
       * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
       * v$attachment.getVersion() (#dynamicsize($attachment.filesize))
-      * $msg.get('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $msg.get('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
-      * (% class="buttonwrapper" %)[[${msg.get("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachment.getDocument()}@${attachment.filename}||title="$msg.get("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
+      * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
+      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachment.getDocument()}@${attachment.filename}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
     #end
   #end
 #end
@@ -2169,7 +2169,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     )))## attachmentframe
     (% class="gallery_actions" %)(((
       #foreach ($action in $actions)
-        #set( $actionname = $msg.get("${translationPrefix}.actions.${action.name}") )
+        #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
         [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
       #end
     )))## actions
@@ -2185,15 +2185,15 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *#
 #macro (attachmentPicker_displayUploadForm $targetDocument, $targetAttachDocument, $options)
 #attachmentPicker_displayStartFrame({
-   'value' : $msg.get("${translationPrefix}.upload.title"),
-   'text' : $msg.get("${translationPrefix}.upload.title"),
+   'value' : $services.localization.render("${translationPrefix}.upload.title"),
+   'text' : $services.localization.render("${translationPrefix}.upload.title"),
    'cssClass' : 'gallery_upload'
   } $NULL)
 {{html clean="false"}}
 &lt;form action="$targetAttachDocument.getURL('upload')" enctype="multipart/form-data" method="post" id="uploadAttachment" class="uploadAttachment xform"&gt;
   &lt;div class="gallery_upload_input"&gt;
     #if (${options.rawfilter} != '')
-      &lt;span class="xHint"&gt;$msg.get("${translationPrefix}.upload.hint", [${options.rawfilter}])&lt;/span&gt;
+      &lt;span class="xHint"&gt;$services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}])&lt;/span&gt;
     #end
     &lt;input type="file" name="filepath" id="attachfile" class="attachment" size="30" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
     &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;
@@ -2205,7 +2205,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   &lt;/div&gt;
   &lt;div class="buttons"&gt;
     &lt;span class="buttonwrapper"&gt;
-    &lt;input type="submit" name="action_upload" class="button " value='$msg.get("${translationPrefix}.upload.submit")'  title='$msg.get("${translationPrefix}.upload.submit")'/&gt;
+    &lt;input type="submit" name="action_upload" class="button " value='$services.localization.render("${translationPrefix}.upload.submit")'  title='$services.localization.render("${translationPrefix}.upload.submit")'/&gt;
     &lt;/span&gt;
   &lt;/div&gt;
 &lt;/form&gt;
@@ -2236,7 +2236,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       #set($dcssClass = 'gallery_image')
     #end
   #end
-  #attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $msg.get("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
+  #attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
   #attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
   #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=&amp;form_token=$!{services.csrf.getToken()}"))
@@ -2312,7 +2312,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
 
   (% class="gallery_buttons buttons" %)(((
-  (% class="buttonwrapper secondary" %)[[$msg.get("${translationPrefix}.cancel")&gt;&gt;$targetDocument||class="button secondary" id="attachment-picker-close"]]
+  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;$targetDocument||class="button secondary" id="attachment-picker-close"]]
   )))
 #end
 {{/velocity}}</content>

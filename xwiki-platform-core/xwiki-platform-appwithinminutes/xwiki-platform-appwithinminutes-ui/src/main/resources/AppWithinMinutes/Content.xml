@@ -15,7 +15,7 @@
   <date>1352137734000</date>
   <contentUpdateDate>1352137734000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('platform.appwithinminutes.classEditorContentFieldName')</title>
+  <title>$services.localization.render('platform.appwithinminutes.classEditorContentFieldName')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

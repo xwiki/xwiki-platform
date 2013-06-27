@@ -21,7 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.stub.CustomStub;

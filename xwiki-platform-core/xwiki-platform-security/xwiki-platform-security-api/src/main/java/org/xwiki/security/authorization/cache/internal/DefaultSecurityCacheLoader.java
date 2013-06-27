@@ -22,7 +22,6 @@ package org.xwiki.security.authorization.cache.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Formatter;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -43,7 +42,6 @@ import org.xwiki.security.authorization.SecurityEntryReader;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
-import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.internal.UserBridge;
@@ -115,8 +113,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             } finally {
                 rulesInvalidator.resume();
             }
-            String message = new Formatter().format("Failed to load the cache in %d attempts.  Giving up.",
-                                                    retries).toString();
+            String message = String.format("Failed to load the cache in %d attempts.  Giving up.", retries);
             this.logger.error(message);
             throw new AuthorizationException(user.getOriginalDocumentReference(),
                                              entity.getOriginalReference(), message);
@@ -140,31 +137,14 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         // No entity, return default rights for user in its wiki
         if (entity == null) {
             return authorizationSettlerProvider.get().settle(user,
-                loadUserEntry(user, getWikiReference(user), null), null);
+                loadUserEntry(user, user.getWikiReference(), null), null);
         }
 
         // Retrieve rules for the entity from the cache
-        SecurityRuleEntry entry = securityCache.get(entity);
-        Deque<SecurityRuleEntry> ruleEntries = null;
-
-        if (entry == null) {
-            // Cached rules missed, retrieve rules from entities and store them in the cache
-            ruleEntries = getRules(entity);
-            // pop out empty rules to evaluate and store access at highest possible entity
-            do {
-                entry = ruleEntries.getFirst();
-            } while (entry.isEmpty()
-                && entry.getReference().getType() != EntityType.WIKI && (ruleEntries.pop() != null));
-        } else {
-            // Cached rules found, pop out empty rules to evaluate and store access at the highest possible entity
-            while (entry.isEmpty() && entry.getReference().getType() != EntityType.WIKI) {
-                entry = securityCache.get(entry.getReference().getParentSecurityReference());
-            }
-            ruleEntries = getRules(entity);
-        }
+        Deque<SecurityRuleEntry> ruleEntries = getRules(entity);
 
         // Evaluate, store and return the access right
-        return loadAccessEntries(user, entry.getReference(), ruleEntries);
+        return loadAccessEntries(user, entity, ruleEntries);
     }
 
     /**
@@ -184,9 +164,9 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
         // userWiki is the wiki of the user
-        SecurityReference userWiki = getWikiReference(user);
+        SecurityReference userWiki = user.getWikiReference();
         // entityWiki is the wiki of the entity when the user is global and the entity is local
-        SecurityReference entityWiki = (entity != null && user.isGlobal()) ? getWikiReference(entity) : null;
+        SecurityReference entityWiki = user.isGlobal() ? entity.getWikiReference() : null;
         if (entityWiki != null && userWiki.equals(entityWiki)) {
             entityWiki = null;
         }
@@ -198,11 +178,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         SecurityAccessEntry accessEntry = authorizationSettlerProvider.get().settle(user, groups, ruleEntries);
 
         // Store the result into the cache
-        if (entityWiki != null) {
-            securityCache.add(accessEntry, entityWiki);
-        } else {
-            securityCache.add(accessEntry);
-        }
+        securityCache.add(accessEntry, entityWiki);
 
         // Return the result
         return accessEntry;

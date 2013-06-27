@@ -19,23 +19,25 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.search.solr.internal.api.Fields;
-import org.xwiki.search.solr.internal.api.SolrIndexException;
+import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,8 +52,16 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component
 @Named("document")
+@Singleton
 public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
+    /**
+     * The Solr reference resolver.
+     */
+    @Inject
+    @Named("document")
+    protected SolrReferenceResolver resolver;
+
     /**
      * BlockRenderer component used to render the wiki content before indexing.
      */
@@ -59,73 +69,113 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     @Named("plain/1.0")
     protected BlockRenderer renderer;
 
+    /**
+     * Reference to String serializer.
+     */
+    @Inject
+    protected EntityReferenceSerializer<String> serializer;
+
     @Override
-    public SolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexException,
-        IllegalArgumentException
+    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+        throws Exception
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
+        XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
+        if (translatedDocument == null) {
+            return false;
+        }
+
+        Locale locale = getLocale(documentReference);
+
+        solrDocument.setField(FieldUtils.FULLNAME, localSerializer.serialize(documentReference));
+
+        // Same for document title
         try {
-            SolrInputDocument solrDocument = new SolrInputDocument();
+            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
-            XWikiDocument translatedDocument = getTranslatedDocument(documentReference);
-            String language = getLanguage(documentReference);
+            // Rendered title.
+            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+        } catch (Throwable e) {
+            this.logger.error("Failed to render title for document [{}]", entityReference);
+        }
 
-            solrDocument.addField(Fields.ID, getId(documentReference));
-            addDocumentFields(documentReference, solrDocument);
-            solrDocument.addField(Fields.TYPE, documentReference.getType().name());
-            solrDocument.addField(Fields.FULLNAME, localSerializer.serialize(documentReference));
+        // Raw Content
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, locale),
+            translatedDocument.getContent());
 
-            // Convert the XWiki syntax of document to plain text.
-            WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(translatedDocument.getXDOM(), printer);
+        // Rendered content
+        try {
+            WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
+            this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
+            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
+                plainContentPrinter.toString());
+        } catch (Throwable e) {
+            this.logger.error("Failed to render content for document [{}]", entityReference);
+        }
 
-            // Same for document title
-            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, context);
+        solrDocument.setField(FieldUtils.VERSION, translatedDocument.getVersion());
+        solrDocument.setField(FieldUtils.COMMENT, translatedDocument.getComment());
 
-            // Get the rendered plain text title.
-            solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.TITLE, language), plainTitle);
-            solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.DOCUMENT_CONTENT, language),
-                printer.toString());
-            solrDocument.addField(Fields.VERSION, translatedDocument.getVersion());
+        solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, translatedDocument.getLocale().toString());
 
-            // Get both serialized user reference string and pretty user name (first_name last_name).
-            String authorString = serializer.serialize(translatedDocument.getAuthorReference());
-            String authorDisplayString = context.getWiki().getUserName(authorString, null, false, context);
-            String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
-            String creatorDisplayString = context.getWiki().getUserName(creatorString, null, false, context);
+        // Add locale inheritance
+        addLocales(translatedDocument, translatedDocument.getLocale(), solrDocument);
 
-            solrDocument.addField(Fields.AUTHOR, authorString);
-            solrDocument.addField(Fields.AUTHOR_DISPLAY, authorDisplayString);
-            solrDocument.addField(Fields.CREATOR, creatorString);
-            solrDocument.addField(Fields.CREATOR_DISPLAY, creatorDisplayString);
+        // Get both serialized user reference string and pretty user name
+        setAuthors(solrDocument, translatedDocument, entityReference);
 
-            // Document dates.
-            solrDocument.addField(Fields.CREATIONDATE, translatedDocument.getCreationDate());
-            solrDocument.addField(Fields.DATE, translatedDocument.getContentUpdateDate());
+        // Document dates.
+        solrDocument.setField(FieldUtils.CREATIONDATE, translatedDocument.getCreationDate());
+        solrDocument.setField(FieldUtils.DATE, translatedDocument.getContentUpdateDate());
 
-            // Document translations have their own hidden fields
-            solrDocument.setField(Fields.HIDDEN, translatedDocument.isHidden());
+        // Document translations have their own hidden fields
+        solrDocument.setField(FieldUtils.HIDDEN, translatedDocument.isHidden());
 
-            // Add any extra fields (about objects, comments, etc.) that can improve the findability of the document.
-            addExtras(documentReference, solrDocument, language);
+        // Add any extra fields (about objects, etc.) that can improve the findability of the document.
+        setExtras(documentReference, solrDocument, locale);
 
-            return solrDocument;
-        } catch (Exception e) {
-            throw new SolrIndexException(String.format("Failed to get input document for '%s'",
-                serializer.serialize(documentReference)), e);
+        return true;
+    }
+
+    /**
+     * @param solrDocument the Solr document
+     * @param translatedDocument the XWiki document
+     * @param entityReference the document reference
+     */
+    private void setAuthors(LengthSolrInputDocument solrDocument, XWikiDocument translatedDocument,
+        EntityReference entityReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        String authorString = serializer.serialize(translatedDocument.getAuthorReference());
+        solrDocument.setField(FieldUtils.AUTHOR, serializer.serialize(translatedDocument.getAuthorReference()));
+        try {
+            String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
+            solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
+        } catch (Throwable e) {
+            this.logger.error("Failed to get author display name for document [{}]", entityReference);
+        }
+
+        String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
+        solrDocument.setField(FieldUtils.CREATOR, creatorString);
+        try {
+            String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
+            solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
+        } catch (Throwable e) {
+            this.logger.error("Failed to get creator display name for document [{}]", entityReference);
         }
     }
 
     /**
      * @param documentReference the document's reference.
      * @param solrDocument the Solr document where to add the data.
-     * @param language the language of which to index the extra data.
+     * @param locale the locale of which to index the extra data.
      * @throws XWikiException if problems occur.
      */
-    protected void addExtras(DocumentReference documentReference, SolrInputDocument solrDocument, String language)
+    protected void setExtras(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale)
         throws XWikiException
     {
         // Index the Comments and Objects in general. Use the original document to get the comment objects since the
@@ -135,11 +185,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // implicitly comments) for each translation. If we don`t do this, only the original document will be found.
         XWikiDocument originalDocument = getDocument(documentReference);
 
-        // Comments. TODO: Is this particular handling of comments actually useful?
-        addComments(solrDocument, originalDocument, language);
-
         // Objects
-        addObjects(solrDocument, language, originalDocument);
+        setObjects(solrDocument, locale, originalDocument);
 
         // Note: Not indexing attachment contents at this point because they are considered first class search
         // results. Also, it's easy to see the source XWiki document from the UI.
@@ -147,57 +194,15 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
     /**
      * @param solrDocument the Solr document where to add the objects.
-     * @param language the language for which to index the objects.
+     * @param locale the locale for which to index the objects.
      * @param originalDocument the original document where the objects come from.
      */
-    protected void addObjects(SolrInputDocument solrDocument, String language, XWikiDocument originalDocument)
+    protected void setObjects(SolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
             for (BaseObject object : objects.getValue()) {
-                this.addObjectContent(solrDocument, object, language);
+                setObjectContent(solrDocument, object, locale);
             }
         }
-    }
-
-    /**
-     * Adds the document comments using the multiValued field {@link Fields#COMMENT}.
-     * 
-     * @param solrDocument the Solr document where to add the comments.
-     * @param originalDocument the XWiki document from which to extract the comments.
-     * @param language the language of the indexed document. In case of translations, this will obviously be different
-     *            than the original document's language.
-     */
-    protected void addComments(SolrInputDocument solrDocument, XWikiDocument originalDocument, String language)
-    {
-        List<BaseObject> comments = originalDocument.getComments();
-        if (comments == null) {
-            return;
-        }
-
-        for (BaseObject comment : comments) {
-            // Yes, objects can be null at this point...
-            if (comment != null) {
-                String commentString = comment.getStringValue("comment");
-                String author = comment.getStringValue("author");
-                Date date = comment.getDateValue("date");
-                solrDocument.addField(String.format(Fields.MULTILIGNUAL_FORMAT, Fields.COMMENT, language),
-                    String.format("%s by %s on %s", commentString, author, date));
-            }
-        }
-    }
-
-    @Override
-    public String getId(EntityReference reference) throws SolrIndexException, IllegalArgumentException
-    {
-        DocumentReference documentReference = new DocumentReference(reference);
-
-        String result = super.getId(reference);
-
-        // Document IDs also contain the language code to differentiate between them.
-        // Objects, attachments, etc. don`t need this because the only thing that is translated in an XWiki document
-        // right now is the document title and content. Objects and attachments are not translated.
-        result += Fields.USCORE + getLanguage(documentReference);
-
-        return result;
     }
 }

@@ -36,7 +36,7 @@ import org.xwiki.model.reference.WikiReference;
  * @version $Id$
  * @since 4.0M2
  */
-public class AbstractSecurityTestCase
+public abstract class AbstractSecurityTestCase
 {
     protected SecurityReference xwikiRef;
     protected SecurityReference wikiRef;

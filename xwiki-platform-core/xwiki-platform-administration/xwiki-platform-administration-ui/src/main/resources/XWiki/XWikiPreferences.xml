@@ -31,12 +31,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1106311617000</creationDate>
-  <date>1299768358000</date>
-  <contentUpdateDate>1299768358000</contentUpdateDate>
+  <creationDate>1364502204000</creationDate>
+  <date>1364566342000</date>
+  <contentUpdateDate>1364566342000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki Preferences</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -1044,7 +1043,7 @@
         {{html}}
           #if($xwiki.jodatime)
             &lt;select id='$prefix$name' name='$prefix$name'&gt;
-              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$msg.get('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
+              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$services.localization.render('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
               #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
                 &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
               #end
@@ -1226,16 +1225,16 @@
       <groups>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>groups</name>
         <number>1</number>
+        <picker>1</picker>
         <prettyName>Groups</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
       </groups>
       <levels>
@@ -1255,16 +1254,16 @@
       <users>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>users</name>
         <number>3</number>
+        <picker>1</picker>
         <prettyName>Users</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
@@ -1279,7 +1278,7 @@
       <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
-      <levels>admin,edit,undelete,delete</levels>
+      <levels>admin,edit,undelete,delete,programming,view,comment,register</levels>
     </property>
     <property>
       <users/>
@@ -1309,16 +1308,16 @@
       <groups>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>groups</name>
         <number>1</number>
+        <picker>1</picker>
         <prettyName>Groups</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
       </groups>
       <levels>
@@ -1338,16 +1337,16 @@
       <users>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>users</name>
         <number>3</number>
+        <picker>1</picker>
         <prettyName>Users</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
@@ -1392,16 +1391,16 @@
       <groups>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>groups</name>
         <number>1</number>
+        <picker>1</picker>
         <prettyName>Groups</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
       </groups>
       <levels>
@@ -1421,16 +1420,16 @@
       <users>
         <cache>0</cache>
         <disabled>0</disabled>
-        <displayType>select</displayType>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>users</name>
         <number>3</number>
+        <picker>1</picker>
         <prettyName>Users</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
@@ -2449,23 +2448,23 @@
       </tags>
       <timezone>
         <customDisplay>{{velocity}}
-        #if ($xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
-          {{html}}
-            #if($xwiki.jodatime)
-              &lt;select id='$prefix$name' name='$prefix$name'&gt;
-                &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$msg.get('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
-                #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
-                  &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
-                #end
-              &lt;/select&gt;
-            #else
-              &lt;input id='$prefix$name' name='$prefix$name' type="text" value="$!value"/&gt;
-            #end
-          {{/html}}
-        #else
-          $value
-        #end
-        {{/velocity}}</customDisplay>
+      #if ($xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+        {{html}}
+          #if($xwiki.jodatime)
+            &lt;select id='$prefix$name' name='$prefix$name'&gt;
+              &lt;option value="" #if($value == $tz)selected="selected"#end&gt;$services.localization.render('XWiki.XWikiPreferences_timezone_default')&lt;/option&gt;
+              #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
+                &lt;option value="$tz" #if($value == $tz)selected="selected"#end&gt;$tz&lt;/option&gt;
+              #end
+            &lt;/select&gt;
+          #else
+            &lt;input id='$prefix$name' name='$prefix$name' type="text" value="$!value"/&gt;
+          #end
+        {{/html}}
+      #else
+        $value
+      #end
+      {{/velocity}}</customDisplay>
         <disabled>0</disabled>
         <name>timezone</name>
         <number>71</number>
@@ -2645,7 +2644,7 @@ Your account on ${wikiname} has been successfully activated. You can now login a
       <invitation_email_content/>
     </property>
     <property>
-      <languages/>
+      <languages>en</languages>
     </property>
     <property>
       <leftPanels/>

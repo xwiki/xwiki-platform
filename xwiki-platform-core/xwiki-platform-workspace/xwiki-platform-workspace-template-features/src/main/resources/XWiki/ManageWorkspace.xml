@@ -15,7 +15,7 @@
   <date>1308327581000</date>
   <contentUpdateDate>1308327581000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get('platform.workspace.manageWorkspaceTitle')</title>
+  <title>$services.localization.render('platform.workspace.manageWorkspaceTitle')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -35,9 +35,9 @@
 #set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
 #if (!$workspace)
   #if (!$WorkspaceManager.lastException)
-    {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', $workspaceId){{/error}}
+    {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$workspaceId"/}}{{/error}}
   #elseif("$!{$WorkspaceManager.lastException.message}" != '')
-    {{error}}$msg.get('platform.workspace.exceptionWithMessage', $WorkspaceManager.lastException.message){{/error}}
+    {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$WorkspaceManager.lastException.message]){{/error}}
   #else
     {{error}}$WorkspaceManager.lastException.class{{/error}}
   #end
@@ -52,20 +52,20 @@
   {{html clean='false' wiki='true'}}
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;$msg.get('workspacemanager.prop.wikiprettyname.label')&lt;/label&gt;
-        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.wikiprettyname.hint')&lt;/span&gt;
+        &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;{{translation key="workspacemanager.prop.wikiprettyname.label"/}}&lt;/label&gt;
+        &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.wikiprettyname.hint"/}}&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;((($wikiDocument.display('wikiprettyname', 'edit'))))&lt;/dd&gt;
 
       &lt;dt&gt;
-        &lt;label for='XWiki.XWikiServerClass_0_description'&gt;$msg.get('workspacemanager.prop.description.label')&lt;/label&gt;
-        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.description.hint')&lt;/span&gt;
+        &lt;label for='XWiki.XWikiServerClass_0_description'&gt;{{translation key="workspacemanager.prop.description.label"/}}&lt;/label&gt;
+        &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.description.hint"/}}&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;((($wikiDocument.display('description', 'edit'))))&lt;/dd&gt;
 
       &lt;dt&gt;
-        &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;$msg.get('workspacemanager.prop.owner.label')&lt;/label&gt;
-        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.owner.hint')&lt;/span&gt;
+        &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;{{translation key="workspacemanager.prop.owner.label"/}}&lt;/label&gt;
+        &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.owner.hint"/}}&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         ## The workspace owner has to be a global user. Currently the "List of Users" XClass property type doesn't have
@@ -76,14 +76,14 @@
       &lt;/dd&gt;
 
       &lt;dt&gt;
-        &lt;label for='WorkspaceManager.WorkspaceClass_0_membershipType'&gt;$msg.get('workspacemanager.prop.membershipType.label')&lt;/label&gt;
-        &lt;span class='xHint'&gt;$msg.get('workspacemanager.prop.membershipType.hint')&lt;/span&gt;
+        &lt;label for='WorkspaceManager.WorkspaceClass_0_membershipType'&gt;{{translation key="workspacemanager.prop.membershipType.label"/}}&lt;/label&gt;
+        &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.membershipType.hint"/}}&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;((($wikiDocument.display('membershipType', 'edit'))))&lt;/dd&gt;
     &lt;/dl&gt;
     &lt;br/&gt;
     &lt;span class="buttonwrapper"&gt;
-      &lt;input class="button" type="submit" name='save' value="$msg.get('admin.save')"/&gt;
+      &lt;input class="button" type="submit" name='save' value="$services.localization.render('admin.save')"/&gt;
     &lt;/span&gt;
     &lt;input type='hidden' name='workspaceId' value="$workspaceId"/&gt;
   {{/html}}

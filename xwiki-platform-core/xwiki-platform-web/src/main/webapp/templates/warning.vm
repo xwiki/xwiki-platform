@@ -1,5 +1,5 @@
 ###
 ### Generic warning message
 ###
-#set($messageType = $msg.get("platform.core.warningMessageType"))
+#set($messageType = $services.localization.render('platform.core.warningMessageType'))
 #template("message.vm")

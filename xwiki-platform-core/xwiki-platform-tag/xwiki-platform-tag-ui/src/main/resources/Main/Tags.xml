@@ -15,14 +15,14 @@
   <date>1264723531000</date>
   <contentUpdateDate>1264723531000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.tag.tags")</title>
+  <title>$services.localization.render("xe.tag.tags")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.StyleSheetExtension</name>
@@ -185,7 +185,7 @@ $xwiki.ssx.use('Main.Tags')##
   (% class="xapp" %)
   = (% class="highlight tag" %)${tag}##
       #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
-        [[$msg.get('xe.tag.rename.link')&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[$msg.get('xe.tag.delete.link')&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
+        [[$services.localization.render('xe.tag.rename.link')&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[$services.localization.render('xe.tag.delete.link')&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
       #end
     (%%) =
 #end
@@ -199,20 +199,20 @@ $xwiki.ssx.use('Main.Tags')##
   ##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag true)
   #if ("$!{request.get('renamedTag')}" != '')
-    {{info}}$msg.get('xe.tag.rename.success', ["//${request.get('renamedTag')}//"]){{/info}}
+    {{info}}$services.localization.render('xe.tag.rename.success', ["//${request.get('renamedTag')}//"]){{/info}}
 
   #end
   #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
   {{container layoutStyle="columns"}}
     (((
       (% class="xapp" %)
-      === $msg.get('xe.tag.alldocs', ["//${tag}//"]) ===
+      === $services.localization.render('xe.tag.alldocs', ["//${tag}//"]) ===
 
       {{html}}#displayDocumentList($list true $blacklistedSpaces){{/html}}
     )))
     (((
       (% class="xapp" %)
-      === $msg.get('xe.tag.activity', ["//${tag}//"]) ===
+      === $services.localization.render('xe.tag.activity', ["//${tag}//"]) ===
 
       {{activity tags="$tag" /}}
     )))
@@ -228,7 +228,7 @@ $xwiki.ssx.use('Main.Tags')##
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="renameTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    $msg.get('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+    $services.localization.render('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
@@ -245,7 +245,7 @@ $xwiki.ssx.use('Main.Tags')##
    #set ($urlEscapedRenameTo = $escapetool.url($renameTo))
    $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedRenameTo}&amp;renamedTag=${urlEscapedTag}"))
   #else
-    {{error}}$msg.get('xe.tag.rename.failure', ["//${tag}//", "//${renameTo}//"]){{/error}}
+    {{error}}$services.localization.render('xe.tag.rename.failure', ["//${tag}//", "//${renameTo}//"]){{/error}}
   #end
 #elseif ($do == 'prepareDelete')
   ##
@@ -258,7 +258,7 @@ $xwiki.ssx.use('Main.Tags')##
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="deleteTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
@@ -270,7 +270,7 @@ $xwiki.ssx.use('Main.Tags')##
   #if ($success == true || $success == 'OK')
     $response.sendRedirect($doc.getURL('view', "deletedTag=${urlEscapedTag}"))
   #else
-    {{error}}$msg.get('xe.tag.delete.failure', ["//${tag}//"]){{/error}}
+    {{error}}$services.localization.render('xe.tag.delete.failure', ["//${tag}//"]){{/error}}
   #end
 #else
   ##
@@ -278,7 +278,7 @@ $xwiki.ssx.use('Main.Tags')##
   ##
   #set ($title = 'All Tags')
   #if ("$!{request.get('deletedTag')}" != '')
-    {{info}}$msg.get('xe.tag.delete.success', ["//${request.get('deletedTag')}//"]){{/info}}
+    {{info}}$services.localization.render('xe.tag.delete.success', ["//${request.get('deletedTag')}//"]){{/info}}
 
   #end
   {{tagcloud/}}

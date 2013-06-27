@@ -15,7 +15,7 @@
   <date>1298680350000</date>
   <contentUpdateDate>1298680350000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if("$!{request.text}"=="")$msg.get("search.page.lucene.title.noquery")#else$msg.get("search.page.lucene.title.query", [$request.text])#end</title>
+  <title>#if("$!{request.text}"=='')$services.localization.render('search.page.lucene.title.noquery')#else$services.localization.render('search.page.lucene.title.query', [$request.text])#end</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -79,8 +79,8 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   &lt;option value="${space}" #if($selectedSpace == $space)selected="selected"#end&gt;$space&lt;/option&gt;
 #end
 #macro(spaceselect $selectedSpace $spaces)
-  &lt;select name="space" title="$msg.get('search.page.bar.spaces.title')"&gt;
-    &lt;option value="" #if($selectedSpace == '')selected="selected"#end&gt;$msg.get('search.page.bar.spaces.all')&lt;/option&gt;
+  &lt;select name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
+    &lt;option value="" #if($selectedSpace == '')selected="selected"#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
     #foreach($space in $spaces)
       #if (!$blacklistedSpaces.contains($space) &amp;&amp; $xwiki.hasAccessLevel('view', "${space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
         #spaceoption($space $selectedSpace)
@@ -130,7 +130,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   #macro(wikisselect $wikinamelist $allwikinamelist)
     ## TODO: find a scaling way to handle wikis multiselect, does not use multiple="multiple" for now because it does not looks nice
     &lt;select name="wikinames"&gt;
-      &lt;option value="" selected="selected"&gt;$msg.get('search.page.bar.wikis.all')&lt;/option&gt;
+      &lt;option value="" selected="selected"&gt;$services.localization.render('search.page.bar.wikis.all')&lt;/option&gt;
       #foreach($wikiname in $allwikinamelist)
         #wikioption($wikiname $wikinamelist)
       #end
@@ -159,16 +159,16 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 {{html}}
 &lt;form action="" id="searchBar"&gt;
   &lt;div class="centered"&gt;
-    &lt;label for="text" class="hidden"&gt;$msg.get('search.page.query.label')&lt;/label&gt;
-    &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
+    &lt;label for="text" class="hidden"&gt;$services.localization.render('search.page.query.label')&lt;/label&gt;
+    &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$services.localization.render('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$services.localization.render('search.page.bar.query.title')"/&gt;
     #if ($xcontext.isMainWiki())
       #wikisselect($request.wikinames $allwikinamelist)
     #end
     #spaceselect($selectedSpace $spaces)
     &lt;span class='buttonwrapper'&gt;
-      &lt;input type="submit" class="button searchButton" value="$msg.get('search.page.bar.submit')" title="$msg.get('search.page.bar.submit.title')"/&gt;
+      &lt;input type="submit" class="button searchButton" value="$services.localization.render('search.page.bar.submit')" title="$services.localization.render('search.page.bar.submit.title')"/&gt;
     &lt;/span&gt;
-    &lt;div class="searchHelp"&gt;$msg.get('search.page.bar.querytip')&lt;/div&gt;
+    &lt;div class="searchHelp"&gt;$services.localization.render('search.page.bar.querytip')&lt;/div&gt;
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
@@ -225,8 +225,8 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         #set ($discard = $feed.setLink($feedURI))
         #set ($discard = $feed.setUri($feedURI))
         #set ($discard = $feed.setAuthor('XWiki'))
-        #set ($discard = $feed.setTitle($msg.get('search.rss', [$text])))
-        #set ($discard = $feed.setDescription($msg.get('search.rss', [$text])))
+        #set ($discard = $feed.setTitle($services.localization.render('search.rss', [$text])))
+        #set ($discard = $feed.setDescription($services.localization.render('search.rss', [$text])))
         #set ($discard = $feed.setLanguage($xcontext.language))
         #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
         {{{$xwiki.feed.getFeedOutput($feed, 'rss_2.0')}}}
@@ -255,16 +255,16 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         #end
 
         {{html}}
-          &lt;a href="${rssURL}" class='hasIcon iconRSS'&gt;$msg.get('search.rss', ["[$escapetool.xml($query)]"])&lt;/a&gt;
+          &lt;a href="${rssURL}" class='hasIcon iconRSS'&gt;$services.localization.render('search.rss', ["[$escapetool.xml($query)]"])&lt;/a&gt;
         {{/html}}
       #end
     #else
 
-      {{info}}$msg.get('search.page.results.noResults'){{/info}}
+      {{info}}$services.localization.render('search.page.results.noResults'){{/info}}
     #end
   #else
 
-    {{error}}$msg.get('search.lucene.plugin.notfound'){{/error}}
+    {{error}}$services.localization.render('search.lucene.plugin.notfound'){{/error}}
   #end
 #end
 #if (!$rssmode)
@@ -279,7 +279,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #set ($queuesize = $xwiki.lucene.getQueueSize())
     #if ($queuesize &gt; 0)
 
-      {{info}}$msg.get('search.page.lucene.rebuilding', [${queuesize}]){{/info}}
+      {{info}}$services.localization.render('search.page.lucene.rebuilding', [${queuesize}]){{/info}}
     #end
   #end## lucene exists
 #end## !$rssmode

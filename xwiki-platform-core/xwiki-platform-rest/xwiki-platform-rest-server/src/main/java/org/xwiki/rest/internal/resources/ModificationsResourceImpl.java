@@ -53,8 +53,9 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
 
             Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-            String query = String.format(
-                    "select doc.space, doc.name, doc.language, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
+            String query = String.format("select doc.space, doc.name, doc.language, rcs.id, rcs.date, rcs.author,"
+                + " rcs.comment from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
+                + " rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
                     order, order, order);
 
             List<Object> queryResult = null;
@@ -74,10 +75,11 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
                 Timestamp timestamp = (Timestamp) fields[4];
                 Date modified = new Date(timestamp.getTime());
                 String modifier = (String) fields[5];
+                String comment = (String) fields[6];
 
                 HistorySummary historySummary = DomainObjectFactory.createHistorySummary(objectFactory,
                         uriInfo.getBaseUri(), wikiName, spaceName, pageName, language, nodeId.getVersion(), modifier,
-                        modified, Utils.getXWikiApi(componentManager), withPrettyNames);
+                        modified, comment, Utils.getXWikiApi(componentManager), withPrettyNames);
 
                 history.getHistorySummaries().add(historySummary);
             }

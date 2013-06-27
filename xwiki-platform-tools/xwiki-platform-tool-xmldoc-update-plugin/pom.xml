@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
   <name>XWiki Platform - Tools - XML Doc Update Plugin</name>
@@ -140,7 +140,7 @@
   <profiles>
     <profile>
       <id>clover</id>
-      <!-- Add dependnency on Clover JAR since the XMLDoc Update plugin uses XWiki oldcore which gets Clovered and
+      <!-- Add dependency on Clover JAR since the XMLDoc Update plugin uses XWiki oldcore which gets Clovered and
            thus when unit tests are executed we need the Clover JAR in the classpath -->
       <dependencies>
         <dependency>

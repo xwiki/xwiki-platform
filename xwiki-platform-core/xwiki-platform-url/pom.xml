@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url</artifactId>
   <name>XWiki Platform - URL - Parent POM</name>
@@ -35,7 +35,7 @@
   <description>XWiki Platform - URL - Parent POM</description>
   <modules>
     <module>xwiki-platform-url-api</module>
-    <module>xwiki-platform-url-default</module>
+    <module>xwiki-platform-url-standard</module>
     <module>xwiki-platform-url-container</module>
   </modules>
 </project>

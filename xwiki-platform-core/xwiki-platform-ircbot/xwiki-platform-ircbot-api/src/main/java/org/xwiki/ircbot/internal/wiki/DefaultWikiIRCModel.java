@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.ircbot.IRCBot;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.internal.BotData;
 import org.xwiki.ircbot.internal.BotListenerData;
@@ -93,6 +94,12 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     @Inject
     private QueryManager queryManager;
 
+    /**
+     * Used to get the wiki in which the Bot has been started.
+     */
+    @Inject
+    private IRCBot bot;
+
     @Override
     public XWikiDocument getDocument(DocumentReference reference) throws IRCBotException
     {
@@ -109,10 +116,9 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     @Override
     public XWikiDocument getConfigurationDocument() throws IRCBotException
     {
-        // First try to find a configuration document in the current wiki and failing that try to find one in the
-        // main wiki.
-        XWikiDocument document = getDocument(
-            new DocumentReference(getXWikiContext().getDatabase(), SPACE, CONFIGURATION_PAGE));
+        // First try to find a configuration document in the wiki where the Bot has been started. If not found, then
+        // try in the main wiki.
+        XWikiDocument document = getDocument(new DocumentReference(this.bot.getWikiId(), SPACE, CONFIGURATION_PAGE));
         if (document.isNew()) {
             document = getDocument(
                 new DocumentReference(this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.WIKI),

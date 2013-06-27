@@ -27,12 +27,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-distribution</artifactId>
   <name>XWiki Platform - Extension - Distribution</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Extension - Distribution</description>
+  <description>Distribution Manager, allows upgrading the extensions in an entire farm after a platform upgrade.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -42,6 +42,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -61,11 +66,22 @@
         <configuration>
           <excludes>
             <!-- Need time -->
+            **/AbstractDistributionJob.java,
+            **/AbstractDistributionStep.java,
+            **/DefaultUIDistributionStep.java,
             **/DistributionJob.java,
             **/DistributionJobStatus.java,
             **/DistributionQuestion.java,
+            **/DistributionRequest.java,
+            **/DistributionStep.java,
             **/DistributionStepStatus.java,
-            **/DefaultDistributionManager.java
+            **/DefaultDistributionManager.java,
+            **/FarmDistributionJobStatus.java,
+            **/OutdatedExtensionsDistributionStep.java,
+            **/UpgradeModeDistributionStep.java,
+            **/WelcomeDistributionStep.java,
+            **/WikiDistributionJob.java,
+            **/WikiDistributionJobStatus.java
           </excludes>
         </configuration>
       </plugin>

@@ -1,0 +1,21 @@
+.runTransformations
+.configuration|rendering.macro.code.pygments.style=colorful
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Testing custom highlight parser
+.#-----------------------------------------------------
+{{code language="test"}}
+content
+{{/code}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [language=test] [content]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+onWord [test]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
+endMacroMarkerStandalone [code] [language=test] [content]
+endDocument

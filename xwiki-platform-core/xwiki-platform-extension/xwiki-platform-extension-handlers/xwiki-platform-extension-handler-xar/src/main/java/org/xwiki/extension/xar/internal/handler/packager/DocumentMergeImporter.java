@@ -31,6 +31,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Role
 public interface DocumentMergeImporter
 {
+    /**
+     * @param comment the comment to use when/if saving the document
+     * @param previousDocument the previous version of the document
+     * @param currentDocument the current version of the document
+     * @param nextDocument the new version of the document
+     * @param configuration various setup for the import
+     * @return the result of the merge
+     * @throws Exception when failed to save the document
+     */
     XarEntryMergeResult saveDocument(String comment, XWikiDocument previousDocument, XWikiDocument currentDocument,
         XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception;
 }

@@ -186,7 +186,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   #else
     ##
     ## No orders, Lets just explain what this page is for.
-    {{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}
+    {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
   #end
 #end
 ##
@@ -297,7 +297,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 
     {{info}}##
      (%id="message-status-and-memo"%)##
-      $msg.get('xe.invitation.inspectMessages.lastEntryInfoBox',
+      $services.localization.render('xe.invitation.inspectMessages.lastEntryInfoBox',
                ["#messageStatusForCode($message.getProperty('status').getValue())", $lastMemo])##
     {{/info}}
 
@@ -312,9 +312,9 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 #macro(displayMessageHistory, $message)
 
     (%id="message-history-table" class="invitation"%)(((
-     |=(%class="status-set-to"%)$msg.get('xe.invitation.displayMessageHistory.messageStatusSetTo')##
-       |=$msg.get('xe.invitation.displayMessageHistory.setByUser')##
-         |=(%class="log-entry"%)$msg.get('xe.invitation.displayMessageHistory.logEntry')
+     |=(%class="status-set-to"%)$services.localization.render('xe.invitation.displayMessageHistory.messageStatusSetTo')##
+       |=$services.localization.render('xe.invitation.displayMessageHistory.setByUser')##
+         |=(%class="log-entry"%)$services.localization.render('xe.invitation.displayMessageHistory.logEntry')
      $message.getProperty('history').getValue()
     )))
 
@@ -363,14 +363,14 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   ##
   #if($action == 'cancel')
     ## Cancel Invitations &lt;----------------------------------------------------------------------
-    = $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.heading') =
+    = $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.heading') =
     #if($messages.size() == 0)
       ## No message found by that id.
       (%id="invitation-action-message"%)((({{error}}##
       #if(!$messageIDs || $messageIDs.size() &lt; 2)
-        $msg.get('xe.invitation.noMessageFound')##
+        $services.localization.render('xe.invitation.noMessageFound')##
       #else
-        $msg.get('xe.invitation.doUserActionOnMultipleMessages.noMessagesFound')##
+        $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesFound')##
       #end
       {{/error}})))
     #elseif($messages.size() != $messageIDs.size())
@@ -380,7 +380,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       #else
         ## x of the y messages to cancel could not be found.
         (%id="invitation-action-message"%)((({{error}}##
-            $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.someMessagesNotFound',
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.someMessagesNotFound',
                      [$mathtool.sub($messageIDs.size(), $messages.size()), $messageIDs.size()]){{error}})))
       #end
     #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
@@ -393,31 +393,31 @@ $xwiki.get('ssx').use($config.get('commonPage'))
         #end
       #end
       #if($changed)
-        $emailContainer.saveAsAuthor($msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.saveComment'))
+        $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.saveComment'))
         ## Invitations canceled successfully.
         (%id="invitation-action-message"%)((({{info}}##
-            $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.success'){{/info}})))
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.success'){{/info}})))
       #else
         (%id="invitation-action-message"%)((({{warning}}##
-            $msg.get('xe.invitation.doUserActionOnMultipleMessages.noMessagesAffected'){{/warning}})))
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesAffected'){{/warning}})))
       #end
     #else
       ## Are you sure?...
       #if($messages.size() &lt; 2)
         ## If one message: "Are you sure you want to cancel this invitation?"
-        == $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.OneMessage') ==
+        == $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.OneMessage') ==
       #elseif($messages.size() == $numGroups)
         ## If number of groups is same as number of messages: "Are you sure you want to cancel X invitations?"
-        == $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.OneMessagePerGroup', [$numGroups]) ==
+        == $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.OneMessagePerGroup', [$numGroups]) ==
       #else
         ## Otherwise: "Are you sure you want to cancel X invitations to Y recipients?"
-        == $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.multipleMessagesMultipleGroups',
+        == $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.multipleMessagesMultipleGroups',
                     [$numGroups, $messages.size()]) ==
       #end
       #displayActionConfirmationForm($messageIDs,
                                      $action,
-                                     $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.memoLabel'),
-                                     $msg.get('xe.invitation.doUserActionOnMultipleMessages.confirmLabel'),
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.memoLabel'),
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.confirmLabel'),
                                      {'inspect': $inspect})
       (%class="invitation right-side"%)(((
         #displayMessageTable($messages, ['sentDate', 'sendingUser', 'subjectLine'], $isAdmin)
@@ -425,15 +425,15 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #end
   #elseif($action == 'notSpam')
     ## Declare message not spam &lt;-----------------------------------------------------------------
-    = $msg.get('xe.invitation.doUserActionOnMultipleMessages.notSpam.heading') =
+    = $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.heading') =
 
     #if($messages.size() == 0)
       ## No message found by that id.
       (%id="invitation-action-message"%)((({{error}}##
       #if(!$messageIDs || $messageIDs.size() &lt; 2)
-        $msg.get('xe.invitation.noMessageFound')
+        $services.localization.render('xe.invitation.noMessageFound')
       #else
-        $msg.get('xe.invitation.doUserActionOnMultipleMessages.noMessagesFound')
+        $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesFound')
       #end
       {{/error}})))
     #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
@@ -446,21 +446,21 @@ $xwiki.get('ssx').use($config.get('commonPage'))
         #end
       #end
       #if($changed)
-        $emailContainer.saveAsAuthor($msg.get('xe.invitation.doUserActionOnMultipleMessages.notSpam.reportHandledSaveComment', 
+        $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.reportHandledSaveComment',
                                               [$xcontext.getUser()]))
         (%id="invitation-action-message"%)((({{info}}##
-          $msg.get('xe.invitation.doUserActionOnMultipleMessages.notSpam.successMessage', [$memo])
+          $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.successMessage', [$memo])
         {{/info}})))
       #else
         (%id="invitation-action-message"%)((({{error}}##
-            $msg.get('xe.invitation.doUserActionOnMultipleMessages.noMessagesAffected'){{/error}})))
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesAffected'){{/error}})))
       #end
     #else
       ## Are you sure?...
       #displayActionConfirmationForm($messageIDs,
                                      $action,
-                                     $msg.get('xe.invitation.doUserActionOnMultipleMessages.notSpam.memoLabel'),
-                                     $msg.get('xe.invitation.doUserActionOnMultipleMessages.notSpam.confirmLabel'),
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.memoLabel'),
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.confirmLabel'),
                                      {'inspect': $inspect})
       #if($messages.size() &gt; 0)
         ## should always be true.
@@ -470,7 +470,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   #else
 
     (%id="invitation-action-message"%)((({{error}}##
-        $msg.get('xe.invitation.doUserActionOnMultipleMessages.notPossibleOnMultipleMessages'){{/error}})))
+        $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notPossibleOnMultipleMessages'){{/error}})))
   #end
 
   #if($confirm)
@@ -497,7 +497,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 
 
   #if(!$mail || $mail.size() &lt; 1)
-    {{info}}$msg.get('xe.invitation.displayMessageTable.noMessages'){{/info}}
+    {{info}}$services.localization.render('xe.invitation.displayMessageTable.noMessages'){{/info}}
   #else
     (%class="invitation"%)(((
      #displayMessageTable($mail, $fieldsToDisplay, $isAdmin,  $numberOfRecipientsByMessage)
@@ -527,7 +527,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 
 
   #if(!$mail || $mail.size() &lt; 1)
-    {{info}}$msg.get('xe.invitation.displayMessageTable.noMessages'){{/info}}
+    {{info}}$services.localization.render('xe.invitation.displayMessageTable.noMessages'){{/info}}
   #else
     {{html wiki=true}}
      &lt;form ##
@@ -545,7 +545,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
             &lt;span class="buttonwrapper"&gt;
              #if($validOptions.contains($option))
                &lt;input type="submit" class="button" name="doAction_$option" ##
-                   value="$msg.get("xe.invitation.displayMessageTableInForm.buttonLabel.$option")"/&gt;
+                   value="$services.localization.render("xe.invitation.displayMessageTableInForm.buttonLabel.${option}")"/&gt;
              #end
             &lt;/span&gt;
           #end

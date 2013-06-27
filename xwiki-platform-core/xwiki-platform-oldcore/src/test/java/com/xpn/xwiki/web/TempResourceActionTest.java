@@ -22,7 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Test;

@@ -36,14 +36,14 @@ The 'xredirect' parameter is also accepted, currently used in the administration
 ## TODO: use a dependency check macro.
 ##
 #if ("$!workspaceId" == '')
-  {{error}}$msg.get('platform.workspace.oneParameterNotSpecified', 'workspaceId'){{/error}}
+  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="workspaceId"/}}{{/error}}
 #else
   #set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
   #if (!$workspace)
     #if (!$WorkspaceManager.lastException)
-      {{error}}$msg.get('workspacemanager.error.workspacedoesnotexist', $workspaceId){{/error}}
+      {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$workspaceId"/}}{{/error}}
     #elseif("$!{WorkspaceManager.lastException.message}" != '')
-      {{error}}$msg.get('platform.workspace.exceptionWithMessage', $WorkspaceManager.lastException.message){{/error}}
+      {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$WorkspaceManager.lastException.message]){{/error}}
     #else
       {{error}}$WorkspaceManager.lastException.class{{/error}}
     #end

@@ -49,12 +49,13 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     public void configure() throws Exception
     {
         this.userConfiguration = getComponentManager().getInstance(ConfigurationSource.class, "user");
-        getMockery().checking(new Expectations() {{
-            ignoring(any(Logger.class)).method("debug");
-            // We need to set this expectation here because this call is made during the filter component initialization
-            oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-            will(returnValue(0));
-        }});
+        getMockery().checking(new Expectations()
+        {{
+                ignoring(any(Logger.class)).method("debug");
+                // We need to set this expectation here because this call is made during the filter component initialization
+                oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
+                will(returnValue(0));
+            }});
 
         this.filter = getComponentManager().getInstance(QueryFilter.class, "hidden");
     }
@@ -63,8 +64,8 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     public void filterHQLStatementWithDoNotDisplayHiddenDocumentsInTheUserPreferences() throws Exception
     {
         assertEquals(
-                "select doc.fullName from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and (1=1)",
-                filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.HQL));
+            "select doc.fullName from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and (1=1)",
+            filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.HQL));
     }
 
     @Test
@@ -79,7 +80,7 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
 
         // Insertions of distinct
         assertEquals("select doc.fullName from XWikiDocument doc where 1=1",
-                filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.HQL));
+            filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.HQL));
     }
 
     @Test
@@ -87,14 +88,14 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     {
         // Insertions of distinct
         assertEquals("select doc.fullName from XWikiDocument mydoc where 1=1",
-                filter.filterStatement("select doc.fullName from XWikiDocument mydoc where 1=1", Query.HQL));
+            filter.filterStatement("select doc.fullName from XWikiDocument mydoc where 1=1", Query.HQL));
     }
 
     @Test
     public void filterXWQLStatement() throws Exception
     {
         assertEquals("select doc.fullName from XWikiDocument doc where 1=1",
-                filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.XWQL));
+            filter.filterStatement("select doc.fullName from XWikiDocument doc where 1=1", Query.XWQL));
     }
 
     @Test
@@ -103,8 +104,8 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
         // Insertions of distinct
         assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
             + "(1=1) order by doc.name",
-                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name",
-                    Query.HQL));
+            filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name",
+                Query.HQL));
     }
 
     @Test
@@ -113,8 +114,8 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
         // Insertions of distinct
         assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
             + "(1=1) group by doc.name",
-                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 group by doc.name",
-                    Query.HQL));
+            filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 group by doc.name",
+                Query.HQL));
     }
 
     @Test
@@ -123,8 +124,8 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
         // Insertions of distinct
         assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) and "
             + "(1=1) order by doc.name group by doc.name",
-                filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name group by "
-                    + "doc.name", Query.HQL));
+            filter.filterStatement("select doc.name from XWikiDocument doc where 1=1 order by doc.name group by "
+                + "doc.name", Query.HQL));
     }
 
     @Test
@@ -132,24 +133,25 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     {
         // Insertions of distinct
         assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null)",
-                filter.filterStatement("select doc.name from XWikiDocument doc", Query.HQL));
+            filter.filterStatement("select doc.name from XWikiDocument doc", Query.HQL));
     }
 
     @Test
     public void filterHQLStatementWithoutWhereWithOrderBy()
     {
         // Insertions of distinct
-        assertEquals("select doc.name from XWikiDocument doc where doc.hidden <> true or doc.hidden is null order by "
-                + "doc.name asc",
-                filter.filterStatement("select doc.name from XWikiDocument doc order by doc.name asc", Query.HQL));
+        assertEquals("select doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) order by "
+            + "doc.name asc",
+            filter.filterStatement("select doc.name from XWikiDocument doc order by doc.name asc", Query.HQL));
     }
 
     @Test
     public void filterHQLStatementWithoutWhereWithGroupBy()
     {
         // Insertions of distinct
-        assertEquals("select doc.web, doc.name from XWikiDocument doc where doc.hidden <> true or doc.hidden is null " +
+        assertEquals(
+            "select doc.web, doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) " +
                 "group by doc.web",
-                filter.filterStatement("select doc.web, doc.name from XWikiDocument doc group by doc.web", Query.HQL));
+            filter.filterStatement("select doc.web, doc.name from XWikiDocument doc group by doc.web", Query.HQL));
     }
 }

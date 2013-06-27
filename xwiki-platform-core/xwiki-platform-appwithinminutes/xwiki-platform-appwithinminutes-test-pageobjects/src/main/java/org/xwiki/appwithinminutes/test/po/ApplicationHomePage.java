@@ -47,6 +47,19 @@ public class ApplicationHomePage extends ViewPage
     private LiveTableElement entriesLiveTable;
 
     /**
+     * Loads the home page of the specified application.
+     * 
+     * @param appName the application name
+     * @return the application home page
+     * @since 5.1RC1
+     */
+    public static ApplicationHomePage gotoPage(String appName)
+    {
+        getUtil().gotoPage(appName, "WebHome");
+        return new ApplicationHomePage();
+    }
+
+    /**
      * Clicks on the link to add a new application entry.
      * 
      * @return the pane used to input the entry name

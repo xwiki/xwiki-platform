@@ -61,8 +61,13 @@ public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot
     @Inject
     private XWikiStubContextProvider stubContextProvider;
 
+    /**
+     * Wiki in which the bot is installed.
+     */
+    private String wikiId;
+
     @Override
-    public void initialize(String wikiName)
+    public void initialize(String wikiId)
     {
         // We use a Fixed Thread Pool instead of the default Cached Thread Pool that PircBotX uses by default because
         // we need to initialize each thread with an Execution Context (it's a ThreadLocal) and since we haven't found
@@ -70,6 +75,13 @@ public class PircBotXIRCBot extends ExtendedPircBotX implements IRCBot
         // (as it's done by the Cached Thread Pool) will slowly use up all memory...
         setListenerManager(new ThreadedListenerManager<PircBotX>(
             Executors.newFixedThreadPool(3, new XWikiContextualizedThreadFactory(this.execution,
-                this.executionContextManager, this.stubContextProvider, wikiName))));
+                this.executionContextManager, this.stubContextProvider, wikiId))));
+        this.wikiId = wikiId;
+    }
+
+    @Override
+    public String getWikiId()
+    {
+        return this.wikiId;
     }
 }

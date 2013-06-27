@@ -29,6 +29,8 @@ bin
 /*/*/*/*/src/META-INF/
 /*/*/*/*/*/src/META-INF/
 /*/*/*/*/*/*/src/META-INF/
+#PyDev
+.pydevproject
 
 # NetBeans
 nbproject

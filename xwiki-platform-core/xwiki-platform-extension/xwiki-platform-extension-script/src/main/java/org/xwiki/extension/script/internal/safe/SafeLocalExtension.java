@@ -65,7 +65,7 @@ public class SafeLocalExtension<T extends LocalExtension> extends WrappingLocalE
     @Override
     public LocalExtensionFile getFile()
     {
-        return safe(super.getRepository());
+        return safe(super.getFile());
     }
 
     @Override

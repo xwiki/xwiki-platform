@@ -19,7 +19,7 @@
  */
 package org.xwiki.component.internal;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.jmock.States;

@@ -146,8 +146,10 @@ public class DeleteAttachmentAction extends XWikiAction
         }
 
         // forward to attach page
-        String redirect = Utils.getRedirect("attach", context);
-        sendRedirect(response, redirect);
+        if (!((Boolean) context.get("ajax")).booleanValue()) {
+            String redirect = Utils.getRedirect("attach", context);
+            sendRedirect(response, redirect);
+        }
 
         return false;
     }

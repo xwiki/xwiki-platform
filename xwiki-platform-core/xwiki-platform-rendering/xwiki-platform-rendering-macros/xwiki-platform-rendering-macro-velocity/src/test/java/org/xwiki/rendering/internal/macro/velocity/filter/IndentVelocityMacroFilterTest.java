@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.velocity.filter;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Test;

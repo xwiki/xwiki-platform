@@ -26,17 +26,18 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.web.Utils;
@@ -153,19 +154,34 @@ public class DocumentData extends AbstractDocumentData
 
     private void indexProperty(Document luceneDoc, BaseObject baseObject, String propertyName, XWikiContext context)
     {
-        String fieldFullName = baseObject.getClassName() + "." + propertyName;
-        BaseClass bClass = baseObject.getXClass(context);
-        PropertyInterface prop = bClass.getField(propertyName);
+        BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) baseObject.getField(propertyName);
+        Object propertyValue = property.getValue();
+        if (propertyValue == null) {
+            return;
+        }
 
-        if (prop instanceof PasswordClass) {
-            // Do not index passwords
-        } else if (prop instanceof StaticListClass && ((StaticListClass) prop).isMultiSelect()) {
-            indexStaticList(luceneDoc, baseObject, (StaticListClass) prop, propertyName, context);
-        } else if (prop instanceof DateClass) {
+        BaseClass xClass = baseObject.getXClass(context);
+        PropertyClass propertyClass = (PropertyClass) xClass.get(propertyName);
+        String fieldFullName = baseObject.getClassName() + "." + propertyName;
+
+        if (propertyClass instanceof PasswordClass) {
+            // Do not index passwords.
+        } else if (propertyClass instanceof StaticListClass && ((StaticListClass) propertyClass).isMultiSelect()) {
+            indexStaticList(luceneDoc, baseObject, (StaticListClass) propertyClass, propertyName, context);
+        } else if (propertyClass instanceof DateClass) {
             // Date properties are indexed the same as document dates: formatted through IndexFields.dateToString() and
             // untokenized, to be able to sort by their values.
             addFieldToDocument(fieldFullName, getContentAsDate(baseObject, propertyName), Field.Store.YES,
                 Field.Index.NOT_ANALYZED, OBJECT_PROPERTY_BOOST, luceneDoc);
+        } else if (propertyValue instanceof List) {
+            // Handle list property values, by adding each list entry.
+            List propertyListValues = (List) propertyValue;
+            for (Object propertyListValue : propertyListValues) {
+                if (propertyListValue != null) {
+                    addFieldToDocument(fieldFullName, propertyListValue.toString(), Field.Store.YES,
+                        Field.Index.ANALYZED, OBJECT_PROPERTY_BOOST, luceneDoc);
+                }
+            }
         } else {
             StringBuilder sb = new StringBuilder();
             getObjectContentAsText(sb, baseObject, propertyName, context);

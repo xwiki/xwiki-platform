@@ -59,6 +59,9 @@ XWiki.DateTimePicker = Class.create({
   }
 });
 
+// -------------------------------------------- //
+// AppWithinMinutes code that needs to be moved //
+// -------------------------------------------- //
 function enhanceEmptyIsToday(field) {
   var emptyIsToday = $(field.getPropertyId('emptyIsToday'));
   if (emptyIsToday.type == 'text') {
@@ -94,7 +97,37 @@ function maybeEnhanceField(field) {
     enhanceDefaultValue(field);
   }
 }
-function init() {
+// -------------------------------------------- //
+
+var initDateTimePickers = function(event) {
+  var containers = (event && event.memo.elements) || [$('body')];
+  containers.each(function(container) {
+    $('body').select('input.datetime').each(function(dateTimeInput) {
+      if (!dateTimeInput.hasClassName('initialized')) {
+        // The input title holds the date format.
+        new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);
+        dateTimeInput.addClassName('initialized');
+      }
+    });
+  });
+};
+
+var init = function(event, tryCount) {
+  // If there's no event then the code was probably lazy loaded. Make sure dependencies are present.
+  if (!event && (typeof Externals == 'undefined' || !Externals.SimpleDateFormat || !Externals.CalendarDateSelect)) {
+    tryCount = tryCount || 0;
+    if (tryCount < 3) {
+      typeof console != 'undefined' && console.warn
+        && console.warn('Cannot initialize DateTimePicker due to missing dependencies. Waiting a bit before trying again.');
+      setTimeout(init.bind(this, event, tryCount + 1), 100);
+    } else {
+      typeof console != 'undefined' && console.error
+        && console.error('Failed to initialize DateTimePicker due to missing dependencies: SimpleDateFormat and CalendarDateSelect.');
+    }
+    return;
+  }
+
+  // AppWithinMinutes code //
   document.observe('xwiki:class:displayField', function(event) {
     maybeEnhanceField(event.memo.field);
   });
@@ -115,15 +148,13 @@ function init() {
       }
     });
   } else {
-    $('body').select('input.datetime').each(function(dateTimeInput) {
-      // The input title holds the date format.
-      new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);
-    });
+    initDateTimePickers(event);
   }
 
   return true;
-}
+};
 (XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
+document.observe('xwiki:dom:updated', initDateTimePickers);
 
 // End XWiki augmentation.
 return XWiki;

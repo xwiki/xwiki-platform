@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-sources</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-source-jar</artifactId>
   <name>XWiki Platform - Localization - Source - JAR</name>
@@ -37,6 +37,11 @@
     <xwiki.jacoco.instructionRatio>69.21</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-api</artifactId>

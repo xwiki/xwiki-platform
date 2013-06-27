@@ -112,13 +112,13 @@
 #set ($query = "$!{query} and isPublished.value = 0")
 #set ($unpublishedEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 5, 0))
 #if ($unpublishedEntries.size() &gt; 0 || $showEmptyPanels)
-  #panelheader($msg.get('xe.blog.unpublished.entries'))
+  #panelheader($services.localization.render('xe.blog.unpublished.entries'))
   #foreach ($entryDoc in $xwiki.wrapDocs($unpublishedEntries))
     #getEntryObject($entryDoc $entryObj)
     * [[$!{entryDoc.display('title', 'view', $entryObj).replaceAll('(\[|\]|\||&gt;)', '~~$1')}&gt;&gt;$!{services.model.serialize($entryDoc.documentReference).replaceAll('(\[|\]|\||&gt;)', '~$1')}]]
   #end
 
-  [[$msg.get('xe.blog.unpublished.viewall') (% class="itemCount" %)($xwiki.countDocuments($query))(%%)&gt;&gt;Blog.Unpublished]]
+  [[$services.localization.render('xe.blog.unpublished.viewall') (% class="itemCount" %)($xwiki.countDocuments($query))(%%)&gt;&gt;Blog.Unpublished]]
   #panelfooter()
 #end
 {{/velocity}}</content>

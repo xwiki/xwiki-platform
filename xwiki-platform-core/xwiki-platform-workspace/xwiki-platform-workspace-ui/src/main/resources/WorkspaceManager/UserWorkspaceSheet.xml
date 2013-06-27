@@ -103,23 +103,18 @@
       <cache>forbid</cache>
     </property>
     <property>
-      <code>if (console == undefined) {
-  var console = {};
-  console.log = function() {};
-}
-XWiki.UserWorkspaceTab = Class.create({
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
 
+XWiki.UserWorkspaceTab = Class.create({
   initialize : function () {
     this.addListeners();
   },
 
   addListeners : function() {
-    var elements = $('workspaces').childElements();
-    for (var key in elements) {
-      var element = elements[key];
-      var workspaceName = element.id;
-      var link = element.down('.workspaceActivity a');
-      link.observe('click', this.onWorkspaceClicked);
+    var elements = $('workspaces') ? $('workspaces').childElements() : [];
+    for (var i = 0; i &lt; elements.length; ++i) {
+      elements[i].down('.workspaceActivity a').observe('click', this.onWorkspaceClicked);
     }
   },
 
@@ -158,14 +153,14 @@ XWiki.UserWorkspaceTab = Class.create({
   }
 });
 
-// FIXME: Replace with XWiki.isDomLoaded when upgrading to 3.1.1. http://jira.xwiki.org/jira/browse/XWIKI-6754
-if (XWiki.isInitialized) {
+var init = function() {
   new XWiki.UserWorkspaceTab();
-} else {
-  document.observe('xwiki:dom:loaded', function() {
-    new XWiki.UserWorkspaceTab();
-  });
-}</code>
+};
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
     </property>
     <property>
       <name/>
@@ -174,7 +169,7 @@ if (XWiki.isInitialized) {
       <parse>1</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -295,18 +290,18 @@ if (XWiki.isInitialized) {
       <parse>1</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
   <content>{{velocity}}
 #set ($obj = $doc.getObject('XWiki.XWikiUsers'))
 #if (!$obj)
-= $msg.get('xe.admin.users.sheet') =
+= {{translation key="xe.admin.users.sheet"/}} =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
+{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
 #else
   #set($temp = $xwiki.ssx.use('WorkspaceManager.UserWorkspaceSheet'))
-  #set($temp = $xwiki.jsx.use('WorkspaceManager.UserWorkspaceSheet', {'minify' : false}))
+  #set($temp = $xwiki.jsx.use('WorkspaceManager.UserWorkspaceSheet'))
   #set($temp = $doc.use($obj))
   #set ($currentUser = $xcontext.user)
   #if (!$currentUser.startsWith("${xcontext.mainWikiName}:"))
@@ -317,7 +312,7 @@ if (XWiki.isInitialized) {
   {{html clean='false'}}
   &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
-      &lt;h1&gt;$msg.get('platform.workspace.profileJoinedWorkspacesLabel')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.workspace.profileJoinedWorkspacesLabel')&lt;/h1&gt;
       #set ($joinedWorkspacesDescriptors = [])
       #set ($workspaces = $services.workspace.getWorkspaces())
       #foreach ($workspace in $workspaces)
@@ -331,13 +326,13 @@ if (XWiki.isInitialized) {
         #end
       #end
       #if ($joinedWorkspacesDescriptors.size() == 0)
-        &lt;span&gt;#if ($isMyProfile)$msg.get('platform.workspace.profileNotMemberOfAnyWorkspace')#{else}$msg.get('platform.workspace.profileUserNotMemberOfAnyWorkspace')#end&lt;/span&gt;
+        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.workspace.profileNotMemberOfAnyWorkspace')#{else}$services.localization.render('platform.workspace.profileUserNotMemberOfAnyWorkspace')#end&lt;/span&gt;
       #else
         &lt;ul id='workspaces'&gt;
         #foreach ($workspaceWikiDescriptor in $joinedWorkspacesDescriptors)
           &lt;li id='$workspaceWikiDescriptor.wikiName'&gt;
             &lt;span class='workspaceHomepage'&gt;&lt;a href='$workspaceWikiDescriptor.homePageUrl'&gt;$workspaceWikiDescriptor.getValue('wikiprettyname')&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='workspaceActivity'&gt;&lt;a href='javascript:void(0)'&gt;$msg.get('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='workspaceActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;

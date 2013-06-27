@@ -454,8 +454,8 @@ XWiki.FormField = Class.create({
   _createToolBox : function() {
     var deleteIcon = new Element('img', {
       src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bulletcross.png')',
-      alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDeleteFieldLabel'))',
-      title: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorDeleteFieldLabel'))'
+      alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDeleteFieldLabel'))',
+      title: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDeleteFieldLabel'))'
     });
     deleteIcon.observe('click', this._onDelete.bindAsEventListener(this));
 
@@ -471,13 +471,13 @@ XWiki.FormField = Class.create({
     var fieldConfig = this.getConfig();
     if (fieldConfig.visible()) {
       fieldConfig.hide();
-      icon.alt = icon.title = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorConfigureFieldLabel'))';
+      icon.alt = icon.title = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorConfigureFieldLabel'))';
       icon.src = '$xwiki.getSkinFile('icons/silk/bullet_wrench.png')';
       this._maybePreview();
     } else {
       fieldConfig.show();
-      icon.alt = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorPreviewFieldLabel'))';
-      icon.title = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorPreviewFieldHint'))';
+      icon.alt = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorPreviewFieldLabel'))';
+      icon.title = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorPreviewFieldHint'))';
       icon.src = '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'bullettick.png')';
       this._maybeSavePreviewData();
     }
@@ -486,7 +486,7 @@ XWiki.FormField = Class.create({
     new XWiki.widgets.ConfirmationBox({
       onYes : this._onConfirmedDelete.bind(this)
     }, {
-      confirmationText : '$msg.get('core.editors.class.deleteProperty.confirm')'
+      confirmationText : '$services.localization.render('core.editors.class.deleteProperty.confirm')'
     });
   },
   _onConfirmedDelete : function() {
@@ -706,7 +706,7 @@ XWiki.FormFieldDefaultValueManager = Class.create({
     var fieldName = field.getName();
     field.getViewer().select('input[type=text]', 'textarea').each(function(input) {
       if (!input.title &amp;&amp; input.name.endsWith('_0_' + fieldName)) {
-        input.title = '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorFieldDefaultValueToolTip'))';
+        input.title = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldDefaultValueToolTip'))';
       }
     });
   },
@@ -830,8 +830,8 @@ XWiki.FormCanvas = Class.create({
     // Create and insert the move icon.
     var moveIcon = new Element('img', {
       src: '$xwiki.getAttachmentURL('AppWithinMinutes.ClassEditSheet', 'arrow-move.png')',
-      alt: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorMoveFieldLabel'))',
-      title: '$escapetool.javascript($msg.get('platform.appwithinminutes.classEditorMoveFieldHint'))',
+      alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorMoveFieldLabel'))',
+      title: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorMoveFieldHint'))',
       'class': 'icon-move'
     });
     field.getToolBox().insert({bottom: moveIcon});
@@ -1430,10 +1430,10 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #macro(displayFieldPalette)
   (% id="palette" %)
   (((
-    **$msg.get('platform.appwithinminutes.classEditorPaletteTitle')**
+    **$services.localization.render('platform.appwithinminutes.classEditorPaletteTitle')**
 
     (% class="xHint" %)
-    $msg.get('platform.appwithinminutes.classEditorPaletteHint')
+    $services.localization.render('platform.appwithinminutes.classEditorPaletteHint')
 
     ## List all form field types, grouped by category.
     #set($formFieldDocs = [])
@@ -1480,7 +1480,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   (% id="canvas" %)
   (((
     (% class="hint" %)
-    $msg.get('platform.appwithinminutes.classEditorCanvasHint')
+    $services.localization.render('platform.appwithinminutes.classEditorCanvasHint')
 
     #set($unknownFields = [])
     #set($empty = true)
@@ -1524,16 +1524,16 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   {{html wiki="true"}}
   ## Hide the options if neither the sheet nor the template nor the translation bundle exists. They don't have to be updated, they have to be created.
   (% id="options" #if(!$xwiki.exists($sheetName) &amp;&amp; !$xwiki.exists($templateName) &amp;&amp; !$xwiki.exists($translationsName))class="hidden" #end%)
-  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;$msg.get('platform.appwithinminutes.classEditorUpdateTemplateLabel')&lt;/label&gt;
-  : (% class="xHint" %)$msg.get('platform.appwithinminutes.classEditorUpdateTemplateHint', "[[$templateName]]")
-  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;$msg.get('platform.appwithinminutes.classEditorUpdateSheetLabel')&lt;/label&gt;
+  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;$services.localization.render('platform.appwithinminutes.classEditorUpdateTemplateLabel')&lt;/label&gt;
+  : (% class="xHint" %)$services.localization.render('platform.appwithinminutes.classEditorUpdateTemplateHint', "[[$templateName]]")
+  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;$services.localization.render('platform.appwithinminutes.classEditorUpdateSheetLabel')&lt;/label&gt;
   : #if($sheetName)
-      (% class="xHint" %)$msg.get('platform.appwithinminutes.classEditorUpdateSheetHint', "[[$sheetName]]")
+      (% class="xHint" %)$services.localization.render('platform.appwithinminutes.classEditorUpdateSheetHint', "[[$sheetName]]")
     #else
-      (% class="warningmessage" %)$msg.get('platform.appwithinminutes.classEditorMultipleSheetsWarning')
+      (% class="warningmessage" %)$services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning')
     #end
-  ; &lt;label for="updateClassTranslations"&gt;&lt;input type="checkbox" id="updateClassTranslations" name="updateClassTranslations" checked="checked" /&gt;$msg.get('platform.appwithinminutes.classEditorUpdateTranslationsLabel')&lt;/label&gt;
-  : (% class="xHint" %)$msg.get('platform.appwithinminutes.classEditorUpdateTranslationsHint', "[[$translationsName]]")
+  ; &lt;label for="updateClassTranslations"&gt;&lt;input type="checkbox" id="updateClassTranslations" name="updateClassTranslations" checked="checked" /&gt;$services.localization.render('platform.appwithinminutes.classEditorUpdateTranslationsLabel')&lt;/label&gt;
+  : (% class="xHint" %)$services.localization.render('platform.appwithinminutes.classEditorUpdateTranslationsHint', "[[$translationsName]]")
   {{/html}}
 #end
 
@@ -1619,10 +1619,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
   ## The class editor moves this resource includes in the HTML page head.
   {{html}}
-  &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin --&gt;
-  &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;
-  &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin --&gt;
-  &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin --&gt;
+  #skinExtensionHooks
   {{/html}}
 
   #set($formFieldDoc = $xwiki.getDocument($request.field))
@@ -1784,7 +1781,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         ## The field name has changed.
         #if($xclass.get($field.name))
           ## There is already a field with the same name.
-          #set($errorMessage = $msg.get('platform.appwithinminutes.classEditorDuplicateFieldNameError', $field.name))
+          #set($errorMessage = $services.localization.render('platform.appwithinminutes.classEditorDuplicateFieldNameError', $field.name))
           #break
         #else
           #set($discard = $xclass.removeField($fieldName))
@@ -1798,7 +1795,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         #end
       #end
     #else
-      #set($errorMessage = $msg.get('propertynamenotcorrect'))
+      #set($errorMessage = $services.localization.render('propertynamenotcorrect'))
       #break
     #end
   #end
@@ -1810,7 +1807,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($discard = $xdoc.renameProperties($doc.documentReference, $fieldsToRename))
     #set($discard = $xdoc.setHidden(true))
     #set($discard = $xdoc.setMetaDataDirty(true))
-    #set($discard = $doc.save($msg.get('core.comment.updateClassProperty'), $minorEdit))
+    #set($discard = $doc.save($services.localization.render('core.comment.updateClassProperty'), $minorEdit))
   #end
   ##
   ## Handle field renames.
@@ -1822,7 +1819,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #foreach($instanceDocName in $instancesQuery.execute())
       #set($instanceDoc = $xwiki.getDocument($instanceDocName))
       #set($discard = $instanceDoc.document.renameProperties($doc.documentReference, $fieldsToRename))
-      #set($discard = $instanceDoc.save($msg.get('core.comment.updateClassPropertyName'), true))
+      #set($discard = $instanceDoc.save($services.localization.render('core.comment.updateClassPropertyName'), true))
     #end
   #end
   ##
@@ -1850,7 +1847,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #end
     #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
     #set($discard = $templateDoc.setHidden(true))
-    #set($discard = $templateDoc.save($msg.get('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))
+    #set($discard = $templateDoc.save($services.localization.render('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))
   #end
 #end
 
@@ -1864,7 +1861,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($className = $stringtool.removeEnd($doc.name, 'Class'))
       #set($sheetReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Sheet"))
       #set($discard = $services.sheet.bindClassSheet($doc, $sheetReference))
-      #set($discard = $doc.save($msg.get('platform.appwithinminutes.classEditorBindSheetSaveComment'), $minorEdit))
+      #set($discard = $doc.save($services.localization.render('platform.appwithinminutes.classEditorBindSheetSaveComment'), $minorEdit))
     #elseif($classSheets.size() == 1)
       #set($sheetReference = $classSheets.get(0))
     #end
@@ -1874,7 +1871,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($discard = $sheetDoc.setParent($doc.name))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content, $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
       #set($discard = $sheetDoc.setHidden(true))
-      #set($discard = $sheetDoc.save($msg.get('platform.appwithinminutes.classEditorSheetSaveComment'), $minorEdit))
+      #set($discard = $sheetDoc.save($services.localization.render('platform.appwithinminutes.classEditorSheetSaveComment'), $minorEdit))
     #end
   #end
 #end
@@ -1896,7 +1893,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
     #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content, $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
     #set($discard = $translationsDoc.setHidden(true))
-    #set($discard = $translationsDoc.save($msg.get('platform.appwithinminutes.classEditorTranslationsSaveComment'), $minorEdit))
+    #set($discard = $translationsDoc.save($services.localization.render('platform.appwithinminutes.classEditorTranslationsSaveComment'), $minorEdit))
   #end
 #end
 
@@ -1917,7 +1914,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
       #set($queryString = 'wizard=true')
       #if(!$xwiki.exists($homePageRef))
-        #set($homePageTitle = '$msg.get(''platform.appwithinminutes.appHomePageTitle'', $doc.space)')
+        #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', $doc.space)')
         #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.LiveTableTemplate&amp;AppWithinMinutes.LiveTableClass_0_class=$escapetool.url($doc.fullName)&amp;title=$escapetool.url($homePageTitle)&amp;parent=AppWithinMinutes.WebHome")
       #end
       $response.sendRedirect($xwiki.getURL($homePageRef, 'edit', $queryString));

@@ -28,14 +28,14 @@ actionButtons.EditActions = Class.create({
   },
   addShortcuts : function() {
     var shortcuts = {
-      'action_cancel' : "$msg.get('core.shortcuts.edit.cancel')",
-      'action_preview' : "$msg.get('core.shortcuts.edit.preview')",
+      'action_cancel' : "$services.localization.render('core.shortcuts.edit.cancel')",
+      'action_preview' : "$services.localization.render('core.shortcuts.edit.preview')",
       // The following 2 are both "Back to edit" in the preview mode, depending on the used editor
-      'action_edit' : "$msg.get('core.shortcuts.edit.backtoedit')",
-      'action_inline' : "$msg.get('core.shortcuts.edit.backtoedit')",
-      'action_save' : "$msg.get('core.shortcuts.edit.saveandview')",
-      'action_propupdate' : "$msg.get('core.shortcuts.edit.saveandview')",
-      'action_saveandcontinue' : "$msg.get('core.shortcuts.edit.saveandcontinue')"
+      'action_edit' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
+      'action_inline' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
+      'action_save' : "$services.localization.render('core.shortcuts.edit.saveandview')",
+      'action_propupdate' : "$services.localization.render('core.shortcuts.edit.saveandview')",
+      'action_saveandcontinue' : "$services.localization.render('core.shortcuts.edit.saveandcontinue')"
     }
     for (var key in shortcuts) {
       var targetButtons = $$("input[name=" + key + "]");
@@ -46,7 +46,7 @@ actionButtons.EditActions = Class.create({
       }
     }
   },
-  validators : new Array(), 
+  validators : new Array(),
   addValidators : function() {
     // Add live presence validation for inputs with classname 'required'.
     var inputs = $('body').select("input.required");
@@ -54,7 +54,7 @@ actionButtons.EditActions = Class.create({
       var input = inputs[i];
       var validator = new LiveValidation(input, { validMessage: "" });
       validator.add(Validate.Presence, {
-        failureMessage: "$msg.get('core.validation.required.message')"
+        failureMessage: "$services.localization.render('core.validation.required.message')"
       });
       validator.validate();
       this.validators.push(validator);
@@ -69,7 +69,7 @@ actionButtons.EditActions = Class.create({
     if ($xwiki.isEditCommentMandatory()) {
       var commentField = form.comment
       while (commentField.value == "") {
-        var response = prompt("${msg.get('core.comment.prompt')}", '');
+        var response = prompt("${services.localization.render('core.comment.prompt')}", '');
         if (response === null) {
           return false;
         }
@@ -78,7 +78,7 @@ actionButtons.EditActions = Class.create({
     } else if ($xwiki.isEditCommentSuggested()) {
       var commentField = form.comment
       if (commentField.value == "") {
-        var response = prompt("${msg.get('core.comment.prompt')}", '');
+        var response = prompt("${services.localization.render('core.comment.prompt')}", '');
         if (response === null) {
           return false;
         }

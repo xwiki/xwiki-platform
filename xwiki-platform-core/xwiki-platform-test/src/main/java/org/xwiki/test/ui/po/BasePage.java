@@ -354,6 +354,10 @@ public class BasePage extends BaseElement
     public void logout()
     {
         this.logoutLink.click();
+        // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
+        // TestUtils#createUser(), which expect the currently cached token to be valid, will fail because they would be
+        // using the token of the previously logged in user.
+        getUtil().recacheSecretToken();
     }
 
     /**

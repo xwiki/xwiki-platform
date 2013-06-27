@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;

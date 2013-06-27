@@ -19,14 +19,11 @@
  */
 package org.xwiki.rest.internal.resources;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -214,14 +211,8 @@ public class BaseSearchResult extends XWikiResource
                 }
             }
 
-            /* Add some filters if the user doesn't have programming rights. */
-            if (hasProgrammingRights) {
-                f.format(") order by %s", orderClause);
-            } else {
-                f.format(
-                        ") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by %s",
-                        orderClause);
-            }
+            // Add ordering
+            f.format(") order by %s", orderClause);
 
             String query = f.toString();
 
@@ -229,15 +220,20 @@ public class BaseSearchResult extends XWikiResource
 
             /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
             if (space != null) {
-                queryResult =
-                        queryManager.createQuery(query, Query.XWQL)
-                                .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
-                                .bindValue("space", space).setLimit(number).setOffset(start).execute();
+                queryResult = this.queryManager.createQuery(query, Query.XWQL)
+                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                    .bindValue("space", space)
+                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager))
+                    .setOffset(start)
+                    .setLimit(number)
+                    .execute();
             } else {
-                queryResult =
-                        queryManager.createQuery(query, Query.XWQL)
-                                .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
-                                .setOffset(start).execute();
+                queryResult = this.queryManager.createQuery(query, Query.XWQL)
+                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager))
+                    .setOffset(start)
+                    .setLimit(number)
+                    .execute();
             }
 
             for (Object object : queryResult) {
@@ -273,29 +269,15 @@ public class BaseSearchResult extends XWikiResource
                     }
 
                     String pageUri = null;
-                    try {
-                        if (StringUtils.isBlank(language)) {
-                            pageUri =
-                                    UriBuilder
-                                            .fromUri(this.uriInfo.getBaseUri())
-                                            .path(PageResource.class)
-                                            .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                                    URLEncoder.encode(spaceName, "UTF-8"),
-                                                    URLEncoder.encode(pageName, "UTF-8"))
-                                            .toString();
-                        } else {
-                            searchResult.setLanguage(language);
-                            pageUri =
-                                    UriBuilder
-                                            .fromUri(this.uriInfo.getBaseUri())
-                                            .path(PageTranslationResource.class)
-                                            .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                                    URLEncoder.encode(spaceName, "UTF-8"),
-                                                    URLEncoder.encode(pageName, "UTF-8"),
-                                                    language).toString();
-                        }
-                    } catch (UnsupportedEncodingException ex) {
-                        // This should never happen, UTF-8 is always valid.
+                    if (StringUtils.isBlank(language)) {
+                        pageUri =
+                            Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName,
+                                pageName).toString();
+                    } else {
+                        searchResult.setLanguage(language);
+                        pageUri =
+                            Utils.createURI(this.uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
+                                spaceName, pageName, language).toString();
                     }
 
                     Link pageLink = new Link();
@@ -366,7 +348,7 @@ public class BaseSearchResult extends XWikiResource
 
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("space");
-                    searchResult.setId(String.format("%s:%s", wikiName, spaceName));
+                    searchResult.setId(Utils.getSpaceId(wikiName, spaceName));
                     searchResult.setWiki(wikiName);
                     searchResult.setSpace(spaceName);
                     searchResult.setTitle(title);
@@ -375,9 +357,7 @@ public class BaseSearchResult extends XWikiResource
                     Link spaceLink = new Link();
                     spaceLink.setRel(Relations.SPACE);
                     String spaceUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(SpaceResource.class)
-                                    .build(wikiName, spaceName)
-                                    .toString();
+                        Utils.createURI(uriInfo.getBaseUri(), SpaceResource.class, wikiName, spaceName).toString();
                     spaceLink.setHref(spaceUri);
                     searchResult.getLinks().add(spaceLink);
 
@@ -385,8 +365,8 @@ public class BaseSearchResult extends XWikiResource
                     String webHomePageId = Utils.getPageId(wikiName, spaceName, "WebHome");
                     if (xwikiApi.exists(webHomePageId) && xwikiApi.hasAccessLevel("view", webHomePageId)) {
                         String pageUri =
-                                UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
-                                        .build(wikiName, spaceName, "WebHome").toString();
+                            Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName, "WebHome")
+                                .toString();
 
                         Link pageLink = new Link();
                         pageLink.setHref(pageUri);
@@ -535,16 +515,16 @@ public class BaseSearchResult extends XWikiResource
                     }
 
                     String pageUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
-                                    .build(wikiName, spaceName, pageName).toString();
+                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName, pageName)
+                            .toString();
                     Link pageLink = new Link();
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
                     searchResult.getLinks().add(pageLink);
 
                     String objectUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class)
-                                    .build(wikiName, spaceName, pageName, className, objectNumber).toString();
+                        Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaceName, pageName,
+                            className, objectNumber).toString();
                     Link objectLink = new Link();
                     objectLink.setHref(objectUri);
                     objectLink.setRel(Relations.OBJECT);
@@ -705,29 +685,15 @@ public class BaseSearchResult extends XWikiResource
                     }
 
                     String pageUri = null;
-                    try {
-                        if (StringUtils.isBlank(language)) {
-                            pageUri =
-                                    UriBuilder
-                                            .fromUri(this.uriInfo.getBaseUri())
-                                            .path(PageResource.class)
-                                            .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                                    URLEncoder.encode(spaceName, "UTF-8"),
-                                                    URLEncoder.encode(pageName, "UTF-8"))
-                                            .toString();
-                        } else {
-                            searchResult.setLanguage(language);
-                            pageUri =
-                                    UriBuilder
-                                            .fromUri(this.uriInfo.getBaseUri())
-                                            .path(PageTranslationResource.class)
-                                            .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                                    URLEncoder.encode(spaceName, "UTF-8"),
-                                                    URLEncoder.encode(pageName, "UTF-8"),
-                                                    language).toString();
-                        }
-                    } catch (UnsupportedEncodingException ex) {
-                        // This should never happen, UTF-8 is always valid.
+                    if (StringUtils.isBlank(language)) {
+                        pageUri =
+                            Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName,
+                                pageName).toString();
+                    } else {
+                        searchResult.setLanguage(language);
+                        pageUri =
+                            Utils.createURI(this.uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
+                                spaceName, pageName, language).toString();
                     }
 
                     Link pageLink = new Link();
@@ -851,14 +817,8 @@ public class BaseSearchResult extends XWikiResource
                             searchResult.setFilename(luceneSearchResult.getFilename());
 
                             String attachmentUri =
-                                    UriBuilder
-                                            .fromUri(this.uriInfo.getBaseUri())
-                                            .path(AttachmentResource.class)
-                                            .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                                    URLEncoder.encode(spaceName, "UTF-8"),
-                                                    URLEncoder.encode(pageName, "UTF-8"),
-                                                    URLEncoder.encode(luceneSearchResult.getFilename(), "UTF-8"))
-                                            .toString();
+                                Utils.createURI(this.uriInfo.getBaseUri(), AttachmentResource.class, wikiName,
+                                    spaceName, pageName, luceneSearchResult.getFilename()).toString();
 
                             Link attachmentLink = new Link();
                             attachmentLink.setHref(attachmentUri);
@@ -883,28 +843,15 @@ public class BaseSearchResult extends XWikiResource
                         }
 
                         String pageUri = null;
-                        try {
-                            if (StringUtils.isBlank(language)) {
-                                pageUri =
-                                        UriBuilder
-                                                .fromUri(this.uriInfo.getBaseUri())
-                                                .path(PageResource.class)
-                                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                                        URLEncoder.encode(spaceName, "UTF-8"),
-                                                        URLEncoder.encode(pageName, "UTF-8"))
-                                                .toString();
-                            } else {
-                                searchResult.setLanguage(language);
-                                pageUri =
-                                        UriBuilder
-                                                .fromUri(this.uriInfo.getBaseUri())
-                                                .path(PageTranslationResource.class)
-                                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
-                                                        URLEncoder.encode(spaceName, "UTF-8"),
-                                                        URLEncoder.encode(pageName, "UTF-8"), language).toString();
-                            }
-                        } catch (UnsupportedEncodingException ex) {
-                            // This should never happen, UTF-8 is always valid.
+                        if (StringUtils.isBlank(language)) {
+                            pageUri =
+                                Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName,
+                                    pageName).toString();
+                        } else {
+                            searchResult.setLanguage(language);
+                            pageUri =
+                                Utils.createURI(this.uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
+                                    spaceName, pageName, language).toString();
                         }
 
                         Link pageLink = new Link();

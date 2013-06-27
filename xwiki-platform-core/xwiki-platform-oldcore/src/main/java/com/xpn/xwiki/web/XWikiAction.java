@@ -43,7 +43,9 @@ import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.velocity.VelocityManager;
 
@@ -92,7 +94,10 @@ public abstract class XWikiAction extends Action
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
 
-    /** Actions that need to be resolved on the main wiki instead of the current in-existing wiki. */
+    /**
+     * Actions that need to be resolved on the main wiki instead of the current non-existing wiki. This is used to be
+     * able to render the skin even on a wiki that doesn't exist.
+     */
     private static final List<String> ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST = Arrays.asList("skin", "ssx", "jsx",
         "download");
 
@@ -156,7 +161,7 @@ public abstract class XWikiAction extends Action
                 xwiki = XWiki.getXWiki(context);
             } catch (XWikiException e) {
                 // If the wiki asked by the user doesn't exist, then we first attempt to use any existing global
-                // redirects. If here are none, then we display the specific error template.
+                // redirects. If there are none, then we display the specific error template.
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
@@ -165,41 +170,32 @@ public abstract class XWikiAction extends Action
                                 "Please update your configuration and/or see XWIKI-8914 for more details."));
                         }
 
-                        if (!"0".equals(context.getWiki().Param("xwiki.virtual.failOnWikiDoesNotExist", "0"))) {
-                            boolean currentActionShouldFail =
-                                !ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST.contains(action);
+                        // Display the error template only for actions that are not ignored
+                        if (!ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST.contains(action)) {
 
-                            // Display the error template only for actions that are not ignored
-                            if (currentActionShouldFail) {
-                                // Set the context wiki to the requested one so that the UI renders accordingly
-                                String requestedWikiName = xwiki.getRequestWikiName(context);
-                                String currentDatabase = context.getDatabase();
-                                context.setDatabase(requestedWikiName);
+                            // Add localization resources to the context
+                            xwiki.prepareResources(context);
 
-                                // Set the context fake document so that the UI renders accordingly
-                                DocumentReference currentDocumentReference =
-                                    xwiki.getDocumentReference(context.getRequest(), context);
-                                // Reset the database or we`ll have problems later on in parseTemplate because of the
-                                // indexistent wiki.
-                                context.setDatabase(currentDatabase);
+                            // Set the main home page in the main space of the main wiki as the current requested entity
+                            // since we cannot set the non existing one as it would generate errors obviously...
+                            EntityReferenceValueProvider valueProvider =
+                                Utils.getComponent(EntityReferenceValueProvider.class);
+                            xwiki.setPhonyDocument(new DocumentReference(
+                                valueProvider.getDefaultValue(EntityType.WIKI),
+                                valueProvider.getDefaultValue(EntityType.SPACE),
+                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
 
-                                // Add localization resources to the context
-                                xwiki.prepareResources(context);
-                                // Add the requested document to the context, even if it does not exist
-                                xwiki.setPhonyDocument(currentDocumentReference, context, vcontext);
+                            // Parse the error template
+                            Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),
+                                context);
 
-                                // Parse the error template
-                                Utils.parseTemplate(
-                                    context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"), context);
-
-                                // Error template was displayed, stop here.
-                                return null;
-                            }
-
-                            // At this point, we allow regular execution of the ignored action because even if the wiki
-                            // does not exist, we still need to allow UI resources to be retrieved (from the filesystem
-                            // and the main wiki) or our error template will not be rendered properly.
+                            // Error template was displayed, stop here.
+                            return null;
                         }
+
+                        // At this point, we allow regular execution of the ignored action because even if the wiki
+                        // does not exist, we still need to allow UI resources to be retrieved (from the filesystem
+                        // and the main wiki) or our error template will not be rendered properly.
 
                         // Proceed with serving the main wiki
 

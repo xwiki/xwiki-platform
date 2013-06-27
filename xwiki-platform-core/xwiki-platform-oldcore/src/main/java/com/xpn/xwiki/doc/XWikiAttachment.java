@@ -272,7 +272,7 @@ public class XWikiAttachment implements Cloneable
     {
         this.doc = doc;
         this.reference = null;
-        if (isMetaDataDirty && doc != null) {
+        if (isMetaDataDirty() && doc != null) {
             doc.setMetaDataDirty(true);
         }
         if (getAttachment_content() != null)
@@ -475,7 +475,7 @@ public class XWikiAttachment implements Cloneable
     public void fromXML(String data) throws XWikiException
     {
         SAXReader reader = new SAXReader();
-        Document domdoc = null;
+        Document domdoc;
         try {
             StringReader in = new StringReader(data);
             domdoc = reader.read(in);
@@ -510,6 +510,11 @@ public class XWikiAttachment implements Cloneable
             String archive = archiveel.getText();
             setArchive(archive);
         }
+
+        // The setters we're calling above will set the metadata dirty flag to true since they're changing the
+        // attachment's identity. However since this method is about loading the attachment from XML it shouldn't be
+        // considered as dirty.
+        setMetaDataDirty(false);
     }
 
     public XWikiAttachmentContent getAttachment_content()

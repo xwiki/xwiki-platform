@@ -15,7 +15,7 @@
   <date>1321658413000</date>
   <contentUpdateDate>1321658413000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("admin.xwiki.addextensions")</title>
+  <title>$services.localization.render('admin.xwiki.addextensions')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -261,7 +261,7 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
       <name>platform.panels.addApplications</name>
     </property>
     <property>
-      <parameters>label=$msg.get('extensions.applicationsPanel.install')
+      <parameters>label=$services.localization.render('extensions.applicationsPanel.install')
 target=XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"
 icon=icon:bullet_go</parameters>
     </property>
@@ -270,10 +270,11 @@ icon=icon:bullet_go</parameters>
     </property>
   </object>
   <content>{{velocity output="false"}}
-## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
-## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template when
-## this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
-#parse('extension.vm')
+## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
+## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to
+## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
+## but unfortunately this doesn't allow the template to be overridden from the skin.
+#evaluate("#include('extension.vm')")
 {{/velocity}}
 
 {{velocity}}
@@ -328,7 +329,7 @@ icon=icon:bullet_go</parameters>
       #set ($totalHits = $extensions.totalHits)
     #end
     #if (!$extensions.iterator().hasNext())
-      &lt;div class="box infomessage"&gt;$msg.get($noResultsMessageKey, ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"])&lt;/div&gt;
+      &lt;div class="box infomessage"&gt;$services.localization.render($noResultsMessageKey, ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"])&lt;/div&gt;
     #else
       #if ($totalHits &amp;&amp; $totalHits &gt; $paginationParams.itemsPerPage)
         #set ($hasPagination = true)

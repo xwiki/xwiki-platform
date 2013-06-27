@@ -479,29 +479,64 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 4.5M1]
 #-# The location where the embedded Solr instance stores its configuration and the indexed data.
 #-# The default is the subfolder "solr" inside the folder defined by the property "environment.permanentDirectory".
-#if ($xwikiPropertiesEnvironmentPermanentDirectory)
-# solr.embedded.home=$xwikiPropertiesEnvironmentPermanentDirectory/solr
-#else
 # solr.embedded.home=/var/local/xwiki/solr
-#end
 
 #-# [Since 4.5M1]
 #-# The URL to use to connect to the remote solr server.
 #-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
 # solr.remote.url=http://localhost:8983/solr
 
-#-# [Since 4.5M1]
-#-# Each language has its particularities and needs to be handled specially in order to index and retrieve the best results.
-#-# The list of available languages for which optimized indexing is possible. 
-# solr.multilingual.availableLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr 
+#-------------------------------------------------------------------------------------
+# Security
+#-------------------------------------------------------------------------------------
 
-#-# [Since 4.5M1]
-#-# The list of languages for which to use optimized indexing.
-#-# The values used here must be a sublist of solr.multilingual.available. A smaller sublist can offer slightly better query time performance.
-# solr.multilingual.activeLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr
+#-# [Since 5.0M2]
+#-# Define the authorization policies by choosing another implementation of the AuthorizationSettler. This component
+#-# is solely responsible for settling access decisions based on user, target entity and available security rules.
+#-# The identifier provided here is matched with the component role hint.
+#-#
+#-# The default is:
+# security.authorization.settler=default
 
-#-# [Since 4.5M1]
-#-# The list of multilingual fields for which to use optimized indexing.
-# solr.multilingual.fields=title,doccontent,comment,objcontent,propertyvalue,attcontent
+#-------------------------------------------------------------------------------------
+# URL
+#-------------------------------------------------------------------------------------
+
+#-# IMPORTANT: The URL module is a feature still in development and as such should be considered experimental at the
+#-# moment. The configuration parameters below are used only in some part of the code at the moment. The idea is to
+#-# progressively refactor more and more till only the new properties are used. For the moment you should continue to
+#-# use the following old properties located in xwiki.cfg:
+#-#  xwiki.virtual.usepath
+#-#  xwiki.virtual.usepath.servletpath
+
+#-# [Since 5.1M1]
+#-# The id of the URL format to use. This allows to plug in different implementations and thus allows to completely
+#-# control the format of XWiki URLs.
+#-#
+#-# The default is:
+# url.format=standard
+
+#-# [Since 5.1M1]
+#-# Defines where the wiki part is defined in a URL pointing to a subwiki
+#-# If true then the wiki part is located in the URL path (a.k.a path-based), for example:
+#-#   http://server/xwiki/wiki/mywiki/view/Space/Page
+#-# If false then the wiki part is located in the URL host domain (a.k.a domain-based), for example:
+#-#   http://mywiki.domain/xwiki/bin/view/Space/Page
+#-#
+#-# The default is:
+# url.standard.multiwiki.isPathBased=true
+
+#-# [Since 5.1M1]
+#-# For path-based setups, this property defines the path segment before the one identifying the subwiki in the URL.
+#-# For example if set to "thewiki", then the following URL will point to a subwiki named "mywiki":
+#-#   http://server/xwiki/thewiki/mywiki/view/Space/Page
+#-# Note that the mapping in web.xml has to be modified accordingly if you don't use the default value:
+#-#   <servlet-mapping>
+#-#     <servlet-name>action</servlet-name>
+#-#     <url-pattern>/wiki/*</url-pattern>
+#-#   </servlet-mapping>
+#-#
+#-# The default is:
+# url.standard.multiwiki.wikiPathPrefix=wiki
 
 $!xwikiPropertiesAdditionalProperties

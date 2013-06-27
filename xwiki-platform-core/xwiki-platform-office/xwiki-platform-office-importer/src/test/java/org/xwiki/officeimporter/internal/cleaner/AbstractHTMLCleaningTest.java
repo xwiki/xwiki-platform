@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.w3c.dom.Document;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;

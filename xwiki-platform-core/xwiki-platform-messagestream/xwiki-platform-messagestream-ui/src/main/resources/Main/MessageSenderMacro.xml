@@ -11,18 +11,17 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1336486989000</creationDate>
-  <date>1337871176000</date>
-  <contentUpdateDate>1337871176000</contentUpdateDate>
+  <creationDate>1367516430000</creationDate>
+  <date>1369320919000</date>
+  <contentUpdateDate>1337867576000</contentUpdateDate>
   <version>1.1</version>
   <title>Message Sender Macro</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.JavaScriptExtension</name>
@@ -134,11 +133,11 @@ XWiki.MessageStream = Class.create({
   suggestParameters : {
     user : {
       script: '$doc.getURL("get", "xpage=uorgsuggest&amp;uorg=user&amp;wiki=${userSuggestScope}")&amp;',
-      noresults: "$escapetool.javascript($msg.get('core.widgets.userPicker.noResults'))"
+      noresults: "$escapetool.javascript($services.localization.render('core.widgets.userPicker.noResults'))"
     },
     group : {
       script: "$doc.getURL('get', 'xpage=uorgsuggest&amp;uorg=group')&amp;",
-      noresults: "$escapetool.javascript($msg.get('core.widgets.groupPicker.noResults'))"
+      noresults: "$escapetool.javascript($services.localization.render('core.widgets.groupPicker.noResults'))"
     }
   },
   initialize : function() {
@@ -146,14 +145,8 @@ XWiki.MessageStream = Class.create({
     this.enhanceSelect();
   },
   prepareTargetInput : function(event, element) {
-    if (event) {
-      element.blur();
-    }
-    $w(element.className).each(function(classname) {
-      element.removeClassName(classname)
-    });
     var targetType = element.options[element.selectedIndex].value;
-    element.addClassName(targetType);
+    element.className = targetType;
     if (!element.__targetNameInput) {return;}
     if (this.targetsWithName.indexOf(targetType) &lt; 0) {
       element.__targetNameInput.addClassName('hidden');
@@ -161,10 +154,14 @@ XWiki.MessageStream = Class.create({
         element.__targetNameInput.__x_suggest.detach();
       }
     } else {
-      element.__targetNameInput.removeClassName('hidden');
-      if (this.suggestParameters[targetType]) {
+      // Focus the text input so that the place-holder value is cleared if present. Otherwise the user picker will treat
+      // the place-holder value as if it was typed by the user and will automatically select the corresponding suggestion.
+      element.__targetNameInput.removeClassName('hidden').activate();
+      // Defer the creation of the user picker to allow the focus listeners to be called first (in order to clear the
+      // place-holder value).
+      this.suggestParameters[targetType] &amp;&amp; function() {
         new CustomUserPicker(element.__targetNameInput, this.suggestParameters[targetType]);
-      }
+      }.bind(this).defer();
     }
   },
   enhanceSelect: function () {
@@ -191,7 +188,7 @@ XWiki.MessageStream = Class.create({
             parameters: msForm.serialize(true),
             onCreate: function() {
               msForm._disabled = true;
-              msForm._notification = new XWiki.widgets.Notification("$msg.get('xe.activity.messages.submit.inProgress')", 'inprogress');
+              msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.inProgress')", 'inprogress');
             },
             onSuccess: function() {
               if (msForm) {
@@ -200,7 +197,7 @@ XWiki.MessageStream = Class.create({
               if (msForm &amp;&amp; msForm._notification) {
                 msForm._notification.hide();
               }
-              msForm._notification = new XWiki.widgets.Notification("$msg.get('xe.activity.messages.submit.success')", 'done');
+              msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.success')", 'done');
 
               document.fire('xwiki:activity:newActivity', msForm);
             },
@@ -216,7 +213,7 @@ XWiki.MessageStream = Class.create({
                 if (msForm._notification) {
                   msForm._notification.hide();
                 }
-                msForm._notification = new XWiki.widgets.Notification("$msg.get('xe.activity.messages.submit.failed'): " + failureReason, 'error');
+                msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.failed'): " + failureReason, 'error');
               }
             },
             on1223 : function(response) { /*SUCCESS*/
@@ -519,7 +516,7 @@ return XWiki;
     #else
       #smallUserAvatar("$!eventUser")
     #end
-    &lt;img class='activityActionAvatar' src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$msg.get("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$msg.get("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
+    &lt;img class='activityActionAvatar' src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
   &lt;/span&gt;
 #end
 ##
@@ -574,20 +571,20 @@ return XWiki;
             #else
               $response.setStatus(403)## Forbidden
             #end
-            $msg.get('xe.activity.messages.submit.failed')
+            $services.localization.render('xe.activity.messages.submit.failed')
           #elseif ("$!{request.xredirect}" != '')
             ## Pass the error message in the xredirect so that we display it in the calling page and not in the macro page.
-            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $msg.get('xe.activity.messages.submit.failed'))
+            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $services.localization.render('xe.activity.messages.submit.failed'))
             $response.sendRedirect($request.xredirect)
           #else
-            {{error}}$msg.get('xe.activity.messages.submit.failed'){{/error}}
+            {{error}}$services.localization.render('xe.activity.messages.submit.failed'){{/error}}
 
           #end
         #elseif ("$!{request.xredirect}" != '')
           $response.sendRedirect(${request.xredirect})
         #elseif ($request.xpage == 'plain')
           ## Just print something for confirmation.
-          $msg.get('xe.activity.messages.submit.success')
+          $services.localization.render('xe.activity.messages.submit.success')
         #end
       #end
     #end
@@ -614,8 +611,6 @@ return XWiki;
           &lt;textarea name='messagestream_message' rows='3' cols='40'#if($inEditMode) disabled='disabled'#end&gt;&lt;/textarea&gt;
         &lt;/div&gt;
         &lt;div class='messagestream-tools'&gt;
-          #set ($targetClassName = '')
-          ##
           #set ($possibleTargets = $context.macro.params.get('visibilityOptions').split('\s*,\s*'))
           #if (!$possibleTargets)
             #set ($possibleTargets = $configClass.get('visibilityLevel').getListValues())
@@ -639,20 +634,17 @@ return XWiki;
               #set ($defaultTarget = 'everyone')
             #end
           #end
-          #if (!$targetName)
-            #set ($targetName = ${msg.get('xe.activity.messages.visibility.targetName.tip')})
-            #set ($targetClassName = 'withTip')
-          #end
-          &lt;label&gt;$msg.get('xe.activity.messages.visibility')
+          &lt;label&gt;$services.localization.render('xe.activity.messages.visibility')
             &lt;select name='visibilityLevel'#if($inEditMode) disabled='disabled'#end&gt;
             #foreach ($target in $possibleTargets)
-              &lt;option value="${target}"#if ($defaultTarget == $target) selected='selected'#end&gt;$msg.get("XWiki.MessageStreamConfig_visibilityLevel_${target}")&lt;/option&gt;
+              &lt;option value="${target}"#if ($defaultTarget == $target) selected='selected'#end&gt;$services.localization.render("XWiki.MessageStreamConfig_visibilityLevel_${target}")&lt;/option&gt;
             #end
             &lt;/select&gt;
           &lt;/label&gt;
           &lt;label for="targetName$!{targetNameCounter}"&gt;
             &lt;span class='hidden'&gt;Name:&lt;/span&gt;
-            &lt;input type='text' name='targetName' id="targetName$!{targetNameCounter}" class="targetName $!{targetClassName}" value="$!{targetName}" size='15'#if($inEditMode) disabled='disabled'#end/&gt;
+            &lt;input type="text" name="targetName" id="targetName$!targetNameCounter" class="targetName withTip useTitleAsTip" value="$!targetName" size="15"
+              title="$services.localization.render('xe.activity.messages.visibility.targetName.tip')" #if ($inEditMode) disabled="disabled"#end/&gt;
           &lt;/label&gt;
           #if (!$targetNameCounter)
             #set ($targetNameCounter = 1)
@@ -661,7 +653,7 @@ return XWiki;
           #end
         &lt;/div&gt;
         &lt;div class='messagestream-buttons'&gt;
-          &lt;span class='butonwrapper'&gt;&lt;input type='submit' value="$msg.get('xe.activity.messages.submit')" class='button'#if($inEditMode) disabled='disabled'#end/&gt;&lt;/span&gt;
+          &lt;span class='butonwrapper'&gt;&lt;input type='submit' value="$services.localization.render('xe.activity.messages.submit')" class='button'#if($inEditMode) disabled='disabled'#end/&gt;&lt;/span&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     #if (!$inEditMode)

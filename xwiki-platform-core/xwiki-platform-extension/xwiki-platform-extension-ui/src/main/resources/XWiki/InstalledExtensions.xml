@@ -15,7 +15,7 @@
   <date>1332153510000</date>
   <contentUpdateDate>1332153510000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("admin.xwiki.installedextensions")</title>
+  <title>$services.localization.render('admin.xwiki.installedextensions')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

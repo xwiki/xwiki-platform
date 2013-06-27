@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.document;
 import java.io.StringReader;
 import java.util.HashMap;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;

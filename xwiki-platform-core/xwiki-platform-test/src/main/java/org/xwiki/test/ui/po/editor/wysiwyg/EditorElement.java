@@ -35,24 +35,9 @@ import org.xwiki.test.ui.po.BaseElement;
 public class EditorElement extends BaseElement
 {
     /**
-     * The XPath used to select a editor tab (Source/WYSIWYG) by its label.
-     */
-    private static final String TAB_ITEM_XPATH = "//div[@role = 'tab' and . = '%s']";
-
-    /**
      * The id of the form field field replaced the WYSIWYG editor.
      */
     private final String fieldId;
-
-    /**
-     * The menu bar.
-     */
-    private MenuBarElement menuBar;
-
-    /**
-     * The tool bar.
-     */
-    private ToolBarElement toolBar;
 
     /**
      * Creates a new instance that can be used to control the WYSIWYG editor that replaced the specified form field.
@@ -65,42 +50,12 @@ public class EditorElement extends BaseElement
     }
 
     /**
-     * @return the menu bar
-     */
-    public MenuBarElement getMenuBar()
-    {
-        if (menuBar == null) {
-            menuBar = new MenuBarElement(getContainer().findElement(By.className("gwt-MenuBar-horizontal")));
-        }
-        return menuBar;
-    }
-
-    /**
-     * @return the tool bar
-     */
-    public ToolBarElement getToolBar()
-    {
-        if (toolBar == null) {
-            toolBar = new ToolBarElement(getContainer().findElement(By.className("xToolbar")));
-        }
-        return toolBar;
-    }
-
-    /**
      * @return the rich text area
      */
     public RichTextAreaElement getRichTextArea()
     {
         // The in-line frame element is renewed while editing so we can't cache it.
         return new RichTextAreaElement(getContainer().findElement(By.className("gwt-RichTextArea")));
-    }
-
-    /**
-     * @return the source text area
-     */
-    public WebElement getSourceTextArea()
-    {
-        return getContainer().findElement(By.className("xPlainTextEditor"));
     }
 
     /**
@@ -130,68 +85,6 @@ public class EditorElement extends BaseElement
             }
         });
         return this;
-    }
-
-    /**
-     * Switches to the Source editor by clicking on the "Source" tab item and waits for the source text area to be
-     * initialized.
-     */
-    public void switchToSource()
-    {
-        switchToSource(true);
-    }
-
-    /**
-     * Switches to the Source editor by clicking on the "Source" tab item.
-     * 
-     * @param wait {@code true} to wait for the source text area to be initialized, {@code false} otherwise
-     */
-    public void switchToSource(boolean wait)
-    {
-        getContainer().findElement(By.xpath(String.format(TAB_ITEM_XPATH, "Source"))).click();
-        if (wait) {
-            waitForSourceTextArea(true);
-        }
-    }
-
-    /**
-     * Switches to the WYSIWYG editor by clicking on the "WYSIWYG" tab item and waits for the rich text area to be
-     * initialized.
-     */
-    public void switchToWysiwyg()
-    {
-        switchToWysiwyg(true);
-    }
-
-    /**
-     * Switches the WYSIWYG editor by clicking on the "WYSIWYG" tab item.
-     * 
-     * @param wait {@code true} to wait for the rich text area to be initialized, {@code false} otherwise
-     */
-    public void switchToWysiwyg(boolean wait)
-    {
-        getContainer().findElement(By.xpath(String.format(TAB_ITEM_XPATH, "WYSIWYG"))).click();
-        if (wait) {
-            waitForSourceTextArea(false);
-        }
-    }
-
-    /**
-     * Waits for the source text area to have the specified state.
-     * 
-     * @param enabled whether the source text area should be enabled or disabled
-     */
-    private void waitForSourceTextArea(final boolean enabled)
-    {
-        getUtil().waitUntilCondition(new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver driver)
-            {
-                WebElement sourceTextArea = getContainer().findElement(By.className("xPlainTextEditor"));
-                return sourceTextArea.isEnabled() == enabled ? sourceTextArea : null;
-            }
-        });
     }
 
     /**

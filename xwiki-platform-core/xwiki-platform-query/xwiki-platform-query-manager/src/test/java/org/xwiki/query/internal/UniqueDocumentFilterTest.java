@@ -19,36 +19,36 @@
  */
 package org.xwiki.query.internal;
 
-import org.jmock.Expectations;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
-
-import static org.junit.Assert.assertEquals;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Tests for {@link org.xwiki.query.internal.UniqueDocumentFilter}
  *
  * @version $Id$
  */
-@MockingRequirement(UniqueDocumentFilter.class)
-public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
+public class UniqueDocumentFilterTest
 {
+    @Rule
+    public MockitoComponentMockingRule<UniqueDocumentFilter> mocker =
+        new MockitoComponentMockingRule<UniqueDocumentFilter>(UniqueDocumentFilter.class);
+
     private QueryFilter filter;
 
     @Before
-    public void configure() throws Exception
+    public void setUp() throws Exception
     {
-        getMockery().checking(new Expectations() {{
-            ignoring(any(Logger.class)).method("debug");
-            ignoring(any(Logger.class)).method("warn");
-        }});
-
-        this.filter = getComponentManager().getInstance(QueryFilter.class, "unique");
+        this.filter = this.mocker.getComponentUnderTest();
     }
 
     @Test
@@ -56,6 +56,9 @@ public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
     {
         assertEquals("select distinct doc.fullName from XWikiDocument doc",
             filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
+
+        List<String> items = Arrays.asList("doc1", "doc2");
+        assertThat((List<String>) filter.filterResults(items), is(items));
     }
 
     @Test
@@ -84,6 +87,12 @@ public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
     {
         assertEquals("select distinct doc.fullName, doc.name from XWikiDocument doc order by doc.name asc",
             filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name asc", Query.HQL));
+
+        List<Object[]> results = filter.filterResults(
+            Arrays.asList(new Object[] {"full1", "name1"}, new Object[] {"full2", "name2"}));
+        assertEquals(2, results.size());
+        assertEquals("full1", results.get(0));
+        assertEquals("full2", results.get(1));
     }
 
     @Test
@@ -92,5 +101,15 @@ public class UniqueDocumentFilterTest extends AbstractMockingComponentTestCase
         assertEquals("select distinct doc.fullName, doc.name from XWikiDocument doc order by doc.name asc",
             filter.filterStatement("select doc.name, doc.fullName from XWikiDocument doc order by doc.name asc",
                 Query.HQL));
+
+        List<Object[]> results = filter.filterResults(
+            Arrays.asList(new Object[] {"full1", "name1"}, new Object[] {"full2", "name2"}));
+        assertEquals(2, results.size());
+        assertEquals(2, results.get(0).length);
+        assertEquals("full1", results.get(0)[0]);
+        assertEquals("name1", results.get(0)[1]);
+        assertEquals(2, results.get(1).length);
+        assertEquals("full2", results.get(1)[0]);
+        assertEquals("name2", results.get(1)[1]);
     }
 }

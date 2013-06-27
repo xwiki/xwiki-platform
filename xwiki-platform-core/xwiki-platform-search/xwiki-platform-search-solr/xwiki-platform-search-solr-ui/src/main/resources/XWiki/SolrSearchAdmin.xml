@@ -102,7 +102,7 @@
       <name>solr</name>
     </property>
     <property>
-      <parameters>label=$msg.get('search.extension.title.solr')
+      <parameters>label=$services.localization.render('search.extension.title.solr')
 admin=XWiki.SolrSearchAdmin
 search=Main.SolrSearch</parameters>
     </property>
@@ -111,47 +111,104 @@ search=Main.SolrSearch</parameters>
     </property>
   </object>
   <content>{{velocity output='false'}}
-## TODO: CSRF protection
+#macro (displayForm)
+  {{html}}
+  &lt;form class="xform half" action="" method="post"&gt;
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+    &lt;/div&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="solrAdminAction"&gt;Action&lt;/label&gt;
+        &lt;span class="xHint"&gt;The action to perform on the index.&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select id="solrAdminAction" name="action"&gt;
+          &lt;option value="index"&gt;Add to index&lt;/option&gt;
+          &lt;option value="delete"&gt;Delete from index&lt;/option&gt;
+          &lt;option value="reindex"&gt;Reindex&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/dd&gt;
+      ## Indexing on the entire farm or on various wikis is done only on the main wiki.
+      #if ($xcontext.isMainWiki())
+        &lt;dt&gt;
+          &lt;label for="solrAdminWiki"&gt;Wiki&lt;/label&gt;
+          &lt;span class="xHint"&gt;The wiki for which all its documents will be affected by the selected action.&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select id="solrAdminWiki" name="wiki"&gt;
+            &lt;option value=""&gt;Entire farm&lt;/option&gt;
+            #foreach ($wiki in $allWikis)
+              #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wiki).wikiPrettyName)
+              #if ("$!wikiPrettyName.trim()" == '')
+                #set ($wikiPrettyName = $wiki)
+              #end
+              &lt;option value="$wiki"&gt;$wikiPrettyName&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/dd&gt;
+      #end
+      &lt;dt&gt;
+        &lt;label for="solrAdminCustomQuery"&gt;Custom query&lt;/label&gt;
+        &lt;span class="xHint"&gt;Optional HQL query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;textarea id="solrAdminCustomQuery" name="customQuery" rows="7" cols="45"&gt;&lt;/textarea&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;p class="buttons"&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input type="submit" class="button" value="Apply" /&gt;
+      &lt;/span&gt;
+    &lt;/p&gt;
+  &lt;/form&gt;
+  {{/html}}
+#end
 
-#set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+#macro (displayAdminSection)
+  == Indexing ==
 
-## Handle request
-#if ("$!request.action" != '')
+  #if ($hasGlobalAdmin)
+    #displayForm()
+  #else
+    {{error}}Admin rights are required to access this section.{{/error}}
+  #end
+#end
+
+#macro (handleAction)
   ##
-  ## Build the targets
+  ## Build the targets.
   ##
   #set ($targetReferences = [])
   #set ($wikis = $request.getParameterValues('wiki'))
-
-  ## No wiki specified =&gt; apply on the entire farm.
-  #if (!$wikis || ($wikis.size() == 1 &amp;&amp; $wikis[0] == ''))
-    #set ($wikis = $allWikis)
+  #if ($xcontext.isMainWiki())
+    #if (!$wikis || ($wikis.size() == 1 &amp;&amp; $wikis[0] == ''))
+      ## No wiki specified =&gt; target the entire farm.
+      #set ($wikis = $allWikis)
+    #end
+  #else
+    ## Target only the current (sub)wiki.
+    #set ($wikis = [$xcontext.database])
   #end
-
   ## On each wiki, execute the custom query or add the entire wiki.
   #set ($currentDatabase = $xcontext.database)
   #foreach ($wiki in $wikis)
     #if (!$stringtool.isBlank($request.customQuery))
       ## Always use the database specified by the wiki parameter.
       #set ($discard = $xcontext.setDatabase($wiki))
-
       ## Run the custom query and get the document references.
       #set ($customDocumentNames = $xwiki.searchDocuments($request.customQuery))
       #foreach ($customDocumentName in $customDocumentNames)
         #set ($customDocumentReference = $services.model.resolveDocument($customDocumentName))
         #set ($discard = $targetReferences.add($customDocumentReference))
       #end
-
     #else
       ## Get the wiki reference.
-      ## FIXME: replace the hack below with a proper wiki reference construction method.
-      #set ($wikiDocumentReference = $services.model.createDocumentReference($wiki, 'Main', 'WebHome'))
-      #set ($discard = $targetReferences.add($wikiDocumentReference.wikiReference))
+      #set ($discard = $targetReferences.add($services.model.createWikiReference($wiki)))
     #end
   #end
   ## Restore the database in case we had to run the custom query.
   #set ($discard = $xcontext.setDatabase($currentDatabase))
-
   ##
   ## Perform the action on the computed targets.
   ##
@@ -166,76 +223,33 @@ search=Main.SolrSearch</parameters>
       #set ($discard = $services.solr.index($targetReferences))
     #end
   #end
-
+  ##
+  ## Display the action result.
+  ##
   #set ($exception = $xcontext.lastexception)
-  #set ($success = true)
+  #if ("$!exception" != '')
+    {{error}}$escapetool.xml($stringtool.capitalize($request.action)) failed: $exception.message ($exception.class){{/error}}
+  #else
+    {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully complete.{{/success}}
+    #if (!$stringtool.isBlank($request.customQuery))
+
+      {{info}}Affected documents in the index: $targetReferences{{/info}}
+    #end
+  #end
 #end
 {{/velocity}}
 
 {{velocity}}
-#if ("$!exception" != '')
-  {{error}}$escapetool.xml($stringtool.capitalize($request.action)) failed: $exception.message ($exception.class){{/error}}
-#elseif ($success)
-  {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully complete.{{/success}}
-  #if (!$stringtool.isBlank($request.customQuery))
+#set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+#if ("$!request.action" != '')
+  #if ($services.csrf.isTokenValid($request.form_token))
+    #handleAction()
 
-    {{info}}Affected documents in the index: $targetReferences{{/info}}
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL())
+    #stop
   #end
 #end
-== Indexing ==
-
-#if ($hasGlobalAdmin)
-{{html}}
-&lt;form class='xform half' action="$xwiki.requestURL" method='post'&gt;
-&lt;dl&gt;
-&lt;dt&gt;
-  &lt;label&gt;Action&lt;/label&gt;
-  &lt;span class='xHint'&gt;The action to perform on the index.&lt;/span&gt;
-&lt;dd&gt;
-  &lt;select name='action' size='1'&gt;
-    &lt;option value='index'&gt;Add to index&lt;/option&gt;
-    &lt;option value='delete'&gt;Delete from index&lt;/option&gt;
-    &lt;option value='reindex'&gt;Reindex&lt;/option&gt;
-  &lt;/select&gt;
-&lt;/dd&gt;
-
-&lt;dt&gt;
-  &lt;label&gt;Wiki&lt;/label&gt;
-  &lt;span class='xHint'&gt;The wiki for which all its documents will be affected by the selected action.&lt;/span&gt;
-&lt;/dt&gt;
-&lt;dd&gt;
-  &lt;select name='wiki' size='1'&gt;
-    ## Indexing on the entire farm or on various wikis is done only on the main wiki.
-    #if ($xcontext.isMainWiki())
-      &lt;option value=''&gt;Entire farm&lt;/option&gt;
-      #foreach ($wiki in $allWikis)
-        &lt;option value='$wiki'&gt;$wiki&lt;/option&gt;
-      #end
-    #else
-      &lt;option value='$xcontext.database'&gt;$xcontext.database&lt;/option&gt;
-    #end
-  &lt;/select&gt;
-&lt;/dd&gt;
-
-&lt;dt&gt;
-  &lt;label&gt;Custom query&lt;/label&gt;
-  &lt;span class='xHint'&gt;Optional HQL query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
-&lt;/dt&gt;
-&lt;dd&gt;
-  &lt;textarea name='customQuery' rows='7' cols='45'&gt;&lt;/textarea&gt;
-&lt;/dd&gt;
-
-&lt;dt&gt;
-  &lt;span class='buttonwrapper'&gt;
-    &lt;input type='submit' class='button' value='Apply' /&gt;
-  &lt;/span&gt;
-&lt;/dt&gt;
-
-&lt;/dl&gt;
-&lt;/form&gt;
-{{/html}}
-#else
-  {{error}}Admin rights are required to access this section.{{/error}}
-#end
+#displayAdminSection()
 {{/velocity}}</content>
 </xwikidoc>

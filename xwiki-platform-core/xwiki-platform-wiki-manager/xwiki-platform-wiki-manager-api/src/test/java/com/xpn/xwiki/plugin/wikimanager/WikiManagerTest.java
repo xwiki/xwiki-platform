@@ -24,12 +24,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.junit.Assert;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 

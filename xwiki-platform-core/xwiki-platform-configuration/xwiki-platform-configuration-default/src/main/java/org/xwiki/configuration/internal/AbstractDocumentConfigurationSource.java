@@ -29,6 +29,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 /**
@@ -62,7 +63,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     /**
      * @return the XWiki Class reference of the XWiki Object containing the configuration properties
      */
-    protected abstract DocumentReference getClassReference();
+    protected abstract LocalDocumentReference getClassReference();
 
     /**
      * @return the bridge used to access Object properties
@@ -139,9 +140,12 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         Object result;
 
         DocumentReference documentReference = getFailsafeDocumentReference();
-        DocumentReference classReference = getFailsafeClassReference();
+        LocalDocumentReference classReference = getFailsafeClassReference();
         if (documentReference != null && classReference != null) {
-            result = getDocumentAccessBridge().getProperty(documentReference, classReference, key);
+            // TODO: use an API taking a local reference for the class instead
+            result =
+                getDocumentAccessBridge().getProperty(documentReference,
+                    new DocumentReference(classReference, documentReference.getWikiReference()), key);
         } else {
             result = null;
         }
@@ -170,9 +174,9 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         return documentReference;
     }
 
-    private DocumentReference getFailsafeClassReference()
+    private LocalDocumentReference getFailsafeClassReference()
     {
-        DocumentReference classReference;
+        LocalDocumentReference classReference;
 
         try {
             classReference = getClassReference();

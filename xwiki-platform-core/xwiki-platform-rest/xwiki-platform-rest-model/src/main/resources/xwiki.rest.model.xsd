@@ -132,6 +132,7 @@
           <element name="modified" type="dateTime"></element>
           <element name="modifier" type="string"></element>
           <element name="modifierName" type="string"></element>
+          <element name="comment" type="string"></element>
           <element name="content" type="string"></element>
         </sequence>
       </extension>
@@ -153,6 +154,7 @@
           <element name="modifier" type="string"></element>
           <element name="modifierName" type="string"></element>
           <element name="language" type="string"></element>
+          <element name="comment" type="string"></element>
         </sequence>
       </extension>
     </complexContent>
@@ -469,7 +471,7 @@
           <element name="filename" type="string" minOccurs="0"></element>
           <element name="score" type="float" minOccurs="0"></element>
           <element name="object" type="xwiki:Object" minOccurs="0"></element>
-	  </sequence>
+        </sequence>
       </extension>
     </complexContent>
   </complexType>

@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.macro.chart;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import java.io.InputStreamReader;
+
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.display.internal.DocumentDisplayer;
@@ -30,15 +30,16 @@ import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.jmock.MockingComponentManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import java.io.InputStreamReader;
+import static org.mockito.Mockito.*;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -48,51 +49,37 @@ import java.io.InputStreamReader;
  * @since 3.0RC1
  */
 @RunWith(RenderingTestSuite.class)
+@AllComponents
 public class IntegrationTests
 {
     private final static String WIKI_CONTENT_FILE = "wiki.txt";
 
     @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
+        ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("currentWiki"));
 
-        final ModelContext modelContext = componentManager.registerMockComponent(mockery, ModelContext.class);
-        mockery.checking(new Expectations() {{
-            allowing(modelContext).getCurrentEntityReference();
-                will(returnValue(new WikiReference("currentWiki")));
-        }});
+        // Document Access Bridge mock
+        DocumentAccessBridge dab = componentManager.registerMockComponent(DocumentAccessBridge.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        DocumentReference currentDocumentReference =
+            new DocumentReference("currentwiki", "currentspace", "currentpage");
+        DocumentModelBridge document = Mockito.mock(DocumentModelBridge.class);
+        when(dab.getDocumentURL(new DocumentReference("currentWiki", "space", "page"), "temp", null, null))
+            .thenReturn("temppath");
+        when(dab.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
+        when(dab.exists(documentReference)).thenReturn(true);
+        when(dab.getDocument(documentReference)).thenReturn(document);
+        when(dab.getCurrentUserReference()).thenReturn(null);
 
-        // Document Access Bridge Mock
-        final DocumentAccessBridge dab = componentManager.registerMockComponent(mockery, DocumentAccessBridge.class);
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        final DocumentModelBridge document = mockery.mock(DocumentModelBridge.class);
-        final DocumentDisplayer displayer = componentManager.registerMockComponent(mockery, DocumentDisplayer.class);
-
+        DocumentDisplayer displayer = componentManager.registerMockComponent(DocumentDisplayer.class);
         Parser parser = componentManager.getInstance(Parser.class, Syntax.XWIKI_2_0.toIdString());
         final XDOM xdom = parser.parse(new InputStreamReader(
             getClass().getClassLoader().getResourceAsStream(WIKI_CONTENT_FILE)));
+        when(displayer.display(eq(document), any(DocumentDisplayerParameters.class))).thenReturn(xdom);
 
-        final AuthorizationManager authorizationManager =
-            componentManager.registerMockComponent(mockery,  AuthorizationManager.class);
-
-        mockery.checking(new Expectations() {{
-            allowing(dab).getDocumentURL(new DocumentReference("unused", "space", "page"), "temp", null, null);
-                will(returnValue("temppath"));
-
-            allowing(dab).getCurrentDocumentReference();
-                will(returnValue(documentReference));
-            allowing(dab).exists(documentReference);
-                will(returnValue(true));
-            allowing(dab).getDocument(documentReference);
-                will(returnValue(document));
-            allowing(displayer).display(with(equal(document)), with(any(DocumentDisplayerParameters.class)));
-                will(returnValue(xdom));
-
-            allowing(dab).getCurrentUserReference();
-                will(returnValue(null));
-            allowing(authorizationManager).hasAccess(Right.VIEW, null, documentReference);
-                will(returnValue(true));
-        }});
+        AuthorizationManager authorizationManager = componentManager.registerMockComponent(AuthorizationManager.class);
+        when(authorizationManager.hasAccess(Right.VIEW, null, documentReference)).thenReturn(true);
     }
 }

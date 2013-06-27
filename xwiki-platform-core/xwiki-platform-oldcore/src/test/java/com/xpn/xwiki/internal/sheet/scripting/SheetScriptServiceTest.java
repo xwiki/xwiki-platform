@@ -19,15 +19,17 @@
  */
 package com.xpn.xwiki.internal.sheet.scripting;
 
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.when;
-import junit.framework.Assert;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
@@ -100,5 +102,33 @@ public class SheetScriptServiceTest
         }), same(sheetReference))).thenReturn(true);
 
         Assert.assertTrue(sheetScriptService.bindClassSheet(classDocumentApi, sheetReference));
+    }
+
+    /**
+     * Unit test for {@link SheetScriptService#getDocuments(DocumentReference)}.
+     */
+    @Test
+    public void getDocuments() throws Exception
+    {
+        DocumentReference sheetReference = new DocumentReference("wiki", "Space", "Sheet");
+        DocumentReference publicDocumentReference = new DocumentReference("wiki", "Space", "PublicPage");
+        DocumentReference privateDocumentReference = new DocumentReference("wiki", "Space", "PrivatePage");
+        DocumentReference publicClassReference = new DocumentReference("wiki", "Space", "PublicClass");
+        DocumentReference privateClassReference = new DocumentReference("wiki", "Space", "PrivateClass");
+
+        SheetBinder documentSheetBinder = mocker.getInstance(SheetBinder.class, "document");
+        when(documentSheetBinder.getDocuments(sheetReference)).thenReturn(
+            Arrays.asList(publicDocumentReference, privateDocumentReference));
+
+        SheetBinder classSheetBinder = mocker.getInstance(SheetBinder.class, "class");
+        when(classSheetBinder.getDocuments(sheetReference)).thenReturn(
+            Arrays.asList(privateClassReference, publicClassReference));
+
+        DocumentAccessBridge documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
+        when(documentAccessBridge.isDocumentViewable(publicClassReference)).thenReturn(true);
+        when(documentAccessBridge.isDocumentViewable(publicDocumentReference)).thenReturn(true);
+
+        Assert.assertEquals(Arrays.asList(publicDocumentReference, publicClassReference),
+            sheetScriptService.getDocuments(sheetReference));
     }
 }

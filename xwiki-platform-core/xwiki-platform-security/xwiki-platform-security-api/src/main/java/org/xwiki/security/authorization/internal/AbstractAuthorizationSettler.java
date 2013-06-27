@@ -22,24 +22,18 @@ package org.xwiki.security.authorization.internal;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Set;
-import java.util.Iterator;
-
-import javax.inject.Inject;
 
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.RightSet;
-import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
+import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
-import org.xwiki.security.internal.EntityBridge;
-import org.xwiki.security.internal.XWikiBridge;
 
 /**
  * Abstract super class for right resolvers.
@@ -56,14 +50,6 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
 
     /** The initial policy size. Check to update initial policies if a new Right is added. */
     private static int initialPolicySize;
-
-    /** Entity bridge used to check entity creator. */
-    @Inject
-    private EntityBridge entityBridge;
-
-    /** XWiki bridge used to check wiki owner. */
-    @Inject
-    private XWikiBridge wikiBridge;
 
     /**
      * Private implementation of the {@link SecurityAccessEntry}.
@@ -180,95 +166,47 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         }
     }
 
-    /**
-     * Determine if the wiki is in its initial import state.
-     *
-     * @param user A user reference.
-     * @param groups A collection of group references.
-     * @param ruleEntries The set of rule entries that has been collected for the current entity.
-     * @return {\code true} if the wiki is in its initial import state.
-     */
-    private boolean isInitialImportState(UserSecurityReference user,
-         Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries)
-    {
-        if (ruleEntries.getLast().getRules().size() == 0 && user.isGlobal()) {
-
-            // No rules at main wiki indicate initial import state of the wiki.  Initial import rights are granted to
-            // users of main wiki to all entities in main wiki.
-
-            int level = 0;
-            for (Iterator<SecurityRuleEntry> r = ruleEntries.descendingIterator(); r.hasNext(); level++) {
-                SecurityRuleEntry e = r.next();
-
-                if (level == 1) {
-                    // If the entity type at the second level is wiki, we are settling for an entity in a
-                    // virtual wiki.  But the initial import state is only relevant for the main wiki.
-
-                    return e.getReference().getType() != EntityType.WIKI;
-                }
-            }
-
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public SecurityAccessEntry settle(UserSecurityReference user,
         Collection<GroupSecurityReference> groups, Deque<SecurityRuleEntry> ruleEntries)
     {
-        SecurityReference reference = ruleEntries.getFirst().getReference();
-
-        if (isInitialImportState(user, groups, ruleEntries)) {
-            return new InternalSecurityAccessEntry(user, reference,
-                                                   XWikiSecurityAccess.getInitialImportAccess());
-        }
-
         XWikiSecurityAccess access = new XWikiSecurityAccess();
+        SecurityReference reference = null;
+
         Policies policies = new Policies();
 
         for (SecurityRuleEntry entry : ruleEntries) {
-            // Merge access with previous access result
-            access = merge(settle(user, groups, entry, policies), access, entry.getReference(), policies);
+            if (!entry.isEmpty()) {
+                // Chose the highest possible level to store the resulting access
+                if (reference == null) {
+                    reference = entry.getReference();
+                }
+                // Compute access of this level and merge it with previous access result
+                merge(settle(user, groups, entry, policies), access, entry.getReference(), policies);
+            }
+            if (reference == null && entry.getReference().getType() == EntityType.WIKI) {
+                reference = entry.getReference();
+            }
         }
 
-        return new InternalSecurityAccessEntry(user, reference,
-            // Check special users and apply defaults
-            postProcess(user, reference, access));
+        // Apply defaults and return the resulting access entry
+        return new InternalSecurityAccessEntry(user, reference, applyDefaults(user, reference, access));
     }
 
     /**
-     * Check the special user and apply default values for undetermined rights.
+     * Apply default values for undetermined rights.
      *
      * @param user The user, whose rights are to be determined.
      * @param reference The entity, which the user wants to access.
      * @param access The accumulated access result (modified and returned).
      * @return the accumulated access result.
      */
-    protected XWikiSecurityAccess postProcess(UserSecurityReference user, SecurityReference reference,
+    protected XWikiSecurityAccess applyDefaults(UserSecurityReference user, SecurityReference reference,
         XWikiSecurityAccess access)
     {
-        // Wiki owner is granted admin rights.
-        if (wikiBridge.isWikiOwner(user, new WikiReference(reference.extractReference(EntityType.WIKI)))) {
-            access.allow(Right.ADMIN);
-            // Implies rights for current level
-            Set<Right> impliedRights = Right.ADMIN.getImpliedRights();
-            for (Right enabledRight : Right.getEnabledRights(EntityType.WIKI)) {
-                if (impliedRights.contains(enabledRight)) {
-                    access.allow(enabledRight);
-                }
-            }
-        } else {
-            // Creator is granted delete-rights.
-            if (Right.getEnabledRights(reference.getSecurityType()).contains(Right.DELETE)
-                && entityBridge.isDocumentCreator(user, reference)) {
-                access.allow(Right.DELETE);
-            }
-        }
-
         for (Right right : Right.values()) {
             if (access.get(right) == RuleState.UNDETERMINED) {
-                if (!user.getOriginalReference().getWikiReference()
+                if (!user.isGlobal() && !user.getOriginalReference().getWikiReference()
                         .equals(reference.extractReference(EntityType.WIKI))) {
                     /*
                      * Deny all by default for users from another wiki.
@@ -300,9 +238,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
      * @param access The resulting access previously computed (modified and returned).
      * @param reference the current entity in the document hierarchy.
      * @param policies the current security policies.
-     * @return the updated access.
      */
-    protected XWikiSecurityAccess merge(SecurityAccess currentAccess, XWikiSecurityAccess access,
+    protected void merge(SecurityAccess currentAccess, XWikiSecurityAccess access,
         SecurityReference reference, Policies policies)
     {
         for (Right right : Right.getEnabledRights(reference.getSecurityType())) {
@@ -318,7 +255,5 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
                 access.allow(right);
             }
         }
-
-        return access;
     }
 }

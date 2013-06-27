@@ -15,7 +15,7 @@
   <date>1252454400000</date>
   <contentUpdateDate>1252454400000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.panels")</title>
+  <title>$services.localization.render('xe.panels')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -26,35 +26,35 @@
   <content>{{velocity}}
 #if($hasAdmin)
 
-= $msg.get('xe.panels.create') =
+= $services.localization.render('xe.panels.create') =
 
 {{include document="Panels.CreatePanel"/}}
 
 #end
-= $msg.get('xe.panels.viewer') =
+= $services.localization.render('xe.panels.viewer') =
 
 #set ($searchResults = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName&lt;&gt;?1 order by doc.name').bindValue(1, 'Panels.PanelTemplate').execute())
 #foreach ($item in $searchResults)
   #set ($pdoc = $xwiki.getDocument($item))
   #set ($obj = $pdoc.getObject("Panels.PanelClass"))
   #if ($obj.getProperty('type').value == 'view')
-* [[$item]] #if ($hasAdmin)[ [[$msg.get('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$msg.get('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
+* [[$item]] #if ($hasAdmin)[ [[$services.localization.render('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$services.localization.render('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
   #end
 #end
 
 #if ($hasAdmin)
 {{box}}
-[[image:icon:wand]] $msg.get('xe.panels.customize') [[$msg.get('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]].
+[[image:icon:wand]] $services.localization.render('xe.panels.customize') [[$services.localization.render('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]].
 {{/box}}
 
 #end
-= $msg.get('xe.panels.editor') =
+= $services.localization.render('xe.panels.editor') =
 
 #foreach ($item in $searchResults)
   #set ($pdoc = $xwiki.getDocument($item))
   #set ($obj = $pdoc.getObject('Panels.PanelClass'))
   #if ($obj.getProperty('type').value == 'edit')
-* [[$item]] #if ($hasAdmin)[ [[$msg.get('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$msg.get('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
+* [[$item]] #if ($hasAdmin)[ [[$services.localization.render('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$services.localization.render('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
   #end
 #end
 {{/velocity}}</content>

@@ -813,10 +813,10 @@
 
        <!-- Faceting defaults. -->
        <str name="facet">on</str>
-       <str name="facet.field">lang</str>
+       <str name="facet.field">locale</str>
        <str name="facet.field">wiki</str>
-       <str name="facet.field">space</str>
-       <str name="facet.field">name</str>
+       <str name="facet.field">space_exact</str>
+       <str name="facet.field">name_exact</str>
        <str name="facet.field">type</str>
        <str name="facet.field">class</str>
        <str name="facet.field">date</str>

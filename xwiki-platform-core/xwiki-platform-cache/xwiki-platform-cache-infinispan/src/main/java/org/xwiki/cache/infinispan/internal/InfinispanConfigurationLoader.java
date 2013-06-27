@@ -19,14 +19,15 @@
  */
 package org.xwiki.cache.infinispan.internal;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
+import org.infinispan.configuration.Builder;
+import org.infinispan.configuration.ConfigurationUtils;
+import org.infinispan.configuration.cache.CacheLoaderConfiguration;
+import org.infinispan.configuration.cache.CacheLoaderConfigurationBuilder;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.FileCacheStoreConfiguration;
 import org.infinispan.configuration.cache.FileCacheStoreConfigurationBuilder;
-import org.infinispan.configuration.cache.LoaderConfiguration;
 import org.infinispan.configuration.cache.LoadersConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -42,7 +43,7 @@ import org.xwiki.cache.util.AbstractCacheConfigurationLoader;
 public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoader
 {
     /**
-     * The default location of a filesystel based cache loader when not provided in the xml configuration file.
+     * The default location of a filesystem based cache loader when not provided in the xml configuration file.
      */
     private static final String DEFAULT_FILECACHESTORE_LOCATION = "Infinispan-FileCacheStore";
 
@@ -80,7 +81,7 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
      */
     private boolean containsIncompleteFileLoader(Configuration isconfiguration)
     {
-        for (Object cacheLoaderConfig : (List) isconfiguration.loaders().cacheLoaders()) {
+        for (CacheLoaderConfiguration cacheLoaderConfig : isconfiguration.loaders().cacheLoaders()) {
             if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
                 FileCacheStoreConfiguration fileCacheLoaderConfig = (FileCacheStoreConfiguration) cacheLoaderConfig;
                 String location = fileCacheLoaderConfig.location();
@@ -149,10 +150,8 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
             LoadersConfigurationBuilder loadersBuilder = builder.loaders();
             loadersBuilder.clearCacheLoaders();
 
-            for (Object cacheLoaderConfig : (List) configuration.loaders().cacheLoaders()) {
-                if (cacheLoaderConfig instanceof LoaderConfiguration) {
-                    loadersBuilder.addCacheLoader().read((LoaderConfiguration) cacheLoaderConfig);
-                } else if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
+            for (CacheLoaderConfiguration cacheLoaderConfig : configuration.loaders().cacheLoaders()) {
+                if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
                     FileCacheStoreConfiguration fileCacheLoaderConfig = (FileCacheStoreConfiguration) cacheLoaderConfig;
 
                     FileCacheStoreConfigurationBuilder loaderBuilder =
@@ -163,6 +162,13 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
                     if (StringUtils.isBlank(location) || location.equals(DEFAULT_FILECACHESTORE_LOCATION)) {
                         loaderBuilder.location(createTempDir());
                     }
+                } else {
+                    // Copy the loader as it is
+                    Class< ? extends CacheLoaderConfigurationBuilder< ? , ? >> builderClass =
+                        (Class< ? extends CacheLoaderConfigurationBuilder< ? , ? >>) ConfigurationUtils
+                            .builderFor(cacheLoaderConfig);
+                    Builder<Object> loaderBuilder = (Builder<Object>) loadersBuilder.addLoader(builderClass);
+                    loaderBuilder.read(cacheLoaderConfig);
                 }
             }
         }

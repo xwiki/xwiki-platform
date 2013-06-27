@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.1-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-ui</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - UI</name>

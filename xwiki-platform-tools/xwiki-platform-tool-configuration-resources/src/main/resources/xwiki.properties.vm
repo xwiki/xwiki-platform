@@ -486,6 +486,22 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
 # solr.remote.url=http://localhost:8983/solr
 
+#-# [Since 5.1M1]
+#-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
+#-# It's possible to configure this behavior with the following properties:
+#-# 
+#-# The maximum number of elements sent at the same time to the Solr server
+#-# The default is 50.
+# solr.indexer.batch.size=50
+#-# The maximum number of characters in the batch of elements to send to the Solr server.
+#-# The default is 10000.
+# solr.indexer.batch.maxLength=10000
+
+#-# [Since 5.1M1]
+#-# The maximum number of elements in the background queue of elements to index/delete
+#-# The default is 10000.
+# solr.indexer.queue.capacity=100000
+
 #-------------------------------------------------------------------------------------
 # Security
 #-------------------------------------------------------------------------------------

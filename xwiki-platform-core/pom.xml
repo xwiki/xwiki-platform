@@ -365,20 +365,6 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <className>org/xwiki/url/InvalidURLException</className>
-              <differenceType>8001</differenceType>
-              <justification>
-                Young API: The URL module has never been finished and we started working on it again
-              </justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/ircbot/IRCBot</className>
-              <method>java.lang.String getWikiId()</method>
-              <justification>Needed to fix http://jira.xwiki.org/browse/XWIKI-9251 and the IRC Bot API is still
-              relatively new and not a mainstream API used by lots of people.</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

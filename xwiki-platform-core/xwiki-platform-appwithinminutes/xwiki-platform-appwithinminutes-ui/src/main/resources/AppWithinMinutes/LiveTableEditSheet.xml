@@ -606,18 +606,16 @@ return XWiki;
   #if($services.uix)
     #set($icon = 'icon:application')
     #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
-      #if($uix.getId() == "platform.panels.${doc.space}Application")
-        #if("$!uix.getParameters().get('icon')" != '')
-          #set($icon = $uix.getParameters().get('icon'))
-        #end
+      #if($uix.getId() == "platform.panels.${doc.space}Application" &amp;&amp; "$!uix.getParameters().get('icon')" != '')
+        #set($icon = $uix.getParameters().get('icon'))
       #end
     #end
     {{html wiki="true"}}
-      ## The icon
-      ; &lt;label for="applicationIcon"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
-        (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorIconHint', [$xwiki.getSkinFile('icons/silk/index_abc.png')])
-      : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!icon" /&gt;
-      {{/html}}
+    ; &lt;label for="applicationIcon"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
+      (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorIconHint',
+        [$xwiki.getSkinFile('icons/silk/index_abc.png')])  
+    : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!escapetool.xml($icon)" /&gt;
+    {{/html}}
   #end
 #end
 

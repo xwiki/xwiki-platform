@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg-test</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Tests - Page Objects</name>

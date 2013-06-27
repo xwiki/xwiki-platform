@@ -28,15 +28,10 @@
 ## to allow creation from template directly, without necessarily going through template provider.
 #set($template = "$!request.getParameter('template')")
 ## ---------------------------------------------------------------------------------------------------------
-## Set the space, page variables from the current doc if its new, from the passed parameters if any
+## Get the space and page from the passed parameters if specified.
 ## ---------------------------------------------------------------------------------------------------------
-#if ($doc.isNew())
-  #set ($space = $doc.getSpace())
-  #set ($page = $doc.getName())
-#else
-  #set ($space = "$!request.getParameter('space')")
-  #set ($page = "$!request.getParameter('page')")
-#end
+#set ($space = "$!request.getParameter('space')")
+#set ($page = "$!request.getParameter('page')")
 ## ---------------------------------------------------------------------------------------------------------
 ## If there was an exception creating the page because of invalid space, notify. 
 ## Should set the other variables only if there is no exception. Otherwise, if there's an exception other than the 

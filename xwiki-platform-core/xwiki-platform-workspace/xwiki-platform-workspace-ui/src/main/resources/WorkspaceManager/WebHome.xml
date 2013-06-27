@@ -138,7 +138,7 @@
 #set($columnsProperties = {
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
     'description' : { 'type' : 'text' , 'size' : 50 },
-    'owner' : { 'type' : 'text', 'size' : 10 },
+    'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
     'membershipType' : { 'type' : 'text', 'class' : 'WorkspaceManager.WorkspaceClass'}
 })
 #set($options = {

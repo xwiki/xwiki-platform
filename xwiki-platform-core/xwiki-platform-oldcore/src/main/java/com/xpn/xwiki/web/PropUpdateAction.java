@@ -44,7 +44,7 @@ public class PropUpdateAction extends XWikiAction
         XWikiForm form = context.getForm();
         XWikiMessageTool msg = context.getMessageTool();
 
-        // Prepare new classSandbox/TestRestriction
+        // Prepare new class
         BaseClass bclass = doc.getXClass();
         BaseClass bclass2 = bclass.clone();
         

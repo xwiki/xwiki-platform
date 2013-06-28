@@ -48,9 +48,8 @@ public class PropUpdateAction extends XWikiAction
         BaseClass bclass = doc.getXClass();
         BaseClass bclass2 = bclass.clone();
         
-        // Set restriction level. Only PR users can set it.
-        boolean hasPR = xwiki.getUser(context).hasAccessLevel("programming", doc.getDocumentReference().toString());
-        if (form.getRequest().getParameter("restriction") != null && hasPR) {
+        // Set restriction level.
+        if (form.getRequest().getParameter("restriction") != null) {
             String restrictionLevel = form.getRequest().getParameter("restriction").toString();
             bclass2.setRestriction(restrictionLevel);
         }

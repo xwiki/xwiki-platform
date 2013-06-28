@@ -33,7 +33,7 @@
   <name>XWiki Platform - Rendering - Macro - Context</name>
   <description>Executes content with another document set as the current document</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>88.11</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Context Macro</xwiki.extension.name>
   </properties>

@@ -36,7 +36,7 @@
   <properties>
     <!-- Don't consider cache test framework as public API since it imposes unnecessary restrictions -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>0</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

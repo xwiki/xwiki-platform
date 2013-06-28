@@ -33,7 +33,7 @@
   <name>XWiki Platform - Query - XWQL</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>80.55</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

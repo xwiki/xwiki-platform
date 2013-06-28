@@ -36,7 +36,7 @@
     However, at this stage it still uses the ActivityStream implementation as its back-end.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>87.96</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

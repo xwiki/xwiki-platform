@@ -33,7 +33,7 @@
   <name>XWiki Platform - Cryptographic Services</name>
   <description>XWiki Platform - Cryptographic Services</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>75.41</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Used by CryptoScriptService which provides a service to Velocity scripts -->

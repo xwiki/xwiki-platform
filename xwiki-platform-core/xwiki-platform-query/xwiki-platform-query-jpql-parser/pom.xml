@@ -34,7 +34,7 @@
   <description>Simple Java Persistence Query Language parser based on SableCC</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>13.50</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
   </properties>
   <build>
     <plugins>

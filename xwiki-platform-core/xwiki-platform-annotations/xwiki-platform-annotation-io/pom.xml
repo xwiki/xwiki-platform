@@ -31,7 +31,7 @@
   <name>XWiki Platform - Annotations - XWiki Storage Implementation</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>5.14</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.05</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

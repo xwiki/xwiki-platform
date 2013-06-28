@@ -33,7 +33,7 @@
   <name>XWiki Platform - Refactoring</name>
   <description>XWiki Platform - Refactoring</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>87.32</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

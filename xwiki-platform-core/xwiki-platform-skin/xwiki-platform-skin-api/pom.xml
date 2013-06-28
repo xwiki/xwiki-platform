@@ -33,7 +33,7 @@
   <name>XWiki Platform - Skin - API</name>
   <description>XWiki Platform - Skin - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

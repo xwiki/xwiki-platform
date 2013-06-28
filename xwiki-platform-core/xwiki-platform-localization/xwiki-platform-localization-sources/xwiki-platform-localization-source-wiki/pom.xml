@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Localization - Source - Wiki</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>68.30</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

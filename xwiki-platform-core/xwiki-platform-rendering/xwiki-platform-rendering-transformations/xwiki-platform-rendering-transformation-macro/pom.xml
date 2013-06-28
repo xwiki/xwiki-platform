@@ -33,7 +33,7 @@
   <name>XWiki Platform - Rendering - Transformations - Macro</name>
   <description>Tools to help write Macros</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>100</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

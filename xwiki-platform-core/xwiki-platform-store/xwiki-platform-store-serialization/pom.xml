@@ -33,7 +33,7 @@
   <name>XWiki Platform - Store - Serialization</name>
   <description>Serializers and deserializers for storing objects on the disk or exporting them.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>70.87</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

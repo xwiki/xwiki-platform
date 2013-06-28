@@ -37,17 +37,15 @@
     <module>xwiki-platform-wysiwyg-client</module>
     <module>xwiki-platform-wysiwyg-plugin-api</module>
     <module>xwiki-platform-wysiwyg-server</module>
-    <module>xwiki-platform-wysiwyg-test</module>
     <module>xwiki-platform-wysiwyg-ui</module>
     <module>xwiki-platform-wysiwyg-war</module>
   </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-wysiwyg-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -34,7 +34,7 @@
   <packaging>maven-plugin</packaging>
   <description>A Maven plugin to load XWiki documents from XML and perform file attachment or setting object properties, before writting the document back to XML </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>44.33</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

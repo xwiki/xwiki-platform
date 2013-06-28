@@ -33,7 +33,7 @@
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - API</name>
   <description>XWiki Platform - Rendering - Wiki Macro Bridge - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>67.85</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

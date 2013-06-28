@@ -33,7 +33,7 @@
   <name>XWiki Platform - Rendering - Macro - Include</name>
   <description>Include an entity (document, property, etc.)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>78.88</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Include Macro</xwiki.extension.name>
   </properties>

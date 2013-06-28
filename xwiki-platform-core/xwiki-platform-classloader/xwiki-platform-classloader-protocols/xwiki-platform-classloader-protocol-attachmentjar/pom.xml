@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - ClassLoader - Protocols - Attachment JAR</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>66.66</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

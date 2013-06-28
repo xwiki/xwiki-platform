@@ -33,7 +33,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - Infinispan</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>68.79</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -31,6 +31,9 @@
   <name>XWiki Platform - Groovy</name>
   <packaging>jar</packaging>
   <description>Groovy-related extensions for XWiki Platform</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>1</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

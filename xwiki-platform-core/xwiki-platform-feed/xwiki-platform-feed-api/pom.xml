@@ -33,7 +33,7 @@
   <name>XWiki Platform - Feed - API</name>
   <description>API for feeds (RSS, ATOM, etc)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>13.76</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

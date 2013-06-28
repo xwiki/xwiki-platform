@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Containers - Portlet</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>17.08</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

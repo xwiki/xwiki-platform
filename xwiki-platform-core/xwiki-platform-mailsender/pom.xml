@@ -33,7 +33,7 @@
   <name>XWiki Platform - Mail Sender</name>
   <description>XWiki Platform - Mail Sender</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>24.22</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.24</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -36,7 +36,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search Query API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>1.94</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

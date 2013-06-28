@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - XWiki-specific implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>80.91</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

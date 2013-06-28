@@ -33,6 +33,7 @@
   <name>XWiki Platform - Rendering - Macro - Groovy</name>
   <description>Adds ability to write scripts in Groovy in wiki pages</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>1</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Groovy Macro</xwiki.extension.name>
   </properties>

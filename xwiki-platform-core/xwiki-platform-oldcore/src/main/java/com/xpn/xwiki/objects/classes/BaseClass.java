@@ -92,7 +92,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private transient XWikiDocument ownerDocument;
     
     /**
-     * Used to specify who can add this object.
+     * Used to specify which rights are required for creating, modifying and deleting objects from this class.
      */
     private String restriction;
 
@@ -1425,7 +1425,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
     
     /**
-     * Checks whether the current user can access objects from this class.
+     * Checks whether the current user can access (i.e create, modify and delete) objects from this class.
      * 
      * @param context the current context
      * @return true if the current user has access rights to the object

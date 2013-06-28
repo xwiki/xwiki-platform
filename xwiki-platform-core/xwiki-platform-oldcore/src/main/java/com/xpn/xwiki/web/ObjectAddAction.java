@@ -24,8 +24,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -48,8 +46,6 @@ public class ObjectAddAction extends XWikiAction
      */
     private EntityReferenceResolver<String> relativeResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING,
         "relative");
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectAddAction.class); 
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException

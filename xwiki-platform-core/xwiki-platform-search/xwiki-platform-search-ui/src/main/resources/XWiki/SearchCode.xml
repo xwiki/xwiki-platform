@@ -32,9 +32,9 @@
 #set ($searchEngine = "$!{searchConfigObj.getProperty('engine').value}")
 
 ## Default search engine to use in case the configured one is not found:
-## - 'lucene' is the preferred default
+## - 'sorl' is the preferred default
 ## - 'database' is the fall-back default
-#set ($searchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortByCustomOrder' : "${searchEngine}, lucene, database"}))
+#set ($searchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortByCustomOrder' : "${searchEngine}, solr, database"}))
 #set ($searchExtension = $searchExtensions[0])
 
 ## Update the configuration if it is out of synch with the reality (installed extensions).

@@ -17,14 +17,15 @@
   #set($canAccess = $class.canAccess())
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   #getFieldSummary($obj $firstField $firstFieldSummary)
+  #if(!$canAccess)
+    <em>$services.localization.render('core.editors.object.restrictedAccess')</em>
+  #end
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
     <h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstField): $firstFieldSummary#end
-      ##if($canAccess)
-        <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
-        #if (!$hasCustomObject)
-          <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
-        #end
-      ##end
+      <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete #if(!$canAccess) hidden #end" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
+      #if (!$hasCustomObject)
+        <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit #if(!$canAccess) hidden #end" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
+      #end
     </h3>
   </div>
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
@@ -117,11 +118,7 @@
       #if ($object)
         <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>${escapetool.xml($class.name)}</h2></div>
         <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
-        #if ($canAccess)
-          #displayObject($object $class $props $titleField)
-        #else
-          #displayViewObject($object $class $props $titleField)
-        #end
+        #displayObject($object $class $props $titleField)
         </div></div>
       #else
         #warning($services.localization.render('core.editors.object.noObject'))

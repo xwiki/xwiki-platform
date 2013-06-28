@@ -36,21 +36,25 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.util.Util;
 
 public class PropUpdateAction extends XWikiAction
-{   
+{
     public boolean propUpdate(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
         XWikiMessageTool msg = context.getMessageTool();
-        
-        // Prepare new class
+
+        // Prepare new classSandbox/TestRestriction
         BaseClass bclass = doc.getXClass();
         BaseClass bclass2 = bclass.clone();
         
-        // Set restriction level
-        String restrictionLevel = form.getRequest().getParameter("restriction").toString();
-        bclass2.setRestriction(restrictionLevel);
+        // Set restriction level. Only PR users can set it.
+        boolean hasPR = xwiki.getUser(context).hasAccessLevel("programming", doc.getDocumentReference().toString());
+        if (form.getRequest().getParameter("restriction") != null && hasPR) {
+            String restrictionLevel = form.getRequest().getParameter("restriction").toString();
+            bclass2.setRestriction(restrictionLevel);
+        }
+        
         bclass2.setFields(new HashMap());
 
         // Prepare a Map for field renames

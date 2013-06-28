@@ -73,6 +73,10 @@ public class ObjectRemoveAction extends XWikiAction
         if (obj == null) {
             return true;
         }
+        
+        if(!obj.getXClass(context).canAccess(context)) {
+            return true;
+        }
 
         doc.removeObject(obj);
         doc.setAuthor(username);

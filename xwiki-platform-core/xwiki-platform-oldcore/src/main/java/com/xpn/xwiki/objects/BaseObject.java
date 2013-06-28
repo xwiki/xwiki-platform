@@ -401,6 +401,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     public void set(String fieldname, java.lang.Object value, XWikiContext context)
     {
         BaseClass bclass = getXClass(context);
+        if (!bclass.canAccess(context)) {
+            return;
+        }
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
         if ((value instanceof String) && (pclass != null)) {

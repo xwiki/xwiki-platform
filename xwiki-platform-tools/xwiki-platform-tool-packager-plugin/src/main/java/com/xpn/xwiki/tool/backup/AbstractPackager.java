@@ -133,6 +133,8 @@ public abstract class AbstractPackager
 
         // Dispose component manager
         org.xwiki.environment.System.dispose(componentManager);
+
+        Utils.setComponentManager(null);
     }
 
 }

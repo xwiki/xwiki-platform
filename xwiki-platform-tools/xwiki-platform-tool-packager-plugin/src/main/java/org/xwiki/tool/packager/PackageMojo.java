@@ -123,7 +123,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * The maven project.
-     *
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -132,7 +132,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * Project builder -- builds a model from a pom.xml.
-     *
+     * 
      * @component role="org.apache.maven.project.ProjectBuilder"
      * @required
      * @readonly
@@ -141,32 +141,32 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * Used to look up Artifacts in the remote repository.
-     *
+     * 
      * @component
      */
     protected RepositorySystem repositorySystem;
 
     /**
      * The current repository/network configuration of Maven.
-     *
+     * 
      * @parameter default-value="${repositorySystemSession}"
      * @readonly
      */
     private RepositorySystemSession repositorySystemSession;
 
-     /**
-      * Local repository to be used by the plugin to resolve dependencies.
-      *
-      * @parameter expression="${localRepository}"
-      */
-     protected ArtifactRepository localRepository;
+    /**
+     * Local repository to be used by the plugin to resolve dependencies.
+     * 
+     * @parameter expression="${localRepository}"
+     */
+    protected ArtifactRepository localRepository;
 
-     /**
-      * List of remote repositories to be used by the plugin to resolve dependencies.
-      *
-      * @parameter expression="${project.remoteArtifactRepositories}"
-      */
-     protected List<ArtifactRepository> remoteRepositories;
+    /**
+     * List of remote repositories to be used by the plugin to resolve dependencies.
+     * 
+     * @parameter expression="${project.remoteArtifactRepositories}"
+     */
+    protected List<ArtifactRepository> remoteRepositories;
 
     /**
      * The user under which the import should be done. If not user is specified then we import with backup pack. For
@@ -338,8 +338,9 @@ public class PackageMojo extends AbstractMojo
         }
 
         // Resolve the artifact
-        Artifact artifact = this.repositorySystem.createArtifact(
-            artifactItem.getGroupId(), artifactItem.getArtifactId(), version, "", type);
+        Artifact artifact =
+            this.repositorySystem.createArtifact(artifactItem.getGroupId(), artifactItem.getArtifactId(), version, "",
+                type);
         resolveArtifact(artifact);
         return artifact;
     }
@@ -347,8 +348,9 @@ public class PackageMojo extends AbstractMojo
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
-        Artifact configurationResourcesArtifact = this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-tool-configuration-resources", getXWikiPlatformVersion(), "", "jar");
+        Artifact configurationResourcesArtifact =
+            this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
+                getXWikiPlatformVersion(), "", "jar");
         resolveArtifact(configurationResourcesArtifact);
 
         configurationFileTargetDirectory.mkdirs();
@@ -425,6 +427,12 @@ public class PackageMojo extends AbstractMojo
             // Copy database files to XWiki's data directory.
             File dataDir = new File(this.outputPackageDirectory, "data");
             copyDirectory(this.databaseDirectory, new File(dataDir, "database"));
+
+            try {
+                importer.disposeXWikiContext(xcontext);
+            } catch (Exception e) {
+                throw new MojoExecutionException("Failed to dispose XWiki context", e);
+            }
         }
     }
 
@@ -492,8 +500,9 @@ public class PackageMojo extends AbstractMojo
 
         // If the Jetty artifact wasn't defined, try to resolve the default Jetty artifact
         if (jettyArtifact == null) {
-            jettyArtifact = this.repositorySystem.createArtifact(
-                "org.xwiki.platform", "xwiki-platform-tool-jetty-resources", getXWikiPlatformVersion(), "", "zip");
+            jettyArtifact =
+                this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-tool-jetty-resources",
+                    getXWikiPlatformVersion(), "", "zip");
         }
 
         if (jettyArtifact != null) {
@@ -559,7 +568,9 @@ public class PackageMojo extends AbstractMojo
 
     private Collection<Artifact> resolveJarArtifacts() throws MojoExecutionException
     {
-        Set<Artifact> mys = resolveTransitively(Collections.singleton(this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-chart-renderer", "5.0-SNAPSHOT", "jar")));
+        Set<Artifact> mys =
+            resolveTransitively(Collections.singleton(this.repositorySystem.createArtifact("org.xwiki.platform",
+                "xwiki-platform-chart-renderer", "5.0-SNAPSHOT", "jar")));
 
         Set<Artifact> artifactsToResolve = this.project.getArtifacts();
 
@@ -585,12 +596,12 @@ public class PackageMojo extends AbstractMojo
     {
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<Artifact>();
 
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
         // Required Plugins
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-skin-skinx", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-skin-skinx", getXWikiPlatformVersion(), null, "jar"));
 
         // We shouldn't need those but right now it's mandatory since they are defined in the default web.xml file we
         // provide. We'll be able to remove them when we start using Servlet 3.0 -->
@@ -600,10 +611,10 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-wysiwyg-client", getXWikiPlatformVersion(), "jar", "shared"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-webdav-server", getXWikiPlatformVersion(), null, "jar"));
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-rest-server", getXWikiPlatformVersion(), null, "jar"));
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(
-            "org.xwiki.platform", "xwiki-platform-gwt-api", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-rest-server", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-gwt-api", getXWikiPlatformVersion(), null, "jar"));
 
         // Needed by platform-web but since we don't have any dep in platform-web's pom.xml at the moment (duplication
         // issue with XE/XEM and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
@@ -634,25 +645,22 @@ public class PackageMojo extends AbstractMojo
 
     private Set<Artifact> resolveTransitively(Set<Artifact> artifacts) throws MojoExecutionException
     {
-        AndArtifactFilter filter = new AndArtifactFilter(Arrays.asList(
-            new ScopeArtifactFilter("runtime"),
+        AndArtifactFilter filter =
+            new AndArtifactFilter(Arrays.asList(new ScopeArtifactFilter("runtime"),
             // - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
             // log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
             // - Exclude batik-js to prevent conflict with the patched version of Rhino used by yuicompressor used
             // for JSX. See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details.
-            new ExcludesArtifactFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
-                "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
+                new ExcludesArtifactFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
+                    "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact(this.project.getArtifact())
-            .setArtifactDependencies(artifacts)
-            .setCollectionFilter(filter)
-            .setRemoteRepositories(this.remoteRepositories)
-            .setLocalRepository(this.localRepository)
-            .setManagedVersionMap(getManagedVersionMap())
-            .setResolveRoot(false);
+        ArtifactResolutionRequest request =
+            new ArtifactResolutionRequest().setArtifact(this.project.getArtifact()).setArtifactDependencies(artifacts)
+                .setCollectionFilter(filter).setRemoteRepositories(this.remoteRepositories)
+                .setLocalRepository(this.localRepository).setManagedVersionMap(getManagedVersionMap())
+                .setResolveRoot(false);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
-        if(resolutionResult.hasExceptions()){
+        if (resolutionResult.hasExceptions()) {
             throw new MojoExecutionException(String.format("Failed to resolve artifacts [%s]", artifacts,
                 resolutionResult.getExceptions().get(0)));
         }
@@ -678,25 +686,25 @@ public class PackageMojo extends AbstractMojo
 
     private MavenProject getTopLevelPOMProject() throws MojoExecutionException
     {
-        return getMavenProject(this.repositorySystem.createProjectArtifact(
-            "org.xwiki.commons", "xwiki-commons", getXWikiCommonsVersion()));
+        return getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.commons", "xwiki-commons",
+            getXWikiCommonsVersion()));
     }
 
     private MavenProject getPlatformPOMProject() throws MojoExecutionException
     {
-        return getMavenProject(this.repositorySystem.createProjectArtifact(
-            "org.xwiki.platform", "xwiki-platform-core", getXWikiPlatformVersion()));
+        return getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.platform", "xwiki-platform-core",
+            getXWikiPlatformVersion()));
     }
 
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
     {
         try {
-            ProjectBuildingRequest request = new DefaultProjectBuildingRequest()
-                .setRepositorySession(this.repositorySystemSession)
-                    // We don't want to execute any plugin here
-                .setProcessPlugins(false)
+            ProjectBuildingRequest request =
+                new DefaultProjectBuildingRequest().setRepositorySession(this.repositorySystemSession)
+                // We don't want to execute any plugin here
+                    .setProcessPlugins(false)
                     // It's not this plugin job to validate this pom.xml
-                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+                    .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
             // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
             ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
             return result.getProject();
@@ -792,12 +800,11 @@ public class PackageMojo extends AbstractMojo
 
     private void resolveArtifact(Artifact artifact) throws MojoExecutionException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact(artifact)
-            .setRemoteRepositories(this.remoteRepositories)
-            .setLocalRepository(this.localRepository);
+        ArtifactResolutionRequest request =
+            new ArtifactResolutionRequest().setArtifact(artifact).setRemoteRepositories(this.remoteRepositories)
+                .setLocalRepository(this.localRepository);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
-        if(resolutionResult.hasExceptions()){
+        if (resolutionResult.hasExceptions()) {
             throw new MojoExecutionException(String.format("Failed to resolve artifact [%s]", artifact,
                 resolutionResult.getExceptions().get(0)));
         }

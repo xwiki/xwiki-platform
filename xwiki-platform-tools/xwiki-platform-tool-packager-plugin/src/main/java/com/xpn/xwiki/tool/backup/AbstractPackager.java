@@ -123,6 +123,12 @@ public abstract class AbstractPackager
         return xcontext;
     }
 
+    /**
+     * Free resources initialized by {@link #createXWikiContext(String, File)}.
+     * 
+     * @param xcontext the XWiki context
+     * @throws ComponentLookupException when failing to dispose component manager
+     */
     public void disposeXWikiContext(XWikiContext xcontext) throws ComponentLookupException
     {
         ComponentManager componentManager = Utils.getComponentManager();

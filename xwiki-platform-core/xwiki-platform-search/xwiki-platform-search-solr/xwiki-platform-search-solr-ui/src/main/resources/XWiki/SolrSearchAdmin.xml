@@ -148,13 +148,22 @@ search=Main.SolrSearch</parameters>
           &lt;/select&gt;
         &lt;/dd&gt;
       #end
-      &lt;dt&gt;
-        &lt;label for="solrAdminCustomQuery"&gt;Custom query&lt;/label&gt;
-        &lt;span class="xHint"&gt;Optional HQL query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;textarea id="solrAdminCustomQuery" name="customQuery" rows="7" cols="45"&gt;&lt;/textarea&gt;
-      &lt;/dd&gt;
+      ## We allow only users with programming rights to execute custom queries in order to prevent administrators that
+      ## don't have programming rights from executing full statement queries when this page is saved with programming
+      ## rights.
+      #if ($hasProgramming)
+        &lt;dt&gt;
+          &lt;label for="solrAdminCustomQuery"&gt;Custom query&lt;/label&gt;
+          &lt;span class="xHint"&gt;Optional query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select name="customQueryLanguage"&gt;
+            &lt;option value="xwql"&gt;XWiki Query Language (XWQL)&lt;/option&gt;
+            &lt;option value="hql"&gt;Hibernate Query Language (HQL)&lt;/option&gt;
+          &lt;/select&gt;
+          &lt;textarea id="solrAdminCustomQuery" name="customQuery" rows="7" cols="45"&gt;&lt;/textarea&gt;
+        &lt;/dd&gt;
+      #end
     &lt;/dl&gt;
     &lt;p class="buttons"&gt;
       &lt;span class="buttonwrapper"&gt;
@@ -191,24 +200,22 @@ search=Main.SolrSearch</parameters>
     #set ($wikis = [$xcontext.database])
   #end
   ## On each wiki, execute the custom query or add the entire wiki.
-  #set ($currentDatabase = $xcontext.database)
   #foreach ($wiki in $wikis)
-    #if (!$stringtool.isBlank($request.customQuery))
+    #set ($wikiReference = $services.model.createWikiReference($wiki))
+    ## Only administrators with programmings rights are allowed to execute a custom query.
+    #if ($hasProgramming &amp;&amp; !$stringtool.isBlank($request.customQuery))
+      #set ($query = $services.query.createQuery($request.customQuery, $request.customQueryLanguage))
       ## Always use the database specified by the wiki parameter.
-      #set ($discard = $xcontext.setDatabase($wiki))
+      #set ($discard = $query.setWiki($wiki).addFilter('unique'))
       ## Run the custom query and get the document references.
-      #set ($customDocumentNames = $xwiki.searchDocuments($request.customQuery))
-      #foreach ($customDocumentName in $customDocumentNames)
-        #set ($customDocumentReference = $services.model.resolveDocument($customDocumentName))
-        #set ($discard = $targetReferences.add($customDocumentReference))
+      #foreach ($documentName in $query.execute())
+        #set ($documentReference = $services.model.resolveDocument($documentName, $wikiReference))
+        #set ($discard = $targetReferences.add($documentReference))
       #end
     #else
-      ## Get the wiki reference.
-      #set ($discard = $targetReferences.add($services.model.createWikiReference($wiki)))
+      #set ($discard = $targetReferences.add($wikiReference))
     #end
   #end
-  ## Restore the database in case we had to run the custom query.
-  #set ($discard = $xcontext.setDatabase($currentDatabase))
   ##
   ## Perform the action on the computed targets.
   ##
@@ -231,7 +238,8 @@ search=Main.SolrSearch</parameters>
     {{error}}$escapetool.xml($stringtool.capitalize($request.action)) failed: $exception.message ($exception.class){{/error}}
   #else
     {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully complete.{{/success}}
-    #if (!$stringtool.isBlank($request.customQuery))
+    ## Only administrators with programmings rights are allowed to execute a custom query.
+    #if ($hasProgramming &amp;&amp; !$stringtool.isBlank($request.customQuery))
 
       {{info}}Affected documents in the index: $targetReferences{{/info}}
     #end
@@ -243,8 +251,12 @@ search=Main.SolrSearch</parameters>
 #set ($allWikis = $sorttool.sort($xwiki.wikiNames))
 #if ("$!request.action" != '')
   #if ($services.csrf.isTokenValid($request.form_token))
-    #handleAction()
+    #if ($hasGlobalAdmin)
+      #handleAction()
 
+    #else
+      {{error}}You are not allowed to perform this action.{{/error}}
+    #end
   #else
     $response.sendRedirect($services.csrf.getResubmissionURL())
     #stop

@@ -1541,7 +1541,7 @@ ul.hSortable li .separator {
   </object>
   <content>{{velocity}}
 {{html wiki="true"}}
-#set($editing = $context.action == 'admin' || $context.action == 'edit' || $context.action == 'inline')
+#set($editing = $xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
 #set($mode = 'view')
 #if($editing)
 #set($mode = 'edit')

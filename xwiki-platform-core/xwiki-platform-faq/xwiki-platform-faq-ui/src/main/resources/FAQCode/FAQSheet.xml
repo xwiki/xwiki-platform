@@ -27,7 +27,7 @@
 #set($faq = $doc.getObject("FAQCode.FAQClass"))
 #if($faq)
   $doc.use("FAQCode.FAQClass")
-    #if ($context.action == "view")
+    #if ($xcontext.action == "view")
       #set ($answer = $doc.getValue("answer"))
       #if ("$!answer" != "")
         ## Make sure to resolve reference based on the right document

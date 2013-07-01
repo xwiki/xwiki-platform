@@ -203,9 +203,9 @@
   &lt;div class="vcard"&gt;
   &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
 #end
-  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column xform"&gt;
+  &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class='userInfo'&gt;
-    #if($context.action == 'view' &amp;&amp; $hasEdit)
+    #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
     #end
     ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
@@ -260,14 +260,14 @@
       &lt;/div&gt;
       #end
       &lt;div class='userRecentChanges'&gt;
-      #if ($context.user == $doc.fullName)
+      #if ($xcontext.user == $doc.fullName)
         &lt;h1&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h1&gt;
       #else
         &lt;h1&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
         &lt;div class='activity-follow'&gt;
-          #set ($xredirect = $doc.getURL($context.action, $request.queryString))
+          #set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
           #if ($xwiki.watchlist.isUserWatched(${doc.prefixedFullName}))
           &lt;span class='following'&gt;$services.localization.render('xe.activity.messages.following')&lt;/span&gt;
           &lt;a class='action unfollow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;

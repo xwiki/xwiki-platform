@@ -28,12 +28,12 @@
   $doc.set('version', $request.version)
 #end
 #if ("$!{doc.getValue('releaseManagers')}" == '')
-  $doc.set('releaseManagers', $services.model.serialize($context.userReference, 'default'))
+  $doc.set('releaseManagers', $services.model.serialize($xcontext.userReference, 'default'))
 #end
 {{/velocity}}
 
 {{velocity}}
-#if ($context.action == "edit" || $context.action == "inline")
+#if ($xcontext.action == "edit" || $xcontext.action == "inline")
   $doc.use("ReleaseCode.ReleaseClass")
   Version: $doc.display("version")
   Release Managers: $doc.display("releaseManagers")

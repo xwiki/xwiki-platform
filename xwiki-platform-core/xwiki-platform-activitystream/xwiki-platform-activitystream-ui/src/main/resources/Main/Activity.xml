@@ -816,7 +816,7 @@ $xwiki.ssx.use('Main.Activity')##
 ## TODO: filter out user statuses from the activity stream if inactive
 ##
 ##
-#set ($currentUser = $services.model.serialize($context.userReference, 'default'))
+#set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
 ##
 ## Filter clause
 ##--------------------------------------------------------------
@@ -827,50 +827,50 @@ $xwiki.ssx.use('Main.Activity')##
 ##--------------------------------------------------------------
 ## Number of entries to display
 #readVariableFromRequest('aEntries' 'entries' 20)
-#if ($aEntries == 20 &amp;&amp; $context.macro.params.get('entries'))
-  #set ($aEntries = $mathtool.toInteger($context.macro.params.get('entries')))
+#if ($aEntries == 20 &amp;&amp; $xcontext.macro.params.get('entries'))
+  #set ($aEntries = $mathtool.toInteger($xcontext.macro.params.get('entries')))
 #end
 ## Number of activities to display for each entry
 #readVariableFromRequest('aSubEntries' 'subentries' 10)
-#if ($aSubEntries == 10 &amp;&amp; $context.macro.params.get('subentries'))
-  #set ($aSubEntries = $mathtool.toInteger($context.macro.params.get('subentries')))
+#if ($aSubEntries == 10 &amp;&amp; $xcontext.macro.params.get('subentries'))
+  #set ($aSubEntries = $mathtool.toInteger($xcontext.macro.params.get('subentries')))
 #end
 ## Wikis
 #readVariableFromRequest('aWikis' 'wikis' [])
 #if ($aWikis.size() == 0)
-  #set ($aWikisString = $context.macro.params.get('wikis'))
+  #set ($aWikisString = $xcontext.macro.params.get('wikis'))
   #asList('aWikis' $aWikisString)
   #if ($aWikis.size() == 0)
-    $aWikis.add($context.database)
+    $aWikis.add($xcontext.database)
   #end
 #end
 ## Spaces
 #readVariableFromRequest('aSpaces' 'spaces' [])
 #if ($aSpaces.size() == 0)
-  #set ($aSpacesString = $context.macro.params.get('spaces'))
+  #set ($aSpacesString = $xcontext.macro.params.get('spaces'))
   #asList('aSpaces' $aSpacesString)
 #end
 ## Authors
 #readVariableFromRequest('aAuthors' 'authors' [])
 #if ($aAuthors.size() == 0)
-  #set ($aAuthorsString = $context.macro.params.get('authors'))
+  #set ($aAuthorsString = $xcontext.macro.params.get('authors'))
   #asList('aAuthors' $aAuthorsString)
 #end
 ## Tags
 #readVariableFromRequest('aTags' 'tags' [])
 #if ($aTags.size() == 0)
-  #set ($aTagsString = $context.macro.params.get('tags'))
+  #set ($aTagsString = $xcontext.macro.params.get('tags'))
   #asList('aTags' $aTagsString)
 #end
 ## Minor versions
 #readVariableFromRequest('aMinor' 'minor' false)
-#if (!$aMinor &amp;&amp; $context.macro.params.get('minor'))
-  #set ($aMinor = $context.macro.params.get('minor'))
+#if (!$aMinor &amp;&amp; $xcontext.macro.params.get('minor'))
+  #set ($aMinor = $xcontext.macro.params.get('minor'))
 #end
 ## RSS link
 #readVariableFromRequest('aRSS' 'rss' false)
-#if (!$aRSS &amp;&amp; $context.macro.params.get('rss'))
-  #set ($aRSS = $context.macro.params.get('rss'))
+#if (!$aRSS &amp;&amp; $xcontext.macro.params.get('rss'))
+  #set ($aRSS = $xcontext.macro.params.get('rss'))
 #end
 ##
 ## Filter by
@@ -1284,7 +1284,7 @@ $xwiki.ssx.use('Main.Activity')##
   * Display the delete tool for own event messages
   *#
 #macro(toolDelete $eventID)
-  &lt;a class='toolDelete' href="$doc.getURL($context.action, "$!{request.queryString}&amp;amp;xaction=deleteMessage&amp;amp;id=$eventID&amp;amp;xredirect=$escapetool.url($doc.getURL($context.action, $request.queryString))")" title="$services.localization.render('xe.activity.messages.delete')"&gt;x&lt;/a&gt;
+  &lt;a class='toolDelete' href="$doc.getURL($xcontext.action, "$!{request.queryString}&amp;amp;xaction=deleteMessage&amp;amp;id=$eventID&amp;amp;xredirect=$escapetool.url($doc.getURL($xcontext.action, $request.queryString))")" title="$services.localization.render('xe.activity.messages.delete')"&gt;x&lt;/a&gt;
 #end
 #**
   * Display RSS URL
@@ -1569,7 +1569,7 @@ $xwiki.ssx.use('Main.Activity')##
       #set ($pageDate = $page.get(1))
       ## If the affected document name matches ".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}" then it is a GUID corresponding to message stream events, and not a real document.
       ## Always assume access to messages. For the rest of the documents, check access.
-      #if ($pageName.matches(".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}") || ($xwiki.hasAccessLevel('view', $context.user, "${context.database}:${pageName}") &amp;&amp; !$iterationDocuments.contains($pageName)))
+      #if ($pageName.matches(".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}") || ($xwiki.hasAccessLevel('view', $xcontext.user, "${context.database}:${pageName}") &amp;&amp; !$iterationDocuments.contains($pageName)))
         ##
         ## Get event list for the current page
         ## -------------------------------------------------------------------
@@ -1613,7 +1613,7 @@ $xwiki.ssx.use('Main.Activity')##
   #set ($displayUI = $NULL)
   #setVariable("$displayUI", true)
   #if ($isMessageStreamActive)
-    #set ($xredirect = $doc.getURL($context.action, $!{request.queryString}))
+    #set ($xredirect = $doc.getURL($xcontext.action, $!{request.queryString}))
     #set ($errorMessageKeyPrefix = "activity.deleteMessage.error.")
     #set ($errorMessage = $request.session.getAttribute("${errorMessageKeyPrefix}${xredirect}"))
     #if ("$!errorMessage" != '')
@@ -1648,7 +1648,7 @@ $xwiki.ssx.use('Main.Activity')##
         #end
       #else
         {{html}}
-        &lt;form action="$doc.getURL($context.action, $!request.queryString))"&gt;
+        &lt;form action="$doc.getURL($xcontext.action, $!request.queryString))"&gt;
           &lt;div class='xdialog-box xdialog-box-confirmation'&gt;
             &lt;div class='xdialog-content'&gt;
               &lt;div class='question'&gt;$services.localization.render('xe.activity.messages.delete.confirm')&lt;/div&gt;

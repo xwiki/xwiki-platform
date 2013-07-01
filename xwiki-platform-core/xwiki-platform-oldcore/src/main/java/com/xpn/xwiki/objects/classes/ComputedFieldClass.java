@@ -23,6 +23,8 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -113,7 +115,8 @@ public class ComputedFieldClass extends PropertyClass
             vcontext.put("name", name);
             vcontext.put("prefix", prefix);
             vcontext.put("object", new com.xpn.xwiki.api.Object((BaseObject) object, context));
-            vcontext.put("context", new com.xpn.xwiki.api.Context(context));
+            vcontext.put("context", new DeprecatedContext(context));
+            vcontext.put("xcontext", new Context(context));
             String classSyntax =
                 context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
             content = context.getDoc().getRenderedContent(script, classSyntax, context);

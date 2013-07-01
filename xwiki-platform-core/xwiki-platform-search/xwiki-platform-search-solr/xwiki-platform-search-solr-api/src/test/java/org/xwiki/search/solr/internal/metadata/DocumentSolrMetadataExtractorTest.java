@@ -19,6 +19,9 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import static org.hamcrest.CoreMatchers.both;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -36,6 +39,7 @@ import java.util.Locale;
 import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -269,8 +273,8 @@ public class DocumentSolrMetadataExtractorTest
 
         Assert.assertEquals(this.localeENUS.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
         Assert.assertEquals(this.languageENUS, solrDocument.getFieldValue(FieldUtils.LANGUAGE));
-        Assert.assertEquals(Arrays.asList("", this.localeENUS.toString()),
-            solrDocument.getFieldValues(FieldUtils.LOCALES));
+        Assert.assertThat((Collection) solrDocument.getFieldValues(FieldUtils.LOCALES),
+            both((Matcher) hasItems("", this.localeENUS.toString())).and((Matcher) hasSize(2)));
         Assert.assertEquals(this.hidden, solrDocument.getFieldValue(FieldUtils.HIDDEN));
         Assert.assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(FieldUtils.TYPE));
 

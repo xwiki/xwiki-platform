@@ -30,14 +30,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 public class DBListClass extends ListClass
 {
@@ -104,7 +109,17 @@ public class DBListClass extends ListClass
                 list = new ArrayList<ListItem>();
             } else {
                 try {
-                    list = makeList(xwiki.search(query, context));
+                    QueryManager queryManager;
+                    DocumentReference docRef = this.getObject().getDocumentReference();
+                    XWikiDocument xdoc = xwiki.getDocument(docRef, context);
+                    // If the user who created the class hasn't PR, let's use the secure queryManager. 
+                    if(!xwiki.getRightService().hasProgrammingRights(xdoc, context)) {
+                        queryManager = Utils.getComponent(QueryManager.class, "secure");
+                    } else {
+                        queryManager = Utils.getComponent(QueryManager.class);
+                    }
+                    Query query2 = queryManager.createQuery(query,Query.HQL);
+                    list = makeList(query2.execute());
                 } catch (Exception e) {
                     LOGGER.error("Failed to get the list", e);
                     list = new ArrayList<ListItem>();

@@ -531,7 +531,7 @@ search=Main.SolrSearch</parameters>
 
 #macro (handleSolrRequest)
   #if (!$hasGlobalAdmin)
-    #if ("$request.action" != '')
+    #if ("$!request.action" != '')
       {{error}}You are not allowed to perform this action.{{/error}}
     #else
       {{error}}Administration rights are required to access this section.{{/error}}

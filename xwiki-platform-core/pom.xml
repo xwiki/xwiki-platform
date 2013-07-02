@@ -96,9 +96,19 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15</artifactId>
           </exclusion>
+          <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
+      	  <exclusion>
+      	    <artifactId>asm-debug-all</artifactId>
+      	    <groupId>org.ow2.asm</groupId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- See the explanation in the tika-parsers exclusion above -->
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>4.1</version>
+      </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk16</artifactId>

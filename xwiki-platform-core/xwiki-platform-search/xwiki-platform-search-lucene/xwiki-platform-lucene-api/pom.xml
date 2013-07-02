@@ -73,6 +73,11 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
     </dependency>
+    <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+    </dependency>
     <!-- Replace a runtime transitive dependency of tika-parsers because it includes old bcprov/bcmail classes. -->
     <dependency>
       <groupId>org.bouncycastle</groupId>

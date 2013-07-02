@@ -99,5 +99,12 @@ solr.facets.title=Refine your search
 solr.facets.hint=Select a category and activate filters on the current results
 solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
-solr.facets.collapseAll=Collapse all</content>
+solr.facets.collapseAll=Collapse all
+solr.facets.emptyValue=Empty Value
+
+solr.facet.field.locale=Language
+solr.facet.field.locale.emptyValue=No Language
+solr.facet.field.space_exact=Space
+solr.facet.field.name_exact=Page
+solr.facet.field.creationdate=Creation Date</content>
 </xwikidoc>

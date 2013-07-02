@@ -717,6 +717,10 @@ blockquote.search-result-highlight {
   width: 75%;
 }
 
+.search-facet-body .itemName.empty {
+  color: $theme.textSecondaryColor;
+}
+
 .search-facet-body .itemName {
   /* Remove link styling */
   color: $theme.textColor;
@@ -965,7 +969,13 @@ blockquote.search-result-highlight {
       #if ($facetRequestValues || $facetValues.size() &gt; 1)
         (% class="search-facet expanded" %)(((
           {{html}}
-          &lt;div class="search-facet-header"&gt;$escapetool.xml($facetField.name)&lt;/div&gt; 
+          #set ($facetPrettyNameKey = "solr.facet.field.$facetField.name")
+          #if ($services.localization.get($facetPrettyNameKey))
+            #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
+          #else
+            #set ($facetPrettyName = $facetField.name)
+          #end
+          &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
           &lt;div class="search-facet-body"&gt;
             &lt;ul&gt;
               #foreach ($facetValue in $facetValues)
@@ -981,7 +991,16 @@ blockquote.search-result-highlight {
                   ## Reset the pagination because the number of results can change when a facet is applied.
                   #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
                   &lt;a href="$url"#if ($selected) class="selected"#end&gt;
-                    &lt;span class="itemName"&gt;$escapetool.xml($facetValue.name)&lt;/span&gt;
+                    #if ($facetValue.name == '')
+                      #set ($facetPrettyValueKey = "solr.facet.field.${facetField.name}.emptyValue")
+                      #if (!$services.localization.get($facetPrettyValueKey))
+                        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
+                      #end
+                      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
+                    #else
+                      #set ($facetPrettyValue = $facetValue.name)
+                    #end
+                    &lt;span class="itemName#if ($facetValue.name == '') empty#end"&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
                     &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
                   &lt;/a&gt;
                 &lt;/li&gt;

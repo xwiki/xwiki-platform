@@ -370,6 +370,8 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Google plugin moved out of oldcore: XWIKI-9305 -->
+            <exclude>com/xpn/xwiki/plugin/google/GooglePlugin*</exclude>
           </excludes>
         </configuration>
       </plugin>

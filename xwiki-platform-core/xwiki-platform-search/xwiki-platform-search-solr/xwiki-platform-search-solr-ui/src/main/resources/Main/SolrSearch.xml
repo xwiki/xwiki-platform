@@ -960,58 +960,64 @@ blockquote.search-result-highlight {
       [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
     )))
     #foreach ($facetField in $searchResponse.facetFields)
-      #set ($facetValues = $facetField.values)
-      ## Keep only the values that have at least one match.
-      #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
-      ## Display the facets that have values specified on the request or that have at least 2 different values matched.
-      #set ($facetRequestParameter = "f_$facetField.name")
-      #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
-      #if ($facetRequestValues || $facetValues.size() &gt; 1)
-        (% class="search-facet expanded" %)(((
-          {{html}}
-          #set ($facetPrettyNameKey = "solr.facet.field.$facetField.name")
-          #if ($services.localization.get($facetPrettyNameKey))
-            #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
-          #else
-            #set ($facetPrettyName = $facetField.name)
-          #end
-          &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
-          &lt;div class="search-facet-body"&gt;
-            &lt;ul&gt;
-              #foreach ($facetValue in $facetValues)
-                &lt;li&gt;
-                  #set ($selectedValues = [])
-                  #if ($facetRequestValues)
-                    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
-                  #end
-                  #set ($selected = $selectedValues.remove($facetValue.name))
-                  #if (!$selected)
-                    #set ($discard = $selectedValues.add($facetValue.name))
-                  #end
-                  ## Reset the pagination because the number of results can change when a facet is applied.
-                  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
-                  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
-                    #if ($facetValue.name == '')
-                      #set ($facetPrettyValueKey = "solr.facet.field.${facetField.name}.emptyValue")
-                      #if (!$services.localization.get($facetPrettyValueKey))
-                        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
-                      #end
-                      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
-                    #else
-                      #set ($facetPrettyValue = $facetValue.name)
-                    #end
-                    &lt;span class="itemName#if ($facetValue.name == '') empty#end"&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
-                    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
-                  &lt;/a&gt;
-                &lt;/li&gt;
-              #end
-            &lt;/ul&gt;
-          &lt;/div&gt;
-          {{/html}}
-        )))
-      #end
+      #displaySearchFacet($facetField)
     #end
   )))
+#end
+
+#macro (displaySearchFacet $facetField)
+  #set ($facetValues = $facetField.values)
+  ## Keep only the values that have at least one match.
+  #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
+  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
+  #set ($facetRequestParameter = "f_$facetField.name")
+  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+  #if ($facetRequestValues || $facetValues.size() &gt; 1)
+    (% class="search-facet expanded" %)(((
+      {{html}}
+      #set ($facetPrettyNameKey = "solr.facet.field.$facetField.name")
+      #if ($services.localization.get($facetPrettyNameKey))
+        #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
+      #else
+        #set ($facetPrettyName = $facetField.name)
+      #end
+      &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
+      &lt;div class="search-facet-body"&gt;
+        &lt;ul&gt;
+          #foreach ($facetValue in $facetValues)
+            &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      {{/html}}
+    )))
+  #end
+#end
+
+#macro(displaySearchFacetValue $facetValue)
+  #set ($selectedValues = [])
+  #if ($facetRequestValues)
+    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+  #end
+  #set ($selected = $selectedValues.remove($facetValue.name))
+  #if (!$selected)
+    #set ($discard = $selectedValues.add($facetValue.name))
+  #end
+  ## Reset the pagination because the number of results can change when a facet is applied.
+  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
+    #if ($facetValue.name == '')
+      #set ($facetPrettyValueKey = "solr.facet.field.${facetField.name}.emptyValue")
+      #if (!$services.localization.get($facetPrettyValueKey))
+        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
+      #end
+      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
+    #else
+      #set ($facetPrettyValue = $facetValue.name)
+    #end
+    &lt;span class="itemName#if ($facetValue.name == '') empty#end"&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
+    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
+  &lt;/a&gt;
 #end
 
 #macro (displaySearchResultsSort)

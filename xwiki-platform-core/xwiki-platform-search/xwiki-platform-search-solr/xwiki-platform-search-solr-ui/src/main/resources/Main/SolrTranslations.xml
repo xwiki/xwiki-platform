@@ -65,6 +65,7 @@ solr.sortBy.author_display_sort=Last Author
 solr.sortOrder.asc=Ascending
 solr.sortOrder.desc=Descending
 
+solr.result.language=Language
 solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 solr.result.author=Modified by {0} on {1}
 solr.result.mediaType=File of type {0}

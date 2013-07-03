@@ -111,6 +111,7 @@
 
 .box.floatinginfobox {
   margin-top: 0;
+  max-width: 50%;
 }
 
 .extensionSummary {

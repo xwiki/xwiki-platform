@@ -218,12 +218,12 @@
     #set ($joinWorkspaceDocumentReference = $services.model.createDocumentReference($xcontext.database, 'WorkspaceManager', 'JoinWorkspaceCode'))
     #set ($leaveWorkspaceDocumentReference = $services.model.createDocumentReference($xcontext.database, 'WorkspaceManager', 'LeaveWorkspaceCode'))
     #foreach($item in $items)
-     #set($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${context.database}:${item}"))
+     #set($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${item}"))
      #if($velocityCount &gt; 1) , #end
      {
       "doc_viewable" : $viewable,
       #if(!$viewable)
-        "doc_fullname" : "$escapetool.javascript(${context.database}):$escapetool.javascript(${item})"
+        "doc_fullname" : "$escapetool.javascript(${xcontext.database}):$escapetool.javascript(${item})"
       #else
         #set($itemDoc = $xwiki.getDocument($item))
         #set($fullname = "${itemDoc.wiki}:${itemDoc.space}.${itemDoc.name}")

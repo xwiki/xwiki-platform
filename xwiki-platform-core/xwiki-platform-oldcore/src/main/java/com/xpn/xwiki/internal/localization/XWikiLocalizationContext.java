@@ -25,8 +25,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationContext;
 
 import com.xpn.xwiki.XWikiContext;

@@ -56,4 +56,19 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
         return new Locale(language, country);
     }
 
+    /**
+     * Extends {@link org.apache.commons.lang3.LocaleUtils} which return {@link Locale.ROOT} for an empty string.
+     * 
+     * @param str the locale String to convert, null returns null
+     * @return a Locale, null if null input
+     * @since 5.2M1
+     */
+    public static Locale toLocale(String str)
+    {
+        if (str != null && str.isEmpty()) {
+            return Locale.ROOT;
+        }
+
+        return org.apache.commons.lang3.LocaleUtils.toLocale(str);
+    }
 }

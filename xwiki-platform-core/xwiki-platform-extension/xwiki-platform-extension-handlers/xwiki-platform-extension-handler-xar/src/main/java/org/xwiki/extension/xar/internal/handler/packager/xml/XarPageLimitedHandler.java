@@ -21,10 +21,10 @@ package org.xwiki.extension.xar.internal.handler.packager.xml;
 
 import java.util.Locale;
 
-import org.apache.commons.lang3.LocaleUtils;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 

@@ -105,6 +105,7 @@
     <property>
       <code>require(['jQueryNoConflict'], function($) {
   var displayTimeDelta = function(millis) {
+    millis = Math.floor(millis);
     if (millis &lt; 1000) {
       return Math.floor(millis) + 'ms';
     } else if (millis &lt; 60000) {

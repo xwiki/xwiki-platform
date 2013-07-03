@@ -810,8 +810,9 @@ blockquote.search-result-highlight {
         &lt;/select&gt;
       &lt;/dd&gt;
       &lt;dt&gt;
-        &lt;label&gt;
-          &lt;input type="checkbox" name="displayRawContent" value="true"#if ($displayRawContent) checked="checked"#end /&gt;
+        &lt;label for="searchFilterDisplayRawContent"&gt;
+          &lt;input type="checkbox" id="searchFilterDisplayRawContent" name="displayRawContent"
+            value="true"#if ($displayRawContent) checked="checked"#end /&gt;
           $escapetool.xml($services.localization.render('solr.filter.displayRawContent.label'))
         &lt;/label&gt;
         &lt;span class="xHint"&gt;

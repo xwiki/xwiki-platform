@@ -112,11 +112,9 @@ ${escapetool.h}set (${escapetool.d}columnsProperties = {
 #set($userPicker = false)
 #foreach($column in $columns)
 #set($field = $xclass.get($column))
-#if($field)
-#if($field.classType == 'Users' &amp;&amp; !$userPicker)
+#if($field &amp;&amp; ($field.classType == 'Users' || $field.classType == 'Groups') &amp;&amp; !$userPicker)
 #set($userPicker = true)
 ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
-#end
 #end
 #end
 #end

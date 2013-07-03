@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -796,8 +797,13 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         String language, VelocityContext vcontext, XWikiContext context) throws XWikiException
     {
         XWikiURLFactory originalURLFactory = context.getURLFactory();
+        // Backup the Locale and restore it in the finally block
+        // because setting the language below to the given language changes the locale.
+        Locale originalLocale = context.getLocale();
         try {
-            context.setURLFactory(new ExternalServletURLFactory(context));
+            context.setURLFactory(new ExternalServletURLFactory(context));			
+            context.setLanguage(language);
+			
             VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
@@ -841,6 +847,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             }
         } finally {
             context.setURLFactory(originalURLFactory);
+            context.setLocale(originalLocale);
         }
     }
 

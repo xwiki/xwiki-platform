@@ -94,6 +94,8 @@ solr.filterBy.fileType.video=Video
 solr.filterBy.fileType.text=Text
 solr.filter.queryBoost.label=Query boost
 solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5
+solr.filter.displayRawContent.label=Display raw content
+solr.filter.displayRawContent.hint=Highlight matches on raw document content (wiki syntax) instead of rendered content.
 
 solr.facets.title=Refine your search
 solr.facets.hint=Select a category and activate filters on the current results

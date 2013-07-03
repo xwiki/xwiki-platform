@@ -370,7 +370,7 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Google plugin moved out of oldcore: XWIKI-9305 -->
+            <!-- Google API plugin has been retired -->
             <exclude>com/xpn/xwiki/plugin/google/GooglePlugin*</exclude>
           </excludes>
         </configuration>
@@ -415,7 +415,6 @@
     <module>xwiki-platform-feed</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
-    <module>xwiki-platform-google</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-help</module>

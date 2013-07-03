@@ -1474,7 +1474,7 @@ $xwiki.ssx.use('Main.Activity')##
       #toolExpand('')
     #end
     ## Users can delete their own messages from the stream
-    #if (($event.application == 'MessageStream') &amp;&amp; $isFirstEntry &amp;&amp; ($xwiki.getDocument("$!{event.user}").prefixedFullName == $xwiki.getDocument("$!{context.user}").prefixedFullName))
+    #if (($event.application == 'MessageStream') &amp;&amp; $isFirstEntry &amp;&amp; ($xwiki.getDocument("$!{event.user}").prefixedFullName == $xwiki.getDocument("$!{xcontext.user}").prefixedFullName))
        #toolDelete($event.getEventId())
     #end
   &lt;/div&gt;
@@ -1569,7 +1569,7 @@ $xwiki.ssx.use('Main.Activity')##
       #set ($pageDate = $page.get(1))
       ## If the affected document name matches ".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}" then it is a GUID corresponding to message stream events, and not a real document.
       ## Always assume access to messages. For the rest of the documents, check access.
-      #if ($pageName.matches(".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}") || ($xwiki.hasAccessLevel('view', $xcontext.user, "${context.database}:${pageName}") &amp;&amp; !$iterationDocuments.contains($pageName)))
+      #if ($pageName.matches(".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}") || ($xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${pageName}") &amp;&amp; !$iterationDocuments.contains($pageName)))
         ##
         ## Get event list for the current page
         ## -------------------------------------------------------------------

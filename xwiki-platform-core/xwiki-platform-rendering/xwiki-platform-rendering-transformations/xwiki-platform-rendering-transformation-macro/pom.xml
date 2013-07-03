@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-transformations</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-transformation-macro</artifactId>
   <name>XWiki Platform - Rendering - Transformations - Macro</name>
   <description>Tools to help write Macros</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>100</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

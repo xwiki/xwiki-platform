@@ -26,18 +26,17 @@ import javax.servlet.ServletContext;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.lucene.internal.AttachmentData;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Unit tests for {@link AttachmentData}.
@@ -191,7 +190,6 @@ public class AttachmentDataTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    @Ignore("Remove once http://jira.xwiki.org/browse/XWIKI-8656 is fixed")
     public void getFullTextFromClass() throws IOException, XWikiException
     {
         // TODO: For some unknown reason XWikiAttachment.getMimeType puts the filename in lowercase...

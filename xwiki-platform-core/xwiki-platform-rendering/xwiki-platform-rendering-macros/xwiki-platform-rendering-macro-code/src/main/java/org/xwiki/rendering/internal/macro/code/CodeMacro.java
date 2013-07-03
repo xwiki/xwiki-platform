@@ -20,8 +20,11 @@
 package org.xwiki.rendering.internal.macro.code;
 
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +36,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
@@ -113,6 +119,15 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to highlight content", e);
+        }
+
+        Map<String, String> formatParameters = new LinkedHashMap<String, String>();
+        formatParameters.put("class", "code");
+
+        if (context.isInline()) {
+            result = Arrays.<Block> asList(new FormatBlock(result, Format.NONE, formatParameters));
+        } else {
+            result = Arrays.<Block> asList(new GroupBlock(result, formatParameters));
         }
 
         return result;

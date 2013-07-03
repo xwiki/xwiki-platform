@@ -61,7 +61,7 @@ import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
  * @since 5.1M2
  */
 @Component
-@Named("solr")
+@Named("solr.update")
 @Singleton
 public class SolrIndexEventListener implements EventListener
 {
@@ -112,15 +112,16 @@ public class SolrIndexEventListener implements EventListener
                 XWikiDocument document = (XWikiDocument) source;
 
                 if (!Locale.ROOT.equals(document.getLocale())) {
-                    // If a new translation is added reindex the whole document (could be optimized a bit by reindexing
-                    // only the parent locales but that would always include objets and attachments anyway)
+                    // If a new translation is added to a document reindex the whole document (could be optimized a bit
+                    // by reindexing only the parent locales but that would always include objects and attachments
+                    // anyway)
                     this.solrIndexer.get().index(new DocumentReference(document.getDocumentReference(), null), true);
                 } else {
                     this.solrIndexer.get().index(
                         new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
                 }
             } else if (event instanceof DocumentDeletedEvent) {
-                XWikiDocument document = (XWikiDocument) source;
+                XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
 
                 this.solrIndexer.get().delete(
                     new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
@@ -131,7 +132,7 @@ public class SolrIndexEventListener implements EventListener
 
                 this.solrIndexer.get().index(attachment.getReference(), false);
             } else if (event instanceof AttachmentDeletedEvent) {
-                XWikiDocument document = (XWikiDocument) source;
+                XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
                 String fileName = ((AbstractAttachmentEvent) event).getName();
                 XWikiAttachment attachment = document.getAttachment(fileName);
 
@@ -159,10 +160,7 @@ public class SolrIndexEventListener implements EventListener
                 this.solrIndexer.get().delete(wikiReference, false);
             }
         } catch (Exception e) {
-            logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
+            this.logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
         }
-
-        // TODO: if a ne language is added to the list of avaibale locales in preferences, reindex all the entries
-        // associated to parent locales
     }
 }

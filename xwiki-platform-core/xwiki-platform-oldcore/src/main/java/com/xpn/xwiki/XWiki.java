@@ -4189,6 +4189,7 @@ public class XWiki implements EventListener
                         txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
+                        context.setDatabase(targetWiki);
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 

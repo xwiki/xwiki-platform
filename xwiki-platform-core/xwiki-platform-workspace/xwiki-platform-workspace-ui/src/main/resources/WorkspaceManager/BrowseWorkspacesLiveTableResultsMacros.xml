@@ -218,7 +218,7 @@
     #set ($joinWorkspaceDocumentReference = $services.model.createDocumentReference($xcontext.database, 'WorkspaceManager', 'JoinWorkspaceCode'))
     #set ($leaveWorkspaceDocumentReference = $services.model.createDocumentReference($xcontext.database, 'WorkspaceManager', 'LeaveWorkspaceCode'))
     #foreach($item in $items)
-     #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${item}"))
+     #set($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${context.database}:${item}"))
      #if($velocityCount &gt; 1) , #end
      {
       "doc_viewable" : $viewable,
@@ -309,7 +309,7 @@
         "doc_wiki_url" : "$escapetool.javascript($wikiUrl)",
         ## If actions are not explicitly set to false, they will show up in the livetable.
         "doc_hasadmin"  : $xwiki.hasAdminRights(),
-        "doc_hasedit" : $xwiki.hasAccessLevel('edit', $context.user, $fullname),
+        "doc_hasedit" : $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname),
         "doc_hasdelete" : $WorkspaceManager.canDeleteWorkspace($currentUser, $itemWikiName),
         "doc_hasjoin" : $itemHasJoin,
         "doc_hasrequestJoin" : $itemHasRequestJoin,
@@ -381,11 +381,6 @@
             #if($fieldUrl == '')
               #if ($colname == 'wikiprettyname')
                 #set ($fieldUrl = $itemWikiDescriptor.homePageUrl)
-              #elseif ($colname == 'owner')
-                #set ($userDocument = $xwiki.getDocument($fieldValue))
-                #set ($fieldUrl = $userDocument.URL)
-                ## Override display value with first_name last_name
-                #set ($fieldDisplayValue = "${userDocument.first_name} ${userDocument.last_name}")
               #end
             #end
             "$escapetool.javascript(${colname})" : "$escapetool.javascript($fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", ''))",

@@ -32,7 +32,7 @@
     #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
     #if($editor == '')
       ## Determine the sheets using the default document translation because objects are accessible only from the default translation.
-      #if(!$services.sheet.getSheets($doc, $context.action).isEmpty())
+      #if(!$services.sheet.getSheets($doc, $xcontext.action).isEmpty())
         #set($editor = 'inline')
       #elseif (($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($tdoc.syntax.toIdString() == 'xwiki/1.0' && !$tdoc.isAdvancedContent() || $services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString())))
         #set($editor = 'wysiwyg')

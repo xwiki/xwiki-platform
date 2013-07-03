@@ -44,7 +44,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 ## Keep testing the inline action for backward compatibility with existing skin documents.
-#if ($context.action == 'edit' || $context.action == 'inline')
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
   #set ($className = 'XWiki.XWikiSkins')
   #set ($class = $doc.getObject($className).xWikiClass)
   #foreach ($prop in $class.properties)

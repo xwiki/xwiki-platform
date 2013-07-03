@@ -64,11 +64,11 @@
 A suggest source is a URL that takes 3 parameters: query, input and nb. The query parameter must contain a ~_~_INPUT~_~_ placeholder. This URL must process the query with the given user input and return the result in the XML format expected by the suggest component.
 
 |= Name |= URL |= Query |= Results Number |= Icon |= Highlight matches |= Activated
-#foreach($srcObj in $doc.getObjects($searchSuggestSourceClassname))| $doc.display('name', $srcObj) | $doc.display('url', $srcObj) | #if($context.action == 'view') {{{ $srcObj.getProperty('query').value }}} #else $doc.display('query', $srcObj) #end | $doc.display('resultsNumber', $srcObj) | $doc.display('icon', $srcObj) | $doc.display('highlight', $srcObj) | $doc.display('activated', $srcObj)
+#foreach($srcObj in $doc.getObjects($searchSuggestSourceClassname))| $doc.display('name', $srcObj) | $doc.display('url', $srcObj) | #if($xcontext.action == 'view') {{{ $srcObj.getProperty('query').value }}} #else $doc.display('query', $srcObj) #end | $doc.display('resultsNumber', $srcObj) | $doc.display('icon', $srcObj) | $doc.display('highlight', $srcObj) | $doc.display('activated', $srcObj)
 #end
 
 
-#if($context.display == 'edit')
+#if($xcontext.display == 'edit')
 [[Add a new source&gt;&gt;$doc.getExternalURL('objectadd', "classname=${searchSuggestSourceClassname}&amp;xredirect=${doc.getURL('inline')}")]]
 #end
 {{/velocity}}</content>

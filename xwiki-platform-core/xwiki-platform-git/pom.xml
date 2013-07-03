@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-git</artifactId>
   <name>XWiki Platform - Git</name>
   <packaging>jar</packaging>
   <description>Script Service to make it easy to run Git commands in wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>81.81</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

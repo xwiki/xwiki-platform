@@ -1619,10 +1619,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
   ## The class editor moves this resource includes in the HTML page head.
   {{html}}
-  &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin --&gt;
-  &lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;
-  &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin --&gt;
-  &lt;!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin --&gt;
+  #skinExtensionHooks
   {{/html}}
 
   #set($formFieldDoc = $xwiki.getDocument($request.field))

@@ -45,6 +45,7 @@ import org.xwiki.xml.XMLUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Util;
 import com.xpn.xwiki.api.XWiki;
@@ -92,10 +93,9 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 
             // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
             // which is for internal use only. In this manner we control what the user can access.
+            gcontext.put("xcontext", new Context(context));
             // "context" binding is deprecated since 1.9.1
-            Context apiContext = new Context(context);
-            gcontext.put("context", apiContext);
-            gcontext.put("xcontext", apiContext);
+            gcontext.put("context", new DeprecatedContext(context));
 
             gcontext.put("util", new Util(context.getWiki(), context));
 

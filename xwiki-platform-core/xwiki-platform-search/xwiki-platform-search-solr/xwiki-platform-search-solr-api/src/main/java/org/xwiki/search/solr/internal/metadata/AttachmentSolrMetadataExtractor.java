@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
@@ -95,16 +94,11 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     protected void setLocaleAndContentFields(XWikiAttachment attachment, SolrInputDocument solrDocument)
         throws Exception
     {
-        Locale defaultDocumentLocale = getLocale(attachment.getDoc().getDocumentReference());
-
         String attachmentTextContent = getContentAsText(attachment);
 
         // Do the work for each locale.
         for (Locale documentLocale : getLocales(attachment.getDoc(), null)) {
-            if (!documentLocale.equals(defaultDocumentLocale)) {
-                // The original document's locale is already set by the call to the setDocumentFields method.
-                solrDocument.addField(FieldUtils.LOCALES, documentLocale.toString());
-            }
+            solrDocument.addField(FieldUtils.LOCALES, documentLocale.toString());
 
             solrDocument.setField(FieldUtils.getFieldName(FieldUtils.ATTACHMENT_CONTENT, documentLocale),
                 attachmentTextContent);
@@ -133,15 +127,13 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
             InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
 
             try {
-                String result = StringUtils.lowerCase(tika.parseToString(in, metadata));
-
-                return result;
+                return tika.parseToString(in, metadata);
             } finally {
                 in.close();
             }
         } catch (Exception e) {
-            throw new SolrIndexerException(String.format("Failed to retrieve attachment content for '%s'", attachment),
-                e);
+            throw new SolrIndexerException(String.format("Failed to retrieve attachment content for attachment ['%s']",
+                attachment), e);
         }
     }
 

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-dashboard</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-dashboard-macro</artifactId>
   <name>XWiki Platform - Dashboard - Macro</name>
@@ -35,7 +35,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Dashboard Macro</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>54.83</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

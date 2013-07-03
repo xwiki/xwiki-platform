@@ -35,6 +35,7 @@ import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -82,12 +83,16 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
     {
         if (EVENTS.contains(remoteEvent.getEvent().getClass())) {
             // fill the local event
-            XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
+            XWikiContext xcontext = unserializeXWikiContext(remoteEvent.getData());
 
-            if (context != null) {
-                localEvent.setEvent((Event) remoteEvent.getEvent());
-                localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
-                localEvent.setData(unserializeXWikiContext(remoteEvent.getData()));
+            try {
+                if (xcontext != null) {
+                    localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
+                    localEvent.setData(xcontext);
+                    localEvent.setEvent((Event) remoteEvent.getEvent());
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to convert remote event [{}]", remoteEvent, e);
             }
 
             return true;

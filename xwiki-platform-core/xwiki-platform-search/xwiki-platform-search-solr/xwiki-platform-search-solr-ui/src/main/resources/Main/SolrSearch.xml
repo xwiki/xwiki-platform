@@ -551,11 +551,14 @@ a.sort-item.active, a.sort-item.active:hover {
 }
 
 .search-result-language {
-  font-size: 0.8em;
+  font-size: 0.7em;
+  font-style: italic;
+  font-weight: lighter;
 }
 
 .search-result-location,
 .search-result-author,
+.search-result-language,
 .search-result-mediaType,
 .search-result-object,
 .search-result-property {
@@ -712,6 +715,10 @@ blockquote.search-result-highlight {
   position: relative;
   text-overflow: ellipsis;
   width: 75%;
+}
+
+.search-facet-body .itemName.empty {
+  color: $theme.textSecondaryColor;
 }
 
 .search-facet-body .itemName {
@@ -953,43 +960,64 @@ blockquote.search-result-highlight {
       [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
     )))
     #foreach ($facetField in $searchResponse.facetFields)
-      #set ($facetValues = $facetField.values)
-      ## Keep only the values that have at least one match.
-      #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
-      ## Display the facets that have values specified on the request or that have at least 2 different values matched.
-      #set ($facetRequestParameter = "f_$facetField.name")
-      #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
-      #if ($facetRequestValues || $facetValues.size() &gt; 1)
-        (% class="search-facet expanded" %)(((
-          {{html}}
-          &lt;div class="search-facet-header"&gt;$escapetool.xml($facetField.name)&lt;/div&gt; 
-          &lt;div class="search-facet-body"&gt;
-            &lt;ul&gt;
-              #foreach ($facetValue in $facetValues)
-                &lt;li&gt;
-                  #set ($selectedValues = [])
-                  #if ($facetRequestValues)
-                    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
-                  #end
-                  #set ($selected = $selectedValues.remove($facetValue.name))
-                  #if (!$selected)
-                    #set ($discard = $selectedValues.add($facetValue.name))
-                  #end
-                  ## Reset the pagination because the number of results can change when a facet is applied.
-                  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
-                  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
-                    &lt;span class="itemName"&gt;$escapetool.xml($facetValue.name)&lt;/span&gt;
-                    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
-                  &lt;/a&gt;
-                &lt;/li&gt;
-              #end
-            &lt;/ul&gt;
-          &lt;/div&gt;
-          {{/html}}
-        )))
-      #end
+      #displaySearchFacet($facetField)
     #end
   )))
+#end
+
+#macro (displaySearchFacet $facetField)
+  #set ($facetValues = $facetField.values)
+  ## Keep only the values that have at least one match.
+  #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
+  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
+  #set ($facetRequestParameter = "f_$facetField.name")
+  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+  #if ($facetRequestValues || $facetValues.size() &gt; 1)
+    (% class="search-facet expanded" %)(((
+      {{html}}
+      #set ($facetPrettyNameKey = "solr.facet.field.$facetField.name")
+      #if ($services.localization.get($facetPrettyNameKey))
+        #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
+      #else
+        #set ($facetPrettyName = $facetField.name)
+      #end
+      &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
+      &lt;div class="search-facet-body"&gt;
+        &lt;ul&gt;
+          #foreach ($facetValue in $facetValues)
+            &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      {{/html}}
+    )))
+  #end
+#end
+
+#macro(displaySearchFacetValue $facetValue)
+  #set ($selectedValues = [])
+  #if ($facetRequestValues)
+    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+  #end
+  #set ($selected = $selectedValues.remove($facetValue.name))
+  #if (!$selected)
+    #set ($discard = $selectedValues.add($facetValue.name))
+  #end
+  ## Reset the pagination because the number of results can change when a facet is applied.
+  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
+    #if ($facetValue.name == '')
+      #set ($facetPrettyValueKey = "solr.facet.field.${facetField.name}.emptyValue")
+      #if (!$services.localization.get($facetPrettyValueKey))
+        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
+      #end
+      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
+    #else
+      #set ($facetPrettyValue = $facetValue.name)
+    #end
+    &lt;span class="itemName#if ($facetValue.name == '') empty#end"&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
+    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
+  &lt;/a&gt;
 #end
 
 #macro (displaySearchResultsSort)
@@ -1055,24 +1083,16 @@ blockquote.search-result-highlight {
 #macro (displaySearchResult $searchResult)
   #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki, $searchResult.space, $searchResult.name))
   #set ($searchResultDocument = $xwiki.getDocument($searchResultDocumentReference))
-  ## The lang field is multivalued to support attachments, objects and properties. For documents however, we only have 1 value.
-  #set ($resultLanguage = $searchResult.lang)
-  #if ($resultLanguage.size() &gt; 0)
-    #set ($resultLanguage = $resultLanguage[0])
-  #end
-  ## Make sure we get the right document translation based on what the resultLanguage says.
-  #if ($searchResultDocument.realLanguage != $resultLanguage)
-    #set ($searchResultDocument = $searchResultDocument.getTranslatedDocument($resultLanguage))
-  #end
+  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
   (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
     ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
     {{html}}
     #displaySearchResultTitle()
     #displaySearchResultLocation()
     ##
-    #set ($date = $datetool.format('d MMM yyyy', $searchResultDocument.date))
+    #set ($date = $datetool.format('d MMM yyyy', $searchResultTranslatedDocument.date))
     ## FIXME: handle multiwiki setup for authors. Better: index absolute authors instead.
-    #set ($author = $xwiki.getUserName($searchResultDocument.author))
+    #set ($author = $xwiki.getUserName($searchResultTranslatedDocument.author))
     &lt;div class="search-result-author"&gt;$services.localization.render('solr.result.author', [$author, $date])&lt;/div&gt;
     ##
     #if ("$!searchResult.mimetype" != '')
@@ -1110,22 +1130,21 @@ blockquote.search-result-highlight {
 #end
 
 #macro (displaySearchResultTitle)
-  #set ($title = $searchResultDocument.plainTitle)
+  #set ($title = $searchResultTranslatedDocument.plainTitle)
   #set ($titleURL = $searchResultDocument.getURL())
   #if ($searchResult.type == 'ATTACHMENT')
     #set ($title = $searchResult.filename)
     #set ($titleURL = $searchResultDocument.getAttachmentURL($searchResult.filename))
-  #elseif ($searchResult.type == 'DOCUMENT')
-    ## This always sets the language parameter to the URL. It can be improved on a per-result basis and not be set when
-    ## the result's original document is the same as the requested language. However, this complicates things and will
-    ## cause problems when facets will be added and multiple languages will be queried at once.
-    #set ($titleURL = $searchResultDocument.getURL('view', "language=${resultLanguage}"))
+  #elseif ($searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != ''
+    &amp;&amp; $xcontext.language != $searchResult.locale)
+    #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
     &lt;a href="$titleURL"&gt;$escapetool.xml($title)&lt;/a&gt;
     ## Display document language for document results when multiple language results are requested.
-    #if ($request.lang == '' &amp;&amp; $searchResult.type == 'DOCUMENT')
-      &lt;span class="search-result-language"&gt;$escapetool.xml($resultLanguage)&lt;/span&gt;
+    #if ($request.lang == '' &amp;&amp; $searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != '')
+      &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
+        class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
     #end
   &lt;/h2&gt;
 #end
@@ -1217,7 +1236,7 @@ blockquote.search-result-highlight {
   ## Collect the query filters.
   #set ($filters = {})
   #if ($language != '')
-    #set ($discard = $filters.put('lang', [$language]))
+    #set ($discard = $filters.put('locales', [$language]))
   #end
   #if ($wiki != '')
     #set ($discard = $filters.put('wiki', [$wiki]))

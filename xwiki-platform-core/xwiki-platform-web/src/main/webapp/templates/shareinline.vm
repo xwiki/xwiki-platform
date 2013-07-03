@@ -4,7 +4,7 @@
   #error ($services.localization.render('core.viewers.share.error.mustLogin'))
 #elseif ("$!{request.send}" != '')
   #set ($message = "$!{request.message.trim()}")
-  #set ($sender = $xwiki.getUserName($context.user, false))
+  #set ($sender = $xwiki.getUserName($xcontext.user, false))
   #set ($display = "$!{request.includeDocument}")
   #set ($serverName = $request.serverName)
   #if ($serverName.matches('\[.*\]|(\d{1,3}+\.){3}+\d{1,3}+'))
@@ -39,7 +39,7 @@
         #end ## @
         #if (!$recipients.contains($recipient) && "$!recipient" != '')
           #set ($discard = $recipients.add($recipient))
-          #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${NULL}, ${NULL}, $context.language, 'XWiki.SharePage', {}))
+          #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${NULL}, ${NULL}, $xcontext.language, 'XWiki.SharePage', {}))
           #if ($result != 0)
             #set ($discard = $errors.put($fullRecipientName, $services.localization.render('core.viewers.share.error.serverError')))
           #else
@@ -76,9 +76,9 @@
     </dt>
     <dd><input type="text" name="target" id="shareTarget" #if (!$xcontext.isMainWiki())class="withScope"#end
       value="$!escapetool.xml($stringtool.join($request.getParameterValues('target'), ','))"/></dd>
-    #set ($ownEmail = "$!{xwiki.getDocument($context.user).getObject('XWiki.XWikiUsers').getProperty('email').value}")
+    #set ($ownEmail = "$!{xwiki.getDocument($xcontext.user).getObject('XWiki.XWikiUsers').getProperty('email').value}")
     #if ($ownEmail != '')
-      <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($context.user, false)} $escapetool.xml("<${ownEmail}>")" /> $services.localization.render('core.viewers.share.target.ccMe')</label></dd>
+      <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($xcontext.user, false)} $escapetool.xml("<${ownEmail}>")" /> $services.localization.render('core.viewers.share.target.ccMe')</label></dd>
     #end
     <dt><label>$services.localization.render('core.viewers.share.includeMethod')</label></dt>
     <dd><label><input type="radio" name="includeDocument" value="link" checked="checked"/> $services.localization.render('core.viewers.share.includeMethod.link')</label></dd>
@@ -87,7 +87,7 @@
     ## <dd><label><input type="checkbox" name="includeComments"/> $services.localization.render('core.viewers.share.includeComments')</label></dd>
 
     #set ($message = "<textarea name='message' rows='3' cols='80'>${services.localization.render('core.viewers.share.defaultMessage')}</textarea>")
-    #set ($fullMessage = $xwiki.getDocument('XWiki.SharePage').getObject('XWiki.Mail', 'language', $context.language, true).getProperty('html').value)
+    #set ($fullMessage = $xwiki.getDocument('XWiki.SharePage').getObject('XWiki.Mail', 'language', $xcontext.language, true).getProperty('html').value)
     #set ($fullMessage = $fullMessage.replace('${recipientName}', $services.localization.render('core.viewers.share.recipientPlaceholder')))
     #set ($fullMessage = $fullMessage.replaceAll('<pre[^>]*+>[^<]*+</pre>', $message))
     #set ($fullMessage = $xwiki.parseContent($fullMessage))

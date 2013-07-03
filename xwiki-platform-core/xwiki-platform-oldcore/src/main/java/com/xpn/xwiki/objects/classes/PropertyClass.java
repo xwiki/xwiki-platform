@@ -37,6 +37,8 @@ import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -276,7 +278,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             vcontext.put("field", new com.xpn.xwiki.api.PropertyClass(this, context));
             vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
             vcontext.put("type", type);
-            vcontext.put("context", new com.xpn.xwiki.api.Context(context));
+            vcontext.put("context", new DeprecatedContext(context));
+            vcontext.put("xcontext", new Context(context));
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {

@@ -96,20 +96,22 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" />
+
    <field name="wiki" type="string" indexed="true" stored="true" />
    <field name="space" type="text_general" indexed="true" stored="true" />
-   <field name="space_exact" type="string" indexed="true" stored="true" />
+   <field name="space_exact" type="string" indexed="true" stored="false" />
+   <field name="name" type="text_general" indexed="true" stored="true" />
+   <field name="name_exact" type="string" indexed="true" stored="false" />
+
    <field name="locale" type="string" indexed="true" stored="true" />
+   <!-- Contains the technical locale of the document (i.e. empty for default entry) -->
+   <field name="doclocale" type="string" indexed="true" stored="true" />
    <!-- Contains only the language part of the locale -->
    <field name="language" type="string" indexed="true" stored="true" />
-   <field name="name" type="text_general" indexed="true" stored="true" />
+
    <field name="type" type="string" indexed="true" stored="true" />
    <field name="hidden" type="boolean" indexed="true" stored="true" />
-   <field name="title" type="text_general" indexed="true" stored="true" />
-   <field name="title_sort" type="lowercase" indexed="true" stored="true" />
-   <field name="comment" type="text_general" indexed="true" stored="true" />
-   <field name="doccontent" type="text_general" indexed="true" stored="true" />
-   <field name="doccontentraw" type="text_general" indexed="true" stored="true" />
+   <field name="title_sort" type="lowercase" indexed="true" stored="false" />
    <field name="fullname" type="string" indexed="true" stored="true" />
    <field name="author" type="string" indexed="true" stored="true" />
    <field name="author_display" type="text_general" indexed="true" stored="true" />
@@ -119,14 +121,19 @@
    <field name="version" type="string" indexed="true" stored="true" />
    <field name="date" type="tdate" indexed="true" stored="true" />
    <field name="creationdate" type="tdate" indexed="true" stored="true" />
-   <field name="objcontent" type="text_general" indexed="true" stored="true" multiValued="true" />
    <field name="class" type="string" indexed="true" stored="true" />
    <field name="propertyname" type="text_general" indexed="true" stored="true" />
-   <field name="propertyvalue" type="text_general" indexed="true" stored="true" multiValued="true" />
-   <field name="filename" type="text_general" indexed="true" stored="true" />
+   <field name="filename" type="text_filename" indexed="true" stored="true" />
    <field name="mimetype" type="string" indexed="true" stored="true" />
    <field name="attversion" type="string" indexed="true" stored="true" />
-   <field name="attcontent" type="text_general" indexed="true" stored="false" />
+
+   <field name="title_" type="text_general" indexed="true" stored="true" />
+   <field name="comment_" type="text_general" indexed="true" stored="true" />
+   <field name="doccontent_" type="text_general" indexed="true" stored="true" />
+   <field name="doccontentraw_" type="text_general" indexed="true" stored="true" />
+   <field name="propertyvalue_" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="objcontent_" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="attcontent_" type="text_general" indexed="true" stored="false" />
 
    <!-- The list of locales covered by this entry. Dynamically determined from the list of enabled locales and the various locales of the document -->
    <field name="locales" type="string" indexed="true" stored="true" multiValued="true" />
@@ -206,13 +213,14 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
   <!-- Copy optimized language fields to text_general indexed fields for generic usage. -->
-  <copyField source="title_*" dest="title"/>
-  <copyField source="doccontent_*" dest="doccontent"/>
-  <copyField source="doccontentraw_*" dest="doccontentraw"/>
-  <copyField source="comment_*" dest="comment"/>
+  <copyField source="title_*" dest="title_"/>
+  <copyField source="doccontent_*" dest="doccontent_"/>
+  <copyField source="doccontentraw_*" dest="doccontentraw_"/>
+  <copyField source="comment_*" dest="comment_"/>
 
   <!-- Copy values for fields that are needed for specific tasks like exact matching or sorting and can not use their tokenized (analyzed) versions. -->
   <copyField source="space" dest="space_exact"/>
+  <copyField source="name" dest="name_exact"/>
   <copyField source="title_*" dest="title_sort"/>
   <copyField source="author_display" dest="author_display_sort"/>
 
@@ -221,11 +229,11 @@
   <copyField source="locales" dest="lang"/>
 
   <!--  The way we handle attachments/objects/properties requires that multiple attcontent_<language> fields are indexed for the same attachment Lucene document.
-        This triggeres copyField each time and forces us to use multiValued="true" on attcontent, thus leading to useless storage overhead.
+        This triggers copyField each time and forces us to use multiValued="true" on attcontent, thus leading to useless storage overhead.
         To fix this, we are doing the copyField logic from the code, only once per attachment/object/property Lucene document.
-  <copyField source="objcontent_*" dest="objcontent"/>
-  <copyField source="propertyvalue_*" dest="propertyvalue"/>
-  <copyField source="attcontent_*" dest="attcontent"/> -->
+  <copyField source="objcontent_*" dest="objcontent_"/>
+  <copyField source="propertyvalue_*" dest="propertyvalue_"/>
+  <copyField source="attcontent_*" dest="attcontent_"/> -->
 
   <types>
     <!-- field type definitions. The "name" attribute is
@@ -379,6 +387,18 @@
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true" />
         <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+    <!-- A text field for file names  -->
+    <fieldType name="text_filename" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <tokenizer class="solr.LetterTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.LetterTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>

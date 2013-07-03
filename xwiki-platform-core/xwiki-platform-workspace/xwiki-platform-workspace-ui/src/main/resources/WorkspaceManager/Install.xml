@@ -57,7 +57,7 @@
     ##
     ## Don't display this information if the code is included from somewhere else.
     ##
-    #if ($context.doc == $context.tdoc)
+    #if ($xcontext.doc == $xcontext.tdoc)
 
       {{success}}{{translation key="workspacemanager.searchSuggestions.install.success"/}}{{/success}}
     #end
@@ -151,7 +151,7 @@
   ##
   ## Don't display this information if the code is included from somewhere else.
   ##
-  #if ($context.doc == $context.tdoc)
+  #if ($xcontext.doc == $xcontext.tdoc)
 
     {{success}}{{translation key="workspacemanager.template.install.success"/}}{{/success}}
   #end
@@ -359,7 +359,7 @@
   ##
   ## Don't display this information if the code is included from somewhere else.
   ##
-  #if ($context.doc == $context.tdoc)
+  #if ($xcontext.doc == $xcontext.tdoc)
 
     {{success}}{{translation key="platform.workspace.templateFeaturesInstallSuccess"/}}{{/success}}
   #end

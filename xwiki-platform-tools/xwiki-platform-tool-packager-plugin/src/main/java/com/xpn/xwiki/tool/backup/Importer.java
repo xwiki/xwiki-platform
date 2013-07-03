@@ -87,7 +87,7 @@ public class Importer extends AbstractPackager
     public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig, String importUser)
         throws Exception
     {
-        XWikiContext context = createXWikiContext(databaseName, hibernateConfig);
+        XWikiContext xcontext = createXWikiContext(databaseName, hibernateConfig);
 
         Package pack = new Package();
         pack.setWithVersions(false);
@@ -95,19 +95,21 @@ public class Importer extends AbstractPackager
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
         // See http://jira.xwiki.org/jira/browse/XWIKI-458
         try {
-            pack.readFromDir(sourceDirectory, context);
+            pack.readFromDir(sourceDirectory, xcontext);
         } catch (IOException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to import documents from ["
                 + sourceDirectory + "]", e);
         }
-        installWithUser(importUser, pack, context);
+        installWithUser(importUser, pack, xcontext);
 
         // We MUST shutdown HSQLDB because otherwise the last transactions will not be flushed
         // to disk and will be lost. In practice this means the last Document imported has a
         // very high chance of not making it...
         // TODO: Find a way to implement this generically for all databases and inside
         // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
-        shutdownHSQLDB(context);
+        shutdownHSQLDB(xcontext);
+
+        disposeXWikiContext(xcontext);
     }
 
     /**

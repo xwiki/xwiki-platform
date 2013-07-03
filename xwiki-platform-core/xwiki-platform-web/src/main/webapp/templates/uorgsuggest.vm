@@ -7,8 +7,7 @@ $response.setContentType("text/xml")
   #set ($input = $services.model.resolveDocument($input).name)
 #end
 #if ($request.wiki == 'global')
-  ## We need an API to create a wiki reference.
-  #set ($wikiReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Space', 'Page').wikiReference)
+  #set ($wikiReference = $services.model.createWikiReference($xcontext.mainWikiName))
 #else
   #set ($wikiReference = $doc.documentReference.wikiReference)
 #end

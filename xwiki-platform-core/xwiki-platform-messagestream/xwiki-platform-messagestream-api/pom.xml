@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-messagestream</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-messagestream-api</artifactId>
   <name>XWiki Platform - Message Stream - API</name>
   <description>API to publish and display user status messages in different streams</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>63.59</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>xwiki-platform-messagestream</xwiki.extension.features>
   </properties>

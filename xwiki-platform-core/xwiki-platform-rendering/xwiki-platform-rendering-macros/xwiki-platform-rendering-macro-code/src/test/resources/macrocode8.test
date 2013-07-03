@@ -12,7 +12,8 @@ bar
 beginDocument
 beginMacroMarkerStandalone [code] [language=sh] [export X=foo
 bar]
-beginGroup [[class]=[box code]]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
 beginFormat [NONE] [[style]=[color: #008000; ]]
 onWord [export]
 onSpace
@@ -26,7 +27,8 @@ endFormat [NONE] [[style]=[color: #666666; ]]
 onWord [foo]
 onNewLine
 onWord [bar]
-endGroup [[class]=[box code]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [code] [language=sh] [export X=foo
 bar]
 endDocument

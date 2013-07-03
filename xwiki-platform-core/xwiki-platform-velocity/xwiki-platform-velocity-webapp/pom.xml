@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-velocity</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-velocity-webapp</artifactId>
   <name>XWiki Platform - Velocity - WebApp Implementation</name>
   <packaging>jar</packaging>
   <description>Velocity Engine implementation when in a Servlet environment (templates located in the webapp's root)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>77.55</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

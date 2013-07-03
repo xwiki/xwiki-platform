@@ -12,8 +12,10 @@ content
 .#----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [code] [language=test] [content]
-beginGroup [[class]=[box code]]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
 onWord [test]
-endGroup [[class]=[box code]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [code] [language=test] [content]
 endDocument

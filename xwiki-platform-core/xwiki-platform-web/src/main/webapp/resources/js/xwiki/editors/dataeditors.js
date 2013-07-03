@@ -72,14 +72,19 @@ editors.XDataEditors = Class.create({
                 var activator = item.up('.add_xobject');
                 if(activator) {
                   var insertedElement;
+                  // We don't use Prototype API here because we wan't to move the CSS/JavaScript includes to the page head.
+                  var responseDocumentFragment = this._parseHTMLResponse(response.responseText);
                   if (activator.up('.xclass')) {
-                    activator.insert({before: response.responseText});
+                    // Using plain JavaScript here because Prototype doesn't know how to insert a document fragment..
+                    activator.up().insertBefore(responseDocumentFragment, activator);
                     insertedElement = activator.previous();
                   } else {
-                    activator.insert({after: response.responseText});
+                    activator.up().insertBefore(responseDocumentFragment, activator.nextSibling);
                     insertedElement = activator.next();
                   }
                   if (insertedElement) {
+                    // Notify the listeners that the DOM has been updated. This is needed in order to have pickers.
+                    document.fire('xwiki:dom:updated', {elements: [insertedElement]});
                     var insertedObject;
                     if(insertedElement.hasClassName('xclass')) {
                       this.enhanceClassUX(insertedElement);
@@ -124,6 +129,41 @@ editors.XDataEditors = Class.create({
         }
       }.bindAsEventListener(this));
     }.bind(this));
+  },
+  /**
+   * Parses the given HTML, moving the CSS/JavaScript includes in the page head.
+   *
+   * @param html the HTML to parse
+   * @return the document fragment corresponding to the given HTML
+   */
+  _parseHTMLResponse : function(html) {
+    // We don't use Element#update() because it doesn't move external scripts and sheets into HEAD and also because we
+    // don't want to support in-line scripts in property displayers.
+    var container = new Element('div');
+    container.innerHTML = html;
+    var head = document.body.previous('head');
+    head && container.select('link').each(function(link) {
+      head.insert(link);
+    });
+    head && container.select('script').each(function(script) {
+      if (script.src) {
+        // The script is not fetched if we simply move the script element.
+        head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
+      }
+      script.remove();
+    });
+    return this._extractContents(container);
+  },
+  /**
+   * Extracts the children of the given element into a document fragment.
+   *
+   * @param element a DOM element
+   * @return a document fragment containing all the children of the given element, including text nodes
+   */
+  _extractContents : function(element) {
+    var documentFragment = element.ownerDocument.createDocumentFragment();
+    for(; element.firstChild; documentFragment.appendChild(element.firstChild));
+    return documentFragment;
   },
   // ------------------------------------
   // Ajax object deletion

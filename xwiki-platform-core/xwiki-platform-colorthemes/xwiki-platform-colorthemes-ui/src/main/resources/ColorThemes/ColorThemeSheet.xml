@@ -1377,7 +1377,7 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
  *#
 #macro(printColorThemeWizard $element)
   ## Only generate the palettes in inline mode
-  #if ($context.action == 'inline')
+  #if ($xcontext.action == 'inline')
     #set($propnames = '')
     #set($propnames = $!elementPropertyMap.get($element))
     #if("$!{propnames}" != '' &amp;&amp; $propnames.size() &gt; 0)
@@ -1525,7 +1525,7 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
 {{html clean="false" wiki="false"}}
 ##
 ##
-#if($context.action == 'inline')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
+#if($xcontext.action == 'inline')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
 &lt;div #elementMetaData('page')&gt;
   #printColorThemeWizard('page')
   ## Main menu

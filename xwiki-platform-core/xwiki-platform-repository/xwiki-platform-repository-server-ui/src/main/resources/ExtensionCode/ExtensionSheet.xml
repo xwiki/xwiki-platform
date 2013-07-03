@@ -157,7 +157,7 @@
   <content>{{include document="ExtensionCode.RepositoryCode"/}}
 
 {{velocity output="false"}}
-#if ($context.action == 'edit' || $context.action == 'inline')
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
   #set($isEditMode = true)
 #else
   #set($isViewMode = true)

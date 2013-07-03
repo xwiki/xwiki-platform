@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-serialization</artifactId>
   <name>XWiki Platform - Store - Serialization</name>
   <description>Serializers and deserializers for storing objects on the disk or exporting them.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>70.87</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

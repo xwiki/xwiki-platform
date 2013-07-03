@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -67,32 +67,22 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.3</version>
+        <version>1.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.3</version>
+        <version>1.4</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
-          <!-- TODO: Remove once http://jira.xwiki.org/browse/XWIKI-8656 is fixed -->
-          <exclusion>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-          </exclusion>
           <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
           <exclusion>
             <groupId>org.gagravarr</groupId>
             <artifactId>vorbis-java-core</artifactId>
-          </exclusion>
-          <!-- Includes classes from an older version of NekoHTML preventing us from using newer versions. -->
-          <exclusion>
-            <groupId>de.l3s.boilerpipe</groupId>
-            <artifactId>boilerpipe</artifactId>
           </exclusion>
           <!-- Tika Parsers 1.3 depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
                require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
@@ -106,9 +96,19 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15</artifactId>
           </exclusion>
+          <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
+      	  <exclusion>
+      	    <artifactId>asm-debug-all</artifactId>
+      	    <groupId>org.ow2.asm</groupId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- See the explanation in the tika-parsers exclusion above -->
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>4.1</version>
+      </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk16</artifactId>
@@ -365,25 +365,13 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <className>org/xwiki/url/InvalidURLException</className>
-              <differenceType>8001</differenceType>
-              <justification>
-                Young API: The URL module has never been finished and we started working on it again
-              </justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/ircbot/IRCBot</className>
-              <method>java.lang.String getWikiId()</method>
-              <justification>Needed to fix http://jira.xwiki.org/browse/XWIKI-9251 and the IRC Bot API is still
-              relatively new and not a mainstream API used by lots of people.</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Google plugin moved out of oldcore: XWIKI-9305 -->
+            <exclude>com/xpn/xwiki/plugin/google/GooglePlugin*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -427,6 +415,7 @@
     <module>xwiki-platform-feed</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
+    <module>xwiki-platform-google</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-help</module>
@@ -441,6 +430,7 @@
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-observation</module>

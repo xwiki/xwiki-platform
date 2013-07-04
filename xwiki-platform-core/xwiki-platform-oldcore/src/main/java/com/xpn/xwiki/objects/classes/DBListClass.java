@@ -103,23 +103,22 @@ public class DBListClass extends ListClass
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
             XWiki xwiki = context.getWiki();
-            String query = getQuery(context);
+            String statement = getQuery(context);
 
-            if (query == null) {
+            if (statement == null) {
                 list = new ArrayList<ListItem>();
             } else {
                 try {
-                    QueryManager queryManager;
-                    DocumentReference docRef = this.getObject().getDocumentReference();
-                    XWikiDocument xdoc = xwiki.getDocument(docRef, context);
-                    // If the user who created the class hasn't PR, let's use the secure queryManager. 
-                    if(!xwiki.getRightService().hasProgrammingRights(xdoc, context)) {
-                        queryManager = Utils.getComponent(QueryManager.class, "secure");
-                    } else {
-                        queryManager = Utils.getComponent(QueryManager.class);
-                    }
-                    Query query2 = queryManager.createQuery(query,Query.HQL);
-                    list = makeList(query2.execute());
+                    QueryManager queryManager = Utils.getComponent(QueryManager.class, "secure");
+                    DocumentReference classRef = this.getObject().getDocumentReference();
+                    XWikiDocument classDoc = xwiki.getDocument(classRef, context);
+                    XWikiDocument currentDoc = context.getDoc();
+                    // We should execute the query in the context of the class document.
+                    // The query should indeed get the privileges of its author.
+                    Query query = queryManager.createQuery(statement,Query.HQL);
+                    context.setDoc(classDoc);
+                    list = makeList(query.execute());
+                    context.setDoc(currentDoc);
                 } catch (Exception e) {
                     LOGGER.error("Failed to get the list", e);
                     list = new ArrayList<ListItem>();

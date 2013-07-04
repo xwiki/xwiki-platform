@@ -66,23 +66,15 @@ actionButtons.EditActions = Class.create({
         return false;
       }
     }
-    if ($xwiki.isEditCommentMandatory()) {
-      var commentField = form.comment
-      while (commentField.value == "") {
-        var response = prompt("${services.localization.render('core.comment.prompt')}", '');
+    var commentField = form.comment;
+    if (commentField && ($xwiki.isEditCommentSuggested() || $xwiki.isEditCommentMandatory())) {
+      while (commentField.value == '') {
+        var response = prompt("$services.localization.render('core.comment.prompt')", '');
         if (response === null) {
           return false;
         }
         commentField.value = response;
-      }
-    } else if ($xwiki.isEditCommentSuggested()) {
-      var commentField = form.comment
-      if (commentField.value == "") {
-        var response = prompt("${services.localization.render('core.comment.prompt')}", '');
-        if (response === null) {
-          return false;
-        }
-        commentField.value = response;
+        if (!$xwiki.isEditCommentMandatory()) break;
       }
     }
     return true;

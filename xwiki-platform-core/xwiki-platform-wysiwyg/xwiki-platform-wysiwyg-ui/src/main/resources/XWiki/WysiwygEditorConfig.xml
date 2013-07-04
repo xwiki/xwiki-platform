@@ -344,6 +344,7 @@ HL2ph7uN448AAAAASUVORK5CYII=
   &lt;fieldset&gt;
     &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.xml($thisURL)" /&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="hidden" name="comment" value="$escapetool.xml($services.localization.render('wysiwyg.admin.saveComment'))" /&gt;
   &lt;/fieldset&gt;
   &lt;div class="bottombuttons"&gt;
     &lt;p class="admin-buttons"&gt;

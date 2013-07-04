@@ -64,7 +64,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("solr.availablelocales")
 @Singleton
-public class SolrIndexAvailableLoalesListener implements EventListener
+public class SolrIndexAvailableLocalesListener implements EventListener
 {
     /**
      * The regex used to match preferences documents.

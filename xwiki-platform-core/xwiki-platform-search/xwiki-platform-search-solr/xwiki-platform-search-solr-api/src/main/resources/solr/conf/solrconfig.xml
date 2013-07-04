@@ -766,7 +766,7 @@
        <str name="v.layout">layout</str>
        <str name="title">Solritas</str>
 
-       <!-- Default qeury fields with default attached boost values. -->
+       <!-- Default query fields with default attached boost values. -->
        <str name="qf">
           name^0.3 title^0.4 fullname^0.25 doccontent^0.5 doccontentraw^0.2 objcontent^0.45 comment^0.40 attcontent^0.65 filename^0.75 propertyvalue^0.55
           space^0.25 wiki^0.2 type^0.1 class^0.4 author_display^0.2 creator_display^0.2 date^1.0 creationdate^1.0 mimetype^0.4

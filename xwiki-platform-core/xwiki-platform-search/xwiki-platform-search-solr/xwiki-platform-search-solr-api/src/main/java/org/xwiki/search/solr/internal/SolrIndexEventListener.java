@@ -123,8 +123,9 @@ public class SolrIndexEventListener implements EventListener
             } else if (event instanceof DocumentDeletedEvent) {
                 XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
 
+                // Delete recursively.
                 this.solrIndexer.get().delete(
-                    new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
+                    new DocumentReference(document.getDocumentReference(), document.getLocale()), true);
             } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();
@@ -144,7 +145,8 @@ public class SolrIndexEventListener implements EventListener
             } else if (event instanceof XObjectDeletedEvent) {
                 EntityEvent entityEvent = (EntityEvent) event;
 
-                this.solrIndexer.get().delete(entityEvent.getReference(), false);
+                // Delete recursively.
+                this.solrIndexer.get().delete(entityEvent.getReference(), true);
             } else if (event instanceof XObjectPropertyUpdatedEvent || event instanceof XObjectPropertyAddedEvent) {
                 EntityEvent entityEvent = (EntityEvent) event;
 
@@ -157,7 +159,8 @@ public class SolrIndexEventListener implements EventListener
                 String wikiName = (String) source;
                 WikiReference wikiReference = new WikiReference(wikiName);
 
-                this.solrIndexer.get().delete(wikiReference, false);
+                // Delete recursively.
+                this.solrIndexer.get().delete(wikiReference, true);
             }
         } catch (Exception e) {
             this.logger.error("Failed to handle event [{}] with source [{}]", event, source, e);

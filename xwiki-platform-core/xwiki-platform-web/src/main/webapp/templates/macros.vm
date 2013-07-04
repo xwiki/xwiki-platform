@@ -1244,6 +1244,7 @@ ${Msz}Mb##
  * @param options the livetable options.
  *#
 #macro(livetable $divid $collist $colprops $options)
+#if($xcontext.action=='view')
 ## Do not indent:
 #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
@@ -1500,6 +1501,7 @@ ${Msz}Mb##
   #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
 
 #else {/pre} #end
+#end
 #end
 
 #**

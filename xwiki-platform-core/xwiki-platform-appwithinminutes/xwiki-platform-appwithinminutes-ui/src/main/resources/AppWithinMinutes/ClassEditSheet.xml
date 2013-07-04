@@ -1914,7 +1914,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
       #set($queryString = 'wizard=true')
       #if(!$xwiki.exists($homePageRef))
-        #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', $doc.space)')
+        #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', [$doc.space])')
         #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.LiveTableTemplate&amp;AppWithinMinutes.LiveTableClass_0_class=$escapetool.url($doc.fullName)&amp;title=$escapetool.url($homePageTitle)&amp;parent=AppWithinMinutes.WebHome")
       #end
       $response.sendRedirect($xwiki.getURL($homePageRef, 'edit', $queryString));

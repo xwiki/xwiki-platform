@@ -392,9 +392,9 @@ public class DocumentSolrMetadataExtractorTest
 
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, this.localeENUS));
-        MatcherAssert.assertThat(objectProperties, Matchers.containsInAnyOrder((Object) ("comment:" + commentContent),
-            (Object) ("author:" + commentAuthor), (Object) ("date:" + commentDate.toString()),
-            (Object) ("list:" + commentList.get(0)), (Object) ("list:" + commentList.get(1))));
+        MatcherAssert.assertThat(objectProperties, Matchers.containsInAnyOrder((Object) ("comment : " + commentContent),
+            (Object) ("author : " + commentAuthor), (Object) ("date : " + commentDate.toString()),
+            (Object) ("list : " + commentList.get(0)), (Object) ("list : " + commentList.get(1))));
         Assert.assertEquals(5, objectProperties.size());
     }
 }

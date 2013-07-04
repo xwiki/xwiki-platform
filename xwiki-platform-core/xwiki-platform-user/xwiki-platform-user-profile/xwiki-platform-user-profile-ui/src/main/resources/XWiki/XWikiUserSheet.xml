@@ -362,6 +362,48 @@ return XWiki;
   margin: 0 2em 0 0;  
 }
 
+.profile-menu .category-tab:before{
+  float: left;
+  margin: 5px 0 0 5px;
+}
+
+.profile-menu .user-menu-profile:before{
+  content: url("$xwiki.getSkinFile('icons/silk/vcard.png')");
+}
+
+.profile-menu .user-menu-preferences:before{
+  content: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
+}
+
+.profile-menu .user-menu-watchlist:before{
+  content: url("$xwiki.getSkinFile('icons/silk/star.png')");
+}
+
+.profile-menu .user-menu-network:before{
+  content: url("$xwiki.getSkinFile('icons/silk/group.png')");
+}
+
+.profile-menu .user-menu-dashboard:before{
+  content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
+}
+
+.profile-menu .group.user-menu-title{
+/*  background-image: url("$xwiki.getSkinFile('icons/silk/user.png')"), linear-gradient(to bottom, #FFFFFF 0%, #E1E1E1 100%) !important;*/
+  background-image: url('/xwiki/resources/icons/silk/user.png');
+  background-image: url('/xwiki/resources/icons/silk/user.png'),-webkit-linear-gradient(top,#fff 0,#e1e1e1 100%);
+  background-image: url('/xwiki/resources/icons/silk/user.png'),-moz-linear-gradient(to bottom,#fff 0,#e1e1e1 100%);
+  background-image: url('/xwiki/resources/icons/silk/user.png'),-o-linear-gradient(to bottom,#fff 0,#e1e1e1 100%);
+  background-image: url('/xwiki/resources/icons/silk/user.png'),linear-gradient(to bottom,#fff 0,#e1e1e1 100%);
+}
+
+.profile-menu .group, .profile-menu .group:hover {
+  background-position: 7px 50%,top center;
+}
+
+.user-menu-title a:hover{
+  color: #4D5860 !important;
+}
+
 /* ----- Page content ---- */
 #user-page-content{
   margin-left: 16em;
@@ -588,7 +630,8 @@ span#avatarUpload {
 #########################
 #set($userMenu = [{
   'id'       : 'menu',
-  'cssClass' : 'usersgroupsIcon',
+  'name'     : $services.localization.render("platform.core.profile.category.preferences"),
+  'cssClass' : 'user-menu-title',
   'children' : $categories
   }
 ])
@@ -597,7 +640,7 @@ span#avatarUpload {
   #foreach($subcategory in $category.get('children'))
     #set($id = $subcategory.get('id')) 
     #set($discard = $subcategory.put('url', "?category=${id}"))
-    #set($discard = $subcategory.put('cssClass', 'category-tab'))
+    #set($discard = $subcategory.put('cssClass', "user-menu-$id category-tab"))
   #end
 #end
 #########################
@@ -623,7 +666,7 @@ span#avatarUpload {
   ##########
   (% id="user-vertical-menu" %)
   (((  
-    #verticalNavigation($userMenu, {'translationPrefix' : 'platform.core.profile.category.', 'crtItemId' : $currentCategory, 'cssClass' : 'admin-menu'})
+    #verticalNavigation($userMenu, {'translationPrefix' : 'platform.core.profile.category.', 'crtItemId' : $currentCategory, 'cssClass' : 'profile-menu'})
   )))
 )))
 #########################

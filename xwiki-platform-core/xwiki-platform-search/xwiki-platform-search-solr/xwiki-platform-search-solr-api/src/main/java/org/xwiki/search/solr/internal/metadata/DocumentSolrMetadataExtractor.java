@@ -178,7 +178,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected void setExtras(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale)
         throws XWikiException
     {
-        // Index the Comments and Objects in general. Use the original document to get the comment objects since the
+        // Index the Objects. Use the original document to get the objects since the
         // translated document is just a lightweight object containing the translated content and title.
 
         // Note: To be able to still find translated documents, we need to redundantly index the same objects (and

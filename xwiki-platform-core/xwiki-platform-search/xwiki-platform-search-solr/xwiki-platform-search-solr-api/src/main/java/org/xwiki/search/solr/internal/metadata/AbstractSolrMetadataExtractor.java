@@ -61,7 +61,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     /**
      * The format used when indexing the objcontent field: "&lt;propertyName&gt;:&lt;propertyValue&gt;".
      */
-    private static final String OBJCONTENT_FORMAT = "%s:%s";
+    private static final String OBJCONTENT_FORMAT = "%s : %s";
 
     /**
      * Logging framework.

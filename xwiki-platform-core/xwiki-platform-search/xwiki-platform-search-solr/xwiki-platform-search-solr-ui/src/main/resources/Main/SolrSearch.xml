@@ -809,16 +809,20 @@ blockquote.search-result-highlight {
           #end
         &lt;/select&gt;
       &lt;/dd&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterDisplayRawContent"&gt;
-          &lt;input type="checkbox" id="searchFilterDisplayRawContent" name="displayRawContent"
-            value="true"#if ($displayRawContent) checked="checked"#end /&gt;
-          $escapetool.xml($services.localization.render('solr.filter.displayRawContent.label'))
-        &lt;/label&gt;
-        &lt;span class="xHint"&gt;
-          $escapetool.xml($services.localization.render('solr.filter.displayRawContent.hint'))
-        &lt;/span&gt;
-      &lt;/dt&gt;
+      #if ($xwiki.isMultiLingual())
+        &lt;dt&gt;
+          &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select id="searchFilterLanguage" name="lang"&gt;
+            &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
+            #getSupportedLanguages()
+            #foreach ($supportedLanguage in $supportedLanguages)
+              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;$supportedLanguage&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/dd&gt;
+      #end
     &lt;/dl&gt;
     &lt;dl class="search-filter-right"&gt;
       &lt;dt&gt;
@@ -843,20 +847,6 @@ blockquote.search-result-highlight {
           #end
         &lt;/select&gt;
       &lt;/dd&gt;
-      #if ($xwiki.isMultiLingual())
-        &lt;dt&gt;
-          &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select id="searchFilterLanguage" name="lang"&gt;
-            &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
-            #getSupportedLanguages()
-            #foreach ($supportedLanguage in $supportedLanguages)
-              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;$supportedLanguage&lt;/option&gt;
-            #end
-          &lt;/select&gt;
-        &lt;/dd&gt;
-      #end
     &lt;/dl&gt;
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
     &lt;dl&gt;
@@ -1197,12 +1187,8 @@ blockquote.search-result-highlight {
   ##
   ## (2) Keep only the matches corresponding to the search result type.
   ##
-  #set ($raw = '')
-  #if ($displayRawContent)
-    #set ($raw = 'raw')
-  #end
   #set ($indexedFields = {
-    'DOCUMENT': ["doccontent$raw", 'comment', 'objcontent', 'attcontent'],
+    'DOCUMENT': ['doccontent', 'doccontentraw', 'comment', 'objcontent', 'attcontent'],
     'OBJECT': ['objcontent'],
     'OBJECT_PROPERTY': ['propertyvalue'],
     'ATTACHMENT': ['attcontent']
@@ -1339,7 +1325,6 @@ blockquote.search-result-highlight {
   #if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
     #set ($wiki = $xcontext.database)
   #end
-  #set ($displayRawContent = $request.displayRawContent == 'true')
 #end
 {{/velocity}}
 

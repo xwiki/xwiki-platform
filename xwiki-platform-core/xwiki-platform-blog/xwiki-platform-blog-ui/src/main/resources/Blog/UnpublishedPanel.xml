@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1232044871000</creationDate>
-  <date>1232045491000</date>
-  <contentUpdateDate>1232045491000</contentUpdateDate>
+  <creationDate>1373016402000</creationDate>
+  <date>1373018522000</date>
+  <contentUpdateDate>1373016402000</contentUpdateDate>
   <version>1.1</version>
   <title>Unpublished Blog Posts Panel</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -56,7 +55,7 @@
         <number>4</number>
         <prettyName>Content</prettyName>
         <rows>25</rows>
-        <size>60</size>
+        <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
@@ -110,7 +109,7 @@
 {{velocity}}
 #getBlogEntriesBaseQuery($query)
 #set ($query = "$!{query} and isPublished.value = 0")
-#set ($unpublishedEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 5, 0))
+#set ($unpublishedEntries = $services.query.hql("${query} order by publishDate.value desc").setLimit(5).setOffset(0).execute())
 #if ($unpublishedEntries.size() &gt; 0 || $showEmptyPanels)
   #panelheader($services.localization.render('xe.blog.unpublished.entries'))
   #foreach ($entryDoc in $xwiki.wrapDocs($unpublishedEntries))

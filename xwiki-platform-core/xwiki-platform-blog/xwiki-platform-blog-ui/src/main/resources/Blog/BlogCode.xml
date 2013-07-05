@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1220389470000</creationDate>
-  <date>1253183596000</date>
-  <contentUpdateDate>1253183596000</contentUpdateDate>
+  <creationDate>1373016402000</creationDate>
+  <date>1373018317000</date>
+  <contentUpdateDate>1373018155000</contentUpdateDate>
   <version>1.1</version>
   <title>Macros for the Blog application</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -99,7 +98,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     #set($result = $xwiki.getDocument("${space}.Blog"))
     #if(!$result.getObject($blogClassname))
       ## Third, try searching for a blog document in the current space
-      #set($blogDocs = $xwiki.searchDocuments(", BaseObject obj where doc.space = ? and obj.name = doc.fullName and obj.className = '$blogClassname' order by doc.name", 1, 0, [${space}]))
+      #set($blogDocs = $services.query.hql(", BaseObject obj where doc.space = ? and obj.name = doc.fullName and obj.className = '$blogClassname' order by doc.name").setLimit(1).setOffset(0).bindValues([${space}]).execute())
       #if($blogDocs.size() &gt; 0)
         #set($result = $xwiki.getDocument($blogDocs.get(0)))
       #else
@@ -190,12 +189,12 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #if (!$entries)
     #setVariable ("$entries" [])
   #end
-  #set($totalEntries = $xwiki.countDocuments(${query}))
+  #set($totalEntries = $services.query.hql($query).count())
   #getBlogProperty($blogDoc 'itemsPerPage' '10' $defaultItemsPerPage)
   #set($defaultItemsPerPage = $mathtool.toInteger($defaultItemsPerPage))
   ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
   #preparePagedViewParams($totalEntries $defaultItemsPerPage)
-  #set($discard = $entries.addAll($xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt)))
+  #set($discard = $entries.addAll($services.query.hql("${query} order by publishDate.value desc").setLimit($itemsPerPage).setOffset($startAt).execute()))
 #end
 ##
 ##
@@ -219,8 +218,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #set($minDay = $dateFormatter.print($weekDate.toMutableDateTime().weekOfWeekyear().roundFloor()))
   #set($maxDay = $dateFormatter.print($weekDate.toMutableDateTime().weekOfWeekyear().roundCeiling()))
   #set($query = "${query} and publishDate.value &gt;= '$minDay' and publishDate.value &lt; '$maxDay'")
-  #set($totalEntries = $xwiki.countDocuments(${query}))
-  #set($discard = $entries.addAll($xwiki.searchDocuments("${query} order by publishDate.value desc")))
+  #set($totalEntries = $services.query.hql($query).count())
+  #set($discard = $entries.addAll($services.query.hql("${query} order by publishDate.value desc").execute()))
 #end
 ##
 ##
@@ -244,8 +243,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #set($minDay = $dateFormatter.print($monthDate.toMutableDateTime().monthOfYear().roundFloor()))
   #set($maxDay = $dateFormatter.print($monthDate.toMutableDateTime().monthOfYear().roundCeiling()))
   #set($query = "${query} and publishDate.value &gt;= '$minDay' and publishDate.value &lt; '$maxDay'")
-  #set($totalEntries = $xwiki.countDocuments(${query}))
-  #set($discard = $entries.addAll($xwiki.searchDocuments("${query} order by publishDate.value desc")))
+  #set($totalEntries = $services.query.hql($query).count())
+  #set($discard = $entries.addAll($services.query.hql("${query} order by publishDate.value desc").execute()))
 #end
 ##
 ##
@@ -262,8 +261,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #if (!$entries)
     #setVariable ("$entries" [])
   #end
-  #set($totalEntries = $xwiki.countDocuments(${query}))
-  #set($discard = $entries.addAll($xwiki.searchDocuments("${query} order by publishDate.value desc")))
+  #set($totalEntries = $services.query.hql($query).count())
+  #set($discard = $entries.addAll($services.query.hql("${query} order by publishDate.value desc").execute()))
 #end
 ##
 ##
@@ -281,8 +280,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     #setVariable ("$entries" [])
   #end
   #set($query = "${query} and isPublished.value = 0")
-  #set($totalEntries = $xwiki.countDocuments(${query}))
-  #set($discard = $entries.addAll($xwiki.searchDocuments("${query} order by publishDate.value desc")))
+  #set($totalEntries = $services.query.hql($query).count())
+  #set($discard = $entries.addAll($services.query.hql("${query} order by publishDate.value desc").execute()))
 #end
 ##
 ##
@@ -297,11 +296,11 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     #setVariable ("$entries" [])
   #end
   #getBlogEntriesBaseQuery($query)
-  #set($totalEntries = $xwiki.countDocuments(${query}))
+  #set($totalEntries = $services.query.hql($query).count())
   #set($defaultItemsPerPage = 20)
   ## This macro is defined in the default macros.vm library. It also sets $itemsPerPage and $startAt.
   #preparePagedViewParams($totalEntries $defaultItemsPerPage)
-  #set($discard = $entries.addAll($xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt)))
+  #set($discard = $entries.addAll($services.query.hql("${query} order by publishDate.value desc").setLimit($itemsPerPage).setOffset($startAt).execute()))
 #end
 ##
 ##
@@ -700,8 +699,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   ## Since the publish date and update date are not set at the exact same time, there could be a small difference that
   ## we assume cannot be more than 3 seconds.
   {{/html}}
-  (% class="separator" %)&#183;(%%) [[{{translation key='xe.blog.code.permalink'/}}&gt;&gt;$entryDoc||rel="bookmark"]] ##
-  (% class="separator" %)&#183;(%%) [[{{translation key='xe.blog.code.comments'/}}&gt;&gt;$entryDoc||anchor="Comments"]] (% class="itemCount" %)($entryDoc.comments.size())(%%) ##
+  (% class="separator" %)·(%%) [[{{translation key='xe.blog.code.permalink'/}}&gt;&gt;$entryDoc||rel="bookmark"]] ##
+  (% class="separator" %)·(%%) [[{{translation key='xe.blog.code.comments'/}}&gt;&gt;$entryDoc||anchor="Comments"]] (% class="itemCount" %)($entryDoc.comments.size())(%%) ##
   )))## entry-footer
 #end
 ##
@@ -746,19 +745,19 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     (% class="pagingLinks" %)(((
     #getRequestedWeek($weekDate)
     $weekDate.addWeeks(-1)##
-    (% class="prevPage" %)**[[&#171; {{translation key='xe.blog.code.previousweek'/}}&gt;&gt;$doc.name||queryString="year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear"]]**(%%)
+    (% class="prevPage" %)**[[« {{translation key='xe.blog.code.previousweek'/}}&gt;&gt;$doc.name||queryString="year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear"]]**(%%)
     #sep()
     $weekDate.addWeeks(2)## 2 because we already subtracted 1 above
-    (% class="nextPage" %)**[[{{translation key='xe.blog.code.nextweek'/}} &#187;&gt;&gt;$doc.name||queryString="year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear"]]**(%%)
+    (% class="nextPage" %)**[[{{translation key='xe.blog.code.nextweek'/}} »&gt;&gt;$doc.name||queryString="year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear"]]**(%%)
     )))
   #elseif($displayType == 'monthly')
     (% class="pagingLinks" %)(((
     #getRequestedMonth($monthDate)
     $monthDate.addMonths(-1)##
-    (% class="prevPage" %)**[[&#171; {{translation key='xe.blog.code.previousmonth'/}}&gt;&gt;$doc.name||queryString="year=$monthDate.year&amp;month=$monthDate.monthOfYear"]]**(%%)
+    (% class="prevPage" %)**[[« {{translation key='xe.blog.code.previousmonth'/}}&gt;&gt;$doc.name||queryString="year=$monthDate.year&amp;month=$monthDate.monthOfYear"]]**(%%)
     #sep()
     $monthDate.addMonths(2)## 2 because we already subtracted 1 above
-    (% class="nextPage" %)**[[{{translation key='xe.blog.code.nextmonth'/}} &#187;&gt;&gt;$doc.name||queryString="year=$monthDate.year&amp;month=$monthDate.monthOfYear"]]**(%%)
+    (% class="nextPage" %)**[[{{translation key='xe.blog.code.nextmonth'/}} »&gt;&gt;$doc.name||queryString="year=$monthDate.year&amp;month=$monthDate.monthOfYear"]]**(%%)
     )))
   #elseif($displayType == 'all')
   #else
@@ -775,7 +774,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       (% class="pagingLinks" %)(((
       #if ($currentPageNumber &lt; $totalPages)
         #set($currentPageNumber = $currentPageNumber + 1)
-        (% class="prevPage" %)**[[&#171; {{translation key='xe.blog.code.olderposts'/}}&gt;&gt;$doc.name||queryString="page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString"]]**(%%)
+        (% class="prevPage" %)**[[« {{translation key='xe.blog.code.olderposts'/}}&gt;&gt;$doc.name||queryString="page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString"]]**(%%)
         #set($currentPageNumber = $currentPageNumber - 1)
       #end
       #if ($currentPageNumber &gt; 1)
@@ -783,7 +782,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
           #sep()
         #end
         #set($currentPageNumber = $currentPageNumber - 1)
-        (% class="nextPage" %)**[[{{translation key='xe.blog.code.newerposts'/}} &#187;&gt;&gt;$doc.name||queryString="page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString"]]**(%%)
+        (% class="nextPage" %)**[[{{translation key='xe.blog.code.newerposts'/}} »&gt;&gt;$doc.name||queryString="page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString"]]**(%%)
         #set($currentPageNumber = $currentPageNumber + 1)
       #end
       (% class="clear" %)(%%)

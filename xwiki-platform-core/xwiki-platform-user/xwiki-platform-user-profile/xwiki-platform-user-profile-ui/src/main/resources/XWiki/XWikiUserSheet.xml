@@ -210,10 +210,11 @@ Object.extend(XWiki, {
     },
 
     switchTab : function(tab) {
+      var tabName = tab.substring(14); // 14 = len('vertical-menu-')
       $("user-page-content").select("div.user-page-pane").each(function(pane){
         pane.addClassName('hidden');
       });
-      $(tab + 'Pane').removeClassName('hidden');
+      $(tabName + 'Pane').removeClassName('hidden');
       $("user-vertical-menu").select("span.category-tab").each(function(tab){
         tab.removeClassName('current');
       });
@@ -223,6 +224,7 @@ Object.extend(XWiki, {
     },
 
     updateCategoryFields : function (category) {
+      category = category.substring(14); // 14 = len('vertical-menu-')
       this.crtCategory = category;
       this.updateField('xredirect', XWiki.currentDocument.getURL('view', 'category=' + category));
       this.updateField('xcontinue', XWiki.currentDocument.getURL('edit', 'editor=inline&amp;category=' + category));
@@ -355,11 +357,19 @@ return XWiki;
 /* ----- User menu ----- */
 #user-menu-col{
   float: left;
-  width: 15em;
+  width: 140px;
+}
+
+.vertical-menu{
+  width: 140px;
 }
 
 #avatar{
-  margin: 0 2em 0 0;  
+    
+}
+
+#avatar img{
+  width: 135px;  
 }
 
 .profile-menu .category-tab:before{
@@ -384,6 +394,10 @@ return XWiki;
 }
 
 .profile-menu .user-menu-dashboard:before{
+  content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+}
+
+.profile-menu .user-menu-workspaces:before{
   content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
 }
 
@@ -406,8 +420,13 @@ return XWiki;
 
 /* ----- Page content ---- */
 #user-page-content{
-  margin-left: 16em;
+  margin-left: 170px;
 }
+
+#user-page-content h1{
+  margin: 0 0 20px 0;
+}
+
 
 .column h1 {
   font-weight:bold;
@@ -542,7 +561,7 @@ span#avatarUpload {
 .attachment-picker {
   position: relative;
   margin: auto;
-  width: 120px;
+  width: 100%;
 }
 .attachment-picker p {
   padding: 0;
@@ -572,6 +591,15 @@ span#avatarUpload {
   z-index: 1;
 }
 
+.attachment-picker img {
+  border: 1px solid #DDDDDD;
+  border-radius: 5px 5px 5px 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
+  padding: 0.3em;
+  width: 95%;
+}
+
 ## --------------------------------------
 ## Dashboard
 /* prevent the clearfloats between buttons &amp; dashboard gadgets from clearing the tabs as well, only the buttons float */
@@ -599,24 +627,24 @@ span#avatarUpload {
 ## Setting categories
 #########################
 #set($categories = [])
-#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet', 'icon': 'icons/silk/vcard.png'}))
+#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet'}))
 #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
 #if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet', 'icon': 'icons/silk/wrench.png'}))
+  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet'}))
 #end
 ## TODO: add APIs to be able to display users watchlists to admins
 #if($isMyProfile &amp;&amp; $hasWatch)  
-  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet', 'icon': 'icons/silk/star.png'}))
+  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet'}))
 #end
 #if($isMyProfile)
-  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet', 'icon': 'icons/silk/group.png'}))
+  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet'}))
 #end
 #set($userWorkspaceSheet = 'WorkspaceManager.UserWorkspaceSheet')
 #if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWorkspaceSheet))  
-  #set($discard = $categories.add({'id':'workspaces', 'sheet':$userWorkspaceSheet, 'icon': 'icons/silk/chart_organisation.png'}))
+  #set($discard = $categories.add({'id':'workspaces', 'sheet':$userWorkspaceSheet}))
 #end
 #if($isMyProfile &amp;&amp; $hasDashboard)
-  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet', 'icon': 'icons/silk/application_view_tile.png'}))  
+  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet'}))  
 #end
 #########################
 ## Current category
@@ -629,8 +657,7 @@ span#avatarUpload {
 ## Creating vertical menu
 #########################
 #set($userMenu = [{
-  'id'       : 'menu',
-  'name'     : $services.localization.render("platform.core.profile.category.preferences"),
+  'id'       : 'settings',
   'cssClass' : 'user-menu-title',
   'children' : $categories
   }

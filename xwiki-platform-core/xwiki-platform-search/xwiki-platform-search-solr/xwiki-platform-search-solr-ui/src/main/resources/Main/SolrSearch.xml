@@ -274,23 +274,21 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     initialize: function(container) {
       this.container = container;
       var highlights = container.down('.search-result-highlights');
-      if (highlights) {
+      if (highlights &amp;&amp; highlights.select('.search-result-highlight').size() &gt; 1) {
         highlights.addClassName('preview');
-        if (highlights.select('.search-result-highlight').size()) {
-          // Workaround for IE8 which doesn't support :first-of-type CSS selector.
-          highlights.down('.search-result-highlight').addClassName('first').up('dd')
-            .addClassName('first').previous('dt').addClassName('first');
-          var highlightAllLink = new Element('a', {
-            'href': '#',
-            'class': 'search-result-highlightAll'
-          }).update("$escapetool.javascript($services.localization.render('solr.result.highlightAll'))".escapeHTML());
-          highlights.insert({after: highlightAllLink});
-          highlightAllLink.observe('click', function(event) {
-            event.stop();
-            highlightAllLink.remove();
-            highlights.removeClassName('preview');
-          });
-        }
+        // Workaround for IE8 which doesn't support :first-of-type CSS selector.
+        highlights.down('.search-result-highlight').addClassName('first').up('dd')
+          .addClassName('first').previous('dt').addClassName('first');
+        var highlightAllLink = new Element('a', {
+          'href': '#',
+          'class': 'search-result-highlightAll'
+        }).update("$escapetool.javascript($services.localization.render('solr.result.highlightAll'))".escapeHTML());
+        highlights.insert({after: highlightAllLink});
+        highlightAllLink.observe('click', function(event) {
+          event.stop();
+          highlightAllLink.remove();
+          highlights.removeClassName('preview');
+        });
       }
     }
   });

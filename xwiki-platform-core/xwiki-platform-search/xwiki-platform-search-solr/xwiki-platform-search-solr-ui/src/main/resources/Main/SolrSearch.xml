@@ -273,17 +273,25 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
   var SearchResultBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
-      var allMatchesLink = container.down('.search-result-highlightAll');
-      allMatchesLink &amp;&amp; allMatchesLink.observe('click', this._onShowAllMatches.bindAsEventListener(this));
-    },
-
-    _onShowAllMatches: function(event) {
-      event.stop();
-      var toggle = event.element();
-      // Hide the toggle and the first match.
-      toggle.hide().previous().hide();
-      // Show all matches.
-      toggle.next().removeClassName('hidden');
+      var highlights = container.down('.search-result-highlights');
+      if (highlights) {
+        highlights.addClassName('preview');
+        if (highlights.select('.search-result-highlight').size()) {
+          // Workaround for IE8 which doesn't support :first-of-type CSS selector.
+          highlights.down('.search-result-highlight').addClassName('first').up('dd')
+            .addClassName('first').previous('dt').addClassName('first');
+          var highlightAllLink = new Element('a', {
+            'href': '#',
+            'class': 'search-result-highlightAll'
+          }).update("$escapetool.javascript($services.localization.render('solr.result.highlightAll'))".escapeHTML());
+          highlights.insert({after: highlightAllLink});
+          highlightAllLink.observe('click', function(event) {
+            event.stop();
+            highlightAllLink.remove();
+            highlights.removeClassName('preview');
+          });
+        }
+      }
     }
   });
 
@@ -613,6 +621,19 @@ blockquote.search-result-highlight {
 dl.search-result-highlights &gt; dt {
   color: $theme.textSecondaryColor;
   font-weight: normal;
+}
+
+dl.search-result-highlights.preview dt,
+dl.search-result-highlights.preview dd &gt; * {
+  display: none;
+}
+
+dl.search-result-highlights.preview dt:first-of-type,
+dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type,
+/* Workaround for IE8 which doesn't support :first-of-type CSS selector. */
+dl.search-result-highlights.preview dt.first,
+dl.search-result-highlights.preview dd.first blockquote.first {
+  display: block;
 }
 
 a.search-result-highlightAll:after {
@@ -1005,7 +1026,7 @@ a.search-result-highlightAll:after {
   #if ($facetRequestValues || $facetValues.size() &gt; 1)
     (% class="search-facet expanded" %)(((
       {{html}}
-      #set ($facetPrettyNameKey = "solr.facet.field.$facetField.name")
+      #set ($facetPrettyNameKey = "solr.field.$facetField.name")
       #if ($services.localization.get($facetPrettyNameKey))
         #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
       #else
@@ -1037,7 +1058,7 @@ a.search-result-highlightAll:after {
   #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
   &lt;a href="$url"#if ($selected) class="selected"#end&gt;
     #if ($facetValue.name == '')
-      #set ($facetPrettyValueKey = "solr.facet.field.${facetField.name}.emptyValue")
+      #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
       #if (!$services.localization.get($facetPrettyValueKey))
         #set ($facetPrettyValueKey = "solr.facets.emptyValue")
       #end
@@ -1191,32 +1212,18 @@ a.search-result-highlightAll:after {
 #macro (displaySearchResultHighlighting $searchResult)
   #getSearchResultHighlighting($searchResult $highlighting)
   #if ($highlighting.size() &gt; 0)
-    #set ($showOnlyFirstMatch = $request.allMatches != 'true')
-    #set ($firstMatches = $highlighting.entrySet().iterator().next().value)
-    #set ($hasMoreMatches = $highlighting.size() &gt; 1 || $firstMatches.size() &gt; 1)
-    #if ($showOnlyFirstMatch || !$hasMoreMatches)
-      &lt;blockquote class="search-result-highlight"&gt;$firstMatches.get(0)&lt;/blockquote&gt;
-    #end
-    #if ($hasMoreMatches)
-      #if ($showOnlyFirstMatch)
-        #extendQueryString($url {'allMatches': [true]})
-        &lt;a href="$url" class="search-result-highlightAll"&gt;
-          $services.localization.render('solr.result.highlightAll')
-        &lt;/a&gt;
-      #end
-      #if ($highlighting.size() == 1)
-        &lt;div#if ($showOnlyFirstMatch) class="hidden"#end&gt;
-          #displaySearchResultMatches($firstMatches)
-        &lt;/div&gt;
-      #else
-        &lt;dl class="search-result-highlights#if ($showOnlyFirstMatch) hidden#end"&gt;
-          #foreach ($entry in $highlighting.entrySet())
-            &lt;dt&gt;$services.localization.render("solr.result.highlight.$entry.key")&lt;/dt&gt;
-            &lt;dd&gt;#displaySearchResultMatches($entry.value)&lt;/dd&gt;
+    &lt;dl class="search-result-highlights"&gt;
+      #foreach ($entry in $highlighting)
+        &lt;dt&gt;
+          #if ($services.localization.get("solr.field.$entry.field"))
+            $services.localization.render("solr.field.$entry.field")
+          #else
+            $entry.field
           #end
-        &lt;/dl&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;#displaySearchResultMatches($entry.matches)&lt;/dd&gt;
       #end
-    #end
+    &lt;/dl&gt;
   #end
 #end
 
@@ -1248,41 +1255,39 @@ a.search-result-highlightAll:after {
     #end
     #set ($discard = $matchesByLanguage.put($lang, $entry.value))
   #end
-  #set ($fieldsByType = {
-    'DOCUMENT': ['doccontent', 'doccontentraw', 'comment', 'objcontent', 'attcontent'],
-    'OBJECT': ['objcontent'],
-    'OBJECT_PROPERTY': ['propertyvalue'],
-    'ATTACHMENT': ['attcontent']
-  })
-  ## Keep only the matches correspoding to the search result type and locale.
-  #set ($filteredHighlighting = $collectionstool.orderedMap)
-  #foreach ($field in $fieldsByType.get($searchResult.type))
-    #set ($matchesByLanguage = $highlightingByLanguage.get($field))
-    #if ($matchesByLanguage)
-      #if ($searchResult.locale != '')
-        #set ($matches = $matchesByLanguage.get($searchResult.locale))
-      #else
-        ## No language.
-        #set ($matches = $matchesByLanguage.get('_'))
-      #end
-      #if (!$matches)
-        ## This should not happen but let's play safe.
-        #set ($matches = $matchesByLanguage.entrySet().iterator().next().value)
-      #end
-      ## Sanitize the matches.
-      #foreach ($match in $matches)
-        #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
-        #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
-        #set ($match = $escapetool.xml($match))
-        #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
-        #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
-        #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
-      #end
-      #set ($discard = $filteredHighlighting.put($field, $matches))
+  ## Keep only the matches correspoding to the search result locale.
+  #set ($highlighting = [])
+  ## Fields with a higher index will be displayed first. Fields that are not included will be displayed at the end.
+  #set ($fieldPriority = ['filename', 'attcontent', 'objcontent', 'comment', 'propertyname', 'propertyvalue', 'title', 'doccontent'])
+  #foreach ($entry in $highlightingByLanguage.entrySet())
+    #if ($searchResult.locale != '')
+      #set ($matches = $entry.value.get($searchResult.locale))
+    #else
+      ## No language.
+      #set ($matches = $entry.value.get('_'))
     #end
+    #if (!$matches)
+      ## This should not happen but let's play safe.
+      #set ($matches = $entry.value.entrySet().iterator().next().value)
+    #end
+    ## Sanitize the matches.
+    #foreach ($match in $matches)
+      #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
+      #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
+      #set ($match = $escapetool.xml($match))
+      #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
+      #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
+      #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
+    #end
+    #set ($discard = $highlighting.add({
+      'field': $entry.key,
+      'priority': $fieldPriority.indexOf($entry.key),
+      'matches': $matches
+    }))
   #end
+  #set ($highlighting = $sorttool.sort($highlighting, 'priority:desc'))
   #set ($return = $NULL)
-  #setVariable("$return" $filteredHighlighting)
+  #setVariable("$return" $highlighting)
 #end
 
 #macro (getSearchResults)

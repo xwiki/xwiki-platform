@@ -71,6 +71,13 @@ solr.result.author=Modified by {0} on {1}
 solr.result.mediaType=File of type {0}
 solr.result.object=Object of type {0}
 solr.result.property=Property {0}#{1}
+solr.result.highlight.doccontent=Rendered Document Content
+solr.result.highlight.doccontentraw=Raw Document Content
+solr.result.highlight.comment=Comments
+solr.result.highlight.objcontent=Object
+solr.result.highlight.propertyvalue=Object Property
+solr.result.highlight.attcontent=Attachment Content
+solr.result.highlightAll=Highlight all matches
 
 solr.filter.title=Advanced Options
 solr.filter.hint=Select predefined filters that will be applied on your query.

@@ -270,12 +270,33 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     }
   });
 
+  var SearchResultBehavior = Class.create({
+    initialize: function(container) {
+      this.container = container;
+      var allMatchesLink = container.down('.search-result-highlightAll');
+      allMatchesLink &amp;&amp; allMatchesLink.observe('click', this._onShowAllMatches.bindAsEventListener(this));
+    },
+
+    _onShowAllMatches: function(event) {
+      event.stop();
+      var toggle = event.element();
+      // Hide the toggle and the first match.
+      toggle.hide().previous().hide();
+      // Show all matches.
+      toggle.next().removeClassName('hidden');
+    }
+  });
+
   var init = function() {
     var searchFilter = $('body').down('.search-filter');
     searchFilter &amp;&amp; new SearchFilterBehavior(searchFilter);
 
     var searchFacets = $('body').down('.search-facets');
     searchFacets &amp;&amp; new SearchFacetsBehavior(searchFacets);
+
+    $('body').select('.search-result').each(function(searchResult) {
+      new SearchResultBehavior(searchResult);
+    });
 
     return true;
   };
@@ -587,6 +608,15 @@ blockquote.search-result-highlight {
 .search-text-highlight {
   background-color: $theme.highlightColor;
   font-weight: bold;
+}
+
+dl.search-result-highlights &gt; dt {
+  color: $theme.textSecondaryColor;
+  font-weight: normal;
+}
+
+a.search-result-highlightAll:after {
+  content: ' \bb';
 }
 
 /**
@@ -1111,16 +1141,7 @@ blockquote.search-result-highlight {
           [$classLink, $escapetool.xml($propertyName)])&lt;/div&gt;
       #end
     #end
-    #getMatches($searchResult $highlightTexts)
-    #if ($highlightTexts &amp;&amp; $highlightTexts.size() &gt; 0)
-      #set ($highlightUpperIndex = $mathtool.min(2, $mathtool.sub($highlightTexts.size(), 1)))
-      #foreach ($highlighIndex in [0..$highlightUpperIndex])
-        #if ($highlighIndex != 0)
-          &lt;span class="separator"&gt;&amp;hellip;&lt;/span&gt;
-        #end
-        &lt;blockquote class="search-result-highlight"&gt;$highlightTexts[$highlighIndex]&lt;/blockquote&gt;
-      #end
-    #end
+    #displaySearchResultHighlighting($searchResult)
     ## Scoring debug data.
     &lt;div id="debug_$searchResult.id" class="hidden"&gt;
       $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
@@ -1167,53 +1188,101 @@ blockquote.search-result-highlight {
     [$wikiLink, $spaceLink, $documentLink])&lt;/div&gt;
 #end
 
-#macro (getMatches $searchResult $return)
-  #set ($resultHighlightingMap = $searchResponse.highlighting.get($searchResult.id))
-  ##
-  ## (1) Filter the result highlighting map to have simple field names (without the language suffix).
-  ##
-  #set ($filteredResultHighlightingMap = {})
-  #foreach ($highlighting in $resultHighlightingMap.entrySet())
-    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
-    #set ($highlightedField = $stringtool.substringBefore($highlighting.key, '_'))
-    #set ($highlightedValues = $highlighting.value)
-    ## Prefer the field variant that has the most matches.
-    #if (!$filteredResultHighlightingMap.containsKey($highlightedField)
-      || $filteredResultHighlightingMap.get($highlightedField).size() &lt; $highlightedValues.size())
-      #set ($discard = $filteredResultHighlightingMap.put($highlightedField, $highlightedValues))
+#macro (displaySearchResultHighlighting $searchResult)
+  #getSearchResultHighlighting($searchResult $highlighting)
+  #if ($highlighting.size() &gt; 0)
+    #set ($showOnlyFirstMatch = $request.allMatches != 'true')
+    #set ($firstMatches = $highlighting.entrySet().iterator().next().value)
+    #set ($hasMoreMatches = $highlighting.size() &gt; 1 || $firstMatches.size() &gt; 1)
+    #if ($showOnlyFirstMatch || !$hasMoreMatches)
+      &lt;blockquote class="search-result-highlight"&gt;$firstMatches.get(0)&lt;/blockquote&gt;
+    #end
+    #if ($hasMoreMatches)
+      #if ($showOnlyFirstMatch)
+        #extendQueryString($url {'allMatches': [true]})
+        &lt;a href="$url" class="search-result-highlightAll"&gt;
+          $services.localization.render('solr.result.highlightAll')
+        &lt;/a&gt;
+      #end
+      #if ($highlighting.size() == 1)
+        &lt;div#if ($showOnlyFirstMatch) class="hidden"#end&gt;
+          #displaySearchResultMatches($firstMatches)
+        &lt;/div&gt;
+      #else
+        &lt;dl class="search-result-highlights#if ($showOnlyFirstMatch) hidden#end"&gt;
+          #foreach ($entry in $highlighting.entrySet())
+            &lt;dt&gt;$services.localization.render("solr.result.highlight.$entry.key")&lt;/dt&gt;
+            &lt;dd&gt;#displaySearchResultMatches($entry.value)&lt;/dd&gt;
+          #end
+        &lt;/dl&gt;
+      #end
     #end
   #end
-  #set ($resultHighlightingMap = $filteredResultHighlightingMap)
-  ##
-  ## (2) Keep only the matches corresponding to the search result type.
-  ##
-  #set ($indexedFields = {
+#end
+
+#macro (displaySearchResultMatches $matches)
+  #foreach ($match in $matches)
+    #if ($foreach.count &gt; 1)
+      &lt;span class="separator"&gt;&amp;hellip;&lt;/span&gt;
+    #end
+    &lt;blockquote class="search-result-highlight"&gt;$match&lt;/blockquote&gt;
+  #end
+#end
+
+#macro (getSearchResultHighlighting $searchResult $return)
+  #set ($highlighting = $searchResponse.highlighting.get($searchResult.id))
+  #set ($highlightingByLanguage = {})
+  #foreach ($entry in $highlighting.entrySet())
+    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
+    #set ($field = $stringtool.substringBefore($entry.key, '_'))
+    ## Extract the language.
+    #set ($lang = $stringtool.substringAfter($entry.key, '_'))
+    #if ($lang == $field)
+      ## No language.
+      #set ($lang = '_')
+    #end
+    #set ($matchesByLanguage = $highlightingByLanguage.get($field))
+    #if (!$matchesByLanguage)
+      #set ($matchesByLanguage = {})
+      #set ($discard = $highlightingByLanguage.put($field, $matchesByLanguage))
+    #end
+    #set ($discard = $matchesByLanguage.put($lang, $entry.value))
+  #end
+  #set ($fieldsByType = {
     'DOCUMENT': ['doccontent', 'doccontentraw', 'comment', 'objcontent', 'attcontent'],
     'OBJECT': ['objcontent'],
     'OBJECT_PROPERTY': ['propertyvalue'],
     'ATTACHMENT': ['attcontent']
   })
-  #set ($matches = [])
-  #foreach ($field in $indexedFields.get($searchResult.type))
-    #set ($matches = $resultHighlightingMap.get($field))
-    ## Consider only the first field that has matches.
-    #if ($matches &amp;&amp; $matches.size() &gt; 0)
-      #break
+  ## Keep only the matches correspoding to the search result type and locale.
+  #set ($filteredHighlighting = $collectionstool.orderedMap)
+  #foreach ($field in $fieldsByType.get($searchResult.type))
+    #set ($matchesByLanguage = $highlightingByLanguage.get($field))
+    #if ($matchesByLanguage)
+      #if ($searchResult.locale != '')
+        #set ($matches = $matchesByLanguage.get($searchResult.locale))
+      #else
+        ## No language.
+        #set ($matches = $matchesByLanguage.get('_'))
+      #end
+      #if (!$matches)
+        ## This should not happen but let's play safe.
+        #set ($matches = $matchesByLanguage.entrySet().iterator().next().value)
+      #end
+      ## Sanitize the matches.
+      #foreach ($match in $matches)
+        #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
+        #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
+        #set ($match = $escapetool.xml($match))
+        #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
+        #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
+        #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
+      #end
+      #set ($discard = $filteredHighlighting.put($field, $matches))
     #end
   #end
-  ##
-  ## (3) Sanitize the matches.
-  ##
-  #foreach ($match in $matches)
-    #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
-    #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
-    #set ($match = $escapetool.xml($match))
-    #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
-    #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
-    #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
-  #end
   #set ($return = $NULL)
-  #setVariable("$return" $matches)
+  #setVariable("$return" $filteredHighlighting)
 #end
 
 #macro (getSearchResults)

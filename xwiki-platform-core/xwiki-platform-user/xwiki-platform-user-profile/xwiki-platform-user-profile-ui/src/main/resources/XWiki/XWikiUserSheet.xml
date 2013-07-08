@@ -357,19 +357,15 @@ return XWiki;
 /* ----- User menu ----- */
 #user-menu-col{
   float: left;
-  width: 140px;
+  width: 10em;
 }
 
 .vertical-menu{
-  width: 140px;
-}
-
-#avatar{
-    
+  width: 100%;
 }
 
 #avatar img{
-  width: 135px;  
+  width: 100%;  
 }
 
 .profile-menu .category-tab:before{
@@ -420,7 +416,7 @@ return XWiki;
 
 /* ----- Page content ---- */
 #user-page-content{
-  margin-left: 170px;
+  margin-left: 12em;
 }
 
 #user-page-content h1{
@@ -592,7 +588,7 @@ span#avatarUpload {
 }
 
 .attachment-picker img {
-  border: 1px solid #DDDDDD;
+  border: 1px solid $theme.borderColor;
   border-radius: 5px 5px 5px 5px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   margin: 0 auto;
@@ -728,3 +724,4 @@ span#avatarUpload {
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>
+

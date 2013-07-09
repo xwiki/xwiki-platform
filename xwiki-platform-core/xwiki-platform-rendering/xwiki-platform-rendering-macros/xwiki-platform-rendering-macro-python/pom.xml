@@ -33,7 +33,7 @@
   <name>XWiki Platform - Rendering - Macro - Python</name>
   <description>Adds ability to write scripts in Python in wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Python Macro</xwiki.extension.name>
   </properties>

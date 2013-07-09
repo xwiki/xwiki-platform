@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>Script Service for the Component modules</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

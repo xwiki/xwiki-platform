@@ -33,7 +33,7 @@
   <name>XWiki Platform - Rendering - Macro - Ruby</name>
   <description>Adds ability to write scripts in Ruby in wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-core-rendering-macro-ruby</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->

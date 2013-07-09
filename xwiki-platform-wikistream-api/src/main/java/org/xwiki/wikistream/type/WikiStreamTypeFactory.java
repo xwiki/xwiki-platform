@@ -28,7 +28,6 @@ import java.util.List;
  */
 public interface WikiStreamTypeFactory
 {
-
     /**
      * Create a specific WikiStream type with given Id as String. (eg : "mediawiki/xml", "xwiki/xar", "wordpress/xmlrpc"
      * .. )
@@ -42,5 +41,4 @@ public interface WikiStreamTypeFactory
      * @return list of available/supported wiki stream types and dataformats
      */
     List<WikiStreamType> getAvailableTypes() throws WikiStreamTypeException;
-
 }

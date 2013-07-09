@@ -19,45 +19,25 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
-import java.io.File;
-import java.io.FileInputStream;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLReader;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
-import org.xwiki.wikistream.internal.input.FileInputSource;
-import org.xwiki.wikistream.internal.input.InputSource;
-import org.xwiki.wikistream.internal.input.InputStreamInputSource;
-import org.xwiki.wikistream.internal.input.ReaderInputSource;
+import org.xwiki.wikistream.input.source.InputSource;
+import org.xwiki.wikistream.input.source.InputStreamInputSource;
+import org.xwiki.wikistream.input.source.ReaderInputSource;
+import org.xwiki.wikistream.internal.input.source.DefaultReaderInputSource;
 
-public abstract class AbstractXMLInputWikiStream<P extends XMLInputParameters> implements InputWikiStream
+public abstract class AbstractXMLInputWikiStream<P extends XMLInputProperties> implements InputWikiStream
 {
     protected P parameters;
 
     public AbstractXMLInputWikiStream(P parameters)
     {
         this.parameters = parameters;
-    }
-
-    protected org.xml.sax.InputSource getSAXInputSource() throws WikiStreamException
-    {
-        org.xml.sax.InputSource saxInputSource;
-
-        InputSource source = this.parameters.getSource();
-        if (source instanceof ReaderInputSource) {
-            saxInputSource = new org.xml.sax.InputSource(((ReaderInputSource) source).getReader());
-        } else if (source instanceof InputStreamInputSource) {
-            saxInputSource = new org.xml.sax.InputSource(((InputStreamInputSource) source).getInputStream());
-        } else {
-            throw new WikiStreamException("Unknown source type [" + source.getClass() + "]");
-        }
-
-        return saxInputSource;
     }
 
     @Override
@@ -70,16 +50,15 @@ public abstract class AbstractXMLInputWikiStream<P extends XMLInputParameters> i
 
             xmlReader.setContentHandler(createContentHandler(listener));
 
-            if (this.parameters.getSource() instanceof FileInputSource) {
-                File file = ((FileInputSource) this.parameters.getSource()).getFile();
-                FileInputStream fis = new FileInputStream(file);
-                try {
-                    xmlReader.parse(new org.xml.sax.InputSource(fis));
-                } finally {
-                    IOUtils.closeQuietly(fis);
-                }
+            InputSource source = this.parameters.getSource();
+            if (source instanceof ReaderInputSource) {
+                xmlReader.parse(new org.xml.sax.InputSource(((DefaultReaderInputSource) source).getReader()));
+            } else if (source instanceof InputStreamInputSource) {
+                InputStreamInputSource inputStreamSource = (InputStreamInputSource) source;
+
+                xmlReader.parse(new org.xml.sax.InputSource(inputStreamSource.getInputStream()));
             } else {
-                xmlReader.parse(getSAXInputSource());
+                throw new WikiStreamException("Unknown source type [" + source.getClass() + "]");
             }
         } catch (Exception e) {
             throw new WikiStreamException("Faild to parse XML source", e);

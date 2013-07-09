@@ -17,21 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output;
+package org.xwiki.wikistream.filter;
 
-import java.io.Writer;
+import org.xwiki.rendering.listener.MetaData;
 
-public class WriterOuputTarget implements OuputTarget
+/**
+ * Unknown elements related events.
+ * 
+ * @version $Id$
+ */
+public interface UnknownFilter
 {
-    private final Writer writer;
+    void beginUnknwon(String id, MetaData metadata);
 
-    public WriterOuputTarget(Writer writer)
-    {
-        this.writer = writer;
-    }
+    void endUnknwon(String id, MetaData metadata);
 
-    public Writer getWriter()
-    {
-        return this.writer;
-    }
+    void onUnknwon(String id, MetaData metadata);
 }

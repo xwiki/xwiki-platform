@@ -19,9 +19,9 @@
  */
 package org.xwiki.wikistream.wikixml.internal.input;
 
-import org.xwiki.wikistream.xml.internal.input.XMLInputParameters;
+import org.xwiki.wikistream.xml.internal.input.XMLInputProperties;
 
-public class WikiXMLInputParameters extends XMLInputParameters
+public class WikiXMLInputParameters extends XMLInputProperties
 {
 
 }

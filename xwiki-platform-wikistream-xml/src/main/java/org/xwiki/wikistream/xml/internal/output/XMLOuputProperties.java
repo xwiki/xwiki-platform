@@ -19,16 +19,17 @@
  */
 package org.xwiki.wikistream.xml.internal.output;
 
-import org.xwiki.wikistream.internal.output.OuputTarget;
+import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.wikistream.output.target.OutputTarget;
 import org.xwiki.wikistream.xml.internal.XMLParameters;
 
-public class XMLOuputParameters extends XMLParameters
+public class XMLOuputProperties extends XMLParameters
 {
     private boolean format = true;
 
     private String encoding = "UTF-8";
 
-    private OuputTarget target;
+    private OutputTarget target;
 
     public boolean isFormat()
     {
@@ -50,12 +51,13 @@ public class XMLOuputParameters extends XMLParameters
         this.encoding = encoding;
     }
 
-    public OuputTarget getTarget()
+    @PropertyMandatory
+    public OutputTarget getTarget()
     {
         return this.target;
     }
 
-    public void setTarget(OuputTarget target)
+    public void setTarget(OutputTarget target)
     {
         this.target = target;
     }

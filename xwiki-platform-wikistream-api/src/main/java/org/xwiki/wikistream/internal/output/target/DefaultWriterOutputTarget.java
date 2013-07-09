@@ -17,24 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.input;
+package org.xwiki.wikistream.internal.output.target;
 
-import org.xml.sax.ContentHandler;
+import java.io.IOException;
+import java.io.Writer;
 
-public class DefaultXMLInputWikiStream<P extends XMLInputProperties> extends AbstractXMLInputWikiStream<P>
+import org.xwiki.wikistream.output.target.WriterOutputTarget;
+
+public class DefaultWriterOutputTarget implements WriterOutputTarget
 {
-    private final AbstractXMLBeanInputWikiStreamFactory<P> factory;
+    private final Writer writer;
 
-    public DefaultXMLInputWikiStream(AbstractXMLBeanInputWikiStreamFactory<P> factory, P parameters)
+    public DefaultWriterOutputTarget(Writer writer, boolean closable)
     {
-        super(parameters);
+        this.writer = writer;
+    }
 
-        this.factory = factory;
+    public Writer getWriter()
+    {
+        return this.writer;
     }
 
     @Override
-    protected ContentHandler createContentHandler(Object listener)
+    public void close() throws IOException
     {
-        return this.factory.createContentHandler(listener, this.parameters);
+        this.writer.close();
+    }
+
+    @Override
+    public String toString()
+    {
+        return getWriter().toString();
     }
 }

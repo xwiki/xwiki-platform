@@ -17,37 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.descriptor;
+package org.xwiki.wikistream.utils;
 
-import java.util.Collection;
+import org.xwiki.wikistream.input.source.InputSource;
+import org.xwiki.wikistream.output.target.OutputTarget;
 
-/**
- * Describes a wiki stream.
- * 
- * @version $Id$
- */
-public interface WikiStreamDescriptor
+public interface WikiStreamConstants
 {
-    /**
-     * @return human readable name of wiki stream input source type.
-     */
-    String getName();
+    // Standard properties
 
     /**
-     * @return the description of the wiki stream
+     * The standard name of the input stream property containing the {@link InputSource} to read.
      */
-    String getDescription();
+    String PROPERTY_SOURCE = "source";
 
     /**
-     * Return descriptor for the provided property name. The property name is not case sensitive.
-     * 
-     * @param propertyName the name of the property
-     * @return the descriptor of the property.
+     * The standard name of the output stream property containing the {@link OutputTarget} to write to.
      */
-    <T> WikiStreamPropertyDescriptor<T> getPropertyDescriptor(String propertyName);
+    String PROPERTY_TARGET = "target";
 
     /**
-     * @return the properties of wiki stream.
+     * The standard name of the output stream property containing the encoding to use to convert to/from byte array and
+     * {@link String}.
      */
-    Collection<WikiStreamPropertyDescriptor<?>> getProperties();
+    String PROPERTY_ENCODING = "encoding";
+
+    /**
+     * The standard name of the output stream property indicating if the output should be formatted (for example in a
+     * XML syntax indent and organize elements in a human friendly way).
+     */
+    String PROPERTY_FORMAT = "format";
 }

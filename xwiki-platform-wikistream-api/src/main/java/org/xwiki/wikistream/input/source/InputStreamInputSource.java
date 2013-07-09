@@ -17,24 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.input;
+package org.xwiki.wikistream.input.source;
 
-import org.xml.sax.ContentHandler;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class DefaultXMLInputWikiStream<P extends XMLInputProperties> extends AbstractXMLInputWikiStream<P>
+public interface InputStreamInputSource extends InputSource
 {
-    private final AbstractXMLBeanInputWikiStreamFactory<P> factory;
-
-    public DefaultXMLInputWikiStream(AbstractXMLBeanInputWikiStreamFactory<P> factory, P parameters)
-    {
-        super(parameters);
-
-        this.factory = factory;
-    }
-
-    @Override
-    protected ContentHandler createContentHandler(Object listener)
-    {
-        return this.factory.createContentHandler(listener, this.parameters);
-    }
+    InputStream getInputStream() throws IOException;
 }

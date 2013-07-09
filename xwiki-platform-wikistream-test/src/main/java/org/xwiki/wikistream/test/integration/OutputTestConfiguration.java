@@ -17,25 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal;
+package org.xwiki.wikistream.test.integration;
 
-import java.io.IOException;
+import java.util.HashMap;
 
-import org.xml.sax.ContentHandler;
 import org.xwiki.wikistream.output.target.OutputTarget;
+import org.xwiki.wikistream.utils.WikiStreamConstants;
 
-public class ContentHandlerOuputTarget implements OutputTarget
+public class OutputTestConfiguration extends HashMap<String, Object>
 {
-    private ContentHandler contentHandler;
+    public final String typeId;
 
-    public ContentHandler getContentHandler()
+    public OutputTestConfiguration(String typeId)
     {
-        return this.contentHandler;
+        this.typeId = typeId;
+    }
+    
+    public OutputTestConfiguration(OutputTestConfiguration other)
+    {
+        super(other);
+
+        this.typeId = other.typeId;
     }
 
-    @Override
-    public void close() throws IOException
+    public OutputTarget getTarget()
     {
-        // ContentHandler is not closeable
+        return (OutputTarget) get(WikiStreamConstants.PROPERTY_TARGET);
+    }
+
+    public void setTarget(OutputTarget target)
+    {
+        put(WikiStreamConstants.PROPERTY_TARGET, target);
+    }
+
+    public void setEncoding(String encoding)
+    {
+        put(WikiStreamConstants.PROPERTY_ENCODING, encoding);
+    }
+
+    public void setFormat(boolean format)
+    {
+        put(WikiStreamConstants.PROPERTY_FORMAT, format);
     }
 }

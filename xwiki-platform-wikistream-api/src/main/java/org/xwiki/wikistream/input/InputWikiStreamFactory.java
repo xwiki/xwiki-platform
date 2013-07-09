@@ -28,5 +28,5 @@ import org.xwiki.wikistream.WikiStreamException;
 @Role
 public interface InputWikiStreamFactory extends WikiStream
 {
-    InputWikiStream createInputWikiStream(Map<String, Object> parameters) throws WikiStreamException;
+    InputWikiStream createInputWikiStream(Map<String, Object> properties) throws WikiStreamException;
 }

@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-api</artifactId>
   <name>XWiki WikiStream API</name>

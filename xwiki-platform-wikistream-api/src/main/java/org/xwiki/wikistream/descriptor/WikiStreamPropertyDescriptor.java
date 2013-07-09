@@ -17,9 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output;
+package org.xwiki.wikistream.descriptor;
 
-public interface OuputTarget
+import java.lang.reflect.Type;
+
+/**
+ * Defines a wiki stream property.
+ * 
+ * @version $Id$
+ */
+public interface WikiStreamPropertyDescriptor<T>
 {
+    /**
+     * @return the identifier of the property.
+     */
+    String getId();
 
+    /**
+     * @return the display name of the property.
+     */
+    String getName();
+
+    /**
+     * @return the description of the property.
+     */
+    String getDescription();
+
+    /**
+     * @return the type of the property.
+     */
+    Type getPropertyType();
+
+    /**
+     * @return the default value of the property.
+     */
+    T getDefaultValue();
+
+    /**
+     * @return indicate if the property is mandatory.
+     */
+    boolean isMandatory();
 }

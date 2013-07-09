@@ -17,9 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input;
+package org.xwiki.wikistream.internal.input.source;
 
-public interface InputSource
+import java.io.IOException;
+import java.io.Reader;
+
+import org.xwiki.wikistream.input.source.ReaderInputSource;
+
+public class DefaultReaderInputSource implements ReaderInputSource
 {
+    private final Reader reader;
 
+    public DefaultReaderInputSource(Reader reader)
+    {
+        this.reader = reader;
+    }
+
+    public Reader getReader()
+    {
+        return this.reader;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        this.reader.close();
+    }
+
+    @Override
+    public String toString()
+    {
+        return getReader().toString();
+    }
 }

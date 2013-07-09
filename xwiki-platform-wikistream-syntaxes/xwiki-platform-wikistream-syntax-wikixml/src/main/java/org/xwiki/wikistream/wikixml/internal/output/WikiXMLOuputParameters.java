@@ -19,9 +19,9 @@
  */
 package org.xwiki.wikistream.wikixml.internal.output;
 
-import org.xwiki.wikistream.xml.internal.output.XMLOuputParameters;
+import org.xwiki.wikistream.xml.internal.output.XMLOuputProperties;
 
-public class WikiXMLOuputParameters extends XMLOuputParameters
+public class WikiXMLOuputParameters extends XMLOuputProperties
 {
 
 }

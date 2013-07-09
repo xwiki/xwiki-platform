@@ -17,21 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input;
+package org.xwiki.wikistream.internal.output.target;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
-public class FileInputSource implements InputSource
+import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
+
+public class DefaultOutputStreamOutputTarget implements OutputStreamOutputTarget
 {
-    private final File file;
+    private final OutputStream outputStream;
 
-    public FileInputSource(File file)
+    public DefaultOutputStreamOutputTarget(OutputStream outputStream)
     {
-        this.file = file;
+        this.outputStream = outputStream;
     }
 
-    public File getFile()
+    public OutputStream getOutputStream()
     {
-        return this.file;
+        return outputStream;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        this.outputStream.close();
     }
 }

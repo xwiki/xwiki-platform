@@ -20,19 +20,18 @@
 package org.xwiki.wikistream.xml.internal.output;
 
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 import org.xml.sax.ContentHandler;
 import org.xwiki.rendering.internal.renderer.xml.SAXSerializer;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.internal.output.OuputTarget;
-import org.xwiki.wikistream.internal.output.OutputStreamOuputTarget;
-import org.xwiki.wikistream.internal.output.WriterOuputTarget;
 import org.xwiki.wikistream.output.OutputWikiStream;
+import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
+import org.xwiki.wikistream.output.target.OutputTarget;
+import org.xwiki.wikistream.output.target.WriterOutputTarget;
 import org.xwiki.wikistream.xml.internal.ContentHandlerOuputTarget;
 
-public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputParameters> implements OutputWikiStream
+public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputProperties> implements OutputWikiStream
 {
     protected final P parameters;
 
@@ -48,21 +47,21 @@ public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputParameters> 
 
     protected ContentHandler createContentHandler(P parameters) throws WikiStreamException
     {
-        OuputTarget target = parameters.getTarget();
+        OutputTarget target = parameters.getTarget();
 
         ContentHandler contentHandler;
 
         if (target instanceof ContentHandlerOuputTarget) {
             contentHandler = ((ContentHandlerOuputTarget) target).getContentHandler();
-        } else if (target instanceof WriterOuputTarget) {
-            contentHandler = new SAXSerializer(((WriterOuputTarget) target).getWriter());
-        } else if (target instanceof OutputStreamOuputTarget) {
+        } else if (target instanceof WriterOutputTarget) {
+            contentHandler = new SAXSerializer(((WriterOutputTarget) target).getWriter());
+        } else if (target instanceof OutputStreamOutputTarget) {
             Writer writer;
             try {
                 writer =
-                    new OutputStreamWriter(((OutputStreamOuputTarget) target).getOutputStream(),
+                    new OutputStreamWriter(((OutputStreamOutputTarget) target).getOutputStream(),
                         parameters.getEncoding());
-            } catch (UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 throw new WikiStreamException("Failed to create a XML serailizer", e);
             }
             contentHandler = new SAXSerializer(writer);

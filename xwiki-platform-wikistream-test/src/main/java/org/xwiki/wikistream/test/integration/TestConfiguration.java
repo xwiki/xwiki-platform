@@ -17,21 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output;
+package org.xwiki.wikistream.test.integration;
 
-import java.io.File;
+import java.util.Map;
 
-public class FileOuputTarget implements OuputTarget
+public class TestConfiguration
 {
-    private final File file;
+    public String name;
+    
+    public Map<String, String> configuration;
 
-    public FileOuputTarget(File file)
-    {
-        this.file = file;
-    }
+    public InputTestConfiguration inputConfiguration;
 
-    public File getFile()
-    {
-        return file;
-    }
+    public ExpectTestConfiguration expectConfiguration;
 }

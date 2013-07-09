@@ -31,7 +31,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * 
  * @version $Id$
  */
-public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputParameters> extends
+public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputProperties> extends
     AbstractBeanOutputWikiStreamFactory<P>
 {
     public AbstractXMLBeanOutputWikiStreamFactory(WikiStreamType type)
@@ -40,9 +40,9 @@ public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputP
     }
 
     @Override
-    public OutputWikiStream creaOutputWikiStream(P parameters) throws WikiStreamException
+    public OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
     {
-        return new DefaultXMLOutputWikiStream<P>(this, parameters);
+        return new DefaultXMLOutputWikiStream<P>(this, properties);
     }
 
     protected abstract Object createListener(ContentHandler contentHandler);

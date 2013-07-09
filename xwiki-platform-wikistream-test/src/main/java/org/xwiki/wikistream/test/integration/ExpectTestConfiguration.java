@@ -17,44 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.descriptor;
+package org.xwiki.wikistream.test.integration;
 
-import java.lang.reflect.Type;
+import org.xwiki.wikistream.input.source.InputSource;
 
-/**
- * Defines a wiki stream parameter
- * 
- * @version $Id$
- */
-public interface WikiStreamParameterDescriptor
+public class ExpectTestConfiguration
 {
-    /**
-     * @return the identifier of the parameter.
-     */
-    String getId();
+    public InputSource expect;
 
-    /**
-     * @return the display name of the parameter.
-     */
-    String getName();
+    public OutputTestConfiguration output;
 
-    /**
-     * @return the description of the parameter.
-     */
-    String getDescription();
+    public ExpectTestConfiguration()
+    {
 
-    /**
-     * @return the type of the parameter.
-     */
-    Type getParameterType();
+    }
 
-    /**
-     * @return the default value of the parameter.
-     */
-    Object getDefaultValue();
-
-    /**
-     * @return indicate if the parameter is mandatory.
-     */
-    boolean isMandatory();
+    public ExpectTestConfiguration(ExpectTestConfiguration other)
+    {
+        this.expect = other.expect;
+        this.output = new OutputTestConfiguration(this.output);
+    }
 }

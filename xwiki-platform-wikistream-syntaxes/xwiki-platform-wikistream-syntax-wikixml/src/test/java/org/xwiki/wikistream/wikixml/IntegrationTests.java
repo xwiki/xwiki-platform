@@ -17,24 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.input;
+package org.xwiki.wikistream.wikixml;
 
-import org.xml.sax.ContentHandler;
+import org.junit.runner.RunWith;
+import org.xwiki.wikistream.test.integration.WikiStreamTestSuite;
 
-public class DefaultXMLInputWikiStream<P extends XMLInputProperties> extends AbstractXMLInputWikiStream<P>
+/**
+ * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
+ * {@link org.xwiki.wikistream.test.integration.TestDataParser}.
+ * 
+ * @version $Id$
+ */
+@RunWith(WikiStreamTestSuite.class)
+public class IntegrationTests
 {
-    private final AbstractXMLBeanInputWikiStreamFactory<P> factory;
-
-    public DefaultXMLInputWikiStream(AbstractXMLBeanInputWikiStreamFactory<P> factory, P parameters)
-    {
-        super(parameters);
-
-        this.factory = factory;
-    }
-
-    @Override
-    protected ContentHandler createContentHandler(Object listener)
-    {
-        return this.factory.createContentHandler(listener, this.parameters);
-    }
 }

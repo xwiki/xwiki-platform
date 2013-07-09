@@ -28,10 +28,11 @@ import org.xwiki.wikistream.filter.FarmFilter;
 import org.xwiki.wikistream.filter.ObjectFilter;
 import org.xwiki.wikistream.filter.ObjectPropertyFilter;
 import org.xwiki.wikistream.filter.SpaceFilter;
+import org.xwiki.wikistream.filter.UnknownFilter;
 import org.xwiki.wikistream.filter.WikiFilter;
 
 public interface AllFilter extends FarmFilter, WikiFilter, SpaceFilter, DocumentFilter, AttachmentFilter, ClassFilter,
-    ClassPropertyFilter, ObjectFilter, ObjectPropertyFilter, Listener
+    ClassPropertyFilter, ObjectFilter, ObjectPropertyFilter, UnknownFilter, Listener
 {
 
 }

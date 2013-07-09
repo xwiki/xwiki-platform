@@ -17,21 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input;
+package org.xwiki.wikistream.input.source;
 
-import java.io.Reader;
+import java.io.Closeable;
 
-public class ReaderInputSource implements InputSource
+public interface InputSource extends Closeable
 {
-    private final Reader reader;
 
-    public ReaderInputSource(Reader reader)
-    {
-        this.reader = reader;
-    }
-
-    public Reader getReader()
-    {
-        return this.reader;
-    }
 }

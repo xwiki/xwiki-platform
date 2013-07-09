@@ -22,9 +22,9 @@ package org.xwiki.wikistream.xml.internal.input;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.wikistream.internal.input.InputSource;
+import org.xwiki.wikistream.input.source.InputSource;
 
-public class XMLInputParameters
+public class XMLInputProperties
 {
     private InputSource source;
 

@@ -17,21 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output;
+package org.xwiki.wikistream.test.integration;
 
-import java.io.OutputStream;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-public class OutputStreamOuputTarget implements OuputTarget
+/**
+ * @version $Id: 7a2f45080656b544f3977e9d5bf67f1b3ca56ca4 $
+ */
+public class TestResourceData
 {
-    private final OutputStream outputStream;
+    public String resourceName;
 
-    public OutputStreamOuputTarget(OutputStream outputStream)
-    {
-        this.outputStream = outputStream;
-    }
+    public List<InputTestConfiguration> inputs = new LinkedList<InputTestConfiguration>();
 
-    public OutputStream getOutputStream()
-    {
-        return outputStream;
-    }
+    public List<ExpectTestConfiguration> expects = new LinkedList<ExpectTestConfiguration>();
+
+    public Map<String, String> configuration = new LinkedHashMap<String, String>();
 }

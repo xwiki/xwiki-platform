@@ -17,24 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.input;
+package org.xwiki.wikistream.internal.input.source;
 
-import org.xml.sax.ContentHandler;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class DefaultXMLInputWikiStream<P extends XMLInputProperties> extends AbstractXMLInputWikiStream<P>
+import org.xwiki.wikistream.input.source.FileInputSource;
+import org.xwiki.wikistream.input.source.InputStreamInputSource;
+
+public class DefaultFileInputSource implements FileInputSource, InputStreamInputSource
 {
-    private final AbstractXMLBeanInputWikiStreamFactory<P> factory;
+    private final File file;
 
-    public DefaultXMLInputWikiStream(AbstractXMLBeanInputWikiStreamFactory<P> factory, P parameters)
+    private FileInputStream fis;
+
+    public DefaultFileInputSource(File file)
     {
-        super(parameters);
+        this.file = file;
+    }
 
-        this.factory = factory;
+    public File getFile()
+    {
+        return this.file;
     }
 
     @Override
-    protected ContentHandler createContentHandler(Object listener)
+    public InputStream getInputStream() throws IOException
     {
-        return this.factory.createContentHandler(listener, this.parameters);
+        if (this.fis == null) {
+            this.fis = new FileInputStream(this.file);
+        }
+
+        return this.fis;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        if (this.fis != null) {
+            this.fis.close();
+        }
+        this.fis = null;
     }
 }

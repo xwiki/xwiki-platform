@@ -25,7 +25,7 @@ import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
-public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputParameters> extends
+public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputProperties> extends
     AbstractBeanInputWikiStreamFactory<P>
 {
     public AbstractXMLBeanInputWikiStreamFactory(WikiStreamType type)
@@ -34,10 +34,10 @@ public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputPa
     }
 
     @Override
-    protected InputWikiStream createInputWikiStream(P parameters) throws WikiStreamException
+    protected InputWikiStream createInputWikiStream(P properties) throws WikiStreamException
     {
-        return new DefaultXMLInputWikiStream<P>(this, parameters);
+        return new DefaultXMLInputWikiStream<P>(this, properties);
     }
 
-    protected abstract ContentHandler createContentHandler(Object listener, P parameters);
+    protected abstract ContentHandler createContentHandler(Object listener, P properties);
 }

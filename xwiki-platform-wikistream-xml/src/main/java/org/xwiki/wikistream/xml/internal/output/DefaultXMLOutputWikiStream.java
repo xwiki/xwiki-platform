@@ -21,7 +21,7 @@ package org.xwiki.wikistream.xml.internal.output;
 
 import org.xwiki.wikistream.WikiStreamException;
 
-public class DefaultXMLOutputWikiStream<P extends XMLOuputParameters> extends AbstractXMLOutputWikiStream<P>
+public class DefaultXMLOutputWikiStream<P extends XMLOuputProperties> extends AbstractXMLOutputWikiStream<P>
 {
     private final AbstractXMLBeanOutputWikiStreamFactory<P> factory;
 

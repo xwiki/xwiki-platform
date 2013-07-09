@@ -25,10 +25,11 @@ import javax.inject.Inject;
 
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.descriptor.DefaultWikiStreamDescriptor;
+import org.xwiki.wikistream.descriptor.DefaultWikiStreamBeanDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStream implements WikiStream, Initializable
@@ -44,35 +45,39 @@ public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStrea
     private String description;
 
     /**
-     * Parameter bean class used to generate the macro descriptor.
+     * Properties bean class used to generate the macro descriptor.
      */
-    private Class<P> parametersBeanClass;
+    private Class<P> propertiesBeanClass;
 
     public AbstractBeanWikiStreamFactory(WikiStreamType type)
     {
         super(type);
+
+        this.propertiesBeanClass =
+            ReflectionUtils.getTypeClass(ReflectionUtils.getLastGenericClassType(getClass(),
+                AbstractBeanWikiStreamFactory.class));
     }
 
     @Override
     public void initialize() throws InitializationException
     {
         // Initialise WikiStream Descriptor.
-        DefaultWikiStreamDescriptor descriptor =
-            new DefaultWikiStreamDescriptor(getName(), getDescription(),
-                this.beanManager.getBeanDescriptor(this.parametersBeanClass));
+        DefaultWikiStreamBeanDescriptor descriptor =
+            new DefaultWikiStreamBeanDescriptor(getName(), getDescription(),
+                this.beanManager.getBeanDescriptor(this.propertiesBeanClass));
 
         setDescriptor(descriptor);
     }
 
-    protected P createParametersBean(Map<String, Object> parameters) throws WikiStreamException
+    protected P createPropertiesBean(Map<String, Object> properties) throws WikiStreamException
     {
         P parametersBean;
         try {
-            parametersBean = getParametersBeanClass().newInstance();
+            parametersBean = getPropertiesBeanClass().newInstance();
 
-            this.beanManager.populate(parameters, parameters);
+            this.beanManager.populate(properties, properties);
         } catch (Exception e) {
-            throw new WikiStreamException("Failed to read parameters [" + parameters + "]", e);
+            throw new WikiStreamException("Failed to read parameters [" + properties + "]", e);
         }
 
         return parametersBean;
@@ -111,18 +116,18 @@ public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStrea
     }
 
     /**
-     * @param parametersBeanClass the parametersBeanClass to set
+     * @param propertiesBeanClass the parametersBeanClass to set
      */
-    public void setParametersBeanClass(Class<P> parametersBeanClass)
+    public void setPropertiesBeanClass(Class<P> propertiesBeanClass)
     {
-        this.parametersBeanClass = parametersBeanClass;
+        this.propertiesBeanClass = propertiesBeanClass;
     }
 
     /**
-     * @return the parametersBeanClass
+     * @return the properties bean class
      */
-    public Class<P> getParametersBeanClass()
+    public Class<P> getPropertiesBeanClass()
     {
-        return this.parametersBeanClass;
+        return this.propertiesBeanClass;
     }
 }

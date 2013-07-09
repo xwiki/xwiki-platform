@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.descriptor;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,7 +30,7 @@ import org.xwiki.properties.PropertyDescriptor;
 /**
  * @version $Id$
  */
-public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
+public class DefaultWikiStreamBeanDescriptor implements WikiStreamBeanDescriptor
 {
     /**
      * @see #getName()
@@ -41,61 +43,72 @@ public class DefaultWikiStreamDescriptor implements WikiStreamDescriptor
     private String description;
 
     /**
-     * The description of the parameters bean.
+     * The description of the properties bean.
      */
-    private BeanDescriptor parametersBeanDescriptor;
+    private BeanDescriptor propertiesBeanDescriptor;
 
     /**
-     * A map containing the {@link WikiStreamParameterDescriptor} for each parameters supported for this wiki stream.
+     * A map containing the {@link WikiStreamPropertyDescriptor} for each parameters supported for this wiki stream.
      * <p>
      * The {@link Map} keys are lower cased for easier case insensitive search, to get the "real" name of the property
-     * use {@link WikiStreamParameterDescriptor#getName()}.
+     * use {@link WikiStreamPropertyDescriptor#getName()}.
      */
-    private Map<String, WikiStreamParameterDescriptor> parameterDescriptorMap =
-        new LinkedHashMap<String, WikiStreamParameterDescriptor>();
+    private Map<String, WikiStreamPropertyDescriptor< ? >> parameterDescriptorMap =
+        new LinkedHashMap<String, WikiStreamPropertyDescriptor< ? >>();
 
     /**
      * @param name
      * @param description
      * @param parametersBeanDescriptor
      */
-    public DefaultWikiStreamDescriptor(String name, String description, BeanDescriptor parametersBeanDescriptor)
+    public DefaultWikiStreamBeanDescriptor(String name, String description, BeanDescriptor parametersBeanDescriptor)
     {
         this.name = name;
         this.description = description;
-        this.parametersBeanDescriptor = parametersBeanDescriptor;
+        this.propertiesBeanDescriptor = parametersBeanDescriptor;
     }
 
     protected void extractParameters()
     {
-        for (PropertyDescriptor propertyDescriptor : parametersBeanDescriptor.getProperties()) {
-            DefaultWikiStreamParameterDescriptor desc = new DefaultWikiStreamParameterDescriptor(propertyDescriptor);
+        for (PropertyDescriptor propertyDescriptor : this.propertiesBeanDescriptor.getProperties()) {
+            DefaultWikiStreamBeanParameterDescriptor< ? > desc =
+                new DefaultWikiStreamBeanParameterDescriptor<Object>(propertyDescriptor);
             this.parameterDescriptorMap.put(desc.getId().toLowerCase(), desc);
         }
     }
 
+    // WikiStreamDescriptor
+
     @Override
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     @Override
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 
     @Override
-    public Class< ? > getParametersBeanClass()
+    public <T> WikiStreamPropertyDescriptor<T> getPropertyDescriptor(String propertyName)
     {
-        return null;
+        return (WikiStreamPropertyDescriptor<T>) this.parameterDescriptorMap.get(propertyName);
     }
 
     @Override
-    public Map<String, WikiStreamParameterDescriptor> getParameterDescriptorMap()
+    public Collection<WikiStreamPropertyDescriptor< ? >> getProperties()
     {
-        return parameterDescriptorMap;
+        return Collections.<WikiStreamPropertyDescriptor< ? >> unmodifiableCollection(this.parameterDescriptorMap
+            .values());
     }
 
+    // WikiStreamBeanDescriptor
+
+    @Override
+    public Class< ? > getBeanClass()
+    {
+        return this.propertiesBeanDescriptor.getBeanClass();
+    }
 }

@@ -24,21 +24,21 @@ import java.lang.reflect.Type;
 import org.xwiki.properties.PropertyDescriptor;
 
 /**
- * The default implementation of {@link WikiStreamParameterDescriptor}.
+ * The default implementation of {@link WikiStreamPropertyDescriptor}.
  * 
  * @version $Id$
  */
-public class DefaultWikiStreamParameterDescriptor implements WikiStreamParameterDescriptor
+public class DefaultWikiStreamBeanParameterDescriptor<T> implements WikiStreamPropertyDescriptor<T>
 {
     /**
-     * The description of the parameter.
+     * The description of the property.
      */
     private PropertyDescriptor propertyDescriptor;
 
     /**
-     * @param propertyDescriptor The description of a parameter
+     * @param propertyDescriptor The description of the property
      */
-    public DefaultWikiStreamParameterDescriptor(PropertyDescriptor propertyDescriptor)
+    public DefaultWikiStreamBeanParameterDescriptor(PropertyDescriptor propertyDescriptor)
     {
         this.propertyDescriptor = propertyDescriptor;
     }
@@ -62,15 +62,15 @@ public class DefaultWikiStreamParameterDescriptor implements WikiStreamParameter
     }
 
     @Override
-    public Type getParameterType()
+    public Type getPropertyType()
     {
         return this.propertyDescriptor.getPropertyType();
     }
 
     @Override
-    public Object getDefaultValue()
+    public T getDefaultValue()
     {
-        return this.propertyDescriptor.getDefaultValue();
+        return (T) this.propertyDescriptor.getDefaultValue();
     }
 
     @Override

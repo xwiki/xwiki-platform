@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-component</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.1</version>
   </parent>
   <artifactId>xwiki-platform-component-multi</artifactId>
   <name>XWiki Platform - Component - Multi</name>

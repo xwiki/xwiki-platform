@@ -23,19 +23,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
-  <content>Der Sandkasten ist ein Teil dieses Wikis, der frei editierbar ist. Er ist dafür gedacht, das Arbeiten mit dem Wiki zu trainieren. Sie können herausfinden,  wie das Editieren von Seiten funktioniert und wie man neue Seiten erstellt. Klicken Sie einfach auf **Editieren** um zu beginnen!
+  <content>Der Sandkasten ist ein Teil dieses Wikis, der frei editierbar ist. Er ist dafür gedacht, das Arbeiten mit dem Wiki zu trainieren. Sie können herausfinden, wie das Editieren von Seiten funktioniert und wie man neue Seiten erstellt. Klicken Sie einfach auf **Editieren** um zu beginnen!
 
-{{info}}Es macht nichts, wenn Sie beim Editieren dieser Seite Inhalte überschreiben oder verlieren. Über den Reiter "Historie" am unteren Rand der Seite, können Sie jederzeit die ursprüngliche Version der Seite wieder herstellen.{{/info}}
+{{info}}Es macht nichts, wenn Sie beim Editieren dieser Seite Inhalte überschreiben oder verlieren. Über den Reiter "Historie" am unteren Rand der Seite können Sie jederzeit die ursprüngliche Version der Seite wieder herstellen.{{/info}}
 
-Wenn Sie mehr über die [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] lernen wollen, können Sie im Menü "Anzeigen" auf "Wiki-Code" klicken, oder auf den Reiter "Quellcode", wenn sie die Seite bearbeiten.
+Wenn Sie mehr über die [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] lernen wollen, können Sie im Menü "Anzeigen" auf "Wiki-Code" klicken, oder auf den Reiter "Quellcode", wenn Sie die Seite bearbeiten.
 
-Hier finden sie eine Reihe von Seiten, mit denen sie herumspielen können:
+Hier finden Sie eine Reihe von Seiten, mit denen Sie herumspielen können:
 
 * [[Sandbox Test Page 1&gt;&gt;Sandbox.TestPage1]]
 * [[Sandbox Test Page 2&gt;&gt;Sandbox.TestPage2]]
 * [[Sandbox Test Page 3&gt;&gt;Sandbox.TestPage3]]
 
-Hier finden sie Beispiele für die [[XWiki Syntaxelemente&gt;&gt;XWiki.XWikiSyntax]], die sie in Wiki-Seiten verwenden können (Überschriften, Bilder, Tabellen).
+Hier finden Sie Beispiele für die [[XWiki Syntaxelemente&gt;&gt;XWiki.XWikiSyntax]], die Sie in Wiki-Seiten verwenden können (Überschriften, Bilder, Tabellen).
 
 = Überschriften =
 
@@ -51,9 +51,9 @@ XWiki bietet 6 Ebenen für Überschriften. Sie können Sie zum Strukturieren Ihr
 
 ====== Überschriftsebene 6 ======
 
-= Zeichenformate =
+= Textformatierung =
 
-XWiki unterstützt folgende grundlegenden Zeichenformate:
+XWiki unterstützt folgende grundlegenden ZTextformatierungen:
 
 * **Fett gesetzter Text**
 * //Kursiv gesetzter Text//
@@ -123,17 +123,17 @@ Xwiki erlaubt Links zu anderen Wiki-Seiten und zum Web:
 
 = Bilder =
 
-Sie können Bilder in ihre Wiki-Seiten integrieren:
+Sie können Bilder in Ihre Wiki-Seiten integrieren:
 
 [[image:XWikiLogo.png]]
 
 = Makros =
 
-Makros bieten die Möglichkeit, das Aussehen von Wiki-Seiten zu verbessern und stellen zusätzliche Funktionalitäten in der Seite zur Verfügung. Hier sind 2 Beispiele, wie Makros die Inhalte verbessern können:
+Makros bieten die Möglichkeit, das Aussehen von Wiki-Seiten zu verbessern und stellen zusätzliche Funktionalitäten in der Seite zur Verfügung. Hier sind zwei Beispiele, wie Makros die Inhalte verbessern können:
 
 == Makro Achtung ==
 
-Dieses Makro bietet die Möglichkeit, die Aufmerksamkeit der Leser auf einen bestimmten Text zu lenken: {{warning}}Hello World{{/warning}}
+Dieses Makro bietet die Möglichkeit, die Aufmerksamkeit der Leser auf einen bestimmten Text zu lenken: {{warning}}Dies ist eine wichtige Warning!{{/warning}}
 
 == Inhaltsverzeichnis ==
 

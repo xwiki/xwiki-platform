@@ -24,6 +24,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+AnnotationCode.AnnotationConfig_activated=Anmerkungen sind aktiviert
 admin.annotations=Anmerkungen
 annotations.title=Anmerkung
 </content>

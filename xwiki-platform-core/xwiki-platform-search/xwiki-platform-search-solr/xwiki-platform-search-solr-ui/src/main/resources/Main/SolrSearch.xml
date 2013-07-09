@@ -25,7 +25,7 @@
   <attachment>
     <filename>dark-grey-disclosure-arrow-down.png</filename>
     <filesize>94</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1368010970000</date>
     <version>1.1</version>
     <comment/>
@@ -36,7 +36,7 @@ wACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==
   <attachment>
     <filename>dark-grey-disclosure-arrow-left.png</filename>
     <filesize>2806</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1368436548000</date>
     <version>1.1</version>
     <comment/>
@@ -95,7 +95,7 @@ owAAAABJRU5ErkJggg==
   <attachment>
     <filename>light-grey-disclosure-arrow-down.png</filename>
     <filesize>93</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1368010970000</date>
     <version>1.1</version>
     <comment/>

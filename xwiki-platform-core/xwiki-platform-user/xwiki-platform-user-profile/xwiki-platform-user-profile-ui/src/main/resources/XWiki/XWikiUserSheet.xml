@@ -357,15 +357,16 @@ return XWiki;
 /* ----- User menu ----- */
 #user-menu-col{
   float: left;
-  width: 10em;
+  width: 13em;
 }
 
-.vertical-menu{
-  width: 100%;
-}
-
-#avatar img{
-  width: 100%;  
+#avatar img {
+  border: 1px solid $theme.borderColor;
+  border-radius: 5px 5px 5px 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
+  padding: 0.3em;
+  width: 95%;
 }
 
 .profile-menu .category-tab:before{
@@ -402,8 +403,8 @@ return XWiki;
   #css3_backgroundIconAndLinearGradient($menuIcon, {
     'to': 'bottom',
     'colors': [
-      {'color':'#fff',    'position': '0%'},
-      {'color':'#e1e1e1', 'position': '100%'}
+      {'color':$theme.menuContentGradientColor,    'position': '0%'},
+      {'color':$theme.menuContentBackgroundColor, 'position': '100%'}
     ]
   })  
 }
@@ -413,12 +414,12 @@ return XWiki;
 }
 
 .user-menu-title a:hover{
-  color: #4D5860 !important;
+  color: $theme.menuLinkColor !important;
 }
 
 /* ----- Page content ---- */
 #user-page-content{
-  margin-left: 12em;
+  margin-left: 14em;
 }
 
 #user-page-content h1{
@@ -584,18 +585,9 @@ span#avatarUpload {
   right: 0;
   text-align: left;
   text-indent: -9999px;
-  top: 0;
+  top: 1px;
   width: 18px !important;
   z-index: 1;
-}
-
-.attachment-picker img {
-  border: 1px solid $theme.borderColor;
-  border-radius: 5px 5px 5px 5px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-  margin: 0 auto;
-  padding: 0.3em;
-  width: 95%;
 }
 
 ## --------------------------------------
@@ -680,7 +672,7 @@ span#avatarUpload {
   (((
     #if($request.xpage == 'edituser')
       {{html clean="false"}}
-        #largeUserAvatar($doc.fullName)
+        #resizedUserAvatar($doc.fullName 170)
       {{/html}}
     #else
       {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}

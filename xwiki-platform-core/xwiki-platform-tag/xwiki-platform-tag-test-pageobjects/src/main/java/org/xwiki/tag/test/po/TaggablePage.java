@@ -86,4 +86,13 @@ public class TaggablePage extends ViewPage
         waitUntilElementDisappears(By.xpath("//*[@id = 'xdocTags']//a[. = '[+]']"));
         return new AddTagsPane();
     }
+    
+    public TagPage clickOnTag(String tagName)
+    {
+        WebElement tag =
+            getUtil()
+                .findElementWithoutWaiting(getDriver(), By.xpath("//span[@class='tag']/a[. = '" + tagName + "' ]"));
+        tag.click();
+        return new TagPage();
+    }
 }

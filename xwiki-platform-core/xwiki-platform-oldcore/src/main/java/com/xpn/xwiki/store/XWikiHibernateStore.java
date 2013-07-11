@@ -496,6 +496,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Make sure the database name is stored
             doc.setDatabase(context.getDatabase());
 
+            // If the comment is larger than the max size supported by the Storage, then abbreviate it
+            String comment = doc.getComment();
+            if (comment != null && comment.length() > 1023) {
+                doc.setComment(StringUtils.abbreviate(comment, 1023));
+            }
+
             if (bTransaction) {
                 checkHibernate(context);
                 SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
@@ -1559,6 +1565,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean bTransaction) throws XWikiException
     {
         try {
+            // If the comment is larger than the max size supported by the Storage, then abbreviate it
+            String comment = attachment.getComment();
+            if (comment != null && comment.length() > 1023) {
+                attachment.setComment(StringUtils.abbreviate(comment, 1023));
+            }
+
             // The version number must be bumped and the date must be set before the attachment
             // metadata is saved. Changing the version and date after calling
             // session.save()/session.update() "worked" (the altered version was what Hibernate saved)

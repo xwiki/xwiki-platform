@@ -152,7 +152,8 @@
         <property name="date" type="timestamp" column="XWA_DATE" index="ATT_DATE" not-null="true" />
         <property name="author" type="string" column="XWA_AUTHOR" length="255" index="ATT_AUTHOR" />
         <property name="version" type="string" column="XWA_VERSION" length="255" not-null="true" />
-        <property name="comment" type="string" column="XWA_COMMENT" length="255" />
+        <!-- Align the max comment size with the document max comment size (i.e. XWD_COMMENT) -->
+        <property name="comment" type="string" column="XWA_COMMENT" length="1023" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachmentContent" table="xwikiattachment_content">

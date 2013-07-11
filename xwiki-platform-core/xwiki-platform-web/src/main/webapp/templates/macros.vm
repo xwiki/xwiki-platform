@@ -1244,7 +1244,7 @@ ${Msz}Mb##
  * @param options the livetable options.
  *#
 #macro(livetable $divid $collist $colprops $options)
-#if($xxontext.action=='export')
+#if($xcontext.action=='export')
   $services.localization.render('platform.livetable.noexport')
 #elseif($xcontext.action=='view')
 ## Do not indent:
@@ -1253,11 +1253,6 @@ ${Msz}Mb##
 
 {{html}}
 #else {pre} #end
-  {{html clean="false"}}
-    <noscript>
-      $services.localization.render('platform.livetable.noscript')
-    </noscript>
-  {{/html}}
   ##
   ## SX deps.
   ##

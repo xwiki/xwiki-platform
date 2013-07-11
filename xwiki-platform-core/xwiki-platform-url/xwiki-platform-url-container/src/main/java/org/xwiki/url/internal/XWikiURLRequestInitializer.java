@@ -26,7 +26,6 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializer;
@@ -85,25 +84,29 @@ public class XWikiURLRequestInitializer implements RequestInitializer
      * Helper method to reconstruct a URL based on the HTTP Servlet Request (since this feature isn't offered by the
      * Servlet specification).
      *
-     * @param httpServletRequest the request from which to extract the URL
-     * @return the URL as a real URL object
+     * @param request the request from which to extract the URL
+     * @return the URL as a real URL object, properly encoded
      * @throws RequestInitializerException if the original request isn't a valid URL (shouldn't happen)
      */
-    private URL getURL(HttpServletRequest httpServletRequest) throws RequestInitializerException
+    private URL getURL(HttpServletRequest request) throws RequestInitializerException
     {
+        // Ensure we build a non-decoded URI since we need to pass a valid URL to XWikiURLFactory.createURL()
+        String uri = request.getScheme()
+            + "://"
+            + request.getServerName()
+            + ":"
+            + request.getServerPort()
+            + request.getRequestURI()
+            + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
+
         URL result;
-        StringBuffer url = httpServletRequest.getRequestURL();
-        if (!StringUtils.isEmpty(httpServletRequest.getQueryString())) {
-            url.append('?');
-            url.append(httpServletRequest.getQueryString());
-        }
         try {
-            result = new URL(url.toString());
+            result = new URL(uri);
         } catch (MalformedURLException e) {
             // Shouldn't happen normally since the Servlet Container should always return valid URLs when
             // getRequestURL() is called...
             throw new RequestInitializerException(
-                String.format("Failed to extract XWiki URL because of invalid Request URL [%s]", url.toString()));
+                String.format("Failed to extract XWiki URL because of invalid Request URL [%s]", uri));
         }
         return result;
     }

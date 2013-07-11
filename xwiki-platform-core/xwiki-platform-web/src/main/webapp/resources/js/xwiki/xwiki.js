@@ -314,6 +314,8 @@ Object.extend(XWiki, {
               if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
                   var editspan = document.createElement("SPAN");
                   editspan.className = "edit_section";
+                  // Hide the section editing link if the section heading is hidden.
+                  (!node.visible() || node.hasClassName('hidden')) && editspan.hide();
 
                   // If there's no Syntax Renderer for the current document's syntax then make sure the section edit
                   // button will be displayed inactive since editing a section requires a Syntax Renderer.

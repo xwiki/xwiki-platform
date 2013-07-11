@@ -4330,16 +4330,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void saveAllAttachments(XWikiContext context) throws XWikiException
     {
-        for (XWikiAttachment attachment : this.attachmentList) {
-            saveAttachmentContent(attachment, context);
-        }
+        saveAllAttachments(true, true, context);
     }
 
     public void saveAllAttachments(boolean updateParent, boolean transaction, XWikiContext context)
         throws XWikiException
     {
         for (XWikiAttachment attachment : this.attachmentList) {
-            saveAttachmentContent(attachment, updateParent, transaction, context);
+            saveAttachmentContent(attachment, false, transaction, context);
+        }
+
+        // Save the document
+        if (updateParent) {
+            context.getWiki().saveDocument(this, context);
         }
     }
 
@@ -4368,10 +4371,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         saveAttachmentContent(attachment, true, true, context);
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, boolean bTransaction,
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean updateParent, boolean transaction,
         XWikiContext context) throws XWikiException
     {
-        String database = context.getDatabase();
+        String currentWiki = context.getDatabase();
         try {
             // We might need to switch database to
             // get the translated content
@@ -4379,17 +4382,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 context.setDatabase(getDatabase());
             }
 
+            // Save the attachment
+            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, false, context, transaction);
+
             // We need to make sure there is a version upgrade
             setMetaDataDirty(true);
 
-            context.getWiki().getAttachmentStore()
-                .saveAttachmentContent(attachment, bParentUpdate, context, bTransaction);
+            // Save the document
+            if (updateParent) {
+                context.getWiki().saveDocument(this, context);
+            }
         } catch (OutOfMemoryError e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
                 "Out Of Memory Exception");
         } finally {
-            if (database != null) {
-                context.setDatabase(database);
+            if (currentWiki != null) {
+                context.setDatabase(currentWiki);
             }
         }
     }
@@ -4417,6 +4425,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         deleteAttachment(attachment, true, context);
     }
 
+    private void removeAttachment(XWikiAttachment attachment)
+    {
+        List<XWikiAttachment> list = getAttachmentList();
+        for (int i = 0; i < list.size(); i++) {
+            XWikiAttachment attach = list.get(i);
+            if (attachment.getFilename().equals(attach.getFilename())) {
+                list.remove(i);
+                break;
+            }
+        }
+    }
+
+    // TODO: deprecated this method and follow object system (mark it as removed in the document and really remove it
+    // when saving the document)
     public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
         throws XWikiException
     {
@@ -4428,13 +4450,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 context.setDatabase(getDatabase());
             }
             try {
-                // We need to make sure there is a version upgrade
-                setMetaDataDirty(true);
                 if (toRecycleBin && context.getWiki().hasAttachmentRecycleBin(context)) {
                     context.getWiki().getAttachmentRecycleBinStore()
                         .saveToRecycleBin(attachment, context.getUser(), new Date(), context, true);
                 }
-                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
+                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, false, context, true);
+
+                // Save the document
+                // We need to make sure there is a version upgrade
+                setMetaDataDirty(true);
+                removeAttachment(attachment);
+                context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
             } catch (java.lang.OutOfMemoryError e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE, "Out Of Memory Exception");

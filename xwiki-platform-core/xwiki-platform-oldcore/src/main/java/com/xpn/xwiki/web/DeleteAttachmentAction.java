@@ -129,12 +129,6 @@ public class DeleteAttachmentAction extends XWikiAction
 
         try {
             newdoc.deleteAttachment(attachment, context);
-
-            // Needed to counter a side effect: the attachment is deleted from the newdoc.originalDoc as well
-            newdoc.setOriginalDocument(doc);
-
-            // Also save the document and attachment metadata
-            context.getWiki().saveDocument(newdoc, context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");

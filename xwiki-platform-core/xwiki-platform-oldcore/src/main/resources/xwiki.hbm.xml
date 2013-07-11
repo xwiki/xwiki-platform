@@ -75,8 +75,10 @@
             <key-property name="version2" column="XWR_VERSION2" type="integer" />
         </composite-id>
         <property name="date" type="timestamp" column="XWR_DATE" index="REV_DATE" not-null="true" />
-        <property name="comment" type="string" column="XWR_COMMENT" not-null="true" />
-        <property name="author" type="string" column="XWR_AUTHOR" index="REV_AUTHOR" not-null="true" />
+        <!-- Note: Length must be the same one as XWD_COMMENT since it's the same content being put in history -->
+        <property name="comment" type="string" column="XWR_COMMENT" length="1023" not-null="true" />
+        <!-- Note: Length must be the same one as XWD_COMMENT since it's the same content being put in history -->
+        <property name="author" type="string" column="XWR_AUTHOR" length="255" index="REV_AUTHOR" not-null="true" />
         <property name="diff" type="boolean" column="XWR_ISDIFF" index="REV_ISDIFF" not-null="false" update="false" insert="false" />
     </class>
 

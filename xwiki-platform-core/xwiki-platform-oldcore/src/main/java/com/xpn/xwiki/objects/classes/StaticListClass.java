@@ -137,6 +137,8 @@ public class StaticListClass extends ListClass
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);
 
+            // We need a hidden input with an empty value to be able to clear the selected values from the above select
+            // when it has multiple selection enabled and no value selected.
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             hidden.setAttributeFilter(new XMLAttributeValueFilter());
             hidden.setDisabled(isDisabled());

@@ -206,11 +206,10 @@ XWiki.AutoResizeInput = Class.create({
     }
     this.input.observe('keypress', this._reserveSpace.bindAsEventListener(this));
 
-    this.meter = new Element('pre', {'class': 'autoResize-meter'});
+    this.meter = new Element('pre', {'class': 'autoResize-meter inherit'});
     this.meter.appendChild(document.createTextNode(''));
-    this.input.insert({after: this.meter});
+    this.input.addClassName('inherit').insert({after: this.meter});
 
-    this._copyStyle();
     this._resize();
   },
   _resize : function(event) {
@@ -232,14 +231,6 @@ XWiki.AutoResizeInput = Class.create({
       }
     }
     this.input.setStyle({width: (this.input.offsetWidth + 6) + 'px'});
-  },
-  _copyStyle : function() {
-    var style = {};
-    var properties = ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'textTransform', 'wordSpacing'];
-    for(var i = 0; i &lt; properties.length; i++) {
-      style[properties[i]] = this.input.getStyle(properties[i]);
-    }
-    this.meter.setStyle(style);
   }
 });
 
@@ -684,7 +675,6 @@ XWiki.FormFieldPrettyNameManager = Class.create({
     previewLabel.insert(prettyNameInput);
     // Enhance the pretty name input.
     new XWiki.InputWithTitle(prettyNameInput);
-    prettyNameInput.addClassName('inherit');
     new XWiki.AutoResizeInput(prettyNameInput);
   }
 });
@@ -1348,9 +1338,11 @@ return XWiki;
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
+  letter-spacing: inherit;
   padding: 0;
   text-align: inherit;
   text-transform: inherit;
+  word-spacing: inherit;
 }
 
 #fields input.inherit:hover, #fields input.xHint:hover {

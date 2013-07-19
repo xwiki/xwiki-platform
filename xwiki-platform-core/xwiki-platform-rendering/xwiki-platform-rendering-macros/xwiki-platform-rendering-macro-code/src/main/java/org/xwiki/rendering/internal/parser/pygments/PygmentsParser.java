@@ -58,7 +58,7 @@ import org.xwiki.rendering.syntax.SyntaxType;
 // Note that we force the Component annotation so that this component is only registered as a Highlight Parser
 // and not a Parser too since we don't want this parser to be visible to users as a valid standard input parser
 // component.
-@Component(roles = {HighlightParser.class })
+@Component(roles = {HighlightParser.class})
 @Singleton
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {
@@ -111,9 +111,9 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private PygmentsParserConfiguration configuration;
 
     /**
-     * The JSR223 Script Engine Manager we use to evaluate Python scripts.
+     * The JSR223 Script Engine we use to evaluate Python scripts.
      */
-    private ScriptEngineManager scriptEngineManager;
+    private ScriptEngine engine;
 
     /**
      * The Python script used to manipulate Pygments.
@@ -129,7 +129,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     @Override
     public void initialize() throws InitializationException
     {
-        this.scriptEngineManager = new ScriptEngineManager();
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
         // Get the script
         InputStream is = getClass().getResourceAsStream("/pygments/code.py");
@@ -146,9 +146,9 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         }
 
         // Get the Python engine
-        ScriptEngine engine = this.scriptEngineManager.getEngineByName(ENGINE_ID);
+        this.engine = scriptEngineManager.getEngineByName(ENGINE_ID);
 
-        if (engine == null) {
+        if (this.engine == null) {
             throw new InitializationException("Failed to find engine for Python script language");
         }
 
@@ -212,9 +212,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         scriptContext.setAttribute(PY_STYLE_VARNAME, this.configuration.getStyle(), ScriptContext.ENGINE_SCOPE);
         scriptContext.setAttribute(PY_LISTENER_VARNAME, listener, ScriptContext.ENGINE_SCOPE);
 
-        ScriptEngine engine = this.scriptEngineManager.getEngineByName(ENGINE_ID);
-
-        engine.eval(this.script, scriptContext);
+        this.engine.eval(this.script, scriptContext);
 
         List<Block> blocks;
         if (scriptContext.getAttribute(PY_LEXER_VARNAME) != null) {

@@ -58,7 +58,7 @@ import org.xwiki.rendering.syntax.SyntaxType;
 // Note that we force the Component annotation so that this component is only registered as a Highlight Parser
 // and not a Parser too since we don't want this parser to be visible to users as a valid standard input parser
 // component.
-@Component(roles = {HighlightParser.class})
+@Component(roles = {HighlightParser.class })
 @Singleton
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {

@@ -22,7 +22,7 @@ package org.xwiki.store.serialization;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A generic thing for converting objects of a known type into InputStreams and back again.
@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole
+@Role
 public interface Serializer<R, P extends R>
 {
     /**

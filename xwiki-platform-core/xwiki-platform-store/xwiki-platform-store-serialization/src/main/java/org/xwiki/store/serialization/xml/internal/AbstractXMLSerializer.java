@@ -29,7 +29,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.SAXException;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.store.serialization.xml.XMLSerializer;
 
 /**
@@ -40,7 +40,7 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole()
+@Role
 public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerializer<R, P>
 {
     @Override

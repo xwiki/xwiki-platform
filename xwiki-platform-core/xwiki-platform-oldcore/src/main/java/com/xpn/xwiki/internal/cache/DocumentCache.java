@@ -21,7 +21,7 @@ package com.xpn.xwiki.internal.cache;
 
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -31,7 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 2.4M1
  */
-@ComponentRole
+@Role
 public interface DocumentCache<C>
 {
     /**

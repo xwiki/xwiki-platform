@@ -22,7 +22,7 @@ package org.xwiki.store.serialization.xml;
 import java.io.IOException;
 
 import org.dom4j.Element;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.store.serialization.Serializer;
 import org.xwiki.store.serialization.xml.internal.XMLWriter;
 
@@ -34,7 +34,7 @@ import org.xwiki.store.serialization.xml.internal.XMLWriter;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole
+@Role
 public interface XMLSerializer<R, P extends R> extends Serializer<R, P>
 {
     /**

@@ -29,7 +29,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.SAXException;
-import org.xwiki.component.annotation.Role;
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.store.serialization.xml.XMLSerializer;
 
 /**
@@ -40,7 +40,10 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @version $Id$
  * @since 3.0M2
  */
-@Role
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have
+// AbstractXMLSerializer<R, P extends R>. Changing it will thus break all code looking up components implementing this
+// role.
+@ComponentRole
 public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerializer<R, P>
 {
     @Override

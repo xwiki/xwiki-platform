@@ -21,7 +21,7 @@ package com.xpn.xwiki.internal.cache;
 
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Role;
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -31,7 +31,9 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 2.4M1
  */
-@Role
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have DocumentCache<C>.
+// Changing it will thus break all code looking up components implementing this role.
+@ComponentRole
 public interface DocumentCache<C>
 {
     /**

@@ -22,7 +22,7 @@ package org.xwiki.store.serialization;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.xwiki.component.annotation.Role;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * A generic thing for converting objects of a known type into InputStreams and back again.
@@ -32,7 +32,9 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @since 3.0M2
  */
-@Role
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have
+// Serializer<R, P extends R>. Changing it will thus break all code looking up components implementing this role.
+@ComponentRole
 public interface Serializer<R, P extends R>
 {
     /**

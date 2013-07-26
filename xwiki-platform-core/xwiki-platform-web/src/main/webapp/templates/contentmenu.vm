@@ -4,6 +4,19 @@
 <div class="rightmenu">
 </div>
 <div class="leftmenu">
+##
+## Let's clean the query string to avoid injections
+##
+#set($cleanQueryString = '')
+#foreach($param in $request.getParameterNames())
+  #set($value = $request.getParameter($param))
+  #set($cleanParam = $!escapetool.url($param))
+  #set($cleanValue = $!escapetool.url($value))
+  #set($cleanQueryString = $cleanQueryString + $!cleanParam + '=' + $!cleanValue + '&amp;')
+#end
+#if($cleanQueryString != '')
+  #set($cleanQueryString = $stringtool.substring($cleanQueryString, 0, -5))
+#end
 #if($hasEdit && !$isReadOnly)
   ## Compute the default edit mode
   #set($editaction = $doc.getDefaultEditMode())
@@ -51,10 +64,10 @@
   ## Preserve the document query string.
   #submenuitem($doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())") $services.localization.render('core.menu.export.pdf') 'tmExportPdf', '')
   #if("$!{services.officemanager.serverState}" == "Connected")
-    #submenuitem($doc.getURL('export', "format=odt&amp;$!request.getQueryString()") $services.localization.render('core.menu.export.odt') 'tmExportOdt', '')
+    #submenuitem($doc.getURL('export', "format=odt&amp;$cleanQueryString") $services.localization.render('core.menu.export.odt') 'tmExportOdt', '')
   #end
-  #submenuitem($doc.getURL('export', "format=rtf&amp;$!request.getQueryString()") $services.localization.render('core.menu.export.rtf') 'tmExportRtf', '')
-  #submenuitem($doc.getURL('export', "format=html&amp;$!request.getQueryString()") $services.localization.render('core.menu.export.html') 'tmExportHtml', '')
+  #submenuitem($doc.getURL('export', "format=rtf&amp;$cleanQueryString") $services.localization.render('core.menu.export.rtf') 'tmExportRtf', '')
+  #submenuitem($doc.getURL('export', "format=html&amp;$cleanQueryString") $services.localization.render('core.menu.export.html') 'tmExportHtml', '')
   #if($hasAdmin && "$!xwiki.getPlugin('package')" != '')
     #submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant") $services.localization.render('core.menu.export.xar') 'tmExportXar', '')
   #end
@@ -65,7 +78,7 @@
 ##
 #if(!$doc.isNew())
   #xwikitopmenuentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' '')
-  #submenuitem($doc.getURL('view', "xpage=print&amp;$!request.getQueryString()") $services.localization.render('core.menu.preview') 'tmPrintPreview', '')
+  #submenuitem($doc.getURL('view', "xpage=print&amp;$cleanQueryString") $services.localization.render('core.menu.preview') 'tmPrintPreview', '')
   #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '')
   #xwikitopmenuentryend()
 #end

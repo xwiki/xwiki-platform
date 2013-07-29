@@ -9,12 +9,14 @@
 ##
 #set($cleanQueryString = '')
 #foreach($param in $request.getParameterNames())
-  #set($value = $request.getParameter($param))
   #set($cleanParam = $!escapetool.url($param))
-  #set($cleanValue = $!escapetool.url($value))
-  #set($cleanQueryString = $cleanQueryString + $!cleanParam + '=' + $!cleanValue + '&amp;')
+  #foreach($value in $request.getParameterValues($param))
+    #set($cleanValue = $!escapetool.url($value))
+    #set($cleanQueryString = $cleanQueryString + $!cleanParam + '=' + $!cleanValue + '&amp;')
+  #end
 #end
 #if($cleanQueryString != '')
+  ## Remove the last "&amp;"
   #set($cleanQueryString = $stringtool.substring($cleanQueryString, 0, -5))
 #end
 #if($hasEdit && !$isReadOnly)

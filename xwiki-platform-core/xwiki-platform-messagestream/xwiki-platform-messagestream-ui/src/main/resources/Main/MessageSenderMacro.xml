@@ -544,47 +544,52 @@ return XWiki;
   ##
   #elseif ("$!{request.xaction}" != '')
     #if ("$!{request.xaction}" == 'postMessage')
-      #set ($message = "$!{request.messagestream_message.trim()}")
-      #if ($message == '')
-        ## Do nothing with empty messages
-        #if ("$!{request.xredirect}" != '')
-          $response.sendRedirect(${request.xredirect})
-        #end
+      #if(!$services.csrf.isTokenValid($!{request.form_token}))
+        #set($redirectURL = $services.csrf.getResubmissionURL())
+        $response.sendRedirect($redirectURL)
       #else
-        #set ($success = false)
-        #if (!$isGuest)
-          #set ($messageType = "$!{request.visibilityLevel}")
-          #if ($messageType == 'everyone')
-            #set ($success = $services.messageStream.postPublicMessage($message))
-          #elseif ($messageType == 'followers')
-            #set ($success = $services.messageStream.postPersonalMessage($message))
-          #elseif ($messageType == 'group')
-            #set ($success = $services.messageStream.postMessageToGroup($message, $services.model.resolveDocument("$!{request.targetName}")))
-          #elseif ($messageType == 'user')
-            #set ($success = $services.messageStream.postDirectMessageToUser($message, $services.model.resolveDocument("$!{request.targetName}")))
+        #set ($message = "$!{request.messagestream_message.trim()}")
+        #if ($message == '')
+          ## Do nothing with empty messages
+          #if ("$!{request.xredirect}" != '')
+            $response.sendRedirect(${request.xredirect})
           #end
-        #end
-        #if (!$success)
-          #if ($request.xpage == 'plain')
-            #if ($isGuest)
-              $response.setStatus(401)## Unauthorized
-            #else
-              $response.setStatus(403)## Forbidden
+        #else
+          #set ($success = false)
+          #if (!$isGuest)
+            #set ($messageType = "$!{request.visibilityLevel}")
+            #if ($messageType == 'everyone')
+              #set ($success = $services.messageStream.postPublicMessage($message))
+            #elseif ($messageType == 'followers')
+              #set ($success = $services.messageStream.postPersonalMessage($message))
+            #elseif ($messageType == 'group')
+              #set ($success = $services.messageStream.postMessageToGroup($message, $services.model.resolveDocument("$!{request.targetName}")))
+            #elseif ($messageType == 'user')
+              #set ($success = $services.messageStream.postDirectMessageToUser($message, $services.model.resolveDocument("$!{request.targetName}")))
             #end
-            $services.localization.render('xe.activity.messages.submit.failed')
-          #elseif ("$!{request.xredirect}" != '')
-            ## Pass the error message in the xredirect so that we display it in the calling page and not in the macro page.
-            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $services.localization.render('xe.activity.messages.submit.failed'))
-            $response.sendRedirect($request.xredirect)
-          #else
-            {{error}}$services.localization.render('xe.activity.messages.submit.failed'){{/error}}
-
           #end
-        #elseif ("$!{request.xredirect}" != '')
-          $response.sendRedirect(${request.xredirect})
-        #elseif ($request.xpage == 'plain')
-          ## Just print something for confirmation.
-          $services.localization.render('xe.activity.messages.submit.success')
+          #if (!$success)
+            #if ($request.xpage == 'plain')
+              #if ($isGuest)
+                $response.setStatus(401)## Unauthorized
+              #else
+                $response.setStatus(403)## Forbidden
+              #end
+              $services.localization.render('xe.activity.messages.submit.failed')
+            #elseif ("$!{request.xredirect}" != '')
+              ## Pass the error message in the xredirect so that we display it in the calling page and not in the macro page.
+              $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $services.localization.render('xe.activity.messages.submit.failed'))
+              $response.sendRedirect($request.xredirect)
+            #else
+              {{error}}$services.localization.render('xe.activity.messages.submit.failed'){{/error}}
+
+            #end
+          #elseif ("$!{request.xredirect}" != '')
+            $response.sendRedirect(${request.xredirect})
+          #elseif ($request.xpage == 'plain')
+            ## Just print something for confirmation.
+            $services.localization.render('xe.activity.messages.submit.success')
+          #end
         #end
       #end
     #end
@@ -604,7 +609,9 @@ return XWiki;
     #end
       &lt;div class='activityContent'&gt;
         #if(!$inEditMode)
-        &lt;input type='hidden' name='xaction' value='postMessage' /&gt;
+          ## CSRF prevention
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type='hidden' name='xaction' value='postMessage' /&gt;
         #end
         #activitySnapshot($xcontext.user, 'personalMessage')
         &lt;div class='messagestream-data'&gt;

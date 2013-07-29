@@ -22,6 +22,8 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.IllegalCharsetNameException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +51,14 @@ public class DownloadAction extends XWikiAction
 {
     /** The identifier of the download action. */
     public static final String ACTION_NAME = "download";
-
+    
+    /** List of authorized attachment mimetypes. */
+    public static final List<String> MIMETYPE_WHITELIST = 
+        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis", 
+            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
+            "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/xml", "text/rtf", "video/mpeg", "video/ogg",
+            "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
+    
     /** The URL part seperator. */
     private static final String SEPARATOR = "/";
 
@@ -272,7 +281,12 @@ public class DownloadAction extends XWikiAction
     {
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
-        response.setContentType(mimetype);
+        if (MIMETYPE_WHITELIST.contains(mimetype)) {
+            response.setContentType(mimetype);
+        } else {
+            // If the type of the file is not considered as safe, let's render it as plain text.
+            response.setContentType("text/plain");
+        }
         try {
             response.setCharacterEncoding("");
         } catch (IllegalCharsetNameException ex) {

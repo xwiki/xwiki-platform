@@ -33,6 +33,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,16 +50,20 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  */
 public class DownloadAction extends XWikiAction
-{
+{   
     /** The identifier of the download action. */
     public static final String ACTION_NAME = "download";
     
     /** List of authorized attachment mimetypes. */
     public static final List<String> MIMETYPE_WHITELIST = 
-        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis", 
-            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
-            "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/xml", "text/rtf", "video/mpeg", "video/ogg",
-            "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
+        Arrays.asList("application/zip", "audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", 
+            "audio/vorbis", "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", 
+            "image/pjpeg", "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/xml", "text/rtf",
+            "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", 
+            "video/x-flv");
+    
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
     
     /** The URL part seperator. */
     private static final String SEPARATOR = "/";
@@ -280,11 +286,22 @@ public class DownloadAction extends XWikiAction
         final XWikiContext context)
     {
         // Choose the right content type
+        boolean hasPR = false;
+        String author = attachment.getAuthor();
+        try {
+            hasPR = 
+                context.getWiki().getRightService().hasAccessLevel(
+                    "programming", author, "XWiki.XWikiPreferences", context);
+        } catch (Exception e) {
+            hasPR = false;
+        }
         String mimetype = attachment.getMimeType(context);
-        if (MIMETYPE_WHITELIST.contains(mimetype)) {
+        if (hasPR || MIMETYPE_WHITELIST.contains(mimetype)) {
             response.setContentType(mimetype);
         } else {
+            
             // If the type of the file is not considered as safe, let's render it as plain text.
+            LOGGER.warn("Untrusted mimetype");
             response.setContentType("text/plain");
         }
         try {

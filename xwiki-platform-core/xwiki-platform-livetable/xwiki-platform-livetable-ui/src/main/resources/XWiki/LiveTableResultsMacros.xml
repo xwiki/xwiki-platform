@@ -275,7 +275,7 @@
     #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
     #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
-    #set($discard = $row.put('doc_title', $escapetool.xml($translatedDoc.plainTitle)))
+    #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
     #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($translatedDoc.author, false)))
     #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
     #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($translatedDoc.creator, false)))

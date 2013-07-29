@@ -1085,7 +1085,7 @@ $xwiki.ssx.use('Main.Activity')##
   #if ($mathtool.sub($eventTimeDiff.getDayOfYear(), 1) == 0 &amp;&amp;
       ($eventDateTime.isAfter($todayMidnight) ||
        $eventDateTime.isEqual($todayMidnight)))
-    #if ($mathtool.sub($eventTimeDiff.getHourOfDay(), 2) == 0)
+    #if ($eventTimeDiff.getHourOfDay() == 0)
       ##
       ## Few seconds ago
       ## ---------------------------------------------------------------
@@ -1094,7 +1094,7 @@ $xwiki.ssx.use('Main.Activity')##
       ##
       ## Number of minutes ago
       ## ---------------------------------------------------------------
-      #set ($hoursAgo = $eventTimeDiff.getHourOfDay() - 2)
+      #set ($hoursAgo = $eventTimeDiff.getHourOfDay())
       #set ($timeAgoMsg = $services.localization.render('timeAgo.hoursAgo', [$hoursAgo]))
     #end
     #set ($isToday = true)

@@ -544,7 +544,7 @@ return XWiki;
   ##
   #elseif ("$!{request.xaction}" != '')
     #if ("$!{request.xaction}" == 'postMessage')
-      #if(!$services.csrf.isTokenValid($!{request.form_token}))
+      #if(!$services.csrf.isTokenValid(${request.form_token}))
         #set($redirectURL = $services.csrf.getResubmissionURL())
         $response.sendRedirect($redirectURL)
       #else

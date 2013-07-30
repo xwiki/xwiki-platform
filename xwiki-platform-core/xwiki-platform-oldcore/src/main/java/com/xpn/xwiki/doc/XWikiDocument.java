@@ -4740,6 +4740,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             query.bindValue("fullName", this.localEntityReferenceSerializer.serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
+            query.setLimit(nb).setOffset(start);
             List<Object[]> queryResults = query.execute();
 
             for (Object[] queryResult : queryResults) {

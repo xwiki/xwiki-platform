@@ -4443,7 +4443,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
         throws XWikiException
     {
-        deleteAttachment(attachment, false, toRecycleBin, context);
+        deleteAttachment(attachment, true, toRecycleBin, context);
     }
 
     // TODO: follow object system (mark it as removed in the document and really remove it when saving the document)
@@ -8269,15 +8269,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Apply deleted attachment diff on result (new attachment has already been saved)
             for (AttachmentDiff diff : attachmentsDiff) {
                 if (diff.getNewVersion() == null) {
-                    try {
-                        XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
+                    XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
 
-                        deleteAttachment(attachmentResult, false, true, context);
+                    removeAttachment(attachmentResult);
 
-                        mergeResult.setModified(true);
-                    } catch (XWikiException e) {
-                        mergeResult.getLog().error("Failed to delete attachment [{}]", diff.getFileName(), e);
-                    }
+                    mergeResult.setModified(true);
                 }
             }
         }

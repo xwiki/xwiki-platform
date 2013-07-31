@@ -809,27 +809,6 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // upgrade
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                // One attachment exist in the recent version but not in the old one
-                oneOf(mockAttachmentStore).deleteXWikiAttachment(with(new BaseMatcher<XWikiAttachment>()
-                {
-                    @Override
-                    public boolean matches(Object arg)
-                    {
-                        return ((XWikiAttachment) arg).getFilename().equals("attachment.txt");
-                    }
-
-                    @Override
-                    public void describeTo(Description description)
-                    {
-                        description.appendValue("attachment.ext");
-                    }
-                }), with(equal(false)), with(any(XWikiContext.class)), with(equal(true)));
-            }
-        });
-
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
         // validate

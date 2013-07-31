@@ -92,8 +92,8 @@
           #end
           &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
-        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
         &lt;/label&gt;
+        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
         &lt;/dt&gt;
         #if ($prop)
           &lt;dd&gt;$doc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;

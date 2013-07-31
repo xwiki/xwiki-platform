@@ -46,7 +46,7 @@
   <content>{{velocity output="false"}}
 ### Administer email related wiki preferences, at global level
 #set ($params = {
-  'sender': ['admin_email'],
+  'general': ['admin_email', 'obfuscateEmailAddresses'],
   'smtp': ['smtp_server', 'smtp_port', 'smtp_server_username', 'smtp_server_password', 'javamail_extra_props']
 })
 {{/velocity}}

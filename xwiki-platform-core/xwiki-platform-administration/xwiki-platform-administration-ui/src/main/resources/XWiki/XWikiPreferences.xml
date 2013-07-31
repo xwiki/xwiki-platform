@@ -742,6 +742,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </multilingual>
+    <obfuscateEmailAddresses>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <name>obfuscateEmailAddresses</name>
+      <number>72</number>
+      <prettyName>Obfuscate Email Addresses</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </obfuscateEmailAddresses>
     <parent>
       <customDisplay/>
       <disabled>0</disabled>
@@ -2151,6 +2165,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </multilingual>
+      <obfuscateEmailAddresses>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>obfuscateEmailAddresses</name>
+        <number>72</number>
+        <prettyName>Obfuscate Email Addresses</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </obfuscateEmailAddresses>
       <parent>
         <customDisplay/>
         <disabled>0</disabled>

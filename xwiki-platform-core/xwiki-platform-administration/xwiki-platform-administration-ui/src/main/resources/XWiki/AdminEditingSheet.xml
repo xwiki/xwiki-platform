@@ -45,10 +45,10 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ### Administer the wiki editor preferences, at global level
-#set ($legend = ['editor', 'versioning'])
-#set ($params = {})
-#set ($params.editor = ['editor', 'core.defaultDocumentSyntax', 'xwiki.title.mandatory'])
-#set ($params.versioning = ['editcomment', 'editcomment_mandatory', 'minoredit'])
+#set ($params = {
+  'editor': ['editor', 'core.defaultDocumentSyntax', 'xwiki.title.mandatory'],
+  'versioning': ['editcomment', 'editcomment_mandatory', 'minoredit']
+})
 {{/velocity}}
 
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}</content>

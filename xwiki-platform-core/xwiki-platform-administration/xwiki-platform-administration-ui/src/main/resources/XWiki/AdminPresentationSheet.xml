@@ -153,10 +153,10 @@
   <content>{{velocity output="false"}}
 $xwiki.jsx.use('XWiki.AdminPresentationSheet')
 ### Change the skin and color theme, at global or space level
-#set($legend = ['skin', 'colortheme'])
-#set($params = {})
-#set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
-#set($params.colortheme = ['colorTheme'])
+#set ($params = {
+  'skin': ['skin', 'stylesheet', 'stylesheets'],
+  'colortheme': ['colorTheme']
+})
 {{/velocity}}
 
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}</content>

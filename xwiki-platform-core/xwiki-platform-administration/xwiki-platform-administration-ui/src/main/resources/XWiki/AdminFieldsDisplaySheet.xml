@@ -50,12 +50,12 @@
   &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
     #set($prefsClassName = 'XWiki.XWikiPreferences')
     #set($obj = $doc.getObject($prefsClassName))
-    #foreach ($item in $legend)
-      #set ($fields = $params.get($item))
-      &lt;fieldset class="$item"&gt;
+    #foreach ($entry in $params.entrySet())
+      #set ($fields = $entry.value)
+      &lt;fieldset class="$entry.key"&gt;
       ## If there is only one section, don't display the legend
-      #if ($legend.size() &gt; 1)
-        &lt;legend&gt;$services.localization.render("admin.${item}")&lt;/legend&gt;
+      #if ($params.size() &gt; 1)
+        &lt;legend&gt;$services.localization.render("admin.$entry.key")&lt;/legend&gt;
       #end
       #if ($fields.size() &gt; 0)
         &lt;dl&gt;

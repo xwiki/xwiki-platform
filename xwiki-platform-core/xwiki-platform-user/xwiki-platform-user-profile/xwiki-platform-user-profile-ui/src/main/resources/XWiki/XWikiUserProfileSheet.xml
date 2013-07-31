@@ -196,12 +196,9 @@
 #set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
 ##
 {{html clean='false' wiki='true'}}
-#set($username = $xwiki.getUserName($doc.fullName, false))
-= $services.localization.render('platform.core.profile.title', [$username]) =
-
 #if (!$inEditMode)
   &lt;div class="vcard"&gt;
-  &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
+  &lt;span class="fn hidden"&gt;$xwiki.getUserName($doc.fullName, false)&lt;/span&gt;
 #end
   &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class='userInfo'&gt;

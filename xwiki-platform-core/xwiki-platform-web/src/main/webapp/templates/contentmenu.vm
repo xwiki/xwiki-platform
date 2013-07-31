@@ -7,18 +7,7 @@
 ##
 ## Let's clean the query string to avoid injections
 ##
-#set($cleanQueryString = '')
-#foreach($param in $request.getParameterNames())
-  #set($cleanParam = $!escapetool.url($param))
-  #foreach($value in $request.getParameterValues($param))
-    #set($cleanValue = $!escapetool.url($value))
-    #set($cleanQueryString = $cleanQueryString + $!cleanParam + '=' + $!cleanValue + '&amp;')
-  #end
-#end
-#if($cleanQueryString != '')
-  ## Remove the last "&amp;"
-  #set($cleanQueryString = $stringtool.substring($cleanQueryString, 0, -5))
-#end
+#set($cleanQueryString = $escapetool.url($request.getParameterMap()))
 #if($hasEdit && !$isReadOnly)
   ## Compute the default edit mode
   #set($editaction = $doc.getDefaultEditMode())

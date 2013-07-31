@@ -192,63 +192,39 @@ Object.extend(XWiki, {
   userprofile : {
     init : function() {
       this.crtCategory = '';
-      this.tabsContainer = $('vertical-tabs');
+      this.tabsContainer = $('user-vertical-menu');
       if (!this.tabsContainer) {
         return;
       }
-      this.tabsContainer.select('.vertical-tab').each(function (tabElement) {
-        if (!tabElement.__name) {
-          tabElement.__name = tabElement.id.replace(/Tab$/, '');
-        }
+      this.tabsContainer.select('.category-tab').each(function (tabElement) {
         tabElement.observe('click', function(event) {
           Event.stop(event);
-          this.switchTab(tabElement.__name);
+          this.switchTab(tabElement.id);
         }.bindAsEventListener(this));
       }.bind(this));
-      this.tabsContainer.select('.vertical-tab.active').each(function (activeTab) {
-        this.updateCategoryFields(activeTab.__name);
-        document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.__name});
+      this.tabsContainer.select('.category-tab.current').each(function (activeTab) {
+        this.updateCategoryFields(activeTab.id);
+        document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.id});
       }.bind(this));
-      XWiki.userprofile.adjustTabsContainerHeight();
       this.handleCancelAction();
     },
 
-    /*
-    ** This ugly hack is used as a workaround for IE6 box model (3px jog bug) which prevent from 
-    ** putting the  separating border between tabs and panes on the pane div. We put the border 
-    ** on the tabs container and adjust its size depending on the size of the right pane.
-    ** FIXME: find a better mechanism for tabbed UIs / drop this hack when stopping IE6 support.
-    */
-    adjustTabsContainerHeight: function() {
-      var currentPane;
-      $("vertical-panes").select("div.vertical-pane").each(function(pane){
-        if(!pane.hasClassName('hidden')) {
-          currentPane = pane;
-        }
-      });
-      if (currentPane.getHeight() &gt; $('vertical-tabs').getHeight()) {
-        $('vertical-tabs').setStyle({ height: currentPane.getHeight() + 'px' });
-      } else {
-        $('vertical-tabs').setStyle({ height: '' });
-      }
-    },
-
     switchTab : function(tab) {
-      $("vertical-panes").select("div.vertical-pane").each(function(pane){
+      var tabName = tab.substring(14); // 14 = len('vertical-menu-')
+      $("user-page-content").select("div.user-page-pane").each(function(pane){
         pane.addClassName('hidden');
       });
-      $('vertical-tabs').setStyle({ height: '' });
-      $(tab + 'Pane').removeClassName('hidden');
-      $("vertical-tabs").select("li.vertical-tab").each(function(tab){
-        tab.removeClassName('active');
+      $(tabName + 'Pane').removeClassName('hidden');
+      $("user-vertical-menu").select("span.category-tab").each(function(tab){
+        tab.removeClassName('current');
       });
-      $(tab + 'Tab').addClassName('active');
-      XWiki.userprofile.adjustTabsContainerHeight();
+      $(tab).addClassName('current');
       this.updateCategoryFields(tab);
       document.fire('xwiki:profile:switchedCategory', {'category' : tab});
     },
 
     updateCategoryFields : function (category) {
+      category = category.substring(14); // 14 = len('vertical-menu-')
       this.crtCategory = category;
       this.updateField('xredirect', XWiki.currentDocument.getURL('view', 'category=' + category));
       this.updateField('xcontinue', XWiki.currentDocument.getURL('edit', 'editor=inline&amp;category=' + category));
@@ -378,23 +354,108 @@ return XWiki;
     <property>
       <code>#template("colorThemeInit.vm")
 #set($tabswidth = "130px")
+/* ----- User menu ----- */
+#user-menu-col{
+  float: left;
+  width: 13em;
+}
 
+#avatar img {
+  border: 1px solid $theme.borderColor;
+  border-radius: 5px 5px 5px 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
+  padding: 0.3em;
+  width: 95%;
+}
+
+.profile-menu .category-tab:before{
+  float: left;
+  margin: 5px 0 0 5px;
+}
+
+.profile-menu .user-menu-profile:before{
+  content: url("$xwiki.getSkinFile('icons/silk/vcard.png')");
+}
+
+.profile-menu .user-menu-preferences:before{
+  content: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
+}
+
+.profile-menu .user-menu-watchlist:before{
+  content: url("$xwiki.getSkinFile('icons/silk/star.png')");
+}
+
+.profile-menu .user-menu-network:before{
+  content: url("$xwiki.getSkinFile('icons/silk/group.png')");
+}
+
+.profile-menu .user-menu-dashboard:before{
+  content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+}
+
+.profile-menu .user-menu-workspaces:before{
+  content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
+}
+
+.profile-menu .group.user-menu-title{
+  #set ($menuIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/user.png')${escapetool.S})")
+  #css3_backgroundIconAndLinearGradient($menuIcon, {
+    'to': 'bottom',
+    'colors': [
+      {'color':$theme.menuContentGradientColor,    'position': '0%'},
+      {'color':$theme.menuContentBackgroundColor, 'position': '100%'}
+    ]
+  })  
+}
+
+.profile-menu .group, .profile-menu .group:hover {
+  background-position: 7px 50%,top center;
+}
+
+.user-menu-title a:hover{
+  color: $theme.panelHeaderTextColor !important;
+}
+
+/* ----- Page content ---- */
+#user-page-content{
+  margin-left: 14em;
+}
+
+#user-page-content h1{
+  margin: 0 0 20px 0;
+}
+
+
+.column h1 {
+  font-weight:bold;
+  font-size:115%;
+  margin:10px 0;
+}
+
+.column h2 {
+  font-size: 110%;
+}
+
+/* For columns that don't adapt well to limited width. */
+.column.min-half {
+  min-width: 49.9%;
+}
+
+div.profile-section,
+div.userInfo, div.userRecentChanges, div.userPreferences, div.passwordManagement, div.watchlistManagement, div.watchlistRss, div.watchlistElements, 
+div.userDashboard, #dashboardPane .dashboard {
+  margin: 5px 10px 10px;
+  padding: 5px 10px 10px;
+}
+
+/* ----- Profile ----- */
 td.recentChangesLeft, .recentChangesMoreActions {
   display:none;
 }
 
 td.recentChangesRight {
   padding: 0 !important;
-}
-
-.vertical-pane .column h1 {
-  font-weight:bold;
-  font-size:115%;
-  margin:10px 0;
-}
-
-.vertical-pane .column h2 {
-  font-size: 110%;
 }
 
 div.profile-section,
@@ -454,12 +515,6 @@ span.pageWatchlistType {
   background: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat;
 }
 
-/* Tabs */
-
-div#vertical-panes {
-  margin-top: 10px;
-}
-
 span#avatarUpload {
   display:block;
   width:$tabswidth;
@@ -469,75 +524,7 @@ span#avatarUpload {
   background-color: white;
 }
 
-#vertical-tabs {
-  float:left;
-  width:$tabswidth;
-  border-right: solid 1px $theme.menuBackgroundColor;
-}
 
-#vertical-tabs ul {
-  margin:0;
-  margin-top:5px;
-  padding:0;
-  border-right:0;
-  border-bottom:0;
-  border-left:0;
-}
-
-#vertical-tabs ul li {
-  display: block;
-  list-style-type: none;
-  list-style-position: outside;
-  margin:0;
-  border: solid 1px $theme.pageContentBackgroundColor;
-  border-right: 0;
-}
-
-#vertical-tabs ul li img {
-  float:left;
-  margin-right:4px;
-  vertical-align:middle;
-}
-
-#vertical-tabs ul li span {
-  line-height:1.5em;
-}
-
-#vertical-tabs ul li.active {
-  border: solid 1px $theme.menuBackgroundColor;
-  border-right: 0px;
-}
-
-#vertical-tabs ul li a {
-  padding: 3px 0px 3px 4px;
-  text-decoration: none;
-  display:block;
-  color:$theme.menuBackgroundColor;
-}
-
-#vertical-tabs ul li.active a {
-  text-decoration: none;
-  position:relative;
-  left:1px;
-  background:$theme.pageContentBackgroundColor;
-  color: $theme.textColor;
-  padding-left: 3px;
-}
-
-.vertical-pane {
-  margin-left:$tabswidth;
-  padding: 10px;
-  padding-top: 0;
-}
-
-.vertical-pane .column {
-  overflow: hidden;
-}
-
-/* For columns that don't adapt well to limited width. */
-.vertical-pane .column.min-half {
-  min-width: 49.9%;
-}
 
 ## --------------------------------------
 ## Network sections style
@@ -572,6 +559,8 @@ span#avatarUpload {
 ## Picker style
 .attachment-picker {
   position: relative;
+  margin: auto;
+  width: 100%;
 }
 .attachment-picker p {
   padding: 0;
@@ -596,7 +585,7 @@ span#avatarUpload {
   right: 0;
   text-align: left;
   text-indent: -9999px;
-  top: 0;
+  top: 1px;
   width: 18px !important;
   z-index: 1;
 }
@@ -619,97 +608,114 @@ span#avatarUpload {
     </property>
   </object>
   <content>{{velocity}}
-##
-## Extensions and vars
-##
-$xwiki.ssx.use("XWiki.XWikiUserSheet")##
-$xwiki.jsx.use("XWiki.XWikiUserSheet")##
-#set($obj = $doc.getObject("XWiki.XWikiUsers"))
-##
-## Categories
-##
+#########################
+## CSS &amp; Javascripts
+#########################
+#set($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
+#set($discard = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
+#########################
+## Setting categories
+#########################
 #set($categories = [])
-#set($discard = $categories.add(['profile', $services.localization.render('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.png']))
+#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet'}))
 #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
 #if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add(['preferences', $services.localization.render('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/wrench.png']))
+  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet'}))
 #end
 ## TODO: add APIs to be able to display users watchlists to admins
-#if($isMyProfile &amp;&amp; $hasWatch)
-  #set($discard = $categories.add(['watchlist', $services.localization.render('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.png']))
+#if($isMyProfile &amp;&amp; $hasWatch)  
+  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet'}))
 #end
-#if ($isMyProfile)
-  #set ($discard = $categories.add(['network', $services.localization.render('platform.core.profile.category.network'), 'XWiki.XWikiUserNetworkSheet', 'icons/silk/group.png']))
+#if($isMyProfile)
+  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet'}))
 #end
-#set ($userWorkspaceSheet = 'WorkspaceManager.UserWorkspaceSheet')
-#if ($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWorkspaceSheet))
-  #set ($discard = $categories.add(['workspaces', $services.localization.render('workspacemanager.profile.category.workspaces'), $userWorkspaceSheet, 'icons/silk/chart_organisation.png']))
+#set($userWorkspaceSheet = 'WorkspaceManager.UserWorkspaceSheet')
+#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWorkspaceSheet))  
+  #set($discard = $categories.add({'id':'workspaces', 'sheet':$userWorkspaceSheet}))
 #end
-#if ($isMyProfile &amp;&amp; $hasDashboard)
-  #set ($discard = $categories.add(['dashboard', $services.localization.render('platform.core.profile.category.dashboard'), 'Dashboard.XWikiUserDashboardSheet', 'icons/silk/application_view_tile.png']))
+#if($isMyProfile &amp;&amp; $hasDashboard)
+  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet'}))  
 #end
-##
+#########################
 ## Current category
-##
+#########################
 #set($currentCategory = "$!request.category")
 #if($currentCategory == "")
-  #set($currentCategory = $listtool.get($listtool.get($categories, 0), 0))
+  #set($currentCategory = $listtool.get($categories, 0).get('id'))
 #end
-##
-## Display
-##
-{{html clean="false"}}
-  &lt;div id="vertical-panes"&gt;
-    ##
-    ## Tabs
-    ##
-    &lt;div id="vertical-tabs"&gt;
-      &lt;div id="avatar"&gt;
-#if ($request.xpage == 'edituser')
-  #largeUserAvatar($doc.fullName)
-#else
-{{/html}}
-
-{{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
-
-{{html clean="false"}}
+#########################
+## Creating vertical menu
+#########################
+#set($userMenu = [{
+  'id'       : 'settings',
+  'cssClass' : 'user-menu-title',
+  'children' : $categories
+  }
+])
+## Setting automaticaly url &amp; css fields of each category
+#foreach($category in $userMenu)
+  #foreach($subcategory in $category.get('children'))
+    #set($id = $subcategory.get('id')) 
+    #set($discard = $subcategory.put('url', "?category=${id}"))
+    #set($discard = $subcategory.put('cssClass', "user-menu-$id category-tab"))
+  #end
 #end
-      &lt;/div&gt;## avatar
-      &lt;div&gt; 
-        &lt;ul&gt;
-          #foreach($tab in $categories)
-            #set($tabKey = $listtool.get($tab, 0))
-            #set($tabName = $listtool.get($tab, 1))
-            #set($tabIcon = $listtool.get($tab, 3))
-            &lt;li id="${tabKey}Tab" class="vertical-tab#if($tabKey == $currentCategory) active#end"&gt;&lt;a href="?category=${tabKey}"&gt;&lt;img src="$xwiki.getSkinFile($tabIcon)" alt="$tabName" /&gt;&lt;span&gt;$tabName&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
-          #end
-        &lt;/ul&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-    ##
-    ## Panes
-    ##
-    #foreach($tab in $categories)
-      #set($tabKey = $listtool.get($tab, 0))
-      #set($tabInclude = $listtool.get($tab, 2))
-      &lt;div id="${tabKey}Pane" class="vertical-pane#if($tabKey != $currentCategory) hidden#end"&gt;
-{{/html}}
-
-{{include document="${tabInclude}" /}}
-
+#########################
+## Display the left menu
+#########################
+(% id="user-menu-col" %)
+(((
+  ############
+  ## Avatar
+  ############
+  (% id="avatar" %)
+  (((
+    #if($request.xpage == 'edituser')
+      {{html clean="false"}}
+        #resizedUserAvatar($doc.fullName 170)
+      {{/html}}
+    #else
+      {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
+    #end
+  )))
+  ##########
+  ## Menu
+  ##########
+  (% id="user-vertical-menu" %)
+  (((  
+    #verticalNavigation($userMenu, {'translationPrefix' : 'platform.core.profile.category.', 'crtItemId' : $currentCategory, 'cssClass' : 'profile-menu'})
+  )))
+)))
+#########################
+## Display the page content
+#########################
+(% id="user-page-content" %)
+(((  
+  #foreach($category in $userMenu)
+    #foreach($subcategory in $category.get('children'))
+      #set($tabKey = $subcategory.get('id')) 
+      (% id="${tabKey}Pane" class="user-page-pane #if($tabKey != $currentCategory) hidden #end" %)
+      (((
+        #set($tabInclude = $subcategory.get('sheet'))
+        {{include document="${tabInclude}" /}}
+      ))) 
+    #end
+  #end
+)))
+#########################
+## END
+#########################
 {{html clean="false"}}
-      &lt;/div&gt;
-    #end
-    #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
-      &lt;input type='hidden' name='category' value="$!{currentCategory}" /&gt;
-    #end
-    &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-  &lt;/div&gt;
-  #if ($request.get('xpage'))
+  #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
+    &lt;input type='hidden' name='category' value="$!{currentCategory}" /&gt;
+  #end
+  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+  #if($request.get('xpage'))
     &lt;script type="text/javascript"&gt;
-    document.fire('lightbox:userprofile:loaded');
+      document.fire('lightbox:userprofile:loaded');
     &lt;/script&gt;
   #end
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>
+

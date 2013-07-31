@@ -4432,6 +4432,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             XWikiAttachment attach = list.get(i);
             if (attachment.getFilename().equals(attach.getFilename())) {
                 list.remove(i);
+                setMetaDataDirty(true);
                 break;
             }
         }
@@ -4440,6 +4441,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     // TODO: deprecated this method and follow object system (mark it as removed in the document and really remove it
     // when saving the document)
     public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
+        throws XWikiException
+    {
+        deleteAttachment(attachment, false, toRecycleBin, context);
+    }
+
+    // TODO: follow object system (mark it as removed in the document and really remove it when saving the document)
+    private void deleteAttachment(XWikiAttachment attachment, boolean saveDocument, boolean toRecycleBin, XWikiContext context)
         throws XWikiException
     {
         String database = context.getDatabase();
@@ -4456,11 +4464,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 }
                 context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, false, context, true);
 
-                // Save the document
-                // We need to make sure there is a version upgrade
-                setMetaDataDirty(true);
                 removeAttachment(attachment);
-                context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
+
+                if (saveDocument) {
+                    // Save the document
+                    context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
+                }
             } catch (java.lang.OutOfMemoryError e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE, "Out Of Memory Exception");
@@ -8263,7 +8272,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     try {
                         XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
 
-                        deleteAttachment(attachmentResult, context);
+                        deleteAttachment(attachmentResult, false, true, context);
 
                         mergeResult.setModified(true);
                     } catch (XWikiException e) {

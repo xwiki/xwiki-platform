@@ -44,7 +44,6 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.RepositoryUtils;
-import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
@@ -227,6 +226,19 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                         }
 
                         documentLanguages.put(document.getLanguage(), document.clone());
+
+                        return null;
+                    }
+                });
+                allowing(mockXWiki).saveDocument(with(any(XWikiDocument.class)), with(any(String.class)),
+                    with(any(XWikiContext.class)));
+                will(new CustomAction("saveDocument")
+                {
+                    @Override
+                    public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                    {
+                        mockXWiki.saveDocument((XWikiDocument) invocation.getParameter(0),
+                            (String) invocation.getParameter(1), false, (XWikiContext) invocation.getParameter(2));
 
                         return null;
                     }
@@ -814,7 +826,7 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
                     {
                         description.appendValue("attachment.ext");
                     }
-                }), with(any(XWikiContext.class)), with(equal(true)));
+                }), with(equal(false)), with(any(XWikiContext.class)), with(equal(true)));
             }
         });
 
@@ -846,11 +858,8 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("property", baseClass.getField("property").getName());
         Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
-        XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
-        Assert.assertNotNull(attachment);
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentSize(getContext()));
-        Assert.assertEquals("attachment content", IOUtils.toString(attachment.getContentInputStream(getContext())));
+        // The attachment does not exist in version 1.0
+        Assert.assertNull(modifiedpage.getAttachment("attachment.txt"));
 
         // space2.page2
 

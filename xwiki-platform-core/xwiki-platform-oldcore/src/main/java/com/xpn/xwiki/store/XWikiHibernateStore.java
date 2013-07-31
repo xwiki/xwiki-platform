@@ -82,6 +82,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -528,6 +529,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                 saveAttachmentList(doc, context, false);
+            }
+            // Remove attachments planned for removal
+            if (doc.getAttachmentsToRemove().size() > 0) {
+                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
+                    context.getWiki().getAttachmentStore()
+                        .deleteXWikiAttachment(attachment.getAttachment(), false, context, false);
+                }
+                doc.clearAttachmentsToRemove();
             }
 
             // Handle the latest text file

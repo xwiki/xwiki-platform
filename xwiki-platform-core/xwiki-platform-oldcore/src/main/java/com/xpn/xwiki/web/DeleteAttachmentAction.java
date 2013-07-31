@@ -116,7 +116,7 @@ public class DeleteAttachmentAction extends XWikiAction
             return true;
         }
 
-        newdoc.setAuthor(context.getUser());
+        newdoc.setAuthorReference(context.getUserReference());
 
         // Set "deleted attachment" as the version comment.
         ArrayList<String> params = new ArrayList<String>();
@@ -128,7 +128,8 @@ public class DeleteAttachmentAction extends XWikiAction
         }
 
         try {
-            newdoc.deleteAttachment(attachment, context);
+            newdoc.removeAttachment(attachment);
+            xwiki.saveDocument(newdoc, "Deleted attachment [" + attachment.getFilename() + "]", context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");

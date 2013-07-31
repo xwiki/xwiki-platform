@@ -125,7 +125,6 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
         this.contextUser = new DocumentReference(getContext().getDatabase(), "XWiki", "ExtensionUser");
 
         this.mockStore = getMockery().mock(XWikiStoreInterface.class);
-        this.mockAttachmentStore = getMockery().mock(XWikiAttachmentStoreInterface.class);
 
         this.mockRightService = getMockery().mock(XWikiRightService.class);
 
@@ -284,9 +283,6 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
                 allowing(mockXWiki).hasAttachmentRecycleBin(with(any(XWikiContext.class)));
                 will(returnValue(false));
-
-                allowing(mockXWiki).getAttachmentStore();
-                will(returnValue(mockAttachmentStore));
             }
         });
 

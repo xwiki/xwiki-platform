@@ -137,6 +137,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
@@ -1445,6 +1446,17 @@ public class XWiki implements EventListener
                 }
             }
 
+            // Put attachments to remove in recycle bin
+            if (hasAttachmentRecycleBin(context)) {
+                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
+                    if (attachment.isToRecycleBin()) {
+                        getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(), context.getUser(),
+                            new Date(), context, true);
+                    }
+                }
+            }
+
+            // Actually delete the document
             getStore().saveXWikiDoc(doc, context);
 
             // Since the store#saveXWikiDoc resets originalDocument, we need to temporarily put it

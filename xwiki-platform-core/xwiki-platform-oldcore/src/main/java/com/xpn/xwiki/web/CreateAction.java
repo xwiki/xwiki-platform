@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
+
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -115,6 +117,21 @@ public class CreateAction extends XWikiAction
      */
     private static final String VELOCITY_CONTEXT_KEY = "vcontext";
 
+    /**
+     * Local entity reference serializer hint.
+     */
+    private static final String LOCAL_SERIALIZER_HINT = "local";
+
+    /**
+     * Default entity reference resolver hint.
+     */
+    private static final String DEFAULT_RESOLVER_HINT = "default";
+
+    /**
+     * Current entity reference resolver hint.
+     */
+    private static final String CURRENT_RESOLVER_HINT = "current";
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -134,7 +151,7 @@ public class CreateAction extends XWikiAction
 
         // get the template provider for creating this document, if any template provider is specified
         DocumentReferenceResolver<EntityReference> referenceResolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+            Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, CURRENT_RESOLVER_HINT);
         DocumentReference templateProviderClassReference = referenceResolver.resolve(TEMPLATE_PROVIDER_CLASS);
         BaseObject templateProvider = getTemplateProvider(context, resolver, templateProviderClassReference);
 
@@ -234,15 +251,30 @@ public class CreateAction extends XWikiAction
     {
         // This template can be passed a parent document reference in parameter (using the "parent" parameter).
         // If a parent parameter is passed, use it to set the parent when creating the new Page or Space.
-        // If no parent parameter was passed, use the current document if we're creating a new page, keep it blank
-        // if we're creating a new space. Also don't set current document as parent if it's a new doc
+        // If no parent parameter was passed, use the current document if we're creating a new page, use the Main 
+        // space's WebHome if we're creating a new space. Also don't set current document as parent if it's a new doc
         String parent = request.getParameter("parent");
-        if (StringUtils.isEmpty(parent) && !isSpace && !doc.isNew()) {
-            DocumentReference parentRef = doc.getDocumentReference();
-
+        if (StringUtils.isEmpty(parent)) {
             EntityReferenceSerializer<String> localSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-            parent = localSerializer.serialize(parentRef);
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
+
+            if (isSpace) {
+                EntityReferenceValueProvider currentReferenceValueProvider =
+                    Utils.getComponent(EntityReferenceValueProvider.class, CURRENT_RESOLVER_HINT);
+                EntityReferenceValueProvider defaultReferenceValueProvider =
+                    Utils.getComponent(EntityReferenceValueProvider.class, DEFAULT_RESOLVER_HINT);
+
+                DocumentReference parentRef =
+                    new DocumentReference(currentReferenceValueProvider.getDefaultValue(EntityType.WIKI),
+                        defaultReferenceValueProvider.getDefaultValue(EntityType.SPACE),
+                        defaultReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT));
+
+                parent = localSerializer.serialize(parentRef);
+            } else if (!doc.isNew()) {
+                DocumentReference parentRef = doc.getDocumentReference();
+
+                parent = localSerializer.serialize(parentRef);
+            }
         }
 
         return parent;

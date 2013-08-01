@@ -117,10 +117,11 @@ public class Importer extends AbstractPackager
      * @param importUser optionally the user under which to perform the import (useful for example when importing pages
      *            that need to have Programming Rights and the page author is not the same as the importing user)
      * @param context the XWiki context
+     * @return the number of imported documents
      * @throws XWikiException failed to import the XAR file
      * @throws IOException failed to parse the XAR file
      */
-    public void importXAR(File file, String importUser, XWikiContext context) throws XWikiException, IOException
+    public int importXAR(File file, String importUser, XWikiContext context) throws XWikiException, IOException
     {
         Package pack = new Package();
         pack.setWithVersions(false);
@@ -134,7 +135,11 @@ public class Importer extends AbstractPackager
         }
 
         // Import into the database
-        installWithUser(importUser, pack, context);
+        if (!pack.getFiles().isEmpty()) {
+            installWithUser(importUser, pack, context);
+        }
+
+        return pack.getFiles().size();
     }
 
     /**

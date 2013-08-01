@@ -185,7 +185,9 @@ public class ImportMojo extends AbstractMojo
                     getLog().info("  ... Importing XAR file: " + artifact.getFile());
 
                     // Import XAR into database
-                    importer.importXAR(artifact.getFile(), null, xcontext);
+                    int nb = importer.importXAR(artifact.getFile(), null, xcontext);
+
+                    getLog().info("  ..... Imported " + nb + " documents");
 
                     // Install extension
                     installExtension(artifact, xcontext);

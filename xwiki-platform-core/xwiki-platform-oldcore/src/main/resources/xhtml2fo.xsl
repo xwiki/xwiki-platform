@@ -870,9 +870,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                         <fo:block text-align="left" font-weight="bold" font-size="12pt"  padding-top="10pt" padding-bottom="10pt">
                             <xsl:apply-templates  select="/html:html/html:body/html:div[@class='pdftoc']" mode="pdftoc" />
                         </fo:block>
-                        <xsl:for-each select="/html:html/html:body/html:div[@id='xwikimaincontainer']/html:h1 |
-                                /html:html/html:body/html:div[@id='xwikimaincontainer']/html:h2 |
-                                /html:html/html:body/html:div[@id='xwikimaincontainer']/html:h3">
+                        <xsl:for-each select="//html:div[@id='xwikicontent' or @id='xwikimaincontainerinner']
+                                /html:*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
                             <fo:block font-size="9pt" start-indent="10pt" width="100%" text-align-last="justify" >
                                 <xsl:choose>
                                     <xsl:when test="self::html:h1">

@@ -79,12 +79,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <dependency>
-      <groupId>net.sf.jtidy</groupId>
-      <artifactId>jtidy</artifactId>
-      <version>r938</version>
-    </dependency>
     
     <!-- Required by the XML-RPC implementation and tests.
          Hopefully they will eventually make it into a swizzle release. -->
@@ -904,7 +898,6 @@
               **/util/AbstractXWikiRunnable.java,
               **/util/MenuSubstitution.java,
               **/util/Programming.java,
-              **/util/TidyMessageLogger.java,
               **/util/TOCGenerator.java,
               **/util/Util.java,
               **/validation/XWikiDefaultValidation.java,

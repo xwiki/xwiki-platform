@@ -371,6 +371,11 @@
               <field>TYPE_PROVIDER</field>
               <justification>This field is not meant to be be modified, the final was just forgotten.</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/util/TidyMessageLogger</className>
+              <justification>We dropped Tidy in favor of HTMLCleaner.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -233,7 +233,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(anchor)) {
             newpath.append("#");
-            newpath.append(encode(anchor, context));
+            newpath.append(anchor);
         }
 
         try {

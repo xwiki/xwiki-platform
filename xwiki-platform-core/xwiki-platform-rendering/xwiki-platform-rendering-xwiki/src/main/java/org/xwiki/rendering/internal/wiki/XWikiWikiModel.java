@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.wiki;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

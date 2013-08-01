@@ -233,7 +233,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(anchor)) {
             newpath.append("#");
-            newpath.append(encode(anchor, context));
+            // Don't encode the anchor part, regarding RFC 3986: http://tools.ietf.org/html/rfc3986#section-3.5
+            newpath.append(anchor);
         }
 
         try {

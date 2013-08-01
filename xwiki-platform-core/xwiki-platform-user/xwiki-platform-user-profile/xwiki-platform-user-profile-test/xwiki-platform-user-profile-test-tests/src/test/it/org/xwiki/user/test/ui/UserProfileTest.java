@@ -130,8 +130,7 @@ public class UserProfileTest extends AbstractTest
         Assert.assertEquals(USER_LAST_NAME, this.customProfilePage.getUserLastName());
         Assert.assertEquals(USER_COMPANY, this.customProfilePage.getUserCompany());
         Assert.assertEquals(USER_ABOUT, this.customProfilePage.getUserAbout());
-        // The page will show w...@xwiki.org for security reasons
-        Assert.assertEquals("w...@xwiki.org", this.customProfilePage.getUserEmail());
+        Assert.assertEquals(USER_EMAIL, this.customProfilePage.getUserEmail());
         Assert.assertEquals(USER_PHONE, this.customProfilePage.getUserPhone());
         Assert.assertEquals(USER_ADDRESS, this.customProfilePage.getUserAddress());
         Assert.assertEquals(USER_BLOG, this.customProfilePage.getUserBlog());

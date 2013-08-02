@@ -90,7 +90,7 @@
       #if($monthArticleCount &gt; 0)
         $tempDate.setMonthOfYear($month)
 == [[$monthFormatter.print($tempDate) (${monthArticleCount})&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]] ==
-        #foreach($entryDoc in $xwiki.wrapDocs($xwiki.searchDocuments("${query} and month(publishDate.value) = $month order by publishDate.value", $queryParams)))
+        #foreach($entryDoc in $xwiki.wrapDocs($services.query.hql("${query} and month(publishDate.value) = $month order by publishDate.value", $queryParams).execute()))
           #getEntryObject($entryDoc $entryObj)
           #isPublished($entryObj $isPublished)
           #isHidden($entryObj $isHidden)
@@ -118,7 +118,7 @@
   #set($query = "${query} and year(publishDate.value) = $year and month(publishDate.value) = $month")
   #set($monthArticleCount = $xwiki.countDocuments(${query}, $queryParams))
   #if($monthArticleCount &gt; 0)
-    #foreach($entryDoc in $xwiki.wrapDocs($xwiki.searchDocuments("${query} order by publishDate.value", $queryParams)))
+    #foreach($entryDoc in $xwiki.wrapDocs($services.query.hql("${query} order by publishDate.value").bindValues($queryParams).execute()))
       #getEntryObject($entryDoc $entryObj)
       #displayEntry($entryDoc $entryObj true true)
     #end

@@ -36,7 +36,7 @@
 ##
 = $services.localization.render('xe.blog.manage.existing') =
 
-#foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
+#foreach($item in $xwiki.wrapDocs($services.query.hql(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'").execute()))
   #getBlogTitle($item $title)
   #if($title != '')
     * [[$title&gt;&gt;$item.fullName]]

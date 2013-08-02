@@ -27,7 +27,7 @@
 #if($request.migrate &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
   #set($newContent = '#includeForm("Blog.BlogPostSheet")')
   #set($query = ", BaseObject obj where obj.name = doc.fullName and obj.className = 'XWiki.ArticleClass'")
-  #foreach($article in $xwiki.searchDocuments($query))
+  #foreach($article in $services.query.hql($query).execute())
     #if($xwiki.hasAccessLevel('edit', $xcontext.user, $article))
       #set($articleDoc = $xwiki.getDocument($article))
     #set($articleObj = $articleDoc.getObject('XWiki.ArticleClass'))

@@ -408,6 +408,8 @@
           #set ($discard = $releaseNotes.add([$version, $notes]))
         #end
       #end
+      ## Reverse the list to have latest versions first
+      #set ($discard = $collectionstool.reverse($releaseNotes))
       #if (!$releaseNotes.isEmpty())
         = Release Notes =
         #foreach ($entry in $releaseNotes)

@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1251108485000</creationDate>
-  <date>1251108485000</date>
-  <contentUpdateDate>1251108485000</contentUpdateDate>
+  <creationDate>1375383699000</creationDate>
+  <date>1375450443000</date>
+  <contentUpdateDate>1375450443000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.themes.colors.title')</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -35,6 +34,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
@@ -49,6 +49,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <disabled>0</disabled>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -58,6 +59,7 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <name>
+        <disabled>0</disabled>
         <name>name</name>
         <number>1</number>
         <prettyName>Name</prettyName>
@@ -66,6 +68,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parse>
+        <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
@@ -76,6 +79,7 @@
       </parse>
       <use>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
@@ -353,7 +357,7 @@ $xwiki.ssx.use($doc.fullName)
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
   #set($query = ", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;? and doc.fullName&lt;&gt;'ColorThemes.ColorThemeSheet' order by doc.title")
   #set($params = ["$!currentTheme"])
-  #set($themeList = $xwiki.searchDocuments($query, 0, 0, $params))
+  #set($themeList = $services.query.hql($query).bindValues($params).execute())
   #if($themeList.size() &gt; 0)
     == $services.localization.render('xe.themes.others') ==
   #end

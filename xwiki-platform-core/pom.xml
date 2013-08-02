@@ -374,7 +374,8 @@
             <difference>
               <differenceType>8001</differenceType>
               <className>com/xpn/xwiki/util/TidyMessageLogger</className>
-              <justification>We dropped Tidy in favor of HTMLCleaner.</justification>
+              <justification>Has been moved to xwiki-platform-feed-api since it was the only module using it. We also
+              dropped Tidy in favor of HTMLCleaner.</justification>
             </difference>
           </ignored>
           <excludes>

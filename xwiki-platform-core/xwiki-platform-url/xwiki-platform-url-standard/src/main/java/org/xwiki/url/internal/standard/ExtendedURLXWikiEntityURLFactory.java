@@ -164,12 +164,16 @@ public class ExtendedURLXWikiEntityURLFactory implements XWikiURLFactory<Extende
         // In Path based it means removing 2 segments:
         // Example of path-based URL: wiki/wikiname/action/space/page
         // Thus removing 2 segments means keeping: action/space/page
-        // In Domain based, we still need to remove one segment since the first segment will contain the type
-        // (i.e. "bin").
         if (isActuallyPathBased) {
             url.getSegments().remove(0);
         }
-        url.getSegments().remove(0);
+
+        // In Domain based, we still need to remove one segment since the first segment will contain the type
+        // (i.e. "bin"). However, since we want to support Short URLs and allow the user to not specify the "bin"
+        // prefix, we only remove the segment if its value is "bin".
+        if (url.getSegments().get(0).equals("bin")) {
+            url.getSegments().remove(0);
+        }
     }
 
     /**

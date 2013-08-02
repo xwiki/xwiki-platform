@@ -42,7 +42,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
         super.setUp();
 
         this.xarExtensionRepository =
-            getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
+            this.mocker.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
     }
 
     protected Job repair(ExtensionId extensionId, String[] namespaces, LogLevel failFrom) throws Throwable

@@ -181,7 +181,7 @@
   #set($countSql = ", BaseObject as workspaceObject $countSql and workspaceObject.name=doc.fullName and workspaceObject.className='WorkspaceManager.WorkspaceClass'")
   #set($sql = "$countSql $!{orderSql}")
   #set($items = $services.query.hql($sql).setLimit($limit).setOffset($offset).bindValues($sqlParams).execute())
-  #set($totalItems = $xwiki.countDocuments($countSql, $sqlParams))
+  #set($totalItems = $services.query.hql($countSql).bindValues($sqlParams).count())
   #set($returnedItems = $items.size())
   ##
   ##

@@ -493,7 +493,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 
 {{html wiki="true" clean="false"}}
 &lt;noscript&gt;
-  #set($deletedDocuments = $xwiki.search('select count(ddoc.id) from XWikiDeletedDocument as ddoc').get(0))
+  #set($deletedDocuments = $services.query.hql('select count(ddoc.id) from XWikiDeletedDocument as ddoc').execute().get(0))
   #if($deletedDocuments == 0)
 
     {{info}}$services.localization.render('platform.index.trashDocumentsEmpty'){{/info}}
@@ -528,7 +528,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
     #set($queryParams = "view=$!{escapetool.url($request.view)}")
   #end
   #set($paginationParameters = {
-    'totalItems' : $xwiki.search("select count(ddoc.id) from XWikiDeletedDocument as ddoc").get(0),
+    'totalItems' : $services.query.hql('select count(ddoc.id) from XWikiDeletedDocument as ddoc').execute().get(0),
     'defaultItemsPerPage' : 15,
     'url' : $doc.getURL('view', $queryParams)
   })
@@ -542,7 +542,8 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
       &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.actions')&lt;/th&gt;
     &lt;/tr&gt;&lt;/thead&gt;
     &lt;tbody class="xwiki-livetable-display-body"&gt;
-    #foreach($item in $xwiki.search('select ddoc.id from XWikiDeletedDocument as ddoc order by ddoc.fullName asc', $paginationParameters.itemsPerPage, $paginationParameters.firstItem))
+    #set ($statement = 'select ddoc.id from XWikiDeletedDocument as ddoc order by ddoc.fullName asc')
+    #foreach ($item in $services.query.hql($statement).setLimit($paginationParameters.itemsPerPage).setOffset($paginationParameters.firstItem).execute())
       #displayDeletedDoc($item)
     #end
     &lt;/tbody&gt;

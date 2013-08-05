@@ -46,7 +46,7 @@
     ## Trim the dangling ' or doc.fullName=?'
     #set($sql = $sql.substring(0, $sql.lastIndexOf(' or doc.fullName=')))
     #set($sql = ", XWikiLock lock where lock.docId=doc.id and lock.userName='$xcontext.getUser()' and (${sql})")
-    #set($namesOfdocumentsToUnlock = $services.query.hql($sql).execute())
+    #set($namesOfdocumentsToUnlock = $services.query.hql($sql).addFilter('unique').execute())
     ## Use ajax and hope the user runs javascript.
     {{html}}
       &lt;script type="text/javascript"&gt;
@@ -128,7 +128,7 @@
               + "order by doc.creationDate")
   ##
   ## Run the search
-  #set($discard = $outputList.addAll($services.query.hql($sql).bindValues($params).execute()))
+  #set($discard = $outputList.addAll($services.query.hql($sql).bindValues($params).addFilter('unique').execute()))
   ##
 #end
 

@@ -13,7 +13,7 @@
 #set($childrenStatement = 'where doc.fullName <> :parentFullName and (doc.parent = :parentFullName or (doc.parent = :parentName and doc.space = :parentSpace))')
 #set($childrenQuery = $services.query.xwql($childrenStatement))
 #set($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.name).bindValue('parentSpace', $doc.space))
-#set($children = $childrenQuery.execute())
+#set($children = $childrenQuery.addFilter('unique').execute())
 #set($quote = '"')
 #set($hasInlinks = false)
 #set($fullmsg = '')

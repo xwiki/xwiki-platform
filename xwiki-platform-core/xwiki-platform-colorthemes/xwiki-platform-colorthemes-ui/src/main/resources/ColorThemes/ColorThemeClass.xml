@@ -631,5 +631,37 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </titleColor>
   </class>
+  <object>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>ColorThemes.ColorThemeClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>d8b3a046-e75e-49bc-9037-f39e49fa4de1</guid>
+    <property>
+      <sheet>ColorThemes.ColorThemeSheet</sheet>
+    </property>
+  </object>
   <content/>
 </xwikidoc>

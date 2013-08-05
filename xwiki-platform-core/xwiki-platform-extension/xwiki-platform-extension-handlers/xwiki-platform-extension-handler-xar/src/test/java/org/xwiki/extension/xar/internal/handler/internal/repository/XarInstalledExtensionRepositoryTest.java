@@ -28,8 +28,10 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+@AllComponents
 public class XarInstalledExtensionRepositoryTest
 {
     protected MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();

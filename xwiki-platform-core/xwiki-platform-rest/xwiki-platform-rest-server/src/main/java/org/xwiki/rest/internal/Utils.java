@@ -269,7 +269,7 @@ public class Utils
      */
     public static URI createURI(URI baseURI, java.lang.Class< ? > resourceClass, java.lang.Object... pathElements)
     {
-        String[] encodedPathElements = new String[pathElements.length];
+        Object[] encodedPathElements = new String[pathElements.length];
         for (int i = 0; i < pathElements.length; i++) {
             if (pathElements[i] != null) {
                 try {

@@ -363,6 +363,7 @@ public class DownloadAction extends XWikiAction
             if (blackList.contains(mimeType)) {
                 return false;
             }
+            return true;
         } else {
             List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
             if (whiteList.contains(mimeType)) {

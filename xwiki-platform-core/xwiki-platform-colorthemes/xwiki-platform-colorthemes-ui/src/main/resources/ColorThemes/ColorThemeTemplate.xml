@@ -774,5 +774,5 @@
       <titleColor>#4D5860</titleColor>
     </property>
   </object>
-  <content>{{include document="ColorThemes.ColorThemeSheet"/}}</content>
+  <content/>
 </xwikidoc>

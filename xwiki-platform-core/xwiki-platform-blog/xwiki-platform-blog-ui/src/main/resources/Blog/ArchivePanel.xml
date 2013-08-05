@@ -143,7 +143,8 @@
         * [[$year (% class="itemCount" %)(${yearArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}]]
         #if ($year == $currentYear)
           #foreach ($month in [1..12])
-            #set ($monthArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year and month(publishDate.value) = $month", $queryParams))
+            #set ($statement = "${query} and year(publishDate.value) = $year and month(publishDate.value) = $month")
+            #set ($monthArticleCount = $services.query.hql($statement).bindValues($queryParams).count())
             #if ($monthArticleCount &gt; 0)
               $tempDate.setMonthOfYear($month)##
               ** [[$monthFormatter.print($tempDate) (% class="itemCount" %)(${monthArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]]

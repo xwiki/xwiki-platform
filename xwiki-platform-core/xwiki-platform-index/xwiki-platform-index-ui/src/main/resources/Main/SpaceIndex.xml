@@ -160,7 +160,7 @@
   {{/html}}
 
   #if ($docNames.size() == $limit)
-    #set ($docCount = $xwiki.countDocuments('where doc.space=?', [${spaceParam}]))
+    #set ($docCount = $services.query.xwql('where doc.space = :space').bindValue('space', $spaceParam).count())
     #set ($remaining = $mathtool.sub($docCount, $limit))
     #if ($remaining &gt; 0)
     (% class="documentListMore" %) (((

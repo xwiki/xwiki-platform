@@ -97,12 +97,20 @@
 ##
 #macro(printUsersAndGroups $rightLevel $userList $groupList)
   #userPicker_import(true)
+  ## The label for this input is generated outside this macro.
   &lt;p&gt;&lt;input type="text" id="${rightLevel}users" name="${rightLevel}users"
     value="$escapetool.xml($stringtool.join($userList, ','))"
     class="suggestUsers multipleSelection global" /&gt;&lt;/p&gt;
-  &lt;p&gt;&lt;input type="text" id="${rightLevel}groups" name="${rightLevel}groups"
-    value="$escapetool.xml($stringtool.join($groupList, ','))"
-    class="suggestGroups multipleSelection global" /&gt;&lt;/p&gt;
+  &lt;p&gt;
+    ## Generate a hidden label to satisfy web standards.
+    ## A visible label is displayed before this group of pickers.
+    &lt;label for="${rightLevel}groups" class="hidden"&gt;
+      $services.localization.render("wikimanager.$rightLevel")
+    &lt;/label&gt;
+    &lt;input type="text" id="${rightLevel}groups" name="${rightLevel}groups"
+      value="$escapetool.xml($stringtool.join($groupList, ','))"
+      class="suggestGroups multipleSelection global" /&gt;
+  &lt;/p&gt;
 #end
 ##
 #macro(addRights $prefdoc $userlist $grouplist $rights $needsave)
@@ -468,7 +476,13 @@
       &lt;dd&gt;
         &lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
         &lt;span id="wikinamevalidation"&gt;&lt;/span&gt;
-        &lt;div id="forcewikinamediv"&gt;&lt;input id="forcewikiname" name="forcewikiname" type="checkbox" #if ($failonexist == false)checked="true"#end onchange="forceWikiNameChanged();"/&gt;&lt;label for="forcewikiname"&gt;$services.localization.render('wikimanager.wikiname.force')&lt;/label&gt;&lt;/div&gt;
+        &lt;div id="forcewikinamediv"&gt;
+          &lt;label for="forcewikiname"&gt;
+            &lt;input id="forcewikiname" type="checkbox"#if ($failonexist == false) checked="true"#end
+              name="forcewikiname" onchange="forceWikiNameChanged();"/&gt;
+            $services.localization.render('wikimanager.wikiname.force')
+          &lt;/label&gt;
+        &lt;/div&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;

@@ -50,7 +50,7 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  */
 public class DownloadAction extends XWikiAction
-{   
+{
     /** The identifier of the download action. */
     public static final String ACTION_NAME = "download";
     

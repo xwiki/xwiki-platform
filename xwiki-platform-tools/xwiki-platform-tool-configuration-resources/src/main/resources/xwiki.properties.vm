@@ -555,4 +555,13 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # url.standard.multiwiki.wikiPathPrefix=wiki
 
+#-# [Since 5.2M1]
+#-# Defines the URL path prefix used for Entity URLs, i.e. URLs pointing to a Document, Space, Object, etc.
+#-# For example this is the "bin" part in the following URL:
+#-#   http://server/xwiki/bin/view/space/page
+#-# Note that this replaces the old xwiki.defaultservletpath property in the old xwiki.cfg file.
+#-#
+#-# The default is:
+# url.standard.getEntityPathPrefix=bin
+
 $!xwikiPropertiesAdditionalProperties

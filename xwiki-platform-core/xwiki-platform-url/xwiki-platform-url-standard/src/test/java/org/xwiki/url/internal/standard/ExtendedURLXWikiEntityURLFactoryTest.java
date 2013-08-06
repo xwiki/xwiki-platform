@@ -62,6 +62,9 @@ public class ExtendedURLXWikiEntityURLFactoryTest
         WikiReferenceExtractor wikiReferenceExtractor = this.mocker.getInstance(WikiReferenceExtractor.class);
         when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(
             new ImmutablePair<WikiReference, Boolean>(this.wikiReference, false));
+
+        StandardURLConfiguration configuration = this.mocker.getInstance(StandardURLConfiguration.class);
+        when(configuration.getEntityPathPrefix()).thenReturn("entity");
     }
 
     @Test
@@ -70,21 +73,21 @@ public class ExtendedURLXWikiEntityURLFactoryTest
         EntityReference fullReference = buildEntityReference("wiki", "space", "page");
 
         // Test when no segment
-        testCreateURL("http://localhost/bin", "view", this.wikiReference, fullReference, EntityType.DOCUMENT);
+        testCreateURL("http://localhost/entity", "view", this.wikiReference, fullReference, EntityType.DOCUMENT);
 
         // Test when no segment but trailing slash
-        testCreateURL("http://localhost/bin/", "view", this.wikiReference, fullReference, EntityType.DOCUMENT);
+        testCreateURL("http://localhost/entity/", "view", this.wikiReference, fullReference, EntityType.DOCUMENT);
 
         // Test when page segment
-        testCreateURL("http://localhost/bin/page", "view", buildEntityReference("wiki", null, "page"),
+        testCreateURL("http://localhost/entity/page", "view", buildEntityReference("wiki", null, "page"),
             fullReference, EntityType.DOCUMENT);
 
         // Test when space segment and trailing slash
-        testCreateURL("http://localhost/bin/space/", "view", buildEntityReference("wiki", "space", null),
+        testCreateURL("http://localhost/entity/space/", "view", buildEntityReference("wiki", "space", null),
             fullReference, EntityType.DOCUMENT);
 
         // Test when space and page segments
-        testCreateURL("http://localhost/bin/space/page", "view", fullReference, fullReference,
+        testCreateURL("http://localhost/entity/space/page", "view", fullReference, fullReference,
             EntityType.DOCUMENT);
     }
 
@@ -94,19 +97,19 @@ public class ExtendedURLXWikiEntityURLFactoryTest
         EntityReference fullReference = buildEntityReference("wiki", "space", "page");
 
         // Test when space segment and trailing slash
-        testCreateURL("http://localhost/bin/view/space/", "view", buildEntityReference("wiki", "space", null),
+        testCreateURL("http://localhost/entity/view/space/", "view", buildEntityReference("wiki", "space", null),
             fullReference, EntityType.DOCUMENT);
 
         // Test when space and page segments
-        testCreateURL("http://localhost/bin/view/space/page", "view", fullReference, fullReference,
+        testCreateURL("http://localhost/entity/view/space/page", "view", fullReference, fullReference,
             EntityType.DOCUMENT);
 
         // Test when space and page segments and trailing slash
-        testCreateURL("http://localhost/bin/view/space/page/", "view", fullReference, fullReference,
+        testCreateURL("http://localhost/entity/view/space/page/", "view", fullReference, fullReference,
             EntityType.DOCUMENT);
 
         // Test when space and page segments and ignored paths
-        testCreateURL("http://localhost/bin/view/space/page/ignored/path", "view", fullReference, fullReference,
+        testCreateURL("http://localhost/entity/view/space/page/ignored/path", "view", fullReference, fullReference,
             EntityType.DOCUMENT);
     }
 
@@ -114,7 +117,7 @@ public class ExtendedURLXWikiEntityURLFactoryTest
     public void createURLWhenSpaceAndPageNamesContainDots() throws Exception
     {
         EntityReference reference = buildEntityReference("wiki", "space.with.dots", "page.with.dots");
-        testCreateURL("http://localhost/bin/view/space.with.dots/page.with.dots", "view",
+        testCreateURL("http://localhost/entity/view/space.with.dots/page.with.dots", "view",
             reference, reference, EntityType.DOCUMENT);
     }
 
@@ -122,7 +125,7 @@ public class ExtendedURLXWikiEntityURLFactoryTest
     public void createURLWhenDownloadAction() throws Exception
     {
         EntityReference reference = buildEntityReference("wiki", "space", "page", "attachment.ext");
-        testCreateURL("http://localhost/bin/download/space/page/attachment.ext", "download", reference, reference,
+        testCreateURL("http://localhost/entity/download/space/page/attachment.ext", "download", reference, reference,
             EntityType.ATTACHMENT);
     }
 
@@ -130,7 +133,7 @@ public class ExtendedURLXWikiEntityURLFactoryTest
     public void createURLWhenURLHasParameters() throws Exception
     {
         EntityReference fullReference = buildEntityReference("wiki", "space", "page");
-        XWikiURL xwikiURL = testCreateURL("http://localhost/bin/view/space/page?param1=value1&param2=value2",
+        XWikiURL xwikiURL = testCreateURL("http://localhost/entity/view/space/page?param1=value1&param2=value2",
             "view", fullReference, fullReference, EntityType.DOCUMENT);
 
         // Assert parameters
@@ -141,12 +144,21 @@ public class ExtendedURLXWikiEntityURLFactoryTest
         assertEquals(expectedMap, xwikiURL.getParameters());
 
         // Also verify it works when there's a param with no value.
-        xwikiURL = testCreateURL("http://localhost/bin/view/space/page?param",
+        xwikiURL = testCreateURL("http://localhost/entity/view/space/page?param",
             "view", fullReference, fullReference, EntityType.DOCUMENT);
         expectedMap = new LinkedHashMap<String, List<String>>();
         expectedMap.put("param", Collections.<String>emptyList());
         assertEquals(expectedMap, xwikiURL.getParameters());
     }
+
+    @Test
+    public void createURLWhenUsingBinEvenThoughPathConfiguredAsEntity() throws Exception
+    {
+        EntityReference fullReference = buildEntityReference("wiki", "space", "page");
+        testCreateURL("http://localhost/bin/space/page", "view", fullReference, fullReference,
+            EntityType.DOCUMENT);
+    }
+
 
     private XWikiURL testCreateURL(String testURL, String expectedAction, EntityReference expectedReference,
         EntityReference returnedReference, EntityType expectedEntityType) throws Exception

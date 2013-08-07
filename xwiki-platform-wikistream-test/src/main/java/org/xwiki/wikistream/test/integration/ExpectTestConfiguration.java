@@ -35,6 +35,6 @@ public class ExpectTestConfiguration
     public ExpectTestConfiguration(ExpectTestConfiguration other)
     {
         this.expect = other.expect;
-        this.output = new OutputTestConfiguration(this.output);
+        this.output = new OutputTestConfiguration(other.output);
     }
 }

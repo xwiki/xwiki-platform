@@ -27,11 +27,10 @@ import java.io.OutputStream;
 import org.xwiki.wikistream.output.target.FileOutputTarget;
 import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
 
-public class DefaultFileOutputTarget implements FileOutputTarget, OutputStreamOutputTarget
+public class DefaultFileOutputTarget extends AbstractOutputStreamOutputTarget implements FileOutputTarget,
+    OutputStreamOutputTarget
 {
     private File file;
-
-    private FileOutputStream fos;
 
     public DefaultFileOutputTarget(File file)
     {
@@ -44,21 +43,8 @@ public class DefaultFileOutputTarget implements FileOutputTarget, OutputStreamOu
     }
 
     @Override
-    public OutputStream getOutputStream() throws IOException
+    protected OutputStream openStream() throws IOException
     {
-        if (this.fos == null) {
-            this.fos = new FileOutputStream(this.file);
-        }
-
-        return this.fos;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        if (this.fos != null) {
-            this.fos.close();
-        }
-        this.file = null;
+        return new FileOutputStream(this.file);
     }
 }

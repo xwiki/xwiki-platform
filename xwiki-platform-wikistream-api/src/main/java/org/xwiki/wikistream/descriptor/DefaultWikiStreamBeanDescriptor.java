@@ -26,10 +26,12 @@ import java.util.Map;
 
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.PropertyDescriptor;
+import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  */
+@Unstable
 public class DefaultWikiStreamBeanDescriptor implements WikiStreamBeanDescriptor
 {
     /**

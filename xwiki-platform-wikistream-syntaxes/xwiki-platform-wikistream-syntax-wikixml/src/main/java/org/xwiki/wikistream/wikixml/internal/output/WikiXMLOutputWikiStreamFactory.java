@@ -22,11 +22,13 @@ package org.xwiki.wikistream.wikixml.internal.output;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Result;
 
-import org.xml.sax.ContentHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.xml.internal.serializer.XMLSerializerFactory;
-import org.xwiki.wikistream.internal.filter.AllFilter;
+import org.xwiki.filter.xml.serializer.XMLSerializerFactory;
+import org.xwiki.wikistream.interal.utils.AllFilter;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
@@ -39,7 +41,7 @@ import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamF
 @Component
 @Named("wiki+xml")
 @Singleton
-public class WikiXMLOutputWikiStreamFactory extends AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputParameters>
+public class WikiXMLOutputWikiStreamFactory extends AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputProperties>
 {
     @Inject
     private XMLSerializerFactory serializerFactory;
@@ -48,13 +50,14 @@ public class WikiXMLOutputWikiStreamFactory extends AbstractXMLBeanOutputWikiStr
     {
         super(WikiStreamType.WIKI_XML);
 
-        setName("Wiki XML output stream");
-        setDescription("Generates wiki events from MediaWiki XML inputstream.");
+        setName("Generic XML output stream");
+        setDescription("Write generic XML from wiki events.");
     }
 
     @Override
-    protected Object createListener(ContentHandler contentHandler)
+    protected Object createListener(Result result, WikiXMLOuputProperties properties) throws XMLStreamException,
+        FactoryConfigurationError
     {
-        return this.serializerFactory.createSerializer(AllFilter.class, contentHandler, null);
+        return this.serializerFactory.createSerializer(AllFilter.class, result, null);
     }
 }

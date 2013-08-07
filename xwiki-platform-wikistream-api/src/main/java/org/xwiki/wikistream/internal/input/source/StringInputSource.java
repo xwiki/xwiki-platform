@@ -23,8 +23,18 @@ import java.io.StringReader;
 
 public class StringInputSource extends DefaultReaderInputSource
 {
+    private String source;
+
     public StringInputSource(String source)
     {
         super(new StringReader(source));
+
+        this.source = source;
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.source;
     }
 }

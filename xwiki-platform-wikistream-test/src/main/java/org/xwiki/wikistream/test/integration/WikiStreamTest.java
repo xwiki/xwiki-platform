@@ -19,9 +19,11 @@
  */
 package org.xwiki.wikistream.test.integration;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
@@ -30,6 +32,7 @@ import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.input.source.InputSource;
+import org.xwiki.wikistream.input.source.InputStreamInputSource;
 import org.xwiki.wikistream.internal.output.target.ByteArrayOutputTarget;
 import org.xwiki.wikistream.internal.output.target.StringWriterOutputTarget;
 import org.xwiki.wikistream.output.OutputWikiStream;
@@ -108,7 +111,7 @@ public class WikiStreamTest
             outputFactory.creaOutputWikiStream(this.configuration.expectConfiguration.output);
 
         // Convert
-        inputWikiStream.read(outputWikiStream);
+        inputWikiStream.read(outputWikiStream.getFilter());
 
         // Compare
 
@@ -120,12 +123,13 @@ public class WikiStreamTest
             this.configuration.expectConfiguration.expect, this.configuration.expectConfiguration.output.getTarget());
     }
 
-    private void assertExpectedResult(String typeId, InputSource expect, OutputTarget actual)
+    private void assertExpectedResult(String typeId, InputSource expect, OutputTarget actual) throws IOException
     {
         if (actual instanceof StringWriterOutputTarget) {
             Assert.assertEquals(expect.toString(), actual.toString());
         } else if (actual instanceof ByteArrayOutputTarget) {
-
+            byte[] actualBytes = ((ByteArrayOutputTarget) actual).toByteArray();
+            byte[] expectButes = IOUtils.toByteArray(((InputStreamInputSource) expect).getInputStream());
         } else {
             // No idea how to compare that
             Assert.fail("Ouput target type [" + actual.getClass() + "] is not supported");

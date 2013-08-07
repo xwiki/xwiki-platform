@@ -19,9 +19,11 @@
  */
 package org.xwiki.wikistream.utils;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.input.source.InputSource;
 import org.xwiki.wikistream.output.target.OutputTarget;
 
+@Unstable
 public interface WikiStreamConstants
 {
     // Standard properties

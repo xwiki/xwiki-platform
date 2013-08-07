@@ -19,22 +19,25 @@
  */
 package org.xwiki.wikistream.type;
 
+import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamException;
+
 /**
  * Encapsulates WikiType and WikiStream type based errors.
  * 
  * @version $Id$
  */
-public class WikiStreamTypeException extends Exception
+@Unstable
+public class WikiStreamTypeException extends WikiStreamException
 {
     /**
      * Class version.
      */
-    private static final long serialVersionUID = -8381136456589744110L;
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a new exception with the specified message.
-     * 
-     * @param message The explanation of the exception.
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+     *            method.
      */
     public WikiStreamTypeException(String message)
     {
@@ -42,9 +45,8 @@ public class WikiStreamTypeException extends Exception
     }
 
     /**
-     * Constructs a new exception with the specified cause.
-     * 
-     * @param cause The underlying cause for this exception.
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
+     *            value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public WikiStreamTypeException(Throwable cause)
     {
@@ -52,10 +54,9 @@ public class WikiStreamTypeException extends Exception
     }
 
     /**
-     * Constructs a new exception with the specified message and cause.
-     * 
-     * @param message The explanation of the exception.
-     * @param cause The underlying cause for this exception.
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
+     *            value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public WikiStreamTypeException(String message, Throwable cause)
     {

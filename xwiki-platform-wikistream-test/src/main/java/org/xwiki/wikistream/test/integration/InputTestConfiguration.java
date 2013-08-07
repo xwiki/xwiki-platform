@@ -21,7 +21,6 @@ package org.xwiki.wikistream.test.integration;
 
 import java.util.HashMap;
 
-import org.xwiki.wikistream.input.source.InputSource;
 import org.xwiki.wikistream.utils.WikiStreamConstants;
 
 public class InputTestConfiguration extends HashMap<String, Object> implements Cloneable
@@ -42,16 +41,6 @@ public class InputTestConfiguration extends HashMap<String, Object> implements C
 
         this.typeId = other.typeId;
         this.buffer = other.buffer;
-    }
-
-    public InputSource getSource()
-    {
-        return (InputSource) get(WikiStreamConstants.PROPERTY_SOURCE);
-    }
-
-    public void setSource(InputSource source)
-    {
-        put(WikiStreamConstants.PROPERTY_SOURCE, source);
     }
 
     public void setEncoding(String encoding)

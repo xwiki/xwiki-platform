@@ -21,6 +21,9 @@ package org.xwiki.wikistream.input.source;
 
 import java.io.Reader;
 
+import org.xwiki.stability.Unstable;
+
+@Unstable
 public interface ReaderInputSource extends InputSource
 {
     public Reader getReader();

@@ -19,7 +19,10 @@
  */
 package org.xwiki.wikistream.xml.internal.output;
 
-import org.xml.sax.ContentHandler;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Result;
+
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
@@ -42,8 +45,13 @@ public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputP
     @Override
     public OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
     {
-        return new DefaultXMLOutputWikiStream<P>(this, properties);
+        try {
+            return new DefaultXMLOutputWikiStream<P>(this, properties);
+        } catch (Exception e) {
+            throw new WikiStreamException("Failed to create output wiki stream", e);
+        }
     }
 
-    protected abstract Object createListener(ContentHandler contentHandler);
+    protected abstract Object createListener(Result result, P parameters) throws XMLStreamException,
+        FactoryConfigurationError;
 }

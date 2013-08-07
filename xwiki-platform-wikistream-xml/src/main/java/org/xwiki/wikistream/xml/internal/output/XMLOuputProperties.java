@@ -21,9 +21,9 @@ package org.xwiki.wikistream.xml.internal.output;
 
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.wikistream.output.target.OutputTarget;
-import org.xwiki.wikistream.xml.internal.XMLParameters;
+import org.xwiki.wikistream.xml.internal.XMLProperties;
 
-public class XMLOuputProperties extends XMLParameters
+public class XMLOuputProperties extends XMLProperties
 {
     private boolean format = true;
 

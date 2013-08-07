@@ -27,11 +27,9 @@ import java.io.InputStream;
 import org.xwiki.wikistream.input.source.FileInputSource;
 import org.xwiki.wikistream.input.source.InputStreamInputSource;
 
-public class DefaultFileInputSource implements FileInputSource, InputStreamInputSource
+public class DefaultFileInputSource extends AbstractInputStreamInputSourceInputSource implements FileInputSource, InputStreamInputSource
 {
     private final File file;
-
-    private FileInputStream fis;
 
     public DefaultFileInputSource(File file)
     {
@@ -44,21 +42,8 @@ public class DefaultFileInputSource implements FileInputSource, InputStreamInput
     }
 
     @Override
-    public InputStream getInputStream() throws IOException
+    protected InputStream openStream() throws IOException
     {
-        if (this.fis == null) {
-            this.fis = new FileInputStream(this.file);
-        }
-
-        return this.fis;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        if (this.fis != null) {
-            this.fis.close();
-        }
-        this.fis = null;
+        return new FileInputStream(this.file);
     }
 }

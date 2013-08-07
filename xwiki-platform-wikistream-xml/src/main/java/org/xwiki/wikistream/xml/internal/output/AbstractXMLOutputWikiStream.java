@@ -19,68 +19,84 @@
  */
 package org.xwiki.wikistream.xml.internal.output;
 
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.IOException;
 
-import org.xml.sax.ContentHandler;
-import org.xwiki.rendering.internal.renderer.xml.SAXSerializer;
+import javanet.staxutils.IndentingXMLStreamWriter;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Result;
+import javax.xml.transform.stax.StAXResult;
+
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.target.OutputTarget;
 import org.xwiki.wikistream.output.target.WriterOutputTarget;
-import org.xwiki.wikistream.xml.internal.ContentHandlerOuputTarget;
+import org.xwiki.wikistream.xml.output.target.ResultOutputTarget;
 
 public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputProperties> implements OutputWikiStream
 {
-    protected final P parameters;
+    protected final P properties;
 
-    protected final ContentHandler contentHandler;
+    protected final Result result;
 
-    protected Object listener;
+    protected Object filter;
 
-    public AbstractXMLOutputWikiStream(P parameters) throws WikiStreamException
+    public AbstractXMLOutputWikiStream(P properties) throws WikiStreamException, XMLStreamException, IOException
     {
-        this.parameters = parameters;
-        this.contentHandler = createContentHandler(this.parameters);
+        this.properties = properties;
+        this.result = createResult(this.properties);
     }
 
-    protected ContentHandler createContentHandler(P parameters) throws WikiStreamException
+    protected Result createResult(P properties) throws WikiStreamException, XMLStreamException, IOException
     {
-        OutputTarget target = parameters.getTarget();
+        OutputTarget target = properties.getTarget();
 
-        ContentHandler contentHandler;
+        Result result;
 
-        if (target instanceof ContentHandlerOuputTarget) {
-            contentHandler = ((ContentHandlerOuputTarget) target).getContentHandler();
-        } else if (target instanceof WriterOutputTarget) {
-            contentHandler = new SAXSerializer(((WriterOutputTarget) target).getWriter());
-        } else if (target instanceof OutputStreamOutputTarget) {
-            Writer writer;
-            try {
-                writer =
-                    new OutputStreamWriter(((OutputStreamOutputTarget) target).getOutputStream(),
-                        parameters.getEncoding());
-            } catch (Exception e) {
-                throw new WikiStreamException("Failed to create a XML serailizer", e);
-            }
-            contentHandler = new SAXSerializer(writer);
+        if (target instanceof ResultOutputTarget) {
+            result = ((ResultOutputTarget) target).getResult();
         } else {
-            throw new WikiStreamException("Unknown target type [" + target.getClass() + "]");
+            XMLOutputFactory factory = XMLOutputFactory.newInstance();
+
+            XMLStreamWriter xmlStreamWriter;
+
+            if (target instanceof WriterOutputTarget) {
+                xmlStreamWriter = factory.createXMLStreamWriter(((WriterOutputTarget) target).getWriter());
+            } else if (target instanceof OutputStreamOutputTarget) {
+                xmlStreamWriter =
+                    factory.createXMLStreamWriter(((OutputStreamOutputTarget) target).getOutputStream(),
+                        properties.getEncoding());
+            } else {
+                throw new WikiStreamException("Unknown target type [" + target.getClass() + "]");
+            }
+
+            if (properties.isFormat()) {
+                xmlStreamWriter = new IndentingXMLStreamWriter(xmlStreamWriter);
+            }
+
+            result = new StAXResult(xmlStreamWriter);
         }
 
-        return contentHandler;
+        return result;
     }
 
     @Override
-    public Object getFilter()
+    public Object getFilter() throws WikiStreamException
     {
-        if (this.listener != null) {
-            this.listener = createListener();
+        if (this.filter == null) {
+            try {
+                this.filter = createFilter(properties);
+            } catch (Exception e) {
+                throw new WikiStreamException("Failed to create filter", e);
+            }
         }
 
-        return this.listener;
+        return this.filter;
     }
 
-    protected abstract Object createListener();
+    protected abstract Object createFilter(P parameters) throws XMLStreamException, FactoryConfigurationError;
 }

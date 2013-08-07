@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.internal;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -52,16 +53,17 @@ public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStrea
     public AbstractBeanWikiStreamFactory(WikiStreamType type)
     {
         super(type);
-
-        this.propertiesBeanClass =
-            ReflectionUtils.getTypeClass(ReflectionUtils.getLastGenericClassType(getClass(),
-                AbstractBeanWikiStreamFactory.class));
     }
 
     @Override
     public void initialize() throws InitializationException
     {
-        // Initialise WikiStream Descriptor.
+        // Get bean properties type
+        ParameterizedType genericType =
+            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanWikiStreamFactory.class, getClass());
+        this.propertiesBeanClass = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
+
+        // Initialize WikiStream Descriptor.
         DefaultWikiStreamBeanDescriptor descriptor =
             new DefaultWikiStreamBeanDescriptor(getName(), getDescription(),
                 this.beanManager.getBeanDescriptor(this.propertiesBeanClass));
@@ -75,7 +77,7 @@ public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStrea
         try {
             parametersBean = getPropertiesBeanClass().newInstance();
 
-            this.beanManager.populate(properties, properties);
+            this.beanManager.populate(parametersBean, properties);
         } catch (Exception e) {
             throw new WikiStreamException("Failed to read parameters [" + properties + "]", e);
         }

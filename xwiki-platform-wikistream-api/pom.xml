@@ -31,7 +31,8 @@
     <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-api</artifactId>
-  <name>XWiki WikiStream API</name>
+  <name>XWiki Platform - Wiki Stream - API</name>
+  <description>XWiki Platform - Wiki Stream - API</description>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>

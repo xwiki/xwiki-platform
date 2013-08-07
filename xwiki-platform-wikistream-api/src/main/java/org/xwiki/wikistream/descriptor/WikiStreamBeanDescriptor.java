@@ -19,6 +19,9 @@
  */
 package org.xwiki.wikistream.descriptor;
 
+import org.xwiki.stability.Unstable;
+
+@Unstable
 public interface WikiStreamBeanDescriptor extends WikiStreamDescriptor
 {
     /**

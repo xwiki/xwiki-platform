@@ -20,21 +20,30 @@
 package org.xwiki.wikistream.filter;
 
 import java.io.InputStream;
+import java.util.Map;
 
-import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.filter.annotation.Default;
+import org.xwiki.filter.annotation.Name;
+import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamException;
 
 /**
  * Attachment related events.
  * 
  * @version $Id$
  */
+@Unstable
 public interface AttachmentFilter
 {
-    void beginAttachment(String attachmentName, MetaData metadata);
+    void beginAttachment(@Name("name") String attachmentName, @Default("") @Name("properties") Map<String, Object> properties)
+        throws WikiStreamException;
 
-    void onAttachmentContent(byte[] content);
+    void onAttachmentContent(@Name("content") byte[] content, @Default("") @Name("properties") Map<String, Object> properties)
+        throws WikiStreamException;
 
-    void onAttachmentContent(InputStream content);
+    void onAttachmentContent(@Name("content") InputStream content, @Default("") @Name("properties") Map<String, Object> properties)
+        throws WikiStreamException;
 
-    void endAttachment(String attachmentName, MetaData metadata);
+    void endAttachment(@Name("name") String attachmentName, @Default("") @Name("properties") Map<String, Object> properties)
+        throws WikiStreamException;
 }

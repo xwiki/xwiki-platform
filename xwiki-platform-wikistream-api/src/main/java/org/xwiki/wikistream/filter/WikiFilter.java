@@ -19,20 +19,23 @@
  */
 package org.xwiki.wikistream.filter;
 
-import org.xwiki.rendering.listener.MetaData;
+import java.util.Map;
+
+import org.xwiki.filter.annotation.Default;
+import org.xwiki.filter.annotation.Name;
+import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamException;
 
 /**
  * Wiki related events.
  * 
  * @version $Id$
  */
+@Unstable
 public interface WikiFilter
 {
-    void beginWiki(MetaData metadata);
+    void beginWiki(@Name("name") String name, @Default("") @Name("properties") Map<String, Object> properties)
+        throws WikiStreamException;
 
-    void endWiki(MetaData metadata);
-
-    void beginWiki(String name, MetaData metadata);
-
-    void endWiki(String name, MetaData metadata);
+    void endWiki(@Name("name") String name, @Default("") @Name("properties") Map<String, Object> properties) throws WikiStreamException;
 }

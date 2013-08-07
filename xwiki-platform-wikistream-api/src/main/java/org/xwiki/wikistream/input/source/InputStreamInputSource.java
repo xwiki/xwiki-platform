@@ -22,6 +22,9 @@ package org.xwiki.wikistream.input.source;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.xwiki.stability.Unstable;
+
+@Unstable
 public interface InputStreamInputSource extends InputSource
 {
     InputStream getInputStream() throws IOException;

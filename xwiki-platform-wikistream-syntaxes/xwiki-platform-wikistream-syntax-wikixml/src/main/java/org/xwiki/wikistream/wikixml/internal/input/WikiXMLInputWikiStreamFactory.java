@@ -22,10 +22,10 @@ package org.xwiki.wikistream.wikixml.internal.input;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.transform.Result;
 
-import org.xml.sax.ContentHandler;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.xml.internal.parser.XMLParserFactory;
+import org.xwiki.filter.xml.parser.XMLParserFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
 
@@ -38,7 +38,7 @@ import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFac
 @Component
 @Named("wiki+xml")
 @Singleton
-public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputParameters>
+public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputProperties>
 {
     @Inject
     private XMLParserFactory parserFactory;
@@ -47,13 +47,13 @@ public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStrea
     {
         super(WikiStreamType.WIKI_XML);
 
-        setName("Wiki XML output stream");
-        setDescription("Generates wiki events from MediaWiki XML inputstream.");
+        setName("Generic XML output stream");
+        setDescription("Generates wiki events from generic XML file.");
     }
 
     @Override
-    protected ContentHandler createContentHandler(Object listener, WikiXMLInputParameters parameters)
+    protected Result createParser(Object filter, WikiXMLInputProperties parameters)
     {
-        return this.parserFactory.createContentHandler(listener, null);
+        return this.parserFactory.createResult(filter, null);
     }
 }

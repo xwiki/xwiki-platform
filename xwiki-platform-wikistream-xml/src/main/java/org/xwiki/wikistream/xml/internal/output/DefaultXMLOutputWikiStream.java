@@ -19,23 +19,28 @@
  */
 package org.xwiki.wikistream.xml.internal.output;
 
+import java.io.IOException;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
+
 import org.xwiki.wikistream.WikiStreamException;
 
 public class DefaultXMLOutputWikiStream<P extends XMLOuputProperties> extends AbstractXMLOutputWikiStream<P>
 {
     private final AbstractXMLBeanOutputWikiStreamFactory<P> factory;
 
-    public DefaultXMLOutputWikiStream(AbstractXMLBeanOutputWikiStreamFactory<P> factory, P parameters)
-        throws WikiStreamException
+    public DefaultXMLOutputWikiStream(AbstractXMLBeanOutputWikiStreamFactory<P> factory, P properties)
+        throws WikiStreamException, XMLStreamException, IOException
     {
-        super(parameters);
+        super(properties);
 
         this.factory = factory;
     }
 
     @Override
-    protected Object createListener()
+    protected Object createFilter(P properties) throws XMLStreamException, FactoryConfigurationError
     {
-        return this.factory.createListener(this.contentHandler);
+        return this.factory.createListener(this.result, properties);
     }
 }

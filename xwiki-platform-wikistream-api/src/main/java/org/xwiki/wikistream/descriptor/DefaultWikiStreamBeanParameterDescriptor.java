@@ -22,12 +22,14 @@ package org.xwiki.wikistream.descriptor;
 import java.lang.reflect.Type;
 
 import org.xwiki.properties.PropertyDescriptor;
+import org.xwiki.stability.Unstable;
 
 /**
  * The default implementation of {@link WikiStreamPropertyDescriptor}.
  * 
  * @version $Id$
  */
+@Unstable
 public class DefaultWikiStreamBeanParameterDescriptor<T> implements WikiStreamPropertyDescriptor<T>
 {
     /**

@@ -21,6 +21,9 @@ package org.xwiki.wikistream.input.source;
 
 import java.io.File;
 
+import org.xwiki.stability.Unstable;
+
+@Unstable
 public interface FileInputSource extends InputSource
 {
     public File getFile();

@@ -19,8 +19,10 @@
  */
 package org.xwiki.wikistream.input;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
 
+@Unstable
 public interface InputWikiStream
 {
     void read(Object filter) throws WikiStreamException;

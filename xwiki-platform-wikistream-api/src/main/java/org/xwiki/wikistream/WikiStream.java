@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -30,6 +31,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * 
  * @version $Id$
  */
+@Unstable
 public interface WikiStream
 {
     /**

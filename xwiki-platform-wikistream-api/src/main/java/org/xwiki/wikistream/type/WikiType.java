@@ -20,12 +20,14 @@
 package org.xwiki.wikistream.type;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents various Wikis supported by Wiki Importer.
  * 
  * @version $Id$
  */
+@Unstable
 public class WikiType
 {
     public static final WikiType MEDIAWIKI = new WikiType("mediawiki", "MediaWiki");

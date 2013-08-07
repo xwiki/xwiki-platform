@@ -19,45 +19,46 @@
  */
 package org.xwiki.wikistream;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Encapsulates WikiConverter errors.
  * 
  * @version $Id$
  */
+@Unstable
 public class WikiStreamException extends Exception
 {
-
     /**
      * Class version.
      */
-    private static final long serialVersionUID = -8668563628341209654L;
+    private static final long serialVersionUID = 1L;
 
     /**
-     * @param message
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+     *            method.
      */
     public WikiStreamException(String message)
     {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 
     /**
-     * @param cause
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
+     *            value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public WikiStreamException(Throwable cause)
     {
         super(cause);
-        // TODO Auto-generated constructor stub
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
+     *            value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public WikiStreamException(String message, Throwable cause)
     {
         super(message, cause);
-        // TODO Auto-generated constructor stub
     }
-
 }

@@ -21,6 +21,9 @@ package org.xwiki.wikistream.input.source;
 
 import java.io.Closeable;
 
+import org.xwiki.stability.Unstable;
+
+@Unstable
 public interface InputSource extends Closeable
 {
 

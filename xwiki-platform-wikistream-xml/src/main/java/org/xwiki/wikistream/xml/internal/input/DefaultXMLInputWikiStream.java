@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
-import org.xml.sax.ContentHandler;
+import javax.xml.transform.Result;
 
 public class DefaultXMLInputWikiStream<P extends XMLInputProperties> extends AbstractXMLInputWikiStream<P>
 {
@@ -33,8 +33,8 @@ public class DefaultXMLInputWikiStream<P extends XMLInputProperties> extends Abs
     }
 
     @Override
-    protected ContentHandler createContentHandler(Object listener)
+    protected Result createParser(Object listener, P parameters)
     {
-        return this.factory.createContentHandler(listener, this.parameters);
+        return this.factory.createParser(listener, parameters);
     }
 }

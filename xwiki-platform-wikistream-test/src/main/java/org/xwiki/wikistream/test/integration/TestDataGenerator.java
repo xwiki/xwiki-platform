@@ -30,9 +30,9 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.xwiki.wikistream.input.source.ReaderInputSource;
-import org.xwiki.wikistream.internal.input.source.StringInputSource;
 import org.xwiki.wikistream.internal.output.target.ByteArrayOutputTarget;
 import org.xwiki.wikistream.internal.output.target.StringWriterOutputTarget;
+import org.xwiki.wikistream.utils.WikiStreamConstants;
 
 /**
  * Finds all test files in the current classloader, read them and return test data to represent them.
@@ -82,11 +82,6 @@ public class TestDataGenerator
                 // Input
                 // Clone because InputSource cannot be reused for several tests
                 testConfiguration.inputConfiguration = new InputTestConfiguration(inputConfiguration);
-                // If there is no custom input source, use the inline string
-                if (testConfiguration.inputConfiguration.getSource() == null) {
-                    testConfiguration.inputConfiguration.setSource(new StringInputSource(
-                        testConfiguration.inputConfiguration.buffer));
-                }
 
                 // Expect
                 // Clone because OutputTarget cannot be reused for several tests

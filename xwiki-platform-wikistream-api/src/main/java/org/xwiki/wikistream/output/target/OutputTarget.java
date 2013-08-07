@@ -21,6 +21,9 @@ package org.xwiki.wikistream.output.target;
 
 import java.io.Closeable;
 
+import org.xwiki.stability.Unstable;
+
+@Unstable
 public interface OutputTarget extends Closeable
 {
 

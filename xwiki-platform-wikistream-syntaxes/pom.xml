@@ -38,8 +38,8 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-wikistream-mediawikixml</module>
     <module>xwiki-platform-wikistream-syntax-wikixml</module>
+    <module>xwiki-platform-wikistream-syntax-xar</module>
   </modules>
   <dependencies>
     <dependency>

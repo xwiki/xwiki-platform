@@ -21,11 +21,14 @@ package org.xwiki.wikistream.descriptor;
 
 import java.util.Collection;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Describes a wiki stream.
  * 
  * @version $Id$
  */
+@Unstable
 public interface WikiStreamDescriptor
 {
     /**

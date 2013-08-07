@@ -22,10 +22,12 @@ package org.xwiki.wikistream.input;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.WikiStreamException;
 
 @Role
+@Unstable
 public interface InputWikiStreamFactory extends WikiStream
 {
     InputWikiStream createInputWikiStream(Map<String, Object> properties) throws WikiStreamException;

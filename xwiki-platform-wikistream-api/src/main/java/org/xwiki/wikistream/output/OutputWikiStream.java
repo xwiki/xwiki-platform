@@ -19,7 +19,11 @@
  */
 package org.xwiki.wikistream.output;
 
+import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamException;
+
+@Unstable
 public interface OutputWikiStream
 {
-    Object getFilter();
+    Object getFilter() throws WikiStreamException;
 }

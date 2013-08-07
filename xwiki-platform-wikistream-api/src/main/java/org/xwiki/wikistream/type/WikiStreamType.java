@@ -21,12 +21,14 @@ package org.xwiki.wikistream.type;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.stability.Unstable;
 
 /**
  * Combination of supported wikis and their export types.
  * 
  * @version $Id$
  */
+@Unstable
 public class WikiStreamType
 {
     public static final WikiStreamType MEDIAWIKI_XML = new WikiStreamType(WikiType.MEDIAWIKI, "XML");
@@ -39,6 +41,11 @@ public class WikiStreamType
      * Generic WIKI XML Syntax
      */
     public static final WikiStreamType WIKI_XML = new WikiStreamType(WikiType.WIKI, "XML");
+
+    /**
+     * The XAR format
+     */
+    public static final WikiStreamType XAR = new WikiStreamType(WikiType.XWIKI, "XAR", "version");
 
     /**
      * Wiki type.

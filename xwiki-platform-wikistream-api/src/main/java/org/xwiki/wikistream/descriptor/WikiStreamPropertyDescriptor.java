@@ -21,11 +21,14 @@ package org.xwiki.wikistream.descriptor;
 
 import java.lang.reflect.Type;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Defines a wiki stream property.
  * 
  * @version $Id$
  */
+@Unstable
 public interface WikiStreamPropertyDescriptor<T>
 {
     /**

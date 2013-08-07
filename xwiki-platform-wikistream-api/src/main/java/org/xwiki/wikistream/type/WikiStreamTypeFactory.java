@@ -21,11 +21,14 @@ package org.xwiki.wikistream.type;
 
 import java.util.List;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * WikiStream type factory component exposes the information about supported wikis and dataformats
  * 
  * @version $Id$
  */
+@Unstable
 public interface WikiStreamTypeFactory
 {
     /**

@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.wikistream.input.source.InputSource;
-import org.xwiki.wikistream.internal.input.source.DefaultInputStreamInputSource;
+import org.xwiki.wikistream.internal.input.source.DefaultURLInputSource;
 import org.xwiki.wikistream.internal.input.source.StringInputSource;
 import org.xwiki.wikistream.utils.WikiStreamConstants;
 
@@ -136,8 +136,8 @@ public class TestDataParser
             } else if (action.equalsIgnoreCase("expect")) {
                 addExpect(data, typeId, buffer, configuration);
             } else if (action.equalsIgnoreCase("inputexpect")) {
-                addInput(data, typeId, buffer, configuration);
                 addExpect(data, typeId, buffer, configuration);
+                addInput(data, typeId, buffer, configuration);
             }
         }
     }
@@ -151,6 +151,19 @@ public class TestDataParser
 
         inputConfiguration.putAll(configuration);
 
+        InputSource source;
+        String expectPath = configuration.get(WikiStreamConstants.PROPERTY_SOURCE);
+        if (expectPath == null) {
+            source = new StringInputSource(buffer.toString());
+        } else {
+            if (!expectPath.startsWith("/")) {
+                expectPath = StringUtils.substringBeforeLast(data.resourceName, "/") + '/' + expectPath;
+            }
+
+            source = new DefaultURLInputSource(getClass().getResource(expectPath));
+        }
+        inputConfiguration.put(WikiStreamConstants.PROPERTY_SOURCE, source);
+
         data.inputs.add(inputConfiguration);
     }
 
@@ -162,7 +175,7 @@ public class TestDataParser
 
         InputSource expect;
 
-        String expectPath = configuration.remove(WikiStreamConstants.PROPERTY_SOURCE);
+        String expectPath = configuration.get(WikiStreamConstants.PROPERTY_SOURCE);
         if (expectPath == null) {
             expect = new StringInputSource(buffer.toString());
         } else {
@@ -170,7 +183,7 @@ public class TestDataParser
                 expectPath = StringUtils.substringBeforeLast(data.resourceName, "/") + '/' + expectPath;
             }
 
-            expect = new DefaultInputStreamInputSource(getClass().getResourceAsStream(expectPath));
+            expect = new DefaultURLInputSource(getClass().getResource(expectPath));
         }
 
         expectTestConfiguration.expect = expect;

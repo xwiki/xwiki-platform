@@ -19,17 +19,17 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import javanet.staxutils.XMLStreamUtils;
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.XMLReader;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.Result;
+
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.source.InputSource;
 import org.xwiki.wikistream.input.source.InputStreamInputSource;
 import org.xwiki.wikistream.input.source.ReaderInputSource;
-import org.xwiki.wikistream.internal.input.source.DefaultReaderInputSource;
 
 public abstract class AbstractXMLInputWikiStream<P extends XMLInputProperties> implements InputWikiStream
 {
@@ -44,26 +44,22 @@ public abstract class AbstractXMLInputWikiStream<P extends XMLInputProperties> i
     public void read(Object listener) throws WikiStreamException
     {
         try {
-            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-            SAXParser saxParser = parserFactory.newSAXParser();
-            XMLReader xmlReader = saxParser.getXMLReader();
-
-            xmlReader.setContentHandler(createContentHandler(listener));
+            XMLEventReader xmlEventReader;
 
             InputSource source = this.parameters.getSource();
             if (source instanceof ReaderInputSource) {
-                xmlReader.parse(new org.xml.sax.InputSource(((DefaultReaderInputSource) source).getReader()));
+                xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(((ReaderInputSource) source).getReader());
             } else if (source instanceof InputStreamInputSource) {
-                InputStreamInputSource inputStreamSource = (InputStreamInputSource) source;
-
-                xmlReader.parse(new org.xml.sax.InputSource(inputStreamSource.getInputStream()));
+                xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(((InputStreamInputSource) source).getInputStream());
             } else {
                 throw new WikiStreamException("Unknown source type [" + source.getClass() + "]");
             }
+
+            XMLStreamUtils.copy(xmlEventReader, createParser(listener, this.parameters));
         } catch (Exception e) {
             throw new WikiStreamException("Faild to parse XML source", e);
         }
     }
 
-    protected abstract ContentHandler createContentHandler(Object listener);
+    protected abstract Result createParser(Object listener, P parameters);
 }

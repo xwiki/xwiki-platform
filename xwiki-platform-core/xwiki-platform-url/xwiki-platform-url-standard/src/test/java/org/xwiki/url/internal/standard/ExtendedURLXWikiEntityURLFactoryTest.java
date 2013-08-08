@@ -159,6 +159,17 @@ public class ExtendedURLXWikiEntityURLFactoryTest
             EntityType.DOCUMENT);
     }
 
+    @Test
+    public void createURLWhenInPathBasedSubWiki() throws Exception
+    {
+        WikiReferenceExtractor wikiReferenceExtractor = this.mocker.getInstance(WikiReferenceExtractor.class);
+        when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(
+            new ImmutablePair<WikiReference, Boolean>(new WikiReference("somewiki"), true));
+
+        EntityReference reference = buildEntityReference("somewiki", "space", "page");
+        testCreateURL("http://localhost/wiki/somewiki/view/space/page", "view",
+            reference, reference, EntityType.DOCUMENT);
+    }
 
     private XWikiURL testCreateURL(String testURL, String expectedAction, EntityReference expectedReference,
         EntityReference returnedReference, EntityType expectedEntityType) throws Exception

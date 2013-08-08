@@ -19,19 +19,33 @@
  */
 package org.xwiki.refactoring.internal.splitter;
 
-import java.io.StringReader;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.xwiki.refactoring.WikiDocument;
-import org.xwiki.refactoring.internal.AbstractRefactoringTestCase;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
-import org.xwiki.refactoring.splitter.criterion.HeadingLevelSplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
-import org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.IdBlock;
+import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.SectionBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.junit.Assert;
-import org.junit.Test;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Test case for {@link DefaultDocumentSplitter}.
@@ -39,64 +53,99 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.9M1
  */
-public class DefaultDocumentSplitterTest extends AbstractRefactoringTestCase
+public class DefaultDocumentSplitterTest
 {
     /**
-     * The {@link DocumentSplitter} component.
+     * A component manager that automatically mocks all dependencies of the component under test.
      */
-    private DocumentSplitter splitter;
+    @Rule
+    public MockitoComponentMockingRule<DocumentSplitter> mocker = new MockitoComponentMockingRule<DocumentSplitter>(
+        DefaultDocumentSplitter.class);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        splitter = getComponentManager().getInstance(DocumentSplitter.class, "default");
-    }
-
-    /**
-     * Tests document splitting by heading-levels.
-     * 
-     * @throws Exception
-     */
     @Test
-    public void testHeadingLevelDocumentSplitting() throws Exception
+    public void split() throws Exception
     {
-        SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(new int[] {4, 1, 3});
-        NamingCriterion namingCriterion = new PageIndexNamingCriterion("Main.Test", docBridge);
-        StringBuffer buf = new StringBuffer();
-        buf.append("=Topic1=\n");
-        buf.append("Some Content\n");
-        buf.append("==Topic1.1==");
-        buf.append("Some Content\n");
-        buf.append("===Topic1.2===");
-        buf.append("Some Content\n");
-        buf.append("=Topic2=\n");
-        buf.append("Some Content\n");
-        buf.append("====Topic2.1====");
-        buf.append("Some Content\n");
-        buf.append("=Topic3=\n");
-        buf.append("Some Content\n");
-        Assert.assertEquals(6, split("Main.Test", buf.toString(), splittingCriterion, namingCriterion).size());
+        SplittingCriterion splittingCriterion = mock(SplittingCriterion.class);
+        when(splittingCriterion.shouldSplit(any(Block.class), anyInt())).thenReturn(true, false, false, true);
+        when(splittingCriterion.shouldIterate(any(SectionBlock.class), anyInt())).thenReturn(true, false, false, false);
+
+        NamingCriterion namingCriterion = mock(NamingCriterion.class);
+        when(namingCriterion.getDocumentName(any(XDOM.class))).thenReturn("Child1", "Child2");
+
+        // = Chapter 1 =
+        // Once upon a time..
+        // == Section 1.1 ==
+        // In a kingdom far away..
+
+        HeaderBlock header = new HeaderBlock(Arrays.<Block> asList(new WordBlock("Section 1.1")), HeaderLevel.LEVEL2);
+        ParagraphBlock paragraph = new ParagraphBlock(Arrays.<Block> asList(new WordBlock("In a kingdom far away..")));
+        SectionBlock subSection = new SectionBlock(Arrays.<Block> asList(header, paragraph));
+
+        header = new HeaderBlock(Arrays.<Block> asList(new WordBlock("Chapter 1")), HeaderLevel.LEVEL1);
+        paragraph = new ParagraphBlock(Arrays.<Block> asList(new WordBlock("Once upon a time..")));
+        SectionBlock section = new SectionBlock(Arrays.<Block> asList(header, paragraph, subSection));
+
+        XDOM xdom = new XDOM(Arrays.<Block> asList(section));
+        WikiDocument document = new WikiDocument("Space.Page", xdom, null);
+
+        List<WikiDocument> result = mocker.getComponentUnderTest().split(document, splittingCriterion, namingCriterion);
+
+        assertEquals(3, result.size());
+        assertSame(document, result.get(0));
+        assertEquals("Child1", result.get(1).getFullName());
+        assertSame(document, result.get(1).getParent());
+        assertEquals("Child2", result.get(2).getFullName());
+        assertSame(result.get(1), result.get(2).getParent());
+
+        ClassBlockMatcher headerMatcher = new ClassBlockMatcher(HeaderBlock.class);
+        assertTrue(document.getXdom().<LinkBlock> getBlocks(headerMatcher, Axes.DESCENDANT).isEmpty());
+        assertEquals(1, result.get(1).getXdom().<LinkBlock> getBlocks(headerMatcher, Axes.DESCENDANT).size());
+        assertEquals(1, result.get(2).getXdom().<LinkBlock> getBlocks(headerMatcher, Axes.DESCENDANT).size());
     }
 
-    /**
-     * A utility method for simulating a document split operation.
-     * 
-     * @param masterDocumentName name of the document being split.
-     * @param xwikiTwoZeroContent xwiki/2.0 content of the masterDocument.
-     * @param splittingCriterion {@link SplittingCriterion}.
-     * @param namingCriterion {@link NamingCriterion}.
-     * @return the list of wiki documents resulting from the split operation.
-     */
-    private List<WikiDocument> split(String masterDocumentName, String xwikiTwoZeroContent,
-        SplittingCriterion splittingCriterion, NamingCriterion namingCriterion) throws Exception
+    @Test
+    public void updateAnchors() throws Exception
     {
-        XDOM xdom = xwikiParser.parse(new StringReader(xwikiTwoZeroContent));
-        WikiDocument rootDoc = new WikiDocument(masterDocumentName, xdom, null);
-        return splitter.split(rootDoc, splittingCriterion, namingCriterion);
+        SplittingCriterion splittingCriterion = mock(SplittingCriterion.class);
+        when(splittingCriterion.shouldSplit(any(Block.class), anyInt())).thenReturn(false, true, true);
+        when(splittingCriterion.shouldIterate(any(SectionBlock.class), anyInt())).thenReturn(false, false, false);
+
+        NamingCriterion namingCriterion = mock(NamingCriterion.class);
+        when(namingCriterion.getDocumentName(any(XDOM.class))).thenReturn("Child1", "Child2");
+
+        // [[link>>||anchor="chapter1"]]
+        // = {{id name="chapter1"}}Chapter 1 =
+        // = Chapter 2 ==
+        // [[link>>||anchor="chapter1"]]
+
+        ResourceReference reference = new ResourceReference("", ResourceType.DOCUMENT);
+        reference.setParameter("anchor", "chapter1");
+        LinkBlock link = new LinkBlock(Arrays.<Block> asList(new WordBlock("link")), reference, false);
+        ParagraphBlock paragraph = new ParagraphBlock(Arrays.<Block> asList(link));
+
+        HeaderBlock header =
+            new HeaderBlock(Arrays.<Block> asList(new IdBlock("chapter1"), new WordBlock("Chapter 1")),
+                HeaderLevel.LEVEL1);
+        SectionBlock section1 = new SectionBlock(Arrays.<Block> asList(header));
+
+        header = new HeaderBlock(Arrays.<Block> asList(new WordBlock("Chapter 2")), HeaderLevel.LEVEL1);
+        SectionBlock section2 = new SectionBlock(Arrays.<Block> asList(header, paragraph.clone()));
+
+        XDOM xdom = new XDOM(Arrays.<Block> asList(paragraph, section1, section2));
+        WikiDocument document = new WikiDocument("Space.Page", xdom, null);
+
+        List<WikiDocument> result = mocker.getComponentUnderTest().split(document, splittingCriterion, namingCriterion);
+
+        ClassBlockMatcher linkMatcher = new ClassBlockMatcher(LinkBlock.class);
+
+        ResourceReference updatedReference =
+            document.getXdom().<LinkBlock> getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
+        assertEquals(reference.getParameters(), updatedReference.getParameters());
+        assertEquals(result.get(1).getFullName(), updatedReference.getReference());
+
+        updatedReference =
+            result.get(2).getXdom().<LinkBlock> getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
+        assertEquals(reference.getParameters(), updatedReference.getParameters());
+        assertEquals(result.get(1).getFullName(), updatedReference.getReference());
     }
 }

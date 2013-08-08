@@ -116,7 +116,7 @@ public class DefaultDocumentSplitterTest
         // [[link>>||anchor="chapter1"]]
         // = {{id name="chapter1"}}Chapter 1 =
         // = Chapter 2 ==
-        // [[link>>||anchor="chapter1"]]
+        // [[link>>path:#chapter1]]
 
         ResourceReference reference = new ResourceReference("", ResourceType.DOCUMENT);
         reference.setParameter("anchor", "chapter1");
@@ -129,7 +129,10 @@ public class DefaultDocumentSplitterTest
         SectionBlock section1 = new SectionBlock(Arrays.<Block> asList(header));
 
         header = new HeaderBlock(Arrays.<Block> asList(new WordBlock("Chapter 2")), HeaderLevel.LEVEL1);
-        SectionBlock section2 = new SectionBlock(Arrays.<Block> asList(header, paragraph.clone()));
+        reference = new ResourceReference("#chapter1", ResourceType.PATH);
+        link = new LinkBlock(Arrays.<Block> asList(new WordBlock("link")), reference, false);
+        SectionBlock section2 =
+            new SectionBlock(Arrays.<Block> asList(header, new ParagraphBlock(Arrays.<Block> asList(link))));
 
         XDOM xdom = new XDOM(Arrays.<Block> asList(paragraph, section1, section2));
         WikiDocument document = new WikiDocument("Space.Page", xdom, null);
@@ -140,12 +143,13 @@ public class DefaultDocumentSplitterTest
 
         ResourceReference updatedReference =
             document.getXdom().<LinkBlock> getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
-        assertEquals(reference.getParameters(), updatedReference.getParameters());
+        assertEquals("chapter1", updatedReference.getParameter("anchor"));
         assertEquals(result.get(1).getFullName(), updatedReference.getReference());
 
         updatedReference =
             result.get(2).getXdom().<LinkBlock> getFirstBlock(linkMatcher, Axes.DESCENDANT).getReference();
-        assertEquals(reference.getParameters(), updatedReference.getParameters());
+        assertEquals(ResourceType.DOCUMENT, updatedReference.getType());
+        assertEquals("chapter1", updatedReference.getParameter("anchor"));
         assertEquals(result.get(1).getFullName(), updatedReference.getReference());
     }
 }

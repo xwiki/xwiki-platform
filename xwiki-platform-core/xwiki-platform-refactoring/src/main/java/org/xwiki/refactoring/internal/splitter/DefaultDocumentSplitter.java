@@ -57,6 +57,11 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 @Component
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
+    /**
+     * The name of the anchor link parameter.
+     */
+    private static final String ANCHOR_PARAMETER = "anchor";
+
     @Override
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
@@ -159,13 +164,20 @@ public class DefaultDocumentSplitter implements DocumentSplitter
             for (LinkBlock linkBlock : document.getXdom().<LinkBlock> getBlocks(new ClassBlockMatcher(LinkBlock.class),
                 Axes.DESCENDANT)) {
                 ResourceReference reference = linkBlock.getReference();
+                String fragment = null;
                 if (reference.getType() == ResourceType.DOCUMENT && StringUtils.isEmpty(reference.getReference())) {
-                    String fragment = reference.getParameter("anchor");
-                    String targetDocument = fragments.get(fragment);
-                    if (targetDocument != null && !targetDocument.equals(document.getFullName())) {
-                        // The fragment has been moved so we need to update the link.
-                        reference.setReference(targetDocument);
-                    }
+                    fragment = reference.getParameter(ANCHOR_PARAMETER);
+                } else if (StringUtils.startsWith(reference.getReference(), "#")
+                    && (reference.getType() == ResourceType.PATH || reference.getType() == ResourceType.URL)) {
+                    fragment = reference.getReference().substring(1);
+                }
+
+                String targetDocument = fragments.get(fragment);
+                if (targetDocument != null && !targetDocument.equals(document.getFullName())) {
+                    // The fragment has been moved so we need to update the link.
+                    reference.setType(ResourceType.DOCUMENT);
+                    reference.setReference(targetDocument);
+                    reference.setParameter(ANCHOR_PARAMETER, fragment);
                 }
             }
         }

@@ -927,6 +927,10 @@ $xwiki.ssx.use('Main.Activity')##
   #foreach ($item in $aTags)
     #set ($discard = $docsWithTag.addAll($xwiki.tag.getDocumentsWithTag($item)))
   #end
+  ## Since there is no 'tag' field in the database schema, we can only use the page field in order to filter the query. In order to get no results when there are no documents with the requested tags, we use a fake document name
+  #if ($docsWithTag.size() == 0)
+    #set ($discard = $docsWithTag.add("XWiki.FakeDocumentToMakeQueryReturnNoResults${mathtool.random(1,999)}"))
+  #end
   #updateFilterClause('page' $docsWithTag false)
 #end
 ## Minor versions

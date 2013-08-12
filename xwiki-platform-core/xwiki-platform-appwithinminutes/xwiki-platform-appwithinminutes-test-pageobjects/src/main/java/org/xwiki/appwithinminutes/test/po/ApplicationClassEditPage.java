@@ -108,7 +108,23 @@ public class ApplicationClassEditPage extends InlinePage
     @Override
     public void clickSaveAndContinue()
     {
+        clickSaveAndContinue(true);
+    }
+
+    /**
+     * Clicks on the Save & Continue button. Use this instead of {@link #clickSaveAndContinue()} when you want to wait
+     * for a different message (e.g. an error message).
+     * 
+     * @param wait {@code true} to wait for the page to be saved, {@code false} otherwise
+     */
+    public void clickSaveAndContinue(boolean wait)
+    {
         saveAndContinueButton.click();
+
+        if (wait) {
+            // Wait until the page is really saved.
+            waitForNotificationSuccessMessage("Saved");
+        }
     }
 
     /**

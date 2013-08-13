@@ -27,7 +27,7 @@
 xapp.action.exportnonrecurse=Export (nicht rekursiv)
 xapp.action.exportrecurse=Export
 xapp.action.reloadapp=Neu laden
-xapp.answer.deleteapp.msg=Sind Sie sicher, dass Sie Applikation "{0}" löschen wollen.
+xapp.answer.deleteapp.msg=Sind Sie sicher, dass Sie Applikation "{0}" löschen wollen?
 xapp.answer.deleteapp.title=Applikation "{0}" löschen
 xapp.answer.exportapp.recursive=Rekursiv
 xapp.answer.exportapp.title=Applikation "{0}" exportieren

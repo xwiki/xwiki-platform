@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>WorkspaceTranslations</name>
+  <language>pt_BR</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1303158348000</creationDate>
+  <date>1307445978000</date>
+  <contentUpdateDate>1307445978000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Workspace Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
+XWiki.WorkspaceCandidateMemberClass_status_accepted=Aceito
+XWiki.WorkspaceCandidateMemberClass_status_pending=Pendente
+XWiki.WorkspaceCandidateMemberClass_status_rejected=Rejeitado
+XWiki.WorkspaceCandidateMemberClass_type_invitation=Convite
+XWiki.WorkspaceCandidateMemberClass_type_request=Pedido
+admin.xwiki.manageworkspace.description=Administrar configurações como nome do espaço de trabalho, descrição, proprietário e tipo de membro.
+admin.xwiki.workspaceusers.description=Administrar membros do espaço de trabalho\: adicionar, remover, convidar, aceitar ou rejeitar membros do espaço de trabalho.
+core.menu.admin.wiki=Administrar Espaço de Trabalho
+core.menu.type.wiki=Espaço de Trabalho
+core.menu.watchlist.add.wiki=Observar Espaço de Trabalho
+core.menu.watchlist.remove.wiki=Suspender Observação de Espaço de Trabalho
+platform.workspace.candidateAcceptLabel=Aceitar
+platform.workspace.candidateAcceptedSuccess=Solicitação aceita com sucesso.
+platform.workspace.candidateHandledComment=Comentário\:
+platform.workspace.candidateHandledSaveComment=Candidato tratado
+platform.workspace.candidateRejectLabel=Rejeitar
+platform.workspace.candidateRejectedSuccess=Solicitação rejeitada com sucesso
+platform.workspace.candidateReviewerLabel=Administrador\:
+platform.workspace.candidateReviewerMessageLabel=Mensagem do Administrador\:
+platform.workspace.candidateReviewerPrivateComment=Comentário Particular\:
+platform.workspace.candidateStatusLabel=Status\:
+platform.workspace.candidateTypeLabel=Tipo\:
+platform.workspace.candidatesHint=Usuários que solicitaram associação ou que foram convidados a se associar ao espaço de trabalho.
+platform.workspace.candidatesLabel=Candidatos
+platform.workspace.currentUserCanJoin=Se desejar, você pode [[se associar a esse espaço de trabalho&gt;&gt;caminho\:{0}]]. 
+platform.workspace.currentUserCanLeave=Se desejar, você pode [[abandonar esse espaço de trabalho&gt;&gt;caminho\:{0}]].
+platform.workspace.currentUserIsAdministrator=Você é um administrador desse espaço de trabalho.
+platform.workspace.currentUserIsMember=Você é um membro desse espaço de trabalho.
+platform.workspace.currentUserIsOwner=Você é o proprietário desse espaço de trabalho.
+platform.workspace.currentUserNotMember=Você não é membro desse espaço de trabalho.
+platform.workspace.exceptionWithMessage=Exceção\: {0}
+platform.workspace.gadgetTopActiveUsersAllMembers=Para ver a lista completa dos membros você pode usar a página [[User Directory&gt;&gt;Main.UserDirectory]]
+platform.workspace.gadgetTopActiveUsersLabel=Membros Mais Ativos
+platform.workspace.gadgetWelcomeToWorkspace=Bem vindo ao espaço de trabalho **{0}** 
+platform.workspace.gadgetWorkspaceInformationLabel=Informação do Espaço de Trabalho
+platform.workspace.invitationActionViewLabel=Visualizar Convite
+platform.workspace.invitationCancelLabel=Cancelar Convite
+platform.workspace.invitationCancelNotification=Seu convite foi cancelado e não é mais válido.
+platform.workspace.invitationCancelSaveComment=Convite cancelado {0} ({1}) 
+platform.workspace.invitationCancelSuccess=Convite cancelado com sucesso
+platform.workspace.invitationPendingForCurrentWorkspace=Você foi convidado a se associar a esse espaço de trabalho.
+platform.workspace.inviteInviteButtonLabel=Convidar
+platform.workspace.inviteMessageHint=A mensagem foi enviada ao usuário.
+platform.workspace.inviteMessageLabel=Mensagem
+platform.workspace.inviteNotification=Você foi convidado a se associar ao espaço de trabalho ''{0}''. 
+platform.workspace.inviteRequestAlreadyExists={0} já tem uma solicitação pendente. Por favor, responda a solicitação inicial
+platform.workspace.inviteSaveComment=O usuário ''{0}'' foi convidado a se associar ao espaço de trabalho.
+platform.workspace.inviteSuccess={0} convidado com sucesso.
+platform.workspace.inviteUserAlreadyInvited={0} já tem um convite pendente.
+platform.workspace.inviteUserAlreadyMember={0} já é im membro do espaço de trabalho.
+platform.workspace.inviteUserNameHint=O nome do usuário para adicionar ao espaço de trabalho.
+platform.workspace.inviteUserNameLabel=Nome de usuário
+platform.workspace.joinActionJoinLabel=Associar
+platform.workspace.joinNeedToLogIn=Para se associar a esse espaço de trabalho você precisa estar logado.
+platform.workspace.joinRequestAcceptedNotification=Sua solicitação para se associar ao espaço de trabalho "{0}" foi aceita.
+platform.workspace.joinRequestActionCancelLabel=Cancelar Solicitação
+platform.workspace.joinRequestActionRequestLabel=Solicitar Associação
+platform.workspace.joinRequestPendingForCurrentWorkspace=Você solicitou associação a esse espaço de trabalho.
+platform.workspace.joinRequestRejectedNotification=Sua solicitação para se associar ao espaço de trabalho "{0}" foi rejeitada.
+platform.workspace.leaveWorkspace=Abandonar Espaço de Trabalho
+platform.workspace.manageWorkspaceTitle=Espaço de Trabalho
+platform.workspace.panelInformationDescriptionLabel=Descrição
+platform.workspace.panelInformationMembersLabel=Membros
+platform.workspace.panelInformationNameLabel=Nome
+platform.workspace.wikiNotWorkspace=O presente wiki não é um espaço de trabalho.
+platform.workspace.workspaceUsersTitle=Usuários do Espaço de Trabalho
+workspacemanager.error.workspacedoesnotexist=O espaço de trabalho [{0}] não existe
+workspacemanager.member.add=Adicione ou convite usuários ao espaço de trabalho
+workspacemanager.panel.title=Informação do espaço de trabalho
+workspacemanager.prop.description.hint=Uma breve descrição do espaço de trabalho e seu propósito.
+workspacemanager.prop.description.label=Descrição
+workspacemanager.prop.membershipType.hint=O modo que usuários podem se associar a esse espaço de trabalho.
+workspacemanager.prop.membershipType.label=Tipo de Membro
+workspacemanager.prop.owner.hint=Um usuário que terá todos os privilégios no espaço de trabalho.
+workspacemanager.prop.owner.label=Proprietário
+workspacemanager.prop.secure.hint=Se habilitado, todos os endereços externos externos gerados serão iniciados com //https\:~/~///.
+workspacemanager.prop.secure.label=Protegido (SSL)
+workspacemanager.prop.wikiprettyname.hint=O nome mostrado no espaço de trabalho
+</content>
+</xwikidoc>

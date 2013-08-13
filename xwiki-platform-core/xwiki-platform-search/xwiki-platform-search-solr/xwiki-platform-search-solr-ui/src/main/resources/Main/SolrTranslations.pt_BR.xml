@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>pt_BR</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.SolrSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1369063635000</creationDate>
+  <date>1369655569000</date>
+  <contentUpdateDate>1369654393000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
+solr.facets.collapseAll=Destruir tudo
+solr.facets.expandAll=Expandir tudo
+solr.facets.hint=Selecione uma categoria e ative os filtros nos resultados atuais
+solr.facets.resetAll=Reinicie tudo
+solr.facets.title=Refine sua busca
+solr.filter.hint=Selecione filtros predefinidos que serão aplicados na sua seleção.
+solr.filter.queryBoost.hint=Permite modificar a relevância de certos campos ex.\: título^1.2 nome^2.0 autor^1.0 docconteúdo^0.
+solr.filter.title=Opções avançadas
+solr.filter.toggle=Alterne o filtro de busca
+solr.filterBy.fileType=Tipo de arquivo
+solr.filterBy.fileType.all=Todos os tipos de arquivo
+solr.filterBy.fileType.audio=Áudio
+solr.filterBy.fileType.image=Imagem
+solr.filterBy.fileType.text=Texto
+solr.filterBy.fileType.video=Vídeo
+solr.filterBy.language=Lingua
+solr.filterBy.language.all=Todas as línguas
+solr.filterBy.space=Espaço
+solr.filterBy.type=Tipo
+solr.filterBy.type.all=Todos os tipos
+solr.filterBy.type.attachment=Anexo
+solr.filterBy.type.document=Documento
+solr.filterBy.type.object=Objeto
+solr.filterBy.type.object_property=Propriedade do objeto
+solr.filterBy.wiki=Wiki
+solr.filterBy.wiki.all=Todos os wikis
+solr.result.author=Modificado por "{0}" em "{1}"
+solr.result.location=Localizado em "{0}" &gt;&gt; "{1}" &gt;&gt; "{2}"
+solr.result.mediaType=Arquivo do tipo "{0}"
+solr.result.object=Objeto do tipo "{0}"
+solr.result.property=Propriedade "{0}"\#"{1}"
+solr.sortBy=Ordenado por\:
+solr.sortBy.author_display_sort=Último autor
+solr.sortBy.date=Data
+solr.sortBy.score=Relevância
+solr.sortBy.title_sort=Título
+solr.sortOrder.asc=Ascendente
+solr.sortOrder.desc=Descendente
+</content>
+</xwikidoc>

@@ -242,7 +242,7 @@ tt .wikimodel-verbatim {
 }
 
 .main table {
-  margin: 1em 1px;
+  margin: 1em 0;
 }
 
 .main th, .main td,

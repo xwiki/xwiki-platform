@@ -23,42 +23,35 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content># Application Manager translation page
+  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
+xapp.action.exportnonrecurse=Exportar (não-recursivo)
+xapp.action.exportrecurse=Exportar
+xapp.action.reloadapp=Recarregar
+xapp.answer.deleteapp.msg=Você tem certeza que deseja remover a aplicação "{0}" ?
+xapp.answer.deleteapp.title=Remover aplicação "{0}"
+xapp.answer.exportapp.recursive=Recursivo
+xapp.answer.exportapp.title=Exporta aplicação "{0}"
+xapp.answer.exportapp.withdetails=Com histórico
 xapp.appmanager=Gerenciador de Aplicações
-xapp.pluginnotenabled=O plugin Gerenciador de Aplicações não está habilitado. Essa página não vai funcionar corretamente. Verifique se "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" está listado no parâmetro xwiki.plugins no arquivo xwiki.cfg.
-
-# LABELS
-xapp.totalnumberofapp=Número total de aplicações
 xapp.appname=Nome da aplicação
+xapp.availablefilestoimport=Arquivos disponíveis para importar
+xapp.createapplication=Criar nova aplicação
 xapp.description=Descrição
 xapp.docname=Nome do documento
-xapp.availablefilestoimport=Arquivos disponíveis para importar
+xapp.errorcreateapp=Um erro ocorreu ao criar a aplicação "{0}" (código "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Aplicação "{0}" já existe. Escolha outro nome.
+xapp.errordeleteapp=Um erro ocorreu ao remover a aplicação "{0}" (código "{1}").
+xapp.errorexportapp=Ocorreu um erro ao exportar a aplicação "{0}" (código "{1}").
+xapp.errorimportapp=Um erro ocorreu ao importar o pacote de aplicação "{0}" (código "{1}").
+xapp.errorreloadapp=Um erro ocorreu ao recarregar a aplicação "{0}" (código "{1}").
 xapp.legend.application=Aplicação
 xapp.legend.validate=Validar
-
-# ACTIONS
-xapp.createapplication=Criar nova aplicação
-xapp.action.reloadapp=Recarregar
-xapp.action.exportrecurse=Exportar
-xapp.action.exportnonrecurse=Exportar (não-recursivo)
-
-# ANSWER
-xapp.answer.deleteapp.title=Remover aplicação \"{0}\"
-xapp.answer.deleteapp.msg=Você tem certeza que deseja remover a aplicação \"{0}\" ?
-xapp.answer.exportapp.title=Exporta aplicação \"{0}\"
-xapp.answer.exportapp.recursive=Recursivo
-xapp.answer.exportapp.withdetails=Com histórico
-
-# MESSAGES
-xapp.successexportapp=Aplicação \"{0}\" exportada com sucesso.
-xapp.errorexportapp=Ocorreu um erro ao exportar a aplicação \"{0}\" (código \"{1}\").
-xapp.successimportapp=Importado com sucesso o pacote de aplicação \"{0}\".
-xapp.errorimportapp=Um erro ocorreu ao importar o pacote de aplicação \"{0}\" (código \"{1}\").
-xapp.successdeleteapp=Aplicação \"{0}\" removida com sucesso.
-xapp.errordeleteapp=Um erro ocorreu ao remover a aplicação \"{0}\" (código \"{1}\").
-xapp.successcreateapp=A aplicação \"{0}\" foi criada. Você pode acessá-la em [{1}].
-xapp.errorcreateapp=Um erro ocorreu ao criar a aplicação \"{0}\" (código \"{1}\").
-xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Aplicação \"{0}\" já existe. Escolha outro nome.
-xapp.successreloadapp=Aplicação \"{0}\" recarregada com sucesso.
-xapp.errorreloadapp=Um erro ocorreu ao recarregar a aplicação \"{0}\" (código \"{1}\").</content>
+xapp.pluginnotenabled=O plugin Gerenciador de Aplicações não está habilitado. Essa página não vai funcionar corretamente. Verifique se "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" está listado no parâmetro xwiki.plugins no arquivo xwiki.cfg.
+xapp.successcreateapp=A aplicação "{0}" foi criada. Você pode acessá-la em [{1}].
+xapp.successdeleteapp=Aplicação "{0}" removida com sucesso.
+xapp.successexportapp=Aplicação "{0}" exportada com sucesso.
+xapp.successimportapp=Importado com sucesso o pacote de aplicação "{0}".
+xapp.successreloadapp=Aplicação "{0}" recarregada com sucesso.
+xapp.totalnumberofapp=Número total de aplicações
+</content>
 </xwikidoc>

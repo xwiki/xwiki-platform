@@ -19,8 +19,12 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating bar charts.
@@ -28,6 +32,9 @@ import org.jfree.chart.renderer.category.CategoryItemRenderer;
  * @version $Id$
  * @since 2.0M1
  */
+@Component
+@Named("bar")
+@Singleton
 public class BarPlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override

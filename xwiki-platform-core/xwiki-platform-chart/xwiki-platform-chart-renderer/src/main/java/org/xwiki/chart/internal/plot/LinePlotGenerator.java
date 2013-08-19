@@ -19,15 +19,22 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating line charts.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
+@Component
+@Named("line")
+@Singleton
 public class LinePlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override

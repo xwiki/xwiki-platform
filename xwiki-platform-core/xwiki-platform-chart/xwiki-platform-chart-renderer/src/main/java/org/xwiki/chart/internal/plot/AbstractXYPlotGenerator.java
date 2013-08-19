@@ -22,24 +22,23 @@ package org.xwiki.chart.internal.plot;
 import java.util.Map;
 
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYDataset;
-import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.PlotGeneratorException;
+import org.xwiki.chart.model.ChartModel;
 
 /**
  * Generate Plots for XY data sets.
- *
+ * 
  * @version $Id$
  * @since 4.2M1
  */
 public abstract class AbstractXYPlotGenerator implements PlotGenerator
 {
     @Override
-    public Plot generate(ChartModel model, Map<String, String> parameters)
-        throws PlotGeneratorException
+    public Plot generate(ChartModel model, Map<String, String> parameters) throws PlotGeneratorException
     {
         XYDataset dataset;
         ValueAxis domainAxis;
@@ -55,10 +54,10 @@ public abstract class AbstractXYPlotGenerator implements PlotGenerator
             domainAxis = (ValueAxis) model.getAxis(0);
         } else {
             throw new PlotGeneratorException("Incompatible axis 0 for xy plot.");
-        } 
+        }
 
         if (model.getAxis(1) instanceof ValueAxis) {
-            rangeAxis  = (ValueAxis) model.getAxis(1);
+            rangeAxis = (ValueAxis) model.getAxis(1);
         } else {
             throw new PlotGeneratorException("Incompatible axis 1 for xy plot.");
         }
@@ -70,5 +69,4 @@ public abstract class AbstractXYPlotGenerator implements PlotGenerator
      * @return an {@link XYItemRenderer} to be used for plotting the chart.
      */
     protected abstract XYItemRenderer getRenderer();
-
 }

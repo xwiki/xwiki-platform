@@ -19,15 +19,22 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Generate Plots for XY data sets using a line and shape renderer.
- *
+ * 
  * @version $Id$
  * @since 4.2M1
  */
+@Component
+@Named("xy_line_and_shape")
+@Singleton
 public class XYLineAndShapePlotGenerator extends AbstractXYPlotGenerator
 {
     @Override

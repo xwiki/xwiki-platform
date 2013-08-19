@@ -21,23 +21,29 @@ package org.xwiki.chart.internal.plot;
 
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.data.general.PieDataset;
-import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.PlotGeneratorException;
+import org.xwiki.chart.model.ChartModel;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating pie charts.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
+@Component
+@Named("pie")
+@Singleton
 public class PiePlotGenerator implements PlotGenerator
 {
     @Override
-    public Plot generate(ChartModel model, Map<String, String> parameters)
-        throws PlotGeneratorException
+    public Plot generate(ChartModel model, Map<String, String> parameters) throws PlotGeneratorException
     {
         PieDataset dataset;
         try {

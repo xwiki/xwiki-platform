@@ -19,15 +19,22 @@
  */
 package org.xwiki.chart.internal.plot;
 
-import org.jfree.chart.renderer.xy.XYItemRenderer;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.xy.XYAreaRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Generate Plots for XY data sets using an area renderer.
- *
+ * 
  * @version $Id$
  * @since 4.2M1
  */
+@Component
+@Named("xy_area")
+@Singleton
 public class XYAreaPlotGenerator extends AbstractXYPlotGenerator
 {
     @Override

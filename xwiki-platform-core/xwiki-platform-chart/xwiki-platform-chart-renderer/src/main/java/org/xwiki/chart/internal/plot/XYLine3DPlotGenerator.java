@@ -19,15 +19,22 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLine3DRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * See {@Link XYLine3DRenderer}.
- *
+ * 
  * @version $Id$
  * @since 4.2M3
  */
+@Component
+@Named("xy_line3D")
+@Singleton
 public class XYLine3DPlotGenerator extends AbstractXYPlotGenerator
 {
     @Override

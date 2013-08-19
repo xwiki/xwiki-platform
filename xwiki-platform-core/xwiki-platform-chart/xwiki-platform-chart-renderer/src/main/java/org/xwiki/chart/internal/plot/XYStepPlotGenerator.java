@@ -19,15 +19,22 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYStepRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * See {@Link XYStepRenderer}.
- *
+ * 
  * @version $Id$
  * @since 4.2M3
  */
+@Component
+@Named("xy_step")
+@Singleton
 public class XYStepPlotGenerator extends AbstractXYPlotGenerator
 {
     @Override

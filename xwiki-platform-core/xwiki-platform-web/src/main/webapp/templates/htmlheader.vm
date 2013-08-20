@@ -31,6 +31,10 @@
     #end
     <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------
+    ## Force Compatibility mode for IE browsers to use the latest rendering mode, placed right after the title
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Favicons
     ## Legacy, for IE
     <link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" />
@@ -50,10 +54,6 @@
     ## it's possible to imagine that the user might want it?  
     ## ---------------------------------------------------------------------------------------------------------------
     <meta http-equiv="imagetoolbar" content="no"/>
-    ## ---------------------------------------------------------------------------------------------------------------
-    ## Force Compatibility mode for IE browsers to use the latest rendering mode
-    ## ---------------------------------------------------------------------------------------------------------------
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     ## ---------------------------------------------------------------------------------------------------------------
     ## Universal edit button. See http://universaleditbutton.org
     ## ---------------------------------------------------------------------------------------------------------------

@@ -62,11 +62,12 @@ public abstract class AbstractXYPlotGenerator implements PlotGenerator
             throw new PlotGeneratorException("Incompatible axis 1 for xy plot.");
         }
 
-        return new XYPlot(dataset, domainAxis, rangeAxis, getRenderer());
+        return new XYPlot(dataset, domainAxis, rangeAxis, getRenderer(parameters));
     }
 
     /**
+     * @param parameters used to configure the renderer
      * @return an {@link XYItemRenderer} to be used for plotting the chart.
      */
-    protected abstract XYItemRenderer getRenderer();
+    protected abstract XYItemRenderer getRenderer(Map<String, String> parameters);
 }

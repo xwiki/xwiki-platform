@@ -19,6 +19,8 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -38,7 +40,7 @@ import org.xwiki.component.annotation.Component;
 public class Line3DPlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override
-    protected CategoryItemRenderer getRenderer()
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
         return new LineRenderer3D();
     }

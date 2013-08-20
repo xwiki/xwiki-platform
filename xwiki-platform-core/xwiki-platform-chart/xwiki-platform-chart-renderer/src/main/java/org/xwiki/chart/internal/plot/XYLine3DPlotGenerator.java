@@ -19,6 +19,8 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -38,7 +40,7 @@ import org.xwiki.component.annotation.Component;
 public class XYLine3DPlotGenerator extends AbstractXYPlotGenerator
 {
     @Override
-    public XYItemRenderer getRenderer()
+    public XYItemRenderer getRenderer(Map<String, String> parameters)
     {
         return new XYLine3DRenderer();
     }

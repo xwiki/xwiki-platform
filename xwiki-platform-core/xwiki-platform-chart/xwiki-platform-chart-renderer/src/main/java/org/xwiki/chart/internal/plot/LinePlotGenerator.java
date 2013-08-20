@@ -19,6 +19,8 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -38,8 +40,10 @@ import org.xwiki.component.annotation.Component;
 public class LinePlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override
-    protected CategoryItemRenderer getRenderer()
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
-        return new LineAndShapeRenderer();
+        boolean linesVisible = !Boolean.valueOf(parameters.get("hideLines"));
+        boolean shapesVisible = !Boolean.valueOf(parameters.get("hideShapes"));
+        return new LineAndShapeRenderer(linesVisible, shapesVisible);
     }
 }

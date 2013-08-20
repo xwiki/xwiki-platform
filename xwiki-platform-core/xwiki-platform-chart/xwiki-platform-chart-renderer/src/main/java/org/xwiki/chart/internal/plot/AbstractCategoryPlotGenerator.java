@@ -63,12 +63,13 @@ public abstract class AbstractCategoryPlotGenerator implements PlotGenerator
             throw new PlotGeneratorException("Incompatible axis 1 for category plot.");
         }
 
-        return new CategoryPlot(dataset, domainAxis, rangeAxis, getRenderer());
+        return new CategoryPlot(dataset, domainAxis, rangeAxis, getRenderer(parameters));
     }
 
     /**
+     * @param parameters used to configure the renderer
      * @return an {@link CategoryItemRenderer} to be used for plotting the chart.
      */
-    protected abstract CategoryItemRenderer getRenderer();
+    protected abstract CategoryItemRenderer getRenderer(Map<String, String> parameters);
 
 }

@@ -59,8 +59,15 @@ public class WebDriverFactory
             // Unfortunately there is no preference to disable the Add-on bar so we have to hide it using the shortcut
             // key. We use Actions instead of sending the keys directly to the active element because starting with
             // v2.35 Selenium complains that the active element is not visible when no web page has been loaded yet.
-            new Actions(driver).sendKeys(driver.switchTo().activeElement(), Keys.chord(Keys.CONTROL, "/")).build()
-                .perform();
+            try {
+                // This has the expected result when I run the tests locally but it throws an exception on the CI agents
+                // (Selenium still complains the active element is not visible).
+                new Actions(driver).sendKeys(driver.switchTo().activeElement(), Keys.chord(Keys.CONTROL, "/")).build()
+                    .perform();
+            } catch (Exception e) {
+                // This works on the CI agents but has no effect when I run the tests locally.
+                new Actions(driver).sendKeys(Keys.chord(Keys.CONTROL, "/")).build().perform();
+            }
         } else if (browserName.startsWith("*iexplore")) {
             driver = new InternetExplorerDriver();
         } else if (browserName.startsWith("*chrome")) {

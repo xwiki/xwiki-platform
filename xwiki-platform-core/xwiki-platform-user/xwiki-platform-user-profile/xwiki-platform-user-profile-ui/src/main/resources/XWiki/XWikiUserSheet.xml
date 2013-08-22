@@ -391,11 +391,11 @@ return XWiki;
 }
 
 .profile-menu .user-menu-dashboard:before{
-  content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+  content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
 }
 
 .profile-menu .user-menu-workspaces:before{
-  content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
+  content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
 .profile-menu .group.user-menu-title{
@@ -631,7 +631,11 @@ span#avatarUpload {
 #end
 #set($userWorkspaceSheet = 'WorkspaceManager.UserWorkspaceSheet')
 #if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWorkspaceSheet))  
-  #set($discard = $categories.add({'id':'workspaces', 'sheet':$userWorkspaceSheet}))
+  #set($discard = $categories.add({
+    'id': 'workspaces',
+    'name': $services.localization.render('workspacemanager.profile.category.workspaces'),
+    'sheet': $userWorkspaceSheet
+  }))
 #end
 #if($isMyProfile &amp;&amp; $hasDashboard)
   #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet'}))  

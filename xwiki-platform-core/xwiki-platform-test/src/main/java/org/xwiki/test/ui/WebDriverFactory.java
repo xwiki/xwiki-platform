@@ -62,11 +62,11 @@ public class WebDriverFactory
             try {
                 // This has the expected result when I run the tests locally but it throws an exception on the CI agents
                 // (Selenium still complains the active element is not visible).
-                new Actions(driver).sendKeys(driver.switchTo().activeElement(), Keys.chord(Keys.CONTROL, "/")).build()
+                new Actions(driver).sendKeys(driver.switchTo().activeElement(), Keys.chord(Keys.CONTROL, "/"))
                     .perform();
             } catch (Exception e) {
                 // This works on the CI agents but has no effect when I run the tests locally.
-                new Actions(driver).sendKeys(Keys.chord(Keys.CONTROL, "/")).build().perform();
+                new Actions(driver).sendKeys(Keys.chord(Keys.CONTROL, "/")).perform();
             }
         } else if (browserName.startsWith("*iexplore")) {
             driver = new InternetExplorerDriver();

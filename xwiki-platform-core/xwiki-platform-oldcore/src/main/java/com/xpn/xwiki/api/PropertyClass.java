@@ -147,7 +147,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * Get the hint string that should be displayed for input fields for instances of this property definition.
      *
-     * @return A raw hint string.
+     * @return The translated hint string.
      */
     public String getHint()
     {

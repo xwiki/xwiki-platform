@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,8 +32,17 @@ import org.dom4j.dom.DOMElement;
 import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -48,6 +58,8 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.Utils;
+
+import javax.inject.Inject;
 
 /**
  * Represents an XClass property and contains property definitions (eg "relational storage", "display type",
@@ -377,6 +389,29 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     public void setPrettyName(String prettyName)
     {
         setStringValue("prettyName", prettyName);
+    }
+
+    public String getHint()
+    {
+        return getLargeStringValue("hint");
+    }
+
+    public String getTranslatedHint(XWikiContext context)
+    {
+        String rawHint = getHint();
+        if(rawHint.isEmpty() && context != null && context.getWiki() != null){
+            String translationKeyName = getFieldFullName() + ".hint";
+            String translatedHint = context.getMessageTool().get(translationKeyName);
+            if(!translatedHint.equals(translationKeyName)){
+                return translatedHint;
+            }
+        }
+        return rawHint;
+    }
+
+    public void setHint(String hint)
+    {
+        setLargeStringValue("hint", hint);
     }
 
     public String getTooltip()

@@ -109,6 +109,13 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
         customDisplayClass.setRows(5);
         customDisplayClass.setSize(80);
         safeput(customDisplayClass.getName(), customDisplayClass);
+
+        TextAreaClass hintClass = new TextAreaClass(this);
+        hintClass.setName("hint");
+        hintClass.setPrettyName("Hint");
+        hintClass.setRows(5);
+        hintClass.setSize(80);
+        safeput(hintClass.getName(), hintClass);
     }
 
     /**

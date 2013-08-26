@@ -399,6 +399,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     public String getTranslatedHint(XWikiContext context)
     {
         String rawHint = getHint();
+        // If raw hint is empty, we fall back to a default translation key convention
         if(rawHint.isEmpty() && context != null && context.getWiki() != null){
             String translationKeyName = getFieldFullName() + ".hint";
             String translatedHint = context.getMessageTool().get(translationKeyName);
@@ -406,6 +407,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
                 return translatedHint;
             }
         }
+        // If not, we display the raw hint
         return rawHint;
     }
 

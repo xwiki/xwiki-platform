@@ -36,6 +36,7 @@
     #end
     #foreach ($prop in $properties)
       <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}">${escapetool.xml($prop.translatedPrettyName)}</label></dt>
+      #if($prop.translatedHint!='')<span class="xHint">($prop.translatedHint)</span>#end
       <dd#if ($prop.isDisabled()) class="disabled"#end>$doc.display($prop.name, "edit", $obj)</dd>
     #end
     </dl>
@@ -270,7 +271,7 @@
     </div>
   #end
   #set ($redirect = $xwiki.relativeRequestURL)
-  <form id="update" method="post" action="$doc.getURL("save")" class="withLock">
+  <form id="update" method="post" action="$doc.getURL("save")" class="withLock xform">
   <div id="xwikieditcontent" class="clear">
   <div id="document-title"><h1>$services.localization.render('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
 

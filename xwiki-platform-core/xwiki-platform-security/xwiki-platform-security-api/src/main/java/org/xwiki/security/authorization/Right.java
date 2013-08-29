@@ -71,6 +71,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** The comment access right. */
     public static final Right COMMENT;
 
+    /** The creation of a SubWiki right. */
+    public static final Right SUBWIKI_CREATION;
+
     /** Illegal value. */
     public static final Right ILLEGAL;
 
@@ -135,6 +138,8 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, ADMIN), FARM_ONLY   , true);
 
         ILLEGAL  = new Right(ILLEGAL_RIGHT_NAME, DENY, DENY, false, null, null             , false);
+
+        SUBWIKI_CREATION = new Right("subwikicreation", DENY, DENY, true, null, FARM_ONLY  , false);
     }
 
     /** The numeric value of this access right. */

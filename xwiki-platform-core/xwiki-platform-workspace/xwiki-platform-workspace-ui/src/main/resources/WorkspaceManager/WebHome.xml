@@ -151,7 +151,9 @@
   #set($discard = $columns.add('_actions'))
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'delete'] }))
 #end
-[[{{translation key="platform.workspace.createNewWorkspaceLabel"/}}&gt;&gt;CreateNewWorkspace]]
+#if($xwiki.hasAccessLevel('subwikicreation', 'XWiki.XWikiPreferences'))
+  [[{{translation key="platform.workspace.createNewWorkspaceLabel"/}}&gt;&gt;CreateNewWorkspace]]
+#end
 #livetable('workspaces', $columns, $columnsProperties, $options)
 {{/velocity}}</content>
 </xwikidoc>

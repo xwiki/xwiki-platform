@@ -261,7 +261,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 available = false;
             } catch (XWikiException e) {
                 // Failed to switch to database. Assume it means database does not exists.
-                available = !(e.getException() instanceof MigrationRequiredException);
+                available = !(e.getCause() instanceof MigrationRequiredException);
             }
         } catch (Exception e) {
             Object[] args = {wikiName};

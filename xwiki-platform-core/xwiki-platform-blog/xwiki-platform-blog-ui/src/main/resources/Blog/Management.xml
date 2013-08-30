@@ -83,7 +83,7 @@
     &lt;option value="main"&gt;$services.localization.render('xe.blog.manage.main')&lt;/option&gt;
   &lt;/select&gt;&lt;/dd&gt;
 &lt;/dl&gt;
-  &lt;input type="submit" value="${escapetool.xml($services.localization.render('xe.blog.manage.create'))}"/&gt;
+  &lt;input class="button" type="submit" value="${escapetool.xml($services.localization.render('xe.blog.manage.create'))}"/&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 #else ## !hasAdmin

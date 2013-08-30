@@ -1002,6 +1002,35 @@ public class XarExtensionHandlerTest
     }
 
     @Test
+    public void testUninstallMandatory() throws Throwable
+    {
+        // register a mandatory document initializer
+        MandatoryDocumentInitializer mandatoryInitializer =
+            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
+
+        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
+
+        mockHasAdminRight(true);
+
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        verifyHasAdminRight(2);
+
+        // uninstall
+
+        uninstall(this.localXarExtensiontId1, "wiki");
+
+        verifyHasAdminRight(3);
+
+        // validate
+
+        XWikiDocument page =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
+    }
+
+    @Test
     public void testImportDocumentWithEqualsExistingDocument() throws Throwable
     {
         importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");

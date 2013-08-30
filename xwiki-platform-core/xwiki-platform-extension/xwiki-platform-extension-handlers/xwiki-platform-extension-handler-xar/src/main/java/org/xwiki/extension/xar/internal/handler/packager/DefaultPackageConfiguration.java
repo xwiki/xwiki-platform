@@ -46,6 +46,8 @@ public class DefaultPackageConfiguration implements PackageConfiguration
 
     private Set<String> entriesToImport;
 
+    private boolean skipMandatorytDocuments = true;
+
     @Override
     public String getWiki()
     {
@@ -121,5 +123,16 @@ public class DefaultPackageConfiguration implements PackageConfiguration
     public void setPreviousPages(Map<XarEntry, XarFile> previousPages)
     {
         this.previousPages = previousPages;
+    }
+
+    @Override
+    public boolean isSkipMandatorytDocuments()
+    {
+        return this.skipMandatorytDocuments;
+    }
+
+    public void setSkipMandatorytDocuments(boolean skipMandatorytDocuments)
+    {
+        this.skipMandatorytDocuments = skipMandatorytDocuments;
     }
 }

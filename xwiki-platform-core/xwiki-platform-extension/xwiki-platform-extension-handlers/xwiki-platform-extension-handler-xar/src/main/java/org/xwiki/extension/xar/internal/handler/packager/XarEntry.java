@@ -22,8 +22,7 @@ package org.xwiki.extension.xar.internal.handler.packager;
 import java.util.Locale;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * @version $Id$
@@ -31,7 +30,7 @@ import org.xwiki.model.reference.EntityReference;
  */
 public class XarEntry
 {
-    private EntityReference documentReference;
+    private LocalDocumentReference documentReference;
 
     private Locale locale;
 
@@ -43,23 +42,22 @@ public class XarEntry
 
     public XarEntry(String space, String page, Locale locale)
     {
-        this.documentReference =
-            new EntityReference(page, EntityType.DOCUMENT, new EntityReference(space, EntityType.SPACE));
+        this.documentReference = new LocalDocumentReference(space, page);
         this.locale = locale;
     }
 
-    public XarEntry(EntityReference documentReference, Locale locale)
+    public XarEntry(LocalDocumentReference documentReference, Locale locale)
     {
         this.documentReference = documentReference;
         this.locale = locale;
     }
 
-    public EntityReference getDocumentReference()
+    public LocalDocumentReference getDocumentReference()
     {
         return this.documentReference;
     }
 
-    public void setDocumentReference(EntityReference documentReference)
+    public void setDocumentReference(LocalDocumentReference documentReference)
     {
         this.documentReference = documentReference;
     }

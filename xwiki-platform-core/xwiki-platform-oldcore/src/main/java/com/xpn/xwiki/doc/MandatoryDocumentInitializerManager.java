@@ -17,33 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package com.xpn.xwiki.doc;
 
-import java.util.Map;
-import java.util.Set;
-
-import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
+ * Provide utility method to access various mandatory document initializers.
+ * 
  * @version $Id$
- * @since 4.0M2
+ * @since 5.2M2
  */
-public interface PackageConfiguration
+@Role
+public interface MandatoryDocumentInitializerManager
 {
-    String getWiki();
-
-    DocumentReference getUserReference();
-
-    boolean isInteractive();
-
-    JobStatus getJobStatus();
-
-    boolean isLogEnabled();
-
-    Map<XarEntry, XarFile> getPreviousPages();
-
-    Set<String> getEntriesToImport();
-    
-    boolean isSkipMandatorytDocuments();
+    /**
+     * @param reference the document reference
+     * @return the initializer associated to the passed document reference
+     */
+    MandatoryDocumentInitializer getMandatoryDocumentInitializer(DocumentReference reference);
 }

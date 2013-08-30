@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include document="Blog.BlogCode"/}}
 
@@ -57,13 +57,15 @@
     #foreach($year in [$firstYear..$lastYear])
       #set($yearArticleCount = $services.query.hql("${query} and year(publishDate.value) = $year").bindValues($queryParams).count())
       #if($yearArticleCount &gt; 0)
-        * [[$year ($yearArticleCount)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}]]
+        #set ($queryString = "space=$escapetool.url($blogDoc.space)&amp;year=${year}")
+        * [[$year ($yearArticleCount)&gt;&gt;Blog.Archive||queryString="${queryString}"]]
         #foreach($month in [1..12])
           #set ($statement = "${query} and year(publishDate.value) = $year and month(publishDate.value) = $month")
           #set ($monthArticleCount = $services.query.hql($statement).bindValues($queryParams).count())
           #if($monthArticleCount &gt; 0)
             $tempDate.setMonthOfYear($month)
-            ** [[$monthFormatter.print($tempDate) (${monthArticleCount})&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]]
+            #set($queryString = "space=${escapetool.url($blogDoc.space)}&amp;year=${year}&amp;month=${month}")
+            ** [[$monthFormatter.print($tempDate) (${monthArticleCount})&gt;&gt;Blog.Archive||queryString="${queryString}"]]
           #end
         #end
       #end
@@ -79,7 +81,7 @@
 = $services.localization.render('xe.blog.archive.postsyear', [$year]) =
   #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = ? or doc.parent = ?)")
-  #set ($queryParams = [$blogDoc.space, $blogDoc.fullName])
+  #set($queryParams = [$blogDoc.space, $blogDoc.fullName])
   #set($query = "${query} and year(publishDate.value) = $year")
   ## Create a Jodatime date formatter that will be used to format dates
   #set($monthFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern('MMMM'))
@@ -90,7 +92,8 @@
       #set($monthArticleCount = $services.query.hql("${query} and month(publishDate.value) = $month").bindValues($queryParams).count())
       #if($monthArticleCount &gt; 0)
         $tempDate.setMonthOfYear($month)
-== [[$monthFormatter.print($tempDate) (${monthArticleCount})&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]] ==
+        #set($queryString = "space=${escapetool.url($blogDoc.space)}&amp;year=${year}&amp;month=${month}")
+== [[$monthFormatter.print($tempDate) (${monthArticleCount})&gt;&gt;Blog.Archive||queryString="${queryString}"]] ==
         #foreach($entryDoc in $xwiki.wrapDocs($services.query.hql("${query} and month(publishDate.value) = $month order by publishDate.value", $queryParams).execute()))
           #getEntryObject($entryDoc $entryObj)
           #isPublished($entryObj $isPublished)

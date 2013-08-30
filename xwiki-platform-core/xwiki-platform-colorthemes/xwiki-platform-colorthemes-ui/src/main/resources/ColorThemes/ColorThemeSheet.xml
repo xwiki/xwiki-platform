@@ -15,7 +15,7 @@
   <date>1251108485000</date>
   <contentUpdateDate>1251108485000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('xe.themes.colors.sheet.title')</title>
+  <title>#if($doc.name == 'ColorThemeSheet')$services.localization.render('xe.themes.colors.sheet.title')#end</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

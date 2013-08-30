@@ -200,7 +200,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private void registerMacro(DocumentReference wikiMacroDocumentReference, String wikiMacroDocumentAuthor,
         XWikiContext xcontext)
     {
-        this.logger.debug("Registering macro [{}]...", wikiMacroDocumentReference);
+        this.logger.debug("Registering macro in document [{}]...", wikiMacroDocumentReference);
 
         DocumentReference originalAuthor = xcontext.getUserReference();
         try {
@@ -208,7 +208,8 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
 
             this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
 
-            this.logger.debug("Macro [{}] is now registered.", wikiMacroDocumentReference);
+            this.logger.debug("Macro [{}] from document [{}] is now registered.", macro.getDescriptor().getId().getId(),
+                wikiMacroDocumentReference);
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.
             // We only log at the debug level here as this is not really an error

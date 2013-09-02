@@ -41,6 +41,7 @@ import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 import static org.hamcrest.Matchers.*;
@@ -93,6 +94,9 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         // document access bridge
         final DocumentAccessBridge mockDocumentAccessBridge =
             getComponentManager().getInstance(DocumentAccessBridge.class);
+        // document reference resolver
+        final DocumentReferenceResolver<String> mockResolver = 
+            getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "default");
         final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
         getMockery().checking(new Expectations()
         {
@@ -106,6 +110,13 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
                     with(aNull(String.class)), with(aNull(String.class)));
                 will(returnValue(mockDocumentUrl));
                 allowing(mockDocumentAccessBridge).getCurrentDocumentReference();
+                will(returnValue(null));
+            }
+        });
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockResolver).resolve("");
                 will(returnValue(null));
             }
         });

@@ -35,12 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.csrf.CSRFToken;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
@@ -196,27 +193,11 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         HttpServletResponse response, XWikiContext context) throws Exception
     {
         CSRFToken csrfVerifier = Utils.getComponent(CSRFToken.class);
-        DocumentReferenceResolver<String> resolver = 
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         String token = request.getParameter("form_token");
         // Let's verify that the CSRF token is correct
         if (!csrfVerifier.isTokenValid(token)) {
-            String redirect;
-            // The document XWiki.XWikiLogin where the login takes place is not a 'real' document. So the context
-            // document could be null. In that case let's set the default space WebHome as the context doc, 
-            // so that users would be redirected to this valid page if they choose not to submit the request.
-            if (context.getDoc() == null) {
-                DocumentReference docRef = resolver.resolve(context.getWiki().getDefaultSpace(context), "WebHome");
-                XWikiDocument redirectDoc = context.getWiki().getDocument(docRef, context);
-                // We need to set the document in the context for getting a correct resubmission URL.
-                context.setDoc(redirectDoc);
-                redirect = csrfVerifier.getResubmissionURL();
-                context.setDoc(null);
-            } else {
-                redirect = csrfVerifier.getResubmissionURL();
-            }
+            String redirect = csrfVerifier.getResubmissionURL(); 
             response.sendRedirect(redirect);
-            return true;
         }
         Principal principal = authenticate(username, password, context);
         if (principal != null) {

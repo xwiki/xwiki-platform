@@ -45,13 +45,7 @@ import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-import static org.xwiki.security.authorization.Right.ADMIN;
-import static org.xwiki.security.authorization.Right.CREATOR;
-import static org.xwiki.security.authorization.Right.DELETE;
-import static org.xwiki.security.authorization.Right.ILLEGAL;
-import static org.xwiki.security.authorization.Right.LOGIN;
-import static org.xwiki.security.authorization.Right.PROGRAM;
-import static org.xwiki.security.authorization.Right.REGISTER;
+import static org.xwiki.security.authorization.Right.*;
 
 
 /**
@@ -68,13 +62,16 @@ public abstract class AbstractAuthorizationTestCase
     /** SuperAdmin user. */
     protected static final DocumentReference SUPERADMIN = new DocumentReference("anyWiki", "anySpace", "SuperAdmin");
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM, SUBWIKI_CREATION. */
     protected static final RightSet ALL_RIGHTS = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, SUBWIKI_CREATION. */
     protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN. */
+    protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION = new RightSet();
+
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN.*/
     protected static final RightSet ALL_RIGHTS_EXCEPT_ADMIN = new RightSet();
 
     /** VIEW, EDIT, COMMENT, DELETE, ADMIN. */
@@ -92,17 +89,20 @@ public abstract class AbstractAuthorizationTestCase
                 ALL_RIGHTS.add(right);
                 if (right != PROGRAM) {
                     ALL_RIGHTS_EXCEPT_PROGRAMING.add(right);
-                    if (right != ADMIN) {
-                        ALL_RIGHTS_EXCEPT_ADMIN.add(right);
+                    if (right != SUBWIKI_CREATION){
+                        ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION.add(right);
+                        if (right != ADMIN) {
+                            ALL_RIGHTS_EXCEPT_ADMIN.add(right);
+                            if (right != LOGIN && right != REGISTER) {
+                                ALL_DOCUMENT_RIGHTS.add(right);
+                            }
+                            if (right != DELETE) {
+                                DEFAULT_DOCUMENT_RIGHTS.add(right);
+                            }
+                        }
                         if (right != LOGIN && right != REGISTER) {
-                            ALL_DOCUMENT_RIGHTS.add(right);
+                            ALL_SPACE_RIGHTS.add(right);
                         }
-                        if (right != DELETE) {
-                            DEFAULT_DOCUMENT_RIGHTS.add(right);
-                        }
-                    }
-                    if (right != LOGIN && right != REGISTER) {
-                        ALL_SPACE_RIGHTS.add(right);
                     }
                 }
             }

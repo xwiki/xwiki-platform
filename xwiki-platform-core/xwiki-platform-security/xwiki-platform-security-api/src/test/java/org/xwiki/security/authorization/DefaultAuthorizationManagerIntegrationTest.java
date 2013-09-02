@@ -69,17 +69,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.xwiki.security.authorization.Right.ADMIN;
-import static org.xwiki.security.authorization.Right.COMMENT;
-import static org.xwiki.security.authorization.Right.CREATOR;
-import static org.xwiki.security.authorization.Right.DELETE;
-import static org.xwiki.security.authorization.Right.EDIT;
-import static org.xwiki.security.authorization.Right.ILLEGAL;
-import static org.xwiki.security.authorization.Right.LOGIN;
-import static org.xwiki.security.authorization.Right.PROGRAM;
-import static org.xwiki.security.authorization.Right.REGISTER;
-import static org.xwiki.security.authorization.Right.VIEW;
-import static org.xwiki.security.authorization.Right.values;
+import static org.xwiki.security.authorization.Right.*;
 
 /**
  * Test XWiki Authorization policy against the authentication module.
@@ -345,7 +335,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             null, getXDoc("an empty main wiki", "anySpace"));
 
         // SuperAdmin access on main wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, SUBWIKI_CREATION, ILLEGAL),
             SUPERADMIN, getXDoc("an empty main wiki", "anySpace"));
 
         // Any Global user without access rules on main wiki
@@ -361,7 +351,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             null, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // SuperAdmin access on sub wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, ILLEGAL),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, SUBWIKI_CREATION, ILLEGAL),
             SUPERADMIN, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // Any Global user without access rules on sub wiki
@@ -412,10 +402,10 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         assertAccess(ALL_SPACE_RIGHTS,             getXUser("userA"), getDoc("docDenyA",     "spaceAllowA", "wikiNoRules"));
         assertAccess(ALL_DOCUMENT_RIGHTS,          getXUser("userA"), getDoc("docAllowA",    "any space",   "wikiNoRules"));
 
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space",  "wikiAllowA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "spaceDenyA", "wikiAllowA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getDoc("any document", "any space",  "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getDoc("any document", "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
     }
 
     @Test
@@ -424,10 +414,10 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         initialiseWikiMock("inheritancePolicyForLocalWikiAccess");
 
         // Main wiki denying all access to A
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("any document", "any space",  "wikiAllowA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("any document", "spaceDenyA", "wikiAllowA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiAllowA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiAllowA"), getDoc("any document", "any space",  "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiAllowA"), getDoc("any document", "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiAllowA"), getDoc("docAllowA",    "spaceDenyA", "wikiAllowA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiAllowA"), getDoc("docDenyA",     "any space",  "wikiAllowA"));
 
         assertAccess(null,                         getUser("userA", "wikiDenyA"), getDoc("any document", "any space",   "wikiDenyA"));
         assertAccess(ALL_SPACE_RIGHTS,             getUser("userA", "wikiDenyA"), getDoc("any document", "spaceAllowA", "wikiDenyA"));
@@ -491,14 +481,14 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     {
         initialiseWikiMock("tieResolutionPolicy");
 
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiUserAllowDeny"), getWiki("wikiUserAllowDeny"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiUserDenyAllow"), getWiki("wikiUserDenyAllow"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiGroupAllowDeny"), getWiki("wikiGroupAllowDeny"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiGroupDenyAllow"), getWiki("wikiGroupDenyAllow"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiUserGroupAllowDeny"), getWiki("wikiUserGroupAllowDeny"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiUserAllowDeny"), getWiki("wikiUserAllowDeny"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiUserDenyAllow"), getWiki("wikiUserDenyAllow"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiGroupAllowDeny"), getWiki("wikiGroupAllowDeny"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiGroupDenyAllow"), getWiki("wikiGroupDenyAllow"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiUserGroupAllowDeny"), getWiki("wikiUserGroupAllowDeny"));
         assertAccess(null,                         getUser("userA", "wikiUserGroupDenyAllow"), getWiki("wikiUserGroupDenyAllow"));
         assertAccess(null,                         getUser("userA", "wikiGroupUserAllowDeny"), getWiki("wikiGroupUserAllowDeny"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiGroupUserDenyAllow"), getWiki("wikiGroupUserDenyAllow"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiGroupUserDenyAllow"), getWiki("wikiGroupUserDenyAllow"));
 
         assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiUserAllowDenyNoAdmin"), getWiki("wikiUserAllowDenyNoAdmin"));
         assertAccess(new RightSet(LOGIN, REGISTER), getUser("userA", "wikiUserDenyAllowNoAdmin"), getWiki("wikiUserDenyAllowNoAdmin"));
@@ -527,14 +517,14 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         initialiseWikiMock("ownerAccess");
 
         // Owner of main wiki has admin access to all wikis whatever the wiki access is
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getXDoc("any document", "any space"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space", "wikiNoRules"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space", "wikiLocalUserA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getXUser("userA"), getDoc("any document", "any space", "wikiDenyLocalUserA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getDoc("any document", "any space", "wikiNoRules"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getDoc("any document", "any space", "wikiLocalUserA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getXUser("userA"), getDoc("any document", "any space", "wikiDenyLocalUserA"));
 
         // Local owner has admin access whatever the wiki access is
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiLocalUserA"), getDoc("any document", "any space", "wikiLocalUserA"));
-        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING, getUser("userA", "wikiDenyLocalUserA"), getDoc("any document", "any space", "wikiDenyLocalUserA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiLocalUserA"), getDoc("any document", "any space", "wikiLocalUserA"));
+        assertAccess(ALL_RIGHTS_EXCEPT_PROGRAMING_AND_SUBWIKI_CREATION, getUser("userA", "wikiDenyLocalUserA"), getDoc("any document", "any space", "wikiDenyLocalUserA"));
     }
 
     @Test

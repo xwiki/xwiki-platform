@@ -69,7 +69,14 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.xwiki.security.authorization.Right.*;
+import static org.xwiki.security.authorization.Right.ADMIN;
+import static org.xwiki.security.authorization.Right.CREATOR;
+import static org.xwiki.security.authorization.Right.DELETE;
+import static org.xwiki.security.authorization.Right.ILLEGAL;
+import static org.xwiki.security.authorization.Right.LOGIN;
+import static org.xwiki.security.authorization.Right.PROGRAM;
+import static org.xwiki.security.authorization.Right.REGISTER;
+import static org.xwiki.security.authorization.Right.SUBWIKI_CREATION;
 
 /**
  * Test XWiki Authorization policy against the authentication module.

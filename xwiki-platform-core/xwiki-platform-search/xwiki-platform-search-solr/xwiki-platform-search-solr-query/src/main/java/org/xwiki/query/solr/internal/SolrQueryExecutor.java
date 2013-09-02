@@ -21,6 +21,7 @@ package org.xwiki.query.solr.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -106,7 +107,11 @@ public class SolrQueryExecutor implements QueryExecutor
             // TODO: good idea? Any confusion? Do we really needs something like this?
             // Reuse the Query.getNamedParameters() map to get extra parameters.
             for (Entry<String, Object> entry : query.getNamedParameters().entrySet()) {
-                solrQuery.set(entry.getKey(), String.valueOf(entry.getValue()));
+                if (entry.getValue() instanceof Collection) {
+                    solrQuery.set(entry.getKey(), toStringArray((Collection) entry.getValue()));
+                } else {
+                    solrQuery.set(entry.getKey(), String.valueOf(entry.getValue()));
+                }
             }
 
             QueryResponse response = solrInstance.query(solrQuery);
@@ -124,6 +129,22 @@ public class SolrQueryExecutor implements QueryExecutor
         } catch (Exception e) {
             throw new QueryException("Exception while executing query", query, e);
         }
+    }
+
+    /**
+     * Converts the given collection of generic objects to a string array.
+     * 
+     * @param col the collection, must not be null
+     * @return an array with the string representations of the collection's items
+     */
+    private String[] toStringArray(Collection col)
+    {
+        String[] args = new String[col.size()];
+        int i = 0;
+        for (Object obj : col) {
+            args[i++] = String.valueOf(obj);
+        }
+        return args;
     }
 
     /**

@@ -19,20 +19,30 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
-import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.activeinstalls.client.InstanceId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.*;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.ClientConfig;
+import io.searchbox.core.Index;
 
 public class ActiveInstallsPingThread extends Thread
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveInstallsPingThread.class);
+
     /**
      * Once every 24 hours.
      */
@@ -40,29 +50,38 @@ public class ActiveInstallsPingThread extends Thread
 
     private static final String LATEST_FORMAT_VERSION = "1.0";
 
+    public static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+
     private InstanceId instanceId;
 
     private InstalledExtensionRepository extensionRepository;
+
+    private String remoteServerURL;
 
     public ActiveInstallsPingThread(InstanceId instanceId, InstalledExtensionRepository extensionRepository)
     {
         this.instanceId = instanceId;
         this.extensionRepository = extensionRepository;
+        this.remoteServerURL = "http://localhost:9200";
     }
 
     @Override
     public void run()
     {
-        //Settings settings = ImmutableSettings.settingsBuilder().build();
-        TransportClient client = new TransportClient();
-        client.addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
+        ClientConfig clientConfig = new ClientConfig.Builder(this.remoteServerURL).multiThreaded(true).build();
+        JestClientFactory factory = new JestClientFactory();
+        factory.setClientConfig(clientConfig);
+        JestClient client = factory.getObject();
 
         while (true) {
             try {
                 sendPing(client);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // Failed to connect or send the ping to the remote Elastic Search instance, will try again after the
                 // sleep.
+                LOGGER.warn(
+                    "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
+                    this.remoteServerURL, ExceptionUtils.getRootCause(e), WAIT_TIME/1000);
             }
             try {
                 Thread.sleep(WAIT_TIME);
@@ -71,34 +90,46 @@ public class ActiveInstallsPingThread extends Thread
             }
         }
 
-        client.close();
+        client.shutdownClient();
     }
 
-    private void sendPing(TransportClient client) throws IOException
+    private void sendPing(JestClient client) throws Exception
     {
-        XContentBuilder builder = jsonBuilder();
+        Index index = new Index.Builder(constructJSON())
+            .index("installs")
+            .type("install")
+            .id(this.instanceId.toString())
+            .build();
+        JestResult result = client.execute(index);
+        if (!result.isSucceeded()) {
+            throw new Exception(result.getErrorMessage());
+        }
+    }
 
-        builder.startObject();
+    private String constructJSON()
+    {
+        StringBuffer source = new StringBuffer();
+        source.append('{');
+        source.append("\"formatVersion\" : \"" + LATEST_FORMAT_VERSION + "\",");
+        source.append("\"date\" : \"" + DATE_FORMATTER.print(new Date().getTime()) + "\",");
+        source.append("\"extensions\" : [");
 
-        builder.field("formatVersion", LATEST_FORMAT_VERSION);
-        builder.field("date", new Date());
-
-        builder.startArray("extensions");
-
-        for (InstalledExtension extension : this.extensionRepository.getInstalledExtensions()) {
-            builder.startObject();
-            builder.field("id", extension.getId().getId());
-            builder.field("version", extension.getId().getVersion().toString());
-            builder.endObject();
+        Collection<InstalledExtension> installedExtensions = this.extensionRepository.getInstalledExtensions();
+        Iterator<InstalledExtension> it = installedExtensions.iterator();
+        while (it.hasNext()) {
+            InstalledExtension extension = it.next();
+            source.append('{');
+            source.append("\"id\" : \"" + extension.getId().getId() + "\",");
+            source.append("\"version\" : \"" + extension.getId().getVersion().toString() + "\"");
+            source.append('}');
+            if (it.hasNext()) {
+                source.append(',');
+            }
         }
 
-        builder.endArray();
+        source.append(']');
+        source.append('}');
 
-        builder.endObject();
-
-        client.prepareIndex("installs", "install", this.instanceId.toString())
-            .setSource(builder)
-            .execute()
-            .actionGet();
+        return source.toString();
     }
 }

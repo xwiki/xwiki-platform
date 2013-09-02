@@ -20,21 +20,26 @@
 package org.xwiki.activeinstalls.client;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.junit.*;
-import static org.elasticsearch.common.xcontent.XContentFactory.*;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.ClientConfig;
+import io.searchbox.core.Index;
 
 public class ESTest
 {
     /**
      * Quick test to be removed once we get ES working with XWiki.
      */
-    @Test
+//    @Test
     public void test() throws Exception
     {
+/*
         TransportClient client = new TransportClient();
         client.addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
 
@@ -51,6 +56,21 @@ public class ESTest
 
         System.out.println("version = " + response.getVersion());
         client.close();
+*/
+
+        ClientConfig clientConfig = new ClientConfig.Builder("http://localhost:9200").multiThreaded(true).build();
+        JestClientFactory factory = new JestClientFactory();
+        factory.setClientConfig(clientConfig);
+        JestClient client = factory.getObject();
+
+        Map<String, String> source = new LinkedHashMap<String,String>();
+        source.put("user", "kimchy");
+
+        Index index = new Index.Builder(source).index("twitter").type("tweet").id("1").build();
+        JestResult result = client.execute(index);
+        System.out.println("result = " + result.getJsonString());
+
+        client.shutdownClient();
     }
 
 }

@@ -22,8 +22,8 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.IllegalCharsetNameException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -294,7 +294,6 @@ public class DownloadAction extends XWikiAction
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
-        
         try {
             response.setCharacterEncoding("");
         } catch (IllegalCharsetNameException ex) {
@@ -322,9 +321,7 @@ public class DownloadAction extends XWikiAction
             hasPR = false;
         }
         // If the mimetype is not authorized to be displayed inline, let's force its content disposition to download.
-        if (!hasPR && !isAuthorized(mimetype)) {
-            dispType = ATTACHMENT;
-        } else if ("1".equals(request.getParameter("force-download"))) {
+        if ((!hasPR && !isAuthorized(mimetype)) || "1".equals(request.getParameter("force-download"))) {
             dispType = ATTACHMENT;
         }
         // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
@@ -359,17 +356,11 @@ public class DownloadAction extends XWikiAction
     {
         ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
         if (configuration.containsKey(BLACKLIST_PROPERTY) && !configuration.containsKey(WHITELIST_PROPERTY)) {
-            List<String> blackList = (configuration.getProperty(BLACKLIST_PROPERTY, new ArrayList<String>()));
-            if (blackList.contains(mimeType)) {
-                return false;
-            }
-            return true;
+            List<String> blackList = (configuration.getProperty(BLACKLIST_PROPERTY, Collections.<String>emptyList()));
+            return !blackList.contains(mimeType);
         } else {
             List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
-            if (whiteList.contains(mimeType)) {
-                return true; 
-            }
+            return whiteList.contains(mimeType);
         }
-        return false;
     }
 }

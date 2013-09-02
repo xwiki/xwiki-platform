@@ -24,7 +24,7 @@ import java.util.Locale;
 import org.xwiki.stability.Unstable;
 
 /**
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Unstable
 public interface Entity extends Persistable, Linkable, Referenceable

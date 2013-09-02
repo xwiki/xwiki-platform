@@ -22,7 +22,7 @@ package org.xwiki.model;
 import org.xwiki.stability.Unstable;
 
 /**
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Unstable
 public interface Version

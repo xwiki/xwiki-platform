@@ -33,7 +33,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 /**
  * TODO: Decide if this should be part of the current EntityReference implementation.
  *
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Unstable
 public class UniqueReference

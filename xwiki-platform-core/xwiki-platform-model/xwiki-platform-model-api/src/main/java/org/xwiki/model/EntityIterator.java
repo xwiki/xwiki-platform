@@ -24,7 +24,7 @@ import org.xwiki.stability.Unstable;
 /**
  * Allows retrieving data by batch (with pagination).
  *
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Unstable
 public class EntityIterator<T extends Entity>

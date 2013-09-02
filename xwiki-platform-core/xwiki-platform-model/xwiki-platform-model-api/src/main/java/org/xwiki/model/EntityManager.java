@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Provides direct access to any Entity through an{@link org.xwiki.model.reference.EntityReference} without having
  * to navigate through the Entity hierarchy.
  *
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Role
 @Unstable

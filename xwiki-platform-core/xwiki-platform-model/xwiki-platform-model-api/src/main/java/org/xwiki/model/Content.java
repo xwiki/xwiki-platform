@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Note that this class is immutable (text and syntax cannot be changed once set).
  *
  * @version $Id$
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Unstable
 public class Content

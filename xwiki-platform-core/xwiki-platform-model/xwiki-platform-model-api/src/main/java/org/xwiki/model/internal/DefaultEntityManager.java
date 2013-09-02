@@ -33,7 +33,7 @@ import org.xwiki.model.UniqueReference;
  * allows choosing which Model implementation to use by using a configuration parameter.
  *
  * @version $Id$
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Component
 @Singleton

@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * Unit tests for {@link BridgedObjectPropertyEntity}.
  *
  * @version $Id$
- * @since 5.0M1
+ * @since 5.2M2
  */
 public class BridgedObjectPropertyTest
 {

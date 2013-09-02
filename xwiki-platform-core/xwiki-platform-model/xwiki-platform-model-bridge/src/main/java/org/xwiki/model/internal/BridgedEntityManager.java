@@ -53,7 +53,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 
 /**
- * @since 5.0M1
+ * @since 5.2M2
  */
 @Component
 @Named("bridge")

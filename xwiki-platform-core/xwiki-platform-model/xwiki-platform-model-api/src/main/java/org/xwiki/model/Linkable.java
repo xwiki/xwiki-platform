@@ -30,7 +30,7 @@ import org.xwiki.stability.Unstable;
  *   <li>aliases an entity</li>
  * </ul>
  *
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Unstable
 public interface Linkable

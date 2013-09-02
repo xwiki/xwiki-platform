@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiContext;
  * Unit tests for {@link BridgedServer}.
  *
  * @version $Id$
- * @since 5.0M1
+ * @since 5.2M2
  */
 public class BridgedServerTest
 {

@@ -39,7 +39,7 @@ public interface ModelConfiguration
 
     /**
      * @return the hint corresponding to the Model implementation to use (e.g. "bridge")
-     * @since 5.0M2
+     * @since 5.2M2
      */
     @Unstable
     String getImplementationHint();

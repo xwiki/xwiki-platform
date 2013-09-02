@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Represents an Object Property, i.e. a generic field in an Object which can contain any type of metadata.
  *
  * @version $Id$
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Unstable
 public interface ObjectPropertyEntity<T> extends Entity

@@ -37,7 +37,7 @@ import org.xwiki.model.ModelRuntimeException;
  * Configuration.
  *
  * @version $Id$
- * @since 5.0M2
+ * @since 5.2M2
  */
 @Component
 @Singleton

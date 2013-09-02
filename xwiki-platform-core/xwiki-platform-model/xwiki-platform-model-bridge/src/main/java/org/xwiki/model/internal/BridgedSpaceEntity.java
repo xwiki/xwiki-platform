@@ -29,7 +29,7 @@ import org.xwiki.model.reference.EntityReference;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * @since 5.0M1
+ * @since 5.2M2
  */
 public class BridgedSpaceEntity extends AbstractBridgedEntity implements SpaceEntity
 {

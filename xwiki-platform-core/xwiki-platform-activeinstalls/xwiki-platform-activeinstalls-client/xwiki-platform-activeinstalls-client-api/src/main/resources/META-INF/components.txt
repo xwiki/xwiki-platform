@@ -1,0 +1,2 @@
+org.xwiki.activeinstalls.internal.client.DefaultInstanceIdManager
+org.xwiki.activeinstalls.internal.client.ActiveInstallsInitializerListener

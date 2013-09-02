@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-url</artifactId>
   <name>XWiki Platform - Legacy - URL</name>
@@ -43,6 +43,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-standard</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Needed to access the ServletContext in order to be able to use XWikiConfigurationService since when this
+         module executes the XWiki object has not been initialized yet and thus we cannot use XWiki.Param(). -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
     </dependency>
   </dependencies>
 </project>

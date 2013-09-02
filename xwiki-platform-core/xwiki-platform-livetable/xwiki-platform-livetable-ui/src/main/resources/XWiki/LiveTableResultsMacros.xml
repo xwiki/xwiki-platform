@@ -61,7 +61,12 @@
     #set($whereSql = "${whereSql} and tobject.className='XWiki.TagClass' and tobject.name=doc.fullName and tobject.id=tagprop.id.id and tagprop.id.name='tags' and (")
     #foreach($tag in $request.getParameterValues('tag'))
       #if($velocityCount &gt; 1) #set($whereSql = "${whereSql} and ") #end
-      #set($whereSql = "${whereSql} ? in elements(tagprop.list)")
+      ## Tags are case insensitive but they are stored unchanged which means we have to normalize them when performing
+      ## a query. Unfortunately there's no simple way to match multiple tags (AND operator). If we join the list of
+      ## tags in the FROM clause then we match at least one of the tags (OR operator). The only remaining option is to
+      ## check that the list of tags contains each of the desired tags. HQL doesn't help us to lower-case the entire
+      ## list of tags so we use an inner select for this.
+      #set($whereSql = "${whereSql} lower(?) in (select lower(tag) from tagprop.list tag)")
       #set($discard = $whereParams.add("${tag}"))
     #end
     #set($whereSql = "${whereSql})")
@@ -205,7 +210,7 @@
   #if (!$limit)
     #set ($limit = 15)
   #end
-  #set($query = $services.query.hql($sql).addFilter('hidden').addFilter('unique').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #set($query = $services.query.hql($sql).addFilter('currentlanguage').addFilter('hidden').setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))
   #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
@@ -226,35 +231,59 @@
  * @param $rows stores the JSON in memory so that it can be adjusted before serialization
  *#
 #macro(gridresult_buildRowJSON $item $rows)
-  #set($viewable = $xwiki.hasAccessLevel('view', $context.user, "${context.database}:${item}"))
+  ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
+  ## only the document name is returned. When more than the document name is returned the $item variable is a list.
+  #if ($item.size())
+    ## Extract doc name and doc language from $item
+    #set($docName = $item[0])
+    #set($docLanguage = $item[1])
+  #else
+    #set($docName = $item)
+    #set($docLanguage = '')
+  #end
+  #set($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
   #set($row = {'doc_viewable': $viewable})
   #if(!$viewable)
-    #set($discard = $row.put('doc_fullName', "${context.database}:${item}"))
+    #set($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
   #else
-    #set($itemDoc = $xwiki.getDocument($item))
+    #set($itemDoc = $xwiki.getDocument($docName))
+    ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
+    ## result is a translation.
+    #if ("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+      #set($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+      #set($isTranslation = true)
+    #else
+      #set($translatedDoc = $itemDoc)
+      #set($isTranslation = false)
+    #end
     #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
     #set($discard = $itemDoc.use($className))
-    #set($discard = $row.put('doc_name', $itemDoc.name))
+    #if ($isTranslation)
+      ## Display the language after the document name so that not all translated documents have the same name displayed
+      #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+    #else
+      #set($discard = $row.put('doc_name', $itemDoc.name))
+    #end
     #set($discard = $row.put('doc_fullName', $fullname))
     #set($discard = $row.put('doc_space', $itemDoc.space))
-    #set($discard = $row.put('doc_url', $xwiki.getURL($item)))
+    #set($discard = $row.put('doc_url', $xwiki.getURL($docName)))
     #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
     #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
     #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
-    #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $context.user, $fullname)))
-    #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $context.user, $fullname)))
+    #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
+    #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))
     #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
     #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
     #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
     #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
     #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
-    #set($discard = $row.put('doc_author_url', $xwiki.getURL($itemDoc.author)))
-    #set($discard = $row.put('doc_date', $xwiki.formatDate($itemDoc.date)))
-    #set($discard = $row.put('doc_title', $escapetool.xml($itemDoc.plainTitle)))
-    #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($itemDoc.author, false)))
-    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($itemDoc.creationDate)))
-    #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($itemDoc.creator, false)))
+    #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
+    #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+    #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+    #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($translatedDoc.author, false)))
+    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+    #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($translatedDoc.creator, false)))
     #foreach($colname in $collist)
       #gridresult_buildColumnJSON($colname $row)
     #end
@@ -275,7 +304,7 @@
   #elseif($colname == '_action')
     #set($discard = $row.put($colname, $services.localization.render("${request.transprefix}actiontext")))
   #elseif($colname == '_attachments')
-    #livetable_getAttachmentsList($itemDoc)
+    #livetable_getAttachmentsList($translatedDoc)
     #set($discard = $row.put($colname, $attachlist))
   #elseif($colname == '_avatar')
     #livetable_getAvatar($itemDoc)

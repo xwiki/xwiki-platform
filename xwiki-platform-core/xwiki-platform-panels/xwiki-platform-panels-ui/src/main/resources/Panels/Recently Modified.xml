@@ -106,16 +106,15 @@
     </property>
     <property>
       <content>{{velocity}}
-#set ($recentlyModified = $services.query.xwql('order by doc.date desc').addFilter('hidden').setLimit(5).setOffset(0).execute())
+#set ($query = $services.query.xwql('order by doc.date desc'))
+#set ($recentlyModified = $query.addFilter('hidden').setLimit(5).execute())
 #if ($recentlyModified.size() &gt; 0 || $showEmptyPanels)
   #panelheader($services.localization.render('panels.recentlyModified.title'))
-  #foreach ($docname in $recentlyModified)
-    #if ($xwiki.hasAccessLevel('view', $xcontext.getUser(), $docname))
-      #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-      #if ($foreach.index &gt; 0)
-        (% class="pitemseparator" %) ~| (%%)##
-      #end
-      (% class="panelitem" %)[[$rdoc.plainTitle&gt;&gt;$rdoc]](%%)##
+  #foreach ($docName in $recentlyModified)
+    #if ($xwiki.hasAccessLevel('view', $docName))
+      #set ($recentDoc = $xwiki.getDocument($docName).getTranslatedDocument())
+      ## We use HTML here because we don't have a tool to escape wiki syntax in document title.
+      * {{html}}&lt;a href="$recentDoc.getURL()"&gt;$escapetool.xml($recentDoc.plainTitle)&lt;/a&gt;{{/html}}
     #end
   #end
 #panelfooter()

@@ -27,19 +27,24 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-feed</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-feed-api</artifactId>
   <name>XWiki Platform - Feed - API</name>
   <description>API for feeds (RSS, ATOM, etc)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>13.76</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>r938</version>
     </dependency>
     <!-- RSS Feed processing -->
     <dependency>
@@ -88,7 +93,8 @@
             **/plugin/feed/SyndEntrySourceApi.java,
             **/plugin/feed/SyndEntrySource.java,
             **/plugin/feed/UpdateThread.java,
-            **/plugin/feed/XWikiFeedFetcher.java
+            **/plugin/feed/XWikiFeedFetcher.java,
+            **/util/TidyMessageLogger.java
           </excludes>
         </configuration>
       </plugin>

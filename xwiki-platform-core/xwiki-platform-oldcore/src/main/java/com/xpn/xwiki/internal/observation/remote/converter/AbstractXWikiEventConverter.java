@@ -32,7 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.LazyXWikiDocument;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
@@ -59,6 +59,12 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     private static final String ORIGDOC_LANGUAGE = "origdoclanguage";
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    protected Logger logger;
+
+    /**
      * Used to set some proper context informations.
      */
     @Inject
@@ -69,12 +75,6 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
      */
     @Inject
     private XWikiStubContextProvider stubContextProvider;
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
 
     /**
      * @param context the XWiki context to serialize
@@ -156,11 +156,31 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         return remoteDataMap;
     }
 
+    protected XWikiDocument getDocument(DocumentReference documentReference, String language, String version)
+        throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiStubContext();
+
+        XWikiDocument document = new XWikiDocument(documentReference);
+        document.setLanguage(language);
+
+        // Force bypassing the cache to make extra sure we get the last version of the document.
+        XWikiDocument targetDocument = xcontext.getWiki().getNotCacheStore().loadXWikiDoc(document, xcontext);
+
+        if (!targetDocument.getVersion().equals(version)) {
+            // It's not the last version of the document, ask versioning store.
+            targetDocument = xcontext.getWiki().getVersioningStore().loadXWikiDoc(document, version, xcontext);
+        }
+
+        return targetDocument;
+    }
+
     /**
      * @param remoteData the serialized version of the document
      * @return the document
+     * @throws XWikiException when failing to unserialize document
      */
-    protected XWikiDocument unserializeDocument(Serializable remoteData)
+    protected XWikiDocument unserializeDocument(Serializable remoteData) throws XWikiException
     {
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
@@ -170,18 +190,18 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         if (remoteDataMap.get(DOC_VERSION) == null) {
             doc = new XWikiDocument(docReference);
         } else {
-            doc = new LazyXWikiDocument(docReference);
-            doc.setLanguage((String) remoteDataMap.get(DOC_LANGUAGE));
-            doc.setVersion((String) remoteDataMap.get(DOC_VERSION));
+            doc =
+                getDocument(docReference, (String) remoteDataMap.get(DOC_LANGUAGE),
+                    (String) remoteDataMap.get(DOC_VERSION));
         }
 
         XWikiDocument origDoc;
         if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
             origDoc = new XWikiDocument(docReference);
         } else {
-            origDoc = new LazyXWikiDocument(docReference);
-            origDoc.setLanguage((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
-            origDoc.setVersion((String) remoteDataMap.get(ORIGDOC_VERSION));
+            origDoc =
+                getDocument(docReference, (String) remoteDataMap.get(ORIGDOC_LANGUAGE),
+                    (String) remoteDataMap.get(ORIGDOC_VERSION));
         }
 
         doc.setOriginalDocument(origDoc);

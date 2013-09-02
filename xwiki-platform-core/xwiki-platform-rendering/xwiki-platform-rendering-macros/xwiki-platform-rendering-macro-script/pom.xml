@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-script</artifactId>
   <name>XWiki Platform - Rendering - Macro - Script</name>
   <description>Executes a script implementing the Java Scripting API (JSR-223)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>56.66</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.56</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Script Macro</xwiki.extension.name>
   </properties>

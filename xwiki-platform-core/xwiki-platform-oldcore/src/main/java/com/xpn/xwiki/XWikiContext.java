@@ -31,7 +31,6 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.jfree.util.Log;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -67,7 +67,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * 
      * @since 5.0M1
      */
-    public static ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class,
+    public static final ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class,
         XWikiContext.class);
 
     public static final int MODE_SERVLET = 0;

@@ -52,9 +52,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Settings;
 import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.id.SequenceGenerator;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -82,6 +79,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -263,7 +261,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 available = false;
             } catch (XWikiException e) {
                 // Failed to switch to database. Assume it means database does not exists.
-                available = !(e.getException() instanceof MigrationRequiredException);
+                available = !(e.getCause() instanceof MigrationRequiredException);
             }
         } catch (Exception e) {
             Object[] args = {wikiName};
@@ -496,6 +494,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Make sure the database name is stored
             doc.setDatabase(context.getDatabase());
 
+            // If the comment is larger than the max size supported by the Storage, then abbreviate it
+            String comment = doc.getComment();
+            if (comment != null && comment.length() > 1023) {
+                doc.setComment(StringUtils.abbreviate(comment, 1023));
+            }
+
             if (bTransaction) {
                 checkHibernate(context);
                 SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
@@ -523,12 +527,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                 saveAttachmentList(doc, context, false);
             }
+            // Remove attachments planned for removal
+            if (doc.getAttachmentsToRemove().size() > 0) {
+                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
+                    context.getWiki().getAttachmentStore()
+                        .deleteXWikiAttachment(attachment.getAttachment(), false, context, false);
+                }
+                doc.clearAttachmentsToRemove();
+            }
 
             // Handle the latest text file
             if (doc.isContentDirty() || doc.isMetaDataDirty()) {
                 Date ndate = new Date();
                 doc.setDate(ndate);
-                doc.setAuthorReference(context.getUserReference());
                 if (doc.isContentDirty()) {
                     doc.setContentUpdateDate(ndate);
                     doc.setContentAuthorReference(doc.getAuthorReference());
@@ -1560,6 +1571,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean bTransaction) throws XWikiException
     {
         try {
+            // If the comment is larger than the max size supported by the Storage, then abbreviate it
+            String comment = attachment.getComment();
+            if (comment != null && comment.length() > 1023) {
+                attachment.setComment(StringUtils.abbreviate(comment, 1023));
+            }
+
             // The version number must be bumped and the date must be set before the attachment
             // metadata is saved. Changing the version and date after calling
             // session.save()/session.update() "worked" (the altered version was what Hibernate saved)

@@ -177,7 +177,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <form action="$doc.getURL('commentadd', "xpage=view&amp;viewer=comments#commentform")" method="post" id="AddComment">
       <fieldset class="expanded" id="commentform">
         <legend>$services.localization.render('core.viewers.comments.add.title')</legend>
-        <div class="commentavatar">#mediumUserAvatar($context.user)</div>
+        <div class="commentavatar">#mediumUserAvatar($xcontext.user)</div>
         #if($xcontext.user != 'XWiki.XWikiGuest')
           <label>$services.localization.render('core.viewers.comments.add.guestName.prompt') $xwiki.getUserName($xcontext.user)</label>
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>

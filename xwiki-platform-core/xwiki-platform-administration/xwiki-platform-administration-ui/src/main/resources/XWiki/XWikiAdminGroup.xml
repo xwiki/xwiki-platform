@@ -42,7 +42,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiGroups</name>
@@ -65,6 +65,34 @@
     </class>
     <name>XWiki.XWikiAdminGroup</name>
     <number>0</number>
+    <className>XWiki.XWikiGroups</className>
+    <guid>46d387f2-4d8d-446d-a618-8bfcb655ba18</guid>
+    <property>
+      <member />
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.XWikiGroups</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <member>
+        <disabled>0</disabled>
+        <name>member</name>
+        <number>1</number>
+        <prettyName>Member</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </member>
+    </class>
+    <name>XWiki.XWikiAdminGroup</name>
+    <number>1</number>
     <className>XWiki.XWikiGroups</className>
     <guid>46d387f2-4d8d-446d-a618-8bfcb655ba18</guid>
     <property>

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -38,7 +38,7 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>29.15</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -60,15 +60,6 @@
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
-    <!-- We need to find what version of the googleapi we're using and get that to the central repository if the
-         license allows it -->
-    <dependency>
-      <groupId>com.google</groupId>
-      <artifactId>googleapi</artifactId>
-      <version>UNKNOWN</version>
-      <classifier>xwiki</classifier>
-    </dependency>
-
     <dependency>
       <groupId>com.novell.ldap</groupId>
       <artifactId>jldap</artifactId>
@@ -87,12 +78,6 @@
           <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.jtidy</groupId>
-      <artifactId>jtidy</artifactId>
-      <version>r938</version>
     </dependency>
     
     <!-- Required by the XML-RPC implementation and tests.
@@ -365,14 +350,7 @@
       <artifactId>picocontainer</artifactId>
       <version>1.2</version>
     </dependency>
-    <!-- This Axis dependency is not used directly and shouldn't be declared. However it's used
-         by the Google API used in the Google Plugin API. It should be declared in that project's
-         POM but it's not so we have to declare it in the meantime... -->
-    <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis</artifactId>
-      <version>1.4</version>
-    </dependency>
+
     <!-- Regular expressions -->
     <dependency>
       <groupId>oro</groupId>
@@ -780,8 +758,6 @@
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
-              **/plugin/google/GooglePluginApi.java,
-              **/plugin/google/GooglePlugin.java,
               **/plugin/graphviz/GraphVizMacro.java,
               <!-- XWiki LDAP Utils has a fan out complexity of 21 that needs to be investigated and refactored. -->
               **/plugin/ldap/XWikiLDAPUtils.java,
@@ -922,7 +898,6 @@
               **/util/AbstractXWikiRunnable.java,
               **/util/MenuSubstitution.java,
               **/util/Programming.java,
-              **/util/TidyMessageLogger.java,
               **/util/TOCGenerator.java,
               **/util/Util.java,
               **/validation/XWikiDefaultValidation.java,

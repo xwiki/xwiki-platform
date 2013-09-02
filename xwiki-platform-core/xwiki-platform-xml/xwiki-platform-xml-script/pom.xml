@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-xml</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-xml-script</artifactId>
   <name>XWiki Platform - XML - Script Service</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - XML - Script Service</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>88.60</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

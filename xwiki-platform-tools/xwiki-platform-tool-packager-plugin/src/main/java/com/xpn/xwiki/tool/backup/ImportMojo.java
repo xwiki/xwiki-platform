@@ -185,7 +185,9 @@ public class ImportMojo extends AbstractMojo
                     getLog().info("  ... Importing XAR file: " + artifact.getFile());
 
                     // Import XAR into database
-                    importer.importXAR(artifact.getFile(), null, xcontext);
+                    int nb = importer.importXAR(artifact.getFile(), null, xcontext);
+
+                    getLog().info("  ..... Imported " + nb + " documents");
 
                     // Install extension
                     installExtension(artifact, xcontext);
@@ -199,6 +201,8 @@ public class ImportMojo extends AbstractMojo
         // TODO: Find a way to implement this generically for all databases and inside
         // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
         importer.shutdownHSQLDB(xcontext);
+
+        importer.disposeXWikiContext(xcontext);
     }
 
     private void installExtension(Artifact artifact, XWikiContext xcontext) throws ComponentLookupException,
@@ -279,12 +283,12 @@ public class ImportMojo extends AbstractMojo
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
     {
         try {
-            ProjectBuildingRequest request = new DefaultProjectBuildingRequest()
-                .setRepositorySession(this.repositorySystemSession)
+            ProjectBuildingRequest request =
+                new DefaultProjectBuildingRequest().setRepositorySession(this.repositorySystemSession)
                 // We don't want to execute any plugin here
-                .setProcessPlugins(false)
-                // It's not this plugin job to validate this pom.xml
-                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+                    .setProcessPlugins(false)
+                    // It's not this plugin job to validate this pom.xml
+                    .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
             // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
             ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
             return result.getProject();

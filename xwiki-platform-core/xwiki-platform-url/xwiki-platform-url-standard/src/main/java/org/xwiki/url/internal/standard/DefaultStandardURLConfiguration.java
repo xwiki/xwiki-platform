@@ -71,6 +71,12 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
         return getWikiPathPrefix("wiki");
     }
 
+    @Override
+    public String getEntityPathPrefix()
+    {
+        return getEntityPathPrefix("bin");
+    }
+
     /**
      * Makes it easy for this class to be extended.
      *
@@ -80,5 +86,16 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
     protected String getWikiPathPrefix(String defaultValue)
     {
         return this.configuration.getProperty(PREFIX + "multiwiki.wikiPathPrefix", defaultValue);
+    }
+
+    /**
+     * Makes it easy for this class to be extended.
+     *
+     * @param defaultValue the default value to use if the key is not found in the configuration
+     * @return see {@link #getEntityPathPrefix()} ()}
+     */
+    protected String getEntityPathPrefix(String defaultValue)
+    {
+        return this.configuration.getProperty(PREFIX + "entityPathPrefix", defaultValue);
     }
 }

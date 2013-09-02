@@ -71,22 +71,23 @@ public class SortByParameterFilter implements UIExtensionFilter
         {
             int result = 0;
 
-            if (!source.getParameters().containsKey(parameterKey)) {
+            String sourceValue = source.getParameters().get(parameterKey);
+            String targetValue = target.getParameters().get(parameterKey);
+            if (sourceValue == null) {
                 // If the source extensions doesn't have the parameter we want it to be put at the end of the collection
                 result = Integer.MAX_VALUE;
-            } else if (!target.getParameters().containsKey(parameterKey)) {
+            } else if (targetValue == null) {
                 // If the target extensions doesn't have the parameter we want it to be put at the end of the collection
                 result = Integer.MIN_VALUE;
             } else {
                 try {
                     // The parameter values might be integers.
-                    int sourceInt = Integer.parseInt(source.getParameters().get(parameterKey));
-                    int targetInt = Integer.parseInt(target.getParameters().get(parameterKey));
+                    int sourceInt = Integer.parseInt(sourceValue);
+                    int targetInt = Integer.parseInt(targetValue);
                     result = sourceInt - targetInt;
                 } catch (NumberFormatException e) {
-                    // They're not both integers we compare the 2 string values
-                    result = source.getParameters().get(parameterKey).compareToIgnoreCase(
-                        target.getParameters().get(parameterKey));
+                    // They're not both integers so we compare the 2 string values instead.
+                    result = sourceValue.compareToIgnoreCase(targetValue);
                 }
             }
 
@@ -107,7 +108,7 @@ public class SortByParameterFilter implements UIExtensionFilter
         List<UIExtension> results = new ArrayList<UIExtension>();
         results.addAll(extensions);
 
-        if (!StringUtils.isBlank(parameterKey[0])) {
+        if (parameterKey.length > 0 && !StringUtils.isBlank(parameterKey[0])) {
             Collections.sort(results, new UIExtensionParameterComparator(parameterKey[0]));
         }
 

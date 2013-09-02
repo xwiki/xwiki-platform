@@ -486,9 +486,12 @@ public abstract class ListClass extends PropertyClass
             selectlist.add(String.valueOf(prop.getValue()));
         }
 
-        // TODO: add elements that are in the values but not in the predefined list..
+        // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
-            if (!list.contains(item)) {
+            // The empty value means no selection when it's not in the predefined list. Both the radio and the checkbox
+            // input support empty selection (unlike the select input which automatically selects the first value when
+            // single selection is on) so we don't have to generate a radio/checkbox for the empty value.
+            if (!StringUtils.isEmpty(item) && !list.contains(item)) {
                 list.add(item);
             }
         }
@@ -516,6 +519,8 @@ public abstract class ListClass extends PropertyClass
             buffer.append("</label>");
         }
 
+        // We need a hidden input with an empty value to be able to clear the selected values when no value is selected
+        // from the above radio/checkbox buttons.
         org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
         hidden.setAttributeFilter(new XMLAttributeValueFilter());
         hidden.setDisabled(isDisabled());
@@ -589,7 +594,7 @@ public abstract class ListClass extends PropertyClass
             selectlist.add(String.valueOf(prop.getValue()));
         }
 
-        // TODO: add elements that are in the values but not in the predefined list..
+        // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
             if (!list.contains(item)) {
                 list.add(item);

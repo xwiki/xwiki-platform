@@ -150,7 +150,7 @@
 "rows": [
 #foreach ($attach in $items)
   #set ($document = $attach.getDocument())
-  #set ($hasAccess = $xwiki.hasAccessLevel('view', $context.user, $document.getFullName()))
+  #set ($hasAccess = $xwiki.hasAccessLevel('view', $xcontext.user, $document.getFullName()))
   #if ($velocityCount &gt; 1) , #end
   { "acclev" : $hasAccess,
   #if ($hasAccess)

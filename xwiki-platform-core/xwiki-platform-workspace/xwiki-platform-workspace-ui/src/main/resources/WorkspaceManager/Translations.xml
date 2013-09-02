@@ -61,7 +61,7 @@
   <content># Workspace Manager translation page
 
 # MESSAGES
-workspacemanager.pluginnotenabled=The Workspace Manager java component is not installed. This page will not work properly. Make sure that the file 'wiki30-components-workspace-manager-&lt;version&gt;.jar' is present under the 'webapps/xwiki/WEB-INF/lib/' folder.
+workspacemanager.pluginnotenabled=The Workspaces Manager java component is not installed. This page will not work properly. Make sure that the "Workspace API" extension is installed (using the Extension Manager) or that the file 'xwiki-platform-workspace-api-&lt;version&gt;.jar' is present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 workspacemanager.template.install.success=Workspace template has been successfully installed.
 workspacemanager.template.install.error=Error installing workspace template. {0}
 workspacemanager.template.install.error.missingattachment=Error installing the workspace template. The file "{0}" is not attached to the document [[{1}&gt;&gt;{1}]]. Please re-import the [[{1}&gt;&gt;{1}]] document from the Workspaces Application XAR.

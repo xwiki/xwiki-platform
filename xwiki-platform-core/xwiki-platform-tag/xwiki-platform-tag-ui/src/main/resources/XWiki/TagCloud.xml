@@ -309,7 +309,7 @@ ol.tagCloud .ultraPopular {
       <code>{{velocity}}
 ##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
-#set ($tagCloudSpace = $context.macro.params.get('space'))
+#set ($tagCloudSpace = $xcontext.macro.params.get('space'))
 ##
 ## Configurable popularity levels. You must enter an even number of levels. Default: 6.
 #set ($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])

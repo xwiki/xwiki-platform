@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include document="Blog.BlogCode"/}}
 
@@ -64,7 +64,7 @@
   #set($postDocName = "${space}.${name.replaceAll('[.:]', '')}")
   ## Get the target blog document, to set it as the parent
   #getBlogDocument($space $blogDoc)
-  #set($parent = $blogDoc.fullName)
+  #set($parent = "$!{escapetool.url($blogDoc.fullName)}")
   #set($title = "$!{escapetool.url($name)}")
   #if("$!request.category" != '')
     #set($category = "&amp;${blogPostClassname}_${blogPostObjectNumber}_category=${escapetool.url(${request.category})}")

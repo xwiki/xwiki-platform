@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-platform-search-solr</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-query</artifactId>
   <packaging>jar</packaging>
@@ -36,7 +36,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search Query API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>1.94</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

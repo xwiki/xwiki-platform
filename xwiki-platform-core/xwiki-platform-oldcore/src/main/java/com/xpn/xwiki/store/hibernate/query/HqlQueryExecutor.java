@@ -28,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.Session;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -36,6 +35,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,7 +43,6 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
-import org.xwiki.query.QueryFilter;
 
 /**
  * QueryExecutor implementation for Hibernate Store.
@@ -72,12 +71,6 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     @Inject
     private Execution execution;
-
-    /**
-     * The bridge to the old XWiki core API, used to access user preferences.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     public void initialize() throws InitializationException

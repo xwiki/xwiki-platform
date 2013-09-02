@@ -646,9 +646,11 @@ span.new-entry {
   <content>{{velocity output="false"}}
 $xwiki.jsx.use('XWiki.AdminLdapSheet')
 $xwiki.ssx.use('XWiki.AdminLdapSheet')
-#set($legend = ['ldap'])
-#set($params = {})
-#set($params.ldap = ['ldap', 'ldap_server', 'ldap_port', 'ldap_bind_DN','ldap_bind_pass', 'ldap_user_group', 'ldap_exclude_group', 'ldap_base_DN', 'ldap_UID_attr', 'ldap_trylocal','ldap_update_user', 'ldap_fields_mapping','ldap_group_mapping', 'ldap_groupcache_expiration', 'ldap_mode_group_sync'])
+#set ($params = {
+  'ldap': ['ldap', 'ldap_server', 'ldap_port', 'ldap_bind_DN','ldap_bind_pass', 'ldap_user_group', 'ldap_exclude_group',
+          'ldap_base_DN', 'ldap_UID_attr', 'ldap_trylocal','ldap_update_user', 'ldap_fields_mapping','ldap_group_mapping',
+          'ldap_groupcache_expiration', 'ldap_mode_group_sync']
+})
 
 Note : 'ldap_validate_password' has been voluntary left out, has it's xwiki.cfg documentation precises that "[it is] covering very rare and bad use cases."
 {{/velocity}}

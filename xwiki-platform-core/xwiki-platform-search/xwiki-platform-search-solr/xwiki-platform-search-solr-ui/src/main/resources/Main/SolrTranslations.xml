@@ -65,11 +65,13 @@ solr.sortBy.author_display_sort=Last Author
 solr.sortOrder.asc=Ascending
 solr.sortOrder.desc=Descending
 
+solr.result.language=Language
 solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 solr.result.author=Modified by {0} on {1}
 solr.result.mediaType=File of type {0}
 solr.result.object=Object of type {0}
 solr.result.property=Property {0}#{1}
+solr.result.highlightAll=Highlight all matches
 
 solr.filter.title=Advanced Options
 solr.filter.hint=Select predefined filters that will be applied on your query.
@@ -98,5 +100,26 @@ solr.facets.title=Refine your search
 solr.facets.hint=Select a category and activate filters on the current results
 solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
-solr.facets.collapseAll=Collapse all</content>
+solr.facets.collapseAll=Collapse all
+solr.facets.emptyValue=Empty Value
+
+solr.field.locale=Language
+solr.field.locale.emptyValue=No Language
+solr.field.wiki=Wiki
+solr.field.space=Space
+solr.field.space_exact=Space
+solr.field.name=Page
+solr.field.name_exact=Page
+solr.field.title=Title
+solr.field.author_display=Author
+solr.field.creator_display=Creator
+solr.field.creationdate=Creation Date
+solr.field.doccontent=Rendered Document Content
+solr.field.doccontentraw=Raw Document Content
+solr.field.propertyname=Property Name
+solr.field.propertyvalue=Property Value
+solr.field.filename=Attachment Name
+solr.field.attcontent=Attachment Content
+solr.field.comment=Comments
+solr.field.objcontent=Objects</content>
 </xwikidoc>

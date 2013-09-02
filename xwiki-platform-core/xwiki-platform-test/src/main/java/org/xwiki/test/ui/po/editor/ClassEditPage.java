@@ -138,8 +138,8 @@ public class ClassEditPage extends BasePage
     {
         this.saveandcontinue.click();
 
-        // Wait until the page is really saved
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Saved']"));
+        // Wait until the class is really saved.
+        waitForNotificationSuccessMessage("Saved");
     }
 
     public ViewPage clickSaveAndView()

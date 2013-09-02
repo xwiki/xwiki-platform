@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.wiki;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -31,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -114,6 +114,12 @@ public class XWikiWikiModel implements WikiModel
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    /**
+     * Provides logging for this class.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * The object used to parse the CSS from the image style parameter.
@@ -312,8 +318,9 @@ public class XWikiWikiModel implements WikiModel
             try {
                 CSSStyleDeclaration sd = this.cssParser.parseStyleDeclaration(new InputSource(new StringReader(style)));
                 value = sd.getPropertyValue(dimension);
-            } catch (IOException e) {
-                // Ignore the style parameter.
+            } catch (Exception e) {
+                // Ignore the style parameter but log a warning to let the user know.
+                this.logger.warn("Failed to parse CSS style [{}]", style);
             }
         }
         if (StringUtils.isBlank(value)) {

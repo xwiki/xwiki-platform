@@ -36,14 +36,6 @@ public class CodeMacroParameters extends BoxMacroParameters
     private String language;
 
     /**
-     * Initialize code macro class.
-     */
-    public CodeMacroParameters()
-    {
-        this.setCssClass("code");
-    }
-
-    /**
      * @param language the language identifier.
      */
     @PropertyDescription("the language identifier (java, python, etc.)")

@@ -87,7 +87,7 @@ public class CommentAddAction extends XWikiAction
                 // A registered user must always post with his name.
                 object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
             }
-            doc.setAuthor(context.getUser());
+            doc.setAuthorReference(context.getUserReference());
             // Consider comments not being content.
             doc.setContentDirty(false);
             // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.

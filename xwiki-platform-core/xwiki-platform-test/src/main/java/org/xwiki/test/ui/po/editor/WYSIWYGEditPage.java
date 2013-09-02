@@ -23,10 +23,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
-import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.wysiwyg.AttachedImageSelectPane;
 import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
-import org.xwiki.test.ui.po.editor.wysiwyg.TableConfigPane;
+import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 /**
  * Represents the actions possible in WYSIWYG edit mode.
@@ -38,9 +36,6 @@ public class WYSIWYGEditPage extends PreviewableEditPage
 {
     @FindBy(id = "xwikidoctitleinput")
     private WebElement titleField;
-
-    @FindBy(name = "action_save")
-    private WebElement saveAndViewSubmit;
 
     @FindBy(name = "parent")
     private WebElement parentInput;
@@ -65,12 +60,6 @@ public class WYSIWYGEditPage extends PreviewableEditPage
         return this.titleField.getAttribute("value");
     }
 
-    public ViewPage save()
-    {
-        this.saveAndViewSubmit.submit();
-        return new ViewPage();
-    }
-
     /**
      * Get the <code>content</code> of the page.
      */
@@ -89,33 +78,15 @@ public class WYSIWYGEditPage extends PreviewableEditPage
     }
 
     /**
-     * @return the WYSIWYG content editor
-     */
-    public EditorElement getContentEditor()
-    {
-        return editor;
-    }
-
-    /**
-     * Triggers the insert attached image wizard.
+     * Sets the content of the editor (rich text area).
      * 
-     * @return the pane used to select an attached image to insert
+     * @param content the content to be set
      */
-    public AttachedImageSelectPane insertAttachedImage()
+    public void setContent(String content)
     {
-        editor.getMenuBar().clickImageMenu();
-        return editor.getMenuBar().clickInsertAttachedImageMenu();
-    }
-
-    /**
-     * Triggers the insert table wizard.
-     * 
-     * @return the pane used to configure the table to insert
-     */
-    public TableConfigPane insertTable()
-    {
-        editor.getMenuBar().clickTableMenu();
-        return editor.getMenuBar().clickInsertTableMenu();
+        RichTextAreaElement textArea = editor.getRichTextArea();
+        textArea.clear();
+        textArea.sendKeys(content);
     }
 
     /**
@@ -124,5 +95,12 @@ public class WYSIWYGEditPage extends PreviewableEditPage
     public String getParent()
     {
         return this.parentInput.getAttribute("value");
+    }
+
+    @Override
+    public WYSIWYGEditPage waitUntilPageIsLoaded()
+    {
+        editor.waitToLoad();
+        return this;
     }
 }

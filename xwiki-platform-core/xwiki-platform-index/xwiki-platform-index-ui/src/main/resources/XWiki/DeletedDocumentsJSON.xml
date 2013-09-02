@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1301566124000</creationDate>
-  <date>1301566365000</date>
-  <contentUpdateDate>1301566365000</contentUpdateDate>
+  <creationDate>1375383727000</creationDate>
+  <date>1375450046000</date>
+  <contentUpdateDate>1375450046000</contentUpdateDate>
   <version>1.1</version>
   <title>JSON Generation for the Deleted Documents Livetable</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -183,8 +182,8 @@ $response.setContentType('application/json')
 #end
 #set($selectSql = "select ddoc.id from XWikiDeletedDocument as ddoc where 1=1 " + $sql + " order by $order $dir")
 #set($countSql = "select count(*) from XWikiDeletedDocument as ddoc where 1=1 " + $sql)
-#set($items = $xwiki.search($selectSql, $limit, $offset))
-#set($totalItems = $xwiki.search($countSql).get(0))
+#set($items = $services.query.hql($selectSql).setLimit($limit).setOffset($offset).execute())
+#set($totalItems = $services.query.hql($countSql).execute().get(0))
 #set($returnedItems = $items.size())
 ## ==============================================
 ## json starts

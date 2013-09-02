@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-api</artifactId>
   <name>XWiki Platform - Localization - API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Localization - API</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.04</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

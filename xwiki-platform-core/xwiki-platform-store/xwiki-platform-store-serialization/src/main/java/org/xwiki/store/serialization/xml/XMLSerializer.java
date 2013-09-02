@@ -34,6 +34,8 @@ import org.xwiki.store.serialization.xml.internal.XMLWriter;
  * @version $Id$
  * @since 3.0M2
  */
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have
+// XMLSerializer<R, P extends R>. Changing it will thus break all code looking up components implementing this role.
 @ComponentRole
 public interface XMLSerializer<R, P extends R> extends Serializer<R, P>
 {

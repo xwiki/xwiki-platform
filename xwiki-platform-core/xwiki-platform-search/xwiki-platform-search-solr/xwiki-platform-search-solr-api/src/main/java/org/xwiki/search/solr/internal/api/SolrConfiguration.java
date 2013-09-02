@@ -20,8 +20,6 @@
 package org.xwiki.search.solr.internal.api;
 
 import java.net.URL;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
@@ -50,32 +48,6 @@ public interface SolrConfiguration
      * @param <T> the type of the default parameter.
      */
     <T> T getInstanceConfiguration(String instanceType, String propertyName, T defaultValue);
-
-    /**
-     * Each locale has its particularities and needs to be handled specially in order to index and retrieve the best
-     * results.
-     * 
-     * @return the list of supported locale codes for which optimized indexing can be performed (using
-     *         locale-code-suffixed fields that are analyzed and queries with the analysis chain specific to the
-     *         locale)
-     * @see #getOptimizedLocales() for the selected locales
-     */
-    List<Locale> getOptimizableLocales();
-
-    /**
-     * Each locale has its particularities and needs to be handled specially in order to index and retrieve the best
-     * results.
-     * 
-     * @return the list of locale codes for which to perform optimized indexing (using locale-code-suffixed fields
-     *         that are analyzed and queries with the analysis chain specific to the locale)
-     * @see #getOptimizableLocales() for the full list of supported locales
-     */
-    List<Locale> getOptimizedLocales();
-
-    /**
-     * @return the list of multilingual fields for which to apply optimized indexing.
-     */
-    List<String> getMultilingualFields();
 
     /**
      * Retrieves the configuration files required by the Solr instance's home directory in order to initialize.

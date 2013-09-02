@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1226789865000</creationDate>
-  <date>1229917290000</date>
-  <contentUpdateDate>1229917290000</contentUpdateDate>
+  <creationDate>1373016401000</creationDate>
+  <date>1373018322000</date>
+  <contentUpdateDate>1373017694000</contentUpdateDate>
   <version>1.1</version>
   <title>Macros for the Blog Categories</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -57,9 +56,9 @@
     #end
     #getBlogEntriesBaseQuery ($query)
     #set ($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category in (${parameters})")
-    #set ($totalResult = $xwiki.countDocuments(${query}, ${categories}))
+    #set ($totalResult = $services.query.hql($query).bindValues($categories).count())
     #preparePagedViewParams ($totalResult 10)
-    #set ($result = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt, ${categories}))
+    #set ($result = $services.query.hql("${query} order by publishDate.value desc").setLimit($itemsPerPage).setOffset($startA).bindValues($categories).execute())
     #if ("$!{blogCategoryEntriesCache.containsKey($!{category})}" == '')
       #set ($blogCategoryEntriesCache = {})
     #end
@@ -100,7 +99,7 @@
       #set($query = "${query}doc.space = '${space}' and ")
     #end
     #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' order by doc.name")
-    #foreach($category in $xwiki.searchDocuments($query))
+    #foreach($category in $services.query.hql($query).execute())
       #set($categoryDoc = $xwiki.getDocument($category))
       #set($categoryParent = "$!categoryDoc.parent")
       #if($categoryParent == '')
@@ -420,7 +419,8 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
     #set($query = "${query}doc.space = '${space}' and ")
   #end
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = ? order by doc.name")
-  #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
+  
+  #foreach($item in $services.query.hql($query).bindValues($parameterValues).execute())
     #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($subcategoryDoc = $xwiki.getDocument($item))
       $subcategoryDoc.setParent($categoryParent)
@@ -432,7 +432,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
     #set($query = "${query}doc.space = '${space}' and ")
   #end
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = ? order by doc.name")
-  #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
+  #foreach($item in $services.query.hql($query).bindValues($parameterValues).execute())
     #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
@@ -456,7 +456,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #set($parameterValues = ["$!{category}"])
   #set($query = ', BaseObject obj where ')
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = ? order by doc.name")
-  #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
+  #foreach($item in $services.query.hql($query).bindValues($parameterValues).execute())
     #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($subcategoryDoc = $xwiki.getDocument($item))
       $subcategoryDoc.setParent($newCategoryDoc.fullName)
@@ -465,7 +465,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #end
   #set($query = ', BaseObject obj, DBStringListProperty categories join categories.list as category where ')
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = ? order by doc.name")
-  #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
+  #foreach($item in $services.query.hql($query).bindValues($parameterValues).execute())
     #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))

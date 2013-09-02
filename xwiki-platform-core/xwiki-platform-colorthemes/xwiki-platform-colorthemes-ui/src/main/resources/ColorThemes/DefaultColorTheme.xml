@@ -16,7 +16,6 @@
   <contentUpdateDate>1324487404000</contentUpdateDate>
   <version>1.1</version>
   <title>Default color theme</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -1391,5 +1390,5 @@ RK5CYII=
       <titleColor>#2173AF</titleColor>
     </property>
   </object>
-  <content>{{include document="ColorThemes.ColorThemeSheet"/}}</content>
+  <content/>
 </xwikidoc>

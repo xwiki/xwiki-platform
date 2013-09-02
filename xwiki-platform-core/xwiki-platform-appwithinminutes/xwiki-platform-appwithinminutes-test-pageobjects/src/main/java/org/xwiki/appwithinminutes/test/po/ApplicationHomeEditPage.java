@@ -106,6 +106,9 @@ public class ApplicationHomeEditPage extends InlinePage
     public void clickSaveAndContinue()
     {
         saveAndContinueButton.click();
+
+        // Wait until the page is really saved.
+        waitForNotificationSuccessMessage("Saved");
     }
 
     @SuppressWarnings("unchecked")

@@ -6,3 +6,4 @@ org.xwiki.query.internal.QueryManagerScriptService
 org.xwiki.query.internal.HiddenDocumentFilter
 org.xwiki.query.internal.UniqueDocumentFilter
 org.xwiki.query.internal.CountFilter
+org.xwiki.query.internal.LanguageQueryFilter

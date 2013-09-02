@@ -111,6 +111,7 @@
 
 .box.floatinginfobox {
   margin-top: 0;
+  max-width: 50%;
 }
 
 .extensionSummary {
@@ -157,7 +158,7 @@
   <content>{{include document="ExtensionCode.RepositoryCode"/}}
 
 {{velocity output="false"}}
-#if ($context.action == 'edit' || $context.action == 'inline')
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
   #set($isEditMode = true)
 #else
   #set($isViewMode = true)
@@ -407,6 +408,8 @@
           #set ($discard = $releaseNotes.add([$version, $notes]))
         #end
       #end
+      ## Reverse the list to have latest versions first
+      #set ($discard = $collectionstool.reverse($releaseNotes))
       #if (!$releaseNotes.isEmpty())
         = Release Notes =
         #foreach ($entry in $releaseNotes)

@@ -95,20 +95,22 @@
   #end
 #end
 ##
-#macro(printUsersAndGroups $users $groups $rightlevel $userlist $grouplist $hidden)
-  &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
-    #foreach ($user in $users)
-      #if ($xcontext.isMainWiki()) #set ($user = "${xcontext.mainWikiName}:${user}") #end
-      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $NULL, false)&lt;/option&gt;
-    #end
-  &lt;/select&gt;
-  &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;
-    #foreach ($group in $groups)
-      #if ($xcontext.isMainWiki()) #set ($group = "${xcontext.mainWikiName}:${group}") #end
-      #set ($pointindex = $group.indexOf(".") + 1)
-      &lt;option value="$group" #if ($grouplist &amp;&amp; $grouplist.contains($group)) selected="selected" #end&gt;$group.substring($pointindex)&lt;/option&gt;
-    #end
-  &lt;/select&gt;
+#macro(printUsersAndGroups $rightLevel $userList $groupList)
+  #userPicker_import(true)
+  ## The label for this input is generated outside this macro.
+  &lt;p&gt;&lt;input type="text" id="${rightLevel}users" name="${rightLevel}users"
+    value="$escapetool.xml($stringtool.join($userList, ','))"
+    class="suggestUsers multipleSelection global" /&gt;&lt;/p&gt;
+  &lt;p&gt;
+    ## Generate a hidden label to satisfy web standards.
+    ## A visible label is displayed before this group of pickers.
+    &lt;label for="${rightLevel}groups" class="hidden"&gt;
+      $services.localization.render("wikimanager.$rightLevel")
+    &lt;/label&gt;
+    &lt;input type="text" id="${rightLevel}groups" name="${rightLevel}groups"
+      value="$escapetool.xml($stringtool.join($groupList, ','))"
+      class="suggestGroups multipleSelection global" /&gt;
+  &lt;/p&gt;
 #end
 ##
 #macro(addRights $prefdoc $userlist $grouplist $rights $needsave)
@@ -264,21 +266,32 @@
  var steps = new Array(#foreach ($wstep in $WSTEPLIST)#if ($velocityCount &gt; 1), #end"$wstep"#end)
  var currentstep = $wstepbystep;
 
- function getUsersGroupsValue(users, groups)
+ var getUserOrGroupPickerValue = function(inputName) {
+   var emptyValue = function(item) {return item.value != ''};
+   var value = function(item) {return item.value};
+   return $('wikicreationform').select('input[name="' + inputName + '"]')
+     .filter(emptyValue).collect(value).join(',');
+ }
+
+ function getUsersGroupsValue(rightLevel)
  {
    var str = "";
+   var users = getUserOrGroupPickerValue(rightLevel + 'users');
+   var groups = getUserOrGroupPickerValue(rightLevel + 'groups');
 
-   if (users.value != "" || groups.value != "") {
-     str = "&lt;ul class=\"star\"&gt;";
+   if (users != '' || groups != '') {
+     str = '&lt;ul class="star"&gt;';
 
-     if (users.value != "")
-       str += "&lt;li&gt;Users: " + users.value + "&lt;\/li&gt;"
-     if (groups.value != "")
-       str += "&lt;li&gt;Groups: " + groups.value + "&lt;\/li&gt;"
+     if (users != '') {
+       str += "&lt;li&gt;Users: " + users + "&lt;\/li&gt;";
+     }
+     if (groups != '') {
+       str += "&lt;li&gt;Groups: " + groups + "&lt;\/li&gt;";
+     }
 
      str += "&lt;\/ul&gt;";
    }
-   
+
    return str;
  }
 
@@ -288,12 +301,12 @@
    $("summarywikiprettyname").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_wikiprettyname").value + "&lt;\/p&gt;";
    $("summarywikidesc").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_description").value + "&lt;\/p&gt;";
    $("summarywikidomain").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_server").value + "&lt;\/p&gt;";
-   $("summarywikiadmin").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_owner").value + "&lt;\/p&gt;";
+   $("summarywikiadmin").innerHTML = "&lt;p&gt;" + getUserOrGroupPickerValue('XWiki.XWikiServerClass_0_owner') + "&lt;\/p&gt;";
    $("summarywikitemplate").innerHTML = "&lt;p&gt;" + $("wikitemplate").value + "&lt;\/p&gt;";
    $("summarywikipackage").innerHTML = "&lt;p&gt;" + $("wikipackage").value + "&lt;\/p&gt;";
-   $("summaryreaders").innerHTML = getUsersGroupsValue($("readersusers"), $("readersgroups"));
-   $("summarywriters").innerHTML = getUsersGroupsValue($("writersusers"), $("writersgroups"));
-   $("summaryadmins").innerHTML = getUsersGroupsValue($("adminsusers"), $("adminsgroups"));
+   $("summaryreaders").innerHTML = getUsersGroupsValue('readers');
+   $("summarywriters").innerHTML = getUsersGroupsValue('writers');
+   $("summaryadmins").innerHTML = getUsersGroupsValue('admins');
  }
 
  function showStep()
@@ -463,7 +476,13 @@
       &lt;dd&gt;
         &lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
         &lt;span id="wikinamevalidation"&gt;&lt;/span&gt;
-        &lt;div id="forcewikinamediv"&gt;&lt;input id="forcewikiname" name="forcewikiname" type="checkbox" #if ($failonexist == false)checked="true"#end onchange="forceWikiNameChanged();"/&gt;&lt;label for="forcewikiname"&gt;$services.localization.render('wikimanager.wikiname.force')&lt;/label&gt;&lt;/div&gt;
+        &lt;div id="forcewikinamediv"&gt;
+          &lt;label for="forcewikiname"&gt;
+            &lt;input id="forcewikiname" type="checkbox"#if ($failonexist == false) checked="true"#end
+              name="forcewikiname" onchange="forceWikiNameChanged();"/&gt;
+            $services.localization.render('wikimanager.wikiname.force')
+          &lt;/label&gt;
+        &lt;/div&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
@@ -536,9 +555,6 @@
   ##
   #############################################################################
   ##
-  #set ($rightsmanager = $xwiki.rightsmanager)
-  #set ($users = $rightsmanager.usersApi.allGlobalUsersNames)
-  #set ($groups = $rightsmanager.groupsApi.allGlobalGroupsNames)
   &lt;div id="$WSTEPNAME_USERS"&gt;
     1.1 $services.localization.render('wikimanager.title.createwiki.members')
     #if ($documentation) $services.localization.render('wikimanager.doc.createwiki.members') #end
@@ -546,19 +562,19 @@
     &lt;dl&gt;
       &lt;dt&gt;&lt;label for="readersusers"&gt;$services.localization.render('wikimanager.readers')&lt;/label&gt;&lt;/dt&gt;
       #if ($documentation) &lt;td&gt;$services.localization.render('wikimanager.doc.createwiki.members.readers')&lt;/td&gt; #end
-      &lt;dd&gt;#printUsersAndGroups($users $groups "readers" $readeruserlist $readergrouplist false)&lt;/dd&gt;
+      &lt;dd&gt;#printUsersAndGroups("readers" $readeruserlist $readergrouplist)&lt;/dd&gt;
     &lt;/dl&gt;
 
     &lt;dl&gt;
       &lt;dt&gt;&lt;label for="writersusers"&gt;$services.localization.render('wikimanager.writers')&lt;/label&gt;&lt;/dt&gt;
       #if ($documentation) &lt;td&gt;$services.localization.render('wikimanager.doc.createwiki.members.writers')&lt;/td&gt; #end
-      &lt;dd&gt;#printUsersAndGroups($users $groups "writers" $writeruserlist $writergrouplist false)&lt;/dd&gt;
+      &lt;dd&gt;#printUsersAndGroups("writers" $writeruserlist $writergrouplist)&lt;/dd&gt;
     &lt;/dl&gt;
 
     &lt;dl&gt;
       &lt;dt&gt;&lt;label for="adminsusers"&gt;$services.localization.render('wikimanager.admins')&lt;/label&gt;&lt;/dt&gt;
       #if ($documentation) &lt;td&gt;$services.localization.render('wikimanager.doc.createwiki.members.administrators')&lt;/td&gt; #end
-      &lt;dd&gt;#printUsersAndGroups($users $groups "admins" $adminuserlist $admingrouplist false)&lt;/dd&gt;
+      &lt;dd&gt;#printUsersAndGroups("admins" $adminuserlist $admingrouplist)&lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
   ##

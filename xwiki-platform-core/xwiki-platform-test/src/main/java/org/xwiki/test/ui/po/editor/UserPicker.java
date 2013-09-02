@@ -313,7 +313,8 @@ public class UserPicker extends BaseElement
         {
             public Boolean apply(WebDriver driver)
             {
-                return !textInput.getAttribute("class").contains("loading");
+                String classNames = textInput.getAttribute("class");
+                return classNames.contains("initialized") && !classNames.contains("loading");
             }
         });
         return this;

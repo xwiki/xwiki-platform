@@ -31,6 +31,12 @@
     #end
     <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------
+    ## Force Compatibility mode for IE browsers to use the latest rendering mode. In order to work, the declaration 
+    ## needs to be placed in the <head>, before all other elements except for the <title> and other <meta> elements
+    ## See http://msdn.microsoft.com/en-us/library/jj676915(v=vs.85).aspx#SETMODE
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Favicons
     ## Legacy, for IE
     <link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" />

@@ -303,7 +303,7 @@ $xwiki.ssx.use('WorkspaceManager.Workspaces')
 ## Workspace creation.
   ##
   ## Only if the current action is not inline. If it's inline, then there is already a form, and if we render the second, nested one, the DOM is messed up in IE.
-  #if(!$isGuest &amp;&amp; "$!context.action" != 'inline')
+  #if(!$isGuest &amp;&amp; "$!xcontext.action" != 'inline')
     &lt;li id='spWorkspaceCreateItem' class='xitem workspace'&gt;
       &lt;div class='xitemcontainer'&gt;
         #set ($createWorkspaceDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'CreateNewWorkspace'))

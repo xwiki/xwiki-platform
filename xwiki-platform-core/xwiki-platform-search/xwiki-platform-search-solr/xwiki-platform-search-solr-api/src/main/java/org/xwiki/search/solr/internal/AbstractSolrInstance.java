@@ -55,48 +55,64 @@ public abstract class AbstractSolrInstance implements SolrInstance
     @Override
     public void add(SolrInputDocument solrDocument) throws SolrServerException, IOException
     {
+        this.logger.debug("Add Solr document [{}] to index", solrDocument);
+
         this.server.add(solrDocument);
     }
 
     @Override
     public void add(List<SolrInputDocument> solrDocuments) throws SolrServerException, IOException
     {
+        this.logger.debug("Add Solr documents [{}] to index", solrDocuments);
+
         this.server.add(solrDocuments);
     }
 
     @Override
     public void delete(String id) throws SolrServerException, IOException
     {
+        this.logger.debug("Delete Solr document [{}] from index", id);
+
         this.server.deleteById(id);
     }
 
     @Override
     public void delete(List<String> ids) throws SolrServerException, IOException
     {
+        this.logger.debug("Delete Solr documents [{}] from index", ids);
+
         this.server.deleteById(ids);
     }
 
     @Override
     public void deleteByQuery(String query) throws SolrServerException, IOException
     {
+        this.logger.debug("Delete Solr documents from index based on query [{}]", query);
+
         this.server.deleteByQuery(query);
     }
 
     @Override
     public void commit() throws SolrServerException, IOException
     {
+        this.logger.debug("Commit changes to Solr");
+
         this.server.commit();
     }
 
     @Override
     public void rollback() throws SolrServerException, IOException
     {
+        this.logger.debug("Rollback changes to Solr");
+
         this.server.rollback();
     }
 
     @Override
     public QueryResponse query(SolrParams solrParams) throws SolrServerException
     {
+        this.logger.debug("Execute Solr query [{}]", solrParams);
+
         QueryResponse result = this.server.query(solrParams);
         return result;
     }

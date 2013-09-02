@@ -45,15 +45,15 @@ public class UpgradeModeDistributionStep extends AbstractDistributionStep
     public UpgradeModeDistributionStep()
     {
         super(ID);
+
+        // TODO: find some better rule
+        // CANCELED by default, will be enabled only if it's enabled in the status or if another step is
+        setState(State.CANCELED);
     }
 
     @Override
     public void initialize(DistributionJob distributionJob)
     {
-        // TODO: find some better rule
-        // CANCELED by default, will be enabled only if it's enabled in the status or if another step is
-        setState(State.CANCELED);
-
         super.initialize(distributionJob);
 
         // Initialize upgrade mode with saved one

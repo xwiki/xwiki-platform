@@ -43,4 +43,12 @@ public interface StandardURLConfiguration
      *         {@code http://server/xwiki/&lt;prefix&gt;/mywiki/...})
      */
     String getWikiPathPrefix();
+
+    /**
+     * @return the path prefix used for signifiying that a URL is pointing at a Model Entity (Document, Space, Object,
+     *         etc): {@code http://server/xwiki/&lt;prefix&gt;/...}.
+     *         For example: {@code http://server/xwiki/bin/...}.
+     */
+    String getEntityPathPrefix();
+
 }

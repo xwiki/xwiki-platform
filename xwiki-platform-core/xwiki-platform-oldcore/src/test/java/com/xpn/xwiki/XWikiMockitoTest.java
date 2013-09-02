@@ -22,12 +22,19 @@ package com.xpn.xwiki;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentRolledBackEvent;
+import org.xwiki.bridge.event.DocumentRollingBackEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -44,9 +51,11 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
+import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Unit tests for {@link XWiki}.
@@ -98,6 +107,7 @@ public class XWikiMockitoTest
 
         Utils.setComponentManager(mocker);
         xwiki = new XWiki();
+        when(context.getWiki()).thenReturn(xwiki);
 
         XWikiStoreInterface store = mock(XWikiStoreInterface.class);
         xwiki.setStore(store);
@@ -167,5 +177,87 @@ public class XWikiMockitoTest
         when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(source, target);
 
         Assert.assertTrue(xwiki.copyDocument(sourceReference, targetReference, context));
+    }
+
+    /**
+     * Verify that {@link XWiki#rollback(XWikiDocument, String, XWikiContext)} fires the right events.
+     */
+    @Test
+    public void rollbackFiresEvents() throws Exception
+    {
+        ObservationManager observationManager = mocker.getInstance(ObservationManager.class);
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        XWikiDocument originalDocument = mock(XWikiDocument.class);
+        // Mark the document as existing so that the roll-back method will fire an update event.
+        when(originalDocument.isNew()).thenReturn(false);
+
+        XWikiDocument result = mock(XWikiDocument.class);
+        when(result.clone()).thenReturn(result);
+        when(result.getDocumentReference()).thenReturn(documentReference);
+        when(result.getOriginalDocument()).thenReturn(originalDocument);
+
+        String revision = "3.5";
+        when(xwiki.getVersioningStore().loadXWikiDoc(document, revision, context)).thenReturn(result);
+
+        when(context.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
+
+        xwiki.rollback(document, revision, context);
+
+        verify(observationManager).notify(new DocumentRollingBackEvent(documentReference, revision), result, context);
+        verify(observationManager).notify(new DocumentUpdatingEvent(documentReference), result, context);
+        verify(observationManager).notify(new DocumentUpdatedEvent(documentReference), result, context);
+        verify(observationManager).notify(new DocumentRolledBackEvent(documentReference, revision), result, context);
+    }
+
+    /**
+     * @see "XWIKI-9399: Attachment version is incremented when a document is rolled back even if the attachment did not
+     *      change"
+     */
+    @Test
+    public void rollbackDoesNotSaveUnchangedAttachment() throws Exception
+    {
+        String version = "1.1";
+        String fileName = "logo.png";
+        Date date = new Date();
+        XWikiAttachment currentAttachment = mock(XWikiAttachment.class);
+        when(currentAttachment.getAttachmentRevision(version, context)).thenReturn(currentAttachment);
+        when(currentAttachment.getDate()).thenReturn(new Timestamp(date.getTime()));
+        when(currentAttachment.getVersion()).thenReturn(version);
+        when(currentAttachment.getFilename()).thenReturn(fileName);
+
+        XWikiAttachment oldAttachment = mock(XWikiAttachment.class);
+        when(oldAttachment.getFilename()).thenReturn(fileName);
+        when(oldAttachment.getVersion()).thenReturn(version);
+        when(oldAttachment.getDate()).thenReturn(date);
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getAttachmentList()).thenReturn(Arrays.asList(currentAttachment));
+        when(document.getAttachment(fileName)).thenReturn(currentAttachment);
+
+        XWikiDocument result = mock(XWikiDocument.class);
+        when(result.clone()).thenReturn(result);
+        when(result.getDocumentReference()).thenReturn(documentReference);
+        when(result.getAttachmentList()).thenReturn(Arrays.asList(oldAttachment));
+        when(result.getAttachment(fileName)).thenReturn(oldAttachment);
+
+        String revision = "3.5";
+        when(xwiki.getVersioningStore().loadXWikiDoc(document, revision, context)).thenReturn(result);
+
+        AttachmentRecycleBinStore attachmentRecycleBinStore = mock(AttachmentRecycleBinStore.class);
+        xwiki.setAttachmentRecycleBinStore(attachmentRecycleBinStore);
+
+        when(context.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
+
+        xwiki.rollback(document, revision, context);
+
+        verify(attachmentRecycleBinStore, never()).saveToRecycleBin(same(currentAttachment), any(String.class),
+            any(Date.class), same(context), eq(true));
+        verify(oldAttachment, never()).setMetaDataDirty(true);
     }
 }

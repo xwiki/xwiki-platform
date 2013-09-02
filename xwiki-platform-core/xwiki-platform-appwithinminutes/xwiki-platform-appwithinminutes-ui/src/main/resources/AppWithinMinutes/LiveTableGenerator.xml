@@ -28,35 +28,49 @@
   #set ($columnProperties = {})
   #set ($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
   #set ($specialColumns = ['_avatar', '_images', '_attachments', '_actions'])
+  ## Field types that aren't sortable nor filterable.
+  #set ($unsortableFieldTypes = ['TextArea', 'ComputedField'])
+  ## Field types that have HTML display.
+  #set ($htmlFieldTypes = ['TextArea', 'Users', 'Groups'])
   #foreach ($column in $columns)
     #set ($field = $xclass.get($column))
     #if ($field.getProperty('customDisplay').value == '{{include reference="AppWithinMinutes.Title"/}}')
       ## This field is a place-holder for the document title.
+      #set ($titleDisplayNamePlaceHolder = $field.translatedPrettyName)
       #set ($field = $NULL)
       #set ($column = 'doc.title')
       #set ($discard = $columns.set($mathtool.sub($velocityCount, 1), $column))
     #end
     #if ($field)
+      ## Column type.
       #set ($properties = {'type': 'text'})
       #if ($field.classType.endsWith('List'))
         #set ($discard = $properties.put('type', 'list'))
       #elseif ($field.classType == 'Number')
         #set ($discard = $properties.put('type', 'number'))
       #end
-      #if ($field.classType == 'TextArea' || $field.classType == 'ComputedField')
+      ## Sortable/Filterable columns.
+      #if ($unsortableFieldTypes.contains($field.classType))
         #set ($discard = $properties.put('filterable', false))
         #set ($discard = $properties.put('sortable', false))
       #else
         ## The size of the filter input.
         #set ($discard = $properties.put('size', 10))
       #end
-      #if ($field.classType == 'TextArea' || $field.getProperty('customDisplay').value != '')
+      ## Columns with HTML display.
+      ## Note that the check for custom display is too generic because you can have a custom displayer that generates
+      ## HTML in edit mode and plain text in view mode.
+      #if ($htmlFieldTypes.contains($field.classType) || $field.getProperty('customDisplay').value != '')
         #set ($discard = $properties.put('html', true))
       #end
     #elseif ($genericColumns.contains($column))
       #set ($properties = {'type': 'text', 'size': 10})
       #if ($column == 'doc.title')
         #set ($discard = $properties.put('size', 20))
+        #if ("$!titleDisplayNamePlaceHolder" != '')
+          #set ($discard = $properties.put('displayName', $titleDisplayNamePlaceHolder))
+          #set ($titleDisplayNamePlaceHolder = $NULL)
+        #end
       #end
       #if ($column == 'doc.creator' || $column == 'doc.author')
         #set ($discard = $properties.put('link', 'author'))
@@ -94,6 +108,17 @@ ${escapetool.h}set (${escapetool.d}columnsProperties = {
 #end
 #end
 
+#macro(generateColumnExtraSSX)
+#set($userPicker = false)
+#foreach($column in $columns)
+#set($field = $xclass.get($column))
+#if($field &amp;&amp; ($field.classType == 'Users' || $field.classType == 'Groups') &amp;&amp; !$userPicker)
+#set($userPicker = true)
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
+#end
+#end
+#end
+
 #macro(generateLiveTable)
 {{{##
 {{velocity}}
@@ -103,6 +128,7 @@ ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localizatio
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
 #set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
+#generateColumnExtraSSX()
 #generateColumnProperties()
 ${escapetool.h}set (${escapetool.d}options = {
   'className': '$className',

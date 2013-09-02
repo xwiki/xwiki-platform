@@ -42,8 +42,12 @@ public class FormElement extends BaseElement
 
     public FormElement(WebElement form)
     {
-        super();
         this.form = form;
+    }
+
+    protected WebElement getForm()
+    {
+        return this.form;
     }
 
     public void fillFieldsByName(Map<String, String> valuesByNames)

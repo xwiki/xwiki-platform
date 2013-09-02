@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-api</artifactId>
   <name>XWiki Platform - Cache - API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- We only need this dependency for the Logging API/Implementation part -->

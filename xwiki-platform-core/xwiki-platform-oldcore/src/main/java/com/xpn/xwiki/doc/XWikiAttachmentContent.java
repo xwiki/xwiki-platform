@@ -89,6 +89,23 @@ public class XWikiAttachmentContent implements Cloneable
     {
     }
 
+    // Used in FilesystemAttachmentContent.clone()
+    // since 5.2M1
+    protected XWikiAttachmentContent(XWikiAttachment attachment, FileItem f)
+    {
+        this.setAttachment(attachment);
+        this.file = f;
+    }
+
+    /**
+     * @return the underlying storage file.
+     * @since 5.2M1
+     */
+    protected FileItem getFileItem()
+    {
+        return this.file;
+    }
+
     /**
      * @return a new FileItem for temporarily storing attachment content.
      * @since 4.2M3

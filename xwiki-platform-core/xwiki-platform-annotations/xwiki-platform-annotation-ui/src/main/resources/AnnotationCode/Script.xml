@@ -967,6 +967,8 @@ XWiki.Annotation = Class.create({
     if ((annotatedContent.annotations &amp;&amp; annotatedContent.annotations.size() &gt; 0) || force) {
       this.annotatedElement.update(annotatedContent.content);
       this.addAnnotationMarkers(annotatedContent.annotations);
+      // Notify the content change.
+      document.fire('xwiki:dom:updated', {elements: [this.annotatedElement]});
       // and also handle the tab 'downstairs' when the annotations list changes
       this.reloadTab(navigateToPane);
     }

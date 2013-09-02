@@ -20,8 +20,8 @@
 package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -75,21 +75,20 @@ public class DefaultWikiComponentManager implements WikiComponentManager
     /**
      * Map of registered components.
      */
-    private Set<WikiComponent> registeredComponents = new HashSet<WikiComponent>();
-    
+    private Map<WikiComponent, Boolean> registeredComponents = new ConcurrentHashMap<WikiComponent, Boolean>();
+
     @Override
-    @SuppressWarnings("unchecked")
     public void registerWikiComponent(WikiComponent component) throws WikiComponentException
     {
         // Save current context information
         DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
         EntityReference currentEntityReference = this.wikiComponentManagerContext.getCurrentEntityReference();
-        
+
         try {
             // Get the component role interface
             Type roleType = component.getRoleType();
-            Class<?> roleTypeClass = ReflectionUtils.getTypeClass(roleType);
-            ComponentDescriptor componentDescriptor = this.createComponentDescriptor(roleType, component.getRoleHint());
+            Class< ? > roleTypeClass = ReflectionUtils.getTypeClass(roleType);
+            ComponentDescriptor componentDescriptor = createComponentDescriptor(roleType, component.getRoleHint());
 
             // Set the proper information so the component manager use the proper keys to find components to register
             this.wikiComponentManagerContext.setCurrentUserReference(component.getAuthorReference());
@@ -108,14 +107,13 @@ public class DefaultWikiComponentManager implements WikiComponentManager
                 roleTypeClass.cast(component));
 
             // And hold a reference to it.
-            this.registeredComponents.add(component);
+            this.registeredComponents.put(component, Boolean.FALSE);
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s] wiki "
-                + "component registration failed",
-                component.getScope()), e);
+                + "component registration failed", component.getScope()), e);
         } catch (ComponentRepositoryException e) {
             throw new WikiComponentException("Failed to register wiki component against component repository", e);
-        }   finally {
+        } finally {
             this.wikiComponentManagerContext.setCurrentUserReference(currentUserReference);
             this.wikiComponentManagerContext.setCurrentEntityReference(currentEntityReference);
         }
@@ -125,11 +123,12 @@ public class DefaultWikiComponentManager implements WikiComponentManager
     public void unregisterWikiComponents(DocumentReference reference) throws WikiComponentException
     {
         WikiComponent unregisteredComponent = null;
+
         // Save current context information
         DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
         EntityReference currentEntityReference = this.wikiComponentManagerContext.getCurrentEntityReference();
 
-        for (WikiComponent registered : this.registeredComponents) {
+        for (WikiComponent registered : this.registeredComponents.keySet()) {
             if (registered.getDocumentReference().equals(reference)) {
                 // Unregister component
                 unregisteredComponent = registered;
@@ -144,7 +143,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
                 } catch (ComponentLookupException e) {
                     throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s]",
                         registered.getScope()), e);
-                }  finally {
+                } finally {
                     this.wikiComponentManagerContext.setCurrentUserReference(currentUserReference);
                     this.wikiComponentManagerContext.setCurrentEntityReference(currentEntityReference);
                 }
@@ -157,7 +156,6 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             this.registeredComponents.remove(reference);
         }
     }
-
 
     /**
      * @param scope the scope required
@@ -183,7 +181,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
         return cm;
     }
-    
+
     /**
      * Helper method to create a component descriptor from role and hint.
      * 
@@ -191,7 +189,6 @@ public class DefaultWikiComponentManager implements WikiComponentManager
      * @param roleHint the hint of the implementation for the descriptor to create
      * @return the constructed {@link ComponentDescriptor}
      */
-    @SuppressWarnings("unchecked")
     private ComponentDescriptor createComponentDescriptor(Type roleType, String roleHint)
     {
         DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
@@ -202,7 +199,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
     /**
      * Helper method that checks if at least one of an array of interfaces is the {@link Initializable} class.
-     *
+     * 
      * @param interfaces the array of interfaces to test
      * @return true if at least one of the passed interfaces is the is the {@link Initializable} class.
      */

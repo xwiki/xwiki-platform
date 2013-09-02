@@ -64,4 +64,10 @@ public class DomainWikiReferenceResolverTest
 
         assertEquals(new WikiReference("xwiki"), this.mocker.getComponentUnderTest().resolve("localhost"));
     }
+
+    @Test
+    public void resolveWhenDomainHasNoDot() throws Exception
+    {
+        assertEquals(new WikiReference("acme"), this.mocker.getComponentUnderTest().resolve("acme"));
+    }
 }

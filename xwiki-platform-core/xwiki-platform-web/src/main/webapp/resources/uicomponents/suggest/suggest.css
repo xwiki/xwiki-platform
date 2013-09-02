@@ -47,6 +47,8 @@ div.suggestItems ul.xlist.suggestList > li.xitem {
   /* Reset the float because we want the suggest items to take only the necessary width. This way, if the width of the
   suggest list is not specified, the list adapts its width to fit the suggest items. */
   float: none;
+  /* IE9 fix for XWIKI-9155. Added !important in order to override Colibri's "ul.xlist li" */
+  width: auto !important;
 }
 
 div.suggestItems * {

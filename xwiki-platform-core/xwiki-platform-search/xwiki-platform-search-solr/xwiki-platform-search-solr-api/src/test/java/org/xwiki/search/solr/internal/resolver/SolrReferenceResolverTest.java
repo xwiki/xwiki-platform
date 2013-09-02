@@ -21,8 +21,6 @@ package org.xwiki.search.solr.internal.resolver;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.iterableWithSize;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -581,21 +579,22 @@ public class SolrReferenceResolverTest
     @Test
     public void getQuerySpace() throws Exception
     {
-        Assert.assertEquals("wiki:wiki1 AND space:space11",
+        Assert.assertEquals("wiki:wiki1 AND space_exact:space11",
             this.defaultSolrReferenceResolver.getQuery(spaceReference11));
     }
 
     @Test
     public void getQueryDocument() throws Exception
     {
-        Assert.assertEquals("wiki:wiki1 AND space:space11 AND name:class111",
+        Assert.assertEquals("wiki:wiki1 AND space_exact:space11 AND name_exact:class111",
             this.defaultSolrReferenceResolver.getQuery(documentReference111));
     }
 
     @Test
     public void getQueryObject() throws Exception
     {
-        Assert.assertEquals("wiki:wiki1 AND space:space12 AND name:space12 AND class:space11.class111 AND number:0",
+        Assert.assertEquals(
+            "wiki:wiki1 AND space_exact:space12 AND name_exact:space12 AND class:space11.class111 AND number:0",
             this.defaultSolrReferenceResolver.getQuery(objectReference1221));
     }
 

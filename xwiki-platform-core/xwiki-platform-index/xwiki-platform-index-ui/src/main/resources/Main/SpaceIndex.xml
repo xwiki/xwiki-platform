@@ -153,14 +153,14 @@
   #if ("$!spaceMacroParam" != '')
     #set ($spaceParam = $spaceMacroParam)
   #end
-  #set ($docNames = $xwiki.searchDocuments('where doc.space=? order by doc.creationDate desc', $limit, 0, [${spaceParam}]))
+  #set ($docNames = $services.query.hql('where doc.space=? order by doc.creationDate desc').setLimit($limit).bindValues([${spaceParam}]).execute())
   {{html}}
     #displayDocumentList($docNames false []) 
     ## Note: we pass an empty blacklistedSpaces list since we are used as a space dashboard, not a global dashboard
   {{/html}}
 
   #if ($docNames.size() == $limit)
-    #set ($docCount = $xwiki.countDocuments('where doc.space=?', [${spaceParam}]))
+    #set ($docCount = $services.query.xwql('where doc.space = :space').bindValue('space', $spaceParam).addFilter('unique').count())
     #set ($remaining = $mathtool.sub($docCount, $limit))
     #if ($remaining &gt; 0)
     (% class="documentListMore" %) (((

@@ -26,14 +26,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-bridge</artifactId>
   <name>XWiki Platform - Security - Bridge</name>
   <description>XWiki Platform - Security - Bridge contains stuffs that depends/bridge oldcore and that are expected to be improved later</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>68.23</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

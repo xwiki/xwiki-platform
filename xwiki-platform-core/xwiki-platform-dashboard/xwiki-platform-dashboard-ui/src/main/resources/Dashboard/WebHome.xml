@@ -382,7 +382,7 @@
   {{messageSender/}}
 #else
   #set ($queryString = "xredirect=$escapetool.url($xwiki.requestURL)")
-  (%class='noitems'%)$services.localization.render('xe.activity.messages.error.loginToSendMessage', "path:$doc.getURL('login', $queryString)")
+  (%class='noitems'%)$services.localization.render('xe.activity.messages.error.loginToSendMessage', ["path:$doc.getURL('login', $queryString)"])
 #end
 {{/velocity}}</content>
     </property>
@@ -482,9 +482,9 @@ icon=icon:application_view_tile</parameters>
   </object>
   <content>{{velocity}}
 #set($displayDashboard = true)
-#if ($context.user != 'XWiki.XWikiGuest')
+#if ($xcontext.user != 'XWiki.XWikiGuest')
   ## get the preferences of the current user
-  #set($userDbPrefs = $xwiki.getDocument($context.user).getObject('Dashboard.UserDashboardPreferencesClass'))
+  #set($userDbPrefs = $xwiki.getDocument($xcontext.user).getObject('Dashboard.UserDashboardPreferencesClass'))
   #if ($userDbPrefs)
     ## if the object exists, use the object value
     #set($prefValue = $userDbPrefs.getProperty('displayOnMainPage').value)
@@ -495,13 +495,13 @@ icon=icon:application_view_tile</parameters>
     #set($prefValue = $displayOnMainPageProp.getProperty('defaultValue').value)
   #end
   #if ($prefValue &amp;&amp; $prefValue &gt; 0)
-    #set($dashboardObjects = $xwiki.getDocument($context.user).getObjects('XWiki.GadgetClass'))
+    #set($dashboardObjects = $xwiki.getDocument($xcontext.user).getObjects('XWiki.GadgetClass'))
     #if ($dashboardObjects.size() &gt; 0)
-      {{dashboard source = "$context.user" /}}
+      {{dashboard source = "$xcontext.user" /}}
       #set($displayDashboard = false)
     #else
       #set($editDashboardLabel = $services.localization.render('platform.dashboard.wiki.personal.empty.edit'))
-      #set($editDashboardUrl = $xwiki.getURL($context.user, 'inline', 'category=dashboard'))
+      #set($editDashboardUrl = $xwiki.getURL($xcontext.user, 'inline', 'category=dashboard'))
       {{info}}{{html}}$services.localization.render('platform.dashboard.wiki.personal.empty', ["&lt;a href='${editDashboardUrl}'&gt;$editDashboardLabel&lt;/a&gt;"]){{/html}}{{/info}}
       #set($displayDashboard = true)
     #end

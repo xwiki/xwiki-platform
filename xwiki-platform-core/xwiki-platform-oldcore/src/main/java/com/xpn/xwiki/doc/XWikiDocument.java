@@ -53,8 +53,9 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -81,6 +82,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -170,6 +172,73 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class XWikiDocument implements DocumentModelBridge, Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
+
+    /**
+     * An attachment waiting to be deleted at next document save.
+     * 
+     * @version $Id$
+     * @since 5.2M1
+     */
+    public static class XWikiAttachmentToRemove
+    {
+        /**
+         * @see #getAttachment()
+         */
+        private XWikiAttachment attachment;
+
+        /**
+         * @see #isToRecycleBin()
+         */
+        private boolean toRecycleBin;
+
+        /**
+         * @param attachment the attachment to delete
+         * @param toRecycleBin true of the attachment should be moved to the recycle bin
+         */
+        public XWikiAttachmentToRemove(XWikiAttachment attachment, boolean toRecycleBin)
+        {
+            this.attachment = attachment;
+            this.toRecycleBin = toRecycleBin;
+        }
+
+        /**
+         * @return the attachment to delete
+         */
+        public XWikiAttachment getAttachment()
+        {
+            return this.attachment;
+        }
+
+        /**
+         * @return true of the attachment should be moved to the recycle bin
+         */
+        public boolean isToRecycleBin()
+        {
+            return this.toRecycleBin;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return this.attachment.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj instanceof XWikiAttachmentToRemove) {
+                return this.attachment.equals(((XWikiAttachmentToRemove) obj).getAttachment());
+            }
+
+            return false;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.attachment.toString();
+        }
+    }
 
     /**
      * Regex Pattern to recognize if there's HTML code in a XWiki page.
@@ -336,6 +405,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private boolean fromCache = false;
 
     private List<BaseObject> xObjectsToRemove = new ArrayList<BaseObject>();
+
+    private List<XWikiAttachmentToRemove> attachmentsToRemove = new ArrayList<XWikiAttachmentToRemove>();
 
     /**
      * The view template (vm file) to use. When not set the default view template is used.
@@ -2171,7 +2242,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         BaseObject object = getXObject((ObjectReference) objectPropertyReference.getParent());
 
-        return (BaseProperty<ObjectPropertyReference>) object.getField(objectPropertyReference.getName());
+        if (object != null) {
+            return (BaseProperty<ObjectPropertyReference>) object.getField(objectPropertyReference.getName());
+        }
+
+        return null;
     }
 
     /**
@@ -2188,11 +2263,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(DocumentReference classReference, int nb)
     {
-        try {
-            return getXObjects().get(classReference).get(nb);
-        } catch (Exception e) {
-            return null;
+        List<BaseObject> objects = getXObjects().get(classReference);
+
+        if (objects != null && objects.size() > nb) {
+            return objects.get(nb);
         }
+
+        return null;
     }
 
     /**
@@ -4322,16 +4399,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void saveAllAttachments(XWikiContext context) throws XWikiException
     {
-        for (XWikiAttachment attachment : this.attachmentList) {
-            saveAttachmentContent(attachment, context);
-        }
+        saveAllAttachments(true, true, context);
     }
 
     public void saveAllAttachments(boolean updateParent, boolean transaction, XWikiContext context)
         throws XWikiException
     {
         for (XWikiAttachment attachment : this.attachmentList) {
-            saveAttachmentContent(attachment, updateParent, transaction, context);
+            saveAttachmentContent(attachment, false, transaction, context);
+        }
+
+        // Save the document
+        if (updateParent) {
+            context.getWiki().saveDocument(this, context);
         }
     }
 
@@ -4360,10 +4440,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         saveAttachmentContent(attachment, true, true, context);
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, boolean bTransaction,
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean updateParent, boolean transaction,
         XWikiContext context) throws XWikiException
     {
-        String database = context.getDatabase();
+        String currentWiki = context.getDatabase();
         try {
             // We might need to switch database to
             // get the translated content
@@ -4371,17 +4451,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 context.setDatabase(getDatabase());
             }
 
+            // Save the attachment
+            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, false, context, transaction);
+
             // We need to make sure there is a version upgrade
             setMetaDataDirty(true);
 
-            context.getWiki().getAttachmentStore()
-                .saveAttachmentContent(attachment, bParentUpdate, context, bTransaction);
+            // Save the document
+            if (updateParent) {
+                context.getWiki().saveDocument(this, context);
+            }
         } catch (OutOfMemoryError e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
                 "Out Of Memory Exception");
         } finally {
-            if (database != null) {
-                context.setDatabase(database);
+            if (currentWiki != null) {
+                context.setDatabase(currentWiki);
             }
         }
     }
@@ -4404,37 +4489,93 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * Remove the attachment from the document attachment list and put it in the list of attachments to remove for next
+     * document save.
+     * <p>
+     * The attachment will be move to recycle bin.
+     * 
+     * @param attachment the attachment to remove
+     * @return the removed attachment, null if none could be found
+     * @since 5.2M1
+     */
+    public XWikiAttachment removeAttachment(XWikiAttachment attachment)
+    {
+        return removeAttachment(attachment, true);
+    }
+
+    /**
+     * Remove the attachment from the document attachment list and put it in the list of attachments to remove for next
+     * document save.
+     * 
+     * @param attachmentToRemove the attachment to remove
+     * @param toRecycleBin indicate if the attachment should be moved to recycle bin
+     * @return the removed attachment, null if none could be found
+     * @since 5.2M1
+     */
+    public XWikiAttachment removeAttachment(XWikiAttachment attachmentToRemove, boolean toRecycleBin)
+    {
+        List<XWikiAttachment> list = getAttachmentList();
+        for (int i = 0; i < list.size(); i++) {
+            XWikiAttachment attachment = list.get(i);
+            if (attachmentToRemove.getFilename().equals(attachment.getFilename())) {
+                list.remove(i);
+                this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachment, toRecycleBin));
+                setMetaDataDirty(true);
+                return attachment;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return the attachment planned for removal
+     */
+    public List<XWikiAttachmentToRemove> getAttachmentsToRemove()
+    {
+        return this.attachmentsToRemove;
+    }
+
+    /**
+     * Clear the list of attachments planned for removal.
+     */
+    public void clearAttachmentsToRemove()
+    {
+        this.attachmentsToRemove.clear();
+    }
+
+    /**
+     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
     public void deleteAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         deleteAttachment(attachment, true, context);
     }
 
+    /**
+     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
     public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
         throws XWikiException
     {
-        String database = context.getDatabase();
-        try {
-            // We might need to switch database to
-            // get the translated content
-            if (getDatabase() != null) {
-                context.setDatabase(getDatabase());
-            }
-            try {
-                // We need to make sure there is a version upgrade
-                setMetaDataDirty(true);
-                if (toRecycleBin && context.getWiki().hasAttachmentRecycleBin(context)) {
-                    context.getWiki().getAttachmentRecycleBinStore()
-                        .saveToRecycleBin(attachment, context.getUser(), new Date(), context, true);
-                }
-                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
-            } catch (java.lang.OutOfMemoryError e) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE, "Out Of Memory Exception");
-            }
-        } finally {
-            if (database != null) {
-                context.setDatabase(database);
-            }
+        deleteAttachment(attachment, true, toRecycleBin, context);
+    }
+
+    /**
+     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
+    private void deleteAttachment(XWikiAttachment attachment, boolean saveDocument, boolean toRecycleBin,
+        XWikiContext context) throws XWikiException
+    {
+        removeAttachment(attachment);
+
+        if (saveDocument) {
+            // Save the document
+            context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
         }
     }
 
@@ -4706,6 +4847,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             query.bindValue("fullName", this.localEntityReferenceSerializer.serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
+            query.setLimit(nb).setOffset(start);
             List<Object[]> queryResults = query.execute();
 
             for (Object[] queryResult : queryResults) {
@@ -5954,6 +6096,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 String saveMessage =
                     context.getMessageTool().get("core.comment.renameParent",
                         Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+                childDocument.setAuthorReference(context.getUserReference());
                 xwiki.saveDocument(childDocument, saveMessage, true, context);
             }
         }
@@ -5993,6 +6136,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             String saveMessage =
                 context.getMessageTool().get("core.comment.renameLink",
                     Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+            backlinkDocument.setAuthorReference(context.getUserReference());
             xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
@@ -6028,6 +6172,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Set new content and save document if needed
             if (modified) {
                 newDocument.setContent(newDocumentXDOM);
+                newDocument.setAuthorReference(context.getUserReference());
                 xwiki.saveDocument(newDocument, context);
             }
         }
@@ -6127,7 +6272,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         newdoc.setContentDirty(true);
         newdoc.getXClass().setDocumentReference(newDocumentReference);
 
-        XWikiDocumentArchive archive = newdoc.getDocumentArchive();
+        XWikiDocumentArchive archive = getDocumentArchive();
         if (archive != null) {
             newdoc.setDocumentArchive(archive.clone(newdoc.getId(), context));
         }
@@ -7984,8 +8129,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         try {
             Utils.getComponent(Parser.class, syntax.toIdString());
         } catch (Exception e) {
-            LOGGER.warn("Failed to find parser for the default syntax [" + syntax.toIdString()
-                + "]. Defaulting to xwiki/2.1 syntax.");
+            LOGGER.warn("Failed to find parser for the default syntax [{}]. Defaulting to xwiki/2.1 syntax.",
+                syntax.toIdString());
             syntax = Syntax.XWIKI_2_1;
         }
 
@@ -8222,15 +8367,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Apply deleted attachment diff on result (new attachment has already been saved)
             for (AttachmentDiff diff : attachmentsDiff) {
                 if (diff.getNewVersion() == null) {
-                    try {
-                        XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
+                    XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
 
-                        deleteAttachment(attachmentResult, context);
+                    removeAttachment(attachmentResult);
 
-                        mergeResult.setModified(true);
-                    } catch (XWikiException e) {
-                        mergeResult.getLog().error("Failed to delete attachment [{}]", diff.getFileName(), e);
-                    }
+                    mergeResult.setModified(true);
                 }
             }
         }
@@ -8243,15 +8384,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
-     * this method is dealing with "real" data and should not change everything related to version management and
-     * document identifier.
+     * this method is dealing with "real" data and should not change anything related to version management and document
+     * identifier.
      * <p>
-     * This method also does not take into account attachments because: <u>
-     * <li>removing attachments means directly modifying the database, there is no way to indicate attachment to remove
-     * later like with objects (this could be improved later)</li>
-     * <li>copying them all from one XWikiDocument to another could be very expensive for the memory if done all at once
-     * since it mean loading all the attachment content in memory. Better doing it one by after before or after the call
-     * to this method.</li>
+     * Important note: this method does not take care of attachments contents related operations and only remove
+     * attachments which need to be removed from the list. For memory handling reasons all attachments contents related
+     * operations should be done elsewhere.
      * 
      * @param document the document to apply
      * @return false is nothing changed
@@ -8273,8 +8411,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * <li>removing attachments means directly modifying the database, there is no way to indicate attachment to remove
      * later like with objects (this could be improved later)</li>
      * <li>copying them all from one XWikiDocument to another could be very expensive for the memory if done all at once
-     * since it mean loading all the attachment content in memory. Better doing it one by after before or after the call
-     * to this method.</li>
+     * since it mean loading all the attachment content in memory. Better doing it one by one after before or after the
+     * call to this method.</li>
      * 
      * @param document the document to apply
      * @return false is nothing changed
@@ -8374,6 +8512,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setXClassXML(document.getXClassXML());
             modified = true;
         }
+
+        // /////////////////////////////////
+        // Attachments
+
+        if (clean) {
+            // Delete attachments that don't exist anymore
+            for (XWikiAttachment attachment : new ArrayList<XWikiAttachment>(getAttachmentList())) {
+                if (document.getAttachment(attachment.getFilename()) == null) {
+                    removeAttachment(attachment);
+                }
+            }
+        }
+        // Add new attachments or update existing objects
 
         return modified;
     }

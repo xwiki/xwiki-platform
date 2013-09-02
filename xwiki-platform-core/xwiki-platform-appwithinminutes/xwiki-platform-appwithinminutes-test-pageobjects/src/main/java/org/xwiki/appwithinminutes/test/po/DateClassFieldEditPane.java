@@ -20,6 +20,7 @@
 package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.editor.DatePicker;
 
 /**
  * Represents the pane used to edit a 'Date' class field.

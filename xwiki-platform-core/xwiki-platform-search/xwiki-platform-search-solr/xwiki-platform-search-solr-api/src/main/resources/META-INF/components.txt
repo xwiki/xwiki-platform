@@ -2,8 +2,11 @@ org.xwiki.search.solr.internal.DefaultSolrConfiguration
 org.xwiki.search.solr.internal.DefaultSolrIndexer
 org.xwiki.search.solr.internal.EmbeddedSolrInstance
 org.xwiki.search.solr.internal.RemoteSolrInstance
+org.xwiki.search.solr.internal.SolrIndexAvailableLocalesListener
 org.xwiki.search.solr.internal.SolrIndexEventListener
+org.xwiki.search.solr.internal.SolrIndexInitializeListener
 org.xwiki.search.solr.internal.SolrInstanceProvider
+org.xwiki.search.solr.internal.job.IndexerJob
 org.xwiki.search.solr.internal.metadata.AttachmentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.DocumentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectPropertySolrMetadataExtractor

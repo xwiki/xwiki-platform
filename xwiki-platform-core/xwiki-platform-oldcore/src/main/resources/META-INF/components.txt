@@ -49,6 +49,7 @@ com.xpn.xwiki.internal.template.DefaultPrivilegedTemplateRenderer
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
+com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
 com.xpn.xwiki.internal.sheet.scripting.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder

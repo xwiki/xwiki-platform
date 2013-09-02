@@ -71,6 +71,7 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -136,6 +137,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
@@ -1444,6 +1446,17 @@ public class XWiki implements EventListener
                 }
             }
 
+            // Put attachments to remove in recycle bin
+            if (hasAttachmentRecycleBin(context)) {
+                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
+                    if (attachment.isToRecycleBin()) {
+                        getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(), context.getUser(),
+                            new Date(), context, true);
+                    }
+                }
+            }
+
+            // Actually delete the document
             getStore().saveXWikiDoc(doc, context);
 
             // Since the store#saveXWikiDoc resets originalDocument, we need to temporarily put it
@@ -2506,14 +2519,73 @@ public class XWiki implements EventListener
         return result;
     }
 
-    public String getDefaultLanguage(XWikiContext context)
+    /**
+     * @deprecated since 5.1M2 use {@link #getDefaultLocale(XWikiContext)} instead
+     */
+    @Deprecated
+    public String getDefaultLanguage(XWikiContext xcontext)
+    {
+        return getDefaultLocale(xcontext).toString();
+    }
+
+    /**
+     * The default locale in the preferences.
+     * 
+     * @param xcontext the XWiki context.
+     * @return the default locale
+     * @since 5.1M2
+     */
+    public Locale getDefaultLocale(XWikiContext xcontext)
     {
         // Find out what is the default language from the XWiki preferences settings.
-        String defaultLanguage = context.getWiki().getXWikiPreference("default_language", "", context);
+        String defaultLanguage = xcontext.getWiki().getXWikiPreference("default_language", "", xcontext);
+
+        Locale defaultLocale;
+
         if (StringUtils.isBlank(defaultLanguage)) {
-            defaultLanguage = "en";
+            defaultLocale = Locale.ENGLISH;
+        } else {
+            try {
+                defaultLocale = LocaleUtils.toLocale(Util.normalizeLanguage(defaultLanguage));
+            } catch (Exception e) {
+                LOGGER.warn("Invalid locale [{}] set as default locale in the preferences", defaultLanguage);
+                defaultLocale = Locale.ENGLISH;
+            }
         }
-        return Util.normalizeLanguage(defaultLanguage);
+
+        return defaultLocale;
+    }
+
+    /**
+     * Get the available locales according to the preferences.
+     * 
+     * @param xcontext the XWiki context
+     * @return all the available locales
+     * @since 5.1M2
+     */
+    public List<Locale> getAvailableLocales(XWikiContext xcontext)
+    {
+        String[] languages = StringUtils.split(xcontext.getWiki().getXWikiPreference("languages", xcontext), ", |");
+
+        List<Locale> locales = new ArrayList<Locale>(languages.length);
+
+        for (String language : languages) {
+            if (StringUtils.isNotBlank(language)) {
+                try {
+                    locales.add(LocaleUtils.toLocale(language));
+                } catch (Exception e) {
+                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences", language, e);
+                }
+            }
+        }
+
+        // Add default language in case it's not listed as available (which is wrong but it happen)
+        Locale defaultocale = getDefaultLocale(xcontext);
+        if (!locales.contains(defaultocale)) {
+            locales.add(defaultocale);
+        }
+
+        return locales;
     }
 
     public String getDocLanguagePreferenceNew(XWikiContext context)
@@ -4129,6 +4201,7 @@ public class XWiki implements EventListener
                         txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
+                        context.setDatabase(targetWiki);
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 
@@ -6302,8 +6375,12 @@ public class XWiki implements EventListener
                 }
                 XWikiAttachment equivalentAttachmentRevision =
                     equivalentAttachment.getAttachmentRevision(oldAttachment.getVersion(), context);
+                // We compare the number of milliseconds instead of the date objects directly because Hibernate can
+                // return java.sql.Timestamp for date fields and the JavaDoc says that Timestamp.equals(Object) doesn't
+                // return true if the passed value is a java.util.Date object with the same number of milliseconds
+                // because the nanoseconds component of the passed date is unknown.
                 if (equivalentAttachmentRevision == null
-                    || !equivalentAttachmentRevision.getDate().equals(oldAttachment.getDate())) {
+                    || equivalentAttachmentRevision.getDate().getTime() != oldAttachment.getDate().getTime()) {
                     // Recreated attachment
                     LOGGER.debug("Recreated attachment: " + filename);
                     // If the attachment trash is not available, don't lose the existing attachment

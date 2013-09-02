@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Menu</web>
+  <name>MenuMacro</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Menu.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1372190553000</creationDate>
+  <date>1372190618000</date>
+  <contentUpdateDate>1372190618000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Menu Macro</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Menu.MenuMacro</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>4671684e-f58c-4704-850f-7e75208d0e4a</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jQueryNoConflict'], function($) {
+  // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
+  // The 'dropdown' CSS class is used only to display the down/left arrow.
+  $('.menu-horizontal li ul').parent().addClass('xDropdown');
+
+  // Collapsible menu bahavior.
+  $('.menu-vertical.collapsible').each(function(){
+    var open = $(this).hasClass('open');
+    $(this).find('li ul').each(function() {
+      $(this).addClass('xDropdown-menu').parent().addClass('xDropdown' + (open ? ' open' : ''));
+      // Wrap everything (including text nodes) before the sub-menu in a DIV that will toggle its state.
+      var toggle = this.ownerDocument.createElement('div');
+      $(this).parent().prepend(toggle);
+      for(var next = toggle.nextSibling; next != this; next = toggle.nextSibling) {
+        toggle.appendChild(next);
+      }
+      $(toggle).addClass('xDropdown-toggle').on('click', function() {
+        $(this).parent().toggleClass('open');
+      });
+    });
+  });
+})</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Menu.MenuMacro</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>75fa0b90-a8bc-4a88-a9e9-bc938d79da85</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+/* General Styles */
+
+.menu-vertical ul, .menu-horizontal ul {
+  list-style-type: none;
+  margin: auto;
+}
+
+.menu-vertical ul *, .menu-horizontal ul * {
+  line-height: normal;
+}
+
+.menu-vertical li, .menu-horizontal li {
+  cursor: default;
+  line-height: 16px;
+  min-height: 16px;
+}
+
+.menu-vertical img, .menu-horizontal img {
+  vertical-align: middle;
+}
+
+/* Horizontal separator */
+.menu-vertical li:empty, .menu-horizontal li li:empty {
+  border-top: 1px solid $theme.borderColor;
+  line-height: 1px;
+  min-height: auto;
+  padding: 0;
+}
+
+/* Horizontal Menu */
+
+.menu-horizontal {
+  #css3_backgroundLinearGradient({
+    'to': 'bottom',
+    'colors': [
+      {'color': $theme.menuGradientColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+  color: $theme.menuLinkColor;
+  font-size: .85em;
+  height: 2em;
+  padding-left: 25px;
+}
+
+.menu-horizontal li {
+  padding: 0.2em 1.3em;
+}
+
+.menu-horizontal li li:empty {
+  border-top: 1px solid $theme.textSecondaryColor;
+  margin: .5em 1em;
+}
+
+/* Vertical separator */
+.menu-horizontal &gt; ul &gt; li:empty {
+  border-left: 1px solid $theme.textSecondaryColor;
+  margin: 0 .5em;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.menu-horizontal li a, .menu-horizontal li a:visited {
+  color: inherit;
+}
+
+.menu-horizontal &gt; ul &gt; li {
+  display: inline-block;
+}
+
+.menu-horizontal &gt; ul &gt; li.xDropdown:after {
+  content: '\25BC';
+  font-size: .8em;
+  margin-left: .5em;
+}
+
+.menu-horizontal li li.xDropdown:after {
+  content: '\25B8';
+  float: right;
+  margin-left: .5em;
+}
+
+.menu-horizontal &gt; ul ul {
+  background: none repeat scroll 0 0 $theme.menuBackgroundColor;
+  border-radius: 0 0 .8em .8em;
+  box-shadow: 0 1px 1px $theme.borderColor;
+  display: none;
+  margin: 0.2em 0 0 -1.3em;
+  padding-bottom: .3em;
+  position: absolute;
+  z-index: 1000;
+}
+
+.menu-horizontal li:hover &gt; ul {
+  display: block;
+}
+
+/* The only way to have a menu with more than 2 levels without JavaScript is to use a fixed width. */
+.menu-horizontal.fixedWidth li li {
+  position: relative;
+}
+
+.menu-horizontal.fixedWidth ul ul {
+  width: 12em;
+}
+
+.menu-horizontal.fixedWidth ul ul ul {
+  left: 12em;
+  margin: 0;
+  top: 0;
+}
+
+/* Vertical Menu */
+
+.menu.menu-vertical ul {
+  margin-top: .3em;
+}
+
+.menu.menu-vertical ul ul {
+  margin-left: 1em;
+}
+
+.menu-vertical li {
+  padding: .3em;
+}
+
+.menu-vertical li:empty {
+  margin: .3em 0;
+}
+
+.menu-vertical .xDropdown-toggle {
+  cursor: pointer;
+}
+
+.menu-vertical .xDropdown-toggle:hover {
+  background-color: $theme.highlightColor;
+}
+
+.menu-vertical .xDropdown-toggle:after {
+  content: '\25C2';
+  float: right;
+}
+
+.menu-vertical .xDropdown.open .xDropdown-toggle:after {
+  content: '\25BE';
+}
+
+.menu-vertical .xDropdown-menu {
+  display: none;
+}
+
+.menu-vertical .xDropdown.open &gt; .xDropdown-menu {
+  display: block;
+}</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>9</number>
+        <prettyName>Macro code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentDescription>
+        <disabled>0</disabled>
+        <name>contentDescription</name>
+        <number>8</number>
+        <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </contentDescription>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>7</number>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Optional|Mandatory|No content</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <defaultCategory>
+        <disabled>0</disabled>
+        <name>defaultCategory</name>
+        <number>4</number>
+        <prettyName>Default category</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultCategory>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Macro description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Macro id</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Macro name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <supportsInlineMode>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>supportsInlineMode</name>
+        <number>5</number>
+        <prettyName>Supports inline mode</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </supportsInlineMode>
+      <visibility>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>visibility</name>
+        <number>6</number>
+        <prettyName>Macro visibility</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Current User|Current Wiki|Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <name>Menu.MenuMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>1f17c513-df60-481f-b8d0-15ef11b75d45</guid>
+    <property>
+      <code>{{velocity}}
+#set ($id = $xcontext.macro.params.id)
+#set ($type = $xcontext.macro.params.type)
+#set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName"))
+#set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
+(% #if ("$!id" != '') id="$id"#end class="menu menu-$!type" %)(((
+  $xcontext.macro.content
+)))
+{{/velocity}}</code>
+    </property>
+    <property>
+      <contentDescription>Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.</contentDescription>
+    </property>
+    <property>
+      <contentType>Mandatory</contentType>
+    </property>
+    <property>
+      <defaultCategory>Navigation</defaultCategory>
+    </property>
+    <property>
+      <description>Displays a menu created using simple wiki syntax (nested lists and links).</description>
+    </property>
+    <property>
+      <id>menu</id>
+    </property>
+    <property>
+      <name>Menu</name>
+    </property>
+    <property>
+      <supportsInlineMode>0</supportsInlineMode>
+    </property>
+    <property>
+      <visibility>Global</visibility>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Menu.MenuMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>bbeba321-44be-4e3a-b102-f59cada761ec</guid>
+    <property>
+      <defaultValue>horizontal</defaultValue>
+    </property>
+    <property>
+      <description>The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>type</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Menu.MenuMacro</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>00eee99c-d118-4b26-8784-98ade58b5af7</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>id</name>
+    </property>
+  </object>
+  <content>{{toc/}}
+
+= Horizontal Menu =
+
+{{velocity}}
+{{code language="none"}}
+{{menu type="horizontal fixedWidth"}}
+$xwiki.getDocument('MenuTemplate').content
+{{/menu}}
+{{/code}}
+{{/velocity}}
+
+{{menu type="horizontal fixedWidth"}}
+{{include reference="MenuTemplate" /}}
+{{/menu}}
+
+= Vertical Menu =
+
+{{velocity}}
+{{code language="none"}}
+{{menu type="vertical"}}
+...
+{{/menu}}
+{{/code}}
+{{/velocity}}
+
+{{menu type="vertical"}}
+{{include reference="MenuTemplate" /}}
+{{/menu}}</content>
+</xwikidoc>

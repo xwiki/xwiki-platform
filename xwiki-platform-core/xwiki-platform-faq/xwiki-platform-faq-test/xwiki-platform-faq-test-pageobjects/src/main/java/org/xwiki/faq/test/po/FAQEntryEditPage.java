@@ -39,6 +39,7 @@ public class FAQEntryEditPage extends InlinePage
      */
     public void setAnswer(String answer)
     {
+        this.answerElement.clear();
         this.answerElement.sendKeys(answer);
     }
 }

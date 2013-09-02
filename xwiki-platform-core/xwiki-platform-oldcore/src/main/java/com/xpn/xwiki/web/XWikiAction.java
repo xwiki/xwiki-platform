@@ -43,7 +43,9 @@ import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.velocity.VelocityManager;
 
@@ -92,7 +94,10 @@ public abstract class XWikiAction extends Action
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
 
-    /** Actions that need to be resolved on the main wiki instead of the current un-existing wiki. */
+    /**
+     * Actions that need to be resolved on the main wiki instead of the current non-existing wiki. This is used to be
+     * able to render the skin even on a wiki that doesn't exist.
+     */
     private static final List<String> ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST = Arrays.asList("skin", "ssx", "jsx",
         "download");
 
@@ -140,24 +145,26 @@ public abstract class XWikiAction extends Action
             String action = context.getAction();
 
             // Initialize context.getWiki() with the main wiki
-            XWiki xwiki = XWiki.getMainXWiki(context);
-
-            // Initialize the url factory
-            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
-            context.setURLFactory(urlf);
-
-            // Initialize the velocity context and its bindings so that it may be used in the velocity templates that we
-            // are parsing below.
-            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-            VelocityContext vcontext = velocityManager.getVelocityContext();
+            XWiki xwiki;
 
             // Verify that the requested wiki exists
             try {
                 xwiki = XWiki.getXWiki(context);
             } catch (XWikiException e) {
                 // If the wiki asked by the user doesn't exist, then we first attempt to use any existing global
-                // redirects. If here are none, then we display the specific error template.
+                // redirects. If there are none, then we display the specific error template.
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
+                    xwiki = XWiki.getMainXWiki(context);
+
+                    // Initialize the url factory
+                    XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+                    context.setURLFactory(urlf);
+
+                    // Initialize the velocity context and its bindings so that it may be used in the velocity templates that we
+                    // are parsing below.
+                    VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+                    VelocityContext vcontext = velocityManager.getVelocityContext();
+
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
                         if (!StringUtils.isEmpty(context.getWiki().Param("xwiki.virtual.redirect"))) {
@@ -167,22 +174,18 @@ public abstract class XWikiAction extends Action
 
                         // Display the error template only for actions that are not ignored
                         if (!ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST.contains(action)) {
-                            // Set the context wiki to the requested one so that the UI renders accordingly
-                            String requestedWikiName = xwiki.getRequestWikiName(context);
-                            String currentDatabase = context.getDatabase();
-                            context.setDatabase(requestedWikiName);
-
-                            // Set the context fake document so that the UI renders accordingly
-                            DocumentReference currentDocumentReference =
-                                xwiki.getDocumentReference(context.getRequest(), context);
-                            // Reset the database or we`ll have problems later on in parseTemplate because of the
-                            // indexistent wiki.
-                            context.setDatabase(currentDatabase);
 
                             // Add localization resources to the context
                             xwiki.prepareResources(context);
-                            // Add the requested document to the context, even if it does not exist
-                            xwiki.setPhonyDocument(currentDocumentReference, context, vcontext);
+
+                            // Set the main home page in the main space of the main wiki as the current requested entity
+                            // since we cannot set the non existing one as it would generate errors obviously...
+                            EntityReferenceValueProvider valueProvider =
+                                Utils.getComponent(EntityReferenceValueProvider.class);
+                            xwiki.setPhonyDocument(new DocumentReference(
+                                valueProvider.getDefaultValue(EntityType.WIKI),
+                                valueProvider.getDefaultValue(EntityType.SPACE),
+                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),
@@ -213,6 +216,9 @@ public abstract class XWikiAction extends Action
                 return null;
             }
 
+            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+            context.setURLFactory(urlf);
+
             String sajax = context.getRequest().get("ajax");
             boolean ajax = false;
             if (sajax != null && !sajax.trim().equals("") && !sajax.equals("0")) {
@@ -225,6 +231,9 @@ public abstract class XWikiAction extends Action
             if (monitor != null) {
                 monitor.startTimer("request");
             }
+
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            VelocityContext vcontext = velocityManager.getVelocityContext();
 
             boolean eventSent = false;
             try {

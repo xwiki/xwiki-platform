@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-xwiki</artifactId>
   <name>XWiki Platform - Rendering - XWiki-specific implementation</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - XWiki-specific implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>80.91</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -61,7 +61,6 @@
       <!-- For parsing the CSS from the style attribute. -->
       <groupId>net.sourceforge.cssparser</groupId>
       <artifactId>cssparser</artifactId>
-      <version>0.9.5</version>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

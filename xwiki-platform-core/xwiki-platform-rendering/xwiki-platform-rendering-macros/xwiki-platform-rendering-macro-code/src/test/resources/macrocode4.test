@@ -59,7 +59,8 @@ beginMacroMarkerStandalone [code] [language=javascript] [// getJSON function by 
     id++;
   }
 })();]
-beginGroup [[class]=[box code]]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
 beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
@@ -537,7 +538,8 @@ onSpecialSymbol [)]
 onSpecialSymbol [(]
 onSpecialSymbol [)]
 onSpecialSymbol [;]
-endGroup [[class]=[box code]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [code] [language=javascript] [// getJSON function by Juriy Zaytsev 
 // http://github.com/kangax/protolicious/tree/master/get_json.js
 (function(){

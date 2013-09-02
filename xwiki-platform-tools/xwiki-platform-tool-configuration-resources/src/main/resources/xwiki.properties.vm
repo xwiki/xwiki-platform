@@ -285,7 +285,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = resource.manager.logwhenfound = false
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
 #-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.ChainingUberspector
-#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector\,org.xwiki.velocity.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy
@@ -479,30 +479,28 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 4.5M1]
 #-# The location where the embedded Solr instance stores its configuration and the indexed data.
 #-# The default is the subfolder "solr" inside the folder defined by the property "environment.permanentDirectory".
-#if ($xwikiPropertiesEnvironmentPermanentDirectory)
-# solr.embedded.home=$xwikiPropertiesEnvironmentPermanentDirectory/solr
-#else
 # solr.embedded.home=/var/local/xwiki/solr
-#end
 
 #-# [Since 4.5M1]
 #-# The URL to use to connect to the remote solr server.
 #-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
 # solr.remote.url=http://localhost:8983/solr
 
-#-# [Since 4.5M1]
-#-# Each language has its particularities and needs to be handled specially in order to index and retrieve the best results.
-#-# The list of available languages for which optimized indexing is possible. 
-# solr.multilingual.availableLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr 
+#-# [Since 5.1M1]
+#-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
+#-# It's possible to configure this behavior with the following properties:
+#-# 
+#-# The maximum number of elements sent at the same time to the Solr server
+#-# The default is 50.
+# solr.indexer.batch.size=50
+#-# The maximum number of characters in the batch of elements to send to the Solr server.
+#-# The default is 10000.
+# solr.indexer.batch.maxLength=10000
 
-#-# [Since 4.5M1]
-#-# The list of languages for which to use optimized indexing.
-#-# The values used here must be a sublist of solr.multilingual.available. A smaller sublist can offer slightly better query time performance.
-# solr.multilingual.activeLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr
-
-#-# [Since 4.5M1]
-#-# The list of multilingual fields for which to use optimized indexing.
-# solr.multilingual.fields=title,doccontent,comment,objcontent,propertyvalue,attcontent
+#-# [Since 5.1M1]
+#-# The maximum number of elements in the background queue of elements to index/delete
+#-# The default is 10000.
+# solr.indexer.queue.capacity=100000
 
 #-------------------------------------------------------------------------------------
 # Security
@@ -556,5 +554,14 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#
 #-# The default is:
 # url.standard.multiwiki.wikiPathPrefix=wiki
+
+#-# [Since 5.2M1]
+#-# Defines the URL path prefix used for Entity URLs, i.e. URLs pointing to a Document, Space, Object, etc.
+#-# For example this is the "bin" part in the following URL:
+#-#   http://server/xwiki/bin/view/space/page
+#-# Note that this replaces the old xwiki.defaultservletpath property in the old xwiki.cfg file.
+#-#
+#-# The default is:
+# url.standard.getEntityPathPrefix=bin
 
 $!xwikiPropertiesAdditionalProperties

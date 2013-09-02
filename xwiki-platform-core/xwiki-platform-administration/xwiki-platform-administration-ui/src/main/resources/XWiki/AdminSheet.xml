@@ -3489,6 +3489,7 @@ document.observe('xwiki:dom:loaded', function() {
        {'id' : 'Editing'},
        {'id' : 'Localization'},
        {'id' : 'Email'},
+       {'id' : 'MultiWikis'},
        {'id' : 'XWiki.OfficeImporterAdmin'}
     ]
   },

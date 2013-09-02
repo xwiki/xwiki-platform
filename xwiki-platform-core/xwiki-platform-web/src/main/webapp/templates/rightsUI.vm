@@ -8,32 +8,41 @@ $xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
 $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
-#set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'delete': 3, 'admin': 4, 'register': 5, 'programming': 6})
+#if("$!request.section"=='MultiWikis')
+  #set ($rightsLevels = {'subwikicreation': 0})
+#else
+  #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'delete': 3, 'admin': 4, 'register': 5, 'programming': 6})  
+#end
 #set ($levelsRights = {})
 #foreach ($r in $rightsLevels.keySet())
   #set ($discard = $levelsRights.put($rightsLevels.get($r), $r))
 #end
 #set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, delete
-#if($doc.fullName == 'XWiki.XWikiPreferences')
-  #if (("$!{request.editor}" == 'globaladmin') || "$!{editor}" == 'globaladmin')
-    #set ($clsname = 'XWiki.XWikiGlobalRights')
-    #if ($xcontext.database == 'xwiki')
-      #set ($maxlevel = $rightsLevels.get('programming')) ## base + admin, register, programming
+#if("$!request.section"=='MultiWikis')
+  #set ($maxlevel = $rightsLevels.get('subwikicreation'))
+  #set ($clsname = 'XWiki.XWikiGlobalRights')
+#else
+  #if($doc.fullName == 'XWiki.XWikiPreferences')
+    #if (("$!{request.editor}" == 'globaladmin') || "$!{editor}" == 'globaladmin')
+      #set ($clsname = 'XWiki.XWikiGlobalRights')
+      #if ($xcontext.database == 'xwiki')
+        #set ($maxlevel = $rightsLevels.get('programming')) ## base + admin, register, programming
+      #else
+        #set ($maxlevel = $rightsLevels.get('register')) ## base + admin, register
+      #end
     #else
-      #set ($maxlevel = $rightsLevels.get('register')) ## base + admin, register
+      #set($clsname = 'XWiki.XWikiRights')
     #end
-  #else
-    #set($clsname = 'XWiki.XWikiRights')
-  #end
-#elseif ($doc.name == 'WebPreferences')
-  #if ("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin')
-    #set ($clsname = 'XWiki.XWikiGlobalRights')
-    #set ($maxlevel = $rightsLevels.get('admin')) ## base + admin
+  #elseif ($doc.name == 'WebPreferences')
+    #if ("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin')
+      #set ($clsname = 'XWiki.XWikiGlobalRights')
+      #set ($maxlevel = $rightsLevels.get('admin')) ## base + admin
+    #else
+      #set ($clsname = 'XWiki.XWikiRights')
+    #end
   #else
     #set ($clsname = 'XWiki.XWikiRights')
   #end
-#else
-  #set ($clsname = 'XWiki.XWikiRights')
 #end
 
 ## url to take the users and groups to display in the ajax-based table
@@ -150,7 +159,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </tr>
     ## Global settings: mandatory authentication for view/edit, captcha
     #set ($guest_comment_captcha_prop = $doc.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
-    #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop)
+    #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'MultiWikis')
       <tr>
         <td>
           <table>

@@ -23,6 +23,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
+ * @version $Id$
  * @since 5.2M2
  */
 @Unstable

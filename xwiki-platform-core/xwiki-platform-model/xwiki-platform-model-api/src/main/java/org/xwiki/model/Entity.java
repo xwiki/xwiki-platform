@@ -24,6 +24,7 @@ import java.util.Locale;
 import org.xwiki.stability.Unstable;
 
 /**
+ * @version $Id$
  * @since 5.2M2
  */
 @Unstable

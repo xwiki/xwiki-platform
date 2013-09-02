@@ -24,7 +24,7 @@ import java.util.Map;
 import org.xwiki.stability.Unstable;
 
 /**
- *
+ * @version $Id$
  * @since 5.2M2
  */
 @Unstable
@@ -37,7 +37,7 @@ public interface Persistable
     void save(String comment, boolean isMinorEdit, Map<String, String> extraParameters) throws ModelException;
 
     /**
-     * Discard all uncomitted changes.
+     * Discard all uncommitted changes.
      */
     void discard();
 }

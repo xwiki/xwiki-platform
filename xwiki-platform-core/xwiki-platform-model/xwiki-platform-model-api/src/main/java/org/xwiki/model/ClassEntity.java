@@ -22,6 +22,10 @@ package org.xwiki.model;
 import org.xwiki.stability.Unstable;
 
 /**
+ * Represents an XWiki Class, ie a list of meta Properties modeling an object (for example a Customer Class would model
+ * a Customer object with properties such as a customer first name, last name, address, etc).
+ *
+ * @version $Id$
  * @since 5.2M2
  */
 @Unstable

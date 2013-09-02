@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseProperty;
 
 /**
+ * @version $Id$
  * @since 5.2M2
  */
 public class BridgedObjectPropertyEntity extends AbstractBridgedEntity implements ObjectPropertyEntity

@@ -24,6 +24,7 @@ import org.xwiki.model.Entity;
 import com.xpn.xwiki.XWikiContext;
 
 /**
+ * @version $Id$
  * @since 5.2M2
  */
 public abstract class AbstractBridgedEntity implements Entity

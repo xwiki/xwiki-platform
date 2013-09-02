@@ -53,6 +53,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 
 /**
+ * @version $Id$
  * @since 5.2M2
  */
 @Component

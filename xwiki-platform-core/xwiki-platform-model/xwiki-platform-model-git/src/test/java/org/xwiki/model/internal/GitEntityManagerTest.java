@@ -37,6 +37,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
+ * Unit tests for {@link GitEntityManager}.
+ *
+ * @version $Id$
  * @since 5.2M2
  */
 @ComponentList({

@@ -33,6 +33,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 /**
  * TODO: Decide if this should be part of the current EntityReference implementation.
  *
+ * @version $Id$
  * @since 5.2M2
  */
 @Unstable

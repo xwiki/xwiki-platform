@@ -24,6 +24,7 @@ import org.xwiki.stability.Unstable;
 /**
  * Allows retrieving data by batch (with pagination).
  *
+ * @version $Id$
  * @since 5.2M2
  */
 @Unstable

@@ -25,6 +25,7 @@ import org.xwiki.stability.Unstable;
  * An XWiki Server is made of one or several {@link WikiEntity}s. This is the top most
  * concept of the XWiki Model.
  *
+ * @version $Id$
  * @since 5.2M2
  */
 @Unstable

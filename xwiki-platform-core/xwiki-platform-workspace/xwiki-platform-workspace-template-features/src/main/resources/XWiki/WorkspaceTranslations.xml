@@ -58,48 +58,48 @@
       <scope>WIKI</scope>
     </property>
   </object>
-  <content># Various translations that are used in the workspace template and, implicitly, in the created workspaces.
+<content># Various translations that are used in the subwiki template and, implicitly, in the created subwiki.
 
-# Rebrand the term 'Wiki' to 'Workspace' in the menu of a workspace. To be used by the workspace template and in all created workspaces.
-core.menu.type.wiki=Workspace
-core.menu.watchlist.add.wiki=Watch Workspace
-core.menu.watchlist.remove.wiki=Unwatch Workspace
-core.menu.admin.wiki=Administer Workspace
+# Rebrand the term 'Wiki' to 'Subwiki' in the menu of a subwiki. To be used by the subwiki template and in all created subwikis.
+core.menu.type.wiki=Subwiki
+core.menu.watchlist.add.wiki=Watch Subwiki
+core.menu.watchlist.remove.wiki=Unwatch Subwiki
+core.menu.admin.wiki=Administer Subwiki
 
 # WORKSPACE INFORMATION PANEL
-workspacemanager.panel.title=Workspace information
+workspacemanager.panel.title=Subwiki information
 
 # MESSAGES
 platform.workspace.wikiNotWorkspace=The current wiki is not a workspace.
-platform.workspace.gadgetWelcomeToWorkspace=Welcome to the **{0}** workspace.
-platform.workspace.currentUserIsOwner=You are the owner of this workspace.
-platform.workspace.currentUserIsAdministrator=You are an administrator of this workspace.
-platform.workspace.joinNeedToLogIn=To join this workspace you need to be logged in.
-platform.workspace.currentUserNotMember=You are not a member of this workspace.
-platform.workspace.currentUserCanJoin=If you like, you can [[join this workspace&gt;&gt;path:{0}]].
-platform.workspace.currentUserIsMember=You are a member of this workspace.
-platform.workspace.currentUserCanLeave=If you like, you can [[leave this workspace&gt;&gt;path:{0}]].
-platform.workspace.gadgetTopActiveUsersAllMembers=To see the full list of workspace members, you can use the [[User Directory&gt;&gt;Main.UserDirectory]] page.
-platform.workspace.invitationPendingForCurrentWorkspace=You have been invited to join this workspace
-platform.workspace.joinRequestPendingForCurrentWorkspace=You have requested to join this workspace
-platform.workspace.joinRequestAcceptedNotification=Your request to join the workspace ''{0}'' has been accepted.
-platform.workspace.joinRequestRejectedNotification=Your request to join the workspace ''{0}'' has been rejected.
+platform.workspace.gadgetWelcomeToWorkspace=Welcome to the **{0}** subwiki.
+platform.workspace.currentUserIsOwner=You are the owner of this subwiki.
+platform.workspace.currentUserIsAdministrator=You are an administrator of this subwiki.
+platform.workspace.joinNeedToLogIn=To join this subwiki you need to be logged in.
+platform.workspace.currentUserNotMember=You are not a member of this subwiki.
+platform.workspace.currentUserCanJoin=If you like, you can [[join this subwiki&gt;&gt;path:{0}]].
+platform.workspace.currentUserIsMember=You are a member of this subwiki.
+platform.workspace.currentUserCanLeave=If you like, you can [[leave this subwiki&gt;&gt;path:{0}]].
+platform.workspace.gadgetTopActiveUsersAllMembers=To see the full list of subwiki members, you can use the [[User Directory&gt;&gt;Main.UserDirectory]] page.
+platform.workspace.invitationPendingForCurrentWorkspace=You have been invited to join this subwiki
+platform.workspace.joinRequestPendingForCurrentWorkspace=You have requested to join this subwiki
+platform.workspace.joinRequestAcceptedNotification=Your request to join the subwiki ''{0}'' has been accepted.
+platform.workspace.joinRequestRejectedNotification=Your request to join the subwiki ''{0}'' has been rejected.
 platform.workspace.candidateHandledSaveComment=Handled candidate {0} ({1})
 platform.workspace.candidateHandledComment=Comment:
 platform.workspace.candidateAcceptedSuccess=Request accepted successfully.
 platform.workspace.candidateRejectedSuccess=Request rejected successfully.
-platform.workspace.inviteUserAlreadyMember={0} is already a member of the workspace.
+platform.workspace.inviteUserAlreadyMember={0} is already a member of the subwiki.
 platform.workspace.inviteRequestAlreadyExists={0} already has a pending request. Please respond to that request instead.
 platform.workspace.inviteUserAlreadyInvited={0} already has a pending invitation.
-platform.workspace.inviteSaveComment=User ''{0}'' has been invited to join the workspace.
-platform.workspace.inviteNotification=You have been invited to join the workspace ''{0}''.
+platform.workspace.inviteSaveComment=User ''{0}'' has been invited to join the subwiki.
+platform.workspace.inviteNotification=You have been invited to join the subwiki ''{0}''.
 platform.workspace.inviteSuccess={0} invited successfully.
 platform.workspace.invitationCancelSaveComment=Cancelled invitation {0} ({1})
 platform.workspace.invitationCancelNotification=Your invitation has been cancelled and is no longer valid.
 platform.workspace.invitationCancelSuccess=Invitation cancelled successfully.
 
 # Duplicated from WorkspaceManager.Translations. To be removed when the 2 are merged.
-workspacemanager.error.workspacedoesnotexist=Workspace [{0}] does not exist
+workspacemanager.error.workspacedoesnotexist=Subwiki [{0}] does not exist
 platform.workspace.exceptionWithMessage=Exception: {0}
 
 
@@ -109,8 +109,8 @@ workspacemanager.prop.description.label=Description
 workspacemanager.prop.owner.label=Owner
 workspacemanager.prop.membershipType.label=Membership Type
 workspacemanager.prop.secure.label=Secure (SSL)
-workspacemanager.member.add=Add or invite users to workspace
-platform.workspace.gadgetWorkspaceInformationLabel=Workspace Information
+workspacemanager.member.add=Add or invite users to subwiki
+platform.workspace.gadgetWorkspaceInformationLabel=Subwiki Information
 platform.workspace.gadgetTopActiveUsersLabel=Top Active Members
 platform.workspace.panelInformationNameLabel=Name
 platform.workspace.panelInformationDescriptionLabel=Description
@@ -119,7 +119,7 @@ platform.workspace.invitationActionViewLabel=View Invitation
 platform.workspace.joinRequestActionCancelLabel=Cancel Request
 platform.workspace.joinRequestActionRequestLabel=Request Join
 platform.workspace.joinActionJoinLabel=Join
-platform.workspace.leaveWorkspace=Leave Workspace
+platform.workspace.leaveWorkspace=Leave Subwiki
 platform.workspace.inviteUserNameLabel=User name
 platform.workspace.inviteMessageLabel=Message
 platform.workspace.inviteInviteButtonLabel=Invite
@@ -132,8 +132,8 @@ platform.workspace.candidateReviewerPrivateComment=Private Comment:
 platform.workspace.candidateAcceptLabel=Accept
 platform.workspace.candidateRejectLabel=Reject
 platform.workspace.invitationCancelLabel=Cancel Invitation
-platform.workspace.workspaceUsersTitle=Workspace Users
-platform.workspace.manageWorkspaceTitle=Workspace
+platform.workspace.workspaceUsersTitle=Subwiki Users
+platform.workspace.manageWorkspaceTitle=Subwiki
 XWiki.WorkspaceCandidateMemberClass_status_pending=Pending
 XWiki.WorkspaceCandidateMemberClass_status_accepted=Accepted
 XWiki.WorkspaceCandidateMemberClass_status_rejected=Rejected
@@ -141,17 +141,17 @@ XWiki.WorkspaceCandidateMemberClass_type_request=Request
 XWiki.WorkspaceCandidateMemberClass_type_invitation=Invitation
 
 # HINTS
-workspacemanager.prop.wikiprettyname.hint=The display name of the workspace.
-workspacemanager.prop.description.hint=A brief description of the workspace and its purpose.
-workspacemanager.prop.owner.hint=A user who will have all the rights on the workspace.
-workspacemanager.prop.membershipType.hint=The way users can join this workspace.
-workspacemanager.prop.secure.hint=If enabled, all this wiki's generated externals URLs will starting with //https:~/~///.
-platform.workspace.inviteUserNameHint=The name of the user to add to the workspace.
+workspacemanager.prop.wikiprettyname.hint=The display name of the subwiki.
+workspacemanager.prop.description.hint=A brief description of the subwiki and its purpose.
+workspacemanager.prop.owner.hint=A user who will have all the rights on the subwiki.
+workspacemanager.prop.membershipType.hint=The way users can join this subwiki.
+workspacemanager.prop.secure.hint=If enabled, all this subwiki's generated externals URLs will starting with //https:~/~///.
+platform.workspace.inviteUserNameHint=The name of the user to add to the subwiki.
 platform.workspace.inviteMessageHint=The message to send to the user.
-platform.workspace.candidatesHint=Users which have requested or which have been invited to join the workspace.
+platform.workspace.candidatesHint=Users which have requested or which have been invited to join the subwiki.
 
 # DESCRIPTIONS
-admin.xwiki.manageworkspace.description=Manage settings such as workspace name, description, owner and membership type.
-admin.xwiki.workspaceusers.description=Manage workspace members: add, remove, invite, accept or reject workspace members.
+admin.xwiki.manageworkspace.description=Manage settings such as subwiki name, description, owner and membership type.
+admin.xwiki.workspaceusers.description=Manage subwiki members: add, remove, invite, accept or reject subwiki members.
 </content>
 </xwikidoc>

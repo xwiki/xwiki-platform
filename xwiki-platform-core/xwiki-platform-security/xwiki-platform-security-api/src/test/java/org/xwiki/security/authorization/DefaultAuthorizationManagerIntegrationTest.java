@@ -70,12 +70,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.Right.ADMIN;
+import static org.xwiki.security.authorization.Right.COMMENT;
 import static org.xwiki.security.authorization.Right.CREATOR;
 import static org.xwiki.security.authorization.Right.DELETE;
+import static org.xwiki.security.authorization.Right.EDIT;
 import static org.xwiki.security.authorization.Right.ILLEGAL;
 import static org.xwiki.security.authorization.Right.LOGIN;
 import static org.xwiki.security.authorization.Right.PROGRAM;
 import static org.xwiki.security.authorization.Right.REGISTER;
+import static org.xwiki.security.authorization.Right.VIEW;
+import static org.xwiki.security.authorization.Right.values;
 import static org.xwiki.security.authorization.Right.SUBWIKI_CREATION;
 
 /**

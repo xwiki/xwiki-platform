@@ -150,7 +150,7 @@
         #end
         &lt;input type="hidden" name="members" value="$!escapetool.xml($membersValue)" /&gt;
         ### WIZARD FIRST HALF ###
-        &lt;div class="wizard-half"&gt;          
+        &lt;div class="half"&gt;
           ### PRETTY NAME ###
           &lt;div id="subwikiprettyname"&gt;
             &lt;dl&gt;
@@ -210,7 +210,7 @@
         ### END OF WIZARD FIRST HALF
         &lt;/div&gt;        
         ### WIZARD SECOND HALF
-        &lt;div class="wizard-half"&gt;
+        &lt;div class="half"&gt;
           ### DESCRIPTION ###
           &lt;div id="subwikidescription"&gt;
             &lt;dl&gt;
@@ -391,7 +391,7 @@
         &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;        
         #userPicker_import(true)
         ### WIZARD FIRST HALF ###
-        &lt;div class="wizard-half"&gt;
+        &lt;div class="half"&gt;
           ### OWNER ###
           &lt;div id="subwikiowner"&gt;
             ## Make this section available only to admins, so that only admins can create subwikis in the name of other users.
@@ -416,7 +416,7 @@
         ### END OF WIZARD FIRST HALF
         &lt;/div&gt;        
         ### WIZARD SECOND HALF
-        &lt;div class="wizard-half"&gt;
+        &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
           &lt;div id="subwikimembershiptype"&gt;
             #set ($workspaceClass = $xwiki.getDocument('WorkspaceManager.WorkspaceClass').getxWikiClass())

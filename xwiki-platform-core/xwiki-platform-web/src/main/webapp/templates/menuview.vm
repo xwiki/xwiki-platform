@@ -50,8 +50,7 @@
 ## Create
 ##
 ## Note: In order to know if the user has the right to create a workspace we compute a name that doesn't exist
-#set ($hasCreateWorkspace = $isWorkspaceManagerAppInstalled && $isMainWikiUser &&
-  $xwiki.hasAccessLevel('subwikicreation', 'XWiki.XWikiPreferences'))
+#set ($hasCreateWorkspace = $isWorkspaceManagerAppInstalled && $hasCreateSubwiki)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $hasCreateWorkspace)
 #if ($displayCreateSubmenu)
   #xwikitopmenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon')

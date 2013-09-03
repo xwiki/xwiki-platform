@@ -3486,10 +3486,10 @@ document.observe('xwiki:dom:loaded', function() {
   {
     'id' : 'configuration',
     'children': [
+       {'id' : 'SubWikis'},
        {'id' : 'Editing'},
        {'id' : 'Localization'},
        {'id' : 'Email'},
-       {'id' : 'SubWikis'},
        {'id' : 'XWiki.OfficeImporterAdmin'}
     ]
   },

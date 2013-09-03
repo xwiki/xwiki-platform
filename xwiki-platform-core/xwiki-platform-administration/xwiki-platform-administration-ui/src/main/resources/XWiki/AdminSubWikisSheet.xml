@@ -22,7 +22,7 @@
 
 <xwikidoc>
   <web>XWiki</web>
-  <name>AdminMultiWikisSheet</name>
+  <name>AdminSubWikisSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -52,10 +52,10 @@
     ## WORKSPACE INSTALLATION STATUS CHECK
     ############################################################################################
     &lt;fieldset&gt;
-      &lt;legend&gt;$services.localization.render("admin.multiwikis.template")&lt;/legend&gt;
+      &lt;legend&gt;$services.localization.render("admin.subwikis.template")&lt;/legend&gt;
       #set ($isInstallComplete = ($services.workspace.getWorkspaceTemplates().size() &gt; 0))      
       #if (!$isInstallComplete)
-        &lt;p&gt;$services.localization.render('admin.multiwikis.templatemissing', [$xwiki.getURL('WorkspaceManager.Install')])&lt;/p&gt;
+        &lt;p&gt;$services.localization.render('admin.subwikis.templatemissing', [$xwiki.getURL('WorkspaceManager.Install')])&lt;/p&gt;
       #else
         &lt;p&gt;$services.localization.render('workspacemanager.template.install.success')&lt;/p&gt;
       #end      
@@ -64,7 +64,7 @@
     ## RIGHTS
     ############################################################################################
     &lt;fieldset&gt;
-      &lt;legend&gt;$services.localization.render("admin.multiwikis.rights")&lt;/legend&gt;
+      &lt;legend&gt;$services.localization.render("admin.subwikis.rights")&lt;/legend&gt;
       #template('rightsUI.vm')
     &lt;/fieldset&gt;          
   &lt;/form&gt;

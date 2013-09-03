@@ -44,7 +44,7 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     /**
      * @see #getPingInstanceURL()
      */
-    private static final String DEFAULT_PING_URL = "http://extensions.xwiki.org:5200";
+    private static final String DEFAULT_PING_URL = "http://extensions.xwiki.org/activeinstalls";
 
     /**
      * Defines from where to read the rendering configuration data.

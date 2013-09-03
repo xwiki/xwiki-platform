@@ -592,6 +592,6 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
 #-#
 #-# The default is:
-# activeinstalls.pingURL=http://extensions.xwiki.org:5200
+# activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
 
 $!xwikiPropertiesAdditionalProperties

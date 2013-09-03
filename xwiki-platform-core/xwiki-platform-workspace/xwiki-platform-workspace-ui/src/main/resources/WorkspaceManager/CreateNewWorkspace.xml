@@ -49,8 +49,13 @@
   {{error}}$services.localization.render('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
 
 #end
+#set ($isInstallComplete = ($WorkspaceManager.getWorkspaceTemplates().size() &gt; 0))
+#if (!$isInstallComplete)
+  {{warning}}$services.localization.render('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
+
+#end
 ## If all dependancies are OK, we call the controller
-#if($WorkspaceManager &amp;&amp; $WikiManager &amp;&amp; $services.applicationmanager) 
+#if($WorkspaceManager &amp;&amp; $WikiManager &amp;&amp; $services.applicationmanager &amp;&amp; $isInstallComplete) 
   #controller()
 #end
 ##################################
@@ -163,7 +168,7 @@
           &lt;div id="subwikiname"&gt;
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="wikiname"&gt;$services.localization.render('wikimanager.prop.wiki.wikiname')#required()&lt;/label&gt;
+                &lt;label for="wikiname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiname')#required()&lt;/label&gt;
                 &lt;span class='xHint'&gt;$services.localization.render('workspacemanager.doc.createwiki.wikiname')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
@@ -398,7 +403,7 @@
                 &lt;/dt&gt;
                 &lt;dd&gt;
                   #set($value = $escapetool.xml($request.getParameter('XWiki.XWikiServerClass_0_owner')))
-                  #if($value == $util.null)
+                  #if("$!value" == "")
                     #set($value = $escapetool.xml($xcontext.user))
                   #end
                   &lt;input type="text" id="owner" name="XWiki.XWikiServerClass_0_owner" value="$!value" class="suggestUsers"/&gt;

@@ -29,6 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.activeinstalls.client.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.client.InstanceId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -39,6 +40,14 @@ import io.searchbox.client.JestResult;
 import io.searchbox.client.config.ClientConfig;
 import io.searchbox.core.Index;
 
+/**
+ * Thread that regularly sends information about the current instance (its unique id + the id and versions of all
+ * installed extensions) to a central active installs Elastic Search server in order to count the number of active
+ * installs of XWiki (and to know what extensions and in which versions they use).
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class ActiveInstallsPingThread extends Thread
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ActiveInstallsPingThread.class);
@@ -56,19 +65,21 @@ public class ActiveInstallsPingThread extends Thread
 
     private InstalledExtensionRepository extensionRepository;
 
-    private String remoteServerURL;
+    private ActiveInstallsConfiguration configuration;
 
-    public ActiveInstallsPingThread(InstanceId instanceId, InstalledExtensionRepository extensionRepository)
+    public ActiveInstallsPingThread(InstanceId instanceId, ActiveInstallsConfiguration configuration,
+        InstalledExtensionRepository extensionRepository)
     {
         this.instanceId = instanceId;
         this.extensionRepository = extensionRepository;
-        this.remoteServerURL = "http://localhost:9200";
+        this.configuration = configuration;
     }
 
     @Override
     public void run()
     {
-        ClientConfig clientConfig = new ClientConfig.Builder(this.remoteServerURL).multiThreaded(true).build();
+        String pingURL = this.configuration.getPingInstanceURL();
+        ClientConfig clientConfig = new ClientConfig.Builder(pingURL).multiThreaded(true).build();
         JestClientFactory factory = new JestClientFactory();
         factory.setClientConfig(clientConfig);
         JestClient client = factory.getObject();
@@ -81,7 +92,7 @@ public class ActiveInstallsPingThread extends Thread
                 // sleep.
                 LOGGER.warn(
                     "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
-                    this.remoteServerURL, ExceptionUtils.getRootCause(e), WAIT_TIME/1000);
+                    pingURL, ExceptionUtils.getRootCause(e), WAIT_TIME/1000);
             }
             try {
                 Thread.sleep(WAIT_TIME);

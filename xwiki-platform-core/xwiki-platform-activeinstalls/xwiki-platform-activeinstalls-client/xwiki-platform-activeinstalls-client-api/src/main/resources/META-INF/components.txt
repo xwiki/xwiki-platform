@@ -1,2 +1,3 @@
 org.xwiki.activeinstalls.internal.client.DefaultInstanceIdManager
 org.xwiki.activeinstalls.internal.client.ActiveInstallsInitializerListener
+org.xwiki.activeinstalls.internal.client.DefaultActiveInstallsConfiguration

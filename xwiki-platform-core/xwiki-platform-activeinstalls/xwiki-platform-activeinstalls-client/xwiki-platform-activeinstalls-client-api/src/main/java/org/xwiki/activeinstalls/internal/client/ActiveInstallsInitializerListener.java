@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.xwiki.activeinstalls.client.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.client.InstanceIdManager;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
@@ -51,6 +52,9 @@ public class ActiveInstallsInitializerListener implements EventListener
     @Inject
     private InstalledExtensionRepository extensionRepository;
 
+    @Inject
+    private ActiveInstallsConfiguration configuration;
+
     @Override
     public List<Event> getEvents()
     {
@@ -71,7 +75,8 @@ public class ActiveInstallsInitializerListener implements EventListener
         idManager.initializeInstanceId();
 
         // Start a thread to regularly send pings to the active installs server.
-        Thread pingThread = new ActiveInstallsPingThread(idManager.getInstanceId(), this.extensionRepository);
+        Thread pingThread = new ActiveInstallsPingThread(idManager.getInstanceId(), this.configuration,
+            this.extensionRepository);
         pingThread.setName("Active Installs Ping Thread");
         pingThread.start();
     }

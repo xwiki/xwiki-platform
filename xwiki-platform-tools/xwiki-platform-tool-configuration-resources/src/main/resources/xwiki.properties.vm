@@ -580,4 +580,18 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# We advise you to forbid at least the following mimetypes : text/html, text/javascript
 # attachment.download.blacklist=text/html,text/javascript 
 
+#-------------------------------------------------------------------------------------
+# Active Installs
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.2M2]
+#-# The URL of where the Active Installs module should connect to in order to send a ping of activity. This feature
+#-# regularly sends the following information to xwiki.org about the current instance:
+#-# - its unique id
+#-# - the id and versions of all installed extensions)
+#-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
+#-#
+#-# The default is:
+# activeinstalls.pingURL=http://extensions.xwiki.org:5200
+
 $!xwikiPropertiesAdditionalProperties

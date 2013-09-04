@@ -56,7 +56,7 @@ import static org.hamcrest.Matchers.*;
 public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
 {
     /** URL of the current document. */
-    private static final String mockDocumentUrl = "http://host/xwiki/bin/save/Main/Test";
+    private static final String mockDocumentUrl = "http://host/xwiki/bin/view/Space/DefaultPage";
 
     /** Resubmission URL. */
     private static final String resubmitUrl = mockDocumentUrl;
@@ -97,6 +97,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         // document reference resolver
         final DocumentReferenceResolver<String> mockResolver = 
             getComponentManager().getInstance(DocumentReferenceResolver.TYPE_STRING, "default");
+        final DocumentReference defaultReference = new DocumentReference("wiki", "Space", "DefaultPage");
         final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
         getMockery().checking(new Expectations()
         {
@@ -106,8 +107,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
                 allowing(mockDocumentAccessBridge).getDocumentURL(with(aNonNull(DocumentReference.class)),
                     with("view"), with(returnValue), with(aNull(String.class)));
                 will(returnValue);
-                allowing(mockDocumentAccessBridge).getDocumentURL(with(aNull(DocumentReference.class)), with("view"),
-                    with(aNull(String.class)), with(aNull(String.class)));
+                allowing(mockDocumentAccessBridge).getDocumentURL(with(defaultReference),
+                    with("view"), with(aNull(String.class)), with(aNull(String.class)));
                 will(returnValue(mockDocumentUrl));
                 allowing(mockDocumentAccessBridge).getCurrentDocumentReference();
                 will(returnValue(null));
@@ -117,7 +118,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         {
             {
                 allowing(mockResolver).resolve("");
-                will(returnValue(null));
+                will(returnValue(defaultReference));
             }
         });
         // configuration

@@ -185,7 +185,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         // back URL is the URL of the document that was about to be modified, so in most
         // cases we can redirect back to the correct document (if the user clicks "no")
         DocumentReference currentDocRef = this.docBridge.getCurrentDocumentReference();
-        //If the current document is null (on the login page for example), let's redirect to the default page.
+        // If the current document is null (on the login page for example), let's redirect to the default page
         if (currentDocRef == null) {
             currentDocRef = resolver.resolve("");
         }

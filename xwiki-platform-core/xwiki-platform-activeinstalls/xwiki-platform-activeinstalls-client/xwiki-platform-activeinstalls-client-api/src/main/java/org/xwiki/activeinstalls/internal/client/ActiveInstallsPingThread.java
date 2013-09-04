@@ -29,15 +29,13 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.activeinstalls.client.ActiveInstallsConfiguration;
+import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.client.InstanceId;
+import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
-import io.searchbox.client.config.ClientConfig;
 import io.searchbox.core.Index;
 
 /**
@@ -59,7 +57,7 @@ public class ActiveInstallsPingThread extends Thread
 
     private static final String LATEST_FORMAT_VERSION = "1.0";
 
-    public static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+    private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
     private InstanceId instanceId;
 
@@ -67,32 +65,29 @@ public class ActiveInstallsPingThread extends Thread
 
     private ActiveInstallsConfiguration configuration;
 
+    private JestClientManager jestClientManager;
+
     public ActiveInstallsPingThread(InstanceId instanceId, ActiveInstallsConfiguration configuration,
-        InstalledExtensionRepository extensionRepository)
+        InstalledExtensionRepository extensionRepository, JestClientManager jestClientManager)
     {
         this.instanceId = instanceId;
         this.extensionRepository = extensionRepository;
         this.configuration = configuration;
+        this.jestClientManager = jestClientManager;
     }
 
     @Override
     public void run()
     {
-        String pingURL = this.configuration.getPingInstanceURL();
-        ClientConfig clientConfig = new ClientConfig.Builder(pingURL).multiThreaded(true).build();
-        JestClientFactory factory = new JestClientFactory();
-        factory.setClientConfig(clientConfig);
-        JestClient client = factory.getObject();
-
         while (true) {
             try {
-                sendPing(client);
+                sendPing();
             } catch (Exception e) {
                 // Failed to connect or send the ping to the remote Elastic Search instance, will try again after the
                 // sleep.
                 LOGGER.warn(
                     "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
-                    pingURL, ExceptionUtils.getRootCause(e), WAIT_TIME/1000);
+                    this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCause(e), WAIT_TIME/1000);
             }
             try {
                 Thread.sleep(WAIT_TIME);
@@ -100,18 +95,16 @@ public class ActiveInstallsPingThread extends Thread
                 break;
             }
         }
-
-        client.shutdownClient();
     }
 
-    private void sendPing(JestClient client) throws Exception
+    private void sendPing() throws Exception
     {
         Index index = new Index.Builder(constructJSON())
             .index("installs")
             .type("install")
             .id(this.instanceId.toString())
             .build();
-        JestResult result = client.execute(index);
+        JestResult result = this.jestClientManager.getClient().execute(index);
         if (!result.isSucceeded()) {
             throw new Exception(result.getErrorMessage());
         }

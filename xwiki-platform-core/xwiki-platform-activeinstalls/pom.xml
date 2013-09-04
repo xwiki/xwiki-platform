@@ -34,6 +34,9 @@
   <packaging>pom</packaging>
   <description>Parent POM for the Active Installs modules</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-activeinstalls-client</module>
+    <module>xwiki-platform-activeinstalls-common</module>
+    <module>xwiki-platform-activeinstalls-server</module>
   </modules>
 </project>

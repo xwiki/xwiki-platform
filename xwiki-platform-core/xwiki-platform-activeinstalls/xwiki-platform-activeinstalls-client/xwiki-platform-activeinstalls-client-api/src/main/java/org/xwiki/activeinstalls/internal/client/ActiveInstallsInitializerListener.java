@@ -28,8 +28,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.activeinstalls.client.ActiveInstallsConfiguration;
+import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.client.InstanceIdManager;
+import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -55,6 +56,9 @@ public class ActiveInstallsInitializerListener implements EventListener
     @Inject
     private ActiveInstallsConfiguration configuration;
 
+    @Inject
+    private JestClientManager jestClientManager;
+
     @Override
     public List<Event> getEvents()
     {
@@ -76,7 +80,7 @@ public class ActiveInstallsInitializerListener implements EventListener
 
         // Start a thread to regularly send pings to the active installs server.
         Thread pingThread = new ActiveInstallsPingThread(idManager.getInstanceId(), this.configuration,
-            this.extensionRepository);
+            this.extensionRepository, this.jestClientManager);
         pingThread.setName("Active Installs Ping Thread");
         pingThread.start();
     }

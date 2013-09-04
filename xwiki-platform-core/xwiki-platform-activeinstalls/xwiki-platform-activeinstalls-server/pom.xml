@@ -26,23 +26,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-activeinstalls-client</artifactId>
+    <artifactId>xwiki-platform-activeinstalls</artifactId>
     <version>5.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-activeinstalls-client-api</artifactId>
-  <name>XWiki Platform - Active Installs - Client - API</name>
-  <packaging>jar</packaging>
-  <description>API to store instance UUID and send regular pings notifying that the instance is alive</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activeinstalls-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-activeinstalls-server</artifactId>
+  <name>XWiki Platform - Active Installs - Server - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Server part of the Active Installs modules</description>
+  <modules>
+    <module>xwiki-platform-activeinstalls-server-api</module>
+  </modules>
 </project>

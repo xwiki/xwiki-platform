@@ -17,24 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.activeinstalls.client;
+package org.xwiki.activeinstalls.internal;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
-/**
- * Configuration properties for the Active Installs module.
- *
- * @version $Id$
- * @since 5.2M2
- */
+import io.searchbox.client.JestClient;
+
 @Role
 @Unstable
-public interface ActiveInstallsConfiguration
+public interface JestClientManager
 {
-    /**
-     * @return the URL (as a string) of where the Active Installs module should connect to in order to send a ping of
-     *         activity
-     */
-    String getPingInstanceURL();
+    JestClient getClient();
 }

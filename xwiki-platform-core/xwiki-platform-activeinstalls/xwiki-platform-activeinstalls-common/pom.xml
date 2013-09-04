@@ -26,23 +26,42 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-activeinstalls-client</artifactId>
+    <artifactId>xwiki-platform-activeinstalls</artifactId>
     <version>5.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-activeinstalls-client-api</artifactId>
-  <name>XWiki Platform - Active Installs - Client - API</name>
+  <artifactId>xwiki-platform-activeinstalls-common</artifactId>
+  <name>XWiki Platform - Active Installs - Common API</name>
   <packaging>jar</packaging>
-  <description>API to store instance UUID and send regular pings notifying that the instance is alive</description>
+  <description>API common to both client and server modules</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activeinstalls-common</artifactId>
-      <version>${project.version}</version>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>1.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <!-- Note that we use Jest which uses REST calls to the ES server instead of using the ES Java API because that
+           API requires a version of Lucene incompatible with the one required by the Search module.
+           See https://github.com/elasticsearch/elasticsearch/issues/2091#issuecomment-23630194 -->
+      <groupId>io.searchbox</groupId>
+      <artifactId>jest</artifactId>
+      <version>0.0.4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

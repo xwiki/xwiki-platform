@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.activeinstalls.internal.client;
+package org.xwiki.activeinstalls.internal;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.xwiki.activeinstalls.client.ActiveInstallsConfiguration;
+import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
@@ -47,6 +47,11 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     private static final String DEFAULT_PING_URL = "http://extensions.xwiki.org/activeinstalls";
 
     /**
+     * @see #getPingInstanceURL()
+     */
+    private static final int DEFAULT_ACTIVITY_THRESHOLD = 30;
+
+    /**
      * Defines from where to read the rendering configuration data.
      */
     @Inject
@@ -56,5 +61,11 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     public String getPingInstanceURL()
     {
         return this.configuration.getProperty(PREFIX + "pingURL", DEFAULT_PING_URL);
+    }
+
+    @Override
+    public int getActivityThreshold()
+    {
+        return this.configuration.getProperty(PREFIX + "activityThreshold",DEFAULT_ACTIVITY_THRESHOLD);
     }
 }

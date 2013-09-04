@@ -1456,7 +1456,7 @@ public class XWiki implements EventListener
                 }
             }
 
-            // Actually delete the document
+            // Actually save the document.
             getStore().saveXWikiDoc(doc, context);
 
             // Since the store#saveXWikiDoc resets originalDocument, we need to temporarily put it

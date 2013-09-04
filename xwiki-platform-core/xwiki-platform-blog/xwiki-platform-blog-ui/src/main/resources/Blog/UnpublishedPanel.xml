@@ -117,7 +117,7 @@
     * [[$!{entryDoc.display('title', 'view', $entryObj).replaceAll('(\[|\]|\||&gt;)', '~~$1')}&gt;&gt;$!{services.model.serialize($entryDoc.documentReference).replaceAll('(\[|\]|\||&gt;)', '~$1')}]]
   #end
 
-  [[$services.localization.render('xe.blog.unpublished.viewall') (% class="itemCount" %)($xwiki.countDocuments($query))(%%)&gt;&gt;Blog.Unpublished]]
+  [[$services.localization.render('xe.blog.unpublished.viewall') (% class="itemCount" %)($services.query.hql($query).count())(%%)&gt;&gt;Blog.Unpublished]]
   #panelfooter()
 #end
 {{/velocity}}</content>

@@ -242,7 +242,7 @@ tt .wikimodel-verbatim {
 }
 
 .main table {
-  margin: 1em 1px;
+  margin: 1em 0;
 }
 
 .main th, .main td,
@@ -877,11 +877,6 @@ iframe.mceEditorIframe, .mceEditor {
 }
 
 /* ----------------New WYSYWYG Editor--------------------*/
-/* Should be in Wysiwyg.css */
-table.xRichTextEditorTabPanel td {
-  background-color: $theme.pageContentBackgroundColor;
-}
-
 /* Should be in RichTextArea.css - for table resizing */
 #body.main table {
   margin: 0;

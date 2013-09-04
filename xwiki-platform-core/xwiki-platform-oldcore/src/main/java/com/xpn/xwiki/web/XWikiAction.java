@@ -145,16 +145,7 @@ public abstract class XWikiAction extends Action
             String action = context.getAction();
 
             // Initialize context.getWiki() with the main wiki
-            XWiki xwiki = XWiki.getMainXWiki(context);
-
-            // Initialize the url factory
-            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
-            context.setURLFactory(urlf);
-
-            // Initialize the velocity context and its bindings so that it may be used in the velocity templates that we
-            // are parsing below.
-            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-            VelocityContext vcontext = velocityManager.getVelocityContext();
+            XWiki xwiki;
 
             // Verify that the requested wiki exists
             try {
@@ -163,6 +154,17 @@ public abstract class XWikiAction extends Action
                 // If the wiki asked by the user doesn't exist, then we first attempt to use any existing global
                 // redirects. If there are none, then we display the specific error template.
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
+                    xwiki = XWiki.getMainXWiki(context);
+
+                    // Initialize the url factory
+                    XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+                    context.setURLFactory(urlf);
+
+                    // Initialize the velocity context and its bindings so that it may be used in the velocity templates that we
+                    // are parsing below.
+                    VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+                    VelocityContext vcontext = velocityManager.getVelocityContext();
+
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
                         if (!StringUtils.isEmpty(context.getWiki().Param("xwiki.virtual.redirect"))) {
@@ -214,6 +216,9 @@ public abstract class XWikiAction extends Action
                 return null;
             }
 
+            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+            context.setURLFactory(urlf);
+
             String sajax = context.getRequest().get("ajax");
             boolean ajax = false;
             if (sajax != null && !sajax.trim().equals("") && !sajax.equals("0")) {
@@ -226,6 +231,9 @@ public abstract class XWikiAction extends Action
             if (monitor != null) {
                 monitor.startTimer("request");
             }
+
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            VelocityContext vcontext = velocityManager.getVelocityContext();
 
             boolean eventSent = false;
             try {

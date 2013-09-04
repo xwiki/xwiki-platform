@@ -20,7 +20,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <object>
     <class>
@@ -124,13 +124,13 @@
   #set ($currentMonth = $xwiki.formatDate($util.date, 'M'))
   #set ($firstYear = '')
   #set ($lastYear = '')
-  #foreach ($firstEntry in $services.query.hql("${query} order by year(publishDate.value)").setLimit(1).setOffset(0).bindValues($queryParams).execute())
+  #foreach ($firstEntry in $services.query.hql("${query} order by year(publishDate.value)").setLimit(1).bindValues($queryParams).execute())
     #set ($discard = $xwiki.getDocument($firstEntry))
     #getEntryObject($discard $entryObj)
     #getEntryDate($discard $entryObj $firstYear)
     #set ($firstYear = $mathtool.toInteger($xwiki.formatDate($firstYear, 'yyyy')))
   #end
-  #foreach ($lastEntry in $services.query.hql("${query} order by year(publishDate.value) desc").setLimit(1).setOffset(0).bindValues($queryParams).execute())
+  #foreach ($lastEntry in $services.query.hql("${query} order by year(publishDate.value) desc").setLimit(1).bindValues($queryParams).execute())
     #set ($discard = $xwiki.getDocument($lastEntry))
     #getEntryObject($discard $entryObj)
     #getEntryDate($discard $entryObj $lastYear)
@@ -140,13 +140,16 @@
     #foreach ($year in [$firstYear..$lastYear])
       #set ($yearArticleCount = $services.query.hql("${query} and year(publishDate.value) = $year").bindValues($queryParams).count())
       #if ($yearArticleCount &gt; 0)
-        * [[$year (% class="itemCount" %)(${yearArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}]]
+        #set ($queryString = "space=$escapetool.url($blogDoc.space)&amp;year=${year}")
+        * [[$year (% class="itemCount" %)(${yearArticleCount})(%%)&gt;&gt;Blog.Archive||queryString="${queryString}"]]
         #if ($year == $currentYear)
           #foreach ($month in [1..12])
-            #set ($monthArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year and month(publishDate.value) = $month", $queryParams))
+            #set ($statement = "${query} and year(publishDate.value) = $year and month(publishDate.value) = $month")
+            #set ($monthArticleCount = $services.query.hql($statement).bindValues($queryParams).count())
             #if ($monthArticleCount &gt; 0)
               $tempDate.setMonthOfYear($month)##
-              ** [[$monthFormatter.print($tempDate) (% class="itemCount" %)(${monthArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]]
+              #set($queryString = "space=${escapetool.url($blogDoc.space)}&amp;year=${year}&amp;month=${month}")
+              ** [[$monthFormatter.print($tempDate) (% class="itemCount" %)(${monthArticleCount})(%%)&gt;&gt;Blog.Archive||queryString="${queryString}"]]
             #end
           #end
         #end

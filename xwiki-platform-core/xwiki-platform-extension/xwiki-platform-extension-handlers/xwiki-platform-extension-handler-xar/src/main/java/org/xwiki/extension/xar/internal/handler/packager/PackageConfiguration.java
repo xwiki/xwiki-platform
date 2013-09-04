@@ -44,4 +44,6 @@ public interface PackageConfiguration
     Map<XarEntry, XarFile> getPreviousPages();
 
     Set<String> getEntriesToImport();
+    
+    boolean isSkipMandatorytDocuments();
 }

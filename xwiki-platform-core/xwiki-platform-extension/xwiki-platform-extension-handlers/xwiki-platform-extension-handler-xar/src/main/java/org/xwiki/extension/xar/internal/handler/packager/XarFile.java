@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * @version $Id$
@@ -69,7 +69,7 @@ public class XarFile
         return this.entries.values();
     }
 
-    public XarEntry getEntry(EntityReference reference, Locale locale)
+    public XarEntry getEntry(LocalDocumentReference reference, Locale locale)
     {
         return this.entries.get(new XarEntry(reference, locale));
     }

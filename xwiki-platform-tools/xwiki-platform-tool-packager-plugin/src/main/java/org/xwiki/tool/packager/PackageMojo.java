@@ -406,7 +406,9 @@ public class PackageMojo extends AbstractMojo
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
 
                 try {
-                    importer.importXAR(xarArtifact.getFile(), this.importUser, xcontext);
+                    int nb = importer.importXAR(xarArtifact.getFile(), this.importUser, xcontext);
+
+                    getLog().info("  .... Imported " + nb + " documents");
                 } catch (Exception e) {
                     throw new MojoExecutionException(
                         String.format("Failed to import XAR [%s]", xarArtifact.toString()), e);

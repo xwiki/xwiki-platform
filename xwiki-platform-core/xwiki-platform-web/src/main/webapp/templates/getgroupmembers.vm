@@ -1,54 +1,50 @@
 #template('xwikivars.vm')
 $response.setContentType('application/x-json')
-#set($offset = $mathtool.toInteger($request.get('offset')))
-#set($off = $offset - 1 )
-#set($limit = $mathtool.toInteger($request.get('limit')))
-#set($order = true)
-#if("$!{request.dir}" == 'desc')
-  #set($order = false)
+#set ($offset = $mathtool.toInteger($request.offset))
+#set ($limit = $mathtool.toInteger($request.limit))
+#set ($order = "$!request.dir" != 'desc')
+##
+#set ($rm = $xwiki.rightsmanager)
+#if ($request.member && !$request.member.trim().equals(''))
+  #set ($count = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, $order).size())
+  #set ($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit,
+    $mathtool.sub($offset, 1), $order))
+#else
+  #set ($count  = $rm.countAllMembersNamesForGroup($doc.fullName))
+  #set ($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $NULL, $limit,
+    $mathtool.sub($offset, 1), $order))
 #end
 ##
-#set($rm = $xwiki.rightsmanager)
-#if($request.member && !$request.member.trim().equals(''))
-  #set($countm = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, 0, 0, $order).size())
-  #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $request.member, $limit, $off, $order))
-#else
-  #set($countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
-  #set($members = $rm.getAllMatchedMembersNamesForGroup($doc.fullName, $NULL, $limit, $off, $order))
+#set ($json = {
+  'totalrows': $count,
+  'returnedrows': $mathtool.min($members.size(), $limit),
+  'offset': $offset,
+  'rows': []
+})
+#foreach ($member in $members)
+  #set ($memberReference = $services.model.resolveDocument($member))
+  #set ($grayed = $memberReference.equals($xcontext.userReference) && $doc.fullName == 'XWiki.XWikiAdminGroup')
+  #set ($discard = $json.rows.add({
+    'fullname': $member,
+    'prettyname': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
+    'wikiname': $memberReference.wikiReference.name,
+    'memberurl': $xwiki.getURL($memberReference),
+    'docurl': $doc.getURL(),
+    'grayed': $grayed,
+    'doc_viewable': $xwiki.hasAccessLevel('view', $xcontext.user, $member),
+    'doc_hasadmin': $xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName),
+    'doc_hasedit': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
+    'doc_hasdelete': $xwiki.hasAccessLevel('delete', $xcontext.user, $doc.fullName),
+    'member': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
+    'member_url': $xwiki.getURL($memberReference),
+    'doc_delete_url': $doc.getURL('view', $escapetool.url({
+      'xpage': 'deletegroupmember',
+      'fullname': $member,
+      'ajax': true,
+      'form_token': $services.csrf.token
+    })),
+    '_avatar': "#mediumUserAvatar($member)",
+    '_avatar_url': $xwiki.getURL($memberReference)
+  }))
 #end
-
-{
-"totalrows": $countm,
-"returnedrows": #if($members.size() < $limit) $members.size() #else $limit #end,
-"offset": $offset,
-"rows": [
-#foreach( $m in $members )
-    #if($xcontext.user == $m && $doc.fullName == 'XWiki.XWikiAdminGroup')
-      #set($grayed = true)
-    #else
-      #set($grayed = false)
-    #end
-    #set($wikiname = $xwiki.getDocument($m).getWiki())
-    #if($wikiname != 'xwiki' || $wikiname == $xcontext.database) #set($wikiname = 'local') #end
-    #set($emptyValue = $services.localization.render('xe.admin.groups.emptyvalue'))
-    #if( $velocityCount > 1 ) , #end
-   {
-    "fullname"     : "$m",
-    "prettyname"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) ($m)#end",
-    "wikiname"     : "$wikiname",
-    "memberurl"    : "$xwiki.getURL($m)",
-    "docurl"       : "$doc.getURL()",
-    "grayed"       : $grayed,
-## livetable data
-    "doc_viewable" : ${xwiki.hasAccessLevel('view', $xcontext.user, $m)},
-    "doc_hasadmin" : ${xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName)},
-    "doc_hasedit" : ${xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName)},
-    "doc_hasdelete" : ${xwiki.hasAccessLevel('delete', $xcontext.user, $doc.fullName)},
-    "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) ($m)#end",
-    "member_url" : "$xwiki.getURL($m)",
-    "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true&form_token=$!{services.csrf.getToken()}")",
-    "_avatar" : "$escapetool.javascript("#mediumUserAvatar($m)").trim()",
-    "_avatar_url" : "$xwiki.getURL($m)"
-   }
-#end
-]}
+$jsontool.serialize($json)

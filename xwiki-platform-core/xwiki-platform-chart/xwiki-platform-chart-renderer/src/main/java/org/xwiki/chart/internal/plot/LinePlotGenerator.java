@@ -19,20 +19,31 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import java.util.Map;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating line charts.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
+@Component
+@Named("line")
+@Singleton
 public class LinePlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override
-    protected CategoryItemRenderer getRenderer()
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
-        return new LineAndShapeRenderer();
+        boolean linesVisible = !Boolean.valueOf(parameters.get("hideLines"));
+        boolean shapesVisible = !Boolean.valueOf(parameters.get("hideShapes"));
+        return new LineAndShapeRenderer(linesVisible, shapesVisible);
     }
 }

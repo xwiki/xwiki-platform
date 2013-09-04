@@ -61,7 +61,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.3.3.Final</version>
+        <version>3.3.4.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
@@ -370,6 +370,12 @@
               <className>com/xpn/xwiki/XWikiContext</className>
               <field>TYPE_PROVIDER</field>
               <justification>This field is not meant to be be modified, the final was just forgotten.</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/util/TidyMessageLogger</className>
+              <justification>Has been moved to xwiki-platform-feed-api since it was the only module using it. We also
+              dropped Tidy in favor of HTMLCleaner.</justification>
             </difference>
           </ignored>
           <excludes>

@@ -45,15 +45,11 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ### Choose the page elements to display, globally and at space level.
-#if ("$!editor" == 'globaladmin')
-  #set ($legend = ['header', 'panels', 'docextra', 'footer'])
-#else
-  #set ($legend = ['header', 'panels', 'docextra'])
-#end
-#set ($params = {})
-#set ($params.header = ['title', 'meta'])
-#set ($params.panels = ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'])
-#set ($params.docextra = ['showannotations', 'showcomments', 'showattachments', 'showhistory', 'showinformation'])
+#set ($params = {
+  'header': ['title', 'meta'],
+  'panels': ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'],
+  'docextra': ['showannotations', 'showcomments', 'showattachments', 'showhistory', 'showinformation']
+})
 #if ("$!editor" == 'globaladmin')
   #set ($params.footer = ['webcopyright', 'version'])
 #end

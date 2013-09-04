@@ -156,6 +156,7 @@ public class XarExtensionJobFinishedListener implements EventListener
             request));
         configuration.setWiki(wiki);
         configuration.setLogEnabled(true);
+        configuration.setSkipMandatorytDocuments(true);
 
         return configuration;
     }

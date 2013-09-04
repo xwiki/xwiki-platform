@@ -950,9 +950,10 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
              */
             XWikiDocument baseXWikiDocument = this.xwiki.getDocument(extendedId.getBasePageId(), this.xwikiContext);
             XWikiAttachment baseXWikiAttachment = baseXWikiDocument.getAttachment(fileName);
-            baseXWikiDocument.deleteAttachment(baseXWikiAttachment, this.xwikiContext);
+            baseXWikiDocument.removeAttachment(baseXWikiAttachment);
 
-            this.xwiki.saveDocument(baseXWikiDocument, this.xwikiContext);
+            this.xwiki.saveDocument(baseXWikiDocument,
+                "Deleted attachment [" + baseXWikiAttachment.getFilename() + "]", this.xwikiContext);
         } else {
             throw new Exception(String.format("Attachment '%s' does not exist on page '%s'", fileName,
                 extendedId.getBasePageId()));

@@ -62,7 +62,7 @@
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
-#set($availableProviders = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and doc.fullName!='XWiki.TemplateProviderTemplate'"))
+#set($availableProviders = $services.query.hql(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and doc.fullName!='XWiki.TemplateProviderTemplate'").execute())
 #if($availableProviders.size() &gt; 0)
 
 == {{translation key="admin.templates.providerslist"/}} ==

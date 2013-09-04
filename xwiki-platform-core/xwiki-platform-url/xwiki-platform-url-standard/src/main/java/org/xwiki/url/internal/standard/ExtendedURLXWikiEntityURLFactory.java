@@ -69,6 +69,12 @@ public class ExtendedURLXWikiEntityURLFactory implements XWikiURLFactory<Extende
     @Inject
     private EntityReferenceResolver<EntityReference> defaultReferenceEntityReferenceResolver;
 
+    /**
+     * Used to get the configured entity path prefix from the URL to allow for short URLs.
+     */
+    @Inject
+    private StandardURLConfiguration configuration;
+
     @Override
     public XWikiEntityURL createURL(ExtendedURL url, Map<String, Object> parameters)
         throws URLCreationException, UnsupportedURLException
@@ -164,12 +170,21 @@ public class ExtendedURLXWikiEntityURLFactory implements XWikiURLFactory<Extende
         // In Path based it means removing 2 segments:
         // Example of path-based URL: wiki/wikiname/action/space/page
         // Thus removing 2 segments means keeping: action/space/page
-        // In Domain based, we still need to remove one segment since the first segment will contain the type
-        // (i.e. "bin").
         if (isActuallyPathBased) {
             url.getSegments().remove(0);
+            url.getSegments().remove(0);
+        } else {
+            // In Domain based, we still need to remove one segment since the first segment will contain the type
+            // (e.g. "bin"). However, since we want to support Short URLs and allow the user to not specify the type
+            // prefix, we only remove the segment if its value is of the configured value.
+            // Note that we also always support "bin" in order to make it easy for the user so that he doesn't have to
+            // change all the URLs everywhere (like the error page URL in web.xml, etc).
+            String entityPathPrefix = this.configuration.getEntityPathPrefix();
+            String firstSegment = url.getSegments().get(0);
+            if (firstSegment.equals(entityPathPrefix) || firstSegment.equals("bin")) {
+                url.getSegments().remove(0);
+            }
         }
-        url.getSegments().remove(0);
     }
 
     /**

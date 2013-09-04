@@ -313,7 +313,6 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @throws ConflictingInsertionException When different threads
      * have inserted conflicting entries into the cache.
      */
-    @SuppressWarnings("unchecked")
     private Deque<SecurityRuleEntry> getRules(SecurityReference entity)
         throws AuthorizationException, ParentEntryEvictedException, ConflictingInsertionException
     {

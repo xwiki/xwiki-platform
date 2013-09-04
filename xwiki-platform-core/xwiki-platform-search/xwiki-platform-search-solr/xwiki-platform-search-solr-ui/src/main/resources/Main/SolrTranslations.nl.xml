@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>nl</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.SolrSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1369063635000</creationDate>
+  <date>1369655569000</date>
+  <contentUpdateDate>1369654393000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
+solr.facets.hint=Selecteer een categorie en activeer filters op de huidige resultaten
+solr.facets.resetAll=Herstel alle
+solr.facets.title=Verfijn uw zoekopdracht
+solr.filter.hint=Selecteer vooraf gedefinieerde filters die toegepast zullen worden op uw query
+solr.filter.title=Geavanceerde opties
+solr.filter.toggle=Schakel de zoekfilter in
+solr.filterBy.fileType=Bestandstype
+solr.filterBy.fileType.all=Alle bestandstypen
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.image=Afbeelding
+solr.filterBy.fileType.text=Tekst
+solr.filterBy.fileType.video=Video
+solr.filterBy.language=Talen
+solr.filterBy.language.all=Alle talen
+solr.filterBy.space=Ruimte
+solr.filterBy.type=Type
+solr.filterBy.type.all=Alle types
+solr.filterBy.type.attachment=Bijlage
+solr.filterBy.type.document=Document
+solr.filterBy.type.object=Object
+solr.filterBy.type.object_property=Object eigenschap
+solr.filterBy.wiki=Wiki
+solr.filterBy.wiki.all=Alle wikis
+solr.result.author=Gewijzigd door {0} op {1} 
+solr.result.location=Gelegen in {0} » {1} » {2} 
+solr.result.mediaType=Bestand van het type {0}
+solr.result.object=Object van het type {0}
+solr.result.property=Eigenschap {0}\#{1} 
+solr.sortBy=Sorteren op\:
+solr.sortBy.author_display_sort=Laatste auteur
+solr.sortBy.date=Datum
+solr.sortBy.score=Relevantie
+solr.sortBy.title_sort=Titel
+solr.sortOrder.asc=Oplopend
+solr.sortOrder.desc=Aflopend
+</content>
+</xwikidoc>

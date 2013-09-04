@@ -927,6 +927,10 @@ $xwiki.ssx.use('Main.Activity')##
   #foreach ($item in $aTags)
     #set ($discard = $docsWithTag.addAll($xwiki.tag.getDocumentsWithTag($item)))
   #end
+  ## Since there is no 'tag' field in the database schema, we can only use the page field in order to filter the query. In order to get no results when there are no documents with the requested tags, we use a fake document name
+  #if ($docsWithTag.size() == 0)
+    #set ($discard = $docsWithTag.add("XWiki.FakeDocumentToMakeQueryReturnNoResults${mathtool.random(1,999)}"))
+  #end
   #updateFilterClause('page' $docsWithTag false)
 #end
 ## Minor versions
@@ -1085,7 +1089,7 @@ $xwiki.ssx.use('Main.Activity')##
   #if ($mathtool.sub($eventTimeDiff.getDayOfYear(), 1) == 0 &amp;&amp;
       ($eventDateTime.isAfter($todayMidnight) ||
        $eventDateTime.isEqual($todayMidnight)))
-    #if ($mathtool.sub($eventTimeDiff.getHourOfDay(), 2) == 0)
+    #if ($eventTimeDiff.getHourOfDay() == 0)
       ##
       ## Few seconds ago
       ## ---------------------------------------------------------------
@@ -1094,7 +1098,7 @@ $xwiki.ssx.use('Main.Activity')##
       ##
       ## Number of minutes ago
       ## ---------------------------------------------------------------
-      #set ($hoursAgo = $eventTimeDiff.getHourOfDay() - 2)
+      #set ($hoursAgo = $eventTimeDiff.getHourOfDay())
       #set ($timeAgoMsg = $services.localization.render('timeAgo.hoursAgo', [$hoursAgo]))
     #end
     #set ($isToday = true)

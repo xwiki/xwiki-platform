@@ -32,9 +32,11 @@
   <artifactId>xwiki-platform-url-standard</artifactId>
   <name>XWiki Platform - URL - Standard Implementation</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - URL - Standard Implementation</description>
+  <description>Standard URL scheme</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Standard URL API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

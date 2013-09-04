@@ -22,24 +22,22 @@ package org.xwiki.extension.xar.internal.handler.packager;
 import java.util.Locale;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
@@ -61,15 +59,7 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
-
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> localSerializer;
+    private MandatoryDocumentInitializerManager initializerManager;
 
     @Inject
     private Execution execution;
@@ -166,26 +156,14 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
             saveDocument(mergedDocument, comment, false, configuration);
         }
 
-        return new XarEntryMergeResult(new XarEntry(mergedDocument.getDocumentReference(), mergedDocument.getLocale()),
-            documentMergeResult);
+        return new XarEntryMergeResult(new XarEntry(new LocalDocumentReference(mergedDocument.getDocumentReference()),
+            mergedDocument.getLocale()), documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
     {
-        MandatoryDocumentInitializer initializer;
-        try {
-            initializer =
-                this.componentManagerProvider.get().getInstance(MandatoryDocumentInitializer.class,
-                    this.serializer.serialize(documentReference));
-        } catch (ComponentLookupException e) {
-            try {
-                initializer =
-                    this.componentManagerProvider.get().getInstance(MandatoryDocumentInitializer.class,
-                        this.localSerializer.serialize(documentReference));
-            } catch (ComponentLookupException e1) {
-                initializer = null;
-            }
-        }
+        MandatoryDocumentInitializer initializer =
+            this.initializerManager.getMandatoryDocumentInitializer(documentReference);
 
         XWikiDocument mandatoryDocument;
         if (initializer != null) {

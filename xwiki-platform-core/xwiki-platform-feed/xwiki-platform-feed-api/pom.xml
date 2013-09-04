@@ -41,6 +41,11 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>net.sf.jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>r938</version>
+    </dependency>
     <!-- RSS Feed processing -->
     <dependency>
       <groupId>rome</groupId>
@@ -88,7 +93,8 @@
             **/plugin/feed/SyndEntrySourceApi.java,
             **/plugin/feed/SyndEntrySource.java,
             **/plugin/feed/UpdateThread.java,
-            **/plugin/feed/XWikiFeedFetcher.java
+            **/plugin/feed/XWikiFeedFetcher.java,
+            **/util/TidyMessageLogger.java
           </excludes>
         </configuration>
       </plugin>

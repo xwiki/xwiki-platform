@@ -15,8 +15,7 @@
   <date>1251108485000</date>
   <contentUpdateDate>1251108485000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('xe.themes.colors.sheet.title')</title>
-  <template/>
+  <title>#if($doc.name == 'ColorThemeSheet')$services.localization.render('xe.themes.colors.sheet.title')#end</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -259,7 +258,7 @@ XWiki.editors.ColorThemeWizard = Class.create({
     return element.className.substring(this.classPrefix.length - 1, element.className.indexOf(' '));
   },
   redefineActivation : function() {
-    if (!$('body').hasClassName('inlinebody')) {
+    if (!$('body').hasClassName('inlinebody') || !$('body').hasClassName('editbody')) {
       return;
     }
 
@@ -805,7 +804,7 @@ $ie .colorthemewizard-trigger {
 #foreach($element in $elementPropertyMap.keySet())
 #if($velocityCount != 1),
 #end
-.inlinebody .colorthemewizard-${element}:hover #colorthemewizard-${element}-trigger#end
+.inlinebody .colorthemewizard-${element}:hover #colorthemewizard-${element}-trigger, .editbody .colorthemewizard-${element}:hover #colorthemewizard-${element}-trigger#end
  {
   display: block;
   /* When hovering the element, a border is displayed reducing 2px from the padding. The triggers are shifted to compensate this difference. */
@@ -843,7 +842,7 @@ $ie .colorthemewizard-editable-group {
 }
 #foreach($i in $paddedElements)
 #if($velocityCount &gt; 1),
-#end.inlinebody .colorthemewizard-$i:hover#end {
+#end.inlinebody .colorthemewizard-$i:hover, .editbody .colorthemewizard-$i:hover#end {
   padding: 1px 8px;
   border: 2px dotted $widgetsColors.selectedBorder !important;
 }
@@ -863,19 +862,19 @@ $ie .colorthemewizard-editable-group {
 }
 #foreach($i in $notPaddedElements)
 #if($velocityCount &gt; 1),
-#end.inlinebody .colorthemewizard-$i:hover#end {
+#end.inlinebody .colorthemewizard-$i:hover, .editbody .colorthemewizard-$i:hover#end {
   padding: 0;
   border: 2px dotted $widgetsColors.selectedBorder;
 }
 /* Set the border for large containers. */
 #foreach($i in $largeContainers)
 #if($velocityCount &gt; 1),
-#end.inlinebody .colorthemewizard-$i:hover#end {
+#end.inlinebody .colorthemewizard-$i:hover, .editbody .colorthemewizard-$i:hover#end {
   border: 2px dotted $widgetsColors.selectedBorder;
 }
 
 #foreach($i in $largeContainers)
-.inlinebody .colorthemewizard-${i}-unhover {
+.inlinebody .colorthemewizard-${i}-unhover, .editbody .colorthemewizard-${i}-unhover {
   border-color: $widgetsColors.border !important;
 }
 #end
@@ -903,11 +902,11 @@ $ie .colorthemewizard-editable-group {
   /* 'Invisible' border. */
   border: 2px solid $theme.pageContentBackgroundColor;
 }
-.inlinebody .colorthemewizard-page {
+.inlinebody .colorthemewizard-page, .editbody .colorthemewizard-page {
   border: 2px dotted $theme.pageContentBackgroundColor; ## $widgetsColors.activeBorder;
 }
 /* Do not shift the page trigger, since there is no change in this element's padding on hover. */
-.inlinebody .colorthemewizard-page:hover #colorthemewizard-page-trigger {
+.inlinebody .colorthemewizard-page:hover #colorthemewizard-page-trigger, .editbody .colorthemewizard-page:hover #colorthemewizard-page-trigger {
   margin: 0;
 }
 /* Display the tip above the bottom of the page */
@@ -942,7 +941,7 @@ $ie .colorthemewizard-editable-group {
 #colorthemewizard-headerbox-trigger {
   margin: 2px;
 }
-.inlinebody .colorthemewizard-headerbox:hover #colorthemewizard-headerbox-trigger {
+.inlinebody .colorthemewizard-headerbox:hover #colorthemewizard-headerbox-trigger, .editbody .colorthemewizard-headerbox:hover #colorthemewizard-headerbox-trigger {
   margin: 0;
 }
 /*
@@ -984,7 +983,7 @@ $ie6 .colorthemewizard-panels {
   margin: 9px 2px;
 }
 /* Reduce 2px from the margin to make room for the border. */
-.inlinebody .colorthemewizard-content:hover {
+.inlinebody .colorthemewizard-content:hover, .editbody .colorthemewizard-content:hover {
   margin: 7px 0;
 }
 
@@ -993,7 +992,7 @@ $ie7 .colorthemewizard-content {
   border-bottom: 1px solid transparent;
 }
 /* Do not shift the page trigger, since there is no change in this element's padding on hover. */
-.inlinebody .colorthemewizard-content:hover #colorthemewizard-content-trigger {
+.inlinebody .colorthemewizard-content:hover #colorthemewizard-content-trigger, .editbody .colorthemewizard-content:hover #colorthemewizard-content-trigger {
   margin: 0;
 }
 .colorthemewizard-xwikicontent {
@@ -1157,6 +1156,12 @@ input.procolor {
 ##
 ## INITIALIZATION
 ##
+## Mode
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+  #set ($sheetMode = 'edit')
+#else
+  #set ($sheetMode = 'view')
+#end
 ## The color theme class and object
 #set($classname = 'ColorThemes.ColorThemeClass')
 #set($class = $xwiki.getDocument($classname).getxWikiClass())
@@ -1273,7 +1278,7 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
              #set($params = $params.replaceAll("(^|&amp;)${propID}=[^&amp;]*", ""))
              #set($params = $params.replaceAll("&amp;", "&amp;amp;"))
              #set($params = "${params}&amp;amp;${propID}=${colorID}")
-             &lt;td&gt;&lt;a href="$doc.getURL('inline', $params)" class="color${colorID}#if("$!{obj.getProperty($propname).value}" == "$!{webColors.get($colorID)}") current#end"&gt;&lt;/a&gt;&lt;/td&gt;
+             &lt;td&gt;&lt;a href="$doc.getURL('edit', $params)" class="color${colorID}#if("$!{obj.getProperty($propname).value}" == "$!{webColors.get($colorID)}") current#end"&gt;&lt;/a&gt;&lt;/td&gt;
           #end
          &lt;/tr&gt;
         #end
@@ -1376,8 +1381,8 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
  * @param element The target element
  *#
 #macro(printColorThemeWizard $element)
-  ## Only generate the palettes in inline mode
-  #if ($xcontext.action == 'inline')
+  ## Only generate the palettes in edit mode
+  #if ($sheetMode == 'edit')
     #set($propnames = '')
     #set($propnames = $!elementPropertyMap.get($element))
     #if("$!{propnames}" != '' &amp;&amp; $propnames.size() &gt; 0)
@@ -1525,7 +1530,7 @@ $xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
 {{html clean="false" wiki="false"}}
 ##
 ##
-#if($xcontext.action == 'inline')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
+#if($sheetMode == 'edit')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
 &lt;div #elementMetaData('page')&gt;
   #printColorThemeWizard('page')
   ## Main menu

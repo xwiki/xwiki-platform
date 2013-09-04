@@ -52,9 +52,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Settings;
 import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.id.SequenceGenerator;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -82,6 +79,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -263,7 +261,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 available = false;
             } catch (XWikiException e) {
                 // Failed to switch to database. Assume it means database does not exists.
-                available = !(e.getException() instanceof MigrationRequiredException);
+                available = !(e.getCause() instanceof MigrationRequiredException);
             }
         } catch (Exception e) {
             Object[] args = {wikiName};
@@ -528,6 +526,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                 saveAttachmentList(doc, context, false);
+            }
+            // Remove attachments planned for removal
+            if (doc.getAttachmentsToRemove().size() > 0) {
+                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
+                    context.getWiki().getAttachmentStore()
+                        .deleteXWikiAttachment(attachment.getAttachment(), false, context, false);
+                }
+                doc.clearAttachmentsToRemove();
             }
 
             // Handle the latest text file

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package com.xpn.xwiki.internal.web;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +40,7 @@ import com.xpn.xwiki.XWikiConfig;
  * @version $Id$
  * @since 1.9.1
  */
-class XWikiConfigurationService
+public class XWikiConfigurationService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiConfigurationService.class);
 
@@ -72,9 +72,13 @@ class XWikiConfigurationService
                 }
                 // Second, try loading it as a resource using the Servlet Context
                 if (xwikicfgis == null) {
-                    xwikicfgis = context.getResourceAsStream(configurationLocation);
-                    LOGGER.debug("Failed to load the file [" + configurationLocation + "] as a resource "
-                        + "using the Servlet Context. Trying to load it as classpath resource...");
+                    if (context != null) {
+                        xwikicfgis = context.getResourceAsStream(configurationLocation);
+                        LOGGER.debug("Failed to load the file [" + configurationLocation + "] as a resource "
+                            + "using the Servlet Context. Trying to load it as classpath resource...");
+                    } else {
+                        LOGGER.debug("No Servlet Context available. Trying to load it as classpath resource...");
+                    }
                 }
 
                 // Third, try loading it from the classloader used to load this current class

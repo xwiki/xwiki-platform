@@ -68,6 +68,15 @@
   #submenuitem($doc.getURL('view', "xpage=print&amp;$!request.getQueryString()") $services.localization.render('core.menu.preview') 'tmPrintPreview', '')
   #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '')
   #xwikitopmenuentryend()
+  #if ($keyboardShortcutsEnabled)
+    <script type="text/javascript">
+    //<![CDATA[
+      shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
+        location.href = $('tmViewSource').href;
+      }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+    //]]>
+    </script>
+  #end
 #end
 </div>
 </div>

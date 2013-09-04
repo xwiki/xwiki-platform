@@ -28,12 +28,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.url.UnsupportedURLException;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.XWikiURLFactory;
 import org.xwiki.url.internal.ExtendedURL;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -62,19 +60,5 @@ public class StandardXWikiURLFactoryTest
         XWikiURLFactory<ExtendedURL, XWikiEntityURL> entityURLFactory =
             this.mocker.getInstance(TYPE_ENTITY_EXTENDED_URL, "standard");
         verify(entityURLFactory).createURL(any(ExtendedURL.class), anyMap());
-    }
-
-    @Test
-    public void createURLWhenUnknownPathSegment() throws Exception
-    {
-        URL url = new URL("http://localhost:8080/xwiki/rest/whatever");
-        Map<String, Object> parameters = Collections.singletonMap("ignorePrefix", (Object) "xwiki");
-
-        try {
-            this.mocker.getComponentUnderTest().createURL(url, parameters);
-            fail("Should have thrown an exception here");
-        } catch (UnsupportedURLException expected) {
-            assertEquals("URL type [rest] are not yet supported!", expected.getMessage());
-        }
     }
 }

@@ -15,10 +15,18 @@
 ## ---------------------------------------------------------------------------------------------------------
 #set ($parent = "$!request.getParameter('parent')")
 ## if there is no passed parent, a page is to be created and the current document is existing, put the current document as a parent
-#if ($parent == '' && $tocreate == 'page' && !$doc.isNew())
-  #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name,
-    $doc.documentReference.lastSpaceReference.name, $doc.documentReference.name))
-  #set ($parent = $services.model.serialize($parentReference, 'local'))
+#if ($parent == '')
+  #if ($tocreate == 'page' && !$doc.isNew())
+    #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name,
+      $doc.documentReference.lastSpaceReference.name, $doc.documentReference.name))
+    #set ($parent = $services.model.serialize($parentReference, 'local'))
+  #elseif ($tocreate == 'space')
+    ## currentWiki:Main.WebHome
+    #set ($parentReference = $services.model.createDocumentReference($services.model.getEntityReferenceValue('WIKI'), 
+      $services.model.getEntityReferenceValue('SPACE', 'default'),
+      $services.model.getEntityReferenceValue('DOCUMENT', 'default')))
+    #set ($parent = $services.model.serialize($parentReference, 'local'))
+  #end
 #end
 ## ---------------------------------------------------------------------------------------------------------
 ## Get the passed template provider, if any
@@ -28,10 +36,15 @@
 ## to allow creation from template directly, without necessarily going through template provider.
 #set($template = "$!request.getParameter('template')")
 ## ---------------------------------------------------------------------------------------------------------
-## Get the space and page from the passed parameters if specified.
+## Set the space, page variables from the current doc if its new, from the passed parameters if any
 ## ---------------------------------------------------------------------------------------------------------
-#set ($space = "$!request.getParameter('space')")
-#set ($page = "$!request.getParameter('page')")
+#if ($doc.isNew())
+  #set ($space = $doc.getSpace())
+  #set ($page = $doc.getName())
+#else
+  #set ($space = "$!request.getParameter('space')")
+  #set ($page = "$!request.getParameter('page')")
+#end
 ## ---------------------------------------------------------------------------------------------------------
 ## If there was an exception creating the page because of invalid space, notify. 
 ## Should set the other variables only if there is no exception. Otherwise, if there's an exception other than the 

@@ -70,15 +70,15 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 <script type="text/javascript">
 // <![CDATA[
 require.config({
-  paths: {
-    // Load from CDN if possible, otherwise load local file.
-    jquery: [
-      '//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min',
-      "$xwiki.getSkinFile('js/amd/')jquery"
-    ],
-    jQueryNoConflict: "$xwiki.getSkinFile('js/amd/')jQueryNoConflict"
+  baseUrl: '/',
+  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
+  paths: { 'jquery': "$xwiki.getSkinFile('js/amd/')jquery" },
+  map: {
+    '*': { 'jquery': 'jQueryNoConflict' },
+    'jQueryNoConflict': { 'jquery': 'jquery' }
   }
 });
+define('jQueryNoConflict', ['jquery'], function($) { $.noConflict(); return $; });
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.contextPath = "${request.contextPath}";

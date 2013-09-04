@@ -36,7 +36,7 @@
 ##
 = $services.localization.render('xe.blog.manage.existing') =
 
-#foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
+#foreach($item in $xwiki.wrapDocs($services.query.hql(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'").execute()))
   #getBlogTitle($item $title)
   #if($title != '')
     * [[$title&gt;&gt;$item.fullName]]
@@ -83,7 +83,7 @@
     &lt;option value="main"&gt;$services.localization.render('xe.blog.manage.main')&lt;/option&gt;
   &lt;/select&gt;&lt;/dd&gt;
 &lt;/dl&gt;
-  &lt;input type="submit" value="${escapetool.xml($services.localization.render('xe.blog.manage.create'))}"/&gt;
+  &lt;input class="button" type="submit" value="${escapetool.xml($services.localization.render('xe.blog.manage.create'))}"/&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 #else ## !hasAdmin

@@ -20,42 +20,32 @@
 package org.xwiki.extension.xar.internal.handler.internal.repository;
 
 import org.junit.Assert;
-
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
-import org.xwiki.extension.test.RepositoryUtils;
+import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-public class XarInstalledExtensionRepositoryTest extends AbstractComponentTestCase
+@AllComponents
+public class XarInstalledExtensionRepositoryTest
 {
+    protected MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+
+    @Rule
+    public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.mocker);
+
     private XarInstalledExtensionRepository installedExtensionRepository;
 
-    private RepositoryUtils repositoryUtil;
-
-    @Override
+    @Before
     public void setUp() throws Exception
     {
-        super.setUp();
-
-        this.repositoryUtil = new RepositoryUtils(getComponentManager(), getMockery());
-        this.repositoryUtil.setup();
-
-        // lookup
-
         this.installedExtensionRepository =
-            getComponentManager().getInstance(InstalledExtensionRepository.class, "xar");
-    }
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        registerComponent(ConfigurableDefaultCoreExtensionRepository.class);
+            this.mocker.getInstance(InstalledExtensionRepository.class, "xar");
     }
 
     // Tests

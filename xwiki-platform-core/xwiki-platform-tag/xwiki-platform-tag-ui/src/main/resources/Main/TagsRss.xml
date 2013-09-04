@@ -40,7 +40,7 @@
   ##
   ## Build feed.
   ##
-  #set ($list = $xwiki.searchDocuments($sql , 20 , 0))
+  #set ($list = $services.query.hql($sql).setLimit(20).execute())
   #set ($feed = $xwiki.feed.getDocumentFeed($list, {}, {}))
   #set ($feedURI = $xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))).getExternalURL("view"))
   #set ($discard = $feed.setLink($feedURI))

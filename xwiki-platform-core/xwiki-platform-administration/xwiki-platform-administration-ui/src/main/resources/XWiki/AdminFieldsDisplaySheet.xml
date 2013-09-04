@@ -50,12 +50,12 @@
   &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
     #set($prefsClassName = 'XWiki.XWikiPreferences')
     #set($obj = $doc.getObject($prefsClassName))
-    #foreach ($item in $legend)
-      #set ($fields = $params.get($item))
-      &lt;fieldset class="$item"&gt;
+    #foreach ($entry in $params.entrySet())
+      #set ($fields = $entry.value)
+      &lt;fieldset class="$entry.key"&gt;
       ## If there is only one section, don't display the legend
-      #if ($legend.size() &gt; 1)
-        &lt;legend&gt;$services.localization.render("admin.${item}")&lt;/legend&gt;
+      #if ($params.size() &gt; 1)
+        &lt;legend&gt;$services.localization.render("admin.$entry.key")&lt;/legend&gt;
       #end
       #if ($fields.size() &gt; 0)
         &lt;dl&gt;
@@ -92,8 +92,8 @@
           #end
           &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
-        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
         &lt;/label&gt;
+        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
         &lt;/dt&gt;
         #if ($prop)
           &lt;dd&gt;$doc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;

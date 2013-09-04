@@ -45,7 +45,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;

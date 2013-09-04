@@ -20,9 +20,8 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.Map;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;

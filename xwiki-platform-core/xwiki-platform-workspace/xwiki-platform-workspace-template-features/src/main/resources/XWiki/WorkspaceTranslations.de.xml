@@ -24,17 +24,52 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
-core.menu.admin.wiki=Workspace administrieren
-workspacemanager.member.add=Benutzer zum Workspace einladen oder hinzufügen
-workspacemanager.panel.title=Workspace Information
-workspacemanager.prop.description.hint=Beschreibung über den Workspace und seiner Verwendung
+XWiki.WorkspaceCandidateMemberClass_status_accepted=akzeptiert
+XWiki.WorkspaceCandidateMemberClass_status_pending=offen
+XWiki.WorkspaceCandidateMemberClass_status_rejected=abgelehnt
+XWiki.WorkspaceCandidateMemberClass_type_invitation=Einladung
+XWiki.WorkspaceCandidateMemberClass_type_request=Anfrage
+core.menu.admin.wiki=Arbeitsgebiet administrieren
+core.menu.type.wiki=Arbeitsgebiet
+core.menu.watchlist.add.wiki=beobachte Arbeitsgebiet
+core.menu.watchlist.remove.wiki=Beobachtung Arbeitsgebiet beenden
+platform.workspace.candidateAcceptLabel=einverstanden
+platform.workspace.candidateAcceptedSuccess=Anforderung wurde akzeptiert
+platform.workspace.candidatesLabel=Kandidaten
+platform.workspace.currentUserIsAdministrator=Sie sind der Administrator dieses Arbeitsgebietes
+platform.workspace.currentUserIsMember=Sie sind ein Mitglied dieses Arbeitsgebietes. 
+platform.workspace.currentUserIsOwner=Sie sind der Eigentümer dieses Arbeitsgebietes.
+platform.workspace.currentUserNotMember=Sie sind kein Mitglied dieses Arbeitsgebietes.
+platform.workspace.gadgetTopActiveUsersLabel=Aktive Mitglieder
+platform.workspace.gadgetWelcomeToWorkspace=Willkommen im **{0}** Arbeitsgebiet. 
+platform.workspace.gadgetWorkspaceInformationLabel=Information zum Arbeitsgebiet
+platform.workspace.invitationActionViewLabel=Einladung ansehen
+platform.workspace.invitationCancelLabel=Einladung ablehnen
+platform.workspace.invitationCancelNotification=Ihre Einladung wurde abgelehnt und ist nicht mehr gültig.
+platform.workspace.invitationPendingForCurrentWorkspace=Sie wurden zu diesem Arbeitsgebiet eingeladen
+platform.workspace.inviteInviteButtonLabel=einladen
+platform.workspace.inviteMessageLabel=Nachricht
+platform.workspace.inviteUserNameLabel=Anwendername
+platform.workspace.joinActionJoinLabel=beitreten
+platform.workspace.joinNeedToLogIn=Um diesen Arbeitsgebiet beizutreten müssen Sie sich authentifizieren
+platform.workspace.joinRequestActionCancelLabel=Anfrage abgebrochen
+platform.workspace.joinRequestPendingForCurrentWorkspace=Sie haben ihren Beitritt zum Arbeitsgebiet angefragt
+platform.workspace.leaveWorkspace=Arbeitsgebiet verlassen
+platform.workspace.manageWorkspaceTitle=Arbeitsgebiet
+platform.workspace.panelInformationDescriptionLabel=Beschreibung
+platform.workspace.panelInformationMembersLabel=Mitglieder
+platform.workspace.wikiNotWorkspace=Das aktuelle Wiki ist kein Arbeitsgebiet
+platform.workspace.workspaceUsersTitle=Arbeitsgebietsmitglieder
+workspacemanager.member.add=Benutzer zum Arbeitsgebiet einladen oder hinzufügen
+workspacemanager.panel.title=\ Information zum Arbeitsgebiet
+workspacemanager.prop.description.hint=Beschreibung über das Arbeitsgebiet und seine Verwendung
 workspacemanager.prop.description.label=Beschreibung
-workspacemanager.prop.membershipType.hint=So können Benutzer an diesem Workspace teilnehmen.
+workspacemanager.prop.membershipType.hint=So können Benutzer an diesem Arbeitsgebiet teilnehmen.
 workspacemanager.prop.membershipType.label=Mitgliedschaftstyp
 workspacemanager.prop.owner.hint=Ein Benutzer mit allen Rechten über den Workspace.
 workspacemanager.prop.owner.label=Besitzer
 workspacemanager.prop.secure.hint=Wenn aktiviert, beginnen alle vom Wiki generierten externen URLs mit\: //https\:~/~///.
-workspacemanager.prop.wikiprettyname.hint=Der Name für den Workspace.
+workspacemanager.prop.wikiprettyname.hint=Der Name des Arbeitsgebietes.
 workspacemanager.prop.wikiprettyname.label=Ausführlicher Name
 </content>
 </xwikidoc>

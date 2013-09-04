@@ -25,8 +25,7 @@ import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.localization.LocaleUtils;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * @version $Id$
@@ -36,7 +35,9 @@ public class XarPageLimitedHandler extends AbstractHandler
 {
     private XarEntry xarEntry = new XarEntry();
 
-    private EntityReference pageReference;
+    private String spaceName;
+
+    private LocalDocumentReference pageReference;
 
     public XarPageLimitedHandler(ComponentManager componentManager)
     {
@@ -44,8 +45,7 @@ public class XarPageLimitedHandler extends AbstractHandler
 
         setCurrentBean(this);
 
-        this.pageReference =
-            new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
+        this.pageReference = new LocalDocumentReference("space", "page");
 
         addsupportedElements("name");
         addsupportedElements("web");
@@ -79,13 +79,10 @@ public class XarPageLimitedHandler extends AbstractHandler
                 this.xarEntry.setLocale(Locale.ROOT);
             }
         } else if (qName.equals("name")) {
-            this.pageReference =
-                new EntityReference(this.value.toString(), EntityType.DOCUMENT, this.pageReference.getParent());
+            this.pageReference = new LocalDocumentReference(this.spaceName, this.value.toString());
             this.xarEntry.setDocumentReference(this.pageReference);
         } else if (qName.equals("web")) {
-            this.pageReference =
-                this.pageReference.replaceParent(this.pageReference.getParent(),
-                    new EntityReference(this.value.toString(), EntityType.SPACE));
+            this.spaceName = this.value.toString();
             this.xarEntry.setDocumentReference(this.pageReference);
         } else {
             super.endElementInternal(uri, localName, qName);

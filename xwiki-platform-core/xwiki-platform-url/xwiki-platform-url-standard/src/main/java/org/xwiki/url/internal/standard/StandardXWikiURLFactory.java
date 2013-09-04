@@ -91,13 +91,10 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL, XWikiURL>
         String ignorePrefix = (String) parameters.get(IGNORE_PREFIX_KEY);
         ExtendedURL extendedURL = new ExtendedURL(url, ignorePrefix);
 
-        // Step2: Find out what type of URL we have and call the appropriate factories
-        String type = extendedURL.getSegments().get(0);
-        if (type.equals("bin") || type.equals(this.configuration.getWikiPathPrefix())) {
-            xwikiURL = this.entityURLFactory.createURL(extendedURL, parameters);
-        } else {
-            throw new UnsupportedURLException(String.format("URL type [%s] are not yet supported!", type));
-        }
+        // Step 2: Find out what type of URL we have and call the appropriate factories
+        // At the moment we consider that all URL givent to this module are Entity URLs and that the filtering is done
+        // by rules in the web.xml so that for example resources, skins or REST URLs do not reach here.
+        xwikiURL = this.entityURLFactory.createURL(extendedURL, parameters);
 
         return xwikiURL;
     }

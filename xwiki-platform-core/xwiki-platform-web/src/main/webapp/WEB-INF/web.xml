@@ -35,7 +35,7 @@
     <param-value>org.xwiki.rest.internal.XWikiRestletJaxRsApplication</param-value>
   </context-param> 
   
-  <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
+  <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
        without affecting the whole container (and the other applications hosted). -->

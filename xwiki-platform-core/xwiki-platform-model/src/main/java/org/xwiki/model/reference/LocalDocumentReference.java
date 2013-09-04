@@ -23,7 +23,7 @@ import org.xwiki.model.EntityType;
 
 /**
  * Represents a reference to a document in the current wiki.
- *
+ * 
  * @version $Id$
  * @since 5.0M1
  */
@@ -31,12 +31,21 @@ public class LocalDocumentReference extends EntityReference
 {
     /**
      * Create a new Document reference in the current wiki.
-     *
+     * 
      * @param spaceName the name of the space containing the document, must not be null
      * @param pageName the name of the document, must not be null
      */
     public LocalDocumentReference(String spaceName, String pageName)
     {
         super(pageName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE));
+    }
+
+    /**
+     * @param documentReference the full document reference
+     * @since 5.2M2
+     */
+    public LocalDocumentReference(DocumentReference documentReference)
+    {
+        super(documentReference, documentReference.getWikiReference(), null);
     }
 }

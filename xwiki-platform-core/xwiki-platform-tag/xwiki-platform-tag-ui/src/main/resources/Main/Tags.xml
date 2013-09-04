@@ -208,7 +208,11 @@ $xwiki.ssx.use('Main.Tags')##
       (% class="xapp" %)
       === $services.localization.render('xe.tag.alldocs', ["//${tag}//"]) ===
 
-      {{html}}#displayDocumentList($list true $blacklistedSpaces){{/html}}
+      #if ($list.size()&gt; 0)
+        {{html}}#displayDocumentList($list true $blacklistedSpaces){{/html}}
+      #else
+        (% class='noitems' %)$services.localization.render('xe.tag.notags')
+      #end
     )))
     (((
       (% class="xapp" %)

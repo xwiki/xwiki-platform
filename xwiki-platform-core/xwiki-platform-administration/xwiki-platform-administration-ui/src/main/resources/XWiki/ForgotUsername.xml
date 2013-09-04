@@ -300,7 +300,7 @@
 {{/html}}
 
 #else
-  #set($results = $xwiki.searchDocuments(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = ?", [$email.toLowerCase()]))
+  #set($results = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = ?").bindValues([$email.toLowerCase()]).execute())
   #if($results.size() == 0)
     {{translation key="xe.admin.forgotUsername.error.noAccount"/}}
 

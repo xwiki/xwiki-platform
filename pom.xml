@@ -41,7 +41,7 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.2.9</hsqldb.version>
+    <hsqldb.version>2.3.0</hsqldb.version>
     <!-- Version of SmartGWT that we use in platform for the XWiki Explorer Tree. -->
     <smartgwt.version>3.1</smartgwt.version>
   </properties>

@@ -23,32 +23,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.test.RepositoryUtils;
+import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
-public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentTestCase
+@AllComponents
+public class ExtensionManagerScriptServiceTest
 {
+    private MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+
+    private MockitoOldcoreRule xwikiBridge = new MockitoOldcoreRule(this.mocker);
+
+    @Rule
+    public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.mocker, this.xwikiBridge);
+
     private XWiki mockXWiki;
 
     private XWikiRightService mockRightService;
-
-    private RepositoryUtils repositoryUtil;
 
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
@@ -56,38 +65,19 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
 
     private ExtensionManagerScriptService scriptService;
 
-    @Override
     @Before
     public void setUp() throws Exception
     {
-        super.setUp();
-
-        this.repositoryUtil = new RepositoryUtils(getComponentManager(), getMockery());
-        this.repositoryUtil.setup();
-
         // mock
 
-        // TODO: replace with a real mock when moving to JMock 2.6 (http://www.jmock.org/threading-synchroniser.html)
-        this.mockXWiki = new XWiki()
-        {
-            @Override
-            public XWikiRightService getRightService()
-            {
-                return mockRightService;
-            }
+        this.mockRightService = Mockito.mock(XWikiRightService.class);
+        this.mockXWiki = Mockito.mock(XWiki.class);
+        Mockito.when(this.mockXWiki.getRightService()).thenReturn(this.mockRightService);
 
-            @Override
-            public void prepareResources(XWikiContext context)
-            {
-                // Do nothing
-            }
-        };
-
-        getContext().setWiki(this.mockXWiki);
-        getContext().setDatabase("xwiki");
-        this.contextUser = new DocumentReference(getContext().getDatabase(), "XWiki", "ExtensionUser");
-
-        this.mockRightService = getMockery().mock(XWikiRightService.class);
+        this.xwikiBridge.getXWikiContext().setWiki(this.mockXWiki);
+        this.xwikiBridge.getXWikiContext().setDatabase("xwiki");
+        this.contextUser =
+            new DocumentReference(this.xwikiBridge.getXWikiContext().getDatabase(), "XWiki", "ExtensionUser");
 
         // classes
 
@@ -96,14 +86,14 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
 
         // checking
 
-        getContext().setUserReference(this.contextUser);
+        this.xwikiBridge.getXWikiContext().setUserReference(this.contextUser);
 
-        ((XWikiStubContextProvider) getComponentManager().getInstance(XWikiStubContextProvider.class))
-            .initialize(getContext());
+        ((XWikiStubContextProvider) this.mocker.getInstance(XWikiStubContextProvider.class))
+            .initialize(this.xwikiBridge.getXWikiContext());
 
         // lookup
 
-        this.scriptService = getComponentManager().getInstance(ScriptService.class, "extension");
+        this.scriptService = this.mocker.getInstance(ScriptService.class, "extension");
     }
 
     // tools
@@ -149,17 +139,10 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test
     public void testInstallOnRoot() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
-                will(returnValue(true));
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(true));
-            }
-        });
+        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
 
         install("extension", "version", null);
     }
@@ -167,17 +150,10 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test
     public void testInstallOnNamespace() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
-                will(returnValue(true));
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(true));
-            }
-        });
+        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
 
         install("extension", "version", "namespace");
     }
@@ -185,17 +161,10 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test(expected = InstallException.class)
     public void testInstallOnRootWithoutProgrammingRigths() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
-                will(returnValue(true));
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(false));
-            }
-        });
+        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
 
         install("extension", "version", null);
     }
@@ -203,17 +172,10 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test(expected = InstallException.class)
     public void testInstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasProgrammingRights(with(any(XWikiContext.class)));
-                will(returnValue(true));
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(false));
-            }
-        });
+        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
 
         install("extension", "version", "namespace");
     }
@@ -223,15 +185,9 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test
     public void testUninstallFromRoot() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(true));
-            }
-        });
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
 
         uninstall("installedonroot", null);
     }
@@ -239,15 +195,9 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test
     public void testUninstallOnNamespace() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(true));
-            }
-        });
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
 
         uninstall("installedonnamespace", "namespace");
     }
@@ -255,15 +205,10 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test(expected = UninstallException.class)
     public void testUninstallOnRootWithoutProgrammingRigths() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(false));
-            }
-        });
+        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
 
         uninstall("installedonroot", null);
     }
@@ -271,15 +216,10 @@ public class ExtensionManagerScriptServiceTest extends AbstractBridgedComponentT
     @Test(expected = UninstallException.class)
     public void testUninstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockRightService).hasAccessLevel(with(equal("programming")),
-                    with(equal("xwiki:XWiki.ExtensionUser")), with(equal("XWiki.XWikiPreferences")),
-                    with(any(XWikiContext.class)));
-                will(returnValue(false));
-            }
-        });
+        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
+        Mockito.when(
+            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
+                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
 
         uninstall("installedonnamespace", "namespace");
     }

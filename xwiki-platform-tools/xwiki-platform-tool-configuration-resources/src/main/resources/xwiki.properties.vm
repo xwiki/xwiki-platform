@@ -559,7 +559,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # Attachment
 #-------------------------------------------------------------------------------------
 
-#-# [Since 5.2M1]
+#-# [Since 5.2M2]
 #-# Define the kind of attachment that can be displayed inline. You can either choose to do it through a whitelist (only
 #-# the mimetypes defined in this list would be displayed inline) or a blacklist (every mimetype that is not in this list
 #-# would be displayed inline if possible)

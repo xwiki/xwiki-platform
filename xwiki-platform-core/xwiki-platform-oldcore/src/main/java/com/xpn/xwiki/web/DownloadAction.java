@@ -22,6 +22,9 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.IllegalCharsetNameException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,7 +53,24 @@ public class DownloadAction extends XWikiAction
 {
     /** The identifier of the download action. */
     public static final String ACTION_NAME = "download";
-
+    
+    /** The identifier of the attachment disposition. */
+    public static final String ATTACHMENT = "attachment";
+    
+    /** List of authorized attachment mimetypes. */
+    public static final List<String> MIMETYPE_WHITELIST = 
+        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis", 
+            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg", 
+            "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf",
+            "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", 
+            "video/x-flv");
+    
+    /** Key of the whitelist in xwiki.properties. */
+    public static final String WHITELIST_PROPERTY = "attachment.download.whitelist";
+    
+    /** Key of the blacklist in xwiki.properties. */
+    public static final String BLACKLIST_PROPERTY = "attachment.download.blacklist";
+    
     /** The URL part seperator. */
     private static final String SEPARATOR = "/";
 
@@ -288,9 +309,20 @@ public class DownloadAction extends XWikiAction
         // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
         // Save dialog box (exe, zip, xar, etc).
         String dispType = "inline";
-
-        if ("1".equals(request.getParameter("force-download"))) {
-            dispType = "attachment";
+        
+        // Determine whether the user who attached the file has Programming Rights or not.
+        boolean hasPR = false;
+        String author = attachment.getAuthor();
+        try {
+            hasPR = 
+                context.getWiki().getRightService().hasAccessLevel(
+                    "programming", author, "XWiki.XWikiPreferences", context);
+        } catch (Exception e) {
+            hasPR = false;
+        }
+        // If the mimetype is not authorized to be displayed inline, let's force its content disposition to download.
+        if ((!hasPR && !isAuthorized(mimetype)) || "1".equals(request.getParameter("force-download"))) {
+            dispType = ATTACHMENT;
         }
         // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
         // See http://tools.ietf.org/html/rfc2231 for more details.
@@ -318,5 +350,17 @@ public class DownloadAction extends XWikiAction
             return false;
         }
         return start == null || end == null || end >= start;
+    }
+    
+    private static boolean isAuthorized(String mimeType)
+    {
+        ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
+        if (configuration.containsKey(BLACKLIST_PROPERTY) && !configuration.containsKey(WHITELIST_PROPERTY)) {
+            List<String> blackList = (configuration.getProperty(BLACKLIST_PROPERTY, Collections.<String>emptyList()));
+            return !blackList.contains(mimeType);
+        } else {
+            List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
+            return whiteList.contains(mimeType);
+        }
     }
 }

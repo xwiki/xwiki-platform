@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.activeinstalls.internal.client;
+package org.xwiki.instance.internal;
 
 import java.util.UUID;
 
@@ -29,31 +29,50 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.slf4j.Logger;
-import org.xwiki.activeinstalls.client.InstanceId;
-import org.xwiki.activeinstalls.client.InstanceIdManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.instance.InstanceId;
+import org.xwiki.instance.InstanceIdManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
+/**
+ * Allow initializing and retrieving the unique instance id.
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Component
 @Singleton
 public class DefaultInstanceIdManager implements InstanceIdManager
 {
+    /**
+     * Used to store the new instance id if none exists already.
+     */
     @Inject
     @Named("hibernate")
     private XWikiStoreInterface hibernateStore;
 
+    /**
+     * Used to get the XWiki Context.
+     */
     @Inject
     private Execution execution;
 
+    /**
+     * Log in case of problem.
+     */
     @Inject
     private Logger logger;
 
+    /**
+     * The unique instance id, cached for performances so that we don't get it from the database every time some client
+     * code needs it.
+     */
     private InstanceId instanceId;
 
     @Override

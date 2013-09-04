@@ -25,7 +25,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
-  <class name="org.xwiki.activeinstalls.client.InstanceId" table="xwikiid">
+  <class name="org.xwiki.instance.InstanceId" table="xwikiid">
     <id name="instanceId" type="string" length="255" unsaved-value="undefined">
       <column name="XWI_ID" not-null="true" />
       <generator class="assigned" />

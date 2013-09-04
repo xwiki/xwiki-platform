@@ -29,11 +29,11 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
-import org.xwiki.activeinstalls.client.InstanceIdManager;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -74,7 +74,9 @@ public class ActiveInstallsInitializerListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Verify if the the instance id is saved in the Database and if not create a unique id and save it.
+        // Ensure that the instance id is initialized and available.
+        // TODO: In the future introduce an EventListener in the instance module and have this listener execute *after*
+        // it.
         InstanceIdManager idManager = this.managerProvider.get();
         idManager.initializeInstanceId();
 

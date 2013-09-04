@@ -30,10 +30,10 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
-import org.xwiki.activeinstalls.client.InstanceId;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.instance.InstanceId;
 
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Index;

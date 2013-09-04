@@ -232,5 +232,12 @@ rendering.macro.workspaces.description=List all workspaces
 xe.admin.groups.comment=About
 xe.admin.groups.tags=Tags
 xe.admin.groups._actions.follow=Follow
-xe.admin.groups._actions.unfollow=Unfollow</content>
-</xwikidoc>
+xe.admin.groups._actions.unfollow=Unfollow
+
+## Admin
+admin.subwikis=Subwikis
+admin.subwikis.description=Settings related to subwikis creation.
+admin.subwikis.template=Subwikis template.
+admin.subwikis.rights=Subwikis creation rights.
+admin.subwikis.templatemissing=To enable the subwiki creation, you need to create a template first.\n\n&lt;a href="{0}"&gt;Click here to create the template&lt;/a&gt;.
+</content></xwikidoc>

@@ -326,12 +326,16 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
 &lt;/form&gt;
 {{/html}}
 
-#set ($searchAdminDoc = $xwiki.getDocument($searchAdminPage))
-#if ($searchAdminDoc)
-= $searchAdminDoc.displayTitle =
+## If no Search UI Extension exist then don't display the Search Admin section.
+#if ("$!searchAdminPage" != '')
+  #set ($searchAdminDoc = $xwiki.getDocument($searchAdminPage))
+  ## If the document doesn't exist don't display it either.
+  #if (!$searchAdminDoc.isNew())
+    = $searchAdminDoc.displayTitle =
 
-## Use context='new' in the include so that we can use PR.
-{{include document="$searchAdminPage" context='new'}}
+    ## Use context='new' in the include so that we can use PR.
+    {{include document="$searchAdminPage" context='new'}}
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

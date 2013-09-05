@@ -22,8 +22,6 @@ package com.xpn.xwiki.web;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +30,6 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
@@ -104,16 +100,9 @@ public class UndeleteActionTest
         XWikiDocument restoredDocument = mock(XWikiDocument.class);
         when(recycleBin.restoreFromRecycleBin(context.getDoc(), 13, context, true)).thenReturn(restoredDocument);
 
-        XWikiAttachment attachment = mock(XWikiAttachment.class);
-        when(restoredDocument.getAttachmentList()).thenReturn(Arrays.asList(attachment));
-        when(attachment.getAttachment_content()).thenReturn(mock(XWikiAttachmentContent.class));
-
         assertFalse(undeleteAction.action(context));
 
-        verify(attachment).setMetaDataDirty(false);
-        verify(attachment.getAttachment_content()).setContentDirty(false);
         verify(context.getWiki()).saveDocument(restoredDocument, "restored from recycle bin", context);
         verify(context.getWiki().getRecycleBinStore()).deleteFromRecycleBin(context.getDoc(), 13, context, true);
-        verify(restoredDocument).saveAllAttachments(false, true, context);
     }
 }

@@ -69,7 +69,6 @@ import org.xwiki.query.QueryException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
@@ -840,15 +839,8 @@ public class Package
                     }
                 }
 
-                // Attachment saving should not generate additional saving
-                for (XWikiAttachment xa : doc.getDoc().getAttachmentList()) {
-                    xa.setMetaDataDirty(false);
-                    xa.getAttachment_content().setContentDirty(false);
-                }
-
                 String saveMessage = context.getMessageTool().get("core.importer.saveDocumentComment");
                 context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
-                doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
                 if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {

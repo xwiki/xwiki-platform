@@ -4157,9 +4157,14 @@ public class XWiki implements EventListener
 
                 if (wikilanguage == null) {
                     tdoc = sdoc.copyDocument(targetDocumentReference, context);
+
+                    // We know the target document doesn't exist and we want to save the attachments without
+                    // incrementing their versions.
+                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    tdoc.setNew(true);
+
                     // forget past versions
                     if (reset) {
-                        tdoc.setNew(true);
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {
@@ -4175,23 +4180,6 @@ public class XWiki implements EventListener
                     tdoc.setMetaDataDirty(false);
                     tdoc.setContentDirty(false);
 
-                    // XWikiDocument#copyAttachments() marks the copied attachments as dirty which leads to their
-                    // versions being incremented in the target document. We want to prevent this so that the
-                    // attachments have the same version in the target document as in the source. We cannot change
-                    // XWikiDocument#copyAttachments() because it's a public API and we would break its behavior so we
-                    // reset the dirty flags here. Note that the packager plugin does the same thing in order to prevent
-                    // attachment versions from being incremented when importing a document with history.
-                    // We force the attachment content save with the XWikiDocument#saveAllAttachments() call below.
-                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
-                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
-                        attachment.setMetaDataDirty(false);
-                        // In case the attachment is broken (no content) the XWikiDocument#copyDocument() call above has
-                        // already logged a warning. We just need to play safe.
-                        if (attachment.getAttachment_content() != null) {
-                            attachment.getAttachment_content().setContentDirty(false);
-                        }
-                    }
-
                     saveDocument(tdoc, "Copied from " + sourceStringReference, context);
 
                     if (!reset) {
@@ -4204,8 +4192,6 @@ public class XWiki implements EventListener
                         context.setDatabase(targetWiki);
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
-
-                    tdoc.saveAllAttachments(false, true, context);
 
                     // Now we need to copy the translations
                     context.setDatabase(sourceWiki);
@@ -4267,12 +4253,16 @@ public class XWiki implements EventListener
 
                     tdoc = stdoc.copyDocument(targetDocumentReference, context);
 
+                    // We know the target document doesn't exist and we want to save the attachments without
+                    // incrementing their versions.
+                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    tdoc.setNew(true);
+
                     // forget language
                     tdoc.setDefaultLanguage(wikilanguage);
                     tdoc.setLanguage("");
                     // forget past versions
                     if (reset) {
-                        tdoc.setNew(true);
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {
@@ -4299,11 +4289,6 @@ public class XWiki implements EventListener
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
-                    }
-
-                    context.setDatabase(targetWiki);
-                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
-                        getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
                     }
                 }
             }

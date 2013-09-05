@@ -1025,7 +1025,7 @@ var LiveTableTagCloud = Class.create({
    /**
     * Tags matching the current filters
     */
-   matchingTags: [],
+   matchingTags: {},
 
    /**
     * Tags selected as filters
@@ -1048,7 +1048,8 @@ var LiveTableTagCloud = Class.create({
         this.hasTags = true;
         this.domNode.removeClassName("hidden");
       }
-      this.matchingTags = matchingTags;
+      // Normalize the list of matching tags (all lower case).
+      this.matchingTags = Object.toJSON(matchingTags || {}).toLowerCase().evalJSON();
       this.displayTagCloud();
    },
 
@@ -1068,7 +1069,9 @@ var LiveTableTagCloud = Class.create({
          var tagLabel = this.tags[i].tag;
          var tagSpan = new Element("span").update(tagLabel.escapeHTML());
          var tag = new Element("li", {'class':liClass}).update(tagSpan);
-         if (typeof this.matchingTags[tagLabel] != "undefined") {
+         // Determine if the tag is selectable (matched) ignoring the case because multiple documents can be tagged with
+         // the same tag but in different cases (e.g. tag, Tag, TAG etc.)
+         if (typeof this.matchingTags[tagLabel.toLowerCase()] != "undefined") {
             tag.addClassName("selectable");
             Event.observe(tagSpan, "click", function(event) {
                 var tag = event.element().up("li").down("span").innerHTML.unescapeHTML();

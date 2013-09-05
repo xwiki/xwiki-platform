@@ -155,6 +155,29 @@ public class XWQLtoHQLTranslatorTest
         assertTranslate("from doc.object('XWiki.XWikiUsers') as user order by user.firstname",
             "select doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_firstname1 " +
                 "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_firstname1.id.id=user.id and user_firstname1.id.name='firstname' order by user_firstname1.value");
+        assertTranslate("order by lower(doc.fullName)",
+                "select doc.fullName from XWikiDocument as doc order by lower ( doc.fullName )");
+        assertTranslate("order by upper(doc.fullName)",
+                "select doc.fullName from XWikiDocument as doc order by upper ( doc.fullName )");
+        assertTranslate("order by trim(doc.fullName)",
+                "select doc.fullName from XWikiDocument as doc order by trim ( doc.fullName )");
+        assertTranslate("order by abs(doc.elements)",
+                "select doc.fullName from XWikiDocument as doc order by abs ( doc.elements )");
+    }
+
+    @Test
+    public void testGroupBy() throws Exception
+    {
+        assertTranslate("where 1=1 group by doc.space",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by doc.space");
+        assertTranslate("where 1=1 group by upper(doc.space)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by upper ( doc.space )");
+        assertTranslate("where 1=1 group by lower(doc.space)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by lower ( doc.space )");
+        assertTranslate("where 1=1 group by trim(doc.space)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by trim ( doc.space )");
+        assertTranslate("where 1=1 group by abs(doc.elements)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by abs ( doc.elements )");
     }
 
     @Test

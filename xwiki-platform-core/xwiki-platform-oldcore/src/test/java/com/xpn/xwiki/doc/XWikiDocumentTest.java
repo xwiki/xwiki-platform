@@ -998,31 +998,37 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setSyntax(Syntax.XWIKI_2_0);
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
         XWikiDocument targetDocument = this.document.duplicate(targetReference);
+        targetDocument.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
         XWikiDocument doc1 = new XWikiDocument(reference1);
         doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>" + DOCSPACE + "." + DOCNAME
             + "]] [[" + DOCNAME + "]]");
         doc1.setSyntax(Syntax.XWIKI_2_0);
+        doc1.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
         XWikiDocument doc2 = new XWikiDocument(reference2);
         doc2.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc2.setSyntax(Syntax.XWIKI_2_0);
+        doc2.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
         XWikiDocument doc3 = new XWikiDocument(reference3);
         doc3.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc3.setSyntax(Syntax.XWIKI_2_0);
+        doc3.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         // Test to make sure it also drags children along.
         DocumentReference reference4 = new DocumentReference(DOCWIKI, DOCSPACE, "Page4");
         XWikiDocument doc4 = new XWikiDocument(reference4);
         doc4.setParent(DOCSPACE + "." + DOCNAME);
+        doc4.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         DocumentReference reference5 = new DocumentReference("newwikiname", "newspace", "Page5");
         XWikiDocument doc5 = new XWikiDocument(reference5);
         doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
+        doc5.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
         this.mockXWiki.stubs().method("getDocument").with(eq(targetReference), ANYTHING)
@@ -1034,6 +1040,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getDocument").with(eq(reference5), ANYTHING).will(returnValue(doc5));
         this.mockXWiki.stubs().method("saveDocument").isVoid();
         this.mockXWiki.stubs().method("deleteDocument").isVoid();
+        this.mockXWikiStoreInterface.stubs().method("getTranslationList").will(returnValue(Arrays.asList()));
 
         this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
             Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5), getContext());

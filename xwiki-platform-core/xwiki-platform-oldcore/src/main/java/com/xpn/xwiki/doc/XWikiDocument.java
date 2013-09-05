@@ -6101,43 +6101,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
         }
 
-        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
-        // Note: we ignore invalid links here. Invalid links should be shown to the user so
-        // that they fix them but the rename feature ignores them.
-        DocumentParser documentParser = new DocumentParser();
-
-        // This link handler recognizes that 2 links are the same when they point to the same
-        // document (regardless of query string, target or alias). It keeps the query string,
-        // target and alias from the link being replaced.
-        RenamePageReplaceLinkHandler linkHandler = new RenamePageReplaceLinkHandler();
-
         // Used for replacing links in XWiki Syntax 1.0
         Link oldLink = createLink(getDocumentReference());
         Link newLink = createLink(newDocumentReference);
 
         for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
-            XWikiDocument backlinkDocument = xwiki.getDocument(backlinkDocumentReference, context);
+            XWikiDocument backlinkRootDocument = xwiki.getDocument(backlinkDocumentReference, context);
 
-            if (backlinkDocument.is10Syntax()) {
-                // Note: Here we cannot do a simple search/replace as there are several ways to point
-                // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
-                // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
-                // to recognize them and do the replace.
-                ReplacementResultCollection result =
-                    documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink, newLink, linkHandler,
-                        getDocumentReference().getLastSpaceReference().getName());
+            // Update default locale instance
+            renameLinks(backlinkRootDocument, oldLink, newLink, newDocumentReference, context);
 
-                backlinkDocument.setContent((String) result.getModifiedContent());
-            } else if (Utils.getComponentManager().hasComponent(BlockRenderer.class,
-                backlinkDocument.getSyntax().toIdString())) {
-                backlinkDocument.refactorDocumentLinks(getDocumentReference(), newDocumentReference, context);
+            // Update translations
+            for (Locale locale : backlinkRootDocument.getTranslationLocales(context)) {
+                XWikiDocument backlinkDocument = backlinkRootDocument.getTranslatedDocument(locale, context);
+
+                renameLinks(backlinkDocument, oldLink, newLink, newDocumentReference, context);
             }
-
-            String saveMessage =
-                context.getMessageTool().get("core.comment.renameLink",
-                    Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
-            backlinkDocument.setAuthorReference(context.getUserReference());
-            xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
         // Get new document
@@ -6183,6 +6162,47 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
         // invalid XWikiDocument object as it's been deleted...
         clone(newDocument);
+    }
+
+    /**
+     * Rename links in passed document and save it if needed.
+     */
+    private void renameLinks(XWikiDocument backlinkDocument, Link oldLink, Link newLink,
+        DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
+    {
+        if (backlinkDocument.is10Syntax()) {
+            // For each backlink to rename, parse the backlink document and replace the links with the new name.
+            // Note: we ignore invalid links here. Invalid links should be shown to the user so
+            // that they fix them but the rename feature ignores them.
+            DocumentParser documentParser = new DocumentParser();
+
+            // This link handler recognizes that 2 links are the same when they point to the same
+            // document (regardless of query string, target or alias). It keeps the query string,
+            // target and alias from the link being replaced.
+            RenamePageReplaceLinkHandler linkHandler = new RenamePageReplaceLinkHandler();
+
+            // Note: Here we cannot do a simple search/replace as there are several ways to point
+            // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
+            // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
+            // to recognize them and do the replace.
+            ReplacementResultCollection result =
+                documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink, newLink, linkHandler,
+                    getDocumentReference().getLastSpaceReference().getName());
+
+            backlinkDocument.setContent((String) result.getModifiedContent());
+        } else if (Utils.getComponentManager().hasComponent(BlockRenderer.class,
+            backlinkDocument.getSyntax().toIdString())) {
+            backlinkDocument.refactorDocumentLinks(getDocumentReference(), newDocumentReference, context);
+        }
+
+        // Save if content changed
+        if (backlinkDocument.isContentDirty()) {
+            String saveMessage =
+                context.getMessageTool().get("core.comment.renameLink",
+                    this.compactEntityReferenceSerializer.serialize(newDocumentReference));
+            backlinkDocument.setAuthorReference(context.getUserReference());
+            context.getWiki().saveDocument(backlinkDocument, saveMessage, true, context);
+        }
     }
 
     /**

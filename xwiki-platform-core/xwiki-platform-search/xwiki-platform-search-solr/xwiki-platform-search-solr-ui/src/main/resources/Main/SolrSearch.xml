@@ -183,8 +183,7 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
       <cache>long</cache>
     </property>
     <property>
-      <code>/* #set ($discard = $services.localization.use('document', 'Main.SolrTranslations')) */
-(function () {
+      <code>(function () {
   var SearchFilterBehavior = Class.create({
     initialize: function(container) {
       this.container = container.hide().addClassName('popup');
@@ -1401,7 +1400,6 @@ a.search-result-highlightAll:after {
 {{/velocity}}
 
 {{velocity}}
-#set ($discard = $services.localization.use('document', 'Main.SolrTranslations'))
 #set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
 #set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
 ## Disable the document extra data: comments, attachments, history...

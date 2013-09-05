@@ -15,7 +15,7 @@
   <date>1351958422000</date>
   <contentUpdateDate>1351958422000</contentUpdateDate>
   <version>1.1</version>
-  <title>Solr search administration</title>
+  <title>$services.localization.render("solr.admin.title")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -374,25 +374,25 @@ search=Main.SolrSearch</parameters>
     &lt;/div&gt;
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for="solrAdminAction"&gt;Action&lt;/label&gt;
-        &lt;span class="xHint"&gt;The action to perform on the index.&lt;/span&gt;
+        &lt;label for="solrAdminAction"&gt;$services.localization.render('solr.admin.indexing.action.label')&lt;/label&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('solr.admin.indexing.action.hint')&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         &lt;select id="solrAdminAction" name="action"&gt;
-          &lt;option value="index"&gt;Add to index&lt;/option&gt;
-          &lt;option value="delete"&gt;Delete from index&lt;/option&gt;
-          &lt;option value="reindex"&gt;Reindex&lt;/option&gt;
+          &lt;option value="index"&gt;$services.localization.render('solr.admin.indexing.action.select_index')&lt;/option&gt;
+          &lt;option value="delete"&gt;$services.localization.render('solr.admin.indexing.action.select_delete')&lt;/option&gt;
+          &lt;option value="reindex"&gt;$services.localization.render('solr.admin.indexing.action.select_reindex')&lt;/option&gt;
         &lt;/select&gt;
       &lt;/dd&gt;
       ## Indexing on the entire farm or on various wikis is done only on the main wiki.
       #if ($xcontext.isMainWiki())
         &lt;dt&gt;
-          &lt;label for="solrAdminWiki"&gt;Wiki&lt;/label&gt;
-          &lt;span class="xHint"&gt;The wiki for which all its documents will be affected by the selected action.&lt;/span&gt;
+          &lt;label for="solrAdminWiki"&gt;$services.localization.render('solr.admin.indexing.wiki.label')&lt;/label&gt;
+          &lt;span class="xHint"&gt;$services.localization.render('solr.admin.indexing.wiki.hint')&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
           &lt;select id="solrAdminWiki" name="wiki"&gt;
-            &lt;option value=""&gt;Entire farm&lt;/option&gt;
+            &lt;option value=""&gt;$services.localization.render('solr.admin.indexing.wiki.select_farm')&lt;/option&gt;
             #foreach ($wiki in $allWikis)
               #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wiki).wikiPrettyName)
               #if ("$!wikiPrettyName.trim()" == '')
@@ -408,8 +408,8 @@ search=Main.SolrSearch</parameters>
       ## rights.
       #if ($hasProgramming)
         &lt;dt&gt;
-          &lt;label for="solrAdminCustomQuery"&gt;Custom query&lt;/label&gt;
-          &lt;span class="xHint"&gt;Optional query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
+          &lt;label for="solrAdminCustomQuery"&gt;$services.localization.render('solr.admin.indexing.query.label')&lt;/label&gt;
+          &lt;span class="xHint"&gt;$services.localization.render('solr.admin.indexing.query.hint')&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
           &lt;select name="customQueryLanguage"&gt;
@@ -422,7 +422,7 @@ search=Main.SolrSearch</parameters>
     &lt;/dl&gt;
     &lt;p class="buttons"&gt;
       &lt;span class="buttonwrapper"&gt;
-        &lt;input type="submit" class="button" value="Apply" /&gt;
+        &lt;input type="submit" class="button" value="$services.localization.render('solr.admin.submit')" /&gt;
       &lt;/span&gt;
     &lt;/p&gt;
   &lt;/form&gt;
@@ -432,14 +432,14 @@ search=Main.SolrSearch</parameters>
 #macro (displaySolrAdminSection)
   #set ($discard = $xwiki.ssx.use('XWiki.SolrSearchAdmin'))
   #set ($discard = $xwiki.jsx.use('XWiki.SolrSearchAdmin'))
-  == Status ==
+  == $services.localization.render('solr.admin.status.title') ==
 
   (% class="xform half" %)
-  ; {{html}}&lt;label&gt;Queue Size&lt;/label&gt;{{/html}}##
-    (% class="xHint" %)The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
+  ; {{html}}&lt;label&gt;$services.localization.render('solr.admin.status.queueSize.label')&lt;/label&gt;{{/html}}##
+    (% class="xHint" %)$services.localization.render('solr.admin.status.queueSize.hint')
   : (% class="solrQueueSize" %)$services.solr.queueSize
 
-  == Indexing ==
+  == $services.localization.render('solr.admin.indexing.title') ==
 
   #displaySolrIndexForm()
 #end
@@ -533,9 +533,9 @@ search=Main.SolrSearch</parameters>
 #macro (handleSolrRequest)
   #if (!$hasGlobalAdmin)
     #if ("$!request.action" != '')
-      {{error}}You are not allowed to perform this action.{{/error}}
+      {{error}}$services.localization.render('solr.admin.error.notallowed'){{/error}}
     #else
-      {{error}}Administration rights are required to access this section.{{/error}}
+      {{error}}$services.localization.render('solr.admin.error.norights'){{/error}}
     #end
   #elseif ($request.form_token)
     #if ($services.csrf.isTokenValid($request.form_token))

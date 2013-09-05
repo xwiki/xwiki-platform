@@ -54,10 +54,31 @@
     <className>XWiki.TranslationDocumentClass</className>
     <guid>54715b8e-2403-4d0f-9b46-26f2b0e9e339</guid>
     <property>
-      <scope>ON_DEMAND</scope>
+      <scope>WIKI</scope>
     </property>
   </object>
-  <content>solr.sortBy=Sort by:
+  <content>solr.admin.title=Solr Search Administration
+solr.admin.submit=Apply
+solr.admin.error.notallowed=You are not allowed to perform this action.
+solr.admin.error.norights=Administration rights are required to access this section.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Queue Size
+solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
+
+solr.admin.indexing.title=Indexing
+solr.admin.indexing.action.label=Action
+solr.admin.indexing.action.hint=The action to perform on the index.
+solr.admin.indexing.action.select_index=Add to index
+solr.admin.indexing.action.select_delete=Delete from index
+solr.admin.indexing.action.select_reindex=Reindex
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affected by the selected action.
+solr.admin.indexing.wiki.select_farm=Entire farm
+solr.admin.indexing.query.label=Custom query
+solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+
+solr.sortBy=Sort by:
 solr.sortBy.score=Relevance
 solr.sortBy.title_sort=Title
 solr.sortBy.date=Date

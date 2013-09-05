@@ -384,6 +384,9 @@
             <!-- Remove the following excludes after we release the current version as final -->
             <!-- Google API plugin has been retired -->
             <exclude>com/xpn/xwiki/plugin/google/GooglePlugin*</exclude>
+            <!-- The JPQLParser generates source code (that should be internal but it is not) and the grammar has
+            changed a bit -->
+            <exclude>org/xwiki/query/jpql/**</exclude>
           </excludes>
         </configuration>
       </plugin>

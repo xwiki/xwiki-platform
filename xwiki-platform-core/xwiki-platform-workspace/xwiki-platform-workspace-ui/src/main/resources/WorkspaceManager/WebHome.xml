@@ -151,7 +151,7 @@
   #set($discard = $columns.add('_actions'))
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'delete'] }))
 #end
-#if($hasSubwikiCreation)
+#if($hasWikiCreation)
   [[{{translation key="platform.workspace.createNewWorkspaceLabel"/}}&gt;&gt;CreateNewWorkspace]]
 #end
 #livetable('workspaces', $columns, $columnsProperties, $options)

@@ -20,13 +20,13 @@
 package org.xwiki.query.xwql.internal;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.query.jpql.analysis.DepthFirstAdapter;
-import org.xwiki.query.jpql.node.AAbstractSchemaName;
-import org.xwiki.query.jpql.node.APath;
-import org.xwiki.query.jpql.node.ARangeVariableDeclaration;
-import org.xwiki.query.jpql.node.ASelectStatement;
-import org.xwiki.query.jpql.node.AXObjectDecl;
-import org.xwiki.query.jpql.node.AXPath;
+import org.xwiki.query.xwql.internal.parser.analysis.DepthFirstAdapter;
+import org.xwiki.query.xwql.internal.parser.node.AAbstractSchemaName;
+import org.xwiki.query.xwql.internal.parser.node.APath;
+import org.xwiki.query.xwql.internal.parser.node.ARangeVariableDeclaration;
+import org.xwiki.query.xwql.internal.parser.node.ASelectStatement;
+import org.xwiki.query.xwql.internal.parser.node.AXObjectDecl;
+import org.xwiki.query.xwql.internal.parser.node.AXPath;
 
 /**
  * @version $Id$

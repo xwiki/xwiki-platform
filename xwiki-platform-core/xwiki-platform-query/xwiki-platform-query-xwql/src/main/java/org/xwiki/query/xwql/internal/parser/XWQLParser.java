@@ -17,21 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.jpql.internal;
+package org.xwiki.query.xwql.internal.parser;
 
 import java.io.PushbackReader;
 import java.io.StringReader;
 
-import org.xwiki.query.jpql.lexer.Lexer;
-import org.xwiki.query.jpql.node.Start;
-import org.xwiki.query.jpql.parser.Parser;
+import org.xwiki.query.xwql.internal.parser.lexer.Lexer;
+import org.xwiki.query.xwql.internal.parser.node.Start;
+import org.xwiki.query.xwql.internal.parser.parser.Parser;
 
 /**
  * JPQL Parser.
  *
  * @version $Id$
  */
-public class JPQLParser
+public class XWQLParser
 {
     /**
      * Parse JPQL content passed as parameter.

@@ -19,8 +19,8 @@
  */
 package org.xwiki.query.xwql.internal.hql;
 
-import org.xwiki.query.jpql.analysis.DepthFirstAdapter;
-import org.xwiki.query.jpql.node.*;
+import org.xwiki.query.xwql.internal.parser.analysis.DepthFirstAdapter;
+import org.xwiki.query.xwql.internal.parser.node.*;
 import org.xwiki.query.xwql.internal.QueryContext;
 
 public class TreePrinter extends DepthFirstAdapter

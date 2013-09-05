@@ -23,8 +23,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.query.jpql.internal.JPQLParser;
-import org.xwiki.query.jpql.node.Start;
+import org.xwiki.query.xwql.internal.parser.XWQLParser;
+import org.xwiki.query.xwql.internal.parser.node.Start;
 import org.xwiki.query.xwql.internal.QueryAnalyzer;
 import org.xwiki.query.xwql.internal.QueryContext;
 import org.xwiki.query.xwql.internal.QueryTranslator;
@@ -51,7 +51,7 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         } else if (lcInput.startsWith("from")) {
             input = addition + "," + input.substring(4);
         }
-        JPQLParser parser = new JPQLParser();
+        XWQLParser parser = new XWQLParser();
         Start tree = parser.parse(input);
         QueryContext context = new QueryContext(tree, getDocumentAccessBridge());
         // analize query and store info in context

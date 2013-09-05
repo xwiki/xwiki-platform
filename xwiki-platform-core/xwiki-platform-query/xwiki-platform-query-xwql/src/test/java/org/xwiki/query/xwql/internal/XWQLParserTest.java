@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.jpql.internal;
+package org.xwiki.query.xwql.internal;
 
 import junit.framework.TestCase;
-import org.xwiki.query.jpql.internal.JPQLParser;
+import org.xwiki.query.xwql.internal.parser.XWQLParser;
 
-public class JPQLParserTest extends TestCase
+public class XWQLParserTest extends TestCase
 {
-    JPQLParser parser = new JPQLParser();
+    XWQLParser parser = new XWQLParser();
 
     public void testStartSpeed() throws Exception
     {

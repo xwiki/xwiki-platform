@@ -97,7 +97,7 @@ public class ActiveInstallsPingThread extends Thread
         }
     }
 
-    private void sendPing() throws Exception
+    protected void sendPing() throws Exception
     {
         Index index = new Index.Builder(constructJSON())
             .index("installs")

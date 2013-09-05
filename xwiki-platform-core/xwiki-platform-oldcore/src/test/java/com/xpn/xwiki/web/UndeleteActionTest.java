@@ -102,7 +102,7 @@ public class UndeleteActionTest
 
         assertFalse(undeleteAction.action(context));
 
-        verify(context.getWiki()).saveDocument(restoredDocument, "restored from recycle bin", context);
+        verify(context.getWiki()).saveDocument(restoredDocument, "Restored from recycle bin", context);
         verify(context.getWiki().getRecycleBinStore()).deleteFromRecycleBin(context.getDoc(), 13, context, true);
     }
 }

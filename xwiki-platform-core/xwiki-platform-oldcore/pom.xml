@@ -193,6 +193,13 @@
       <artifactId>hibernate-validator</artifactId>
       <version>4.3.0.Final</version>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- Already part of Java SE 6 -->
+      	<exclusion>
+      	  <artifactId>validation-api</artifactId>
+      	  <groupId>javax.validation</groupId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javassist</groupId>

@@ -60,9 +60,15 @@
       <artifactId>org.restlet.ext.jaxrs</artifactId>
       <version>${restlet.version}</version>
       <exclusions>
+        <!-- Already part of Java SE 6 -->
         <exclusion>
           <artifactId>jaxb-api</artifactId>
           <groupId>javax.xml.bind</groupId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
         </exclusion>
       </exclusions>
     </dependency>

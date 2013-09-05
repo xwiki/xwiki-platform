@@ -273,11 +273,11 @@
 #else
   #xwikitopmenuentrystart($xwiki.getURL($doc.documentReference, 'view') "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' 'hasIcon')
   #if ($canWatch)
-    #set ($watchClasses = 'hasIcon')
-    #set ($unwatchClasses = 'hasIcon hidden')
+   #set ($watchClasses = '')
+    #set ($unwatchClasses = 'hidden')
     #if ($xwiki.watchlist.isDocumentWatched())
-      #set ($watchClasses = 'hasIcon hidden')
-      #set ($unwatchClasses = 'hasIcon')
+      #set ($watchClasses = 'hidden')
+      #set ($unwatchClasses = '')
     #end
     #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses)
     #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses)

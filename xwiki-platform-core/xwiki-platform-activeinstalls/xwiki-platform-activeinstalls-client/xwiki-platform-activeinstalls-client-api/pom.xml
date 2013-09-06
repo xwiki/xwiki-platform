@@ -33,6 +33,9 @@
   <name>XWiki Platform - Active Installs - Client - API</name>
   <packaging>jar</packaging>
   <description>API to store instance UUID and send regular pings notifying that the instance is alive</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

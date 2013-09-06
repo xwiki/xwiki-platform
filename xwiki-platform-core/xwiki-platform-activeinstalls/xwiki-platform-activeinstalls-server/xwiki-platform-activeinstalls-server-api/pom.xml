@@ -33,6 +33,9 @@
   <name>XWiki Platform - Active Installs - Server - API</name>
   <packaging>jar</packaging>
   <description>API to retrieve Active Installs ping data</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

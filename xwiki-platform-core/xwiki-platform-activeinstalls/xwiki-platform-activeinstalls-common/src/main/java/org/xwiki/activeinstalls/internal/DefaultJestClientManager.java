@@ -33,6 +33,13 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.ClientConfig;
 
+/**
+ * Factory to get a singleton {@link JestClient} instance since it's threadsafe. The URL to connect to is defined in
+ * the Active Install configuration.
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Component
 @Singleton
 public class DefaultJestClientManager implements JestClientManager, Initializable, Disposable
@@ -40,6 +47,9 @@ public class DefaultJestClientManager implements JestClientManager, Initializabl
     @Inject
     private ActiveInstallsConfiguration configuration;
 
+    /**
+     * The Jest Client singleton instance to use to connect to the remote instance.
+     */
     private JestClient client;
 
     @Override

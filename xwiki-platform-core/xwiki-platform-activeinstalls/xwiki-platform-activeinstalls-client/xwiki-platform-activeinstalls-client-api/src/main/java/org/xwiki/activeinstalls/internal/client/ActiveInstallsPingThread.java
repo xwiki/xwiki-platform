@@ -53,7 +53,7 @@ public class ActiveInstallsPingThread extends Thread
     /**
      * Once every 24 hours.
      */
-    private static final long WAIT_TIME = 1000L*60L*60L*24L;
+    private static final long WAIT_TIME = 1000L * 60L * 60L * 24L;
 
     private static final String LATEST_FORMAT_VERSION = "1.0";
 
@@ -87,7 +87,7 @@ public class ActiveInstallsPingThread extends Thread
                 // sleep.
                 LOGGER.warn(
                     "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
-                    this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCause(e), WAIT_TIME/1000);
+                    this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCause(e), WAIT_TIME / 1000);
             }
             try {
                 Thread.sleep(WAIT_TIME);

@@ -66,6 +66,6 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     @Override
     public int getActivityThreshold()
     {
-        return this.configuration.getProperty(PREFIX + "activityThreshold",DEFAULT_ACTIVITY_THRESHOLD);
+        return this.configuration.getProperty(PREFIX + "activityThreshold", DEFAULT_ACTIVITY_THRESHOLD);
     }
 }

@@ -24,9 +24,18 @@ import org.xwiki.stability.Unstable;
 
 import io.searchbox.client.JestClient;
 
+/**
+ * Factory to get the {@link JestClient} instance to connect to the remote instance.
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Role
 @Unstable
 public interface JestClientManager
 {
+    /**
+     * @return the object to use to connect to the remote instance
+     */
     JestClient getClient();
 }

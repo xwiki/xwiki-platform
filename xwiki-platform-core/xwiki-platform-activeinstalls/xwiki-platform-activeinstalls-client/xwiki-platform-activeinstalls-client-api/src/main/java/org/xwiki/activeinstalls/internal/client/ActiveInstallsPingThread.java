@@ -19,24 +19,10 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
-import org.xwiki.activeinstalls.internal.JestClientManager;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.instance.InstanceId;
-
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Index;
 
 /**
  * Thread that regularly sends information about the current instance (its unique id + the id and versions of all
@@ -55,25 +41,14 @@ public class ActiveInstallsPingThread extends Thread
      */
     private static final long WAIT_TIME = 1000L * 60L * 60L * 24L;
 
-    private static final String LATEST_FORMAT_VERSION = "1.0";
-
-    private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
-
-    private InstanceId instanceId;
-
-    private InstalledExtensionRepository extensionRepository;
+    private PingSender manager;
 
     private ActiveInstallsConfiguration configuration;
 
-    private JestClientManager jestClientManager;
-
-    public ActiveInstallsPingThread(InstanceId instanceId, ActiveInstallsConfiguration configuration,
-        InstalledExtensionRepository extensionRepository, JestClientManager jestClientManager)
+    public ActiveInstallsPingThread(ActiveInstallsConfiguration configuration, PingSender manager)
     {
-        this.instanceId = instanceId;
-        this.extensionRepository = extensionRepository;
         this.configuration = configuration;
-        this.jestClientManager = jestClientManager;
+        this.manager = manager;
     }
 
     @Override
@@ -81,13 +56,13 @@ public class ActiveInstallsPingThread extends Thread
     {
         while (true) {
             try {
-                sendPing();
+                this.manager.sendPing();
             } catch (Exception e) {
                 // Failed to connect or send the ping to the remote Elastic Search instance, will try again after the
                 // sleep.
                 LOGGER.warn(
                     "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
-                    this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCause(e), WAIT_TIME / 1000);
+                    this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCauseMessage(e), WAIT_TIME / 1000);
             }
             try {
                 Thread.sleep(WAIT_TIME);
@@ -95,45 +70,5 @@ public class ActiveInstallsPingThread extends Thread
                 break;
             }
         }
-    }
-
-    protected void sendPing() throws Exception
-    {
-        Index index = new Index.Builder(constructJSON())
-            .index("installs")
-            .type("install")
-            .id(this.instanceId.toString())
-            .build();
-        JestResult result = this.jestClientManager.getClient().execute(index);
-        if (!result.isSucceeded()) {
-            throw new Exception(result.getErrorMessage());
-        }
-    }
-
-    private String constructJSON()
-    {
-        StringBuffer source = new StringBuffer();
-        source.append('{');
-        source.append("\"formatVersion\" : \"" + LATEST_FORMAT_VERSION + "\",");
-        source.append("\"date\" : \"" + DATE_FORMATTER.print(new Date().getTime()) + "\",");
-        source.append("\"extensions\" : [");
-
-        Collection<InstalledExtension> installedExtensions = this.extensionRepository.getInstalledExtensions();
-        Iterator<InstalledExtension> it = installedExtensions.iterator();
-        while (it.hasNext()) {
-            InstalledExtension extension = it.next();
-            source.append('{');
-            source.append("\"id\" : \"" + extension.getId().getId() + "\",");
-            source.append("\"version\" : \"" + extension.getId().getVersion().toString() + "\"");
-            source.append('}');
-            if (it.hasNext()) {
-                source.append(',');
-            }
-        }
-
-        source.append(']');
-        source.append('}');
-
-        return source.toString();
     }
 }

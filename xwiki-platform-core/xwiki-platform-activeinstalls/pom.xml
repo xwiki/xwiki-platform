@@ -39,4 +39,12 @@
     <module>xwiki-platform-activeinstalls-common</module>
     <module>xwiki-platform-activeinstalls-server</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-activeinstalls-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

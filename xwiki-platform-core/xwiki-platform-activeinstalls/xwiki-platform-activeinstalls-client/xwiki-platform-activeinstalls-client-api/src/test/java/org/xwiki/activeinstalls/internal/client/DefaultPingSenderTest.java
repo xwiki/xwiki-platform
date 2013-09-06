@@ -24,13 +24,13 @@ import java.util.UUID;
 
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
-import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.instance.InstanceId;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.instance.InstanceIdManager;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import io.searchbox.Action;
 import io.searchbox.client.JestClient;
@@ -43,27 +43,29 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link ActiveInstallsPingThread}.
+ * Unit tests for {@link DefaultPingSender}.
  *
  * @version $Id$
  * @since 5.2M2
  */
-public class ActiveInstallsPingThreadTest
+public class DefaultPingSenderTest
 {
     @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    public MockitoComponentMockingRule<DefaultPingSender> mocker =
+        new MockitoComponentMockingRule<DefaultPingSender>(DefaultPingSender.class);
 
     @Test
     public void sendPing() throws Exception
     {
         InstanceId id = new InstanceId(UUID.randomUUID().toString());
-        ActiveInstallsConfiguration configuration = mock(ActiveInstallsConfiguration.class);
+        InstanceIdManager idManager = this.mocker.getInstance(InstanceIdManager.class);
+        when(idManager.getInstanceId()).thenReturn(id);
 
         ExtensionId extensionId = new ExtensionId("extensionid", "1.0");
         InstalledExtension extension = mock(InstalledExtension.class);
         when(extension.getId()).thenReturn(extensionId);
 
-        InstalledExtensionRepository repository = mock(InstalledExtensionRepository.class);
+        InstalledExtensionRepository repository = this.mocker.getInstance(InstalledExtensionRepository.class);
         when(repository.getInstalledExtensions()).thenReturn(Collections.singletonList(extension));
 
         JestClient client = mock(JestClient.class);
@@ -71,11 +73,10 @@ public class ActiveInstallsPingThreadTest
         result.setSucceeded(true);
         when(client.execute(any(Action.class))).thenReturn(result);
 
-        JestClientManager jestManager = mock(JestClientManager.class);
+        JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(client);
 
-        ActiveInstallsPingThread thread = new ActiveInstallsPingThread(id, configuration, repository, jestManager);
-        thread.sendPing();
+        this.mocker.getComponentUnderTest().sendPing();
 
         // Real test is here, we verify the data sent to the server.
         ArgumentCaptor<Index> index = ArgumentCaptor.forClass(Index.class);

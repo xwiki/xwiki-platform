@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,22 +18,34 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-activeinstalls</artifactId>
-    <version>5.2-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-activeinstalls-server</artifactId>
-  <name>XWiki Platform - Active Installs - Server - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Server part of the Active Installs modules</description>
-  <modules>
-    <module>xwiki-platform-activeinstalls-server-api</module>
-    <module>xwiki-platform-activeinstalls-server-ui</module>
-  </modules>
-</project>
+<xwikidoc>
+  <web>ActiveInstalls</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1378460829000</creationDate>
+  <date>1378460921000</date>
+  <contentUpdateDate>1378460905000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWiki Installations Statistics</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
+; Total number of XWiki installations
+: $services.activeinstalls.totalInstalls
+; Active XWiki installations (i.e. we've received a ping in the past month)
+: $services.activeinstalls.activeInstalls
+{{/velocity}}</content>
+</xwikidoc>

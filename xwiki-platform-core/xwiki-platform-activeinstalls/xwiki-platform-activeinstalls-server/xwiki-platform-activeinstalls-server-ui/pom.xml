@@ -26,15 +26,30 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-activeinstalls</artifactId>
+    <artifactId>xwiki-platform-activeinstalls-server</artifactId>
     <version>5.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-activeinstalls-server</artifactId>
-  <name>XWiki Platform - Active Installs - Server - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Server part of the Active Installs modules</description>
-  <modules>
-    <module>xwiki-platform-activeinstalls-server-api</module>
-    <module>xwiki-platform-activeinstalls-server-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-activeinstalls-server-ui</artifactId>
+  <name>XWiki Platform - Active Installs - Server - UI</name>
+  <packaging>xar</packaging>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Active Installs Application</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-activeinstalls-server-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

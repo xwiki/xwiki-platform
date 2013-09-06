@@ -1,1 +1,2 @@
 org.xwiki.activeinstalls.internal.client.ActiveInstallsInitializerListener
+org.xwiki.activeinstalls.internal.client.DefaultPingSender

@@ -29,10 +29,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
-import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -48,16 +46,13 @@ public class ActiveInstallsInitializerListener implements EventListener
     private static final List<Event> EVENTS = new ArrayList<Event>(Arrays.asList(new ApplicationReadyEvent()));
 
     @Inject
-    private Provider<InstanceIdManager> managerProvider;
+    private Provider<InstanceIdManager> instanceIdManagerProvider;
 
     @Inject
-    private InstalledExtensionRepository extensionRepository;
+    private Provider<PingSender> pingSenderProvider;
 
     @Inject
     private ActiveInstallsConfiguration configuration;
-
-    @Inject
-    private JestClientManager jestClientManager;
 
     @Override
     public List<Event> getEvents()
@@ -76,13 +71,10 @@ public class ActiveInstallsInitializerListener implements EventListener
     {
         // Ensure that the instance id is initialized and available.
         // TODO: In the future introduce an EventListener in the instance module and have this listener execute *after*
-        // it.
-        InstanceIdManager idManager = this.managerProvider.get();
-        idManager.initializeInstanceId();
+        this.instanceIdManagerProvider.get().initializeInstanceId();
 
         // Start a thread to regularly send pings to the active installs server.
-        Thread pingThread = new ActiveInstallsPingThread(idManager.getInstanceId(), this.configuration,
-            this.extensionRepository, this.jestClientManager);
+        Thread pingThread = new ActiveInstallsPingThread(this.configuration, this.pingSenderProvider.get());
         pingThread.setName("Active Installs Ping Thread");
         pingThread.start();
     }

@@ -34,10 +34,19 @@ import org.xwiki.component.annotation.Component;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 
+/**
+ * Get stored ping data from a remote Elastic Search instance.
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Component
 @Singleton
 public class DefaultDataManager implements DataManager
 {
+    /**
+     * Formatter to format dates in a standard format.
+     */
     private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
     @Inject

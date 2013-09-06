@@ -35,6 +35,12 @@ import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+/**
+ * Used to trigger a Thread to periodically send a ping to the remote instance that stores it.
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Component
 @Singleton
 @Named("ActiveInstallsInitializerListener")
@@ -45,12 +51,32 @@ public class ActiveInstallsInitializerListener implements EventListener
      */
     private static final List<Event> EVENTS = new ArrayList<Event>(Arrays.asList(new ApplicationReadyEvent()));
 
+    /**
+     * Used to initialize the unique XWiki instance id (to be removed in the future, see the source documentation
+     * below).
+     * <p/>
+     * Note that we use a Provider since the Observation Manager will register listeners very early in the
+     * initialization process and some of the components injected transitively by the {@link InstanceIdManager}
+     * implementation have initialization code that require an Execution Context to be available, which is not the case
+     * early one in XWiki's initialization since no HTTP request has been made yet...
+     */
     @Inject
     private Provider<InstanceIdManager> instanceIdManagerProvider;
 
+    /**
+     * Used to send the ping to the remote instance.
+     * <p/>
+     * Note that we use a Provider since the Observation Manager will register listeners very early in the
+     * initialization process and some of the components injected transitively by the {@link InstanceIdManager}
+     * implementation have initialization code that require an Execution Context to be available, which is not the case
+     * early one in XWiki's initialization since no HTTP request has been made yet...
+     */
     @Inject
     private Provider<PingSender> pingSenderProvider;
 
+    /**
+     * Used to display the remote URL being hit in the logs if the ping fails...
+     */
     @Inject
     private ActiveInstallsConfiguration configuration;
 

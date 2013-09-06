@@ -34,6 +34,9 @@ import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
  */
 public class ActiveInstallsPingThread extends Thread
 {
+    /**
+     * The logger to use when logging in this class.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(ActiveInstallsPingThread.class);
 
     /**
@@ -41,10 +44,20 @@ public class ActiveInstallsPingThread extends Thread
      */
     private static final long WAIT_TIME = 1000L * 60L * 60L * 24L;
 
+    /**
+     * @see #ActiveInstallsPingThread(org.xwiki.activeinstalls.ActiveInstallsConfiguration, PingSender)
+     */
     private PingSender manager;
 
+    /**
+     * @see #ActiveInstallsPingThread(org.xwiki.activeinstalls.ActiveInstallsConfiguration, PingSender)
+     */
     private ActiveInstallsConfiguration configuration;
 
+    /**
+     * @param configuration used to nicely display the ping URL in logs if there's an error...
+     * @param manager used to send the ping to the remote instance
+     */
     public ActiveInstallsPingThread(ActiveInstallsConfiguration configuration, PingSender manager)
     {
         this.configuration = configuration;

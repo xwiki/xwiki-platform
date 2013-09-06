@@ -22,11 +22,26 @@ package org.xwiki.activeinstalls.server;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
+/**
+ * Provides access to stored ping data.
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Role
 @Unstable
 public interface DataManager
 {
+    /**
+     * @return the total number of XWiki installs (active or not)
+     * @throws Exception when an error happens while retrieving the data
+     */
     long getTotalInstalls() throws Exception;
 
+    /**
+     * @return the total number of active installs (i.e. we've received a ping from them in the past N months - defined
+     *         in the Active Installs module configuration)
+     * @throws Exception when an error happens while retrieving the data
+     */
     long getActiveInstalls() throws Exception;
 }

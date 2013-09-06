@@ -21,7 +21,9 @@ package org.xwiki.activeinstalls.internal.client;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,13 +39,27 @@ import org.xwiki.instance.InstanceIdManager;
 
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Index;
+import net.sf.json.JSONObject;
 
+/**
+ * Default implementation using the Jest API to connect to a remote Elastic Search instance.
+ *
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Component
 @Singleton
 public class DefaultPingSender implements PingSender
 {
+    /**
+     * The version of the JSON format used to send the ping data. This will allow us to modify the data we send and
+     * still have the server part be able to parse the results depending on the format used by the client side.
+     */
     private static final String LATEST_FORMAT_VERSION = "1.0";
 
+    /**
+     * Formatter to format dates in a standard format.
+     */
     private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
     @Inject
@@ -71,28 +87,24 @@ public class DefaultPingSender implements PingSender
 
     private String constructJSON()
     {
-        StringBuffer source = new StringBuffer();
-        source.append('{');
-        source.append("\"formatVersion\" : \"" + LATEST_FORMAT_VERSION + "\",");
-        source.append("\"date\" : \"" + DATE_FORMATTER.print(new Date().getTime()) + "\",");
-        source.append("\"extensions\" : [");
+        Map jsonMap = new HashMap();
+        jsonMap.put("formatVersion", LATEST_FORMAT_VERSION);
+        jsonMap.put("date", DATE_FORMATTER.print(new Date().getTime()));
 
         Collection<InstalledExtension> installedExtensions = this.extensionRepository.getInstalledExtensions();
+        JSONObject[] extensions = new JSONObject[installedExtensions.size()];
         Iterator<InstalledExtension> it = installedExtensions.iterator();
+        int i = 0;
         while (it.hasNext()) {
             InstalledExtension extension = it.next();
-            source.append('{');
-            source.append("\"id\" : \"" + extension.getId().getId() + "\",");
-            source.append("\"version\" : \"" + extension.getId().getVersion().toString() + "\"");
-            source.append('}');
-            if (it.hasNext()) {
-                source.append(',');
-            }
+            Map extensionMap = new HashMap();
+            extensionMap.put("id", extension.getId().getId());
+            extensionMap.put("version", extension.getId().getVersion().toString());
+            extensions[i] = JSONObject.fromObject(extensionMap);
+            i++;
         }
+        jsonMap.put("extensions", extensions);
 
-        source.append(']');
-        source.append('}');
-
-        return source.toString();
+        return JSONObject.fromObject(jsonMap).toString();
     }
 }

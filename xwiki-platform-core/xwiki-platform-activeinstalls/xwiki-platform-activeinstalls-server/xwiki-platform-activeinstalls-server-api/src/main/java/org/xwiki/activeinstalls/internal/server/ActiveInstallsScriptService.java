@@ -50,9 +50,18 @@ public class ActiveInstallsScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    /**
+     * Used to retrieve the data.
+     */
     @Inject
     private DataManager dataManager;
 
+    /**
+     * See {@link org.xwiki.activeinstalls.server.DataManager#getTotalInstalls()}.
+     *
+     * @return the total number of XWiki installs (active or not) or -1 if an error happened, in which case the error
+     *         can be retrieved with {@link #getLastError()}.
+     */
     public long getTotalInstalls()
     {
         setError(null);
@@ -68,6 +77,13 @@ public class ActiveInstallsScriptService implements ScriptService
         return result;
     }
 
+    /**
+     * See {@link org.xwiki.activeinstalls.server.DataManager#getActiveInstalls()}.
+     *
+     * @return the total number of active installs (i.e. we've received a ping from them in the past N months - defined
+     *         in the Active Installs module configuration) or -1 if an error happened, in which case the error
+     *         can be retrieved with {@link #getLastError()}.
+     */
     public long getActiveInstalls()
     {
         setError(null);

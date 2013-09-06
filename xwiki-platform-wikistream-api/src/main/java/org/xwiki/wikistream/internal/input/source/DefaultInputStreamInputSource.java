@@ -41,7 +41,7 @@ public class DefaultInputStreamInputSource implements InputStreamInputSource
     @Override
     public void close() throws IOException
     {
-        this.inputStream.close();
+        // Closing the stream is the responsibility of the caller
     }
 
     @Override

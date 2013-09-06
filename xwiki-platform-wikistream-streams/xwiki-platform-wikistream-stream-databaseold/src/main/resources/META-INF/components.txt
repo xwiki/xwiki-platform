@@ -1,0 +1,2 @@
+org.xwiki.wikistream.databaseold.internal.input.DatabaseInputWikiStreamFactory
+org.xwiki.wikistream.databaseold.internal.output.DatabaseOutputWikiStreamFactory

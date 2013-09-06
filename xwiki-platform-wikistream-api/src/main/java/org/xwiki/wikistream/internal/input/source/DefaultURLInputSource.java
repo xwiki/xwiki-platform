@@ -25,7 +25,7 @@ import java.net.URL;
 
 import org.xwiki.wikistream.input.source.URLInputSource;
 
-public class DefaultURLInputSource extends AbstractInputStreamInputSourceInputSource implements URLInputSource
+public class DefaultURLInputSource extends AbstractInputStreamInputSource implements URLInputSource
 {
     private final URL url;
 

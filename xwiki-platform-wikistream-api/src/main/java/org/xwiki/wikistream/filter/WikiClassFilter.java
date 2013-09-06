@@ -19,8 +19,7 @@
  */
 package org.xwiki.wikistream.filter;
 
-import java.util.Map;
-
+import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.annotation.Default;
 import org.xwiki.filter.annotation.Name;
 import org.xwiki.stability.Unstable;
@@ -34,7 +33,25 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiClassFilter
 {
-    void beginWikiClass(@Default("") @Name("properties") Map<String, Object> properties) throws WikiStreamException;
+    public static final String PARAMETER_CUSTOMCLASS = "class_customclass";
 
-    void endWikiClass(@Default("") @Name("properties") Map<String, Object> properties) throws WikiStreamException;
+    public static final String PARAMETER_CUSTOMMAPPING = "class_custommapping";
+
+    public static final String PARAMETER_SHEET_DEFAULTVIEW = "class_sheet_defaultview";
+
+    public static final String PARAMETER_SHEET_DEFAULTEDIT = "class_sheet_defaultedit";
+
+    public static final String PARAMETER_DEFAULTSPACE = "class_defaultspace";
+
+    public static final String PARAMETER_NAMEFIELD = "class_namefield";
+
+    public static final String PARAMETER_VALIDATIONSCRIPT = "class_validationscript";
+
+    void beginWikiClass(
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
+
+    void endWikiClass(
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
 }

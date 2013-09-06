@@ -20,8 +20,8 @@
 package org.xwiki.wikistream.filter;
 
 import java.util.Locale;
-import java.util.Map;
 
+import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.annotation.Default;
 import org.xwiki.filter.annotation.Name;
 import org.xwiki.stability.Unstable;
@@ -40,128 +40,139 @@ public interface WikiDocumentFilter
     /**
      * @type String
      */
-    String PROPERTY_SPACE = "document.space";
+    String PARAMETER_SPACE = "space";
 
     /**
      * @type String
      */
-    String PROPERTY_NAME = "document.name";
+    String PARAMETER_NAME = "document_name";
+
+    /**
+     * @type Syntax
+     */
+    String PARAMETER_SYNTAX = "document_syntax";
 
     /**
      * @type String
      */
-    String PROPERTY_PARENT = "document.parentreference";
+    String PARAMETER_PARENT = "document_parent_reference";
 
     /**
      * @type String
      */
-    String PROPERTY_TITLE = "document.title";
+    String PARAMETER_TITLE = "document_title";
 
     /**
      * @type Boolean
      */
-    String PROPERTY_HIDDEN = "document.hidden";
+    String PARAMETER_HIDDEN = "document_hidden";
 
     /**
      * @type String
      */
-    String PROPERTY_CUSTOMCLASS = "document.customclass";
+    String PARAMETER_CUSTOMCLASS = "document_customclass";
 
     /**
      * @type String
      */
-    String PROPERTY_DEFAULTTEMPLATE = "document.defaulttemplate";
+    String PARAMETER_DEFAULTTEMPLATE = "document_defaulttemplate";
 
     /**
      * @type String
      */
-    String PROPERTY_VALIDATIONSCRIPT = "document.validationscript";
+    String PARAMETER_VALIDATIONSCRIPT = "document_validationscript";
 
     // content
 
     /**
      * @type String
      */
-    String PROPERTY_CONTENT = "document.content";
-
-    /**
-     * @type Syntax
-     */
-    String PROPERTY_CONTENT_SYNTAX = "document.content.syntax";
+    String PARAMETER_CONTENT = "document_content";
 
     /**
      * @type String
      */
-    String PROPERTY_CONTENT_AUTHOR = "document.content.author";
+    String PARAMETER_CONTENT_HTML = "document_content_html";
+
+    /**
+     * @type String
+     */
+    String PARAMETER_CONTENT_AUTHOR = "document_content_author";
 
     /**
      * @type Date
      */
-    String PROPERTY_CONTENT_DATE = "document.content.date";
+    String PARAMETER_CONTENT_DATE = "document_content_date";
 
     // creation
 
     /**
      * @type String
      */
-    String PROPERTY_CREATION_AUTHOR = "document.creation.creator";
+    String PARAMETER_CREATION_AUTHOR = "document_creation_author";
 
     /**
      * @type Date
      */
-    String PROPERTY_CREATION_DATE = "document.creation.date";
+    String PARAMETER_CREATION_DATE = "document_creation_date";
 
     // locale
 
     /**
      * @type Locale
      */
-    String PROPERTY_LOCALE = "document.locale";
+    String PARAMETER_LOCALE = "document_locale";
 
     // revision
 
     /**
      * @type String
      */
-    String PROPERTY_REVISION = "document.revision";
+    String PARAMETER_REVISION = "document_revision";
 
     /**
      * @type Date
      */
-    String PROPERTY_REVISION_DATE = "document.revision.date";
+    String PARAMETER_REVISION_DATE = "document_revision_date";
 
     /**
      * @type String
      */
-    String PROPERTY_REVISION_AUTHOR = "document.revision.author";
+    String PARAMETER_REVISION_AUTHOR = "document_revision_author";
 
     /**
      * @type String
      */
-    String PROPERTY_REVISION_COMMENT = "document.revision.comment";
+    String PARAMETER_REVISION_COMMENT = "document_revision_comment";
 
     /**
      * @type Boolean
      */
-    String PROPERTY_REVISION_MINOR = "document.revision.minor";
+    String PARAMETER_REVISION_MINOR = "document_revision_minor";
 
     // Events
 
-    void beginWikiDocument(@Name("name") String name, @Default("") @Name("properties") Map<String, Object> properties)
+    void beginWikiDocument(@Name("name") String name,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
-    void endWikiDocument(@Name("name") String name, @Default("") @Name("properties") Map<String, Object> properties)
+    void endWikiDocument(@Name("name") String name,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
-    void beginWikiDocumentLocale(@Name("locale") Locale locale,
-        @Default("") @Name("properties") Map<String, Object> properties) throws WikiStreamException;
+    void beginWikiDocumentLocale(@Default("") @Name("locale") Locale locale,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
 
-    void endWikiDocumentLocale(@Name("locale") Locale locale,
-        @Default("") @Name("properties") Map<String, Object> properties) throws WikiStreamException;
+    void endWikiDocumentLocale(@Default("") @Name("locale") Locale locale,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
 
     void beginWikiDocumentRevision(@Name("version") String version,
-        @Default("") @Name("properties") Map<String, Object> properties) throws WikiStreamException;
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
 
     void endWikiDocumentRevision(@Name("version") String version,
-        @Default("") @Name("properties") Map<String, Object> properties) throws WikiStreamException;
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
 }

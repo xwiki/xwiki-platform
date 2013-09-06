@@ -36,8 +36,13 @@
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-filter-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-transformation-macro</artifactId>
+      <artifactId>xwiki-rendering-api</artifactId>
       <version>${rendering.version}</version>
     </dependency>
 

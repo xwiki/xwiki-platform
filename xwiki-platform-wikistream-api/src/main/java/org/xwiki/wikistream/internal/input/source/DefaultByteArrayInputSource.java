@@ -27,7 +27,7 @@ import java.io.InputStream;
 import org.xwiki.wikistream.input.source.FileInputSource;
 import org.xwiki.wikistream.input.source.InputStreamInputSource;
 
-public class DefaultByteArrayInputSource extends AbstractInputStreamInputSourceInputSource implements FileInputSource, InputStreamInputSource
+public class DefaultByteArrayInputSource extends AbstractInputStreamInputSource implements FileInputSource, InputStreamInputSource
 {
     private final File file;
 

@@ -31,21 +31,20 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class WikiStreamType
 {
-    public static final WikiStreamType MEDIAWIKI_XML = new WikiStreamType(WikiType.MEDIAWIKI, "XML");
-
-    public static final WikiStreamType CONFLUENCE_XML = new WikiStreamType(WikiType.CONFLUENCE, "XML");
-
-    public static final WikiStreamType XWIKI_XAR = new WikiStreamType(WikiType.XWIKI, "XAR");
+    /**
+     * Generic WIKI XML Syntax.
+     */
+    public static final WikiStreamType WIKI_XML = new WikiStreamType(WikiType.WIKI, "xml");
 
     /**
-     * Generic WIKI XML Syntax
+     * The XAR format.
      */
-    public static final WikiStreamType WIKI_XML = new WikiStreamType(WikiType.WIKI, "XML");
+    public static final WikiStreamType XWIKI_XAR = new WikiStreamType(WikiType.XWIKI, "xar", "1.0");
 
     /**
-     * The XAR format
+     * The database stream based on oldcore APIs.
      */
-    public static final WikiStreamType XAR = new WikiStreamType(WikiType.XWIKI, "XAR", "version");
+    public static final WikiStreamType XWIKI_DATABASEOLD = new WikiStreamType(WikiType.XWIKI, "databaseold");
 
     /**
      * Wiki type.
@@ -68,8 +67,7 @@ public class WikiStreamType
      */
     public WikiStreamType(WikiType type, String dataFormat)
     {
-        this.type = type;
-        this.dataFormat = dataFormat;
+        this(type, dataFormat, null);
     }
 
     /**
@@ -80,7 +78,7 @@ public class WikiStreamType
     public WikiStreamType(WikiType type, String dataFormat, String version)
     {
         this.type = type;
-        this.dataFormat = dataFormat;
+        this.dataFormat = dataFormat != null ? dataFormat.toLowerCase() : null;
         this.version = version;
     }
 
@@ -108,15 +106,64 @@ public class WikiStreamType
         return this.version;
     }
 
-    public String toIdString()
+    public String serialize()
     {
-        return getType().getId() + '+' + getDataFormat().toLowerCase() + '/' + getVersion();
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(getType().serialize());
+        builder.append('+');
+        builder.append(getDataFormat());
+        if (getVersion() != null) {
+            builder.append('/');
+            builder.append(getVersion());
+        }
+
+        return builder.toString();
+    }
+
+    public static WikiStreamType unserialize(String str)
+    {
+        if (str == null) {
+            return null;
+        }
+
+        String wikiType = str;
+        String data = null;
+        String version = null;
+
+        // Version
+
+        int versionIndex = str.lastIndexOf('/');
+
+        if (versionIndex == 0) {
+            throw new IllegalArgumentException("Invalid wiki sream type format: " + str);
+        }
+
+        if (versionIndex != -1) {
+            version = wikiType.substring(versionIndex + 1);
+            wikiType = wikiType.substring(0, versionIndex);
+        }
+
+        // Data
+
+        int dataIndex = str.indexOf('+');
+
+        if (dataIndex == 0) {
+            throw new IllegalArgumentException("Invalid wiki sream type format: " + str);
+        }
+
+        if (dataIndex != -1) {
+            data = wikiType.substring(dataIndex + 1);
+            wikiType = wikiType.substring(0, dataIndex);
+        }
+
+        return new WikiStreamType(WikiType.unserialize(wikiType), data, version);
     }
 
     @Override
     public String toString()
     {
-        return toIdString();
+        return serialize();
     }
 
     @Override

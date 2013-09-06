@@ -35,12 +35,18 @@ public class DefaultOutputStreamOutputTarget implements OutputStreamOutputTarget
 
     public OutputStream getOutputStream()
     {
-        return outputStream;
+        return this.outputStream;
     }
 
     @Override
     public void close() throws IOException
     {
-        this.outputStream.close();
+        // Closing the stream is the responsibility of the caller
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.outputStream.toString();
     }
 }

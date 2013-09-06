@@ -22,7 +22,7 @@ package org.xwiki.wikistream.interal.utils;
 import org.xwiki.filter.UnknownFilter;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.filter.AttachmentFilter;
+import org.xwiki.wikistream.filter.WikiAttachmentFilter;
 import org.xwiki.wikistream.filter.WikiClassFilter;
 import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
 import org.xwiki.wikistream.filter.WikiDocumentFilter;
@@ -33,7 +33,7 @@ import org.xwiki.wikistream.filter.WikiSpaceFilter;
 import org.xwiki.wikistream.filter.WikiFilter;
 
 @Unstable
-public interface AllFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter, AttachmentFilter, WikiClassFilter,
+public interface AllFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter, WikiAttachmentFilter, WikiClassFilter,
     WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter, UnknownFilter, Listener
 {
 

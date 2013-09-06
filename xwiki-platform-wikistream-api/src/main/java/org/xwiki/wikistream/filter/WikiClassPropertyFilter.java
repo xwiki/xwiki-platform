@@ -19,8 +19,7 @@
  */
 package org.xwiki.wikistream.filter;
 
-import java.util.Map;
-
+import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.annotation.Default;
 import org.xwiki.filter.annotation.Name;
 import org.xwiki.stability.Unstable;
@@ -34,9 +33,16 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiClassPropertyFilter
 {
-    void beginWikiClassProperty(@Name("name") String propertyName, @Default("") @Name("properties") Map<String, Object> properties)
+    /**
+     * @type Map<String, String>
+     */
+    public static final String PARAMETER_FIELDS = "classproperty_fields";
+
+    void beginWikiClassProperty(@Name("name") String name, @Name("type") String type,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
-    void endWikiClassProperty(@Name("name") String propertyName, @Default("") @Name("properties") Map<String, Object> properties)
+    void endWikiClassProperty(@Name("name") String name, @Name("type") String type,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 }

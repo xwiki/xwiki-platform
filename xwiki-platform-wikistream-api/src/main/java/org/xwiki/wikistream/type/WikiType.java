@@ -30,35 +30,34 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class WikiType
 {
-    public static final WikiType MEDIAWIKI = new WikiType("mediawiki", "MediaWiki");
+    public static final WikiType MEDIAWIKI = new WikiType("mediawiki");
 
-    public static final WikiType CONFLUENCE = new WikiType("confluence", "Confluence");
+    public static final WikiType CONFLUENCE = new WikiType("confluence");
 
-    public static final WikiType XWIKI = new WikiType("xwiki", "XWiki");
+    public static final WikiType XWIKI = new WikiType("xwiki");
 
     /**
      * Generic WIKI.
      */
-    public static final WikiType WIKI = new WikiType("wiki", "Wiki");
+    public static final WikiType WIKI = new WikiType("wiki");
 
     /**
-     * Id of a Wiki
+     * Id of a Wiki.
      */
     private String id;
 
-    /**
-     * Name of a Wiki
-     */
-    private String name;
+    public static WikiType unserialize(String str)
+    {
+        return new WikiType(str);
+    }
 
     /**
      * @param id of a wiki
      * @param name of a wiki
      */
-    public WikiType(String id, String name)
+    public WikiType(String id)
     {
-        this.id = id;
-        this.name = name;
+        this.id = id.toLowerCase();
     }
 
     /**
@@ -66,21 +65,18 @@ public class WikiType
      */
     public String getId()
     {
-        return id;
+        return this.id;
     }
 
-    /**
-     * @return name of the wiki
-     */
-    public String getName()
+    public String serialize()
     {
-        return name;
+        return getId();
     }
 
     @Override
     public String toString()
     {
-        return this.name;
+        return serialize();
     }
 
     @Override

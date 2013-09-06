@@ -56,11 +56,21 @@ import static org.mockito.Mockito.when;
 public class SolrQueryExecutorTest
 {
 
-    private static final String MULTI_PARAM_NAME = "multiParam";
-    private static final String[] MULTI_PARAM_EXPECTED_VALUES = {"value1", "value2"};
+    private static final String   ITERABLE_PARAM_NAME = "multiParam";
+    private static final String[] ITERABLE_PARAM_EXPECTED = {"value1", "value2"};
+    private static final Iterable ITERABLE_PARAM_VALUE = Arrays.asList(ITERABLE_PARAM_EXPECTED);
+
+    private static final String   INT_ARR_PARAM_NAME = "intArrayParam";
+    private static final String[] INT_ARR_PARAM_EXPECTED = {"-42", "4711"};
+    private static final int[]    INT_ARR_PARAM_VALUE = {-42, 4711};
+
+    private static final String   STR_ARR_PARAM_NAME = "stringArrayParam";
+    private static final String[] STR_ARR_PARAM_EXPECTED = {"valueA", "valueB"};
+    private static final String[] STR_ARR_PARAM_VALUE = STR_ARR_PARAM_EXPECTED;
 
     private static final String SINGLE_PARAM_NAME = "singleParam";
-    private static final Object SINGLE_PARAM_EXPECTED_VALUE = new Object();
+    private static final Object SINGLE_PARAM_VALUE = new Object();
+    private static final Object SINGLE_PARAM_EXPECTED = SINGLE_PARAM_VALUE.toString();
 
     @Rule
     public final MockitoComponentMockingRule<QueryExecutor> componentManager =
@@ -83,8 +93,10 @@ public class SolrQueryExecutorTest
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 SolrQuery solrQuery = (SolrQuery) invocation.getArguments()[0];
 
-                Assert.assertArrayEquals(MULTI_PARAM_EXPECTED_VALUES, solrQuery.getParams(MULTI_PARAM_NAME));
-                Assert.assertEquals(SINGLE_PARAM_EXPECTED_VALUE.toString(), solrQuery.get(SINGLE_PARAM_NAME));
+                Assert.assertArrayEquals(ITERABLE_PARAM_EXPECTED, solrQuery.getParams(ITERABLE_PARAM_NAME));
+                Assert.assertArrayEquals(INT_ARR_PARAM_EXPECTED,  solrQuery.getParams(INT_ARR_PARAM_NAME));
+                Assert.assertArrayEquals(STR_ARR_PARAM_EXPECTED,  solrQuery.getParams(STR_ARR_PARAM_NAME));
+                Assert.assertEquals(SINGLE_PARAM_EXPECTED, solrQuery.get(SINGLE_PARAM_NAME));
 
                 QueryResponse r = mock(QueryResponse.class);
                 when(r.getResults()).thenReturn(new SolrDocumentList());
@@ -97,8 +109,10 @@ public class SolrQueryExecutorTest
         when(provider.get()).thenReturn(solr);
 
         DefaultQuery query = new DefaultQuery("TestQuery", null);
-        query.bindValue(MULTI_PARAM_NAME, Arrays.asList(MULTI_PARAM_EXPECTED_VALUES));
-        query.bindValue(SINGLE_PARAM_NAME, SINGLE_PARAM_EXPECTED_VALUE);
+        query.bindValue(ITERABLE_PARAM_NAME, ITERABLE_PARAM_VALUE);
+        query.bindValue(INT_ARR_PARAM_NAME,  INT_ARR_PARAM_VALUE);
+        query.bindValue(STR_ARR_PARAM_NAME,  STR_ARR_PARAM_VALUE);
+        query.bindValue(SINGLE_PARAM_NAME,   SINGLE_PARAM_VALUE);
 
         componentManager.getComponentUnderTest().execute(query);
     }

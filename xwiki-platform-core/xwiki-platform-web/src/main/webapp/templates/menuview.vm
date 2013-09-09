@@ -149,7 +149,7 @@
 ##
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 #set ($canDeleteWorkspace = $isWorkspaceManagerAppInstalled && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
-#set ($displayWorkspaceDirectoryMenuEntry = $isWorkspaceManagerAppInstalled && $isMainWikiUser && $xcontext.isMainWiki())
+#set ($displayWorkspaceDirectoryMenuEntry = $isWorkspaceManagerAppInstalled && $isMainWikiUser && $xcontext.isMainWiki() && $services.workspace.getWorkspaces().size()>1)
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $displayWorkspaceDirectoryMenuEntry || $canDeleteWorkspace)
 #set ($wikiEntryId = 'tmWiki')
 #if ($isWorkspaceManagerAppInstalled)

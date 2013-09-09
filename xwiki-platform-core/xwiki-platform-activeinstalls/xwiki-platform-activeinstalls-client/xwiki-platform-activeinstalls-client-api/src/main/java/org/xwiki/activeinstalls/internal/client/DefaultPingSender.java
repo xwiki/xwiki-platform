@@ -33,8 +33,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.version.Version;
 import org.xwiki.instance.InstanceIdManager;
 
 import io.searchbox.client.JestResult;
@@ -71,6 +74,9 @@ public class DefaultPingSender implements PingSender
     @Inject
     private InstanceIdManager instanceIdManager;
 
+    @Inject
+    private DistributionManager distributionManager;
+
     @Override
     public void sendPing() throws Exception
     {
@@ -90,6 +96,15 @@ public class DefaultPingSender implements PingSender
         Map jsonMap = new HashMap();
         jsonMap.put("formatVersion", LATEST_FORMAT_VERSION);
         jsonMap.put("date", DATE_FORMATTER.print(new Date().getTime()));
+
+        // Send distribution version if it exists (in case some distribution doesn't expose any information).
+        CoreExtension distributionExtension = this.distributionManager.getDistributionExtension();
+        if (distributionExtension != null) {
+            Version distributionVersion = distributionExtension.getId().getVersion();
+            if (distributionVersion != null) {
+                jsonMap.put("distributionVersion", distributionVersion.toString());
+            }
+        }
 
         Collection<InstalledExtension> installedExtensions = this.extensionRepository.getInstalledExtensions();
         JSONObject[] extensions = new JSONObject[installedExtensions.size()];

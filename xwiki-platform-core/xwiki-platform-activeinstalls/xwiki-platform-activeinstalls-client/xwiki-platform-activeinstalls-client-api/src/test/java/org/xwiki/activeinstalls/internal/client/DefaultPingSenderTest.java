@@ -25,8 +25,10 @@ import java.util.UUID;
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.activeinstalls.internal.JestClientManager;
+import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
@@ -76,6 +78,12 @@ public class DefaultPingSenderTest
         JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(client);
 
+        ExtensionId distributionExtensionId = new ExtensionId("distributionextensionid", "2.0");
+        CoreExtension distributionExtension = mock(CoreExtension.class);
+        when(distributionExtension.getId()).thenReturn(distributionExtensionId);
+        DistributionManager distributionManager = this.mocker.getInstance(DistributionManager.class);
+        when(distributionManager.getDistributionExtension()).thenReturn(distributionExtension);
+
         this.mocker.getComponentUnderTest().sendPing();
 
         // Real test is here, we verify the data sent to the server.
@@ -85,6 +93,7 @@ public class DefaultPingSenderTest
         JSONObject json = (JSONObject) JSONSerializer.toJSON(jsonString);
         assertEquals("1.0", json.getString("formatVersion"));
         assertNotNull(json.getString("date"));
+        assertEquals("2.0", json.getString("distributionVersion"));
         assertEquals(1, json.getJSONArray("extensions").size());
         assertEquals("{\"id\":\"extensionid\",\"version\":\"1.0\"}", json.getJSONArray("extensions").get(0).toString());
     }

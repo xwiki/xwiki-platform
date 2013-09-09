@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @version $Id: 7a2f45080656b544f3977e9d5bf67f1b3ca56ca4 $
+ * @version $Id$
  */
 public class TestResourceData
 {

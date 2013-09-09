@@ -43,7 +43,7 @@ import org.xwiki.wikistream.output.target.OutputTarget;
  * A generic JUnit Test used by {@link WikiStreamTestSuite} to parse some passed content and verify it matches some
  * passed expectation. The format of the input/expectation is specified in {@link TestDataParser}.
  * 
- * @version $Id: 531d234998099a58341b69312559ef42c372a962 $
+ * @version $Id$
  */
 public class WikiStreamTest
 {

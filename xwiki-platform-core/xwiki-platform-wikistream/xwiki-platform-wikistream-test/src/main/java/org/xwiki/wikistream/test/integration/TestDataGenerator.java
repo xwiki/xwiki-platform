@@ -37,7 +37,7 @@ import org.xwiki.wikistream.utils.WikiStreamConstants;
 /**
  * Finds all test files in the current classloader, read them and return test data to represent them.
  * 
- * @version $Id: b7274de59d9732f7ea2416213f8c619c6440f96d $
+ * @version $Id$
  */
 public class TestDataGenerator
 {

@@ -17,21 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml;
+package org.xwiki.wikistream.input;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.wikistream.test.integration.WikiStreamTestSuite;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.xwiki.stability.Unstable;
 
 /**
- * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
- * {@link org.xwiki.wikistream.test.integration.TestDataParser}.
  * 
  * @version $Id$
  * @since 5.2M2
  */
-@RunWith(WikiStreamTestSuite.class)
-@AllComponents
-public class IntegrationTests
+@Unstable
+public interface InputStreamInputSource extends InputSource
 {
+    InputStream getInputStream() throws IOException;
 }

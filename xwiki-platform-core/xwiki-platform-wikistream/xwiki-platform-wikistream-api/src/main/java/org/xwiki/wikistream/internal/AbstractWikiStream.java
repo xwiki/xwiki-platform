@@ -23,6 +23,11 @@ import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractWikiStream implements WikiStream
 {
     protected final WikiStreamType type;

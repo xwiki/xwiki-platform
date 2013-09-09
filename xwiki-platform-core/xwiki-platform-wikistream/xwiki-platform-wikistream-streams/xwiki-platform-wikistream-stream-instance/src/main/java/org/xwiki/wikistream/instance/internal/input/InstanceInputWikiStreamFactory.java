@@ -37,6 +37,7 @@ import com.xpn.xwiki.XWikiContext;
  * XMLInputStream wiki parsers.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Component
 @Named("xwiki+databaseold")

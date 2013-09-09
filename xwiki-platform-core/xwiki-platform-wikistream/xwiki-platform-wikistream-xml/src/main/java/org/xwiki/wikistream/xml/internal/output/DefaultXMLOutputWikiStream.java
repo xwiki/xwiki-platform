@@ -26,6 +26,12 @@ import javax.xml.stream.XMLStreamException;
 
 import org.xwiki.wikistream.WikiStreamException;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class DefaultXMLOutputWikiStream<P extends XMLOuputProperties> extends AbstractXMLOutputWikiStream<P>
 {
     private final AbstractXMLBeanOutputWikiStreamFactory<P> factory;

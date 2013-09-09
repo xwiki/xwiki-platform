@@ -40,6 +40,11 @@ import org.junit.runners.model.Statement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class WikiStreamTestSuite extends Suite
 {
     private static final TestDataGenerator GENERATOR = new TestDataGenerator();

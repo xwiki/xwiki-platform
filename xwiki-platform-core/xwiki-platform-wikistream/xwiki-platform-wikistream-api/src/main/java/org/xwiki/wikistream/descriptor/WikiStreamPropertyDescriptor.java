@@ -27,6 +27,7 @@ import org.xwiki.stability.Unstable;
  * Defines a wiki stream property.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public interface WikiStreamPropertyDescriptor<T>

@@ -17,14 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.output.target;
+package org.xwiki.wikistream.internal.output;
 
-import java.io.Closeable;
+import java.io.IOException;
+import java.io.OutputStream;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 
-@Unstable
-public interface OutputTarget extends Closeable
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+public class DefaultOutputStreamOutputTarget implements OutputStreamOutputTarget
 {
+    private final OutputStream outputStream;
 
+    public DefaultOutputStreamOutputTarget(OutputStream outputStream)
+    {
+        this.outputStream = outputStream;
+    }
+
+    public OutputStream getOutputStream()
+    {
+        return this.outputStream;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        // Closing the stream is the responsibility of the caller
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.outputStream.toString();
+    }
 }

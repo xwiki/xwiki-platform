@@ -25,6 +25,7 @@ import org.xwiki.stability.Unstable;
  * Encapsulates WikiConverter errors.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public class WikiStreamException extends Exception

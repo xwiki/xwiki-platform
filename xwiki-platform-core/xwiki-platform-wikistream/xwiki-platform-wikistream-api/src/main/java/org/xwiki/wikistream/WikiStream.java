@@ -30,6 +30,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * </p>
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public interface WikiStream

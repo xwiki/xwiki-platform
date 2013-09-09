@@ -26,11 +26,17 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.Result;
 
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.input.InputWikiStream;
-import org.xwiki.wikistream.input.source.InputSource;
-import org.xwiki.wikistream.input.source.InputStreamInputSource;
-import org.xwiki.wikistream.input.source.ReaderInputSource;
+import org.xwiki.wikistream.input.ReaderInputSource;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractXMLInputWikiStream<P extends XMLInputProperties> implements InputWikiStream
 {
     protected P parameters;

@@ -17,15 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input.source;
+package org.xwiki.wikistream.internal.output;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.xwiki.stability.Unstable;
+import org.apache.commons.lang3.ArrayUtils;
 
-@Unstable
-public interface InputStreamInputSource extends InputSource
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+public class ByteArrayOutputTarget extends AbstractOutputStreamOutputTarget
 {
-    InputStream getInputStream() throws IOException;
+    @Override
+    protected OutputStream openStream() throws IOException
+    {
+        return new ByteArrayOutputStream();
+    }
+
+    public byte[] toByteArray()
+    {
+        return this.outputStream != null ? ((ByteArrayOutputStream) this.outputStream).toByteArray()
+            : ArrayUtils.EMPTY_BYTE_ARRAY;
+    }
 }

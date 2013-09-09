@@ -17,14 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input.source;
+package org.xwiki.wikistream.input;
 
-import java.io.Closeable;
+import java.io.Reader;
 
 import org.xwiki.stability.Unstable;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Unstable
-public interface InputSource extends Closeable
+public interface ReaderInputSource extends InputSource
 {
-
+    public Reader getReader();
 }

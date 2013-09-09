@@ -17,44 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml.internal.input;
+package org.xwiki.wikistream.internal.output;
+
+import java.lang.reflect.Type;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.transform.Result;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.filter.xml.parser.XMLParserFactory;
-import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
+import org.xwiki.properties.converter.AbstractConverter;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
+import org.xwiki.wikistream.output.OutputTarget;
 
 /**
- * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
- * XMLInputStream wiki parsers.
  * 
  * @version $Id$
  * @since 5.2M2
  */
 @Component
-@Named("wiki+xml")
 @Singleton
-public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputProperties>
+public class OutputTargetConverter extends AbstractConverter<OutputTarget>
 {
     @Inject
-    private XMLParserFactory parserFactory;
-
-    public WikiXMLInputWikiStreamFactory()
-    {
-        super(WikiStreamType.WIKI_XML);
-
-        setName("Generic XML output stream");
-        setDescription("Generates wiki events from generic XML file.");
-    }
+    private ResourceReferenceParser resourceReferenceParser;
 
     @Override
-    protected Result createParser(Object filter, WikiXMLInputProperties parameters)
+    protected <G extends OutputTarget> G convertToType(Type targetType, Object value)
     {
-        return this.parserFactory.createResult(filter, null);
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof OutputTarget) {
+            return (G) value;
+        }
+
+        String source = value.toString();
+
+        ResourceReference resourceReference = this.resourceReferenceParser.parse(source);
+
+        OutputTarget outputTarget;
+
+        // TODO: use some OutputTargetParser instead to make it extensible
+        outputTarget = new StringWriterOutputTarget();
+
+        return (G) outputTarget;
     }
 }

@@ -17,24 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input.source;
+package org.xwiki.wikistream.internal.output;
 
-import java.io.StringReader;
+import java.io.StringWriter;
 
-public class StringInputSource extends DefaultReaderInputSource
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+public class StringWriterOutputTarget extends DefaultWriterOutputTarget
 {
-    private String source;
-
-    public StringInputSource(String source)
+    public StringWriterOutputTarget()
     {
-        super(new StringReader(source));
-
-        this.source = source;
+        super(new StringWriter(), false);
     }
 
-    @Override
-    public String toString()
+    /**
+     * Return the string buffer itself.
+     * 
+     * @return StringBuffer holding the current buffer value.
+     */
+    public StringBuffer getBuffer()
     {
-        return this.source;
+        return ((StringWriter) getWriter()).getBuffer();
     }
 }

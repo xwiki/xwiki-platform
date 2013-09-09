@@ -30,6 +30,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public class DefaultWikiStreamBeanDescriptor implements WikiStreamBeanDescriptor

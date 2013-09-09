@@ -17,21 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml;
+package org.xwiki.wikistream.internal.output;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.wikistream.test.integration.WikiStreamTestSuite;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.xwiki.wikistream.output.FileOutputTarget;
+import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 
 /**
- * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
- * {@link org.xwiki.wikistream.test.integration.TestDataParser}.
  * 
  * @version $Id$
  * @since 5.2M2
  */
-@RunWith(WikiStreamTestSuite.class)
-@AllComponents
-public class IntegrationTests
+public class DefaultFileOutputTarget extends AbstractOutputStreamOutputTarget implements FileOutputTarget,
+    OutputStreamOutputTarget
 {
+    private File file;
+
+    public DefaultFileOutputTarget(File file)
+    {
+        this.file = file;
+    }
+
+    public File getFile()
+    {
+        return this.file;
+    }
+
+    @Override
+    protected OutputStream openStream() throws IOException
+    {
+        return new FileOutputStream(this.file);
+    }
 }

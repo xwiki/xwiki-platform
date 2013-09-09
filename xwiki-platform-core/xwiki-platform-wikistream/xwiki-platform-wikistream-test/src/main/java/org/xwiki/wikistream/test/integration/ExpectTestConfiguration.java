@@ -19,8 +19,13 @@
  */
 package org.xwiki.wikistream.test.integration;
 
-import org.xwiki.wikistream.input.source.InputSource;
+import org.xwiki.wikistream.input.InputSource;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class ExpectTestConfiguration
 {
     public InputSource expect;

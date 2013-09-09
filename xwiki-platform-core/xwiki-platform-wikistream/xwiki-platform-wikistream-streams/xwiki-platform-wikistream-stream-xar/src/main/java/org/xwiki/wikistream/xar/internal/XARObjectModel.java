@@ -19,6 +19,11 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class XARObjectModel
 {
     public static final String ELEMENT_OBJECT = "object";

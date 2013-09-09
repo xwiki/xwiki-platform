@@ -17,35 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input.source;
+package org.xwiki.wikistream.output;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.xwiki.wikistream.input.source.InputStreamInputSource;
+import org.xwiki.stability.Unstable;
 
-public abstract class AbstractInputStreamInputSource implements InputStreamInputSource
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+@Unstable
+public interface OutputStreamOutputTarget extends OutputTarget
 {
-    protected InputStream inputStream;
-
-    @Override
-    public InputStream getInputStream() throws IOException
-    {
-        if (this.inputStream == null) {
-            this.inputStream = openStream();
-        }
-
-        return this.inputStream;
-    }
-
-    protected abstract InputStream openStream() throws IOException;
-
-    @Override
-    public void close() throws IOException
-    {
-        if (this.inputStream != null) {
-            this.inputStream.close();
-        }
-        this.inputStream = null;
-    }
+    OutputStream getOutputStream() throws IOException;
 }

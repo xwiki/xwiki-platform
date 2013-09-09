@@ -20,8 +20,8 @@
 package org.xwiki.wikistream.utils;
 
 import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.input.source.InputSource;
-import org.xwiki.wikistream.output.target.OutputTarget;
+import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.wikistream.output.OutputTarget;
 
 @Unstable
 public interface WikiStreamConstants

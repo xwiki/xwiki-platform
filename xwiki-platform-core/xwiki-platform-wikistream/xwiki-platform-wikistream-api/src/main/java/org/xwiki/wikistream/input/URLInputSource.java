@@ -17,14 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input.source;
+package org.xwiki.wikistream.input;
 
-import java.io.File;
+import java.net.URL;
 
 import org.xwiki.stability.Unstable;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Unstable
-public interface FileInputSource extends InputSource
+public interface URLInputSource extends InputSource
 {
-    public File getFile();
+    public URL getURL();
 }

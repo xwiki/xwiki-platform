@@ -17,21 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml;
+package org.xwiki.wikistream.internal.output;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.wikistream.test.integration.WikiStreamTestSuite;
+import java.io.IOException;
+import java.io.Writer;
+
+import org.xwiki.wikistream.output.WriterOutputTarget;
 
 /**
- * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
- * {@link org.xwiki.wikistream.test.integration.TestDataParser}.
  * 
  * @version $Id$
  * @since 5.2M2
  */
-@RunWith(WikiStreamTestSuite.class)
-@AllComponents
-public class IntegrationTests
+public class DefaultWriterOutputTarget implements WriterOutputTarget
 {
+    private final Writer writer;
+
+    public DefaultWriterOutputTarget(Writer writer, boolean closable)
+    {
+        this.writer = writer;
+    }
+
+    public Writer getWriter()
+    {
+        return this.writer;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        this.writer.close();
+    }
+
+    @Override
+    public String toString()
+    {
+        return getWriter().toString();
+    }
 }

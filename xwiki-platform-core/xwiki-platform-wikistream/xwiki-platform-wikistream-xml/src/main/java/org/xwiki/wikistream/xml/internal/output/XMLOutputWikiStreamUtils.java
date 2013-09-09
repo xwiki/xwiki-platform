@@ -28,12 +28,17 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
-import org.xwiki.wikistream.output.target.OutputTarget;
-import org.xwiki.wikistream.output.target.WriterOutputTarget;
+import org.xwiki.wikistream.output.OutputStreamOutputTarget;
+import org.xwiki.wikistream.output.OutputTarget;
+import org.xwiki.wikistream.output.WriterOutputTarget;
 import org.xwiki.wikistream.xml.output.target.ResultOutputTarget;
 import org.xwiki.xml.stax.StAXUtils;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public final class XMLOutputWikiStreamUtils
 {
     public static XMLStreamWriter createXMLStreamWriter(XMLOuputProperties properties) throws XMLStreamException,

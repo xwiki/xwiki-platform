@@ -33,6 +33,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * XMLInputStream wiki parsers.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputProperties> extends
     AbstractBeanOutputWikiStreamFactory<P>

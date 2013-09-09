@@ -17,33 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input.source;
+package org.xwiki.wikistream.input;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.Closeable;
 
-import org.xwiki.wikistream.input.source.FileInputSource;
-import org.xwiki.wikistream.input.source.InputStreamInputSource;
+import org.xwiki.stability.Unstable;
 
-public class DefaultByteArrayInputSource extends AbstractInputStreamInputSource implements FileInputSource, InputStreamInputSource
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+@Unstable
+public interface InputSource extends Closeable
 {
-    private final File file;
 
-    public DefaultByteArrayInputSource(File file)
-    {
-        this.file = file;
-    }
-
-    public File getFile()
-    {
-        return this.file;
-    }
-
-    @Override
-    protected InputStream openStream() throws IOException
-    {
-        return new FileInputStream(this.file);
-    }
 }

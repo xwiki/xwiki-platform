@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.wikistream.input.source.InputSource;
-import org.xwiki.wikistream.internal.input.source.DefaultURLInputSource;
-import org.xwiki.wikistream.internal.input.source.StringInputSource;
+import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.wikistream.internal.input.DefaultURLInputSource;
+import org.xwiki.wikistream.internal.input.StringInputSource;
 import org.xwiki.wikistream.utils.WikiStreamConstants;
 
 /**
@@ -46,6 +46,7 @@ import org.xwiki.wikistream.utils.WikiStreamConstants;
  * the found {@code .expect} will be executed and checked.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 public class TestDataParser
 {

@@ -41,6 +41,6 @@
     <module>xwiki-platform-wikistream-api</module>
     <module>xwiki-platform-wikistream-xml</module>
     <module>xwiki-platform-wikistream-test</module>
-    <module>xwiki-platform-wikistream-syntaxes</module>
+    <module>xwiki-platform-wikistream-streams</module>
   </modules>
 </project>

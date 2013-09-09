@@ -28,7 +28,7 @@ import javax.xml.transform.Result;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.xml.serializer.XMLSerializerFactory;
-import org.xwiki.wikistream.interal.utils.AllFilter;
+import org.xwiki.wikistream.internal.utils.AllFilter;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
@@ -37,6 +37,7 @@ import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamF
  * XMLInputStream wiki parsers.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Component
 @Named("wiki+xml")

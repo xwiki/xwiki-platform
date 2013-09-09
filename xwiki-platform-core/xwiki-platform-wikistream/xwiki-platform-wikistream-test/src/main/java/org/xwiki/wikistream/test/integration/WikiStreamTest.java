@@ -29,21 +29,22 @@ import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.internal.MockConfigurationSource;
+import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.input.source.InputSource;
-import org.xwiki.wikistream.input.source.InputStreamInputSource;
-import org.xwiki.wikistream.internal.output.target.ByteArrayOutputTarget;
-import org.xwiki.wikistream.internal.output.target.StringWriterOutputTarget;
+import org.xwiki.wikistream.internal.output.ByteArrayOutputTarget;
+import org.xwiki.wikistream.internal.output.StringWriterOutputTarget;
+import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
-import org.xwiki.wikistream.output.target.OutputTarget;
 
 /**
  * A generic JUnit Test used by {@link WikiStreamTestSuite} to parse some passed content and verify it matches some
  * passed expectation. The format of the input/expectation is specified in {@link TestDataParser}.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 public class WikiStreamTest
 {

@@ -22,6 +22,12 @@ package org.xwiki.wikistream.internal.output;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.OutputWikiStream;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractBeanOutputWikiStream<P> implements OutputWikiStream
 {
     protected final P properties;

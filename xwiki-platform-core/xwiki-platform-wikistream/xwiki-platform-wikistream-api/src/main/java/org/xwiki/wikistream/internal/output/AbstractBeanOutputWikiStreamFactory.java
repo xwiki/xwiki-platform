@@ -27,6 +27,12 @@ import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractBeanOutputWikiStreamFactory<P> extends AbstractBeanWikiStreamFactory<P> implements
     OutputWikiStreamFactory
 {

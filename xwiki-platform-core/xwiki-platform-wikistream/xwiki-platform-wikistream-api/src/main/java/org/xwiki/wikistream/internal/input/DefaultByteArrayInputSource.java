@@ -17,36 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output.target;
+package org.xwiki.wikistream.internal.input;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.InputStream;
 
-import org.xwiki.wikistream.output.target.WriterOutputTarget;
+import org.xwiki.wikistream.input.FileInputSource;
+import org.xwiki.wikistream.input.InputStreamInputSource;
 
-public class DefaultWriterOutputTarget implements WriterOutputTarget
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+public class DefaultByteArrayInputSource extends AbstractInputStreamInputSource implements FileInputSource, InputStreamInputSource
 {
-    private final Writer writer;
+    private final File file;
 
-    public DefaultWriterOutputTarget(Writer writer, boolean closable)
+    public DefaultByteArrayInputSource(File file)
     {
-        this.writer = writer;
+        this.file = file;
     }
 
-    public Writer getWriter()
+    public File getFile()
     {
-        return this.writer;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        this.writer.close();
+        return this.file;
     }
 
     @Override
-    public String toString()
+    protected InputStream openStream() throws IOException
     {
-        return getWriter().toString();
+        return new FileInputStream(this.file);
     }
 }

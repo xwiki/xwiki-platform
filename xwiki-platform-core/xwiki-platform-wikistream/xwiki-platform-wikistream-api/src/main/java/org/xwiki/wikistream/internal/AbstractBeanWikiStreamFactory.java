@@ -33,6 +33,12 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.descriptor.DefaultWikiStreamBeanDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStream implements WikiStream, Initializable
 {
     /**

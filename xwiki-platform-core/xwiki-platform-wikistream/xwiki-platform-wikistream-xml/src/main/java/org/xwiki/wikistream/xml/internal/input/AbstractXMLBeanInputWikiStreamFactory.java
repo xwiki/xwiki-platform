@@ -26,6 +26,12 @@ import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputProperties> extends
     AbstractBeanInputWikiStreamFactory<P>
 {

@@ -27,6 +27,7 @@ import org.xwiki.wikistream.filter.WikiSpaceFilter;
  * All events supported by Database module.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 public interface DatabaseFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, XWikiDocumentFilter
 {

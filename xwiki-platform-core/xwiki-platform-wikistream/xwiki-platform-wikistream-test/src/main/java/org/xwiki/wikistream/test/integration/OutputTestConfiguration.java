@@ -21,9 +21,14 @@ package org.xwiki.wikistream.test.integration;
 
 import java.util.HashMap;
 
-import org.xwiki.wikistream.output.target.OutputTarget;
+import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.utils.WikiStreamConstants;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class OutputTestConfiguration extends HashMap<String, Object>
 {
     public final String typeId;

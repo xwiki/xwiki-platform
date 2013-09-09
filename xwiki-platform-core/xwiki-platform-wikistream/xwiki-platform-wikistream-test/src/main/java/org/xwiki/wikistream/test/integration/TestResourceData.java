@@ -26,6 +26,7 @@ import java.util.Map;
 
 /**
  * @version $Id$
+ * @since 5.2M2
  */
 public class TestResourceData
 {

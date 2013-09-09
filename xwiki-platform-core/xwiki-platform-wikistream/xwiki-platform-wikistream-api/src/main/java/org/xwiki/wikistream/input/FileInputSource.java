@@ -17,36 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input.source;
+package org.xwiki.wikistream.input;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
 
-import org.xwiki.wikistream.input.source.InputStreamInputSource;
+import org.xwiki.stability.Unstable;
 
-public class DefaultInputStreamInputSource implements InputStreamInputSource
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+@Unstable
+public interface FileInputSource extends InputSource
 {
-    private final InputStream inputStream;
-
-    public DefaultInputStreamInputSource(InputStream inputStream)
-    {
-        this.inputStream = inputStream;
-    }
-
-    public InputStream getInputStream()
-    {
-        return this.inputStream;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        // Closing the stream is the responsibility of the caller
-    }
-
-    @Override
-    public String toString()
-    {
-        return getInputStream().toString();
-    }
+    public File getFile();
 }

@@ -21,6 +21,11 @@ package org.xwiki.wikistream.instance.internal.input;
 
 import org.xwiki.wikistream.instance.internal.XWikiDocumentProperties;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class InstanceInputProperties extends XWikiDocumentProperties
 {
     

@@ -23,6 +23,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentProperties;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class InstanceOutputProperties extends XWikiDocumentProperties
 {
     private DocumentReference author;

@@ -29,15 +29,15 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import org.xwiki.wikistream.input.source.ReaderInputSource;
-import org.xwiki.wikistream.internal.output.target.ByteArrayOutputTarget;
-import org.xwiki.wikistream.internal.output.target.StringWriterOutputTarget;
-import org.xwiki.wikistream.utils.WikiStreamConstants;
+import org.xwiki.wikistream.input.ReaderInputSource;
+import org.xwiki.wikistream.internal.output.ByteArrayOutputTarget;
+import org.xwiki.wikistream.internal.output.StringWriterOutputTarget;
 
 /**
  * Finds all test files in the current classloader, read them and return test data to represent them.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 public class TestDataGenerator
 {

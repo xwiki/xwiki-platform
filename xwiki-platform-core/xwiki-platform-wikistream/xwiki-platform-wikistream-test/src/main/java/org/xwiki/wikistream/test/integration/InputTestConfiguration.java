@@ -23,6 +23,11 @@ import java.util.HashMap;
 
 import org.xwiki.wikistream.utils.WikiStreamConstants;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class InputTestConfiguration extends HashMap<String, Object> implements Cloneable
 {
     public final String typeId;

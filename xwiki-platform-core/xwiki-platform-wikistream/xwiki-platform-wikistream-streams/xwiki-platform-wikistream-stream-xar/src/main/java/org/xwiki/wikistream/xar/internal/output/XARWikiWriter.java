@@ -32,11 +32,16 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
-import org.xwiki.wikistream.output.target.OutputTarget;
+import org.xwiki.wikistream.output.OutputStreamOutputTarget;
+import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.xar.internal.XARModel;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class XARWikiWriter
 {
     private static final LocalizedStringEntityReferenceSerializer TOSTRING_SERIALIZER =

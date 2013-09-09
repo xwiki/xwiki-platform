@@ -17,36 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output.target;
+package org.xwiki.wikistream.internal.input;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.StringReader;
 
-import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
-
-public class DefaultOutputStreamOutputTarget implements OutputStreamOutputTarget
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
+public class StringInputSource extends DefaultReaderInputSource
 {
-    private final OutputStream outputStream;
+    private String source;
 
-    public DefaultOutputStreamOutputTarget(OutputStream outputStream)
+    public StringInputSource(String source)
     {
-        this.outputStream = outputStream;
-    }
+        super(new StringReader(source));
 
-    public OutputStream getOutputStream()
-    {
-        return this.outputStream;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        // Closing the stream is the responsibility of the caller
+        this.source = source;
     }
 
     @Override
     public String toString()
     {
-        return this.outputStream.toString();
+        return this.source;
     }
 }

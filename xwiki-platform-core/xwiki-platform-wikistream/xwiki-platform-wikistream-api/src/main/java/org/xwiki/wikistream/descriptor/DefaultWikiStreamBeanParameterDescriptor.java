@@ -28,6 +28,7 @@ import org.xwiki.stability.Unstable;
  * The default implementation of {@link WikiStreamPropertyDescriptor}.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public class DefaultWikiStreamBeanParameterDescriptor<T> implements WikiStreamPropertyDescriptor<T>

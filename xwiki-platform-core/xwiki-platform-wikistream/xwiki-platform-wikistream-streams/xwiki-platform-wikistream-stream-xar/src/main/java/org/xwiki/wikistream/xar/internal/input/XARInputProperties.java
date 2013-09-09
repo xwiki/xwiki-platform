@@ -22,8 +22,13 @@ package org.xwiki.wikistream.xar.internal.input;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.wikistream.input.source.InputSource;
+import org.xwiki.wikistream.input.InputSource;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class XARInputProperties
 {
     private InputSource source;

@@ -21,6 +21,11 @@ package org.xwiki.wikistream.wikixml.internal.input;
 
 import org.xwiki.wikistream.xml.internal.input.XMLInputProperties;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class WikiXMLInputProperties extends XMLInputProperties
 {
 

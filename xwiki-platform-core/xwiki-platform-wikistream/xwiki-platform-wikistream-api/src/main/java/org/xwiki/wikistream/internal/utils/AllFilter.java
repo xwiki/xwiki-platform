@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.interal.utils;
+package org.xwiki.wikistream.internal.utils;
 
 import org.xwiki.filter.UnknownFilter;
 import org.xwiki.rendering.listener.Listener;
@@ -32,6 +32,11 @@ import org.xwiki.wikistream.filter.WikiObjectPropertyFilter;
 import org.xwiki.wikistream.filter.WikiSpaceFilter;
 import org.xwiki.wikistream.filter.WikiFilter;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Unstable
 public interface AllFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter, WikiAttachmentFilter, WikiClassFilter,
     WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter, UnknownFilter, Listener

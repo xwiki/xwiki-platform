@@ -21,6 +21,11 @@ package org.xwiki.wikistream.descriptor;
 
 import org.xwiki.stability.Unstable;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Unstable
 public interface WikiStreamBeanDescriptor extends WikiStreamDescriptor
 {

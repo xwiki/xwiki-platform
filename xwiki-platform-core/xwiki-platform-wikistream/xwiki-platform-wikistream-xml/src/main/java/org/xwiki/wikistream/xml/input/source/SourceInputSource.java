@@ -22,8 +22,13 @@ package org.xwiki.wikistream.xml.input.source;
 import javax.xml.transform.Source;
 
 import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.input.source.InputSource;
+import org.xwiki.wikistream.input.InputSource;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Unstable
 public interface SourceInputSource extends InputSource
 {

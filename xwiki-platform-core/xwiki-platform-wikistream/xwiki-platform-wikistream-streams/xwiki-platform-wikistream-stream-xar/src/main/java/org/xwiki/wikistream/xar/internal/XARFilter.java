@@ -33,6 +33,7 @@ import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
  * All events supported by XAR module.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 public interface XARFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, XWikiWikiDocumentFilter,
     XWikiWikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter

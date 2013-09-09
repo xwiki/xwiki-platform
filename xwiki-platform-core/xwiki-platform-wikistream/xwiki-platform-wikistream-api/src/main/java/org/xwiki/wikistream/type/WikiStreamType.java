@@ -27,6 +27,7 @@ import org.xwiki.stability.Unstable;
  * Combination of supported wikis and their export types.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public class WikiStreamType

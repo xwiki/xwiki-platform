@@ -41,7 +41,7 @@
     <module>xwiki-platform-wikistream-stream-wikixml</module>
     <module>xwiki-platform-wikistream-stream-xwiki</module>
     <module>xwiki-platform-wikistream-stream-xar</module>
-    <module>xwiki-platform-wikistream-stream-databaseold</module>
+    <module>xwiki-platform-wikistream-stream-instance</module>
   </modules>
   <dependencies>
     <dependency>

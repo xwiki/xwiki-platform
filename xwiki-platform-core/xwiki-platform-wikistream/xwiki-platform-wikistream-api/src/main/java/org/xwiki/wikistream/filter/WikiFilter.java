@@ -29,6 +29,7 @@ import org.xwiki.wikistream.WikiStreamException;
  * Wiki related events.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public interface WikiFilter

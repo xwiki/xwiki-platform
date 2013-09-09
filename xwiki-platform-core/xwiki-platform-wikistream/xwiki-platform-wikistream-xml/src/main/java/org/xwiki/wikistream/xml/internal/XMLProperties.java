@@ -19,6 +19,11 @@
  */
 package org.xwiki.wikistream.xml.internal;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class XMLProperties
 {
 }

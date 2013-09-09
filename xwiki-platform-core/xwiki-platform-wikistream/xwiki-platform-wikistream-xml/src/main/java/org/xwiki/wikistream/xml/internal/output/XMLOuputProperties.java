@@ -20,9 +20,14 @@
 package org.xwiki.wikistream.xml.internal.output;
 
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.wikistream.output.target.OutputTarget;
+import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.xml.internal.XMLProperties;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class XMLOuputProperties extends XMLProperties
 {
     private boolean format = true;

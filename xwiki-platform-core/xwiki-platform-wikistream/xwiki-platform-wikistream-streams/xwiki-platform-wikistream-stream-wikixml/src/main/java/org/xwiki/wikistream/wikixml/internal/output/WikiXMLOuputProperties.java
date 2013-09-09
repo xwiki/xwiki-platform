@@ -21,6 +21,11 @@ package org.xwiki.wikistream.wikixml.internal.output;
 
 import org.xwiki.wikistream.xml.internal.output.XMLOuputProperties;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 public class WikiXMLOuputProperties extends XMLOuputProperties
 {
 

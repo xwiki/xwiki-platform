@@ -26,6 +26,11 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.WikiStreamException;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Role
 @Unstable
 public interface InputWikiStreamFactory extends WikiStream

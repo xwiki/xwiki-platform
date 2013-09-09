@@ -26,6 +26,7 @@ import org.xwiki.stability.Unstable;
  * Represents various Wikis supported by Wiki Importer.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public class WikiType

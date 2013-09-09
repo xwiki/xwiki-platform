@@ -31,12 +31,18 @@ import javax.xml.transform.Result;
 import javax.xml.transform.stax.StAXResult;
 
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.output.OutputStreamOutputTarget;
+import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.output.OutputWikiStream;
-import org.xwiki.wikistream.output.target.OutputStreamOutputTarget;
-import org.xwiki.wikistream.output.target.OutputTarget;
-import org.xwiki.wikistream.output.target.WriterOutputTarget;
+import org.xwiki.wikistream.output.WriterOutputTarget;
 import org.xwiki.wikistream.xml.output.target.ResultOutputTarget;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputProperties> implements OutputWikiStream
 {
     protected final P properties;

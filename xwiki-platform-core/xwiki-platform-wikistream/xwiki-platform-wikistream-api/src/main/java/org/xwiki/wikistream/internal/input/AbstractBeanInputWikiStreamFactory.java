@@ -28,6 +28,12 @@ import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.internal.AbstractBeanWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
+/**
+ * 
+ * @param <P>
+ * @version $Id$
+ * @since 5.2M2
+ */
 public abstract class AbstractBeanInputWikiStreamFactory<P> extends AbstractBeanWikiStreamFactory<P> implements
     InputWikiStreamFactory, Initializable
 {

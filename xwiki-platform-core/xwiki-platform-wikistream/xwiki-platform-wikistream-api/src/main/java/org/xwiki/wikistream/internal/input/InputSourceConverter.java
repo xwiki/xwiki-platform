@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.input.source;
+package org.xwiki.wikistream.internal.input;
 
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -31,8 +31,13 @@ import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
-import org.xwiki.wikistream.input.source.InputSource;
+import org.xwiki.wikistream.input.InputSource;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Component
 @Singleton
 public class InputSourceConverter extends AbstractConverter<InputSource>

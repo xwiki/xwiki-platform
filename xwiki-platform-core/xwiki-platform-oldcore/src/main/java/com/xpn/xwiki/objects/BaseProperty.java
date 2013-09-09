@@ -185,8 +185,8 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     public Element toXML()
     {
         Element el = new DOMElement(getName());
-        Object value = getValue();
-        el.setText((value == null) ? "" : value.toString());
+
+        el.setText(toText());
 
         return el;
     }

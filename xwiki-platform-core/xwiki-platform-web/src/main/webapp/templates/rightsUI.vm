@@ -65,7 +65,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #end
     #set ($specifiedRights = $!obj.getProperty('levels').getValue().split(','))
     #foreach ($right in $specifiedRights)
-      #if ($maxlevel >= $rightsLevels.get($right))
+      #if ($rightsLevels.containsKey($right) && $maxlevel >= $rightsLevels.get($right))
         #set ($discard = $r.set($rightsLevels.get($right), $rightValue))
       #end
     #end

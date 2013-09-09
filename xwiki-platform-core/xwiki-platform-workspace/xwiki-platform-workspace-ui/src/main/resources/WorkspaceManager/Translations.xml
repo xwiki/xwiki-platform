@@ -232,5 +232,12 @@ rendering.macro.workspaces.description=List all workspaces
 xe.admin.groups.comment=About
 xe.admin.groups.tags=Tags
 xe.admin.groups._actions.follow=Follow
-xe.admin.groups._actions.unfollow=Unfollow</content>
-</xwikidoc>
+xe.admin.groups._actions.unfollow=Unfollow
+
+## Admin
+admin.wikis=Wikis
+admin.wikis.description=Settings related to wikis creation.
+admin.wikis.template=Wikis template.
+admin.wikis.rights=Wikis creation rights.
+admin.wikis.templatemissing=To enable the wiki creation, you need to create a template first.\n\n&lt;a href="{0}"&gt;Click here to create the template&lt;/a&gt;.
+</content></xwikidoc>

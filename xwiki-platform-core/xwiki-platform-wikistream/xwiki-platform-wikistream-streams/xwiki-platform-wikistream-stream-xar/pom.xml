@@ -32,7 +32,9 @@
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
   <name>XWiki Platform - Wiki Stream - XAR</name>
-  <description>XWiki Platform - Wiki Stream - XAR</description>
+  <description>XWiki Platform - Wiki Stream - XAR</description>  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.commons</groupId>

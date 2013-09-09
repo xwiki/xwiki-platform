@@ -31,7 +31,8 @@
     <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-test</artifactId>
-  <name>Wiki Stream test framework</name>
+  <name>XWiki Platform - Wiki Stream - Test framework</name>
+  <description>Wiki Stream test framework</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

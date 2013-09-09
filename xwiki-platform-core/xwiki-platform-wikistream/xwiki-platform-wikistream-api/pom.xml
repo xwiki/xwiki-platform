@@ -34,6 +34,9 @@
   <name>XWiki Platform - Wiki Stream - API</name>
   <description>XWiki Platform - Wiki Stream - API</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -147,7 +147,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             return false;
         }
 
-        /* Check if the user has the SUBWIKI_CREATION right */
+        /* Check if the user has the CREATE_WIKI right */
         try {
             XWikiContext xcontext = getXWikiContext();
 
@@ -156,7 +156,7 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             String mainWikiPreferencesDocumentName =
                     String.format(WIKI_PREFERENCES_PREFIXED_FORMAT, xcontext.getMainXWiki());
 
-            if (!rightService.hasAccessLevel("subwikicreation", userName, mainWikiPreferencesDocumentName,
+            if (!rightService.hasAccessLevel("createwiki", userName, mainWikiPreferencesDocumentName,
                     xcontext))
             {
                 return false;

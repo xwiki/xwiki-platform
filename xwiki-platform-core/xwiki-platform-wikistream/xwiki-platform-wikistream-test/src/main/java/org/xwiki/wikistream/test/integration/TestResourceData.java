@@ -1,0 +1,39 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.wikistream.test.integration;
+
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @version $Id: 7a2f45080656b544f3977e9d5bf67f1b3ca56ca4 $
+ */
+public class TestResourceData
+{
+    public String resourceName;
+
+    public List<InputTestConfiguration> inputs = new LinkedList<InputTestConfiguration>();
+
+    public List<ExpectTestConfiguration> expects = new LinkedList<ExpectTestConfiguration>();
+
+    public Map<String, String> configuration = new LinkedHashMap<String, String>();
+}

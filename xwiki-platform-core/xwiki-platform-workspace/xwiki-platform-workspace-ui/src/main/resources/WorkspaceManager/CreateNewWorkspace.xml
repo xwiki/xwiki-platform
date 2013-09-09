@@ -25,9 +25,9 @@
   <hidden>false</hidden>
   <content>{{velocity}}
 #######################################################
-##         Create a new subwiki - WIZARD
+##         Create a new (sub)wiki - WIZARD
 ##
-## This wizard let user create a new subwiki.
+## This wizard let user create a new wiki.
 ## The 'controller' macro call the good submacro 
 ## depending on the step
 ##
@@ -152,7 +152,7 @@
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
           ### PRETTY NAME ###
-          &lt;div id="subwikiprettyname"&gt;
+          &lt;div id="wikiprettyname"&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="prettyname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiprettyname')#required()&lt;/label&gt;
@@ -165,7 +165,7 @@
             &lt;/dl&gt;
           &lt;/div&gt;
           ### WIKI NAME ###
-          &lt;div id="subwikiname"&gt;
+          &lt;div id="wikiname"&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="wikiname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiname')#required()&lt;/label&gt;
@@ -178,7 +178,7 @@
             &lt;/dl&gt;
           &lt;/div&gt;
           ### TEMPLATE ###
-          &lt;div id="subwikitemplate"&gt;
+          &lt;div id="wikitemplate"&gt;
             #set ($templates = $services.workspace.getWorkspaceTemplates())
             #if ($templates.size() &gt; 1)
               &lt;dt&gt;
@@ -212,7 +212,7 @@
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
           ### DESCRIPTION ###
-          &lt;div id="subwikidescription"&gt;
+          &lt;div id="wikidescription"&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="description"&gt;$services.localization.render('workspacemanager.prop.wiki.description')&lt;/label&gt;
@@ -393,8 +393,8 @@
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
           ### OWNER ###
-          &lt;div id="subwikiowner"&gt;
-            ## Make this section available only to admins, so that only admins can create subwikis in the name of other users.
+          &lt;div id="wikiowner"&gt;
+            ## Make this section available only to admins, so that only admins can create wikis in the name of other users.
             #if ($hasAdmin)
               &lt;dl&gt;
                 &lt;dt&gt;
@@ -418,7 +418,7 @@
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
-          &lt;div id="subwikimembershiptype"&gt;
+          &lt;div id="wikimembershiptype"&gt;
             #set ($workspaceClass = $xwiki.getDocument('WorkspaceManager.WorkspaceClass').getxWikiClass())
             #set ($membershipTypeProperty = $workspaceClass.get('membershipType'))
             #set ($membershipTypeValues = '')
@@ -447,7 +447,7 @@
             &lt;/dl&gt;
           &lt;/div&gt;
           ### MEMBERS
-          &lt;div id="subwikimembers"&gt;
+          &lt;div id="wikimembers"&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="members"&gt;$services.localization.render('workspacemanager.members')&lt;/label&gt;
@@ -484,7 +484,7 @@
 ##################################
 ##           CREATE
 ##
-## The final step that eventually create the subwiki
+## The final step that eventually create the wiki
 ##################################
 #macro(create)
   #set ($ALIASSUFFIX = "")

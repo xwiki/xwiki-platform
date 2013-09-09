@@ -8,8 +8,8 @@ $xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
 $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
-#if("$!request.section"=='SubWikis')
-  #set ($rightsLevels = {'subwikicreation': 0})
+#if("$!request.section"=='Wikis')
+  #set ($rightsLevels = {'createwiki': 0})
 #else
   #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'delete': 3, 'admin': 4, 'register': 5, 'programming': 6})  
 #end
@@ -18,8 +18,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #set ($discard = $levelsRights.put($rightsLevels.get($r), $r))
 #end
 #set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, delete
-#if("$!request.section"=='SubWikis')
-  #set ($maxlevel = $rightsLevels.get('subwikicreation'))
+#if("$!request.section"=='Wikis')
+  #set ($maxlevel = $rightsLevels.get('createwiki'))
   #set ($clsname = 'XWiki.XWikiGlobalRights')
 #else
   #if($doc.fullName == 'XWiki.XWikiPreferences')
@@ -159,7 +159,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </tr>
     ## Global settings: mandatory authentication for view/edit, captcha
     #set ($guest_comment_captcha_prop = $doc.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
-    #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'SubWikis')
+    #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'Wikis')
       <tr>
         <td>
           <table>

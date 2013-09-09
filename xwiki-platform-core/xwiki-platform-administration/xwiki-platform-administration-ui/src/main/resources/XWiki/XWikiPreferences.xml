@@ -1292,7 +1292,7 @@
       <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
-      <levels>admin,edit,undelete,delete,programming,view,comment,register,wikicreation</levels>
+      <levels>admin,edit,undelete,delete,programming,view,comment,register,createwiki</levels>
     </property>
     <property>
       <users/>

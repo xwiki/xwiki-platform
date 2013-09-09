@@ -104,3 +104,9 @@
   position: absolute;
   top: .1em;
 }
+
+.wizard-body .half{
+  width: 48%;
+  padding: 0 1%;
+  float: left;
+}

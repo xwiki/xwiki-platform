@@ -31,7 +31,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.output.WriterOutputTarget;
-import org.xwiki.wikistream.xml.output.target.ResultOutputTarget;
+import org.xwiki.wikistream.xml.output.ResultOutputTarget;
 import org.xwiki.xml.stax.StAXUtils;
 
 /**

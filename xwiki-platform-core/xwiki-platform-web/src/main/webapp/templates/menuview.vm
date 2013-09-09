@@ -49,8 +49,12 @@
 ##
 ## Create
 ##
-## Note: In order to know if the user has the right to create a workspace we compute a name that doesn't exist
-#set ($hasCreateWorkspace = $isWorkspaceManagerAppInstalled && $hasCreateWiki)
+## $hasCreateWorkspace is determined by:
+## - the workspaces app is installed
+## - and the user has the right to create a wiki
+## - and the workspaces application has been installed. We check this by checking if there's at least one template since the installation process will create a template
+## (in the future the last condition will be removed since we will use the Distribution Wizard for wiki creation)
+#set ($hasCreateWorkspace = $isWorkspaceManagerAppInstalled && $hasCreateWiki && $services.workspace.getWorkspaceTemplates().size() > 0)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $hasCreateWorkspace)
 #if ($displayCreateSubmenu)
   #xwikitopmenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon')

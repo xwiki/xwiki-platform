@@ -152,7 +152,7 @@
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
           ### PRETTY NAME ###
-          &lt;div id="wikiprettyname"&gt;
+          &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="prettyname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiprettyname')#required()&lt;/label&gt;
@@ -165,7 +165,7 @@
             &lt;/dl&gt;
           &lt;/div&gt;
           ### WIKI NAME ###
-          &lt;div id="wikiname"&gt;
+          &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="wikiname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiname')#required()&lt;/label&gt;
@@ -178,7 +178,7 @@
             &lt;/dl&gt;
           &lt;/div&gt;
           ### TEMPLATE ###
-          &lt;div id="wikitemplate"&gt;
+          &lt;div&gt;
             #set ($templates = $services.workspace.getWorkspaceTemplates())
             #if ($templates.size() &gt; 1)
               &lt;dt&gt;
@@ -212,7 +212,7 @@
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
           ### DESCRIPTION ###
-          &lt;div id="wikidescription"&gt;
+          &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="description"&gt;$services.localization.render('workspacemanager.prop.wiki.description')&lt;/label&gt;
@@ -393,7 +393,7 @@
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
           ### OWNER ###
-          &lt;div id="wikiowner"&gt;
+          &lt;div&gt;
             ## Make this section available only to admins, so that only admins can create wikis in the name of other users.
             #if ($hasAdmin)
               &lt;dl&gt;
@@ -418,7 +418,7 @@
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
-          &lt;div id="wikimembershiptype"&gt;
+          &lt;div&gt;
             #set ($workspaceClass = $xwiki.getDocument('WorkspaceManager.WorkspaceClass').getxWikiClass())
             #set ($membershipTypeProperty = $workspaceClass.get('membershipType'))
             #set ($membershipTypeValues = '')
@@ -447,7 +447,7 @@
             &lt;/dl&gt;
           &lt;/div&gt;
           ### MEMBERS
-          &lt;div id="wikimembers"&gt;
+          &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
                 &lt;label for="members"&gt;$services.localization.render('workspacemanager.members')&lt;/label&gt;

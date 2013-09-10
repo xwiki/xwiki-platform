@@ -32,8 +32,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1378814394000</creationDate>
-  <date>1378815313000</date>
-  <contentUpdateDate>1378815313000</contentUpdateDate>
+  <date>1378820444000</date>
+  <contentUpdateDate>1378820444000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki Installations Statistics</title>
   <defaultTemplate/>
@@ -42,7 +42,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>Total number of XWiki installations:
+  <content>Total number of XWiki installations{{footnote}}Total number of XWiki installations that have sent us a ping and for XWiki versions &gt;= 5.2-milestone-2.{{/footnote}}:
 
 (% id="totalCounter" class="flip-counter" %)(((
 )))
@@ -55,7 +55,7 @@
 
 
 
-Active XWiki installations (i.e. we've received a ping in the past month):
+Active XWiki installations{{footnote}}Total number of XWiki installations that have sent us a ping in the past 30 days.{{/footnote}}:
 
 (% id="activeCounter" class="flip-counter" %)(((
 )))
@@ -63,5 +63,16 @@ Active XWiki installations (i.e. we've received a ping in the past month):
 {{velocity}}
 $xwiki.jsx.use('ActiveInstalls.Counter')
 $xwiki.ssx.use('ActiveInstalls.Counter')
-{{/velocity}}</content>
+{{/velocity}}
+
+
+
+
+
+
+
+
+
+
+{{putFootnotes/}}</content>
 </xwikidoc>

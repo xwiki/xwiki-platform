@@ -36,7 +36,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @since 5.2M2
  */
 @Component
-@Named("xar/1.0")
+@Named("xwiki+instance")
 @Singleton
 public class InstanceOutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<InstanceOutputProperties>
 {

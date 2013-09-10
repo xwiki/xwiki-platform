@@ -49,10 +49,12 @@ public class ActiveInstallsTest extends AbstractAdminAuthenticatedTest
             Thread.sleep(100L);
         }
 
-        // Navigate to the Active Installs home page to verify that we can see how ping
-        ViewPage vp  = getUtil().gotoPage("ActiveInstalls", "WebHome");
-        String expected = "Total number of XWiki installations\n1\nActive XWiki installations (i.e. we've received a ping "
-            + "in the past month)\n1";
-        assertEquals(expected, vp.getContent());
+        // Navigate to the Active Installs Counter Value page to verify that the ping has been received
+        ViewPage vp  = getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue");
+        assertEquals("1", vp.getContent());
+
+        // Navigate to the Total Installs Counter Value page to verify that the ping has been received
+        vp  = getUtil().gotoPage("ActiveInstalls", "TotalCounterValue");
+        assertEquals("1", vp.getContent());
     }
 }

@@ -22,46 +22,27 @@
 
 <xwikidoc>
   <web>ActiveInstalls</web>
-  <name>WebHome</name>
+  <name>TotalCounterValue</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
+  <parent>ActiveInstalls.Counter</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1378814394000</creationDate>
-  <date>1378815313000</date>
-  <contentUpdateDate>1378815313000</contentUpdateDate>
+  <creationDate>1378814845000</creationDate>
+  <date>1378814853000</date>
+  <contentUpdateDate>1378814853000</contentUpdateDate>
   <version>1.1</version>
-  <title>XWiki Installations Statistics</title>
+  <title>Total Installs Counter Value</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
-  <content>Total number of XWiki installations:
-
-(% id="totalCounter" class="flip-counter" %)(((
-)))
-
-
-
-
-
-
-
-
-
-Active XWiki installations (i.e. we've received a ping in the past month):
-
-(% id="activeCounter" class="flip-counter" %)(((
-)))
-
-{{velocity}}
-$xwiki.jsx.use('ActiveInstalls.Counter')
-$xwiki.ssx.use('ActiveInstalls.Counter')
+  <hidden>true</hidden>
+  <content>{{velocity}}
+$services.activeinstalls.totalInstalls
 {{/velocity}}</content>
 </xwikidoc>

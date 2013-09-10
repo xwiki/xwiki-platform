@@ -20,7 +20,7 @@
 package org.xwiki.activeinstalls.test.ui;
 
 import org.junit.*;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractGuestTest;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.Assert.*;
@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 5.2M2
  */
-public class ActiveInstallsTest extends AbstractAdminAuthenticatedTest
+public class ActiveInstallsTest extends AbstractGuestTest
 {
     @Test
     public void verifyPingIsSent() throws Exception

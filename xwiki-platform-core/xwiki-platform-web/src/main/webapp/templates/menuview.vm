@@ -151,12 +151,8 @@
 #set ($canDeleteWorkspace = $isWorkspaceManagerAppInstalled && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $displayWorkspaceDirectoryMenuEntry || $canDeleteWorkspace)
 #set ($wikiEntryId = 'tmWiki')
-#if ($isWorkspaceManagerAppInstalled)
-  #if ($xcontext.isMainWiki())
-    #set ($wikiEntryId = 'tmMainWiki')
-  #elseif ($isWorkspace)
-    #set ($wikiEntryId = 'tmWorkspace')
-  #end
+#if ($isWorkspaceManagerAppInstalled)  
+  #set ($wikiEntryId = 'tmWorkspace')  
 #end
 #set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))
 #set ($wikiName = $!{services.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName()})
@@ -194,6 +190,10 @@
   #if ($hasPreviousMenuSection && ($displayWorkspaceDirectoryMenuEntry || $xwiki.exists('Main.AllDocs')))
     #submenuseparator()
   #end
+##  #if ($displayWorkspaceDirectoryMenuEntry)
+##    #submenuitem("$xwiki.getURL($workspaceManagerMainDocumentReference)" $services.localization.render('workspacemanager.menu.workspace.index') 'tmWorkspaceIndex' '')
+##    #set ($hasPreviousMenuSection = true)
+##  #end
   #if ($xwiki.exists('Main.AllDocs'))
     #submenuitem("$xwiki.getURL('Main.AllDocs')" $services.localization.render('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
     #set ($hasPreviousMenuSection = true)

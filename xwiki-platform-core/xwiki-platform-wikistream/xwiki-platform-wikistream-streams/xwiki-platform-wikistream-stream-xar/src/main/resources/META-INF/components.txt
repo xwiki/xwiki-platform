@@ -1,2 +1,2 @@
-org.xwiki.wikistream.xar.internal.input.XARInputWikiStreamFactory
+org.xwiki.wikistream.xar.internal.output.XAROutputWikiStream
 org.xwiki.wikistream.xar.internal.output.XAROutputWikiStreamFactory

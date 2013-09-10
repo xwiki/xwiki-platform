@@ -1,2 +1,2 @@
-org.xwiki.wikistream.internal.input.source.InputSourceConverter
-org.xwiki.wikistream.internal.output.target.OutputTargetConverter
+org.xwiki.wikistream.internal.input.InputSourceConverter
+org.xwiki.wikistream.internal.output.OutputTargetConverter

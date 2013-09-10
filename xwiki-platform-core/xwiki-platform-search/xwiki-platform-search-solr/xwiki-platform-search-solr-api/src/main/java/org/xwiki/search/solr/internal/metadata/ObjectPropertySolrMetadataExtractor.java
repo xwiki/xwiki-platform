@@ -76,7 +76,7 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
         solrDocument.setField(FieldUtils.NUMBER, objectReference.getObjectNumber());
 
         // Property
-        solrDocument.setField(FieldUtils.PROPERTY_NAME, objectReference.getName());
+        solrDocument.setField(FieldUtils.PROPERTY_NAME, objectPropertyReference.getName());
 
         setLocaleAndContentFields(documentReference, solrDocument, objectProperty);
 

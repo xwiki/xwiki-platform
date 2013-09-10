@@ -136,24 +136,60 @@ var XWiki = (function (XWiki) {
   });
 
   function init(){
-    var sources = [
+    /*
     ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
     ## search suggest contructor.
-    #set($sourceDocument = $xwiki.getDocument("XWiki.SearchSuggestConfig"))
-    #foreach($source in $sourceDocument.getObjects('XWiki.SearchSuggestSourceClass'))
-      #if($source.getProperty('activated').value == 1)
-      {
-        name : "$escapetool.javascript("#evaluate($source.getProperty('name').value)")",
-        varname : 'input',
-        script : "#evaluate($source.getProperty('url').value)&query=$source.getProperty('query').value&nb=$source.getProperty('resultsNumber').value&",
-        icon : "#evaluate($source.getProperty('icon').value)",
-        highlight: #if($source.getProperty('highlight').value == 1) true #else false #end
-      },
+    #set ($sources = [])
+    #set ($searchSuggestConfig = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
+    #foreach ($source in $searchSuggestConfig.getObjects('XWiki.SearchSuggestSourceClass'))
+      #if ($source.getProperty('activated').value == 1)
+        #set ($engine = $source.getProperty('engine').value)
+        #if ("$!engine" == '')
+          ## For backward compatibility we consider the search engine to be Lucene when it's no specified.
+          #set ($engine = 'lucene')
+        #end
+        #set ($discard = $xwiki.getDocument('XWiki.SearchCode').getRenderedContent())
+        #if ($engine == $searchEngine)
+          #set ($name = $source.getProperty('name').value)
+          #if ($services.localization.get($name))
+            #set ($name = $services.localization.render($name))
+          #else
+            ## Evaluate the Velocity code for backward compatibility.
+            #set ($name = "#evaluate($name)")
+          #end
+          #set ($icon = $source.getProperty('icon').value)
+          #if ($icon.startsWith('icon:'))
+            #set ($icon = $xwiki.getSkinFile("icons/silk/${icon.substring(5)}.png"))
+          #else
+            ## Evaluate the Velocity code for backward compatibility.
+            #set ($icon = "#evaluate($icon)")
+          #end
+          #set ($service = $source.getProperty('url').value)
+          #set ($parameters = {
+            'query': $source.getProperty('query').value,
+            'nb': $source.getProperty('resultsNumber').value
+          })
+          #if ($xwiki.exists($service))
+            #set ($discard = $parameters.put('outputSyntax', 'plain'))
+            #set ($service = $xwiki.getURL($service, 'get', $escapetool.url($parameters)))
+          #else
+            ## Evaluate the Velocity code for backward compatibility.
+            #set ($service = "#evaluate($service)")
+            #set ($service = "$service#if ($service.contains('?'))&#else?#end$escapetool.url($parameters)")
+          #end
+          #set ($highlight = $source.getProperty('highlight').value == 1)
+          #set ($discard = $sources.add({
+            'name': $name,
+            'varname': 'input',
+            'script': $service,
+            'icon': $icon,
+            'highlight': $highlight
+          }))
+        #end
       #end
     #end
-      null  // Don't handle last coma. This is going to be compated anyway.
-    ].compact()
-
+    */
+    var sources = $jsontool.serialize($sources);
     new XWiki.SearchSuggest($('headerglobalsearchinput'), sources);
     return true;
   }

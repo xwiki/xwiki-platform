@@ -301,7 +301,7 @@ var XWiki = (function(XWiki){
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
 
-      var url = source.script + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
+      var url = source.script + (source.script.indexOf('?') < 0 ? '?' : '&') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
       var method = source.method || "get";
       var headers = {};
       if (source.json) {

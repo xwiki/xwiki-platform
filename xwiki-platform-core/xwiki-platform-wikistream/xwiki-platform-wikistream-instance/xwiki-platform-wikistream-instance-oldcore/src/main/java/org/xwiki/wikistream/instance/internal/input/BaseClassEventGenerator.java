@@ -55,7 +55,7 @@ public class BaseClassEventGenerator extends
     private EntityEventGenerator<PropertyClass, PropertyClassProperties> propertyEventGenerator;
 
     @Override
-    public void writeInternal(BaseClass xclass, Object filter, BaseClassFilter xclassFilter,
+    public void write(BaseClass xclass, Object filter, BaseClassFilter xclassFilter,
         BaseClassProperties properties) throws WikiStreamException
     {
         // WikiClass

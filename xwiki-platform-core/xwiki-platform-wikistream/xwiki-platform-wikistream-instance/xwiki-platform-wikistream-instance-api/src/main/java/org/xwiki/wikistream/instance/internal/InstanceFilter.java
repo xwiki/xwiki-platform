@@ -17,34 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal.output;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.xwiki.wikistream.instance.internal;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
-import org.xwiki.wikistream.output.OutputWikiStream;
-import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.filter.UnknownFilter;
+import org.xwiki.wikistream.filter.WikiFarmFilter;
 
 /**
- * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
- * XMLInputStream wiki parsers.
- * 
  * @version $Id$
  * @since 5.2M2
  */
-@Component
-@Named("xwiki+instance")
-@Singleton
-public class InstanceOutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<InstanceOutputProperties>
+public interface InstanceFilter extends WikiFarmFilter, UnknownFilter
 {
-    public InstanceOutputWikiStreamFactory()
-    {
-        super(WikiStreamType.XWIKI_XAR);
 
-        setName("XWiki instance input stream");
-        setDescription("Setup XWiki instance from wiki events.");
-    }
 }

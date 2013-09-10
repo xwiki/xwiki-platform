@@ -19,11 +19,22 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import java.util.Set;
+
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
+
 /**
  * @version $Id$
  * @since 5.2M2
  */
+@Unstable
 public class InstanceInputProperties
 {
+    private Set<WikiReference> wikis;
 
+    public Set<WikiReference> getWikis()
+    {
+        return this.wikis;
+    }
 }

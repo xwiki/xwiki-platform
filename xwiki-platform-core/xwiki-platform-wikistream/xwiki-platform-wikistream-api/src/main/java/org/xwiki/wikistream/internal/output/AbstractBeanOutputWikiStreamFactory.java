@@ -21,14 +21,19 @@ package org.xwiki.wikistream.internal.output;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.internal.AbstractBeanWikiStreamFactory;
+import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
- * 
  * @param <P>
  * @version $Id$
  * @since 5.2M2
@@ -36,6 +41,9 @@ import org.xwiki.wikistream.type.WikiStreamType;
 public abstract class AbstractBeanOutputWikiStreamFactory<P> extends AbstractBeanWikiStreamFactory<P> implements
     OutputWikiStreamFactory
 {
+    @Inject
+    private ComponentManager componentManager;
+
     public AbstractBeanOutputWikiStreamFactory(WikiStreamType type)
     {
         super(type);
@@ -47,5 +55,20 @@ public abstract class AbstractBeanOutputWikiStreamFactory<P> extends AbstractBea
         return creaOutputWikiStream(createPropertiesBean(properties));
     }
 
-    public abstract OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException;
+    public OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
+    {
+        BeanOutputWikiStream<P> inputWikiStream;
+        try {
+            inputWikiStream =
+                this.componentManager.getInstance(new DefaultParameterizedType(null, BeanOutputWikiStream.class,
+                    properties.getClass()), getType().serialize());
+        } catch (ComponentLookupException e) {
+            throw new WikiStreamException(String.format("Failed to get instance of [%s] for type [%s]",
+                BeanInputWikiStream.class, getType()), e);
+        }
+
+        inputWikiStream.setProperties(properties);
+
+        return inputWikiStream;
+    }
 }

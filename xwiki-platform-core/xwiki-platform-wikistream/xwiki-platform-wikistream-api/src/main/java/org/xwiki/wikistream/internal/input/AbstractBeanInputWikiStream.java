@@ -17,7 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.input;
+
+package org.xwiki.wikistream.internal.input;
 
 import java.lang.reflect.ParameterizedType;
 
@@ -27,41 +28,54 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.filter.FilterDescriptorManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.input.InputWikiStream;
 
 /**
- * @param <E>
- * @param <P>
- * @param <F>
+ * @param <F> the type of the filter supported by this {@link InputWikiStream}
  * @version $Id$
  * @since 5.2M2
  */
-@Unstable
-public abstract class AbstractEntityEventGenerator<E, P, F> implements EntityEventGenerator<E, P>, Initializable
+public abstract class AbstractBeanInputWikiStream<P, F> implements BeanInputWikiStream<P>, Initializable
 {
     @Inject
     private FilterDescriptorManager filterDescriptorManager;
 
     protected Class<F> filterType;
 
+    protected P properties;
+
+    public AbstractBeanInputWikiStream()
+    {
+    }
+
+    public AbstractBeanInputWikiStream(FilterDescriptorManager filterDescriptorManager, P properties)
+    {
+        this.filterDescriptorManager = filterDescriptorManager;
+        setProperties(properties);
+    }
+
+    public void setProperties(P properties)
+    {
+        this.properties = properties;
+    }
+
     @Override
     public void initialize() throws InitializationException
     {
         // Get the type of the internal filter
         ParameterizedType genericType =
-            (ParameterizedType) ReflectionUtils.resolveType(AbstractEntityEventGenerator.class, getClass());
-        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[2]);
+            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanInputWikiStream.class, getClass());
+        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
     }
 
     @Override
-    public void write(E entity, Object filter, P properties) throws WikiStreamException
+    public void read(Object filter) throws WikiStreamException
     {
         F internalFilter = this.filterDescriptorManager.createFilterProxy(this.filterType, filter);
 
-        write(entity, filter, internalFilter, properties);
+        read(filter, internalFilter);
     }
 
-    protected abstract void write(E entity, Object filter, F internalFilter, P properties)
-        throws WikiStreamException;
+    protected abstract void read(Object filter, F internalFilter) throws WikiStreamException;
 }

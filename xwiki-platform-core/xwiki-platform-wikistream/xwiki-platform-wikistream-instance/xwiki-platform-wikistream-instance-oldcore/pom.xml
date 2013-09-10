@@ -27,40 +27,43 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wikistream</artifactId>
+    <artifactId>xwiki-platform-wikistream-instance</artifactId>
     <version>5.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wikistream-streams</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Wiki Stream - Streams</name>
+  <artifactId>xwiki-platform-wikistream-instance-oldcore</artifactId>
+  <name>XWiki Platform - Wiki Stream - Instance - Oldcore</name>
+  <description>Extract oldcore related data from the current XWiki instance</description>
   <properties>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
-  <modules>
-    <module>xwiki-platform-wikistream-stream-wikixml</module>
-    <module>xwiki-platform-wikistream-stream-xwiki</module>
-    <module>xwiki-platform-wikistream-stream-xar</module>
-  </modules>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-api</artifactId>
+      <artifactId>xwiki-platform-wikistream-stream-xwiki</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-instance-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-api</artifactId>
+      <artifactId>xwiki-platform-wikistream-test</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-stream-wikixml</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

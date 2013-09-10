@@ -45,7 +45,7 @@ public class WikiStreamType
     /**
      * The database stream based on oldcore APIs.
      */
-    public static final WikiStreamType XWIKI_DATABASEOLD = new WikiStreamType(WikiType.XWIKI, "databaseold");
+    public static final WikiStreamType XWIKI_INSTANCE = new WikiStreamType(WikiType.XWIKI, "instance");
 
     /**
      * Wiki type.

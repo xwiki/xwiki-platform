@@ -38,20 +38,11 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<InstanceInputProperties, InstanceFilter>
 {
-    private InstanceInputProperties properties;
-
-    public InstanceInputWikiStream(InstanceInputProperties properties)
-    {
-        this.properties = properties;
-    }
-
     @Override
     protected void read(Object filter, InstanceFilter internalFilter) throws WikiStreamException
     {
         internalFilter.beginWikiFarm(FilterEventParameters.EMPTY);
 
-        
-        
         internalFilter.endWikiFarm(FilterEventParameters.EMPTY);
     }
 }

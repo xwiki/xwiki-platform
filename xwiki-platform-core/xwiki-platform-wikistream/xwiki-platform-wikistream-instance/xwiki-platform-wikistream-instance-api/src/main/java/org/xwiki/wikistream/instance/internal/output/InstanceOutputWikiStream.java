@@ -31,11 +31,6 @@ import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<InstanceOutputProperties> implements
     UnknownFilter
 {
-    public InstanceOutputWikiStream(InstanceOutputProperties properties)
-    {
-        super(properties);
-    }
-
     // events
 
     @Override

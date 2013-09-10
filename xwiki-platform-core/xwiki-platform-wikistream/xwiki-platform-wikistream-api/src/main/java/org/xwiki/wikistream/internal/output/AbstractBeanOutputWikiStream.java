@@ -20,21 +20,30 @@
 package org.xwiki.wikistream.internal.output;
 
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.output.OutputWikiStream;
 
 /**
- * 
- * @param <P>
+ * @param <P> the type of the properties bean
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractBeanOutputWikiStream<P> implements OutputWikiStream
+public abstract class AbstractBeanOutputWikiStream<P> implements BeanOutputWikiStream<P>
 {
-    protected final P properties;
+    protected P properties;
 
     protected Object filter;
 
+    public AbstractBeanOutputWikiStream()
+    {
+
+    }
+
     public AbstractBeanOutputWikiStream(P properties)
+    {
+        setProperties(properties);
+    }
+
+    @Override
+    public void setProperties(P properties)
     {
         this.properties = properties;
     }

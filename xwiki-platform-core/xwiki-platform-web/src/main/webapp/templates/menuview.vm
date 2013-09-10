@@ -119,33 +119,29 @@
   #xwikitopmenuentryend()
 #end
 ##
-## Main Wiki
+## Home
 ##
-#set ($hasMainWikiAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${xcontext.mainWikiName}:XWiki.XWikiPreferences"))
-#set ($mainWikiAllDocsDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'AllDocs'))
-#set ($displayMainWikiSubmenu = $hasWatch || $hasMainWikiAdmin || $xwiki.exists($mainWikiAllDocsDocumentReference))
-#if ($isWorkspaceManagerAppInstalled && !$xcontext.isMainWiki() && ($isMainWikiUser || ($isGuest && $isWorkspace)))
+## This menu is displayed if
+## - Workspace Manager App is installed
+## - There is at least 2 (sub)wikis (workspace-template which is hidden + a real wiki)
+## - The user is not a local user (a guest in workspace or in the main wiki is not considered as a local user).
+#set ($localUser = !$isMainWikiUser && (!$isGuest && ($isWorkspace || $xcontext.isMainWiki())))
+#set ($displayMainWikiSubmenu = $isWorkspaceManagerAppInstalled && $listtool.size($services.workspace.getWorkspaces())>1 && !$localUser)
+#if ($displayMainWikiSubmenu)
   #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
-  #if (!$displayMainWikiSubmenu)
-    #xwikitopmenuentry($xwiki.getURL($mainWikiHomeDocumentReference) 'Main' 'tmMainWiki' 'hasIcon')
-  #else
-    #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) 'Main' 'tmMainWiki' 'hasIcon')
-      #set ($hasPreviousMenuSection = false)
-      #if ($hasMainWikiAdmin)
-        #set ($mainWikiAdministrationDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', 'XWikiPreferences'))
-        #submenuitem("$xwiki.getURL($mainWikiAdministrationDocumentReference, 'admin', '')" $services.localization.render('workspacemanager.menu.mainwiki.admin') 'tmAdminMainWiki' '')
-        #set ($hasPreviousMenuSection = true)
-      #end
-      #if($hasPreviousMenuSection)
-        #submenuseparator()
-      #end
-      #submenuitem("$xwiki.getURL($workspaceManagerMainDocumentReference)" $services.localization.render('workspacemanager.menu.workspace.index') 'tmWorkspaceIndex' '')
-      #if ($xwiki.exists($mainWikiAllDocsDocumentReference))
-        #submenuitem("$xwiki.getURL($mainWikiAllDocsDocumentReference)" $services.localization.render('core.menu.wiki.documentindex') 'tmMainWikiDocumentIndex' '')
-        #set ($hasPreviousMenuSection = true)
-      #end
-    #xwikitopmenuentryend()
-  #end
+  #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) 'Home' 'tmMainWiki' 'hasIcon')
+    #set ($hasPreviousMenuSection = false)
+    #set ($hasMainWikiAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${xcontext.mainWikiName}:XWiki.XWikiPreferences"))
+    #if ($hasMainWikiAdmin)
+      #set ($mainWikiAdministrationDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', 'XWikiPreferences'))
+      #submenuitem("$xwiki.getURL($mainWikiAdministrationDocumentReference, 'admin', '')" $services.localization.render('workspacemanager.menu.mainwiki.admin') 'tmAdminMainWiki' '')
+      #set ($hasPreviousMenuSection = true)
+    #end
+    #if($hasPreviousMenuSection)
+      #submenuseparator()
+    #end
+    #submenuitem("$xwiki.getURL($workspaceManagerMainDocumentReference)" $services.localization.render('workspacemanager.menu.workspace.index') 'tmWorkspaceIndex' '')
+  #xwikitopmenuentryend()
   #xwikitopmenuseparator()
 #end
 ##
@@ -153,7 +149,6 @@
 ##
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 #set ($canDeleteWorkspace = $isWorkspaceManagerAppInstalled && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
-#set ($displayWorkspaceDirectoryMenuEntry = $isWorkspaceManagerAppInstalled && $isMainWikiUser && $xcontext.isMainWiki() && $services.workspace.getWorkspaces().size()>1)
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $displayWorkspaceDirectoryMenuEntry || $canDeleteWorkspace)
 #set ($wikiEntryId = 'tmWiki')
 #if ($isWorkspaceManagerAppInstalled)
@@ -198,10 +193,6 @@
   #end
   #if ($hasPreviousMenuSection && ($displayWorkspaceDirectoryMenuEntry || $xwiki.exists('Main.AllDocs')))
     #submenuseparator()
-  #end
-  #if ($displayWorkspaceDirectoryMenuEntry)
-    #submenuitem("$xwiki.getURL($workspaceManagerMainDocumentReference)" $services.localization.render('workspacemanager.menu.workspace.index') 'tmWorkspaceIndex' '')
-    #set ($hasPreviousMenuSection = true)
   #end
   #if ($xwiki.exists('Main.AllDocs'))
     #submenuitem("$xwiki.getURL('Main.AllDocs')" $services.localization.render('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')

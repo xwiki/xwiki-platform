@@ -39,9 +39,11 @@ public interface DataManager
     long getTotalInstalls() throws Exception;
 
     /**
-     * @return the total number of active installs (i.e. we've received a ping from them in the past N months - defined
-     *         in the Active Installs module configuration)
+     * @param days the number of days after which an Install is no longer be considered active (eg 30 days means that
+     *        if we haven't received a ping for the last 30 days the installation is no longer considered as an active
+     *        installation)
+     * @return the total number of active installs
      * @throws Exception when an error happens while retrieving the data
      */
-    long getActiveInstalls() throws Exception;
+    long getActiveInstalls(int days) throws Exception;
 }

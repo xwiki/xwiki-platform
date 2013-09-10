@@ -47,11 +47,6 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     private static final String DEFAULT_PING_URL = "http://extensions.xwiki.org/activeinstalls";
 
     /**
-     * @see #getPingInstanceURL()
-     */
-    private static final int DEFAULT_ACTIVITY_THRESHOLD = 30;
-
-    /**
      * Defines from where to read the rendering configuration data.
      */
     @Inject
@@ -61,11 +56,5 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     public String getPingInstanceURL()
     {
         return this.configuration.getProperty(PREFIX + "pingURL", DEFAULT_PING_URL);
-    }
-
-    @Override
-    public int getActivityThreshold()
-    {
-        return this.configuration.getProperty(PREFIX + "activityThreshold", DEFAULT_ACTIVITY_THRESHOLD);
     }
 }

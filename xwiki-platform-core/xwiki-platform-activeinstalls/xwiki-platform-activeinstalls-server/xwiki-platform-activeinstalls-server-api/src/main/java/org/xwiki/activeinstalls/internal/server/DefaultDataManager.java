@@ -26,7 +26,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.activeinstalls.server.DataManager;
 import org.xwiki.component.annotation.Component;
@@ -52,9 +51,6 @@ public class DefaultDataManager implements DataManager
     @Inject
     private JestClientManager jestClientManager;
 
-    @Inject
-    private ActiveInstallsConfiguration configuration;
-
     @Override
     public long getTotalInstalls() throws Exception
     {
@@ -62,11 +58,11 @@ public class DefaultDataManager implements DataManager
     }
 
     @Override
-    public long getActiveInstalls() throws Exception
+    public long getActiveInstalls(int days) throws Exception
     {
         // Compute current date - N days
         DateTime dt = new DateTime();
-        dt = dt.plusDays(-configuration.getActivityThreshold());
+        dt = dt.plusDays(-days);
 
         // Serialize the new date
         String serializedDate = DATE_FORMATTER.print(dt);

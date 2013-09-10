@@ -37,11 +37,4 @@ public interface ActiveInstallsConfiguration
      *         activity
      */
     String getPingInstanceURL();
-
-    /**
-     * @return the number of days after which an Install will no longer be considered active (eg 30 days means that if
-     *         we haven't received a ping for the last 30 days the installation is no longer considered as an active
-     *         installation)
-     */
-    int getActivityThreshold();
 }

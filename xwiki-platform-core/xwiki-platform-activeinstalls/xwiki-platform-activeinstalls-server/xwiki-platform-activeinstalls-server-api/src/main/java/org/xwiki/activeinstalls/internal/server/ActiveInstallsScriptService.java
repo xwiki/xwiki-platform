@@ -78,20 +78,22 @@ public class ActiveInstallsScriptService implements ScriptService
     }
 
     /**
-     * See {@link org.xwiki.activeinstalls.server.DataManager#getActiveInstalls()}.
+     * See {@link org.xwiki.activeinstalls.server.DataManager#getActiveInstalls(int)}.
      *
-     * @return the total number of active installs (i.e. we've received a ping from them in the past N months - defined
-     *         in the Active Installs module configuration) or -1 if an error happened, in which case the error
-     *         can be retrieved with {@link #getLastError()}.
+     * @param days the number of days after which an Install is no longer be considered active (eg 30 days means that
+     *        if we haven't received a ping for the last 30 days the installation is no longer considered as an active
+     *        installation)
+     * @return the total number of active installs or -1 if an error happened, in which case the error can be retrieved
+     *         with {@link #getLastError()}.
      */
-    public long getActiveInstalls()
+    public long getActiveInstalls(int days)
     {
         setError(null);
 
         long result = -1;
 
         try {
-            result = this.dataManager.getActiveInstalls();
+            result = this.dataManager.getActiveInstalls(days);
         } catch (Exception e) {
             setError(e);
         }

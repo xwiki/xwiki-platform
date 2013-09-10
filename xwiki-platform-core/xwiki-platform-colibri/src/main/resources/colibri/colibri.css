@@ -2182,7 +2182,7 @@ ol.footnotes {
   border-top: 1px solid $theme.borderColor;
   font-size: 80%;
   margin: 10px 0;
-  padding: 1em;
+  padding: 2em;
 }
 
 .footnotes li {

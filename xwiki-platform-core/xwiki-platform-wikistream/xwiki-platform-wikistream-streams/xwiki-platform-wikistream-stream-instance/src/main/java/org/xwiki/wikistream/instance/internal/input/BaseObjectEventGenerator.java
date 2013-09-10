@@ -19,14 +19,22 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Iterator;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiObjectFilter;
-import org.xwiki.wikistream.input.InputWikiStream;
+import org.xwiki.wikistream.instance.internal.BaseClassProperties;
 import org.xwiki.wikistream.instance.internal.BaseObjectFilter;
 import org.xwiki.wikistream.instance.internal.BaseObjectProperties;
+import org.xwiki.wikistream.instance.internal.BasePropertyProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -34,64 +42,63 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class BaseObjectInputWikiStream implements InputWikiStream
+@Component
+@Singleton
+public class BaseObjectEventGenerator extends
+    AbstractEntityEventGenerator<BaseObject, BaseObjectProperties, BaseObjectFilter>
 {
-    private BaseObject xobject;
+    public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
+        BaseObject.class, BaseObjectProperties.class);
 
-    private BaseObjectProperties properties;
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
-    private XWikiContext xcontext;
+    @Inject
+    private EntityEventGenerator<BaseClass, BaseClassProperties> classEventGenerator;
 
-    public BaseObjectInputWikiStream(BaseObject xobject, XWikiContext xcontext, BaseObjectProperties properties)
-    {
-        this.xobject = xobject;
-        this.properties = properties;
-        this.xcontext = xcontext;
-    }
+    @Inject
+    private EntityEventGenerator<BaseProperty, BasePropertyProperties> propertyEventGenerator;
 
     @Override
-    public void read(Object filter) throws WikiStreamException
+    public void writeInternal(BaseObject xobject, Object filter, BaseObjectFilter objectFilter,
+        BaseObjectProperties properties) throws WikiStreamException
     {
-        BaseObjectFilter objectFilter = (BaseObjectFilter) filter;
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         // > WikiObject
 
         FilterEventParameters objectParameters = new FilterEventParameters();
 
-        objectParameters.put(WikiObjectFilter.PARAMETER_CLASS_REFERENCE, this.xobject.getClassName());
-        objectParameters.put(WikiObjectFilter.PARAMETER_GUID, this.xobject.getGuid());
-        objectParameters.put(WikiObjectFilter.PARAMETER_NUMBER, this.xobject.getNumber());
+        objectParameters.put(WikiObjectFilter.PARAMETER_CLASS_REFERENCE, xobject.getClassName());
+        objectParameters.put(WikiObjectFilter.PARAMETER_GUID, xobject.getGuid());
+        objectParameters.put(WikiObjectFilter.PARAMETER_NUMBER, xobject.getNumber());
 
-        objectFilter.beginWikiObject(this.xobject.getReference().getName(), objectParameters);
+        objectFilter.beginWikiObject(xobject.getReference().getName(), objectParameters);
 
         // Properties
 
         // Iterate over values/properties sorted by field name so that the values are
         // exported to XML in a consistent order.
-        Iterator<BaseProperty< ? >> it = this.xobject.getSortedIterator();
+        Iterator<BaseProperty< ? >> it = xobject.getSortedIterator();
         while (it.hasNext()) {
             BaseProperty< ? > xproperty = it.next();
 
             String pname = xproperty.getName();
             if (pname != null && !pname.trim().equals("")) {
-                BasePropertyInputWikiStream propertyStream =
-                    new BasePropertyInputWikiStream(xproperty, this.properties);
-                propertyStream.read(objectFilter);
+                this.propertyEventGenerator.write(xproperty, objectFilter, properties);
             }
         }
 
         // Object class
 
-        BaseClass xclass = this.xobject.getXClass(this.xcontext);
-        BaseClassInputWikiStream classStream = new BaseClassInputWikiStream(xclass, this.properties);
-        classStream.read(objectFilter);
+        BaseClass xclass = xobject.getXClass(xcontext);
+        this.classEventGenerator.write(xclass, objectFilter, properties);
 
         // < WikiObject
 
-        objectFilter.endWikiObject(this.xobject.getReference().getName(), objectParameters);
+        objectFilter.endWikiObject(xobject.getReference().getName(), objectParameters);
     }
 }

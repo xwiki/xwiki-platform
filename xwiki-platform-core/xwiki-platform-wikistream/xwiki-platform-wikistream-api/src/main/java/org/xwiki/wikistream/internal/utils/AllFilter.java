@@ -27,19 +27,19 @@ import org.xwiki.wikistream.filter.WikiClassFilter;
 import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
 import org.xwiki.wikistream.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.filter.WikiFarmFilter;
+import org.xwiki.wikistream.filter.WikiFilter;
 import org.xwiki.wikistream.filter.WikiObjectFilter;
 import org.xwiki.wikistream.filter.WikiObjectPropertyFilter;
 import org.xwiki.wikistream.filter.WikiSpaceFilter;
-import org.xwiki.wikistream.filter.WikiFilter;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 @Unstable
-public interface AllFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter, WikiAttachmentFilter, WikiClassFilter,
-    WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter, UnknownFilter, Listener
+public interface AllFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter,
+    WikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter,
+    Listener, UnknownFilter
 {
 
 }

@@ -29,6 +29,8 @@ public class XWikiDocumentProperties extends XWikiAttachmentProperties implement
 
     private boolean withWikiObjects = true;
 
+    private boolean withWikiClass = true;
+
     private boolean withWikiAttachments = true;
 
     private boolean withWikiDocumentContentHTML = false;
@@ -51,6 +53,16 @@ public class XWikiDocumentProperties extends XWikiAttachmentProperties implement
     public void setWithWikiAttachments(boolean withWikiAttachments)
     {
         this.withWikiAttachments = withWikiAttachments;
+    }
+
+    public boolean isWithWikiClass()
+    {
+        return this.withWikiClass;
+    }
+
+    public void setWithWikiClass(boolean withWikiClass)
+    {
+        this.withWikiClass = withWikiClass;
     }
 
     public boolean isWithWikiObjects()

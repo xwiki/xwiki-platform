@@ -23,10 +23,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
-import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.instance.internal.PropertyClassProperties;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 
@@ -34,27 +36,18 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class PropertyClassInputWikiStream implements InputWikiStream
+@Component
+@Singleton
+public class PropertyClassEventGenerator extends
+    AbstractEntityEventGenerator<PropertyClass, PropertyClassProperties, XWikiDocumentFilter>
 {
-    private PropertyClass xclassProperty;
-
-    private PropertyClassProperties properties;
-
-    public PropertyClassInputWikiStream(PropertyClass xclassProperty, PropertyClassProperties properties)
-    {
-        this.xclassProperty = xclassProperty;
-        this.properties = properties;
-    }
-
     @Override
-    public void read(Object filter) throws WikiStreamException
+    public void writeInternal(PropertyClass xclassProperty, Object filter, XWikiDocumentFilter documentFilter,
+        PropertyClassProperties properties) throws WikiStreamException
     {
-        XWikiDocumentFilter documentFilter = (XWikiDocumentFilter) filter;
-
         // > WikiClassProperty
 
         FilterEventParameters propertyParameters = new FilterEventParameters();
@@ -63,7 +56,7 @@ public class PropertyClassInputWikiStream implements InputWikiStream
 
         // Iterate over values sorted by field name so that the values are
         // exported to XML in a consistent order.
-        Iterator<BaseProperty< ? >> it = this.xclassProperty.getSortedIterator();
+        Iterator<BaseProperty< ? >> it = xclassProperty.getSortedIterator();
         while (it.hasNext()) {
             BaseProperty< ? > bprop = it.next();
             fields.put(bprop.getName(), bprop.toText());
@@ -71,17 +64,17 @@ public class PropertyClassInputWikiStream implements InputWikiStream
 
         propertyParameters.put(WikiClassPropertyFilter.PARAMETER_FIELDS, fields);
 
-        String classType = this.xclassProperty.getClassType();
-        if (this.xclassProperty.getClass().getSimpleName().equals(classType + "Class")) {
+        String classType = xclassProperty.getClassType();
+        if (xclassProperty.getClass().getSimpleName().equals(classType + "Class")) {
             // Keep exporting the full Java class name for old/default property types to avoid breaking the XAR format
             // (to allow XClasses created with the current version of XWiki to be imported in an older version).
             classType = getClass().getName();
         }
 
-        documentFilter.beginWikiClassProperty(this.xclassProperty.getName(), classType, propertyParameters);
+        documentFilter.beginWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);
 
         // < WikiClassProperty
 
-        documentFilter.endWikiClassProperty(this.xclassProperty.getName(), classType, propertyParameters);
+        documentFilter.endWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);
     }
 }

@@ -19,12 +19,12 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
-import org.xwiki.wikistream.filter.WikiObjectFilter;
+import org.xwiki.wikistream.filter.WikiObjectPropertyFilter;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public interface BaseObjectFilter extends BaseClassFilter, WikiObjectFilter, BasePropertyFilter
+public interface BasePropertyFilter extends WikiObjectPropertyFilter
 {
 }

@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal;
+package org.xwiki.wikistream.instance.internal.input;
 
-import org.xwiki.wikistream.filter.WikiObjectFilter;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.wikistream.WikiStreamException;
 
-/**
- * @version $Id$
- * @since 5.2M2
- */
-public interface BaseObjectFilter extends BaseClassFilter, WikiObjectFilter, BasePropertyFilter
+@Role
+public interface EntityEventGenerator<E, P>
 {
+    void write(E entity, Object filter, P properties) throws WikiStreamException;
 }

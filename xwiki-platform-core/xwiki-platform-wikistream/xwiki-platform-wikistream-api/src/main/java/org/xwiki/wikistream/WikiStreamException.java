@@ -22,7 +22,7 @@ package org.xwiki.wikistream;
 import org.xwiki.stability.Unstable;
 
 /**
- * Encapsulates WikiConverter errors.
+ * Encapsulates WikiStream errors.
  * 
  * @version $Id$
  * @since 5.2M2

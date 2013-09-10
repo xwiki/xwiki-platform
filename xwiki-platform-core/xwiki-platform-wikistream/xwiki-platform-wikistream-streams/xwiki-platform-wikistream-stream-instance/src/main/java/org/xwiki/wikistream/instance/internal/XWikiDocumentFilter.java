@@ -19,18 +19,13 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
-import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
-import org.xwiki.wikistream.filter.WikiObjectFilter;
-import org.xwiki.wikistream.filter.WikiObjectPropertyFilter;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public interface XWikiDocumentFilter extends XWikiWikiDocumentFilter, XWikiAttachmentFilter, WikiClassFilter,
-    WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter
+public interface XWikiDocumentFilter extends XWikiWikiDocumentFilter, XWikiAttachmentFilter, BaseClassFilter,
+    BaseObjectFilter
 {
 }

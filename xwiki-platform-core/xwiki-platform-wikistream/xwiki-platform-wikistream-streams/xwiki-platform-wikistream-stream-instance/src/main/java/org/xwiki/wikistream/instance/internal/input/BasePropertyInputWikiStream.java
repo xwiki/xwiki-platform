@@ -19,44 +19,37 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.InputWikiStream;
+import org.xwiki.wikistream.instance.internal.BasePropertyFilter;
 import org.xwiki.wikistream.instance.internal.BasePropertyProperties;
-import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 
 import com.xpn.xwiki.objects.BaseProperty;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class BasePropertyInputWikiStream implements InputWikiStream
+@Component
+@Singleton
+public class BasePropertyInputWikiStream extends
+    AbstractEntityEventGenerator<BaseProperty, BasePropertyProperties, BasePropertyFilter>
 {
-    private BaseProperty< ? > xclassProperty;
-
-    private BasePropertyProperties properties;
-
-    public BasePropertyInputWikiStream(BaseProperty< ? > xproperty, BasePropertyProperties properties)
-    {
-        this.xclassProperty = xproperty;
-        this.properties = properties;
-    }
-
     @Override
-    public void read(Object filter) throws WikiStreamException
+    public void writeInternal(BaseProperty xclassProperty, Object filter, BasePropertyFilter propertyFilter,
+        BasePropertyProperties properties) throws WikiStreamException
     {
-        XWikiDocumentFilter documentFilter = (XWikiDocumentFilter) filter;
-
         // > WikiObjectProperty
 
-        documentFilter.beginWikiObjectProperty(this.xclassProperty.getName(), this.xclassProperty.toText(),
+        propertyFilter.beginWikiObjectProperty(xclassProperty.getName(), xclassProperty.toText(),
             FilterEventParameters.EMPTY);
 
         // < WikiObjectProperty
 
-        documentFilter.endWikiObjectProperty(this.xclassProperty.getName(), this.xclassProperty.toText(),
+        propertyFilter.endWikiObjectProperty(xclassProperty.getName(), xclassProperty.toText(),
             FilterEventParameters.EMPTY);
     }
 }

@@ -80,7 +80,7 @@ public class XWikiDocumentEventGenerator extends
     private EntityEventGenerator<BaseObject, BaseObjectProperties> objectEventGenerator;
 
     @Override
-    public void writeInternal(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,
+    public void write(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,
         XWikiDocumentProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();

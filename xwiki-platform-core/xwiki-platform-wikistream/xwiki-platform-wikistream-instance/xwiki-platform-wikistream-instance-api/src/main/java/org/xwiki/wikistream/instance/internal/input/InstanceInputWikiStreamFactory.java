@@ -23,8 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -46,11 +44,5 @@ public class InstanceInputWikiStreamFactory extends AbstractBeanInputWikiStreamF
 
         setName("XWiki instance output stream");
         setDescription("Generates wiki events from XWiki instance.");
-    }
-
-    @Override
-    protected InputWikiStream createInputWikiStream(InstanceInputProperties properties) throws WikiStreamException
-    {
-        return new InstanceInputWikiStream(properties);
     }
 }

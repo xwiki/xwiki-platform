@@ -19,25 +19,30 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import javax.inject.Named;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.InputWikiStream;
+import org.xwiki.wikistream.instance.internal.InstanceFilter;
+import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public class InstanceInputWikiStream implements InputWikiStream
+@Component
+@Named("xwiki+instance")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<InstanceInputProperties, InstanceFilter>
 {
-    private InstanceInputProperties properties;
-
-    public InstanceInputWikiStream(InstanceInputProperties properties)
-    {
-        this.properties = properties;
-    }
-
     @Override
-    public void read(Object filter) throws WikiStreamException
+    protected void read(Object filter, InstanceFilter internalFilter) throws WikiStreamException
     {
+        internalFilter.beginWikiFarm(FilterEventParameters.EMPTY);
 
+        internalFilter.endWikiFarm(FilterEventParameters.EMPTY);
     }
 }

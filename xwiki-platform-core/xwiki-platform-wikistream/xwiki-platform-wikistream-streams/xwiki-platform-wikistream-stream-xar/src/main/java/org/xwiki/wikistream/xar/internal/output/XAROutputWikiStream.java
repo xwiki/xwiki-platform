@@ -23,8 +23,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -47,10 +52,12 @@ import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
+@Component
+@Named("xwiki+xar/1.0")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputProperties> implements XARFilter
 {
     private static final LocalizedStringEntityReferenceSerializer TOSTRING_SERIALIZER =
@@ -79,11 +86,6 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     private String currentObjectClass;
 
     private WikiStreamXMLStreamWriter writer;
-
-    public XAROutputWikiStream(XAROutputProperties properties)
-    {
-        super(properties);
-    }
 
     public String toString(Object obj)
     {
@@ -250,8 +252,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     }
 
     @Override
-    public void beginWikiDocumentRevision(String version, FilterEventParameters parameters)
-        throws WikiStreamException
+    public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentDocumentVersion = version;
         this.currentParameters = new ParametersTree(parameters, this.currentParameters);
@@ -299,8 +300,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     }
 
     @Override
-    public void endWikiAttachmentRevision(String version, FilterEventParameters parameters)
-        throws WikiStreamException
+    public void endWikiAttachmentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
         this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, this.currentAttachment);
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,

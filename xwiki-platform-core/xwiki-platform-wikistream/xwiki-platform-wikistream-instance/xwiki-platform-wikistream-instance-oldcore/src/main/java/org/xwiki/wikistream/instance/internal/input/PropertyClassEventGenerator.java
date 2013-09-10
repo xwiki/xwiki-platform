@@ -46,7 +46,7 @@ public class PropertyClassEventGenerator extends
     AbstractEntityEventGenerator<PropertyClass, PropertyClassProperties, XWikiDocumentFilter>
 {
     @Override
-    public void writeInternal(PropertyClass xclassProperty, Object filter, XWikiDocumentFilter documentFilter,
+    public void write(PropertyClass xclassProperty, Object filter, XWikiDocumentFilter documentFilter,
         PropertyClassProperties properties) throws WikiStreamException
     {
         // > WikiClassProperty

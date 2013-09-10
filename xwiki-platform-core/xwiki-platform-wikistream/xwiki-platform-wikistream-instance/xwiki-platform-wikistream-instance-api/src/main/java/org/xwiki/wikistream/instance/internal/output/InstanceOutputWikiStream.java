@@ -19,6 +19,11 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
+import javax.inject.Named;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.UnknownFilter;
@@ -28,14 +33,12 @@ import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
  * @version $Id$
  * @since 5.2M2
  */
+@Component
+@Named("xwiki+instance")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<InstanceOutputProperties> implements
     UnknownFilter
 {
-    public InstanceOutputWikiStream(InstanceOutputProperties properties)
-    {
-        super(properties);
-    }
-
     // events
 
     @Override

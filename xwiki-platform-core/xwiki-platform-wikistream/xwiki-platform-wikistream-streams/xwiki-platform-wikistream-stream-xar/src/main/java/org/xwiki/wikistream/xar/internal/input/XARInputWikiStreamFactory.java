@@ -23,8 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -46,11 +44,5 @@ public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactor
 
         setName("Wiki XML output stream");
         setDescription("Generates wiki events from XAR package.");
-    }
-
-    @Override
-    protected InputWikiStream createInputWikiStream(XARInputProperties properties) throws WikiStreamException
-    {
-        return null;
     }
 }

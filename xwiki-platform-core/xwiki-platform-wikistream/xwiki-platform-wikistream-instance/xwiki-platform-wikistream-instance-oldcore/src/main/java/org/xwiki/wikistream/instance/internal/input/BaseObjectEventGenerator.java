@@ -65,7 +65,7 @@ public class BaseObjectEventGenerator extends
     private EntityEventGenerator<BaseProperty, BasePropertyProperties> propertyEventGenerator;
 
     @Override
-    public void writeInternal(BaseObject xobject, Object filter, BaseObjectFilter objectFilter,
+    public void write(BaseObject xobject, Object filter, BaseObjectFilter objectFilter,
         BaseObjectProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();

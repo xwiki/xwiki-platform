@@ -40,7 +40,7 @@ public class BasePropertyInputWikiStream extends
     AbstractEntityEventGenerator<BaseProperty, BasePropertyProperties, BasePropertyFilter>
 {
     @Override
-    public void writeInternal(BaseProperty xclassProperty, Object filter, BasePropertyFilter propertyFilter,
+    public void write(BaseProperty xclassProperty, Object filter, BasePropertyFilter propertyFilter,
         BasePropertyProperties properties) throws WikiStreamException
     {
         // > WikiObjectProperty

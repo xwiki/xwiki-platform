@@ -62,7 +62,7 @@ public class XWikiAttachmentEventGenerator extends
     private Logger logger;
 
     @Override
-    public void writeInternal(XWikiAttachment attachment, Object filter, XWikiAttachmentFilter attachmentFilter,
+    public void write(XWikiAttachment attachment, Object filter, XWikiAttachmentFilter attachmentFilter,
         XWikiAttachmentProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();

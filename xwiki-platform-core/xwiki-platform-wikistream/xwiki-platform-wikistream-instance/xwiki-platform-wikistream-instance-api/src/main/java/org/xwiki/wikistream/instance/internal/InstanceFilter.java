@@ -17,17 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input;
 
-import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.WikiStreamException;
+package org.xwiki.wikistream.instance.internal;
+
+import org.xwiki.filter.UnknownFilter;
+import org.xwiki.wikistream.filter.WikiFarmFilter;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-@Unstable
-public interface InputWikiStream
+public interface InstanceFilter extends WikiFarmFilter, UnknownFilter
 {
-    void read(Object filter) throws WikiStreamException;
+
 }

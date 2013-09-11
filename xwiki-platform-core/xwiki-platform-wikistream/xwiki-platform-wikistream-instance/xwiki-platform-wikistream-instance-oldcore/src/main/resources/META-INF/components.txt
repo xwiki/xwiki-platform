@@ -1,3 +1,4 @@
+org.xwiki.wikistream.instance.internal.DefaultInstanceModel
 org.xwiki.wikistream.instance.internal.input.DocumentInstanceInputEventGenerator
 org.xwiki.wikistream.instance.internal.input.BaseClassEventGenerator
 org.xwiki.wikistream.instance.internal.input.BaseObjectEventGenerator

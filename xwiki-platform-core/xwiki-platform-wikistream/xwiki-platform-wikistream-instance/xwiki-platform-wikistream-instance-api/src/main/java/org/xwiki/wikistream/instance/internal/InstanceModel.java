@@ -17,16 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal.input;
+package org.xwiki.wikistream.instance.internal;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.wikistream.WikiStreamException;
 
 @Role
 public interface InstanceModel
 {
-    List<String> getWikis();
+    List<String> getWikis() throws WikiStreamException;
 
-    List<String> getSpaces(String wiki);
+    List<String> getSpaces(String wiki) throws WikiStreamException;
 }

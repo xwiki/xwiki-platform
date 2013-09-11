@@ -396,7 +396,11 @@ ul.searchSuggestSources {
 
 #set($discard = $doc.use($doc.fullName))
 (% class="xform" %)(((
-; {{html}}&lt;label for="${doc.fullName}_0_activated"&gt;$doc.displayPrettyName('activated', false, false)&lt;/label&gt;{{/html}}
+; {{html}}
+  &lt;label#if ($editing) for="${doc.fullName}_0_activated"#end&gt;
+    $doc.displayPrettyName('activated', false, false)
+  &lt;/label&gt;
+  {{/html}}
 : $doc.display('activated', $mode)
 )))
 

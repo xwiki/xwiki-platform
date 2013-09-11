@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.codec.binary.Base64;
@@ -31,7 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
-import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
@@ -60,8 +61,9 @@ import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputProperties> implements XARFilter
 {
-    private static final LocalizedStringEntityReferenceSerializer TOSTRING_SERIALIZER =
-        new LocalizedStringEntityReferenceSerializer();
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localSerializer;
 
     private XARWikiWriter wikiWriter;
 
@@ -329,7 +331,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.currentParameters = new ParametersTree(parameters, this.currentParameters);
 
         this.writer.writeElement(XARClassModel.ELEMENT_NAME, this.currentObjectClass != null ? this.currentObjectClass
-            : TOSTRING_SERIALIZER.serialize(this.currentDocumentReference));
+            : this.localSerializer.serialize(this.currentDocumentReference));
 
         this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMCLASS,
             this.currentParameters.<String> get(WikiClassFilter.PARAMETER_CUSTOMCLASS));
@@ -393,7 +395,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.currentObjectClass = this.currentParameters.<String> get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE);
 
         this.writer.writeElement(XARObjectModel.ELEMENT_NAME,
-            TOSTRING_SERIALIZER.serialize(this.currentDocumentReference));
+            this.localSerializer.serialize(this.currentDocumentReference));
         this.writer.writeElement(XARObjectModel.ELEMENT_NUMBER,
             toString(this.currentParameters.<Integer> get(WikiObjectFilter.PARAMETER_NUMBER)));
         this.writer.writeElement(XARObjectModel.ELEMENT_CLASSNAME, this.currentObjectClass);

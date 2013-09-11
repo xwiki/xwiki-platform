@@ -30,7 +30,7 @@ import java.util.Map;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang3.ObjectUtils;
-import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.FileOutputTarget;
@@ -45,8 +45,8 @@ import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
  */
 public class XARWikiWriter
 {
-    private static final LocalizedStringEntityReferenceSerializer TOSTRING_SERIALIZER =
-        new LocalizedStringEntityReferenceSerializer();
+    private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
+        new LocalStringEntityReferenceSerializer();
 
     private static class Entry
     {

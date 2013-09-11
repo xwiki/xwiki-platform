@@ -29,9 +29,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
-import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
+import org.xwiki.wikistream.instance.internal.PropertyClassFilter;
 import org.xwiki.wikistream.instance.internal.PropertyClassProperties;
-import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -43,10 +42,10 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Component
 @Singleton
 public class PropertyClassEventGenerator extends
-    AbstractEntityEventGenerator<PropertyClass, PropertyClassProperties, XWikiDocumentFilter>
+    AbstractBeanEntityEventGenerator<PropertyClass, PropertyClassFilter, PropertyClassProperties>
 {
     @Override
-    public void write(PropertyClass xclassProperty, Object filter, XWikiDocumentFilter documentFilter,
+    public void write(PropertyClass xclassProperty, Object filter, PropertyClassFilter propertyFilter,
         PropertyClassProperties properties) throws WikiStreamException
     {
         // > WikiClassProperty
@@ -72,10 +71,10 @@ public class PropertyClassEventGenerator extends
             classType = getClass().getName();
         }
 
-        documentFilter.beginWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);
+        propertyFilter.beginWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);
 
         // < WikiClassProperty
 
-        documentFilter.endWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);
+        propertyFilter.endWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);
     }
 }

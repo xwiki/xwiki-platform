@@ -103,7 +103,9 @@
     </property>
     <property>
       <code>require(['jquery'], function($) {
+  //-----------------------
   // Search engine tab bar.
+  //-----------------------
   $('.searchEngines a').click(function(event) {
     event.stopPropagation();
     event.preventDefault();
@@ -114,12 +116,15 @@
   });
 
   // Toggle source details.
-  $('.searchSuggestSources .source-header').click(function(event) {
+  var sourceHeaderClickHandler = function() {
     $(this).next('.source-body').toggleClass('hidden');
-  });
+  };
+  $('.searchSuggestSources .source-header').click(sourceHeaderClickHandler);
 
+  //--------------------
   // Ajax source delete.
-  $('.searchSuggestSources .source-header .delete').click(function(event) {
+  //--------------------
+  var sourceDeleteHandler = function(event) {
     event.stopPropagation();
     event.preventDefault();
     var deleteLink = this;
@@ -147,6 +152,73 @@
         failureMessageText : "$escapetool.javascript($services.localization.render('core.editors.object.delete.failed'))"
       }
     );
+  };
+  $('.searchSuggestSources .source-header .delete').click(sourceDeleteHandler);
+
+  //-----------------
+  // Ajax source add.
+  //-----------------
+  var targetDocument = new XWiki.Document('SearchSuggestConfig', 'XWiki');
+  var createSourceDeleteLink = function(objectNumber) {
+    var icon = document.createElement('img');
+    $(icon).addClass('icon').attr('alt', 'cross')
+      .attr('src', "$xwiki.getSkinFile('icons/silk/cross.png')");
+    var link = document.createElement('a');
+    var deleteSourceURL = targetDocument.getURL('objectremove', $.param({
+      form_token: $('meta[name="form_token"]').attr('content'),
+      classname: 'XWiki.SearchSuggestSourceClass',
+      classid: objectNumber
+    }));
+    $(link).addClass('delete').attr('href', deleteSourceURL)
+      .append(icon).click(sourceDeleteHandler);
+    return link;
+  };
+  var createSourceUI = function(sourceFormHTML) {
+    var container = document.createElement('li');
+    $(container).html('&lt;div class="source"&gt;&lt;div class="source-header"&gt;&lt;span class="name"&gt;'
+      + 'New Source&lt;/span&gt;&lt;div class="actions"/&gt;&lt;/div&gt;&lt;div class="source-body"/&gt;&lt;/div&gt;');
+    $(container).find('.source-body').html(sourceFormHTML);
+    var objectNumber = parseInt($(container).find('input[type="text"]')
+      .attr('name').substr('XWiki.SearchSuggestSourceClass_'.length));
+    $(container).find('.source-header').click(sourceHeaderClickHandler)
+      .find('.actions').append(createSourceDeleteLink(objectNumber));
+    return container;
+  };
+  var insertSource = function(sourceFormHTML) {
+    var searchEngines = $(this).closest('p').prevAll('.searchEngines');
+    if (searchEngines.length == 0) {
+      // There is no search suggest source present. This will be the first one.
+      // TODO: Prepare the search engine tab bar.
+      // TODO: Prepare the search suggest sources container.
+    }
+    var source = createSourceUI(sourceFormHTML);
+    searchEngines.nextAll(searchEngines.find('li.active a').attr('href')).append(source);
+  }
+  $('.addSearchSuggestSource').click(function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    if ($(this).hasClass('loading')) return;
+    $(this).addClass('loading');
+    var notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.inProgress')", 'inprogress');
+    var addLink = this;
+    $.get(targetDocument.getURL('objectadd'), {
+      form_token: $(this).closest('form').find('input[name="form_token"]').prop('value'),
+      classname: 'XWiki.SearchSuggestSourceClass',
+      xredirect: targetDocument.getURL('get', $.param({
+        sheet: 'XWiki.SearchSuggestSourceSheet',
+        xobjectNumber: '',
+      }))
+    })
+    .done(function(data) {
+      insertSource.call(addLink, data);
+      notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", 'done'));
+    })
+    .fail(function() {
+      notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.failed')", 'error'));
+    })
+    .always(function() {
+      $(addLink).removeClass('loading');
+    });
   });
 })</code>
     </property>
@@ -241,9 +313,14 @@
     </property>
     <property>
       <code>#template('colorThemeInit.vm')
+ul.searchEngines {
+  margin-top: 1.2em;
+}
 ul.searchSuggestSources {
+  border: 1px solid $theme.borderColor;
   list-style-type: none;
-  margin-left: 0;
+  margin: 0;
+  padding: 1em 0.5em;
 }
 .searchSuggestSources .source-header {
   border-left: 2px solid $theme.borderColor;
@@ -252,7 +329,7 @@ ul.searchSuggestSources {
   padding: 0.1em 0.1em 0.1em 0.3em;
   position: relative;
 }
-.searchSuggestSources .source-header:hover {
+.searchSuggestSources .source:hover .source-header {
   background-color: $theme.highlightColor;
 }
 .searchSuggestSources .source-header.activated {
@@ -286,6 +363,13 @@ ul.searchSuggestSources {
 }
 .searchSuggestSources .source-body .xform dt:first-of-type {
   margin-top: 0;
+}
+.addSearchSuggestSource {
+  background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat scroll left center transparent;
+  padding-left: 20px;
+}
+.addSearchSuggestSource.loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
 }</code>
     </property>
     <property>
@@ -317,7 +401,6 @@ ul.searchSuggestSources {
 )))
 
 == Sources ==
-
 #set ($searchSuggestSourceClassName = 'XWiki.SearchSuggestSourceClass')
 ## Group sources by search engine.
 #set ($sources = {})
@@ -346,8 +429,8 @@ ul.searchSuggestSources {
   #end
   &lt;/ul&gt;
   {{/html}}
-#end
 
+#end
 ## Display sources by search engine.
 #set ($sourceSheet = $xwiki.getDocument('XWiki.SearchSuggestSourceSheet'))
 #foreach ($engine in $sources.keySet())
@@ -396,11 +479,11 @@ ul.searchSuggestSources {
 #end
 
 #if ($editing)
-  [[[[image:icon:add||class="icon"]] Add a new source&gt;&gt;path:$doc.getURL('objectadd', $escapetool.url({
+  [[Add a new source&gt;&gt;path:$doc.getURL('objectadd', $escapetool.url({
     'form_token': $services.csrf.token,
     'classname': $searchSuggestSourceClassName,
     'xredirect': $xwiki.relativeRequestURL
-  }))||class="add"]]
+  }))||class="addSearchSuggestSource"]]
 #end
 {{/velocity}}</content>
 </xwikidoc>

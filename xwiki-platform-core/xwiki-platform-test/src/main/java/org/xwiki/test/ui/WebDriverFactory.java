@@ -25,7 +25,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -56,18 +55,7 @@ public class WebDriverFactory
             // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can
             // prevent buttons or links from being clicked when they are beneath it and native events are used.
             // See https://groups.google.com/forum/#!msg/selenium-users/gBozOynEjs8/XDxxQNmUSCsJ
-            // Unfortunately there is no preference to disable the Add-on bar so we have to hide it using the shortcut
-            // key. We use Actions instead of sending the keys directly to the active element because starting with
-            // v2.35 Selenium complains that the active element is not visible when no web page has been loaded yet.
-            try {
-                // This has the expected result when I run the tests locally but it throws an exception on the CI agents
-                // (Selenium still complains the active element is not visible).
-                new Actions(driver).sendKeys(driver.switchTo().activeElement(), Keys.chord(Keys.CONTROL, "/"))
-                    .perform();
-            } catch (Exception e) {
-                // This works on the CI agents but has no effect when I run the tests locally.
-                new Actions(driver).sendKeys(Keys.chord(Keys.CONTROL, "/")).perform();
-            }
+            driver.switchTo().activeElement().sendKeys(Keys.chord(Keys.CONTROL, "/"));
         } else if (browserName.startsWith("*iexplore")) {
             driver = new InternetExplorerDriver();
         } else if (browserName.startsWith("*chrome")) {

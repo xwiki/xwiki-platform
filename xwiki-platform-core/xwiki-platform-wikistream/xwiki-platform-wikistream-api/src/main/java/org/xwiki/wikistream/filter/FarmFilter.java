@@ -17,19 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.wikistream.filter;
 
-package org.xwiki.wikistream.instance.internal;
-
-import org.xwiki.filter.UnknownFilter;
-import org.xwiki.wikistream.filter.FarmFilter;
-import org.xwiki.wikistream.filter.WikiFilter;
-import org.xwiki.wikistream.filter.WikiSpaceFilter;
+import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.filter.annotation.Default;
+import org.xwiki.filter.annotation.Name;
+import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamException;
 
 /**
+ * Farm related events.
+ * 
  * @version $Id$
  * @since 5.2M2
  */
-public interface InstanceFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, UnknownFilter
+@Unstable
+public interface FarmFilter
 {
+    void beginFarm(
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
 
+    void endFarm(
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
 }

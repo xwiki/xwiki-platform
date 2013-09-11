@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.xar.internal.output;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
@@ -29,23 +30,23 @@ import java.util.Map;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang3.ObjectUtils;
-import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.xar.internal.XARModel;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 public class XARWikiWriter
 {
-    private static final LocalizedStringEntityReferenceSerializer TOSTRING_SERIALIZER =
-        new LocalizedStringEntityReferenceSerializer();
+    private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
+        new LocalStringEntityReferenceSerializer();
 
     private static class Entry
     {
@@ -80,22 +81,27 @@ public class XARWikiWriter
         this.xarProperties = xarProperties;
 
         OutputTarget target = this.xarProperties.getTarget();
-        if (target instanceof OutputStreamOutputTarget) {
-            try {
-                this.zipStream = new ZipArchiveOutputStream(((OutputStreamOutputTarget) target).getOutputStream());
-                this.zipStream.setEncoding("UTF8");
 
-                // By including the unicode extra fields, it is possible to extract XAR-files containing documents with
-                // non-ascii characters in the document name using InfoZIP, and the filenames will be correctly
-                // converted to the character set of the local file system.
-                this.zipStream.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
-            } catch (IOException e) {
-                throw new WikiStreamException("Files to create zip output stream", e);
+        try {
+            if (target instanceof FileOutputTarget && ((FileOutputTarget) target).getFile().isDirectory()) {
+                this.zipStream =
+                    new ZipArchiveOutputStream(new File(((FileOutputTarget) target).getFile(), name + ".xar"));
+            } else if (target instanceof OutputStreamOutputTarget) {
+                this.zipStream = new ZipArchiveOutputStream(((OutputStreamOutputTarget) target).getOutputStream());
+            } else {
+                throw new WikiStreamException(String.format("Unsupported output target [%s]. Only [%s] is suppoted",
+                    target, OutputStreamOutputTarget.class));
             }
-        } else {
-            throw new WikiStreamException("Unsupported output target [" + target + "]. Only ["
-                + OutputStreamOutputTarget.class.getName() + "] is suppoted");
+        } catch (IOException e) {
+            throw new WikiStreamException("Files to create zip output stream", e);
         }
+
+        this.zipStream.setEncoding("UTF8");
+
+        // By including the unicode extra fields, it is possible to extract XAR-files containing documents with
+        // non-ascii characters in the document name using InfoZIP, and the filenames will be correctly
+        // converted to the character set of the local file system.
+        this.zipStream.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
     }
 
     public String getName()

@@ -85,8 +85,8 @@
   &lt;div class="wizard-header"&gt;
     &lt;h1&gt;&lt;span&gt;$title&lt;/span&gt;&lt;/h1&gt;
     &lt;ul class="steps"&gt;
-      #wizardHeaderStep("Type", 1, $currentStepNumber)
-      #wizardHeaderStep("Members", 2, $currentStepNumber)
+      #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step1.shortname'), 1, $currentStepNumber)
+      #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step2.shortname'), 2, $currentStepNumber)
     &lt;/ul&gt;
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;/div&gt;
@@ -133,7 +133,7 @@
   
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;      
-      #wizardHeader("Step 1 — Choose a name and a type", 1)
+      #wizardHeader($services.localization.render('platform.workspace.wizard.step1'), 1)
       ### WIZARD BODY ###  
       &lt;div class="wizard-body"&gt;
         ### SECOND STEP VALUES
@@ -381,7 +381,7 @@
   
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;      
-      #wizardHeader("Step 2 — Choose members", 2)
+      #wizardHeader($services.localization.render('platform.workspace.wizard.step2'), 2)
       ### WIZARD BODY ###  
       &lt;div class="wizard-body"&gt;
         ### FIRST STEP VALUES

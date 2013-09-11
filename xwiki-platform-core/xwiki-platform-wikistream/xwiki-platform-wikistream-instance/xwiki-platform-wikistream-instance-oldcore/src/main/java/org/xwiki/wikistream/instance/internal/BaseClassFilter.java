@@ -20,13 +20,11 @@
 package org.xwiki.wikistream.instance.internal;
 
 import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public interface BaseClassFilter extends WikiClassFilter, WikiClassPropertyFilter
+public interface BaseClassFilter extends WikiClassFilter, PropertyClassFilter
 {
 }

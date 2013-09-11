@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.BasePropertyFilter;
 import org.xwiki.wikistream.instance.internal.BasePropertyProperties;
 
@@ -36,8 +35,8 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 @Component
 @Singleton
-public class BasePropertyInputWikiStream extends
-    AbstractEntityEventGenerator<BaseProperty, BasePropertyProperties, BasePropertyFilter>
+public class BasePropertyEventGenerator extends
+    AbstractBeanEntityEventGenerator<BaseProperty, BasePropertyFilter, BasePropertyProperties>
 {
     @Override
     public void write(BaseProperty xclassProperty, Object filter, BasePropertyFilter propertyFilter,

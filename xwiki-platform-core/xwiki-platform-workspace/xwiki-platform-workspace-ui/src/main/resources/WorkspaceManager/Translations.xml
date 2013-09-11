@@ -219,7 +219,7 @@ workspacemanager.doc.createwiki.desc.wikiprettyname=The display name of the wiki
 platform.workspace.newWorkspaceTemplateHint=Template to use for this new wiki (all documents will be cloned).
 workspacemanager.doc.createwiki.desc.description=A brief description of the wiki and its purpose.
 workspacemanager.doc.createwiki.desc.owner=A user who will have all the rights on the wiki.
-workspacemanager.doc.createwiki.members=The users that can participate in the wiki.
+workspacemanager.doc.createwiki.members=The users who can participate in the wiki.
 workspacemanager.prop.workspace.membershipType.hint=The way users can join this wiki.
 platform.workspace.invitationReplyHint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
 platform.workspace.joinRequestHint=To join the wiki [[{0}&gt;&gt;{1}]], you must first issue a join request. After this, a wiki admin will review your request and consider accepting or rejecting it.
@@ -237,7 +237,13 @@ xe.admin.groups._actions.unfollow=Unfollow
 ## Admin
 admin.wikis=Wikis
 admin.wikis.description=Settings related to wikis creation.
-admin.wikis.template=Wikis template.
-admin.wikis.rights=Wikis creation rights.
-admin.wikis.templatemissing=To enable the wiki creation, you need to create a template first.\n\n&lt;a href="{0}"&gt;Click here to create the template&lt;/a&gt;.
+admin.wikis.template=Wiki Template
+admin.wikis.rights=Wiki Creation Right
+admin.wikis.templatemissing=To enable the creation of wikis, you need to &lt;a href="{0}"&gt;create a template first&lt;/a&gt;.
+
+## Create new wiki wizard
+platform.workspace.wizard.step1=Step 1 — Choose a name
+platform.workspace.wizard.step2=Step 2 — Choose members
+platform.workspace.wizard.step1.shortname=Name
+platform.workspace.wizard.step2.shortname=Members
 </content></xwikidoc>

@@ -329,7 +329,7 @@ ul.searchSuggestSources {
   padding: 0.1em 0.1em 0.1em 0.3em;
   position: relative;
 }
-.searchSuggestSources .source-header:hover {
+.searchSuggestSources .source:hover .source-header {
   background-color: $theme.highlightColor;
 }
 .searchSuggestSources .source-header.activated {

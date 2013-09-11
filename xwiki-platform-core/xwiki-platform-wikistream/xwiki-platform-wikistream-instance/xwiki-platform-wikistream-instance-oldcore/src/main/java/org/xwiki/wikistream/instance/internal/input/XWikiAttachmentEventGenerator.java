@@ -31,7 +31,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiAttachmentFilter;
-import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiAttachmentFilter;
 import org.xwiki.wikistream.instance.internal.XWikiAttachmentProperties;
@@ -50,7 +49,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 @Singleton
 // TODO: add support for real revision events (instead of the jrcs archive )
 public class XWikiAttachmentEventGenerator extends
-    AbstractEntityEventGenerator<XWikiAttachment, XWikiAttachmentProperties, XWikiAttachmentFilter>
+    AbstractBeanEntityEventGenerator<XWikiAttachment, XWikiAttachmentFilter, XWikiAttachmentProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
         XWikiAttachment.class, XWikiAttachmentProperties.class);

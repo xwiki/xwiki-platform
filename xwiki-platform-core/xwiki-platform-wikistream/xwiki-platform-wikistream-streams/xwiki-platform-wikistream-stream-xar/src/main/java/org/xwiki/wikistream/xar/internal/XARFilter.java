@@ -21,7 +21,7 @@ package org.xwiki.wikistream.xar.internal;
 
 import org.xwiki.wikistream.filter.WikiClassFilter;
 import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
-import org.xwiki.wikistream.filter.WikiFarmFilter;
+import org.xwiki.wikistream.filter.FarmFilter;
 import org.xwiki.wikistream.filter.WikiFilter;
 import org.xwiki.wikistream.filter.WikiObjectFilter;
 import org.xwiki.wikistream.filter.WikiObjectPropertyFilter;
@@ -35,7 +35,7 @@ import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
  * @version $Id$
  * @since 5.2M2
  */
-public interface XARFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, XWikiWikiDocumentFilter,
+public interface XARFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, XWikiWikiDocumentFilter,
     XWikiWikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter
 {
 

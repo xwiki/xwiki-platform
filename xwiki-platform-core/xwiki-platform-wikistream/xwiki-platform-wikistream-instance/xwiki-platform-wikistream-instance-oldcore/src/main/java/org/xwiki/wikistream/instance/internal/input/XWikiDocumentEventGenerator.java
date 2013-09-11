@@ -35,11 +35,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiDocumentFilter;
-import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
-import org.xwiki.wikistream.instance.internal.BaseClassProperties;
-import org.xwiki.wikistream.instance.internal.BaseObjectProperties;
-import org.xwiki.wikistream.instance.internal.XWikiAttachmentProperties;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentProperties;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
@@ -59,7 +55,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Singleton
 // TODO: add support for real revision events (instead of the jrcs archive)
 public class XWikiDocumentEventGenerator extends
-    AbstractEntityEventGenerator<XWikiDocument, XWikiDocumentProperties, XWikiDocumentFilter>
+    AbstractBeanEntityEventGenerator<XWikiDocument, XWikiDocumentFilter, XWikiDocumentProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
         XWikiDocument.class, XWikiDocumentProperties.class);
@@ -71,13 +67,13 @@ public class XWikiDocumentEventGenerator extends
     private Logger logger;
 
     @Inject
-    private EntityEventGenerator<XWikiAttachment, XWikiAttachmentProperties> attachmentEventGenerator;
+    private EntityEventGenerator<XWikiAttachment> attachmentEventGenerator;
 
     @Inject
-    private EntityEventGenerator<BaseClass, BaseClassProperties> classEventGenerator;
+    private EntityEventGenerator<BaseClass> classEventGenerator;
 
     @Inject
-    private EntityEventGenerator<BaseObject, BaseObjectProperties> objectEventGenerator;
+    private EntityEventGenerator<BaseObject> objectEventGenerator;
 
     @Override
     public void write(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,
@@ -166,7 +162,8 @@ public class XWikiDocumentEventGenerator extends
             });
 
             for (XWikiAttachment attachment : sortedAttachments) {
-                this.attachmentEventGenerator.write(attachment, documentFilter, properties);
+                ((XWikiAttachmentEventGenerator) this.attachmentEventGenerator).write(attachment, filter,
+                    documentFilter, properties);
             }
         }
 
@@ -174,7 +171,7 @@ public class XWikiDocumentEventGenerator extends
         if (properties.isWithWikiClass()) {
             BaseClass xclass = document.getXClass();
             if (!xclass.getFieldList().isEmpty()) {
-                this.classEventGenerator.write(xclass, documentFilter, properties);
+                ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, documentFilter, properties);
             }
         }
 
@@ -183,7 +180,8 @@ public class XWikiDocumentEventGenerator extends
             for (List<BaseObject> xobjects : document.getXObjects().values()) {
                 for (BaseObject xobject : xobjects) {
                     if (xobject != null) {
-                        this.objectEventGenerator.write(xobject, documentFilter, properties);
+                        ((BaseObjectEventGenerator) this.objectEventGenerator).write(xobject, filter, documentFilter,
+                            properties);
                     }
                 }
             }

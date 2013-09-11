@@ -166,13 +166,13 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     // events
 
     @Override
-    public void beginWikiFarm(FilterEventParameters parameters) throws WikiStreamException
+    public void beginFarm(FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
-    public void endWikiFarm(FilterEventParameters parameters) throws WikiStreamException
+    public void endFarm(FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentParameters = this.currentParameters.getParent();
     }

@@ -30,11 +30,9 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.BaseClassFilter;
 import org.xwiki.wikistream.instance.internal.BaseClassProperties;
-import org.xwiki.wikistream.instance.internal.PropertyClassProperties;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -46,17 +44,17 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Component
 @Singleton
 public class BaseClassEventGenerator extends
-    AbstractEntityEventGenerator<BaseClass, BaseClassProperties, BaseClassFilter>
+    AbstractBeanEntityEventGenerator<BaseClass, BaseClassFilter, BaseClassProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
         BaseClass.class, BaseClassProperties.class);
 
     @Inject
-    private EntityEventGenerator<PropertyClass, PropertyClassProperties> propertyEventGenerator;
+    private EntityEventGenerator<PropertyClass> propertyEventGenerator;
 
     @Override
-    public void write(BaseClass xclass, Object filter, BaseClassFilter xclassFilter,
-        BaseClassProperties properties) throws WikiStreamException
+    public void write(BaseClass xclass, Object filter, BaseClassFilter xclassFilter, BaseClassProperties properties)
+        throws WikiStreamException
     {
         // WikiClass
 
@@ -80,7 +78,8 @@ public class BaseClassEventGenerator extends
         while (it.hasNext()) {
             PropertyClass xclassProperty = it.next();
 
-            this.propertyEventGenerator.write(xclassProperty, xclassFilter, properties);
+            ((PropertyClassEventGenerator) this.propertyEventGenerator).write(xclassProperty, filter, xclassFilter,
+                properties);
         }
 
         // /WikiClass

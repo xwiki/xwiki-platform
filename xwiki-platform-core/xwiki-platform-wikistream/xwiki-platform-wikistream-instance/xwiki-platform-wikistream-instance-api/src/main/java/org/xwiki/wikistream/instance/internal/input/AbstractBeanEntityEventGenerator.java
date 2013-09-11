@@ -17,52 +17,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.input;
+package org.xwiki.wikistream.instance.internal.input;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.filter.FilterDescriptorManager;
-import org.xwiki.stability.Unstable;
+import org.xwiki.properties.BeanManager;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
 
-/**
- * @param <E>
- * @param <P>
- * @param <F>
- * @version $Id$
- * @since 5.2M2
- */
-@Unstable
-public abstract class AbstractEntityEventGenerator<E, F> implements EntityEventGenerator<E>, Initializable
+public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends AbstractEntityEventGenerator<E, F>
 {
     @Inject
-    private FilterDescriptorManager filterDescriptorManager;
+    private BeanManager beanManager;
 
-    protected Class<F> filterType;
+    private Class<P> propertiesType;
 
     @Override
     public void initialize() throws InitializationException
     {
-        // Get the type of the internal filter
+        super.initialize();
+
+        // Get the type of the properties
         ParameterizedType genericType =
-            (ParameterizedType) ReflectionUtils.resolveType(AbstractEntityEventGenerator.class, getClass());
-        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[1]);
+            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanEntityEventGenerator.class, getClass());
+        this.propertiesType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[2]);
     }
 
     @Override
-    public void write(E entity, Object filter, Map<String, Object> properties) throws WikiStreamException
+    protected void write(E entity, Object filter, F internalFilter, Map<String, Object> properties)
+        throws WikiStreamException
     {
-        F internalFilter = this.filterDescriptorManager.createFilterProxy(this.filterType, filter);
+        P propertiesBean;
+        try {
+            propertiesBean = this.propertiesType.newInstance();
 
-        write(entity, filter, internalFilter, properties);
+            this.beanManager.populate(propertiesBean, properties);
+        } catch (Exception e) {
+            throw new WikiStreamException("Failed to convert properties to Java bean", e);
+        }
+
+        write(entity, filter, internalFilter, propertiesBean);
     }
 
-    protected abstract void write(E entity, Object filter, F internalFilter, Map<String, Object> properties)
-        throws WikiStreamException;
+    protected abstract void write(E entity, Object filter, F internalFilter, P properties) throws WikiStreamException;
 }

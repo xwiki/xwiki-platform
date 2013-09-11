@@ -17,19 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.wikistream.instance.input;
 
-package org.xwiki.wikistream.instance.internal;
+import java.util.Map;
 
-import org.xwiki.filter.UnknownFilter;
-import org.xwiki.wikistream.filter.FarmFilter;
-import org.xwiki.wikistream.filter.WikiFilter;
-import org.xwiki.wikistream.filter.WikiSpaceFilter;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.instance.internal.InstanceFilter;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public interface InstanceFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, UnknownFilter
+@Unstable
+@Role
+public interface InstanceInputEventGenerator extends InstanceFilter
 {
+    void setFilter(Object filter);
 
+    void setProperties(Map<String, Object> properties);
 }

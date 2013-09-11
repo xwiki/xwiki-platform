@@ -31,12 +31,9 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiObjectFilter;
-import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
-import org.xwiki.wikistream.instance.internal.BaseClassProperties;
 import org.xwiki.wikistream.instance.internal.BaseObjectFilter;
 import org.xwiki.wikistream.instance.internal.BaseObjectProperties;
-import org.xwiki.wikistream.instance.internal.BasePropertyProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -50,7 +47,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Singleton
 public class BaseObjectEventGenerator extends
-    AbstractEntityEventGenerator<BaseObject, BaseObjectProperties, BaseObjectFilter>
+    AbstractBeanEntityEventGenerator<BaseObject, BaseObjectFilter, BaseObjectProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
         BaseObject.class, BaseObjectProperties.class);
@@ -59,14 +56,14 @@ public class BaseObjectEventGenerator extends
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private EntityEventGenerator<BaseClass, BaseClassProperties> classEventGenerator;
+    private EntityEventGenerator<BaseClass> classEventGenerator;
 
     @Inject
-    private EntityEventGenerator<BaseProperty, BasePropertyProperties> propertyEventGenerator;
+    private EntityEventGenerator<BaseProperty> propertyEventGenerator;
 
     @Override
-    public void write(BaseObject xobject, Object filter, BaseObjectFilter objectFilter,
-        BaseObjectProperties properties) throws WikiStreamException
+    public void write(BaseObject xobject, Object filter, BaseObjectFilter objectFilter, BaseObjectProperties properties)
+        throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -90,14 +87,15 @@ public class BaseObjectEventGenerator extends
 
             String pname = xproperty.getName();
             if (pname != null && !pname.trim().equals("")) {
-                this.propertyEventGenerator.write(xproperty, objectFilter, properties);
+                ((BasePropertyInputWikiStream) this.propertyEventGenerator).write(xproperty, filter, objectFilter,
+                    properties);
             }
         }
 
         // Object class
 
         BaseClass xclass = xobject.getXClass(xcontext);
-        this.classEventGenerator.write(xclass, objectFilter, properties);
+        ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, objectFilter, properties);
 
         // < WikiObject
 

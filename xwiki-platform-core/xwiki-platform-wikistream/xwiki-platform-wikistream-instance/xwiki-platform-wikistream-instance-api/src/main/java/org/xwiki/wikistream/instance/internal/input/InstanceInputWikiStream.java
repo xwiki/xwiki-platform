@@ -19,6 +19,9 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import java.util.List;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
@@ -26,6 +29,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 
@@ -38,11 +42,69 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<InstanceInputProperties, InstanceFilter>
 {
+    @Inject
+    private InstanceModel instanceModel;
+
+    @Inject
+    private List<InstanceInputEventGenerator> eventGenerators;
+
     @Override
     protected void read(Object filter, InstanceFilter internalFilter) throws WikiStreamException
     {
-        internalFilter.beginWikiFarm(FilterEventParameters.EMPTY);
+        FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
-        internalFilter.endWikiFarm(FilterEventParameters.EMPTY);
+        internalFilter.beginFarm(parameters);
+
+        for (InstanceInputEventGenerator generators : this.eventGenerators) {
+            generators.beginFarm(parameters);
+        }
+
+        for (String wikiName : this.instanceModel.getWikis()) {
+            writeWiki(wikiName, filter, internalFilter);
+        }
+
+        for (InstanceInputEventGenerator generators : this.eventGenerators) {
+            generators.endFarm(parameters);
+        }
+
+        internalFilter.endFarm(parameters);
+    }
+
+    private void writeWiki(String name, Object filter, InstanceFilter internalFilter) throws WikiStreamException
+    {
+        FilterEventParameters parameters = FilterEventParameters.EMPTY;
+
+        internalFilter.beginWiki(name, parameters);
+
+        for (InstanceInputEventGenerator generators : this.eventGenerators) {
+            generators.beginWiki(name, parameters);
+        }
+
+        for (String spaceName : this.instanceModel.getSpaces(name)) {
+            writeSpace(spaceName, filter, internalFilter);
+        }
+
+        for (InstanceInputEventGenerator generators : this.eventGenerators) {
+            generators.endWiki(name, parameters);
+        }
+
+        internalFilter.endWiki(name, parameters);
+    }
+
+    private void writeSpace(String name, Object filter, InstanceFilter internalFilter) throws WikiStreamException
+    {
+        FilterEventParameters parameters = FilterEventParameters.EMPTY;
+
+        internalFilter.beginWikiSpace(name, parameters);
+
+        for (InstanceInputEventGenerator generators : this.eventGenerators) {
+            generators.beginWikiSpace(name, parameters);
+        }
+
+        for (InstanceInputEventGenerator generators : this.eventGenerators) {
+            generators.endWikiSpace(name, parameters);
+        }
+
+        internalFilter.endWikiSpace(name, parameters);
     }
 }

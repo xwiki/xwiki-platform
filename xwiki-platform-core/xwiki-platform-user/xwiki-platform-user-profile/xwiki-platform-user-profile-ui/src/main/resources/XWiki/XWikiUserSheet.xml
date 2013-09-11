@@ -686,7 +686,7 @@ span#avatarUpload {
   ## Menu
   ##########
   (% id="user-vertical-menu" %)
-  (((  
+  (((
     #verticalNavigation($userMenu, {'translationPrefix' : 'platform.core.profile.category.', 'crtItemId' : $currentCategory, 'cssClass' : 'profile-menu'})
   )))
 )))
@@ -694,15 +694,15 @@ span#avatarUpload {
 ## Display the page content
 #########################
 (% id="user-page-content" %)
-(((  
+(((
   #foreach($category in $userMenu)
     #foreach($subcategory in $category.get('children'))
       #set($tabKey = $subcategory.get('id')) 
-      (% id="${tabKey}Pane" class="user-page-pane #if($tabKey != $currentCategory) hidden #end" %)
+      (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
       (((
         #set($tabInclude = $subcategory.get('sheet'))
-        {{include document="${tabInclude}" /}}
-      ))) 
+        {{include reference="${tabInclude}" /}}
+      )))
     #end
   #end
 )))

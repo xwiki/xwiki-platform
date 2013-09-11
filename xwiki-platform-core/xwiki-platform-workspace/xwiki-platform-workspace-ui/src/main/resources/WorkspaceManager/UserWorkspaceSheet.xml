@@ -309,6 +309,7 @@ return XWiki;
   #end
   #set($documentUser = $doc.prefixedFullName)
   #set($isMyProfile = ($currentUser == $documentUser))
+
   {{html clean='false'}}
   &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
@@ -345,6 +346,7 @@ return XWiki;
   &lt;/div&gt;
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   {{/html}}
+
 #end ## User object exists
 {{/velocity}}</content>
 </xwikidoc>

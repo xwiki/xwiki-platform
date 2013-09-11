@@ -103,7 +103,11 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>.actionmenu #tmCreateWorkspace {
+      <code>.actionmenu #tmXWiki {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/logo-xs.png')");
+}
+
+.actionmenu #tmCreateWorkspace {
   background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.png')");
 }
 

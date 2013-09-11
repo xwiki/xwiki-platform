@@ -87,7 +87,7 @@ public class BaseObjectEventGenerator extends
 
             String pname = xproperty.getName();
             if (pname != null && !pname.trim().equals("")) {
-                ((BasePropertyInputWikiStream) this.propertyEventGenerator).write(xproperty, filter, objectFilter,
+                ((BasePropertyEventGenerator) this.propertyEventGenerator).write(xproperty, filter, objectFilter,
                     properties);
             }
         }

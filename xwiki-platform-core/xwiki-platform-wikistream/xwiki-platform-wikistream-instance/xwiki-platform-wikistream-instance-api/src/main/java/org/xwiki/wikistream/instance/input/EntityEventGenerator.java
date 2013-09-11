@@ -21,6 +21,7 @@ package org.xwiki.wikistream.instance.input;
 
 import java.util.Map;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
 
@@ -32,6 +33,7 @@ import org.xwiki.wikistream.WikiStreamException;
  * @since 5.2M2
  */
 @Unstable
+@Role
 public interface EntityEventGenerator<E>
 {
     void write(E entity, Object filter, Map<String, Object> properties) throws WikiStreamException;

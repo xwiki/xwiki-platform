@@ -33,9 +33,17 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.internal.ParametersTree;
 
+/**
+ * 
+ * @param <F>
+ * @version $Id$
+ * @since 5.2M2
+ */
+@Unstable
 public abstract class AbstractInstanceInputEventGenerator<F> implements InstanceInputEventGenerator, Initializable
 {
     @Inject

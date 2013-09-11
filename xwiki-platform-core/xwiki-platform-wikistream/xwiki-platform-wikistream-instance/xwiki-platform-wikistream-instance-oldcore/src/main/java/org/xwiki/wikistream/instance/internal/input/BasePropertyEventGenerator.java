@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 @Component
 @Singleton
-public class BasePropertyInputWikiStream extends
+public class BasePropertyEventGenerator extends
     AbstractBeanEntityEventGenerator<BaseProperty, BasePropertyFilter, BasePropertyProperties>
 {
     @Override

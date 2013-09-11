@@ -140,9 +140,6 @@
 #set ($canDeleteWorkspace = $isWorkspaceManagerAppInstalled && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $displayWorkspaceDirectoryMenuEntry || $canDeleteWorkspace)
 #set ($wikiEntryId = 'tmWiki')
-#if ($isWorkspaceManagerAppInstalled)  
-  #set ($wikiEntryId = 'tmWorkspace')  
-#end
 #set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))
 #set ($wikiName = $!{services.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName()})
 ## If no pretty name is available (no wikimanager service or pretty name is empty), use the wiki name.

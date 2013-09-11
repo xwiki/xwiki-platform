@@ -25,15 +25,16 @@
   <content>{{velocity}}
 #set ($className = 'XWiki.SearchSuggestSourceClass')
 #set ($class = $xwiki.getDocument($className).xWikiClass)
-#if (!$object &amp;&amp; "$!request.number" != '')
-  #set ($object = $doc.getObject($className, $numbertool.integer($request.number)))
+#if (!$object &amp;&amp; "$!request.xobjectNumber" != '')
+  #set ($object = $doc.getObject($className, $numbertool.integer($request.xobjectNumber)))
 #end
 #if (!$object)
   #set ($object = $doc.getObject($className, true))
 #end
 #set ($discard = $doc.use($object))
 #set ($prefix = "${className}_${object.number}_")
-#set ($editing = $xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+## We include the 'get' action because we use it when adding a new search suggest source through AJAX.
+#set ($editing = $xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline' || $xcontext.action == 'get')
 (% class="xform" %)(((
 #foreach ($property in $class.properties)
   #set ($displayFormType = $property.getProperty('displayFormType'))

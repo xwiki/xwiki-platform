@@ -31,6 +31,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
+import org.xwiki.wikistream.instance.internal.InstanceModel;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 
 /**

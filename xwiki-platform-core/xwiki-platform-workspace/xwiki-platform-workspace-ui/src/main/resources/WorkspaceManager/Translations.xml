@@ -237,7 +237,13 @@ xe.admin.groups._actions.unfollow=Unfollow
 ## Admin
 admin.wikis=Wikis
 admin.wikis.description=Settings related to wikis creation.
-admin.wikis.template=Wikis template.
-admin.wikis.rights=Wikis creation rights.
-admin.wikis.templatemissing=To enable the wiki creation, you need to create a template first.\n\n&lt;a href="{0}"&gt;Click here to create the template&lt;/a&gt;.
+admin.wikis.template=Wiki Template
+admin.wikis.rights=Wiki Creation Right
+admin.wikis.templatemissing=To enable the creation of wikis, you need to &lt;a href="{0}"&gt;create a template first&lt;/a&gt;.
+
+## Create new wiki wizard
+platform.workspace.wizard.step1=Step 1 — Choose a name
+platform.workspace.wizard.step2=Step 2 — Choose members
+platform.workspace.wizard.step1.shortname=Name
+platform.workspace.wizard.step2.shortname=Members
 </content></xwikidoc>

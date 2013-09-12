@@ -24,17 +24,27 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+platform.workspace.activityHint=Erzeugt einen Aktivitätsverlauf fuer die angegebenen Workspaces
 platform.workspace.activityMultipleTitle=Aktivitäten in den Arbeitsgebieten {0}
 platform.workspace.activityTitle=Aktivitäten im Arbeitsgebiet {0}
 platform.workspace.createInitialMembersSaveComment=füge dem Arbeitsgebiet Beteiligte zu
 platform.workspace.createNewWorkspaceLabel=Erzeuge ein neues Arbeitsgebiet
+platform.workspace.deleteWorkspaceNo=Nein
+platform.workspace.deleteWorkspaceYes=Ja
+platform.workspace.joinNo=Nein
 platform.workspace.joinRequestCancelLabel=zurück
 platform.workspace.joinRequestCancelNo=nein
+platform.workspace.joinRequestCancelYes=Ja
+platform.workspace.joinRequestMessageLabel=Mitteilung
 platform.workspace.joinRequestSaveComment=Der Anwender {0} möchte sich an diesem Arbeitsgebiet beteiligen.. 
 platform.workspace.joinRequestSendLabel=Anforderung senden
 platform.workspace.joinYes=Ja
 platform.workspace.leaveNo=Nein
 platform.workspace.leaveSaveComment=Anwender {0} hat den Arbeitsbereich verlassen. 
+platform.workspace.leaveYes=Ja
+platform.workspace.templateFeaturesInstallErrorNeedTemplateFirst=Die durch die Workspace-vorlage bereitgestellten Features können erst verwendet werden, wenn die Workspace-vorlage installiert ist.
+platform.workspace.templateFeaturesInstallSuccess=Die Workspace-vorlage wurde erfolgreich installiert.
+platform.workspace.templateNotInstalledInstallNow=Die Workspace-vorlage ist noch nicht installiert. Möchten Sie die Workspace-vorlage jetzt installieren?
 workspacemanager.browse=Durchsuche Workspaces
 workspacemanager.browse._actions=Aktionen
 workspacemanager.browse._actions.cancelJoinRequest=Anfrage abbrechen

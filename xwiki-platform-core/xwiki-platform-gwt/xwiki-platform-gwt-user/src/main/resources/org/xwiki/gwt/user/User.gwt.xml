@@ -24,7 +24,7 @@
   <inherits name='com.google.gwt.json.JSON' />
   <inherits name="org.xwiki.gwt.dom.DOM" />
 
-  <extend-property name="locale" values="ca,cs,da,de,es,fr,it,pt_BR,ru,sv,zh,zh_TW" />
+  <extend-property name="locale" values="ca,cs,da,de,es,fr,it,nl,pt_BR,ru,sv,zh,zh_TW" />
 
   <!-- RichTextArea -->
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIEOld">

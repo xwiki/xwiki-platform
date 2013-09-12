@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AnnotationCode</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1264862667000</creationDate>
+  <date>1271949711000</date>
+  <contentUpdateDate>1271949711000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
+AnnotationCode.AnnotationConfig_activated=Annotering er aktiv
+AnnotationCode.AnnotationConfig_annotationClass=XWiki-klasse, der definerer annoteringsstruktur
+AnnotationCode.AnnotationConfig_displayHighlight=Vis annoterings-markeringer som standard
+AnnotationCode.AnnotationConfig_displayed=Vis annoteringer som standard
+AnnotationCode.AnnotationConfig_exceptionSpaces=Undtagen de følgende områder
+admin.annotations=Annotationer
+annotations.action.create.cancel.text=Afbryd
+annotations.action.create.error.notarget=Uspecificeret side (dokument) der oprettes annoteringer for.
+annotations.action.create.error.unauthorized=Du har ikke rettigheder til at tilføje annotationer til dette dokument.
+annotations.action.create.error.unauthorizedguest=Du har ikke rettigheder til at tilføje annotationer til dette dokument. Prøv at logge ind først.
+annotations.action.create.error.wrongsyntax=Annotationer er ikke mulige for dokumenter skrevet i XWiki/1.0 syntaks.
+annotations.action.create.form.loaderror=Fejl\:
+annotations.action.create.helpmessage=For at annotere en tekst, fremhæv det og tryk {0}.
+</content>
+</xwikidoc>

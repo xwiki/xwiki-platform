@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-legacy-web</artifactId>
   <name>XWiki Platform - Legacy - Web Resources</name>

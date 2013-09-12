@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
@@ -111,7 +112,7 @@ public class DBListClass extends ListClass
                     // We create the query
                     Query query = queryManager.createQuery(hqlQuery, Query.HQL);
                     // The DBlist may come from an other wiki
-                    String wikiName = this.getObject().getDocumentReference().getWikiReference().getName();
+                    String wikiName = getReference().extractReference(EntityType.WIKI).getName();
                     query.setWiki(wikiName);
                     // We execute the query to create the list of values.
                     list = makeList(query.execute());

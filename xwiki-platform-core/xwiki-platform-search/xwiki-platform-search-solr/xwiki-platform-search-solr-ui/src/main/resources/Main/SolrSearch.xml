@@ -943,7 +943,7 @@ a.search-result-highlightAll:after {
     #set ($discard = $wikis.add({'value': $wikiName, 'label': $wikiPrettyName}))
   #end
   &lt;select id="searchFilterWiki" name="wiki"&gt;
-    #if ($xcontext.isMainWiki())
+    #if ($xcontext.isMainWiki() &amp;&amp; $wikis.size() &gt; 1)
       ## The main wiki can search in all wikis.
       &lt;option value=""&gt;$services.localization.render('solr.filterBy.wiki.all')&lt;/option&gt;
     #end
@@ -955,9 +955,10 @@ a.search-result-highlightAll:after {
 
 #macro(spaceSelector)
   #set ($spaces = [])
-  #if ($wiki == $xcontext.database)
+  #set ($wikiNames = $xwiki.wikiNames)
+  #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
     #set ($spaces = $xwiki.spaces)
-  #elseif ($xwiki.wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
+  #elseif ($wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
     #set ($spaces = $services.query.xwql('select distinct doc.space from Document as doc order by doc.space').setWiki($wiki).execute())
   #end
   &lt;select id="searchFilterSpace" name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;

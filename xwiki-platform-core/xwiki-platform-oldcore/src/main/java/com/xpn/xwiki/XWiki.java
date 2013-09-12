@@ -6617,9 +6617,7 @@ public class XWiki implements EventListener
         if (event instanceof XObjectPropertyEvent) {
             EntityReference reference = ((XObjectPropertyEvent) event).getReference();
             String modifiedProperty = reference.getName();
-            if ("plugins".equals(modifiedProperty)) {
-                onPluginPreferenceEvent(event, doc, context);
-            } else if ("backlinks".equals(modifiedProperty)) {
+            if ("backlinks".equals(modifiedProperty)) {
                 this.hasBacklinks =
                     doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
                         (int) ParamAsLong("xwiki.backlinks", 0)) == 1;
@@ -6635,14 +6633,6 @@ public class XWiki implements EventListener
         flushVirtualWikis(doc);
     }
 
-    private void onPluginPreferenceEvent(Event event, XWikiDocument doc, XWikiContext context)
-    {
-        /*
-         * FIXME: This does not make sense anymore. Discard it? if (!isVirtualMode()) { // If the XWikiPreferences
-         * plugin propery is modified, reload all plugins. preparePlugins(context); }
-         */
-    }
-
     /**
      * The reference to match class XWiki.XWikiServerClass on whatever wiki.
      */
@@ -6653,7 +6643,7 @@ public class XWiki implements EventListener
      * The reference to match properties "plugins" and "backlinks" of class XWiki.XWikiPreference on whatever wiki.
      */
     private static final RegexEntityReference XWIKIPREFERENCE_PROPERTY_REFERENCE = new RegexEntityReference(
-        Pattern.compile("plugins|backlinks"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
+        Pattern.compile("backlinks"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
             Pattern.compile(".*:XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT));
 
     private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()

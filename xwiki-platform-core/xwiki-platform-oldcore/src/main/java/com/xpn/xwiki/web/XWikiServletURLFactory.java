@@ -236,12 +236,19 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             newpath.append(encode(anchor, context));
         }
 
+        URL result;
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            result = new URL(getServerURL(xwikidb, context), newpath.toString());
+            // For robust session tracking, all URLs emitted by a servlet should be encoded. Otherwise, URL rewriting
+            // cannot be used with browsers which do not support cookies.
+            String encodedURLAsString = context.getResponse().encodeURL(result.toExternalForm());
+            result = new URL(encodedURLAsString);
         } catch (MalformedURLException e) {
             // This should not happen
-            return null;
+            result = null;
         }
+
+        return result;
     }
 
     private void addServletPath(StringBuffer newpath, String xwikidb, XWikiContext context)

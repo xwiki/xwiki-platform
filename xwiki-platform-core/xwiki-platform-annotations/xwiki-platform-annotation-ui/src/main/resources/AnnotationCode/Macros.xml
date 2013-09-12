@@ -68,7 +68,7 @@
  *#
 #macro(displayCreateBox $docWiki $docSpace $docPage $annData)
 &lt;div class="annotation-box annotation-box-create"&gt;
-  &lt;form method="POST" action="${restURL}/wikis/${escapetool.url($docWiki)}/spaces/${escapetool.url($docSpace)}/pages/${escapetool.url($docPage)}/annotations?media=json"&gt;
+  &lt;form method="POST" action="$request.encodeURL(""${restURL}/wikis/${escapetool.url($docWiki)}/spaces/${escapetool.url($docSpace)}/pages/${escapetool.url($docPage)}/annotations?media=json"")"&gt;
     &lt;div class="hidden"&gt;
       #foreach($field in $annData.keySet())
          &lt;input type="hidden" name="${field}" value="$!{escapetool.xml($annData.get(${field}))}"/&gt;

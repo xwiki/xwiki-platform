@@ -30,6 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -38,6 +41,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 public class DBListClass extends ListClass
 {
@@ -97,14 +101,21 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            XWiki xwiki = context.getWiki();
-            String query = getQuery(context);
+            String hqlQuery = getQuery(context);
 
-            if (query == null) {
+            if (hqlQuery == null) {
                 list = new ArrayList<ListItem>();
             } else {
                 try {
-                    list = makeList(xwiki.search(query, context));
+                    // We need the query manager
+                    QueryManager queryManager = Utils.getComponent(QueryManager.class);
+                    // We create the query
+                    Query query = queryManager.createQuery(hqlQuery, Query.HQL);
+                    // The DBlist may come from an other wiki
+                    String wikiName = getReference().extractReference(EntityType.WIKI).getName();
+                    query.setWiki(wikiName);
+                    // We execute the query to create the list of values.
+                    list = makeList(query.execute());
                 } catch (Exception e) {
                     LOGGER.error("Failed to get the list", e);
                     list = new ArrayList<ListItem>();

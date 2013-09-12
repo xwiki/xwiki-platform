@@ -54,9 +54,10 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     $super(event);
     if (typeof(XWiki.widgets.Suggest) != "undefined") {
       // Create the Suggest.
+      var restURL = "${request.contextPath}/rest/wikis/${xcontext.database}/search?scope=name&number=10&";
       new XWiki.widgets.Suggest(this.input, {
         // This document also provides the suggestions.
-        script: "${request.contextPath}/rest/wikis/${xcontext.database}/search?scope=name&number=10&",
+        script: "$response.encodeURL(restURL)",
         // Prefixed with & since the current (as of 1.7) Suggest code does not automatically append it.
         varname: "q",
         noresults: "$services.localization.render('core.viewers.jump.suggest.noResults')",

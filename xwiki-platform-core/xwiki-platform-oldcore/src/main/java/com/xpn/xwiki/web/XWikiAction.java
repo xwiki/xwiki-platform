@@ -558,7 +558,7 @@ public abstract class XWikiAction extends Action
     {
         try {
             if (url != null) {
-                response.sendRedirect(url);
+                response.sendRedirect(response.encodeRedirectURL(url));
             }
         } catch (IOException e) {
             Object[] args = {url};

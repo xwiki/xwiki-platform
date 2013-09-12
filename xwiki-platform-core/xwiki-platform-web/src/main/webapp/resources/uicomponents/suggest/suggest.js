@@ -601,10 +601,13 @@ var XWiki = (function(XWiki){
     //
     for (var i=0,len=arr.length;i<len;i++)
     {
+      var escapeHTML = function(value) {
+        return ((value || '') + '').escapeHTML();
+      };
       var valueNode = new Element('div')
-            .insert(new Element('span', {'class':'suggestId'}).update(arr[i].id))
-            .insert(new Element('span', {'class':'suggestValue'}).update(arr[i].value))
-            .insert(new Element('span', {'class':'suggestInfo'}).update(arr[i].info));
+            .insert(new Element('span', {'class':'suggestId'}).update(escapeHTML(arr[i].id)))
+            .insert(new Element('span', {'class':'suggestValue'}).update(escapeHTML(arr[i].value)))
+            .insert(new Element('span', {'class':'suggestInfo'}).update(escapeHTML(arr[i].info)));
 
       var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
         containerClasses: 'suggestItem',
@@ -640,17 +643,21 @@ var XWiki = (function(XWiki){
    * @param {Object} source the source for the suggeestion item data
    */
   createItemDisplay : function(data, source) {
+    var escapedInput = this.sInput ? this.sInput.escapeHTML() : this.sInput;
+    var escapedValue = ((data.value || '') + '').escapeHTML();
     // Output is either emphasized or raw value depending on source option.
-    var output = source.highlight ? this.emphasizeMatches(this.sInput, data.value) : data.value;
+    var output = source.highlight ? this.emphasizeMatches(escapedInput, escapedValue) : escapedValue;
     if (data.hint) {
-      output += "<span class='hint'>" + data.hint + "</span>";
+      var escapedHint = (data.hint + '').escapeHTML();
+      output += "<span class='hint'>" + escapedHint + "</span>";
     }
     if (!this.options.displayValue) {
       var displayNode = new Element("span", {'class':'info'}).update(output);
     } else {
+      var escapedInfo = ((data.info || '') + '').escapeHTML();
       var displayNode = new Element("div").insert(new Element('div', {'class':'value'}).update(output))
         .insert(new Element('div', {'class':'info'}).update("<span class='legend'>"
-        + this.options.displayValueText + "</span>" + data.info));
+        + this.options.displayValueText + "</span>" + escapedInfo));
     }
     // If the search result contains an icon information, we insert this icon in the result entry.
     if (data.icon) {
@@ -828,12 +835,15 @@ var XWiki = (function(XWiki){
   {
     if (this.iHighlighted && !this.iHighlighted.hasClassName('noSuggestion'))
     {
+      var text = function(element) {
+        return element.textContent || element.innerText;
+      };
       var icon = this.iHighlighted.down('img.icon');
       var data = {
         'suggest' : this,
-        'id': this.iHighlighted.down(".suggestId").innerHTML,
-        'value': this.iHighlighted.down(".suggestValue").innerHTML,
-        'info': this.iHighlighted.down(".suggestInfo").innerHTML,
+        'id': text(this.iHighlighted.down(".suggestId")),
+        'value': text(this.iHighlighted.down(".suggestValue")),
+        'info': text(this.iHighlighted.down(".suggestInfo")),
         'icon' : icon ? icon.src : ''
       }
 

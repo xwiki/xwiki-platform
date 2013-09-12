@@ -20,10 +20,8 @@
 package org.xwiki.wikistream.instance.internal.input;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.properties.RawProperties;
 import org.xwiki.stability.Unstable;
 
@@ -32,24 +30,21 @@ import org.xwiki.stability.Unstable;
  * @since 5.2M2
  */
 @Unstable
-public class InstanceInputProperties implements RawProperties
+public class InstanceInputProperties extends HashMap<String, Object> implements RawProperties
 {
-    private Map<String, Object> properties;
-
-    private Set<EntityReference> containers;
-
-    public Set<EntityReference> getContainers()
+    public EntityReferenceSet getEntities()
     {
-        return this.containers;
+        return (EntityReferenceSet) get("entities");
+    }
+
+    public void setEntities(EntityReferenceSet entities)
+    {
+        put("entities", entities);
     }
 
     @Override
     public void set(String propertyName, Object value)
     {
-        if (this.properties == null) {
-            this.properties = new HashMap<String, Object>();
-        }
-
-        this.properties.put(propertyName, value);
+        put(propertyName, value);
     }
 }

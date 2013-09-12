@@ -27,7 +27,10 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
@@ -50,22 +53,46 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
     private List<InstanceInputEventGenerator> eventGenerators;
 
     @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.setProperties(this.properties);
+        }
+    }
+
+    private boolean isWikiInContainers(String wiki)
+    {
+        return this.properties.getEntities() == null || this.properties.getEntities().matches(new WikiReference(wiki));
+    }
+
+    private boolean isSpaceInContainers(String wiki, String space)
+    {
+        return this.properties.getEntities() == null
+            || this.properties.getEntities().matches(new SpaceReference(space, new WikiReference(wiki)));
+    }
+
+    @Override
     protected void read(Object filter, InstanceFilter internalFilter) throws WikiStreamException
     {
         FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
         internalFilter.beginFarm(parameters);
 
-        for (InstanceInputEventGenerator generators : this.eventGenerators) {
-            generators.beginFarm(parameters);
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.setFilter(filter);
+            generator.beginFarm(parameters);
         }
 
         for (String wikiName : this.instanceModel.getWikis()) {
-            writeWiki(wikiName, filter, internalFilter);
+            if (isWikiInContainers(wikiName)) {
+                writeWiki(wikiName, filter, internalFilter);
+            }
         }
 
-        for (InstanceInputEventGenerator generators : this.eventGenerators) {
-            generators.endFarm(parameters);
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.endFarm(parameters);
         }
 
         internalFilter.endFarm(parameters);
@@ -77,16 +104,18 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
 
         internalFilter.beginWiki(name, parameters);
 
-        for (InstanceInputEventGenerator generators : this.eventGenerators) {
-            generators.beginWiki(name, parameters);
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.beginWiki(name, parameters);
         }
 
         for (String spaceName : this.instanceModel.getSpaces(name)) {
-            writeSpace(spaceName, filter, internalFilter);
+            if (isSpaceInContainers(name, spaceName)) {
+                writeSpace(spaceName, filter, internalFilter);
+            }
         }
 
-        for (InstanceInputEventGenerator generators : this.eventGenerators) {
-            generators.endWiki(name, parameters);
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.endWiki(name, parameters);
         }
 
         internalFilter.endWiki(name, parameters);
@@ -98,12 +127,12 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
 
         internalFilter.beginWikiSpace(name, parameters);
 
-        for (InstanceInputEventGenerator generators : this.eventGenerators) {
-            generators.beginWikiSpace(name, parameters);
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.beginWikiSpace(name, parameters);
         }
 
-        for (InstanceInputEventGenerator generators : this.eventGenerators) {
-            generators.endWikiSpace(name, parameters);
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.endWikiSpace(name, parameters);
         }
 
         internalFilter.endWikiSpace(name, parameters);

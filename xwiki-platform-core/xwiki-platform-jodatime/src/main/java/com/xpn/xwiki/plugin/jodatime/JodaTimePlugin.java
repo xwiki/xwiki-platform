@@ -207,6 +207,7 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
 
     /**
      * @return an ISO8601 date time formatter
+     * @since 5.2RC1
      */
     public DateTimeFormatter getISODateTimeFormatter()
     {

@@ -181,6 +181,7 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
 
     /**
      * @return an ISO8601 date time formatter
+     * @since 5.2RC1
      */
     public DateTimeFormatter getISODateTimeFormatter()
     {

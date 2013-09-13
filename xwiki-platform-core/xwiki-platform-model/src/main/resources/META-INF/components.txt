@@ -1,3 +1,5 @@
+org.xwiki.model.internal.DefaultModelConfiguration
+org.xwiki.model.internal.DefaultModelContext
 org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver
 org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver
 org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver
@@ -16,6 +18,5 @@ org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolver
 org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResolver
 org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver
 org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver
-org.xwiki.model.internal.DefaultModelConfiguration
-org.xwiki.model.internal.DefaultModelContext
+org.xwiki.model.internal.reference.converter.DocumentReferenceConverter
 org.xwiki.model.internal.scripting.ModelScriptService

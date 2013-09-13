@@ -36,6 +36,7 @@ public interface DataManager
      * @param query the query in Lucene syntax to match installs
      * @return the number of matching installs
      * @throws Exception when an error happens while retrieving the data
+     * @since 5.2RC1
      */
     long getInstallCount(String query) throws Exception;
 }

@@ -62,6 +62,7 @@ public class ActiveInstallsScriptService implements ScriptService
      * @param query the query in Lucene syntax to match installs
      * @return the number of matching installs or -1 if an error happened, in which case the error can be retrieved
      *         with {@link #getLastError()}.
+     * @since 5.2RC1
      */
     public long getInstallCount(String query)
     {

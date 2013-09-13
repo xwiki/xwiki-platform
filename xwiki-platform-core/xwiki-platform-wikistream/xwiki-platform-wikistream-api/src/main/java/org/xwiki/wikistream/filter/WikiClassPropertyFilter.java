@@ -34,16 +34,15 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiClassPropertyFilter
 {
-    /**
-     * @type Map<String, String>
-     */
-    public static final String PARAMETER_FIELDS = "classproperty_fields";
-
     void beginWikiClassProperty(@Name("name") String name, @Name("type") String type,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
     void endWikiClassProperty(@Name("name") String name, @Name("type") String type,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
+
+    void onWikiClassPropertyField(@Name("name") String name, @Name("value") String value,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 }

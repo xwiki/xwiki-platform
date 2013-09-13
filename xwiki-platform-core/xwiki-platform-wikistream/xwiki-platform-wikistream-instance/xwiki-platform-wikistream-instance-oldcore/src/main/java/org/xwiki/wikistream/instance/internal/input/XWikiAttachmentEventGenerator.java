@@ -82,8 +82,8 @@ public class XWikiAttachmentEventGenerator extends
             try {
                 parameters.put(WikiAttachmentFilter.PARAMETER_CONTENT, attachment.getContentInputStream(xcontext));
             } catch (XWikiException e) {
-                throw new WikiStreamException("Failed to get content for attachment [" + attachment.getReference()
-                    + "]", e);
+                throw new WikiStreamException(String.format("Failed to get content for attachment [%s]",
+                    attachment.getReference()), e);
             }
         }
 

@@ -19,14 +19,17 @@
  */
 package org.xwiki.wikistream.xar.internal.output;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -37,9 +40,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
 import org.xwiki.wikistream.filter.WikiObjectFilter;
-import org.xwiki.wikistream.internal.ParametersTree;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
@@ -67,23 +68,23 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
 
     private XARWikiWriter wikiWriter;
 
-    private ParametersTree currentParameters;
-
     private String currentSpace;
 
     private String currentDocument;
 
-    private LocalDocumentReference currentDocumentReference;
+    private FilterEventParameters currentDocumentParameters;
 
-    private ParametersTree currentDocumentParameters;
+    private FilterEventParameters currentDocumentLocaleParameters;
+
+    private FilterEventParameters currentDocumentRevisionParameters;
+
+    private LocalDocumentReference currentDocumentReference;
 
     private Locale currentDocumentLocale = Locale.ROOT;
 
     private String currentDocumentVersion;
 
     private String currentAttachment;
-
-    private String currentAttachmentVersion;
 
     private String currentObjectClass;
 
@@ -129,37 +130,48 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
                 toString(this.currentDocumentParameters.get(XWikiWikiDocumentFilter.PARAMETER_LOCALE)));
             this.writer.writeElement(XARDocumentModel.ELEMENT_ISTRANSLATION, this.currentDocumentLocale != null
                 && !Locale.ROOT.equals(this.currentDocumentLocale) ? "1" : "0");
-            this.writer.writeElement(XARDocumentModel.ELEMENT_PARENT,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_PARENT));
+
             this.writer.writeElement(XARDocumentModel.ELEMENT_CREATION_AUTHOR,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_CREATION_AUTHOR));
-            this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_AUTHOR,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
-            this.writer.writeElement(XARDocumentModel.ELEMENT_CUSTOMCLASS,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS));
-            this.writer.writeElement(XARDocumentModel.ELEMENT_CONTENT_AUTHOR,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR));
+                (String) this.currentDocumentLocaleParameters.get(XWikiWikiDocumentFilter.PARAMETER_CREATION_AUTHOR));
             this.writer.writeElement(XARDocumentModel.ELEMENT_CREATION_DATE,
-                toString(this.currentParameters.<Date> get(XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE)));
+                toString((Date) this.currentDocumentLocaleParameters
+                    .get(XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE)));
+
+            this.writer.writeElement(XARDocumentModel.ELEMENT_PARENT,
+                (String) this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT));
+            this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_AUTHOR,
+                (String) this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
+            this.writer.writeElement(XARDocumentModel.ELEMENT_CUSTOMCLASS,
+                (String) this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS));
+            this.writer.writeElement(XARDocumentModel.ELEMENT_CONTENT_AUTHOR,
+                (String) this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR));
             this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_DATE,
-                toString(this.currentParameters.<Date> get(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE)));
+                toString((Date) this.currentDocumentRevisionParameters
+                    .get(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE)));
             this.writer.writeElement(XARDocumentModel.ELEMENT_CONTENT_DATE,
-                toString(this.currentParameters.<Date> get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE)));
+                toString((Date) this.currentDocumentRevisionParameters
+                    .get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE)));
             this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_VERSION, this.currentDocumentVersion);
             this.writer.writeElement(XARDocumentModel.ELEMENT_TITLE,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_TITLE));
+                (String) this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_TITLE));
             this.writer.writeElement(XARDocumentModel.ELEMENT_DEFAULTTEMPLATE,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
-            this.writer.writeElement(XARDocumentModel.ELEMENT_VALIDATIONSCRIPT,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
-            this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_COMMENT,
-                this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
+                (String) this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
+            this.writer
+                .writeElement(XARDocumentModel.ELEMENT_VALIDATIONSCRIPT,
+                    (String) this.currentDocumentRevisionParameters
+                        .get(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
+            this.writer
+                .writeElement(XARDocumentModel.ELEMENT_REVISION_COMMENT,
+                    (String) this.currentDocumentRevisionParameters
+                        .get(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
             this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_MINOR,
-                toString(this.currentParameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR)));
-            this.writer.writeElement(XARDocumentModel.ELEMENT_CONTENT_SYNTAX,
-                toString(this.currentParameters.<Syntax> get(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)));
+                toString(this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR)));
+            this.writer
+                .writeElement(XARDocumentModel.ELEMENT_CONTENT_SYNTAX,
+                    toString((Syntax) this.currentDocumentRevisionParameters
+                        .get(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)));
             this.writer.writeElement(XARDocumentModel.ELEMENT_ISHIDDEN,
-                toString(this.currentParameters.get(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)));
+                toString(this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)));
         }
 
         return this.writer;
@@ -170,21 +182,17 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Override
     public void beginFarm(FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
     public void endFarm(FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
     public void beginWiki(String name, FilterEventParameters parameters) throws WikiStreamException
     {
         this.wikiWriter = new XARWikiWriter(name, parameters, this.properties);
-
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
@@ -193,7 +201,6 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.wikiWriter.close();
 
         this.wikiWriter = null;
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
@@ -204,22 +211,19 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         }
 
         this.currentSpace = name;
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
     public void endWikiSpace(String name, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentSpace = null;
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentDocument = name;
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
-        this.currentDocumentParameters = this.currentParameters;
+        this.currentDocumentParameters = parameters;
 
         this.currentDocumentReference = new LocalDocumentReference(this.currentSpace, this.currentDocument);
     }
@@ -229,7 +233,6 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     {
         this.currentDocument = null;
         this.currentDocumentReference = null;
-        this.currentParameters = this.currentParameters.getParent();
         this.currentDocumentParameters = null;
     }
 
@@ -237,37 +240,35 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentDocumentLocale = locale;
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
+        this.currentDocumentLocaleParameters = parameters;
     }
 
     @Override
     public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
         getWriter().writeElement(XARDocumentModel.ELEMENT_REVISIONS,
-            this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
+            (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
 
         getWriter().writeEndElement();
 
         this.writer = null;
         this.currentDocumentLocale = null;
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
     public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentDocumentVersion = version;
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
+        this.currentDocumentRevisionParameters = parameters;
     }
 
     @Override
     public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
         getWriter().writeElement(XARDocumentModel.ELEMENT_CONTENT,
-            this.currentParameters.<String> get(XWikiWikiDocumentFilter.PARAMETER_CONTENT));
+            (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT));
 
         this.currentDocumentVersion = null;
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
@@ -276,51 +277,61 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         getWriter().writeStartElement(XARAttachmentModel.ELEMENT_ATTACHMENT);
 
         this.currentAttachment = name;
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
+
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, this.currentAttachment);
     }
 
     @Override
     public void endWikiAttachment(String attachmentName, FilterEventParameters parameters) throws WikiStreamException
     {
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
-            this.currentParameters.<String> get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+            (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
 
         if (this.writer != null) {
             getWriter().writeEndElement();
         }
 
         this.currentAttachment = null;
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
     public void beginWikiAttachmentRevision(String version, FilterEventParameters parameters)
         throws WikiStreamException
     {
-        this.currentAttachmentVersion = version;
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
+            (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_DATE,
+            toString((Date) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)));
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_VERSION, version);
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_COMMENT,
+            (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
+
+        Object contentObject = parameters.get(XWikiWikiAttachmentFilter.PARAMETER_CONTENT);
+        if (contentObject != null) {
+            byte[] content;
+            if (contentObject instanceof byte[]) {
+                content = (byte[]) contentObject;
+            } else if (contentObject instanceof InputStream) {
+                Base64InputStream b64InputStream = new Base64InputStream((InputStream) contentObject, true);
+                try {
+                    content = IOUtils.toByteArray(b64InputStream);
+                } catch (IOException e) {
+                    throw new WikiStreamException(String.format("Failed to write content of atchment [%s]",
+                        this.currentAttachment), e);
+                }
+            } else {
+                throw new WikiStreamException(String.format("Unsupported attachment content type [%s]",
+                    contentObject.getClass()));
+            }
+
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT, toString(content));
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(content.length));
+        }
     }
 
     @Override
     public void endWikiAttachmentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, this.currentAttachment);
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
-            this.currentParameters.<String> get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_DATE,
-            toString(this.currentParameters.<Date> get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)));
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_VERSION, this.currentAttachmentVersion);
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_COMMENT,
-            this.currentParameters.<String> get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
-
-        byte[] content = this.currentParameters.<byte[]> get(XWikiWikiAttachmentFilter.PARAMETER_CONTENT);
-        if (content != null) {
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT, toString(content));
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(content.length));
-        }
-
-        this.currentAttachmentVersion = null;
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
@@ -328,79 +339,67 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     {
         getWriter().writeStartElement(XARClassModel.ELEMENT_CLASS);
 
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
-
         this.writer.writeElement(XARClassModel.ELEMENT_NAME, this.currentObjectClass != null ? this.currentObjectClass
             : this.localSerializer.serialize(this.currentDocumentReference));
 
         this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMCLASS,
-            this.currentParameters.<String> get(WikiClassFilter.PARAMETER_CUSTOMCLASS));
+            (String) parameters.get(WikiClassFilter.PARAMETER_CUSTOMCLASS));
         this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMMAPPING,
-            this.currentParameters.<String> get(WikiClassFilter.PARAMETER_CUSTOMMAPPING));
+            (String) parameters.get(WikiClassFilter.PARAMETER_CUSTOMMAPPING));
         this.writer.writeElement(XARClassModel.ELEMENT_DEFAULTVIEWSHEET,
-            this.currentParameters.<String> get(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW));
+            (String) parameters.get(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW));
         this.writer.writeElement(XARClassModel.ELEMENT_DEFAULTEDITSHEET,
-            this.currentParameters.<String> get(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT));
+            (String) parameters.get(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT));
         this.writer.writeElement(XARClassModel.ELEMENT_DEFAULTWEB,
-            this.currentParameters.<String> get(WikiClassFilter.PARAMETER_DEFAULTSPACE));
+            (String) parameters.get(WikiClassFilter.PARAMETER_DEFAULTSPACE));
         this.writer.writeElement(XARClassModel.ELEMENT_NAMEFIELD,
-            this.currentParameters.<String> get(WikiClassFilter.PARAMETER_NAMEFIELD));
+            (String) parameters.get(WikiClassFilter.PARAMETER_NAMEFIELD));
         this.writer.writeElement(XARClassModel.ELEMENT_VALIDATIONSCRIPT,
-            this.currentParameters.<String> get(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT));
+            (String) parameters.get(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT));
     }
 
     @Override
     public void endWikiClass(FilterEventParameters parameters) throws WikiStreamException
     {
         getWriter().writeEndElement();
-
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
     public void beginWikiClassProperty(String name, String type, FilterEventParameters parameters)
         throws WikiStreamException
     {
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
-
         getWriter().writeStartElement(name);
-
-        Map<String, String> fields =
-            this.currentParameters.<Map<String, String>> get(WikiClassPropertyFilter.PARAMETER_FIELDS);
-        if (fields != null) {
-            for (Map.Entry<String, String> entry : fields.entrySet()) {
-                this.writer.writeElement(entry.getKey(), entry.getValue());
-            }
-        }
-
-        this.writer.writeElement(XARClassPropertyModel.ELEMENT_CLASSTYPE, type);
     }
 
     @Override
     public void endWikiClassProperty(String name, String type, FilterEventParameters parameters)
         throws WikiStreamException
     {
-        getWriter().writeEndElement();
+        this.writer.writeElement(XARClassPropertyModel.ELEMENT_CLASSTYPE, type);
 
-        this.currentParameters = this.currentParameters.getParent();
+        getWriter().writeEndElement();
+    }
+
+    @Override
+    public void onWikiClassPropertyField(String name, String value, FilterEventParameters parameters)
+        throws WikiStreamException
+    {
+        this.writer.writeElement(name, value);
     }
 
     @Override
     public void beginWikiObject(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
-
         getWriter().writeStartElement(XARObjectModel.ELEMENT_OBJECT);
 
-        this.currentObjectClass = this.currentParameters.<String> get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE);
+        this.currentObjectClass = (String) parameters.get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE);
 
         this.writer.writeElement(XARObjectModel.ELEMENT_NAME,
             this.localSerializer.serialize(this.currentDocumentReference));
         this.writer.writeElement(XARObjectModel.ELEMENT_NUMBER,
-            toString(this.currentParameters.<Integer> get(WikiObjectFilter.PARAMETER_NUMBER)));
+            toString((Integer) parameters.get(WikiObjectFilter.PARAMETER_NUMBER)));
         this.writer.writeElement(XARObjectModel.ELEMENT_CLASSNAME, this.currentObjectClass);
-        this.writer.writeElement(XARObjectModel.ELEMENT_GUID,
-            this.currentParameters.<String> get(WikiObjectFilter.PARAMETER_GUID));
+        this.writer.writeElement(XARObjectModel.ELEMENT_GUID, (String) parameters.get(WikiObjectFilter.PARAMETER_GUID));
     }
 
     @Override
@@ -409,15 +408,12 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         getWriter().writeEndElement();
 
         this.currentObjectClass = null;
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
     public void beginWikiObjectProperty(String name, String value, FilterEventParameters parameters)
         throws WikiStreamException
     {
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
-
         getWriter().writeStartElement(XARObjectPropertyModel.ELEMENT_PROPERTY);
 
         this.writer.writeElement(name, value);
@@ -428,7 +424,5 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         throws WikiStreamException
     {
         getWriter().writeEndElement();
-
-        this.currentParameters = this.currentParameters.getParent();
     }
 }

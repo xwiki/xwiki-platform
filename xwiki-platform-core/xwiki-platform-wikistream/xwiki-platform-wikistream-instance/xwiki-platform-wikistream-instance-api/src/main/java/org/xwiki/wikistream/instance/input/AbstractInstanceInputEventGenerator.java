@@ -35,10 +35,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.internal.ParametersTree;
 
 /**
- * 
  * @param <F>
  * @version $Id$
  * @since 5.2M2
@@ -62,8 +60,6 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     protected Stack<String> currentSpaces = new Stack<String>();
 
     protected EntityReference currentReference;
-
-    private ParametersTree currentParameters;
 
     @Override
     public void initialize() throws InitializationException
@@ -89,13 +85,11 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     @Override
     public void beginFarm(FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
     public void endFarm(FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
@@ -103,7 +97,6 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     {
         this.currentWiki = name;
         this.currentReference = new EntityReference(this.currentWiki, EntityType.WIKI);
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
@@ -111,7 +104,6 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     {
         this.currentWiki = null;
         this.currentReference = this.currentReference.getParent();
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
@@ -119,7 +111,6 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     {
         this.currentSpaces.push(name);
         this.currentReference = new EntityReference(name, EntityType.SPACE, this.currentReference);
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
@@ -127,19 +118,16 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     {
         this.currentSpaces.pop();
         this.currentReference = this.currentReference.getParent();
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override
     public void beginUnknwon(String id, FilterEventParameters parameters) throws FilterException
     {
-        this.currentParameters = new ParametersTree(parameters, this.currentParameters);
     }
 
     @Override
     public void endUnknwon(String id, FilterEventParameters parameters) throws FilterException
     {
-        this.currentParameters = this.currentParameters.getParent();
     }
 
     @Override

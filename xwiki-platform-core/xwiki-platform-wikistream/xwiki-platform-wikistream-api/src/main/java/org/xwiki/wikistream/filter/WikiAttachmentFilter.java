@@ -37,32 +37,32 @@ public interface WikiAttachmentFilter
     /**
      * @type String
      */
-    String PARAMETER_NAME = "attachment_name";
+    String PARAMETER_NAME = "name";
 
     /**
      * @type String
      */
-    String PARAMETER_REVISION_AUTHOR = "attachment_revision_author";
+    String PARAMETER_REVISION_AUTHOR = "revision_author";
 
     /**
      * @type Date
      */
-    String PARAMETER_REVISION_DATE = "attachment_revision_date";
+    String PARAMETER_REVISION_DATE = "revision_date";
 
     /**
      * @type String
      */
-    String PARAMETER_REVISION_VERSION = "attachment_revision_version";
+    String PARAMETER_REVISION_VERSION = "revision_version";
 
     /**
      * @type String
      */
-    String PARAMETER_REVISION_COMMENT = "attachment_revision_comment";
+    String PARAMETER_REVISION_COMMENT = "revision_comment";
 
     /**
      * @type String
      */
-    String PARAMETER_CONTENT = "attachment_content";
+    String PARAMETER_CONTENT = "content";
 
     void beginWikiAttachment(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)

@@ -41,115 +41,110 @@ public interface WikiDocumentFilter
     /**
      * @type String
      */
-    String PARAMETER_SPACE = "space";
-
-    /**
-     * @type String
-     */
-    String PARAMETER_NAME = "document_name";
+    String PARAMETER_NAME = "name";
 
     /**
      * @type Syntax
      */
-    String PARAMETER_SYNTAX = "document_syntax";
+    String PARAMETER_SYNTAX = "syntax";
 
     /**
      * @type String
      */
-    String PARAMETER_PARENT = "document_parent_reference";
+    String PARAMETER_PARENT = "parent_reference";
 
     /**
      * @type String
      */
-    String PARAMETER_TITLE = "document_title";
+    String PARAMETER_TITLE = "title";
 
     /**
      * @type Boolean
      */
-    String PARAMETER_HIDDEN = "document_hidden";
+    String PARAMETER_HIDDEN = "hidden";
 
     /**
      * @type String
      */
-    String PARAMETER_CUSTOMCLASS = "document_customclass";
+    String PARAMETER_CUSTOMCLASS = "customclass";
 
     /**
      * @type String
      */
-    String PARAMETER_DEFAULTTEMPLATE = "document_defaulttemplate";
+    String PARAMETER_DEFAULTTEMPLATE = "defaulttemplate";
 
     /**
      * @type String
      */
-    String PARAMETER_VALIDATIONSCRIPT = "document_validationscript";
+    String PARAMETER_VALIDATIONSCRIPT = "validationscript";
 
     // content
 
     /**
      * @type String
      */
-    String PARAMETER_CONTENT = "document_content";
+    String PARAMETER_CONTENT = "content";
 
     /**
      * @type String
      */
-    String PARAMETER_CONTENT_HTML = "document_content_html";
+    String PARAMETER_CONTENT_HTML = "content_html";
 
     /**
      * @type String
      */
-    String PARAMETER_CONTENT_AUTHOR = "document_content_author";
+    String PARAMETER_CONTENT_AUTHOR = "content_author";
 
     /**
      * @type Date
      */
-    String PARAMETER_CONTENT_DATE = "document_content_date";
+    String PARAMETER_CONTENT_DATE = "content_date";
 
     // creation
 
     /**
      * @type String
      */
-    String PARAMETER_CREATION_AUTHOR = "document_creation_author";
+    String PARAMETER_CREATION_AUTHOR = "creation_author";
 
     /**
      * @type Date
      */
-    String PARAMETER_CREATION_DATE = "document_creation_date";
+    String PARAMETER_CREATION_DATE = "creation_date";
 
     // locale
 
     /**
      * @type Locale
      */
-    String PARAMETER_LOCALE = "document_locale";
+    String PARAMETER_LOCALE = "locale";
 
     // revision
 
     /**
      * @type String
      */
-    String PARAMETER_REVISION = "document_revision";
+    String PARAMETER_REVISION = "revision";
 
     /**
      * @type Date
      */
-    String PARAMETER_REVISION_DATE = "document_revision_date";
+    String PARAMETER_REVISION_DATE = "revision_date";
 
     /**
      * @type String
      */
-    String PARAMETER_REVISION_AUTHOR = "document_revision_author";
+    String PARAMETER_REVISION_AUTHOR = "revision_author";
 
     /**
      * @type String
      */
-    String PARAMETER_REVISION_COMMENT = "document_revision_comment";
+    String PARAMETER_REVISION_COMMENT = "revision_comment";
 
     /**
      * @type Boolean
      */
-    String PARAMETER_REVISION_MINOR = "document_revision_minor";
+    String PARAMETER_REVISION_MINOR = "revision_minor";
 
     // Events
 

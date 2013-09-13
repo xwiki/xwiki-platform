@@ -24,8 +24,13 @@ import java.util.HashMap;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.properties.RawProperties;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
 
 /**
+ * The properties passed to the instance input wiki stream.
+ * <p>
+ * The properties are also passed to implementations of {@link InstanceInputEventGenerator}.
+ * 
  * @version $Id$
  * @since 5.2M2
  */

@@ -20,15 +20,12 @@
 package org.xwiki.wikistream.instance.internal.input;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
 import org.xwiki.wikistream.instance.internal.PropertyClassFilter;
 import org.xwiki.wikistream.instance.internal.PropertyClassProperties;
 
@@ -50,19 +47,7 @@ public class PropertyClassEventGenerator extends
     {
         // > WikiClassProperty
 
-        FilterEventParameters propertyParameters = new FilterEventParameters();
-
-        Map<String, String> fields = new LinkedHashMap<String, String>();
-
-        // Iterate over values sorted by field name so that the values are
-        // exported to XML in a consistent order.
-        Iterator<BaseProperty< ? >> it = xclassProperty.getSortedIterator();
-        while (it.hasNext()) {
-            BaseProperty< ? > bprop = it.next();
-            fields.put(bprop.getName(), bprop.toText());
-        }
-
-        propertyParameters.put(WikiClassPropertyFilter.PARAMETER_FIELDS, fields);
+        FilterEventParameters propertyParameters = FilterEventParameters.EMPTY;
 
         String classType = xclassProperty.getClassType();
         if (xclassProperty.getClass().getSimpleName().equals(classType + "Class")) {
@@ -72,6 +57,16 @@ public class PropertyClassEventGenerator extends
         }
 
         propertyFilter.beginWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);
+
+        // * WikiClassPropertyField
+
+        // Iterate over values sorted by field name so that the values are
+        // exported to XML in a consistent order.
+        Iterator<BaseProperty< ? >> it = xclassProperty.getSortedIterator();
+        while (it.hasNext()) {
+            BaseProperty< ? > bprop = it.next();
+            propertyFilter.onWikiClassPropertyField(bprop.getName(), bprop.toText(), FilterEventParameters.EMPTY);
+        }
 
         // < WikiClassProperty
 

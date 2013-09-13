@@ -34,19 +34,19 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiClassFilter
 {
-    public static final String PARAMETER_CUSTOMCLASS = "class_customclass";
+    public static final String PARAMETER_CUSTOMCLASS = "customclass";
 
-    public static final String PARAMETER_CUSTOMMAPPING = "class_custommapping";
+    public static final String PARAMETER_CUSTOMMAPPING = "custommapping";
 
-    public static final String PARAMETER_SHEET_DEFAULTVIEW = "class_sheet_defaultview";
+    public static final String PARAMETER_SHEET_DEFAULTVIEW = "sheet_defaultview";
 
-    public static final String PARAMETER_SHEET_DEFAULTEDIT = "class_sheet_defaultedit";
+    public static final String PARAMETER_SHEET_DEFAULTEDIT = "sheet_defaultedit";
 
-    public static final String PARAMETER_DEFAULTSPACE = "class_defaultspace";
+    public static final String PARAMETER_DEFAULTSPACE = "defaultspace";
 
-    public static final String PARAMETER_NAMEFIELD = "class_namefield";
+    public static final String PARAMETER_NAMEFIELD = "namefield";
 
-    public static final String PARAMETER_VALIDATIONSCRIPT = "class_validationscript";
+    public static final String PARAMETER_VALIDATIONSCRIPT = "validationscript";
 
     void beginWikiClass(
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)

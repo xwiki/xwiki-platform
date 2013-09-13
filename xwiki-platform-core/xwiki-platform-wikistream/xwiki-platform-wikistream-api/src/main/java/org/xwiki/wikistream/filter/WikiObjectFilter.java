@@ -34,13 +34,13 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiObjectFilter
 {
-    public static final String PARAMETER_NAME = "object_name";
+    public static final String PARAMETER_NAME = "name";
 
-    public static final String PARAMETER_NUMBER = "object_number";
+    public static final String PARAMETER_NUMBER = "number";
 
-    public static final String PARAMETER_CLASS_REFERENCE = "object_class_reference";
+    public static final String PARAMETER_CLASS_REFERENCE = "class_reference";
 
-    public static final String PARAMETER_GUID = "object_guid";
+    public static final String PARAMETER_GUID = "guid";
 
     void beginWikiObject(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)

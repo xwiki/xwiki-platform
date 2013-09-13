@@ -223,7 +223,7 @@ $xwiki.getUserName("xwiki:${username}")
   #else
     #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatar.png', true))
   #end
-  #if (!$profileDoc.isNew() && $profileDoc.attachmentList.size() > 0)
+  #if ($profileDoc && !$profileDoc.isNew() && $profileDoc.attachmentList.size() > 0)
     #set ($profileObj = $profileDoc.getObject('XWiki.XWikiUsers', 0))
     #set ($avatarFileName = $profileObj.getProperty('avatar').value)
     #if ("$!avatarFileName" != '')
@@ -1612,13 +1612,10 @@ function (row, i, table) {
       #end
     #end
   #end
-  }
-  else {
-    var page = row["doc_fullName"];
-    var dp = page.indexOf(':');
-    var p = page.indexOf('.');
-    var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
-    var name = page.substring(p + 1);
+  } else {
+    var documentReference = XWiki.Model.resolve(row['doc_fullName'] || '', XWiki.EntityType.DOCUMENT);
+    var pageName = documentReference.name;
+    var spaceName = documentReference.parent ? documentReference.parent.name : '';
     #foreach($colname in $collist)
       // $colname
       #set($colprop = $colprops.get($colname))
@@ -1629,9 +1626,9 @@ function (row, i, table) {
          #set($jscolname = $colname)
         #end
         #if($jscolname == "doc_name")
-          tr.insert(new Element("td").update(name + "*"));
+          tr.insert(new Element("td").update(pageName + "*"));
         #elseif($jscolname == "doc_space")
-          tr.insert(new Element("td").update(space));
+          tr.insert(new Element("td").update(spaceName));
         #else
           tr.insert(new Element("td").update(" "));
         #end

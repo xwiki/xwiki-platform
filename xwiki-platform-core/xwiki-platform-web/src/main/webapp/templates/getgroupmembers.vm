@@ -24,13 +24,18 @@ $response.setContentType('application/x-json')
 #foreach ($member in $members)
   #set ($memberReference = $services.model.resolveDocument($member))
   #set ($grayed = $memberReference.equals($xcontext.userReference) && $doc.fullName == 'XWiki.XWikiAdminGroup')
-  #set ($discard = $json.rows.add({
+  ## The following properties are kept for backward compatibility with XWiki versions older than 2.7.2.
+  #set ($oldProperties = {
     'fullname': $member,
     'prettyname': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
     'wikiname': $memberReference.wikiReference.name,
     'memberurl': $xwiki.getURL($memberReference),
     'docurl': $doc.getURL(),
-    'grayed': $grayed,
+    'grayed': $grayed
+  })
+  ## Live table data.
+  #set ($liveTableData = {
+    'doc_fullName': $member,
     'doc_viewable': $xwiki.hasAccessLevel('view', $xcontext.user, $member),
     'doc_hasadmin': $xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName),
     'doc_hasedit': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
@@ -45,6 +50,10 @@ $response.setContentType('application/x-json')
     })),
     '_avatar': "#mediumUserAvatar($member)",
     '_avatar_url': $xwiki.getURL($memberReference)
-  }))
+  })
+  #set ($data = {})
+  #set ($discard = $data.putAll($oldProperties))
+  #set ($discard = $data.putAll($liveTableData))
+  #set ($discard = $json.rows.add($data))
 #end
 $jsontool.serialize($json)

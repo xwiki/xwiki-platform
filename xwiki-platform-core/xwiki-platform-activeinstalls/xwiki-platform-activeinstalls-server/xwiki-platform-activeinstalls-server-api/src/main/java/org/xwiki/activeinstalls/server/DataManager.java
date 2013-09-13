@@ -33,17 +33,9 @@ import org.xwiki.stability.Unstable;
 public interface DataManager
 {
     /**
-     * @return the total number of XWiki installs (active or not)
+     * @param query the query in Lucene syntax to match installs
+     * @return the number of matching installs
      * @throws Exception when an error happens while retrieving the data
      */
-    long getTotalInstalls() throws Exception;
-
-    /**
-     * @param days the number of days after which an Install is no longer be considered active (eg 30 days means that
-     *        if we haven't received a ping for the last 30 days the installation is no longer considered as an active
-     *        installation)
-     * @return the total number of active installs
-     * @throws Exception when an error happens while retrieving the data
-     */
-    long getActiveInstalls(int days) throws Exception;
+    long getInstallCount(String query) throws Exception;
 }

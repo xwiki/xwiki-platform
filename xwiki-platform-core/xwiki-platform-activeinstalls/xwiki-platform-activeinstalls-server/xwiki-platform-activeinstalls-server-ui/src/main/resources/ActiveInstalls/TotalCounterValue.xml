@@ -43,6 +43,6 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-$services.activeinstalls.totalInstalls
+$services.activeinstalls.getInstallCount('*')
 {{/velocity}}</content>
 </xwikidoc>

@@ -57,43 +57,20 @@ public class ActiveInstallsScriptService implements ScriptService
     private DataManager dataManager;
 
     /**
-     * See {@link org.xwiki.activeinstalls.server.DataManager#getTotalInstalls()}.
+     * See {@link org.xwiki.activeinstalls.server.DataManager#getInstallCount(String)}.
      *
-     * @return the total number of XWiki installs (active or not) or -1 if an error happened, in which case the error
-     *         can be retrieved with {@link #getLastError()}.
-     */
-    public long getTotalInstalls()
-    {
-        setError(null);
-
-        long result = -1;
-
-        try {
-            result = this.dataManager.getTotalInstalls();
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return result;
-    }
-
-    /**
-     * See {@link org.xwiki.activeinstalls.server.DataManager#getActiveInstalls(int)}.
-     *
-     * @param days the number of days after which an Install is no longer be considered active (eg 30 days means that
-     *        if we haven't received a ping for the last 30 days the installation is no longer considered as an active
-     *        installation)
-     * @return the total number of active installs or -1 if an error happened, in which case the error can be retrieved
+     * @param query the query in Lucene syntax to match installs
+     * @return the number of matching installs or -1 if an error happened, in which case the error can be retrieved
      *         with {@link #getLastError()}.
      */
-    public long getActiveInstalls(int days)
+    public long getInstallCount(String query)
     {
         setError(null);
 
         long result = -1;
 
         try {
-            result = this.dataManager.getActiveInstalls(days);
+            result = this.dataManager.getInstallCount(query);
         } catch (Exception e) {
             setError(e);
         }

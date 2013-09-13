@@ -22,10 +22,6 @@ package org.xwiki.activeinstalls.internal.server;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.activeinstalls.server.DataManager;
 import org.xwiki.component.annotation.Component;
@@ -43,43 +39,19 @@ import io.searchbox.core.Count;
 @Singleton
 public class DefaultDataManager implements DataManager
 {
-    /**
-     * Formatter to format dates in a standard format.
-     */
-    private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
-
     @Inject
     private JestClientManager jestClientManager;
 
     @Override
-    public long getTotalInstalls() throws Exception
+    public long getInstallCount(String query) throws Exception
     {
-        return executeCount("{\"match_all\" : { }}");
-    }
-
-    @Override
-    public long getActiveInstalls(int days) throws Exception
-    {
-        // Compute current date - N days
-        DateTime dt = new DateTime();
-        dt = dt.plusDays(-days);
-
-        // Serialize the new date
-        String serializedDate = DATE_FORMATTER.print(dt);
-
-        String query = "{\n"
-            + "  \"constant_score\" : {\n"
-            + "    \"filter\" : {\n"
-            + "      \"numeric_range\" : {\n"
-            + "        \"date\" : {\n"
-            + "          \"gte\" : \"" + serializedDate + "\"\n"
-            + "        }\n"
-            + "      }\n"
-            + "    }\n"
+        String queryString = "{\n"
+            + "  \"query_string\" : {\n"
+            + "    \"query\" : \"" + query + "\"\n"
             + "  }\n"
             + "}";
 
-        return executeCount(query);
+        return executeCount(queryString);
     }
 
     private long executeCount(String query) throws Exception

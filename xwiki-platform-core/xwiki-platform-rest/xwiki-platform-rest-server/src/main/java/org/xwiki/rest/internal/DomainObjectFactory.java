@@ -80,6 +80,7 @@ import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
+import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -622,7 +623,7 @@ public class DomainObjectFactory
 
         String[] propertyNames = xwikiObject.getPropertyNames();
         if (propertyNames.length > 0) {
-            objectSummary.setHeadline(xwikiObject.get(propertyNames[0]).toFormString());
+            objectSummary.setHeadline(((BaseProperty)xwikiObject.get(propertyNames[0])).getValue().toString());
         }
     }
 
@@ -711,7 +712,12 @@ public class DomainObjectFactory
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
             if (xwikiObject.get(propertyClass.getName()) != null) {
-                property.setValue(xwikiObject.get(propertyClass.getName()).toFormString());
+                java.lang.Object value = ((BaseProperty) xwikiObject.get(propertyClass.getName())).getValue();
+                if (value instanceof List) {
+                    property.setValue(StringUtils.join((List)value, "|"));
+                } else {
+                    property.setValue(value.toString());
+                }
             } else {
                 property.setValue("");
             }

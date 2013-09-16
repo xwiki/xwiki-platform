@@ -46,6 +46,6 @@
 #set ($now = $xwiki.jodatime.dateTime)
 #set ($threshold = $now.plusDays(-30))
 #set ($formatted = $xwiki.jodatime.getISODateTimeFormatter().print($threshold))
-$services.activeinstalls.getInstallCount("distributionVersion:[$formatted TO *]")
+$services.activeinstalls.getInstallCount("date:[$formatted TO *]")
 {{/velocity}}</content>
 </xwikidoc>

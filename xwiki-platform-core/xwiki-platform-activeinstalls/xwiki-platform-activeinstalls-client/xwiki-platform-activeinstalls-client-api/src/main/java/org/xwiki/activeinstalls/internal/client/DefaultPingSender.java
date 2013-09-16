@@ -40,8 +40,11 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.version.Version;
 import org.xwiki.instance.InstanceIdManager;
 
+import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Index;
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.mapping.PutMapping;
 import net.sf.json.JSONObject;
 
 /**
@@ -59,6 +62,16 @@ public class DefaultPingSender implements PingSender
      * still have the server part be able to parse the results depending on the format used by the client side.
      */
     private static final String LATEST_FORMAT_VERSION = "1.0";
+
+    /**
+     * The elastic search index we use to index pings.
+     */
+    private static final String INDEX = "installs";
+
+    /**
+     * The elastic search index type we use to index pings.
+     */
+    private static final String TYPE = "install";
 
     /**
      * Formatter to format dates in a standard format.
@@ -80,12 +93,29 @@ public class DefaultPingSender implements PingSender
     @Override
     public void sendPing() throws Exception
     {
+        JestClient client = this.jestClientManager.getClient();
+
+        // Step 1: Create index (if already exists then it'll just be ignored)
+        client.execute(new CreateIndex.Builder(INDEX).build());
+
+        // Step 2: Create a mapping so that we can search distribution versions containing hyphens (otherwise they
+        // are removed by the default tokenizer/analyzer). If mapping already exists then it'll just be ignored.
+        PutMapping putMapping = new PutMapping.Builder(
+            INDEX,
+            TYPE,
+            "{ \"" + TYPE + "\" : { \"properties\" : { "
+                + "\"distributionVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"}"
+                + "} } }").build();
+        client.execute(putMapping);
+
+        // Step 3: Index the data
         Index index = new Index.Builder(constructJSON())
-            .index("installs")
-            .type("install")
+            .index(INDEX)
+            .type(TYPE)
             .id(this.instanceIdManager.getInstanceId().toString())
             .build();
-        JestResult result = this.jestClientManager.getClient().execute(index);
+        JestResult result = client.execute(index);
+
         if (!result.isSucceeded()) {
             throw new Exception(result.getErrorMessage());
         }

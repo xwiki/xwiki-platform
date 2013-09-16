@@ -88,7 +88,7 @@ public class DefaultPingSenderTest
 
         // Real test is here, we verify the data sent to the server.
         ArgumentCaptor<Index> index = ArgumentCaptor.forClass(Index.class);
-        verify(client).execute(index.capture());
+        verify(client, times(3)).execute(index.capture());
         String jsonString = index.getValue().getData().toString();
         JSONObject json = (JSONObject) JSONSerializer.toJSON(jsonString);
         assertEquals("1.0", json.getString("formatVersion"));

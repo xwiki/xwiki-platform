@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -80,7 +81,6 @@ import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
-import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -89,6 +89,7 @@ import com.xpn.xwiki.api.PropertyClass;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
@@ -623,7 +624,7 @@ public class DomainObjectFactory
 
         String[] propertyNames = xwikiObject.getPropertyNames();
         if (propertyNames.length > 0) {
-            objectSummary.setHeadline(((BaseProperty)xwikiObject.get(propertyNames[0])).getValue().toString());
+            objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(propertyNames[0])));
         }
     }
 
@@ -711,16 +712,7 @@ public class DomainObjectFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (xwikiObject.get(propertyClass.getName()) != null) {
-                java.lang.Object value = ((BaseProperty) xwikiObject.get(propertyClass.getName())).getValue();
-                if (value instanceof List) {
-                    property.setValue(StringUtils.join((List)value, "|"));
-                } else {
-                    property.setValue(value.toString());
-                }
-            } else {
-                property.setValue("");
-            }
+            property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
 
             String propertyUri;
 
@@ -842,5 +834,25 @@ public class DomainObjectFactory
     private static String uri(URI baseURI, java.lang.Class< ? > resourceClass, java.lang.Object... pathElements)
     {
         return Utils.createURI(baseURI, resourceClass, pathElements).toString();
+    }
+
+    /**
+     * Serializes the value of the given XObject property.
+     * 
+     * @param property an XObject property
+     * @return the String representation of the property value
+     */
+    private static String serializePropertyValue(PropertyInterface property)
+    {
+        if (property == null) {
+            return "";
+        }
+
+        java.lang.Object value = ((BaseProperty) property).getValue();
+        if (value instanceof List) {
+            return StringUtils.join((List) value, "|");
+        } else {
+            return value.toString();
+        }
     }
 }

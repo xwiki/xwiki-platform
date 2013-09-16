@@ -100,12 +100,7 @@ public class DefaultPingSender implements PingSender
 
         // Step 2: Create a mapping so that we can search distribution versions containing hyphens (otherwise they
         // are removed by the default tokenizer/analyzer). If mapping already exists then it'll just be ignored.
-        PutMapping putMapping = new PutMapping.Builder(
-            INDEX,
-            TYPE,
-            "{ \"" + TYPE + "\" : { \"properties\" : { "
-                + "\"distributionVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"}"
-                + "} } }").build();
+        PutMapping putMapping = new PutMapping.Builder(INDEX, TYPE, constructJSONMapping()).build();
         client.execute(putMapping);
 
         // Step 3: Index the data
@@ -119,6 +114,19 @@ public class DefaultPingSender implements PingSender
         if (!result.isSucceeded()) {
             throw new Exception(result.getErrorMessage());
         }
+    }
+
+    private String constructJSONMapping()
+    {
+        return "{ \"" + TYPE + "\" : { \"properties\" : { "
+            + "\"formatVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
+            + "\"date\" : {\"type\" : \"date\"}"
+            + "\"distributionVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
+            + "\"extensions\" : { \"properties\" : {"
+            + "\"id\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
+            + "\"version\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"}"
+            + "} }"
+            + "} } }";
     }
 
     private String constructJSON()

@@ -20,7 +20,6 @@
 package org.xwiki.wikistream.xar.internal;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -50,11 +49,11 @@ public class XARDocumentModel
 
     public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
 
+    public static final String ELEMENT_SYNTAX = "syntaxId";
+
     // content
 
     public static final String ELEMENT_CONTENT = "content";
-
-    public static final String ELEMENT_CONTENT_SYNTAX = "syntaxId";
 
     public static final String ELEMENT_CONTENT_AUTHOR = "contentAuthor";
 
@@ -77,6 +76,6 @@ public class XARDocumentModel
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 
     public static final String ELEMENT_REVISION_MINOR = "minorEdit";
-    
+
     public static final String ELEMENT_REVISIONS = "versions";
 }

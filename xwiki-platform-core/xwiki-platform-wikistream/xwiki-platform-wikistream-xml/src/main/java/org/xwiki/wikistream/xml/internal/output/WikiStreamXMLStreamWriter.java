@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.xwiki.wikistream.WikiStreamException;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -147,6 +146,15 @@ public class WikiStreamXMLStreamWriter
             } catch (XMLStreamException e) {
                 throw new WikiStreamException("Failed to write attribute", e);
             }
+        }
+    }
+
+    public void writeCharacters(char[] text, int start, int len) throws WikiStreamException
+    {
+        try {
+            this.writer.writeCharacters(text, start, len);
+        } catch (XMLStreamException e) {
+            throw new WikiStreamException("Failed to write characters", e);
         }
     }
 

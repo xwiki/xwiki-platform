@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.filter;
 
+import java.io.InputStream;
+
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.annotation.Default;
 import org.xwiki.filter.annotation.Name;
@@ -59,11 +61,6 @@ public interface WikiAttachmentFilter
      */
     String PARAMETER_REVISION_COMMENT = "revision_comment";
 
-    /**
-     * @type String
-     */
-    String PARAMETER_CONTENT = "content";
-
     void beginWikiAttachment(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
@@ -77,6 +74,10 @@ public interface WikiAttachmentFilter
         throws WikiStreamException;
 
     void endWikiAttachment(@Name("name") String name,
+        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+        throws WikiStreamException;
+
+    void onWikiAttachmentContent(@Name("content") InputStream content, @Name("size") Long size,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 }

@@ -28,8 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -167,9 +166,8 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_MINOR,
                 toString(this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR)));
             this.writer
-                .writeElement(XARDocumentModel.ELEMENT_CONTENT_SYNTAX,
-                    toString((Syntax) this.currentDocumentRevisionParameters
-                        .get(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)));
+                .writeElement(XARDocumentModel.ELEMENT_SYNTAX, toString((Syntax) this.currentDocumentRevisionParameters
+                    .get(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)));
             this.writer.writeElement(XARDocumentModel.ELEMENT_ISHIDDEN,
                 toString(this.currentDocumentRevisionParameters.get(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)));
         }
@@ -305,33 +303,43 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_VERSION, version);
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_COMMENT,
             (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
-
-        Object contentObject = parameters.get(XWikiWikiAttachmentFilter.PARAMETER_CONTENT);
-        if (contentObject != null) {
-            byte[] content;
-            if (contentObject instanceof byte[]) {
-                content = (byte[]) contentObject;
-            } else if (contentObject instanceof InputStream) {
-                Base64InputStream b64InputStream = new Base64InputStream((InputStream) contentObject, true);
-                try {
-                    content = IOUtils.toByteArray(b64InputStream);
-                } catch (IOException e) {
-                    throw new WikiStreamException(String.format("Failed to write content of atchment [%s]",
-                        this.currentAttachment), e);
-                }
-            } else {
-                throw new WikiStreamException(String.format("Unsupported attachment content type [%s]",
-                    contentObject.getClass()));
-            }
-
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT, toString(content));
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(content.length));
-        }
     }
 
     @Override
     public void endWikiAttachmentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
+    }
+
+    @Override
+    public void onWikiAttachmentContent(InputStream content, Long size, FilterEventParameters parameters)
+        throws WikiStreamException
+    {
+        long contentSize = 0;
+
+        this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
+        byte[] buffer = new byte[4096];
+        int readSize;
+        do {
+            try {
+                readSize = content.read(buffer, 0, 4096);
+            } catch (IOException e) {
+                throw new WikiStreamException("Failed to read content stream", e);
+            }
+
+            if (readSize > 0) {
+                String chunk;
+                if (readSize == 4096) {
+                    chunk = Base64.encodeBase64String(buffer);
+                } else {
+                    chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
+                }
+                this.writer.writeCharacters(chunk);
+                contentSize += readSize;
+            }
+        } while (readSize == 4096);
+        this.writer.writeEndElement();
+
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
     }
 
     @Override

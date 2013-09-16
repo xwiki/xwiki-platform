@@ -119,12 +119,9 @@
                   <string>revision_comment</string>
                   <string>comment</string>
                 </entry>
-                <entry>
-                  <string>content</string>
-                  <byte-array>YXR0YWNobWVudCBjb250ZW50</byte-array>
-                </entry>
               </parameters>
             </p>
+            <WikiAttachmentContent>0,1,2,3,4,5,6,7,8,9</WikiAttachmentContent>
           </wikiAttachmentRevision>
         </wikiAttachment>
         <wikiClass>
@@ -329,8 +326,8 @@
     <date>947030400000</date>
     <version>1.1</version>
     <comment>comment</comment>
-    <content>YXR0YWNobWVudCBjb250ZW50</content>
-    <filesize>18</filesize>
+    <content>AAECAwQFBgcICQ==</content>
+    <filesize>10</filesize>
     <versions>jrcsrevisions</versions>
   </attachment>
   <class>

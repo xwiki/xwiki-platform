@@ -68,6 +68,23 @@ public class XWikiAttachmentEventGenerator extends
 
         // > WikiAttachment
 
+        FilterEventParameters attachmentParameters = new FilterEventParameters();
+
+        // TODO: add support for real revision events (instead of the jrcs archive )
+        if (properties.isWithWikiAttachmentRevisions()) {
+            try {
+                // We need to make sure content is loaded
+                XWikiAttachmentArchive archive;
+                archive = attachment.loadArchive(xcontext);
+                if (archive != null) {
+                    attachmentParameters.put(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS,
+                        new String(archive.getArchive()));
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Attachment [{}] has malformed history", attachment.getReference(), e);
+            }
+        }
+
         attachmentFilter.beginWikiAttachment(attachment.getFilename(), FilterEventParameters.EMPTY);
 
         // > WikiAttachmentRevision
@@ -78,29 +95,19 @@ public class XWikiAttachmentEventGenerator extends
         parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, attachment.getComment());
         parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
 
+        attachmentFilter.beginWikiAttachmentRevision(attachment.getVersion(), parameters);
+
+        // < WikiAttachmentContent
+
         if (properties.isWithWikiAttachmentContent()) {
             try {
-                parameters.put(WikiAttachmentFilter.PARAMETER_CONTENT, attachment.getContentInputStream(xcontext));
+                attachmentFilter.onWikiAttachmentContent(attachment.getContentInputStream(xcontext),
+                    Long.valueOf(attachment.getFilesize()), FilterEventParameters.EMPTY);
             } catch (XWikiException e) {
-                throw new WikiStreamException(String.format("Failed to get content for attachment [%s]",
+                throw new WikiStreamException(String.format("Failed to get content of attachment [%s]",
                     attachment.getReference()), e);
             }
         }
-
-        if (properties.isWithWikiAttachmentRevisions()) {
-            try {
-                // We need to make sure content is loaded
-                XWikiAttachmentArchive archive;
-                archive = attachment.loadArchive(xcontext);
-                if (archive != null) {
-                    parameters.put(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS, new String(archive.getArchive()));
-                }
-            } catch (XWikiException e) {
-                this.logger.error("Attachment [{}] has malformed history", attachment.getReference(), e);
-            }
-        }
-
-        attachmentFilter.beginWikiAttachmentRevision(attachment.getVersion(), parameters);
 
         // < WikiAttachmentRevision
 

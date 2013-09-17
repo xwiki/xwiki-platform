@@ -19,14 +19,13 @@
  */
 package org.xwiki.model.reference;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.model.EntityType;
 
 /**
  * A set of entities references.
- * <p>
- * Several "utility" reference can be used too like {@link PartialEntityReference} and {@link RegexEntityReference}
  * 
  * @version $Id$
  * @since 5.2M2
@@ -35,118 +34,158 @@ public class EntityReferenceSet
 {
     private static class EntityReferenceEntry
     {
-        public boolean or;
+        public String entityName;
 
-        public EntityReference reference;
+        public EntityType childrenType;
 
-        public boolean not;
+        public Map<String, EntityReferenceEntry> children;
 
-        public EntityReferenceEntry(boolean or, EntityReference reference, boolean not)
+        public EntityReferenceEntry()
         {
-            this.or = or;
-            this.reference = reference;
-            this.not = not;
         }
 
-        public boolean matches(EntityReference otherReference)
+        public EntityReferenceEntry(String entityName)
         {
-            boolean result;
+            this.entityName = entityName;
+        }
 
-            if (otherReference == this.reference) {
-                result = true;
-            } else {
-                result = matchesReference(otherReference);
+        public EntityReferenceEntry(EntityReferenceEntry entry)
+        {
+            this.entityName = entry.entityName;
+            this.childrenType = entry.childrenType;
+            this.children = entry.children;
+        }
+
+        public EntityReferenceEntry add()
+        {
+            return add((String) null);
+        }
+
+        public void add(EntityReferenceEntry entry)
+        {
+            if (this.children == null) {
+                this.children = new HashMap<String, EntityReferenceEntry>();
             }
 
-            return this.not ? !result : result;
+            this.children.put(entry.entityName, entry);
         }
 
-        /**
-         * Try to match the provided reference.
-         * 
-         * @param otherReference the reference to match
-         * @return true if the provided reference is matched
-         */
-        protected boolean matchesReference(EntityReference otherReference)
+        public EntityReferenceEntry add(String name)
         {
-            return this.reference == null || this.reference.equals(otherReference);
+            if (this.children == null) {
+                this.children = new HashMap<String, EntityReferenceEntry>();
+            }
+
+            EntityReferenceEntry entry = this.children.get(name);
+
+            if (entry == null) {
+                entry = new EntityReferenceEntry(name);
+
+                this.children.put(name, entry);
+            }
+
+            return entry;
+        }
+
+        public void reset()
+        {
+            this.childrenType = null;
+            this.children = null;
         }
     }
 
-    private List<EntityReferenceEntry> entries = new ArrayList<EntityReferenceEntry>();
+    private EntityReferenceEntry includes;
 
-    /**
-     * @param entityreference the reference
-     * @return the entity reference set
-     */
-    public EntityReferenceSet and(EntityReference entityreference)
+    private EntityReferenceEntry excludes;
+
+    private void add(EntityReference reference, EntityReferenceEntry entry)
     {
-        this.entries.add(new EntityReferenceEntry(false, entityreference, false));
+        EntityReferenceEntry currentEntry = entry;
+        for (EntityReference element : reference.getReversedReferenceChain()) {
+            // Move to the right level in the tree
+            while (currentEntry.childrenType != null && currentEntry.childrenType.compareTo(element.getType()) < 0) {
+                currentEntry = currentEntry.add();
+            }
 
-        return this;
-    }
-
-    /**
-     * @param entityReference the reference
-     * @return the entity reference set
-     */
-    public EntityReferenceSet andnot(EntityReference entityReference)
-    {
-        this.entries.add(new EntityReferenceEntry(false, entityReference, true));
-
-        return this;
-    }
-
-    /**
-     * @param entityReference the reference
-     * @return the entity reference set
-     */
-    public EntityReferenceSet or(EntityReference entityReference)
-    {
-        this.entries.add(new EntityReferenceEntry(true, entityReference, false));
-
-        return this;
-    }
-
-    /**
-     * @param entityReference the reference
-     * @return the entity reference set
-     */
-    public EntityReferenceSet ornot(EntityReference entityReference)
-    {
-        this.entries.add(new EntityReferenceEntry(true, entityReference, true));
-
-        return this;
-    }
-
-    /**
-     * @param entityReference the reference
-     * @return the entity reference set
-     */
-    public boolean matches(EntityReference entityReference)
-    {
-        if (this.entries.isEmpty()) {
-            return true;
-        }
-
-        Iterator<EntityReferenceEntry> iterator = this.entries.iterator();
-
-        boolean result = iterator.next().matches(entityReference);
-
-        while (iterator.hasNext()) {
-            EntityReferenceEntry entry = iterator.next();
-
-            if (entry.or) {
-                result |= entry.matches(entityReference);
+            if (currentEntry.childrenType == null || currentEntry.childrenType == element.getType()) {
+                currentEntry.add(reference.getName());
             } else {
-                result &= entry.matches(entityReference);
+                EntityReferenceEntry newEntry = new EntityReferenceEntry(currentEntry);
+                currentEntry.reset();
+                currentEntry.add(newEntry);
+            }
+            currentEntry.childrenType = reference.getType();
+        }
+    }
 
-                if (!result) {
-                    break;
+    /**
+     * @param reference the reference
+     * @return the entity reference set
+     */
+    public EntityReferenceSet includes(EntityReference reference)
+    {
+        if (this.includes == null) {
+            this.includes = new EntityReferenceEntry();
+        }
+
+        add(reference, this.includes);
+
+        return this;
+    }
+
+    /**
+     * @param reference the reference
+     * @return the entity reference set
+     */
+    public EntityReferenceSet excludes(EntityReference reference)
+    {
+        if (this.excludes == null) {
+            this.excludes = new EntityReferenceEntry();
+        }
+
+        add(reference, this.excludes);
+
+        return this;
+    }
+
+    private boolean matches(EntityReference reference, EntityReferenceEntry entry, boolean def)
+    {
+        if (entry == null) {
+            return def;
+        }
+
+        EntityReferenceEntry currentEntry = entry;
+        for (EntityReference element : reference.getReversedReferenceChain()) {
+            // No children
+            if (currentEntry.children == null) {
+                return true;
+            }
+
+            // Children have same type
+            if (currentEntry.childrenType == element.getType()) {
+                EntityReferenceEntry nameEntry = currentEntry.children.get(element.getName());
+
+                if (nameEntry == null) {
+                    currentEntry = currentEntry.children.get(null);
+
+                    if (currentEntry == null) {
+                        return false;
+                    }
+                } else {
+                    currentEntry = nameEntry;
                 }
             }
         }
 
-        return result;
+        return true;
+    }
+
+    /**
+     * @param reference the reference
+     * @return the entity reference set
+     */
+    public boolean matches(EntityReference reference)
+    {
+        return matches(reference, this.includes, true) && !matches(reference, this.excludes, false);
     }
 }

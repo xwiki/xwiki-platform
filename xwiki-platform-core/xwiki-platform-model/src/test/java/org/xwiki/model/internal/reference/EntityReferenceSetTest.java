@@ -25,105 +25,52 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSet;
 
+/**
+ * Validate {@link EntityReferenceSet}.
+ * 
+ * @version $Id$
+ */
 public class EntityReferenceSetTest
 {
     @Test
-    public void testAnd()
+    public void testIncludeWiki()
     {
         EntityReferenceSet set = new EntityReferenceSet();
 
-        set.and(new EntityReference("name", EntityType.WIKI));
+        set.includes(new EntityReference("name", EntityType.WIKI));
 
         Assert.assertTrue(set.matches(new EntityReference("name", EntityType.WIKI)));
 
         Assert.assertFalse(set.matches(new EntityReference("notname", EntityType.WIKI)));
-    }
 
-    @Test
-    public void testAndNot()
-    {
-        EntityReferenceSet set = new EntityReferenceSet();
-
-        set.andnot(new EntityReference("name", EntityType.WIKI));
-
-        Assert.assertFalse(set.matches(new EntityReference("name", EntityType.WIKI)));
-
-        Assert.assertTrue(set.matches(new EntityReference("notname", EntityType.WIKI)));
-    }
-
-    @Test
-    public void testOr()
-    {
-        EntityReferenceSet set = new EntityReferenceSet();
-
-        set.or(new EntityReference("name", EntityType.WIKI));
+        set.includes(new EntityReference("othername", EntityType.WIKI));
 
         Assert.assertTrue(set.matches(new EntityReference("name", EntityType.WIKI)));
 
+        Assert.assertTrue(set.matches(new EntityReference("othername", EntityType.WIKI)));
+
         Assert.assertFalse(set.matches(new EntityReference("notname", EntityType.WIKI)));
     }
 
     @Test
-    public void testOrnot()
+    public void testExcludeWiki()
     {
         EntityReferenceSet set = new EntityReferenceSet();
 
-        set.ornot(new EntityReference("name", EntityType.WIKI));
+        set.excludes(new EntityReference("name", EntityType.WIKI));
 
         Assert.assertFalse(set.matches(new EntityReference("name", EntityType.WIKI)));
 
+        Assert.assertTrue(set.matches(new EntityReference("othername", EntityType.WIKI)));
+
         Assert.assertTrue(set.matches(new EntityReference("notname", EntityType.WIKI)));
-    }
 
-    @Test
-    public void testAndAnd()
-    {
-        EntityReferenceSet set = new EntityReferenceSet();
+        set.excludes(new EntityReference("othername", EntityType.WIKI));
 
-        set.and(new EntityReference("name1", EntityType.WIKI));
-        set.and(new EntityReference("name2", EntityType.WIKI));
+        Assert.assertFalse(set.matches(new EntityReference("name", EntityType.WIKI)));
 
-        Assert.assertFalse(set.matches(new EntityReference("name1", EntityType.WIKI)));
-        Assert.assertFalse(set.matches(new EntityReference("name2", EntityType.WIKI)));
-        Assert.assertFalse(set.matches(new EntityReference("notname", EntityType.WIKI)));
-    }
+        Assert.assertFalse(set.matches(new EntityReference("othername", EntityType.WIKI)));
 
-    @Test
-    public void testAndAndnot()
-    {
-        EntityReferenceSet set = new EntityReferenceSet();
-
-        set.and(new EntityReference("name1", EntityType.WIKI));
-        set.andnot(new EntityReference("name2", EntityType.WIKI));
-
-        Assert.assertTrue(set.matches(new EntityReference("name1", EntityType.WIKI)));
-        Assert.assertFalse(set.matches(new EntityReference("name2", EntityType.WIKI)));
-        Assert.assertFalse(set.matches(new EntityReference("notname", EntityType.WIKI)));
-    }
-
-    @Test
-    public void testAndOr()
-    {
-        EntityReferenceSet set = new EntityReferenceSet();
-
-        set.and(new EntityReference("name1", EntityType.WIKI));
-        set.or(new EntityReference("name2", EntityType.WIKI));
-
-        Assert.assertTrue(set.matches(new EntityReference("name1", EntityType.WIKI)));
-        Assert.assertTrue(set.matches(new EntityReference("name2", EntityType.WIKI)));
-        Assert.assertFalse(set.matches(new EntityReference("notname", EntityType.WIKI)));
-    }
-
-    @Test
-    public void testAndOrnot()
-    {
-        EntityReferenceSet set = new EntityReferenceSet();
-
-        set.and(new EntityReference("name1", EntityType.WIKI));
-        set.ornot(new EntityReference("name2", EntityType.WIKI));
-
-        Assert.assertTrue(set.matches(new EntityReference("name1", EntityType.WIKI)));
-        Assert.assertFalse(set.matches(new EntityReference("name2", EntityType.WIKI)));
         Assert.assertTrue(set.matches(new EntityReference("notname", EntityType.WIKI)));
     }
 }

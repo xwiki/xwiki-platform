@@ -5,4 +5,4 @@ org.xwiki.wikistream.instance.internal.input.BaseObjectEventGenerator
 org.xwiki.wikistream.instance.internal.input.BasePropertyEventGenerator
 org.xwiki.wikistream.instance.internal.input.PropertyClassEventGenerator
 org.xwiki.wikistream.instance.internal.input.XWikiAttachmentEventGenerator
-org.xwiki.wikistream.instance.internal.input.XWikiDocumentEventGenerator
+org.xwiki.wikistream.instance.internal.input.XWikiDocumentLocaleEventGenerator

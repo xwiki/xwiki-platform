@@ -25,7 +25,6 @@ import java.io.Reader;
 import org.xwiki.wikistream.input.ReaderInputSource;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -46,7 +45,7 @@ public class DefaultReaderInputSource implements ReaderInputSource
     @Override
     public void close() throws IOException
     {
-        this.reader.close();
+        // Closing the reader is the responsibility of the caller
     }
 
     @Override

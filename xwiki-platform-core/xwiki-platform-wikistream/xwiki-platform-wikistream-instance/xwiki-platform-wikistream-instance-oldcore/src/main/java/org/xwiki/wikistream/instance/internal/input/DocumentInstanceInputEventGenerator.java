@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.instance.internal.input;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +35,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.instance.input.AbstractInstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
@@ -86,5 +88,55 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
 
             this.documentParser.write(document, document, this.properties);
         }
+    }
+
+    @Override
+    public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
+    {
+        super.beginWikiDocument(name, parameters);
+
+        DocumentReference reference = new DocumentReference(this.currentReference);
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument defaultDocument;
+        try {
+            defaultDocument = xcontext.getWiki().getDocument(reference, xcontext);
+        } catch (XWikiException e) {
+            throw new WikiStreamException("Failed to get document [" + reference + "]", e);
+        }
+
+        // > WikiDocument
+
+        FilterEventParameters documentParameters = new FilterEventParameters();
+
+        documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, defaultDocument.getDefaultLocale());
+
+        this.proxyFilter.beginWikiDocument(name, documentParameters);
+
+        // Default document locale
+        this.documentParser.write(defaultDocument, defaultDocument, this.properties);
+
+        List<Locale> locales;
+        try {
+            locales = defaultDocument.getTranslationLocales(xcontext);
+        } catch (XWikiException e) {
+            throw new WikiStreamException("Failed to get translations of document [" + reference + "]", e);
+        }
+
+        // Translations
+        for (Locale locale : locales) {
+            try {
+                XWikiDocument translationDocument = defaultDocument.getTranslatedDocument(locale, xcontext);
+                this.documentParser.write(translationDocument, defaultDocument, this.properties);
+            } catch (XWikiException e) {
+                throw new WikiStreamException("Failed to get document [" + reference + "] for locale [" + locale + "]",
+                    e);
+            }
+        }
+
+        // < WikiDocument
+
+        this.proxyFilter.endWikiDocument(defaultDocument.getDocumentReference().getName(), documentParameters);
     }
 }

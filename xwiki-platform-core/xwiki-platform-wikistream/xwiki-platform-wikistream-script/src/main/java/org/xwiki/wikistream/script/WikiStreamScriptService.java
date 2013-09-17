@@ -17,41 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output;
+package org.xwiki.wikistream.script;
 
-import java.io.IOException;
-import java.io.Writer;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.xwiki.wikistream.output.WriterOutputTarget;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
 
 /**
+ * Expose various WikiStream related APIs to scripts.
  * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2RC1
  */
-public class DefaultWriterOutputTarget implements WriterOutputTarget
+@Component
+@Named(WikiStreamScriptService.ROLEHINT)
+@Singleton
+@Unstable
+public class WikiStreamScriptService implements ScriptService
 {
-    private final Writer writer;
+    public static final String ROLEHINT = "wikistream";
 
-    public DefaultWriterOutputTarget(Writer writer)
-    {
-        this.writer = writer;
-    }
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
 
-    public Writer getWriter()
+    public ScriptService get(String id)
     {
-        return this.writer;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        // Closing the writer is the responsibility of the caller
-    }
-
-    @Override
-    public String toString()
-    {
-        return getWriter().toString();
+        return this.scriptServiceManager.get(ROLEHINT + '.' + id);
     }
 }

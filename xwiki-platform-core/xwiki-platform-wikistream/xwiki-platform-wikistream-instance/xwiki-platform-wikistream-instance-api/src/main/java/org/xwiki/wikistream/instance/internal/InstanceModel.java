@@ -30,4 +30,6 @@ public interface InstanceModel
     List<String> getWikis() throws WikiStreamException;
 
     List<String> getSpaces(String wiki) throws WikiStreamException;
+
+    List<String> getDocuments(String wiki, String space) throws WikiStreamException;
 }

@@ -19,19 +19,18 @@
  */
 package org.xwiki.wikistream.internal.output;
 
+import java.io.File;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.lang.reflect.Type;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.converter.AbstractConverter;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.wikistream.output.OutputTarget;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -39,9 +38,6 @@ import org.xwiki.wikistream.output.OutputTarget;
 @Singleton
 public class OutputTargetConverter extends AbstractConverter<OutputTarget>
 {
-    @Inject
-    private ResourceReferenceParser resourceReferenceParser;
-
     @Override
     protected <G extends OutputTarget> G convertToType(Type targetType, Object value)
     {
@@ -53,15 +49,28 @@ public class OutputTargetConverter extends AbstractConverter<OutputTarget>
             return (G) value;
         }
 
-        String source = value.toString();
+        OutputTarget outputTarget;
 
-        ResourceReference resourceReference = this.resourceReferenceParser.parse(source);
+        if (value instanceof OutputStream) {
+            outputTarget = new DefaultOutputStreamOutputTarget((OutputStream) value);
+        } else if (value instanceof File) {
+            outputTarget = new DefaultFileOutputTarget((File) value);
+        } else if (value instanceof Writer) {
+            outputTarget = new DefaultWriterOutputTarget((Writer) value);
+        } else {
+            outputTarget = fromString(value.toString());
+        }
 
+        return (G) outputTarget;
+    }
+
+    private OutputTarget fromString(String source)
+    {
         OutputTarget outputTarget;
 
         // TODO: use some OutputTargetParser instead to make it extensible
         outputTarget = new StringWriterOutputTarget();
 
-        return (G) outputTarget;
+        return outputTarget;
     }
 }

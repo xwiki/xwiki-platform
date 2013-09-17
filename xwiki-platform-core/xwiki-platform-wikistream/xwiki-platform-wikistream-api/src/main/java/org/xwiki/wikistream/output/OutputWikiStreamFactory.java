@@ -35,5 +35,5 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface OutputWikiStreamFactory extends WikiStream
 {
-    OutputWikiStream creaOutputWikiStream(Map<String, Object> parameters) throws WikiStreamException;
+    OutputWikiStream creaOutputWikiStream(Map<String, Object> properties) throws WikiStreamException;
 }

@@ -39,6 +39,7 @@
   </properties>
   <modules>
     <module>xwiki-platform-wikistream-api</module>
+    <module>xwiki-platform-wikistream-script</module>
     <module>xwiki-platform-wikistream-xml</module>
     <module>xwiki-platform-wikistream-test</module>
     <module>xwiki-platform-wikistream-streams</module>

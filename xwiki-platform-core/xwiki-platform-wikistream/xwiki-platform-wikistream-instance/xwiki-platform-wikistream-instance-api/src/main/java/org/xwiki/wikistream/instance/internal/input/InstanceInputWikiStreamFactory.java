@@ -34,10 +34,12 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @since 5.2M2
  */
 @Component
-@Named("xwiki+instance")
+@Named(InstanceInputWikiStreamFactory.ROLEHINT)
 @Singleton
 public class InstanceInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<InstanceInputProperties>
 {
+    public static final String ROLEHINT = "xwiki+instance";
+
     public InstanceInputWikiStreamFactory()
     {
         super(WikiStreamType.XWIKI_INSTANCE);

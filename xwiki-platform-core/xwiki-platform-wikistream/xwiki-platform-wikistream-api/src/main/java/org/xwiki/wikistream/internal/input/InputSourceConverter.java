@@ -19,22 +19,20 @@
  */
 package org.xwiki.wikistream.internal.input;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.reflect.Type;
 import java.net.URL;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.properties.converter.ConversionException;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.wikistream.input.InputSource;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -42,9 +40,6 @@ import org.xwiki.wikistream.input.InputSource;
 @Singleton
 public class InputSourceConverter extends AbstractConverter<InputSource>
 {
-    @Inject
-    private ResourceReferenceParser resourceReferenceParser;
-
     @Override
     protected <G extends InputSource> G convertToType(Type targetType, Object value)
     {
@@ -56,16 +51,31 @@ public class InputSourceConverter extends AbstractConverter<InputSource>
             return (G) value;
         }
 
-        String source = value.toString();
+        InputSource inputSource;
 
-        ResourceReference resourceReference = this.resourceReferenceParser.parse(source);
+        if (value instanceof InputStream) {
+            inputSource = new DefaultInputStreamInputSource((InputStream) value);
+        } else if (value instanceof File) {
+            inputSource = new DefaultFileInputSource((File) value);
+        } else if (value instanceof Reader) {
+            inputSource = new DefaultReaderInputSource((Reader) value);
+        } else if (value instanceof URL) {
+            inputSource = new DefaultURLInputSource((URL) value);
+        } else {
+            inputSource = fromString(value.toString());
+        }
 
+        return (G) inputSource;
+    }
+
+    private InputSource fromString(String source)
+    {
         InputSource inputSource;
 
         // TODO: use some InputSourceParser instead to make it extensible
-        if (resourceReference.getType().equals(ResourceType.URL)) {
+        if (source.startsWith("url:")) {
             try {
-                inputSource = new DefaultURLInputSource(new URL(source));
+                inputSource = new DefaultURLInputSource(new URL(source.substring("url:".length())));
             } catch (Exception e) {
                 throw new ConversionException("Failed to create input source for URL [" + source + "]", e);
             }
@@ -73,6 +83,6 @@ public class InputSourceConverter extends AbstractConverter<InputSource>
             inputSource = new StringInputSource(source);
         }
 
-        return (G) inputSource;
+        return inputSource;
     }
 }

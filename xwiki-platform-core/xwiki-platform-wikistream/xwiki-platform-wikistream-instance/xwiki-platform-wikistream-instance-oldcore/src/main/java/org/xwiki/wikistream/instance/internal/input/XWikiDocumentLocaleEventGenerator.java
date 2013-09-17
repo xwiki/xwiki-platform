@@ -54,7 +54,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Singleton
 // TODO: add support for real revision events (instead of the jrcs archive)
-public class XWikiDocumentEventGenerator extends
+public class XWikiDocumentLocaleEventGenerator extends
     AbstractBeanEntityEventGenerator<XWikiDocument, XWikiDocumentFilter, XWikiDocumentProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
@@ -81,15 +81,7 @@ public class XWikiDocumentEventGenerator extends
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        // WikiDocument
-
-        FilterEventParameters documentParameters = new FilterEventParameters();
-
-        documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, document.getDefaultLocale());
-
-        documentFilter.beginWikiDocument(document.getDocumentReference().getName(), documentParameters);
-
-        // WikiDocumentLocale
+        // > WikiDocumentLocale
 
         FilterEventParameters documentLocaleParameters = new FilterEventParameters();
 
@@ -104,7 +96,7 @@ public class XWikiDocumentEventGenerator extends
 
         documentFilter.beginWikiDocumentLocale(document.getLocale(), FilterEventParameters.EMPTY);
 
-        // WikiDocumentRevision
+        // > WikiDocumentRevision
 
         FilterEventParameters parameters = new FilterEventParameters();
 
@@ -187,16 +179,12 @@ public class XWikiDocumentEventGenerator extends
             }
         }
 
-        // /WikiDocumentRevision
+        // < WikiDocumentRevision
 
         documentFilter.endWikiDocumentRevision(document.getVersion(), parameters);
 
-        // /WikiDocumentLocale
+        // < WikiDocumentLocale
 
         documentFilter.endWikiDocumentLocale(document.getLocale(), FilterEventParameters.EMPTY);
-
-        // /WikiDocument
-
-        documentFilter.endWikiDocument(document.getDocumentReference().getName(), documentParameters);
     }
 }

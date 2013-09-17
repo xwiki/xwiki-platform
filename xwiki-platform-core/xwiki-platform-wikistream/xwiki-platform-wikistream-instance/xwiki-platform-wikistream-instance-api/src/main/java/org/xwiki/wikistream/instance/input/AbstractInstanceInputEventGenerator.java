@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.instance.input;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
@@ -118,6 +119,41 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     {
         this.currentSpaces.pop();
         this.currentReference = this.currentReference.getParent();
+    }
+
+    @Override
+    public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
+    {
+        this.currentReference = this.currentReference.getParent();
+    }
+
+    @Override
+    public void endWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
+    {
+
+    }
+
+    @Override
+    public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
+    {
+
+    }
+
+    @Override
+    public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
+    {
+    }
+
+    @Override
+    public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
+    {
+
+    }
+
+    @Override
+    public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
+    {
+
     }
 
     @Override

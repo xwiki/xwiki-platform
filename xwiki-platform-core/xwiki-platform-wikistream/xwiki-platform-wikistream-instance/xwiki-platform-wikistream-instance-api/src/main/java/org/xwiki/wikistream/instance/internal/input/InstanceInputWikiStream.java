@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wikistream.WikiStreamException;
@@ -62,15 +63,21 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         }
     }
 
-    private boolean isWikiInContainers(String wiki)
+    private boolean isWikiEnaled(String wiki)
     {
         return this.properties.getEntities() == null || this.properties.getEntities().matches(new WikiReference(wiki));
     }
 
-    private boolean isSpaceInContainers(String wiki, String space)
+    private boolean isSpaceEnabled(String wiki, String space)
     {
         return this.properties.getEntities() == null
             || this.properties.getEntities().matches(new SpaceReference(space, new WikiReference(wiki)));
+    }
+
+    private boolean isDocumentEnaled(String wiki, String space, String document)
+    {
+        return this.properties.getEntities() == null
+            || this.properties.getEntities().matches(new DocumentReference(wiki, space, document));
     }
 
     @Override
@@ -86,7 +93,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         }
 
         for (String wikiName : this.instanceModel.getWikis()) {
-            if (isWikiInContainers(wikiName)) {
+            if (isWikiEnaled(wikiName)) {
                 writeWiki(wikiName, filter, internalFilter);
             }
         }
@@ -98,43 +105,68 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         internalFilter.endFarm(parameters);
     }
 
-    private void writeWiki(String name, Object filter, InstanceFilter internalFilter) throws WikiStreamException
+    private void writeWiki(String wiki, Object filter, InstanceFilter internalFilter) throws WikiStreamException
     {
         FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
-        internalFilter.beginWiki(name, parameters);
+        internalFilter.beginWiki(wiki, parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.beginWiki(name, parameters);
+            generator.beginWiki(wiki, parameters);
         }
 
-        for (String spaceName : this.instanceModel.getSpaces(name)) {
-            if (isSpaceInContainers(name, spaceName)) {
-                writeSpace(spaceName, filter, internalFilter);
+        for (String spaceName : this.instanceModel.getSpaces(wiki)) {
+            if (isSpaceEnabled(wiki, spaceName)) {
+                writeSpace(wiki, spaceName, filter, internalFilter);
             }
         }
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.endWiki(name, parameters);
+            generator.endWiki(wiki, parameters);
         }
 
-        internalFilter.endWiki(name, parameters);
+        internalFilter.endWiki(wiki, parameters);
     }
 
-    private void writeSpace(String name, Object filter, InstanceFilter internalFilter) throws WikiStreamException
+    private void writeSpace(String wiki, String space, Object filter, InstanceFilter internalFilter)
+        throws WikiStreamException
     {
         FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
-        internalFilter.beginWikiSpace(name, parameters);
+        internalFilter.beginWikiSpace(space, parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.beginWikiSpace(name, parameters);
+            generator.beginWikiSpace(space, parameters);
+        }
+
+        for (String documentName : this.instanceModel.getDocuments(wiki, space)) {
+            if (isDocumentEnaled(wiki, space, documentName)) {
+                writeDocument(documentName, filter, internalFilter);
+            }
         }
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.endWikiSpace(name, parameters);
+            generator.endWikiSpace(space, parameters);
         }
 
-        internalFilter.endWikiSpace(name, parameters);
+        internalFilter.endWikiSpace(space, parameters);
+    }
+
+    private void writeDocument(String document, Object filter, InstanceFilter internalFilter)
+        throws WikiStreamException
+    {
+        FilterEventParameters parameters = FilterEventParameters.EMPTY;
+
+        internalFilter.beginWikiDocument(document, parameters);
+
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.beginWikiDocument(document, parameters);
+        }
+
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.endWikiDocument(document, parameters);
+        }
+
+        internalFilter.endWikiSpace(document, parameters);
     }
 }

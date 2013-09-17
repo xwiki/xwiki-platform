@@ -26,6 +26,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wikistream.WikiStreamException;
@@ -69,4 +70,20 @@ public class DefaultInstanceModel implements InstanceModel
         }
     }
 
+    @Override
+    public List<String> getDocuments(String wiki, String space) throws WikiStreamException
+    {
+        try {
+            Query query =
+                this.queryManager.createQuery("select distinct doc.name from Document doc where doc.space = :space",
+                    Query.XWQL);
+            query.bindValue("space", space);
+            query.setWiki(wiki);
+
+            return query.execute();
+        } catch (QueryException e) {
+            throw new WikiStreamException(String.format(
+                "Failed to get the list of documents in wiki [%s] and space [%s]", wiki, space), e);
+        }
+    }
 }

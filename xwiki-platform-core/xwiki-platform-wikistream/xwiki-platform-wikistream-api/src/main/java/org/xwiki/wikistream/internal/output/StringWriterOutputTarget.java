@@ -22,7 +22,6 @@ package org.xwiki.wikistream.internal.output;
 import java.io.StringWriter;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -30,7 +29,7 @@ public class StringWriterOutputTarget extends DefaultWriterOutputTarget
 {
     public StringWriterOutputTarget()
     {
-        super(new StringWriter(), false);
+        super(new StringWriter());
     }
 
     /**

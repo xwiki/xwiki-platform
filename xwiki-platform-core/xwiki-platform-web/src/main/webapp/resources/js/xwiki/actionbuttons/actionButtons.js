@@ -145,8 +145,7 @@ actionButtons.AjaxSaveAndContinue = Class.create({
   createMessages : function() {
     this.savingBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.inprogress'))", "inprogress", {inactive: true});
     this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
-    this.failedBox = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error",
-      ["<span id=""ajaxRequestFailureReason""/>"]))', "error", {inactive: true});
+    this.failedBox = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""/>"]))', "error", {inactive: true});
   },
   addListeners : function() {
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));

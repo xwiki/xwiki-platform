@@ -17,26 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.input;
+package org.xwiki.wikistream.internal.input;
 
-import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 
-import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
+import org.xwiki.wikistream.input.FileInputSource;
 
 /**
- * Represent a source of data used by a wiki stream input stream. What kind of {@link InputSource} is supported by each
- * input stream is entirely input stream choice.
- * <p>
- * {@link #clone()} is only closing {@link Closeable} created by the {@link InputSource} itself. For example
- * {@link DefaultInputStreamInputSource} is not going to close the {@link java.io.InputStream} passed to its constructor
- * because it did not created it.
- * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2RC1
  */
-@Unstable
-public interface InputSource extends Closeable
+public class DirectoryInputSource implements FileInputSource
 {
+    private final File file;
 
+    public DirectoryInputSource(File file)
+    {
+        this.file = file;
+    }
+
+    public File getFile()
+    {
+        return this.file;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        // Can't close a open/directory
+    }
 }

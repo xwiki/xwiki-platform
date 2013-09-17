@@ -64,23 +64,23 @@ public class DistributionScriptService implements ScriptService
     public static final String EXTENSIONERROR_KEY = "scriptservice.distribution.error";
 
     /**
-     * Provides safe objects for scripts.
-     */
-    @Inject
-    @SuppressWarnings("rawtypes")
-    private ScriptSafeProvider scriptProvider;
-
-    /**
      * The component used to get information about the current distribution.
      */
     @Inject
-    private DistributionManager distributionManager;
+    protected DistributionManager distributionManager;
 
     /**
      * Used to access current {@link XWikiContext}.
      */
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    protected Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Provides safe objects for scripts.
+     */
+    @Inject
+    @SuppressWarnings("rawtypes")
+    private ScriptSafeProvider scriptProvider;
 
     /**
      * Used to access HTML renderer.

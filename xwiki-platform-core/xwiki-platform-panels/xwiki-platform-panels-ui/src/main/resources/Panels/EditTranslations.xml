@@ -115,9 +115,20 @@
     #set ($forcetrans = '')
     #set ($rlanguage = $tdoc.language)
   #end
-  #if ((!$tdoc.language || $tdoc.language == '' || $tdoc.language == $doc.defaultLanguage) &amp;&amp; ($forcetrans == ''))
+  ## Some documents have no default language set. This is the case with documents having scripts, which obviously are
+  ## not translatable and more importantly are not written in a specific spoken language. In order to be consistent with
+  ## the language displayed in the top right corner (global.vm) we use 'default' when the default language is not
+  ## specified. This is a temporary solution.
+  #set ($defaultLanguage = "$!doc.defaultLanguage")
+  #if ($defaultLanguage == '')
+    #set ($defaultLanguage = "$!doc.language")
+    #if ($defaultLanguage == '')
+      #set ($defaultLanguage = 'default')
+    #end
+  #end
+  #if (("$!tdoc.language" == '' || $tdoc.language == $doc.defaultLanguage) &amp;&amp; ($forcetrans == ''))
     (% class="important" %)
-    **$services.localization.render('panels.translation.editingOriginal', [${doc.defaultLanguage}])**
+    **$services.localization.render('panels.translation.editingOriginal', [$defaultLanguage])**
     #if ($!doc.translationList.size() &gt; 0)
 
       $services.localization.render('panels.translation.existingTranslations')##
@@ -130,7 +141,7 @@
     (% class="important" %)
     **$services.localization.render('panels.translation.editingTranslation', [${rlanguage}])**
 
-    $services.localization.render('panels.translation.editOriginalLanguage', ["[[${doc.defaultLanguage}&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLanguage}"")]]"])
+    $services.localization.render('panels.translation.editOriginalLanguage', ["[[$defaultLanguage&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLanguage}"")]]"])
     #if ($doc.translationList.size() &gt; 1)
 
       $services.localization.render('panels.translation.otherTranslations')##

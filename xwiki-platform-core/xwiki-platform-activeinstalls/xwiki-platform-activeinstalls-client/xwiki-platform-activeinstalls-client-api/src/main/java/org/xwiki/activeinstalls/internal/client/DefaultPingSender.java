@@ -120,7 +120,7 @@ public class DefaultPingSender implements PingSender
     {
         return "{ \"" + TYPE + "\" : { \"properties\" : { "
             + "\"formatVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
-            + "\"date\" : {\"type\" : \"date\"}"
+            + "\"date\" : {\"type\" : \"date\"},"
             + "\"distributionVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
             + "\"extensions\" : { \"properties\" : {"
             + "\"id\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"

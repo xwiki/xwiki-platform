@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.converter.AbstractConverter;
 
 /**
- * Converter that converts a value into an {@link DocumentReference} object. Relative references are resilved using
+ * Converter that converts a value into a {@link DocumentReference} object. Relative references are resolved using
  * "current" {@link DocumentReferenceResolver}.
  * 
  * @version $Id$
@@ -76,6 +76,10 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
     @Override
     protected String convertToString(DocumentReference value)
     {
+        if (value == null) {
+            return null;
+        }
+
         return this.serialier.serialize(value);
     }
 }

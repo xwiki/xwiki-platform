@@ -19,4 +19,5 @@ org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResolver
 org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver
 org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver
 org.xwiki.model.internal.reference.converter.DocumentReferenceConverter
+org.xwiki.model.internal.reference.converter.EntityReferenceConverter
 org.xwiki.model.internal.scripting.ModelScriptService

@@ -653,4 +653,10 @@ xwiki.plugin.image.cache.capacity=30
 #-# * new: add to watchlist only newly created documents
 # xwiki.plugin.watchlist.automaticwatch=major
 
+#-# [Since 5.2RC1]
+#-# Indicate if WikiStream should be used when exporting a XAR in the export action.
+#-# This property will be removed as soon as WikiStream is old/stable enough.
+#-# By default the old system is used, uncomment to use WikiStream (among other things it allows exporting very big wikis).
+# xwiki.action.export.xar.usewikistream=1
+
 $!xwikiCfgAdditionalProperties

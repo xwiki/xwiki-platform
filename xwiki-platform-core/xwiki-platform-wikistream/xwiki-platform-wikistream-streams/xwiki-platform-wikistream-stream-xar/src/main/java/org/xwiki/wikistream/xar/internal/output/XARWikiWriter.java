@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -145,13 +146,21 @@ public class XARWikiWriter
         return this.zipStream;
     }
 
+    public void closeEntry() throws WikiStreamException
+    {
+        try {
+            this.zipStream.closeArchiveEntry();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close zip archive entry", e);
+        }
+    }
+
     private void writePackage() throws WikiStreamException, IOException
     {
         ZipArchiveEntry zipentry = new ZipArchiveEntry(XARModel.PATH_PACKAGE);
         this.zipStream.putArchiveEntry(zipentry);
 
-        WikiStreamXMLStreamWriter writer =
-            new WikiStreamXMLStreamWriter(this.zipStream, this.xarProperties.getEncoding());
+        WikiStreamXMLStreamWriter writer = new WikiStreamXMLStreamWriter(this.zipStream, this.xarProperties);
 
         try {
             writer.writeStartDocument();
@@ -182,6 +191,7 @@ public class XARWikiWriter
             writer.flush();
         } finally {
             writer.close();
+            this.zipStream.closeArchiveEntry();
         }
     }
 

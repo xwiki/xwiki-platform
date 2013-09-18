@@ -67,8 +67,8 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     {
         // Get the type of the internal filter
         ParameterizedType genericType =
-            (ParameterizedType) ReflectionUtils.resolveType(AbstractEntityEventGenerator.class, getClass());
-        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[2]);
+            (ParameterizedType) ReflectionUtils.resolveType(AbstractInstanceInputEventGenerator.class, getClass());
+        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
     }
 
     public void setProperties(Map<String, Object> properties)
@@ -124,13 +124,13 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     @Override
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentReference = this.currentReference.getParent();
+        this.currentReference = new EntityReference(name, EntityType.DOCUMENT, this.currentReference);
     }
 
     @Override
     public void endWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-
+        this.currentReference = this.currentReference.getParent();
     }
 
     @Override

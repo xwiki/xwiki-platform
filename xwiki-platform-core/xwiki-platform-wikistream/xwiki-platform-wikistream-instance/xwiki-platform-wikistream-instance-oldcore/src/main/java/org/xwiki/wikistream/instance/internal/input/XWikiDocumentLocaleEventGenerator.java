@@ -106,7 +106,7 @@ public class XWikiDocumentLocaleEventGenerator extends
         parameters.put(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, document.getCustomClass());
         parameters.put(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, document.getDefaultTemplate());
         parameters.put(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, document.getValidationScript());
-        parameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getValidationScript());
+        parameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getSyntax());
         parameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
 
         parameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, document.getAuthor());

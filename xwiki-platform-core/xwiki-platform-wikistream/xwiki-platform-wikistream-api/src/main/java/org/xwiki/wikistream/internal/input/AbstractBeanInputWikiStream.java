@@ -66,16 +66,16 @@ public abstract class AbstractBeanInputWikiStream<P, F> implements BeanInputWiki
         // Get the type of the internal filter
         ParameterizedType genericType =
             (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanInputWikiStream.class, getClass());
-        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
+        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[1]);
     }
 
     @Override
     public void read(Object filter) throws WikiStreamException
     {
-        F internalFilter = this.filterDescriptorManager.createFilterProxy(this.filterType, filter);
+        F proxyFilter = this.filterDescriptorManager.createFilterProxy(this.filterType, filter);
 
-        read(filter, internalFilter);
+        read(filter, proxyFilter);
     }
 
-    protected abstract void read(Object filter, F internalFilter) throws WikiStreamException;
+    protected abstract void read(Object filter, F proxyFilter) throws WikiStreamException;
 }

@@ -592,6 +592,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-instance-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- XWiki syntax parsers -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

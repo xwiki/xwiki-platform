@@ -31,9 +31,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.instance.input.AbstractInstanceInputEventGenerator;
@@ -54,41 +51,6 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private QueryManager queryManager;
-
-    @Override
-    public void beginWikiSpace(String name, FilterEventParameters parameters) throws WikiStreamException
-    {
-        super.beginWikiSpace(name, parameters);
-
-        List<String> documents;
-        try {
-            documents =
-                this.queryManager
-                    .createQuery("select distinct doc.name from Document doc where doc.space=:space", Query.XWQL)
-                    .bindValue("space", this.currentSpaces.peek()).setWiki(this.currentWiki).execute();
-        } catch (QueryException e) {
-            throw new WikiStreamException("Failed to get documents for space [" + this.currentSpaces.peek()
-                + "] and wiki [" + this.currentWiki + "]", e);
-        }
-
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        for (String documentName : documents) {
-            DocumentReference reference = new DocumentReference(this.currentWiki, this.currentSpaces, documentName);
-
-            XWikiDocument document;
-            try {
-                document = xcontext.getWiki().getDocument(reference, xcontext);
-            } catch (XWikiException e) {
-                throw new WikiStreamException("Failed to get document [" + reference + "]", e);
-            }
-
-            this.documentParser.write(document, document, this.properties);
-        }
-    }
 
     @Override
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
@@ -115,7 +77,7 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
         this.proxyFilter.beginWikiDocument(name, documentParameters);
 
         // Default document locale
-        this.documentParser.write(defaultDocument, defaultDocument, this.properties);
+        this.documentParser.write(defaultDocument, this.filter, this.properties);
 
         List<Locale> locales;
         try {
@@ -128,7 +90,7 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
         for (Locale locale : locales) {
             try {
                 XWikiDocument translationDocument = defaultDocument.getTranslatedDocument(locale, xcontext);
-                this.documentParser.write(translationDocument, defaultDocument, this.properties);
+                this.documentParser.write(translationDocument, this.filter, this.properties);
             } catch (XWikiException e) {
                 throw new WikiStreamException("Failed to get document [" + reference + "] for locale [" + locale + "]",
                     e);

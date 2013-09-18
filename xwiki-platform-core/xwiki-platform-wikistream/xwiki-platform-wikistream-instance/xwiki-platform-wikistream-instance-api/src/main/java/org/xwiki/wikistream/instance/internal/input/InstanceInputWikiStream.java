@@ -27,7 +27,6 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -54,9 +53,9 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
     private List<InstanceInputEventGenerator> eventGenerators;
 
     @Override
-    public void initialize() throws InitializationException
+    public void setProperties(InstanceInputProperties properties)
     {
-        super.initialize();
+        super.setProperties(properties);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
             generator.setProperties(this.properties);
@@ -81,11 +80,11 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
     }
 
     @Override
-    protected void read(Object filter, InstanceFilter internalFilter) throws WikiStreamException
+    protected void read(Object filter, InstanceFilter proxyFilter) throws WikiStreamException
     {
         FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
-        internalFilter.beginFarm(parameters);
+        proxyFilter.beginFarm(parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
             generator.setFilter(filter);
@@ -94,7 +93,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
 
         for (String wikiName : this.instanceModel.getWikis()) {
             if (isWikiEnaled(wikiName)) {
-                writeWiki(wikiName, filter, internalFilter);
+                writeWiki(wikiName, filter, proxyFilter);
             }
         }
 
@@ -102,14 +101,14 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
             generator.endFarm(parameters);
         }
 
-        internalFilter.endFarm(parameters);
+        proxyFilter.endFarm(parameters);
     }
 
-    private void writeWiki(String wiki, Object filter, InstanceFilter internalFilter) throws WikiStreamException
+    private void writeWiki(String wiki, Object filter, InstanceFilter proxyFilter) throws WikiStreamException
     {
         FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
-        internalFilter.beginWiki(wiki, parameters);
+        proxyFilter.beginWiki(wiki, parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
             generator.beginWiki(wiki, parameters);
@@ -117,7 +116,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
 
         for (String spaceName : this.instanceModel.getSpaces(wiki)) {
             if (isSpaceEnabled(wiki, spaceName)) {
-                writeSpace(wiki, spaceName, filter, internalFilter);
+                writeSpace(wiki, spaceName, filter, proxyFilter);
             }
         }
 
@@ -125,15 +124,15 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
             generator.endWiki(wiki, parameters);
         }
 
-        internalFilter.endWiki(wiki, parameters);
+        proxyFilter.endWiki(wiki, parameters);
     }
 
-    private void writeSpace(String wiki, String space, Object filter, InstanceFilter internalFilter)
+    private void writeSpace(String wiki, String space, Object filter, InstanceFilter proxyFilter)
         throws WikiStreamException
     {
         FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
-        internalFilter.beginWikiSpace(space, parameters);
+        proxyFilter.beginWikiSpace(space, parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
             generator.beginWikiSpace(space, parameters);
@@ -141,7 +140,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
 
         for (String documentName : this.instanceModel.getDocuments(wiki, space)) {
             if (isDocumentEnaled(wiki, space, documentName)) {
-                writeDocument(documentName, filter, internalFilter);
+                writeDocument(documentName, filter, proxyFilter);
             }
         }
 
@@ -149,15 +148,15 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
             generator.endWikiSpace(space, parameters);
         }
 
-        internalFilter.endWikiSpace(space, parameters);
+        proxyFilter.endWikiSpace(space, parameters);
     }
 
-    private void writeDocument(String document, Object filter, InstanceFilter internalFilter)
+    private void writeDocument(String document, Object filter, InstanceFilter proxyFilter)
         throws WikiStreamException
     {
         FilterEventParameters parameters = FilterEventParameters.EMPTY;
 
-        internalFilter.beginWikiDocument(document, parameters);
+        proxyFilter.beginWikiDocument(document, parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
             generator.beginWikiDocument(document, parameters);
@@ -167,6 +166,6 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
             generator.endWikiDocument(document, parameters);
         }
 
-        internalFilter.endWikiSpace(document, parameters);
+        proxyFilter.endWikiDocument(document, parameters);
     }
 }

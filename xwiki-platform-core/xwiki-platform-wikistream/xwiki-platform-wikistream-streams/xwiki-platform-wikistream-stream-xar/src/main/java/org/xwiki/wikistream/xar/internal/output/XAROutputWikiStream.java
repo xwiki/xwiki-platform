@@ -115,11 +115,12 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             if (this.wikiWriter != null) {
                 this.writer =
                     new WikiStreamXMLStreamWriter(this.wikiWriter.newEntry(this.currentDocumentReference,
-                        this.currentDocumentLocale), this.properties.getEncoding());
+                        this.currentDocumentLocale), this.properties);
             } else {
                 this.writer = new WikiStreamXMLStreamWriter(this.properties);
             }
 
+            this.writer.writeStartDocument();
             this.writer.writeStartElement(XARDocumentModel.ELEMENT_DOCUMENT);
             this.writer.writeElement(XARDocumentModel.ELEMENT_SPACE, this.currentSpace);
             this.writer.writeElement(XARDocumentModel.ELEMENT_NAME, this.currentDocument);
@@ -204,10 +205,6 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Override
     public void beginWikiSpace(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        if (this.currentSpace != null) {
-            throw new WikiStreamException("XAR format supports only one of space");
-        }
-
         this.currentSpace = name;
     }
 
@@ -248,6 +245,13 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
 
         getWriter().writeEndElement();
+        getWriter().writeEndDocument();
+
+        getWriter().close();
+
+        if (this.wikiWriter != null) {
+            this.wikiWriter.closeEntry();
+        }
 
         this.writer = null;
         this.currentDocumentLocale = null;

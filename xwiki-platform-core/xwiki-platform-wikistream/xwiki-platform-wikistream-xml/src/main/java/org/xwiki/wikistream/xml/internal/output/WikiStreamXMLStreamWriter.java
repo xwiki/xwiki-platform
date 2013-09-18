@@ -21,6 +21,8 @@ package org.xwiki.wikistream.xml.internal.output;
 
 import java.io.OutputStream;
 
+import javanet.staxutils.IndentingXMLStreamWriter;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -40,10 +42,18 @@ public class WikiStreamXMLStreamWriter
         this.writer = writer;
     }
 
-    public WikiStreamXMLStreamWriter(OutputStream outputStream, String encoding) throws WikiStreamException
+    public WikiStreamXMLStreamWriter(OutputStream outputStream, XMLOuputProperties properties)
+        throws WikiStreamException
     {
         try {
-            this.writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outputStream, encoding);
+            XMLStreamWriter streamWriter =
+                XMLOutputFactory.newInstance().createXMLStreamWriter(outputStream, properties.getEncoding());
+
+            if (properties.isFormat()) {
+                this.writer = new IndentingXMLStreamWriter(streamWriter);
+            } else {
+                this.writer = streamWriter;
+            }
         } catch (Exception e) {
             throw new WikiStreamException("Failed to create XML writer", e);
         }

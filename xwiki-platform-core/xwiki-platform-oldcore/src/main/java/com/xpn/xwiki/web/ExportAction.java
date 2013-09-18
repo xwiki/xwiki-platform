@@ -25,7 +25,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSet;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.input.InputWikiStream;
+import org.xwiki.wikistream.input.InputWikiStreamFactory;
+import org.xwiki.wikistream.instance.internal.input.InstanceInputProperties;
+import org.xwiki.wikistream.internal.output.DefaultOutputStreamOutputTarget;
+import org.xwiki.wikistream.output.OutputWikiStream;
+import org.xwiki.wikistream.output.OutputWikiStreamFactory;
+import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.utils.WikiStreamConstants;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -210,19 +223,19 @@ public class ExportAction extends XWikiAction
         return null;
     }
 
-    private String exportXAR(XWikiContext context) throws XWikiException, IOException
+    private String exportXAR(XWikiContext context) throws XWikiException, IOException, WikiStreamException
     {
         XWikiRequest request = context.getRequest();
 
-        String history = request.get("history");
-        String backup = request.get("backup");
+        boolean history = Boolean.valueOf(request.get("history"));
+        boolean backup = Boolean.valueOf(request.get("backup"));
         String author = request.get("author");
         String description = request.get("description");
         String licence = request.get("licence");
         String version = request.get("version");
         String name = request.get("name");
         String[] pages = request.getParameterValues("pages");
-        boolean isBackup = ((pages == null) || (pages.length == 0));
+        boolean all = ArrayUtils.isEmpty(pages);
 
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");
@@ -233,65 +246,127 @@ public class ExportAction extends XWikiAction
             return "export";
         }
 
-        PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
-        if (export == null) {
-            // No Packaging plugin configured
-            return "exception";
-        }
-
-        if ("true".equals(history)) {
-            export.setWithVersions(true);
-        } else {
-            export.setWithVersions(false);
-        }
-
-        if (author != null) {
-            export.setAuthorName(author);
-        }
-
-        if (description != null) {
-            export.setDescription(description);
-        }
-
-        if (licence != null) {
-            export.setLicence(licence);
-        }
-
-        if (version != null) {
-            export.setVersion(version);
-        }
-
-        if (name.trim().equals("")) {
-            if (isBackup) {
+        if (StringUtils.isBlank(name)) {
+            if (all) {
                 name = "backup";
             } else {
                 name = "export";
             }
         }
 
-        if ("true".equals(backup)) {
-            export.setBackupPack(true);
-        }
+        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 0) == 1) {
+            // Create input wiki stream
+            InstanceInputProperties inputProperties = new InstanceInputProperties();
 
-        export.setName(name);
+            EntityReferenceSet entities = new EntityReferenceSet();
 
-        if (isBackup) {
-            export.backupWiki();
-        } else {
-            if (pages != null) {
-                for (int i = 0; i < pages.length; i++) {
-                    String pageName = pages[i];
-                    String defaultAction = request.get("action_" + pageName);
-                    int iAction;
-                    try {
-                        iAction = Integer.parseInt(defaultAction);
-                    } catch (Exception e) {
-                        iAction = 0;
+            if (all) {
+                entities.includes(new WikiReference(context.getDatabase()));
+            } else {
+                if (pages != null) {
+                    DocumentReferenceResolver<String> resolver =
+                        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+                    for (String pageName : pages) {
+                        entities.includes(resolver.resolve(pageName));
                     }
-                    export.add(pageName, iAction);
                 }
+
+                return null;
             }
-            export.export();
+
+            inputProperties.setEntities(entities);
+
+            InputWikiStreamFactory inputWikiStreamFactory =
+                Utils.getComponent(InputWikiStreamFactory.class, WikiStreamType.XWIKI_INSTANCE.serialize());
+
+            InputWikiStream inputWikiStream = inputWikiStreamFactory.createInputWikiStream(inputProperties);
+
+            // Create output wiki stream
+            Map<String, Object> outputProperties = new HashMap<String, Object>();
+
+            XWikiResponse response = context.getResponse();
+
+            outputProperties.put(WikiStreamConstants.PROPERTY_TARGET,
+                new DefaultOutputStreamOutputTarget(response.getOutputStream()));
+            outputProperties.put("name", name);
+            if (description != null) {
+                outputProperties.put("description", description);
+            }
+            if (licence != null) {
+                outputProperties.put("license", licence);
+            }
+            if (author != null) {
+                outputProperties.put("author", author);
+            }
+            if (version != null) {
+                outputProperties.put("version", version);
+            }
+            outputProperties.put("backupPack", backup);
+            outputProperties.put("preserveVersion", backup);
+
+            OutputWikiStreamFactory outputWikiStreamFactory =
+                Utils.getComponent(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR.serialize());
+
+            OutputWikiStream outputWikiStream = outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
+
+            // Export
+            response.setContentType("application/zip");
+            response.addHeader("Content-disposition", "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
+
+            inputWikiStream.read(outputWikiStream.getFilter());
+
+            // Flush
+            response.getOutputStream().flush();
+
+            // Indicate that we are done with the response so no need to add anything
+            context.setFinished(true);
+        } else {
+            PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+            if (export == null) {
+                // No Packaging plugin configured
+                return "exception";
+            }
+
+            export.setWithVersions(history);
+
+            if (author != null) {
+                export.setAuthorName(author);
+            }
+
+            if (description != null) {
+                export.setDescription(description);
+            }
+
+            if (licence != null) {
+                export.setLicence(licence);
+            }
+
+            if (version != null) {
+                export.setVersion(version);
+            }
+
+            export.setBackupPack(backup);
+
+            export.setName(name);
+
+            if (all) {
+                export.backupWiki();
+            } else {
+                if (pages != null) {
+                    for (int i = 0; i < pages.length; i++) {
+                        String pageName = pages[i];
+                        String defaultAction = request.get("action_" + pageName);
+                        int iAction;
+                        try {
+                            iAction = Integer.parseInt(defaultAction);
+                        } catch (Exception e) {
+                            iAction = 0;
+                        }
+                        export.add(pageName, iAction);
+                    }
+                }
+                export.export();
+            }
         }
 
         return null;

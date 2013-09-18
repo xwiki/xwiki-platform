@@ -112,7 +112,7 @@
 }
 
 .actionmenu #tmMainWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/building.png')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/house.png')");
 }
 
 .actionmenu #tmAdminMainWiki {
@@ -125,6 +125,9 @@
 
 .actionmenu #tmMainWikiDocumentIndex {
   background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
+}
+.actionmenu #tmMainUserIndex {
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 
 .actionmenu #tmWorkspace {

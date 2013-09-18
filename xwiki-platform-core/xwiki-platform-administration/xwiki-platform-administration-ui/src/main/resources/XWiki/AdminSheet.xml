@@ -3452,7 +3452,11 @@ document.observe('xwiki:dom:loaded', function() {
 #usersandgroupstable-filters #name {
     width: 65%;
 }
-</code>
+
+.rights-settings dt {
+  /* The labels for the general rights settings are long and thus look bad when displayed with bold text. */
+  font-weight: normal;
+}</code>
     </property>
     <property>
       <name>Administration application stylesheet</name>

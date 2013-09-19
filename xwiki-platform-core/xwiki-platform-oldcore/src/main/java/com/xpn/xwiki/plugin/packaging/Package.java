@@ -802,7 +802,12 @@ public class Package
                     {
                         if (!newDocAttachments.contains(att))
                         {
-                           newDocAttachments.add(att);
+                            // We add the attachement to new document
+                            newDocAttachments.add(att);
+                            // But then we add it in the "to remove list" of the document
+                            // So the attachment will be removed from the database when XWiki#saveDocument
+                            // will be called
+                            doc.getDoc().removeAttachment(att);
                         }
                     }
                 }

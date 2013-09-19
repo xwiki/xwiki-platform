@@ -328,6 +328,8 @@ var XWiki = (function (XWiki) {
   detach : function() {
     this.clearTool && this.clearTool.stopObserving('click').remove();
     this.list && this.list.remove();
+    this.input.name = this.inputName;
+    this.input.removeClassName("accept-value");
   }
 });
   return XWiki;

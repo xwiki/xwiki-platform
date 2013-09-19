@@ -201,6 +201,3 @@ var XWiki = (function (XWiki) {
   return XWiki;
 
 })(XWiki);
-
-
-

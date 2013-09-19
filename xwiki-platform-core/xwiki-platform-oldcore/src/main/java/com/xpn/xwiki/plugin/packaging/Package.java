@@ -69,6 +69,7 @@ import org.xwiki.query.QueryException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
@@ -790,6 +791,18 @@ public class Package
                         }
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
+                        }
+                    }
+                }
+                else if(previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS))
+                {
+                    // We conserve the old attachments in the new documents
+                    List<XWikiAttachment> newDocAttachments = doc.getDoc().getAttachmentList();
+                    for (XWikiAttachment att : previousdoc.getAttachmentList())
+                    {
+                        if (!newDocAttachments.contains(att))
+                        {
+                           newDocAttachments.add(att);
                         }
                     }
                 }

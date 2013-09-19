@@ -431,7 +431,7 @@ links</sections>
 
       &lt;dt&gt;
         &lt;label for="${sectionObjectClassName}_${sectionObject.number}_name"&gt;$services.localization.render('platform.user.profileConfigureSectionNameLabel')&lt;/label&gt;
-        &lt;span class='xHint'&gt;$services.localization.render('platform.user.profileConfigureSectionNameHint', 'http://platform.xwiki.org/xwiki/bin/view/DevGuide/InternationalizingApplications')&lt;/span&gt;
+        &lt;span class='xHint'&gt;$services.localization.render('platform.user.profileConfigureSectionNameHint', ['http://platform.xwiki.org/xwiki/bin/view/DevGuide/InternationalizingApplications'])&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;$sheetDocument.display('name', 'edit', $sectionObject)&lt;/dd&gt;
 

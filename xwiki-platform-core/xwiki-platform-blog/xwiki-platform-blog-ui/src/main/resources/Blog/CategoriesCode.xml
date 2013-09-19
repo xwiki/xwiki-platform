@@ -58,7 +58,7 @@
     #set ($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category in (${parameters})")
     #set ($totalResult = $services.query.hql($query).bindValues($categories).count())
     #preparePagedViewParams ($totalResult 10)
-    #set ($result = $services.query.hql("${query} order by publishDate.value desc").setLimit($itemsPerPage).setOffset($startA).bindValues($categories).execute())
+    #set ($result = $services.query.hql("${query} order by publishDate.value desc").setLimit($itemsPerPage).setOffset($startAt).bindValues($categories).execute())
     #if ("$!{blogCategoryEntriesCache.containsKey($!{category})}" == '')
       #set ($blogCategoryEntriesCache = {})
     #end

@@ -230,7 +230,7 @@ XWiki.editors.ColorThemeWizard = Class.create({
     return element.className.substring(this.classPrefix.length - 1, element.className.indexOf(' '));
   },
   redefineActivation : function() {
-    if (!$('body').hasClassName('inlinebody') || !$('body').hasClassName('editbody')) {
+    if (!$('body').hasClassName('inlinebody') &amp;&amp; !$('body').hasClassName('editbody')) {
       return;
     }
 

@@ -45,13 +45,13 @@
   <object>
     <class>
       <name>XWiki.ConfigurableClass</name>
-      <customClass></customClass>
-      <customMapping></customMapping>
-      <defaultViewSheet></defaultViewSheet>
-      <defaultEditSheet></defaultEditSheet>
-      <defaultWeb></defaultWeb>
-      <nameField></nameField>
-      <validationScript></validationScript>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
       <codeToExecute>
         <disabled>0</disabled>
         <editor>---</editor>
@@ -62,8 +62,8 @@
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </codeToExecute>
       <configurationClass>
@@ -74,21 +74,21 @@
         <prettyName>configurationClass</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </configurationClass>
       <configureGlobally>
-        <defaultValue></defaultValue>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
-        <displayType></displayType>
+        <displayType/>
         <name>configureGlobally</name>
         <number>4</number>
         <prettyName>configureGlobally</prettyName>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </configureGlobally>
       <displayInSection>
@@ -99,8 +99,8 @@
         <prettyName>displayInSection</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </displayInSection>
       <heading>
@@ -111,8 +111,8 @@
         <prettyName>heading</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </heading>
       <iconAttachment>
@@ -123,8 +123,8 @@
         <prettyName>iconAttachment</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </iconAttachment>
       <linkPrefix>
@@ -135,8 +135,8 @@
         <prettyName>linkPrefix</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </linkPrefix>
       <propertiesToShow>
@@ -149,14 +149,14 @@
         <picker>0</picker>
         <prettyName>propertiesToShow</prettyName>
         <relationalStorage>1</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>20</size>
         <sort>none</sort>
         <unmodifiable>0</unmodifiable>
-        <validationMessage></validationMessage>
-        <validationRegExp></validationRegExp>
-        <values></values>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
     </class>
@@ -165,10 +165,10 @@
     <className>XWiki.ConfigurableClass</className>
     <guid>e1627a9f-98c6-4f7e-b3b8-d181da8d37d8</guid>
     <property>
-      <codeToExecute></codeToExecute>
+      <codeToExecute/>
     </property>
     <property>
-      <configurationClass></configurationClass>
+      <configurationClass/>
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
@@ -177,13 +177,13 @@
       <displayInSection>Wikis</displayInSection>
     </property>
     <property>
-      <heading></heading>
+      <heading/>
     </property>
     <property>
-      <iconAttachment></iconAttachment>
+      <iconAttachment/>
     </property>
     <property>
-      <linkPrefix></linkPrefix>
+      <linkPrefix/>
     </property>
     <property>
       <propertiesToShow/>

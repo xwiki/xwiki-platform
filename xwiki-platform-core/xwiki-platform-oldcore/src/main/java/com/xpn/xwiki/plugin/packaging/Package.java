@@ -800,9 +800,9 @@ public class Package
                     List<XWikiAttachment> newDocAttachments = doc.getDoc().getAttachmentList();
                     for (XWikiAttachment att : previousdoc.getAttachmentList())
                     {
-                        if (!newDocAttachments.contains(att))
+                        if (doc.getDoc().getAttachment(att.getFilename()) == null)
                         {
-                            // We add the attachement to new document
+                            // We add the attachment to new document
                             newDocAttachments.add(att);
                             // But then we add it in the "to remove list" of the document
                             // So the attachment will be removed from the database when XWiki#saveDocument

@@ -205,7 +205,7 @@ var XWiki = (function(XWiki){
 
     switch(key) {
       case Event.KEY_RETURN:
-        if (this.aSuggestions.length == 1) {
+        if (!this.iHighlighted && this.aSuggestions.length == 1) {
           this.highlightFirst();
         }
         this.setHighlightedValue();

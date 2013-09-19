@@ -414,15 +414,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 // Check in the current database first
                 try {
                     String user = findUser(susername, context);
-                    if (user != null) {
-                        if (checkPassword(user, password, context)) {
-                            return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user
-                                : user);
-                        } else {
-                            context.put("message", "invalidcredentials");
-                        }
-                    } else {
-                        context.put("message", "invalidcredentials");
+                    if (user != null && checkPassword(user, password, context)) {
+                        return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user: user);
                     }
                 } catch (Exception e) {
                     // continue
@@ -433,26 +426,19 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     context.setDatabase(context.getMainXWiki());
                     try {
                         String user = findUser(susername, context);
-                        if (user != null) {
-                            if (checkPassword(user, password, context)) {
-                                return new SimplePrincipal(context.getDatabase() + ":" + user);
-                            } else {
-                                context.put("message", "invalidcredentials");
-                                return null;
-                            }
-                        } else {
-                            context.put("message", "invalidcredentials");
-                            return null;
+                        if (user != null && checkPassword(user, password, context)) {
+                            return new SimplePrincipal(context.getDatabase() + ":" + user);
                         }
                     } catch (Exception e) {
                         context.put("message", "loginfailed");
                         return null;
                     }
-
-                } else {
-                    // error message was already set
-                    return null;
                 }
+
+                // No user found
+                context.put("message", "invalidcredentials");
+                return null;
+
             } finally {
                 context.setDatabase(db);
             }

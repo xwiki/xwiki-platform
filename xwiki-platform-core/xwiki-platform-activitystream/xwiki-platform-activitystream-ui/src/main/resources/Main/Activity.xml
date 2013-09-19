@@ -507,6 +507,11 @@ ul.activityList {
   margin: 0;
   padding: 3px 0 0;
 }
+
+.activityList .message {
+  /* Preserve the white-space because messages are written in plain text. */
+  white-space: pre;
+}
 /** &lt;end&gt; **/
 
 /** &lt;start&gt; Tools **/
@@ -1326,9 +1331,7 @@ $xwiki.ssx.use('Main.Activity')##
   * Display a user message
   *#
 #macro(displayMessage $event)
-  &lt;div class="message"&gt;
-   $!{escapetool.xml($event.getBody())}
-  &lt;/div&gt;
+  &lt;div class="message"&gt;$!{escapetool.xml($event.getBody())}&lt;/div&gt;
 #end
 #**
   * Display comment

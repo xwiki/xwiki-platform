@@ -851,8 +851,10 @@ public class DomainObjectFactory
         java.lang.Object value = ((BaseProperty) property).getValue();
         if (value instanceof List) {
             return StringUtils.join((List) value, "|");
-        } else {
+        } else if (value != null) {
             return value.toString();
+        } else {
+            return "";
         }
     }
 }

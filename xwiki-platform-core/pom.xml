@@ -377,6 +377,12 @@
               <justification>Has been moved to xwiki-platform-feed-api since it was the only module using it. We also
               dropped Tidy in favor of HTMLCleaner.</justification>
             </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
+              <method>addHibernateSequenceIfRequired(java.lang.String[], java.lang.String, org.hibernate.Session)</method>
+              <justification>Not an API. This should be internal.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

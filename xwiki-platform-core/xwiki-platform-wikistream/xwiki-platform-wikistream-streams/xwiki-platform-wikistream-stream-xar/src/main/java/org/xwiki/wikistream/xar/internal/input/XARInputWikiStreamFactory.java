@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xar.internal.XARUtils;
 
 /**
  * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
@@ -34,7 +35,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @since 5.2M2
  */
 @Component
-@Named("xwiki+xar/1.0")
+@Named(XARUtils.ROLEHINT)
 @Singleton
 public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<XARInputProperties>
 {

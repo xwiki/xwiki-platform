@@ -19,6 +19,9 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @version $Id$
  * @since 5.2M2
@@ -78,4 +81,8 @@ public class XARDocumentModel
     public static final String ELEMENT_REVISION_MINOR = "minorEdit";
 
     public static final String ELEMENT_REVISIONS = "versions";
+    
+    // Utils
+
+    public static final Map<String, String> XARTOEVENTPARAMETERS = new HashMap<String, String>();
 }

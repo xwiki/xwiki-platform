@@ -34,34 +34,11 @@ import org.xwiki.wikistream.xml.input.source.SourceInputSource;
 import org.xwiki.xml.stax.StAXUtils;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 public final class XMLInputWikiStreamUtils
 {
-    public static XMLStreamReader createXMLStreamWriter(XMLInputProperties properties) throws XMLStreamException,
-        IOException, WikiStreamException
-    {
-        XMLStreamReader xmlStreamReader;
-
-        InputSource source = properties.getSource();
-
-        if (source instanceof ReaderInputSource) {
-            xmlStreamReader =
-                XMLInputFactory.newInstance().createXMLStreamReader(((ReaderInputSource) source).getReader());
-        } else if (source instanceof InputStreamInputSource) {
-            xmlStreamReader =
-                XMLInputFactory.newInstance().createXMLStreamReader(((InputStreamInputSource) source).getInputStream());
-        } else if (source instanceof SourceInputSource) {
-            xmlStreamReader = StAXUtils.getXMLStreamReader(((SourceInputSource) source).getSource());
-        } else {
-            throw new WikiStreamException("Unknown source type [" + source.getClass() + "]");
-        }
-
-        return xmlStreamReader;
-    }
-
     public static XMLEventReader createXMLEventReader(XMLInputProperties properties) throws XMLStreamException,
         IOException, WikiStreamException
     {
@@ -82,5 +59,27 @@ public final class XMLInputWikiStreamUtils
         }
 
         return xmlEventReader;
+    }
+
+    public static XMLStreamReader createXMLStreamReader(XMLInputProperties properties) throws XMLStreamException,
+        IOException, WikiStreamException
+    {
+        XMLStreamReader xmlStreamReader;
+
+        InputSource source = properties.getSource();
+
+        if (source instanceof ReaderInputSource) {
+            xmlStreamReader =
+                XMLInputFactory.newInstance().createXMLStreamReader(((ReaderInputSource) source).getReader());
+        } else if (source instanceof InputStreamInputSource) {
+            xmlStreamReader =
+                XMLInputFactory.newInstance().createXMLStreamReader(((InputStreamInputSource) source).getInputStream());
+        } else if (source instanceof SourceInputSource) {
+            xmlStreamReader = StAXUtils.getXMLStreamReader(((SourceInputSource) source).getSource());
+        } else {
+            throw new WikiStreamException("Unknown source type [" + source.getClass() + "]");
+        }
+
+        return xmlStreamReader;
     }
 }

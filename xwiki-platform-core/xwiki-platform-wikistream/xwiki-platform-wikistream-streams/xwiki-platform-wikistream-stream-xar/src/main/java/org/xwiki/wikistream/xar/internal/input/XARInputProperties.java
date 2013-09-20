@@ -19,30 +19,12 @@
  */
 package org.xwiki.wikistream.xar.internal.input;
 
-import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.wikistream.xml.internal.input.XMLInputProperties;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class XARInputProperties
+public class XARInputProperties extends XMLInputProperties
 {
-    private InputSource source;
-
-    @PropertyName("The source")
-    @PropertyDescription("The source to load the wiki from")
-    @PropertyMandatory
-    public InputSource getSource()
-    {
-        return this.source;
-    }
-
-    public void setSource(InputSource source)
-    {
-        this.source = source;
-    }
 }

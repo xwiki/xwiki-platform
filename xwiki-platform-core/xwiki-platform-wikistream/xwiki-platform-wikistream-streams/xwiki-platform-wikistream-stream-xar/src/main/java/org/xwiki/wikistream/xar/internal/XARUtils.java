@@ -20,11 +20,13 @@
 package org.xwiki.wikistream.xar.internal;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 public final class XARUtils
 {
-
+    /**
+     * @since 5.2RC1
+     */
+    public static final String ROLEHINT = "xwiki+xar/1.0";
 }

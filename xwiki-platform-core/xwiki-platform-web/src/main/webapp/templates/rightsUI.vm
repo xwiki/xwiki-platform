@@ -173,7 +173,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
         #end
         <dt>
           <label for="authenticate_view">
-            <input type="image" id="authenticate_view" alt="$view_alt" src="$view_icon" class="icon" /></td>
+            <input type="image" id="authenticate_view" alt="$view_alt" src="$view_icon" class="icon" />
             $services.localization.render('authenticate_view')
           </label>
         </dt>
@@ -187,7 +187,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
         #end
         <dt>
           <label for="authenticate_edit">
-            <input type="image" id="authenticate_edit" alt="$edit_alt" src="$edit_icon" class="icon" /></td>
+            <input type="image" id="authenticate_edit" alt="$edit_alt" src="$edit_icon" class="icon" />
             $services.localization.render('authenticate_edit')
           </label>
         </dt>
@@ -209,7 +209,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
         <dt>
           <label for="guest_comment_requires_captcha">
             <input type="image" id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt"
-                src="$guest_comment_requires_captcha_icon" class="icon" /></td>
+                src="$guest_comment_requires_captcha_icon" class="icon" />
             $services.localization.render('rightsmanager.guestcommentrequirescaptcha')
           </label>
         </dt>

@@ -270,6 +270,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
 
         final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
         final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
+        extensionObjects.add(null);
         extensionObjects.add(extensionObject);
 
         final ObjectReference extensionReference = new BaseObjectReference(DOC_REF, 1, DOC_REF);

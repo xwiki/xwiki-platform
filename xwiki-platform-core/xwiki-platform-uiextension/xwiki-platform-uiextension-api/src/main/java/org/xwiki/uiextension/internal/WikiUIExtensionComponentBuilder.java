@@ -145,6 +145,9 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
         }
 
         for (BaseObject extensionDefinition : this.getExtensionDefinitions(doc)) {
+            if (extensionDefinition == null) {
+                continue;
+            }
             // Extract extension definition.
             String id = extensionDefinition.getStringValue(ID_PROPERTY);
             String extensionPointId = extensionDefinition.getStringValue(EXTENSION_POINT_ID_PROPERTY);

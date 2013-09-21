@@ -23,6 +23,8 @@ var XWiki = (function (XWiki) {
 
       document.observe("xwiki:suggest:clearSuggestions", this.onClearSuggestions.bindAsEventListener(this));
       document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this));
+      document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
+      document.observe("xwiki:suggest:updated", this.onSuggestUpdated.bindAsEventListener(this));
       document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
 
       this.createSuggest();
@@ -47,6 +49,28 @@ var XWiki = (function (XWiki) {
         this.searchInputBorderBottomSavedStyle = this.searchInput.getStyle('borderBottomStyle');
         // Hide bottom border of input field to not double the container border just under the field
         this.searchInput.setStyle({'borderBottomStyle' : 'none'});
+      }
+    },
+
+    /**
+     * Callback triggered just before the suggest sends a new set of requests to fetch the suggestions from all the
+     * configured sources. At this point the list of suggestions is empty and all sources are marked as loading.
+     */
+    onSuggestContainerPrepared: function(event) {
+      // Hide the "No results!" message.
+      this.noResultsMessage.addClassName('hidden');
+    },
+
+    /**
+     * Callback triggered after the suggest receives the list of suggestions from all configured sources (even if the
+     * list of suggestions from one source is empty).
+     */
+    onSuggestUpdated: function(event) {
+      // Check if there are any suggestions, taking into account that there is at least one suggestion used to link the
+      // search page.
+      if (event.memo.container.select('.suggestItem').length == 1) {
+        // Show the "No results!" message.
+        this.noResultsMessage.removeClassName('hidden').setStyle({'float': 'left'});
       }
     },
 
@@ -76,11 +100,18 @@ var XWiki = (function (XWiki) {
       var valueNode = new Element('div')
             .insert(new Element('span', {'class':'suggestId'}))
             .insert(new Element('span', {'class':'suggestValue'}))
-            .insert(new Element('span', {'class':'suggestInfo'}))
+            .insert(new Element('span', {'class':'suggestInfo'}));
+      this.noResultsMessage = new Element('div', {'class': 'hidden'})
+        .update("$escapetool.javascript($services.localization.render('core.widgets.suggest.noResults'))".escapeHTML());
+      var gotoSearchPageMessage = new Element('div')
+        .update("$escapetool.javascript($services.localization.render('core.widgets.suggest.showResults'))"
+        .escapeHTML());
+      var content = new Element('div').insert(this.noResultsMessage).insert(gotoSearchPageMessage)
+        .insert(new Element('div', {'class': 'clearfloats'}));
       var allResultsNode = new XWiki.widgets.XList([
-        new XWiki.widgets.XListItem( "$services.localization.render('core.widgets.suggest.showResults')", {
+        new XWiki.widgets.XListItem( content, {
           'containerClasses': 'suggestItem',
-          'classes': 'showAllResuts',
+          'classes': 'showAllResults',
           'eventCallbackScope' : this,
           'noHighlight' : true,
           'value' : valueNode
@@ -112,7 +143,6 @@ var XWiki = (function (XWiki) {
         displayValueText: "in ",
         timeout: 0,
         width: 500,
-        align: "right",
         unifiedLoader:true,
         loaderNode: allResults.down("li"),
         shownoresults:false

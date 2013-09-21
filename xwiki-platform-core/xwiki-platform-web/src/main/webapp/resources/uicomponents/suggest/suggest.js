@@ -469,7 +469,7 @@ var XWiki = (function(XWiki){
           }
           else {
             (this.options.loaderNode || this.fld).addClassName("loading");
-            this.resultContainer.down('.results' + source.id).addClassName('hidden loading');
+            this.resultContainer.down('.results' + source.id).addClassName('hidden').addClassName('loading');
           }
         }
         else {
@@ -479,7 +479,7 @@ var XWiki = (function(XWiki){
               sourceHeader = new Element('div', {'class':'sourceName'});
 
           if (this.options.unifiedLoader) {
-            sourceContainer.addClassName('hidden loading');
+            sourceContainer.addClassName('hidden').addClassName('loading');
           }
 
           if (typeof source.icon != 'undefined') {
@@ -542,35 +542,50 @@ var XWiki = (function(XWiki){
   },
 
   /**
-   * Create the HTML list of suggestions.
+   * Create the HTML list of suggestions and then notify that the suggest has been updated if all sources are loaded.
    *
    * @param {Object} arr
    * @param {Object} source the source for data for which to create this list of results.
    */
   createList: function(arr, source)
   {
+    this._createList(arr, source);
+
+    if (this.sources.length == 1 || !this.resultContainer.down('.results.loading')) {
+      document.fire('xwiki:suggest:updated', {
+        'container' : this.container,
+        'suggest' : this
+      });
+    }
+  },
+
+  /**
+   * Create the HTML list of suggestions.
+   *
+   * @param {Object} arr
+   * @param {Object} source the source for data for which to create this list of results.
+   */
+  _createList: function(arr, source)
+  {
     this.isActive = true;
     var pointer = this;
 
     this.killTimeout();
 
-    // create holding div
-    //
+    // Determine the source container.
     if (this.sources.length > 1) {
-      var div = this.resultContainer.down(".results" + source.id);
-      if (arr.length > 0 || this.options.shownoresults) {
-        div.down('.sourceContent').removeClassName('loading');
-        this.resultContainer.down(".results" + source.id).removeClassName("hidden loading");
-      }
+      var sourceContainer = this.resultContainer.down('.results' + source.id);
+      sourceContainer.removeClassName('loading');
+      sourceContainer.down('.sourceContent').removeClassName('loading');
+      (arr.length > 0 || this.options.shownoresults) && sourceContainer.removeClassName('hidden');
 
       // If we are in mode "unified loader" (showing one loading indicator for all requests and not one per request)
       // and there aren't any source still loading, we remove the unified loading status.
-      if (this.options.unifiedLoader && !this.resultContainer.down("loading")) {
-        (this.options.loaderNode || this.fld).removeClassName("loading");
+      if (this.options.unifiedLoader && !this.resultContainer.down('.results.loading')) {
+        (this.options.loaderNode || this.fld).removeClassName('loading');
       }
-    }
-    else {
-      var div = this.resultContainer;
+    } else {
+      var sourceContainer = this.resultContainer;
     }
 
     // if no results, and shownoresults is false, go no further
@@ -579,9 +594,7 @@ var XWiki = (function(XWiki){
     }
 
     // Ensure any previous list of results for this source gets removed
-    if (div.down('ul')) {
-      div.down('ul').remove();
-    }
+    sourceContainer.down('ul') && sourceContainer.down('ul').remove();
 
     // Show the "hide suggestions" buttons
     this.container.select('.hide-button-wrapper').invoke('show');
@@ -625,9 +638,9 @@ var XWiki = (function(XWiki){
                           'classes' : 'noSuggestion',
                           noHighlight :true }) );
     }
-    div.appendChild( list.getElement() );
+    sourceContainer.appendChild( list.getElement() );
 
-    this.suggest = div;
+    this.suggest = sourceContainer;
 
     // remove list after an interval
     var pointer = this;

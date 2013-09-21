@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxLinks</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497904000</date>
+  <contentUpdateDate>1301497904000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxLinks</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <attachment>
+    <filename>img.png</filename>
+    <filesize>959</filesize>
+    <author>XWiki.Admin</author>
+    <date>1300912732000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAAAAADgE0Q3AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAA
+CxMAAAsTAQCanBgAAAAHdElNRQfWBxcOEy+3/bdlAAADUElEQVRIx52WTW/cVBSG32tfezxJZiaT
+0EwnCkVKgVZI3cFAVYkFLEFCKoI/wz9Bgh/ApqqEWLQLFmUHAtJKqKIqMKhSJ50R+aCTTHzPey4L
+2/PVIru9C8u6Po/f83XtYzxefAUvwcACAMZPjrXc1gfJVm0VgPHA+HCQGmOMKcfQ6jYypeO/jQ1t
+WAGCng1sHRY4ehzYuBbUwzIojb1nOkmMBf5xNonW46iCUhoxPY3WLPBvEK826lFQAUq8xhawgNrE
+1muBqZJsFwVQWMAE8Vq0xIxv7a+rjhN38Z3Ezu3HQORgPO6G7VYSLjD9Gx92SJK8e//z15KFF3qJ
+AgBmOZz+d5+ec8455+TSe18/mCw8NEAAPFvXGx9Z55yIiHPr79/suwq9d+fd0ImIc86JuFbrx5Ev
+hwY7LndORCS9uPfo7HkNu7goQiWZXWhOn5wmpZB3M4JK6kTKleAKHVGSozAMKkCS6YiSSh4mjbiy
+Uu4b03qjVpq98eMs3yLihCKj+lpUqvRzV0hRKkmlsjV8epaUKR2tO+co4kQoItJ1fx2Vutc9dCJ5
+F4mI7FPKO2JrNI+IjNrbjVLovP81s6aIk8HoaXc7KYXsZ40D5hhl8OjC5XNhKWQ2r0ym7k2423ur
+gfLixu2sGZTKk/obVzq2AgRkZVKqnq502hZVoFcPEyU9VVVXl3vo//4aTVJIISmTqBaiktKBcapU
+VVXWrKkGfdNkjmhkjDcVoOGXJioYjf54uL1iyqDht7+3QdUsD/TRzb2Pdxc/lzAe9+xGM9/t//bL
+SQuFilIzsvN275VZaC6ag/o//MkVy4Iorqr0Pn7zg0tJsAyN7txn02R29My8o5+iCC/0crkCSm/3
+NyLmZizc0iIyVQAIbOdarxMUUP2r8wHpqXO+Kf0UmZ7BcOuLTbjIAsDDDQinxpr7VUQ2d2w5fLBZ
+pHzsnV8MfuagLhx1OZjWSZpHupjnWUyLVdxJ84Y1uPa6kJSsRUmhZvdcZnD1kxyqAX6XuX1mKxSK
+yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
++QsNjAcwUSSm2vBhYTIlAGk1xmQzinmZcfQ/40v+ffqYGLoAAAAASUVORK5CYII=
+</content>
+  </attachment>
+  <object>
+    <class>
+      <name>XWiki.XWikiSyntaxClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>category</name>
+        <number>1</number>
+        <numberType>integer</numberType>
+        <prettyName>Category ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </category>
+      <maxSyntaxVersion>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>maxSyntaxVersion</name>
+        <number>4</number>
+        <numberType>float</numberType>
+        <prettyName>Maximum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </maxSyntaxVersion>
+      <minSyntaxVersion>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>minSyntaxVersion</name>
+        <number>3</number>
+        <numberType>float</numberType>
+        <prettyName>Minimum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </minSyntaxVersion>
+      <section>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>section</name>
+        <number>2</number>
+        <numberType>integer</numberType>
+        <prettyName>Section ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </section>
+    </class>
+    <name>XWiki.XWikiSyntaxLinks</name>
+    <number>0</number>
+    <className>XWiki.XWikiSyntaxClass</className>
+    <guid>de540b02-c4f0-41b7-a1e9-1a9182de7f5a</guid>
+    <property>
+      <category>1</category>
+    </property>
+    <property>
+      <maxSyntaxVersion>2.1</maxSyntaxVersion>
+    </property>
+    <property>
+      <minSyntaxVersion>1.0</minSyntaxVersion>
+    </property>
+    <property>
+      <section>7</section>
+    </property>
+  </object>
+  <content>= Editing =
+
+== Links ==
+
+===== 1.0 =====
+
+(% style="width:100%;table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
+|=Feature|=XWiki Syntax 1.0|=Result
+|Link to a page in the current Space|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
+|Link with a label|{{{[label&gt;WebHome]}}}|[[label&gt;&gt;WebHome]]
+|Link with XWiki Syntax in the label|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;bold label&lt;/strong&gt;&lt;/a&gt;}}}|[[**bold label**&gt;&gt;WebHome]]
+|Link to a page with the space specified|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
+|Link to a subwiki|{{{[subwiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
+|Link that opens in a new window|{{{[label&gt;WebHome&gt;_blank]}}}|[[label&gt;&gt;WebHome||rel="__blank"]]
+|Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
+|Link to a URL|{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
+|Link to a URL with a label|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Link to an email address|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Image Link|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2}&lt;/a&gt;}}}|[[image:img.png&gt;&gt;Main.WebHome]]
+|Image Link with image parameters|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Link to an attachment on the current page|(((
+{{info}}See [[Attach Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] for details{{/info}}
+{{{{attach:text|file=img.png}}}}
+)))|[[text&gt;&gt;attach:img.png]]
+|Link to an attachment in a different page|(((
+{{info}}See [[Attach Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] for details{{/info}}
+{{{{attach:text|document=Space.Page|file=img.png}}}}
+)))|[[text&gt;&gt;attach:XWiki.XWikiSyntax@img.png]]
+
+{{velocity}}$subHeading XWiki Syntax 1.0 Link Specification $subHeading{{/velocity}}
+
+{{info}}
+Part in ##( )## is required, parts in ##[ ]## are optional and one of the two chars in ##{ }## needs to be added if optional parts are being used.
+{{/info}}
+
+The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias] [{&gt; or |} target]##**
+
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. Example: ##My Page##
+* **##resource##**: The full link reference using the following syntax: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: The link reference. This can be either
+*** **A URI** in the form **##protocol:path##** (examples: ##http:~/~/xwiki.org##, ##mailto~:john@smith.com##), or
+*** **A wiki page** reference in the form **##~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
+**** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
+**** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
+* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
+* **##target##**: An optional string corresponding to the HTML ##target## attribute for a HTML ##A## link element. This element is used when rendering the link. It defaults to opening the link in the current window. Examples: ##_self##, ##_blank##
+
+===== 2.0 =====
+
+(% style="width:100%;table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
+|=Feature|=XWiki Syntax 2.0|=Result
+|Link to a page in the current Space|{{{[[WebHome]]}}}|[[WebHome]]
+|Link with a label|(((
+{{{[[label&gt;&gt;WebHome]]}}}
+{{info}}XWiki Syntax is supported inside link labels.{{/info}}
+)))|[[label&gt;&gt;WebHome]]
+|Link with XWiki Syntax in the label|{{{[[**bold label**&gt;&gt;WebHome]]}}}|[[**bold label**&gt;&gt;WebHome]]
+|Link to a page with the space specified|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|Link to a subwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|Link that opens in a new window|{{{[[label&gt;&gt;WebHome||rel="__blank"]]}}}|[[label&gt;&gt;WebHome||rel="__blank"]]
+|Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
+|Link to a URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
+|Link to a URL with a label|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Link to an email address|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Image Link|{{{[[image:Space2.Page2@img.png&gt;&gt;Space1.Page1]]}}}|[[image:img.png&gt;&gt;Main.WebHome]]
+|Image Link with image parameters|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Link to an attachment on the current page|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:img.png]]
+|Link to an attachment in a different page|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntax@img.png]]
+
+{{velocity}}$subHeading XWiki Syntax 2.0 Link Specification $subHeading{{/velocity}}
+
+{{info}}
+The part in ##( )## is required, while the parts in ##[ ]## are optional.
+{{/info}}
+
+The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [||parameters]##**
+
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Example: ##My Page##
+* **##resource##**: The full link reference using the following syntax: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: The link reference in one of the following forms:
+*** **URL**: Any URL in the form of **##protocol:~/~/path##**. Examples: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
+*** **Wiki page name** reference in the form **##~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
+**** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
+**** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+*** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
+**** **##attach~:##**: A required string identifying the resource as attachment.
+**** **##wikiPageName##**: An optional string referencing the document that holds the attachment, see "Wiki page name" above.
+**** **##attachmentName##**: Name of the attachment as it is stored in the wiki.
+*** **Email address** in the form **##mailto~: (emailAddress)##** (###anchor## is not valid). Example: ##mailto~:john@smith.com##
+**** **##mailto~:##**: A required string identifying the resource as email.
+**** **##emailAddress##**: Targeted email address. Example: "##john@smith.com##"
+** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
+* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
+* **##parameters##**: An optional list of parameters passed to the link. Example: ##rel="~_~_blank"## (open in new window)
+
+===== 2.1 =====
+
+(% style="width:100%;table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
+|=Feature|=XWiki Syntax 2.1|=Result
+|Link to a page in the current Space|{{{[[WebHome]]}}}|[[WebHome]]
+|Link with a label|(((
+{{{[[label&gt;&gt;WebHome]]}}}
+{{info}}XWiki Syntax is supported inside link labels.{{/info}}
+)))|[[label&gt;&gt;WebHome]]
+|Link with XWiki Syntax in the label|{{{[[**bold label**&gt;&gt;WebHome]]}}}|[[**bold label**&gt;&gt;WebHome]]
+|Link to a page with the space specified|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|Link to a subwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|Link that opens in a new window|{{{[[label&gt;&gt;WebHome||rel="__blank"]]}}}|[[label&gt;&gt;WebHome||rel="__blank"]]
+|Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
+|Link to a URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
+|Link to a URL with a label|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Link to an email address|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Image Link|{{{[[image:Space2.Page2@img.png&gt;&gt;Space1.Page1]]}}}|[[image:img.png&gt;&gt;Main.WebHome]]
+|Image Link with image parameters|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Link to an attachment on the current page|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:img.png]]
+|Link to an attachment in a different page|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntax@img.png]]
+
+{{velocity}}$subHeading XWiki Syntax 2.1 Link Specification $subHeading{{/velocity}}
+
+{{info}}
+The part in ##( )## is required, while the parts in ##[ ]## are optional.
+{{/info}}
+
+The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
+
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Example: ##My Page##
+* **##resource##**: A required string with the link reference in one of the following forms
+** **URL**: Any URL in the form of **##[url:] (protocol:~/~/path)##**. Examples: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
+*** **##url:##** An optional string identifying the resource as an URL.
+** **Wiki page name** reference in the form **##[doc:] ~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+*** **##doc:##** An optional string identifying the resource as an XWiki document.
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
+*** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
+*** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+** **InterWiki page name** reference in the form **##interwiki: {{{(interWikiAlias:)}}} (page)##**. Example: ##interwiki:wikipedia:XWiki##
+*** **##interwiki:##** A required string identifying the resource as an InterWiki link.
+*** **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Example: ##wikipedia##
+*** **##page##**: A required string containing the name of the linked page. Example: ##XWiki##
+** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
+*** **##attach~:##**: A required string identifying the resource as attachment.
+*** **##wikiPageName##**: An optional string referencing the document that holds the attachment, see "Wiki page name" above.
+*** **##attachmentName##**: Name of the attachment as it is stored in the wiki.
+** **Email address** in the form **##mailto~: (emailAddress)##** (###anchor## is not valid). Example: ##mailto~:john@smith.com##
+*** **##mailto~:##**: A required string identifying the resource as email.
+*** **##emailAddress##**: Targeted email address. Example: ##john@smith.com##
+** **Relative path** reference on the server in the form **##path: (relPath)##**. Example: ##path:$doc.getURL('reset')## produces target address ##http:~/~/server.domain.com/xwiki/bin/reset/Space/Page## where ##/xwiki/bin/reset/Space/Page## is produced by ##$doc.getURL('reset')##.
+*** **##path:##** A required string identifying the resource as a relative path.
+*** **##relPath##**: A required string containing the relative path of the resource on the server that shall be linked.
+** **UNC (Windows Explorer)** reference in the form **##unc: (path)##**. The link is rendered as a ##file:~/~/## link. Examples: ##unc:C:\Windows\##, ##unc:~\~\myserver\path\img.png##, ##unc:home/user/somefile##
+*** **##unc:##** A required string identifying the resource as a UNC (Windows Explorer) path.
+*** **##path##**: A required string containing the local path of resource accessible by the user. Examples: ##C:\Windows\##, ##~\~\myserver\path\img.png##, ##home/user/somefile##
+* **##parameters##**: An optional list of space-separated parameters passed to the link. Example: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" rel="~_~_blank"##
+** **##queryString##**: An optional query string for specifying parameters that will be appended to the link target address and used in the rendered URL. Example: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## produces target address ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##
+** **##rel##**: An optional parameter that allows to open link target in new window. Example: ##rel="~_~_blank"##</content>
+</xwikidoc>

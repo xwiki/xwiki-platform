@@ -107,7 +107,7 @@
 
 == Verbatim ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 Allow to enter content that will not be formatted (in other words the XWiki Syntax will not be taken into account).
 
@@ -130,7 +130,7 @@ multi line
 content
 }}})))
 
-===== 2.0 =====
+=== 2.0 ===
 
 Allow to enter content that will not be formatted (in other words the XWiki Syntax will not be taken into account).
 

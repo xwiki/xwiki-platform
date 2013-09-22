@@ -107,7 +107,7 @@
 
 == HTML ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 {{info}}It is possible to enter HTML markup directly in the text in XWiki Syntax 1.0.{{/info}}
 
@@ -115,7 +115,7 @@
 |=XWiki Syntax 1.0|=Result
 |&lt;b&gt;bold&lt;/b&gt;|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
 
-===== 2.0 =====
+=== 2.0 ===
 
 {{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} HTML or XHTML must be entered by using the HTML macro.{{/info}}
 

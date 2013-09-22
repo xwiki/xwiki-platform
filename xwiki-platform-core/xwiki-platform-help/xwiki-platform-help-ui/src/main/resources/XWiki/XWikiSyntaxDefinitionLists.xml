@@ -107,7 +107,7 @@
 
 == Definition Lists ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 (% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
@@ -147,7 +147,7 @@
 : definition
 )))
 
-===== 2.0 =====
+=== 2.0 ===
 
 (% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result

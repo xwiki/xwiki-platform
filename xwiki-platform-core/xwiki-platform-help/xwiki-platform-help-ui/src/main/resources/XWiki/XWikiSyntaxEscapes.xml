@@ -107,7 +107,7 @@
 
 == Escapes ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 Allows to escape XWiki Syntax.
 
@@ -115,7 +115,7 @@ Allows to escape XWiki Syntax.
 |=Feature|=XWiki Syntax 1.0|=Result
 |Escape a character|{{{This is not a \[link\]}}}|{{{This is not a [link]}}}
 
-===== 2.0 =====
+=== 2.0 ===
 
 Allows to escape XWiki Syntax.
 

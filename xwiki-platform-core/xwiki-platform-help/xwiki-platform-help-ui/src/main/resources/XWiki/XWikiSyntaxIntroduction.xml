@@ -107,7 +107,7 @@
 
 == Introduction ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 In addition to the XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki.
 
@@ -124,7 +124,7 @@ The following other syntaxes are implemented in XWiki Enterprise:
 The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.
 {{/warning}}
 
-===== 2.0 =====
+=== 2.0 ===
 
 Starting with XWiki Enterprise version 1.7 we've introduced a new wiki syntax. We've named the old syntax the //XWiki Syntax 1.0// and the new syntax was logically called the //XWiki Syntax 2.0//. The main reasons for introducing the new syntax were:
 
@@ -148,7 +148,7 @@ The following other syntaxes are implemented in XWiki Enterprise:
 The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.
 {{/warning}}
 
-===== 2.1 =====
+=== 2.1 ===
 
 Since the introduction of XWiki Syntax 2.0 a few shortcomings of this syntax have been found. To fix these a new, as of now //experimental//, XWiki Syntax 2.1 was introduced in XWiki Enterprise version 3.0. Some reason for the development of this new syntax are:
 

@@ -107,7 +107,7 @@
 
 == New Line/Line Breaks ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 
@@ -120,7 +120,7 @@ New lines are not honored in XWiki Syntax 1.0.
 |Line break|{{{Line\\New line}}}|Line\\New line
 |New line|Line\\New line|Line New line
 
-===== 2.0 =====
+=== 2.0 ===
 
 A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 

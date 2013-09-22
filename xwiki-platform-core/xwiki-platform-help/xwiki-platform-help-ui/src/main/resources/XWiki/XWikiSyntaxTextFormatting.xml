@@ -107,7 +107,7 @@
 
 == Text Formatting ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 (% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
@@ -119,7 +119,7 @@
 |Superscript|some &lt;sup&gt;superscript&lt;/sup&gt;|some ^^superscript^^
 |Subscript|some &lt;sub&gt;subscript&lt;/sub&gt;|some ,,subscript,,
 
-===== 2.0 =====
+=== 2.0 ===
 
 {{info}}
 New in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} over XWiki Syntax 1.0:

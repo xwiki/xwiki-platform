@@ -15,7 +15,7 @@
   <date>1301497691000</date>
   <contentUpdateDate>1301497691000</contentUpdateDate>
   <version>1.1</version>
-  <title>$msg.get("xe.syntax.syntaxpage.title")</title>
+  <title>$services.localization.render("xe.syntax.syntaxpage.title")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -227,7 +227,7 @@ document.observe('xwiki:dom:loaded', function() {
 
 /*******************************************************/
 
-.syntax-menu .generalIcon  {
+.syntax-menu .generalIcon {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.gif')");
 }
 
@@ -235,12 +235,15 @@ document.observe('xwiki:dom:loaded', function() {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
 }
 
-.syntax-menu .programmingIcon  {
+.syntax-menu .programmingIcon {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_gear.gif')");
 }
 
-h5{
-  display: none !important;
+#syntax-page-content h3 {
+  display: none;
+}
+#syntax-page-content h3.sectionheader {
+  display: block;
 }
 
 /* Firefox panics when it has an overflowing table but the content is pre-formatted. */
@@ -357,7 +360,7 @@ $syntaxMenu.add($cat)
   ## "Standard" URLs and icons for categories
   ###set ($category.url = $xwiki.getURL($currentDoc, 'view', "syntax=$escapetool.url(${crtSyntaxVer})&amp;amp;category=${mathtool.sub($velocityCount, 1)}"))
   #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($velocityCount, 1)}")
-  ## #set ($category.name = $msg.get("admin.${category.id}")) ## We have this hardcoded above right now
+  ## #set ($category.name = $services.localization.render("admin.${category.id}")) ## We have this hardcoded above right now
   #set ($category.cssClass = "${category.id}Icon")
   #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
     #set ($crtCategory = $category)
@@ -378,7 +381,7 @@ $syntaxMenu.add($cat)
 #end
 
 #**
- * Displays the sections from an syntax category
+ * Displays the sections from a syntax category
  *
  * Expected format:
  * sections = vector of items
@@ -386,7 +389,7 @@ $syntaxMenu.add($cat)
  *        'id'       : mandatory
  *        'name'     : the text displayed for the corresponding menu item;
  *                     optional, defaults to
- *                     $msg.get("$!{translationPrefix}${item.id}")
+ *                     $services.localization.render("$!{translationPrefix}${item.id}")
  *
  * @param $sections the sections list, in the format described above
  * @param $translationPrefix the translation prefix added to the id of each
@@ -400,6 +403,7 @@ $syntaxMenu.add($cat)
     #if ($crtSyntaxVer &gt; $section.maxSyntax)
       #set ($displayVersion = $section.maxSyntax)
     #end
+    (% class="sectionheader" %)
     $heading $section.name $heading
 
     {{include document="XWiki.XWikiSyntax${section.id}" section="H${displayVersion}"/}}
@@ -416,7 +420,7 @@ $syntaxMenu.add($cat)
  *        'id'       : mandatory
  *        'name'     : the text displayed for the corresponding menu item;
  *                     optional, defaults to
- *                     $msg.get("$!{translationPrefix}${item.id}")
+ *                     $services.localization.render("$!{translationPrefix}${item.id}")
  *
  * @param $sections the sections list, in the format described above
  * @param $translationPrefix the translation prefix added to the id of each
@@ -446,8 +450,8 @@ $syntaxMenu.add($cat)
   &lt;form id="change-context" class="xformInline" action=""&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
-      &lt;select id="goto-select" name="target"&gt;
-        ##&lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
+      &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("xe.syntax.changesyntax"))"&gt;
+        ##&lt;optgroup label="$services.localization.render('admin.gotospaceadministration')"&gt;
         &lt;optgroup label="Select Syntax"&gt;
           #set ($query = "syntax=1.0&amp;amp;${crtSelection}")
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;XWiki Syntax 1.0&lt;/option&gt;
@@ -457,7 +461,7 @@ $syntaxMenu.add($cat)
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;XWiki Syntax 2.1&lt;/option&gt;
         &lt;/optgroup&gt;
       &lt;/select&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($msg.get('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
@@ -470,24 +474,22 @@ $syntaxMenu.add($cat)
 ## groups, rights etc.) at global / space level and also for several applications.
 ##**************************************************************************************************
 ##$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
-$xwiki.jsx.use('XWiki.XWikiSyntaxNew')##
-$xwiki.ssx.use('XWiki.XWikiSyntaxNew')##
+$xwiki.get('jsx').use($doc.getFullName())##
+$xwiki.get('ssx').use($doc.getFullName())##
 #if ($crtSectionId != '')
   #set ($sectionName = ${crtSection.name})
 #elseif ($crtCategoryId != '')
   #set ($sectionName = ${crtCategory.name})
 #else
-  #set ($sectionName = $msg.get("xe.syntax.syntaxall"))
+  #set ($sectionName = $services.localization.render("xe.syntax.syntaxall"))
 #end
-#set ($syntaxTitle = $msg.get("xe.syntax.syntaxtitle", ["${crtSyntaxVer}"]))
+#set ($syntaxTitle = $services.localization.render("xe.syntax.syntaxtitle", ["${crtSyntaxVer}"]))
 #syntaxSwitch()
-(% id="hierarchy" %)(((
+(((
 #set ($query = "syntax=$escapetool.url(${crtSyntaxVer})")
 #if ($crtCategory){{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}}#{else}(% class="current" %)$syntaxTitle(%%)#{end}#if ($crtCategory) (% class="separator" %)»(%%) #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}(%%)#{end}#if ($crtSection) (% class="separator" %)»(%%) (% class="current" %)${crtSection.name}(%%)#end#end
 )))
-(% id="document-title" %)(((
-  = $syntaxTitle: $sectionName =
-)))
+== $syntaxTitle: $sectionName ==
 
 #verticalNavigation($syntaxMenu {'translationPrefix' : 'syntax.', 'crtItemId' : "$!crtItemId", 'cssClass' : 'syntax-menu'})
 ##-----------------------------------------

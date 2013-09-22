@@ -107,7 +107,7 @@
 
 == Scripts ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 {{info}}In XWiki Syntax 1.0 it was possible to enter Velocity scripts anywhere directly in the page. This can lead to issues for example when the user was involuntarily entering Velocity content. It is also performance hungry for pages not requiring Velocity content. There are several other technical limitations. The same goes for entering Groovy scripts.{{/info}}
 
@@ -122,7 +122,7 @@ def var = "whatever"
 %&gt;
 }}})))
 
-===== 2.0 =====
+=== 2.0 ===
 
 {{info}}In XWiki Syntax 1.0 it was possible to enter Velocity scripts anywhere directly in the page. This lead to issues for example when the user was involuntarily entering Velocity content. It was also performance hungry for pages not requiring Velocity content. There were several other technical limitations. Thus in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} Velocity scripts must be entered using the ##velocity## macro. The same goes for entering Groovy scripts.{{/info}}
 

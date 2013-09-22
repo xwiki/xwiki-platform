@@ -107,7 +107,7 @@
 
 == Macros ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 There are 2 kinds of macros in XWiki Syntax 1.0:
 * Velocity macros (called using the ###macroname(param1 ... paramN)## syntax)
@@ -124,7 +124,7 @@ java content
 {code}
 }}})))
 
-===== 2.0 =====
+=== 2.0 ===
 
 There are also 2 kinds of macros in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}:
 * Velocity macros (called using the ###macroname(param1 ... paramN)## syntax inside the Velocity Macro)

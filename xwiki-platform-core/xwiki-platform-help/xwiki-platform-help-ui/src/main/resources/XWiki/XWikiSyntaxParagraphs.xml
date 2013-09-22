@@ -107,7 +107,7 @@
 
 == Paragraphs ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 Paragraphs are text elements separated by 2 or more new lines.
 
@@ -120,7 +120,7 @@ Paragraphs are text elements separated by 2 or more new lines.
 |Two paragraphs|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two
 |Parametrized paragraph|&lt;p style="text-align:center;color:blue"&gt;Centered and blue paragraph&lt;/p&gt;|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph
 
-===== 2.0 =====
+=== 2.0 ===
 
 Paragraphs are text elements separated by 2 or more new lines.
 

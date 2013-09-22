@@ -107,7 +107,7 @@
 
 == Headings ==
 
-===== 1.0 =====
+=== 1.0 ===
 
 (% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
@@ -129,7 +129,7 @@
 {{/html}})))
 |Headings with XWiki Syntax|1.1.1 Heading with *bold*|(((=== Heading with **bold** ===)))
 
-===== 2.0 =====
+=== 2.0 ===
 
 (% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result

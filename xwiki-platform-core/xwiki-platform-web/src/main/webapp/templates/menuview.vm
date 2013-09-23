@@ -130,7 +130,7 @@
 ## - The current wiki is the main wiki OR the current wiki is a workspace
 #set ($displayHomeMenu = $isWorkspaceManagerAppInstalled && $moreThan1Workspace && ($xcontext.isMainWiki() || $isWorkspace))
 #if ($displayHomeMenu)
-  #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) 'Home' 'tmMainWiki' 'hasIcon')
+  #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon')
   #set ($hasPreviousMenuSection = false)
   #if ($hasWatch && $xcontext.isMainWiki())
     #set ($watchClasses = '')

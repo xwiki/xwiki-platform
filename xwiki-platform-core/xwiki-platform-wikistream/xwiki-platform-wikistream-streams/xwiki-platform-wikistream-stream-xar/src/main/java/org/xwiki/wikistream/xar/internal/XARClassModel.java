@@ -19,8 +19,12 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.wikistream.filter.WikiClassFilter;
+
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -34,13 +38,29 @@ public class XARClassModel
 
     public static final String ELEMENT_CUSTOMMAPPING = "customMapping";
 
-    public static final String ELEMENT_DEFAULTVIEWSHEET = "defaultViewSheet";
+    public static final String ELEMENT_SHEET_DEFAULTVIEW = "defaultViewSheet";
 
-    public static final String ELEMENT_DEFAULTEDITSHEET = "defaultEditSheet";
+    public static final String ELEMENT_SHEET_DEFAULTEDIT = "defaultEditSheet";
 
-    public static final String ELEMENT_DEFAULTWEB = "defaultWeb";
+    public static final String ELEMENT_DEFAULTSPACE = "defaultWeb";
 
     public static final String ELEMENT_NAMEFIELD = "nameField";
 
     public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
+
+    // Utils
+
+    public static final Map<String, String> XARTOEVENTPARAMETERS = new HashMap<String, String>()
+    {
+        {
+            put(ELEMENT_NAME, null);
+            put(ELEMENT_CUSTOMCLASS, WikiClassFilter.PARAMETER_CUSTOMCLASS);
+            put(ELEMENT_CUSTOMMAPPING, WikiClassFilter.PARAMETER_CUSTOMMAPPING);
+            put(ELEMENT_SHEET_DEFAULTVIEW, WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW);
+            put(ELEMENT_SHEET_DEFAULTEDIT, WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT);
+            put(ELEMENT_DEFAULTSPACE, WikiClassFilter.PARAMETER_DEFAULTSPACE);
+            put(ELEMENT_NAMEFIELD, WikiClassFilter.PARAMETER_NAMEFIELD);
+            put(ELEMENT_VALIDATIONSCRIPT, WikiClassFilter.PARAMETER_VALIDATIONSCRIPT);
+        }
+    };
 }

@@ -83,53 +83,54 @@ public class XWikiDocumentLocaleEventGenerator extends
 
         // > WikiDocumentLocale
 
-        FilterEventParameters documentLocaleParameters = new FilterEventParameters();
+        FilterEventParameters localeParameters = new FilterEventParameters();
 
         if (properties.isWithWikiDocumentRevisions()) {
             try {
-                documentLocaleParameters.put(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, document
-                    .getDocumentArchive(xcontext).getArchive(xcontext));
+                localeParameters.put(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS,
+                    document.getDocumentArchive(xcontext).getArchive(xcontext));
             } catch (XWikiException e) {
                 this.logger.error("Document [{}] has malformed history", document.getDocumentReference(), e);
             }
         }
 
-        documentFilter.beginWikiDocumentLocale(document.getLocale(), FilterEventParameters.EMPTY);
+        localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, document.getCreator());
+        localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE, document.getCreationDate());
+
+        documentFilter.beginWikiDocumentLocale(document.getLocale(), localeParameters);
 
         // > WikiDocumentRevision
 
-        FilterEventParameters parameters = new FilterEventParameters();
+        FilterEventParameters revisionParameters = new FilterEventParameters();
 
-        parameters.put(WikiDocumentFilter.PARAMETER_LOCALE, document.getLocale());
-        parameters.put(WikiDocumentFilter.PARAMETER_PARENT, document.getParent());
-        parameters.put(WikiDocumentFilter.PARAMETER_TITLE, document.getTitle());
-        parameters.put(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, document.getCustomClass());
-        parameters.put(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, document.getDefaultTemplate());
-        parameters.put(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, document.getValidationScript());
-        parameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getSyntax());
-        parameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, document.getLocale());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_PARENT, document.getParent());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE, document.getTitle());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, document.getCustomClass());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, document.getDefaultTemplate());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, document.getValidationScript());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getSyntax());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
 
-        parameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, document.getAuthor());
-        parameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
-        parameters.put(WikiDocumentFilter.PARAMETER_REVISION_DATE, document.getDate());
-        parameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, document.getAuthor());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_DATE, document.getDate());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
 
-        parameters.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, document.getContentAuthor());
-        parameters.put(WikiDocumentFilter.PARAMETER_CONTENT_DATE, document.getContentUpdateDate());
-        parameters.put(WikiDocumentFilter.PARAMETER_CONTENT, document.getContent());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, document.getContentAuthor());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_DATE, document.getContentUpdateDate());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT, document.getContent());
         if (properties.isWithWikiDocumentContentHTML()) {
             try {
-                parameters.put(WikiDocumentFilter.PARAMETER_CONTENT_HTML, document.getRenderedContent(xcontext));
+                revisionParameters
+                    .put(WikiDocumentFilter.PARAMETER_CONTENT_HTML, document.getRenderedContent(xcontext));
             } catch (XWikiException e) {
                 this.logger.error("Failed to render content of document [{}] as HTML", document.getDocumentReference(),
                     e);
             }
         }
 
-        parameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, document.getCreator());
-        parameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE, document.getCreationDate());
-
-        documentFilter.beginWikiDocumentRevision(document.getVersion(), parameters);
+        documentFilter.beginWikiDocumentRevision(document.getVersion(), revisionParameters);
 
         // Attachments
 
@@ -181,7 +182,7 @@ public class XWikiDocumentLocaleEventGenerator extends
 
         // < WikiDocumentRevision
 
-        documentFilter.endWikiDocumentRevision(document.getVersion(), parameters);
+        documentFilter.endWikiDocumentRevision(document.getVersion(), revisionParameters);
 
         // < WikiDocumentLocale
 

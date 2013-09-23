@@ -22,6 +22,8 @@ package org.xwiki.wikistream.xar.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
+
 /**
  * @version $Id$
  * @since 5.2M2
@@ -44,7 +46,7 @@ public class XARDocumentModel
 
     public static final String ELEMENT_TITLE = "title";
 
-    public static final String ELEMENT_ISHIDDEN = "hidden";
+    public static final String ELEMENT_HIDDEN = "hidden";
 
     public static final String ELEMENT_CUSTOMCLASS = "customClass";
 
@@ -62,6 +64,8 @@ public class XARDocumentModel
 
     public static final String ELEMENT_CONTENT_DATE = "contentUpdateDate";
 
+    public static final String ELEMENT_CONTENT_HTML = "renderedcontent";
+
     // creation
 
     public static final String ELEMENT_CREATION_AUTHOR = "creator";
@@ -72,7 +76,7 @@ public class XARDocumentModel
 
     public static final String ELEMENT_REVISION_DATE = "date";
 
-    public static final String ELEMENT_REVISION_VERSION = "version";
+    public static final String ELEMENT_REVISION = "version";
 
     public static final String ELEMENT_REVISION_AUTHOR = "author";
 
@@ -81,8 +85,44 @@ public class XARDocumentModel
     public static final String ELEMENT_REVISION_MINOR = "minorEdit";
 
     public static final String ELEMENT_REVISIONS = "versions";
-    
+
     // Utils
 
-    public static final Map<String, String> XARTOEVENTPARAMETERS = new HashMap<String, String>();
+    public static final Map<String, String> DOCUMENTPARAMETERS = new HashMap<String, String>()
+    {
+        {
+            put(ELEMENT_DEFAULTLOCALE, XWikiWikiDocumentFilter.PARAMETER_LOCALE);
+        }
+    };
+
+    public static final Map<String, String> DOCUMENTLOCALEPARAMETERS = new HashMap<String, String>()
+    {
+        {
+            put(ELEMENT_CREATION_AUTHOR, XWikiWikiDocumentFilter.PARAMETER_CREATION_AUTHOR);
+            put(ELEMENT_CREATION_DATE, XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE);
+            put(ELEMENT_LOCALE, XWikiWikiDocumentFilter.PARAMETER_LOCALE);
+            put(ELEMENT_REVISIONS, XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS);
+        }
+    };
+
+    public static final Map<String, String> DOCUMENTREVISIONPARAMETERS = new HashMap<String, String>()
+    {
+        {
+            put(ELEMENT_CONTENT, XWikiWikiDocumentFilter.PARAMETER_CONTENT);
+            put(ELEMENT_CONTENT_AUTHOR, XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR);
+            put(ELEMENT_CONTENT_DATE, XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE);
+            put(ELEMENT_CONTENT_HTML, XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML);
+            put(ELEMENT_CUSTOMCLASS, XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS);
+            put(ELEMENT_DEFAULTTEMPLATE, XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE);
+            put(ELEMENT_HIDDEN, XWikiWikiDocumentFilter.PARAMETER_HIDDEN);
+            put(ELEMENT_PARENT, XWikiWikiDocumentFilter.PARAMETER_PARENT);
+            put(ELEMENT_REVISION_AUTHOR, XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR);
+            put(ELEMENT_REVISION_COMMENT, XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT);
+            put(ELEMENT_REVISION_DATE, XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE);
+            put(ELEMENT_REVISION_MINOR, XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR);
+            put(ELEMENT_SYNTAX, XWikiWikiDocumentFilter.PARAMETER_SYNTAX);
+            put(ELEMENT_TITLE, XWikiWikiDocumentFilter.PARAMETER_TITLE);
+            put(ELEMENT_VALIDATIONSCRIPT, XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT);
+        }
+    };
 }

@@ -85,17 +85,12 @@ public class XWikiAttachmentEventGenerator extends
             }
         }
 
-        attachmentFilter.beginWikiAttachment(attachment.getFilename(), FilterEventParameters.EMPTY);
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, attachment.getAuthor());
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, attachment.getComment());
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_VERSION, attachment.getVersion());
 
-        // > WikiAttachmentRevision
-
-        FilterEventParameters parameters = new FilterEventParameters();
-
-        parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, attachment.getAuthor());
-        parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, attachment.getComment());
-        parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
-
-        attachmentFilter.beginWikiAttachmentRevision(attachment.getVersion(), parameters);
+        attachmentFilter.beginWikiAttachment(attachment.getFilename(), attachmentParameters);
 
         // < WikiAttachmentContent
 
@@ -108,10 +103,6 @@ public class XWikiAttachmentEventGenerator extends
                     attachment.getReference()), e);
             }
         }
-
-        // < WikiAttachmentRevision
-
-        attachmentFilter.endWikiAttachmentRevision(attachment.getVersion(), parameters);
 
         // < WikiAttachment
 

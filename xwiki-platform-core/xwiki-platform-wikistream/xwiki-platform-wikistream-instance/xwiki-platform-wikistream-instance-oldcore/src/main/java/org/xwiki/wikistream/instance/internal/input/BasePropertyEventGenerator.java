@@ -42,14 +42,9 @@ public class BasePropertyEventGenerator extends
     public void write(BaseProperty xclassProperty, Object filter, BasePropertyFilter propertyFilter,
         BasePropertyProperties properties) throws WikiStreamException
     {
-        // > WikiObjectProperty
+        // * WikiObjectProperty
 
-        propertyFilter.beginWikiObjectProperty(xclassProperty.getName(), xclassProperty.toText(),
-            FilterEventParameters.EMPTY);
-
-        // < WikiObjectProperty
-
-        propertyFilter.endWikiObjectProperty(xclassProperty.getName(), xclassProperty.toText(),
+        propertyFilter.onWikiObjectProperty(xclassProperty.getName(), xclassProperty.toText(),
             FilterEventParameters.EMPTY);
     }
 }

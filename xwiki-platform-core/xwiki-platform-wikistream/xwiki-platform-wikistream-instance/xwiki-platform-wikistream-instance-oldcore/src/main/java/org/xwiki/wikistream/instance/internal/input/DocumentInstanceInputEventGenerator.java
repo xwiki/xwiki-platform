@@ -47,7 +47,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEventGenerator<XWikiDocumentFilter>
 {
     @Inject
-    private EntityEventGenerator<XWikiDocument> documentParser;
+    private EntityEventGenerator<XWikiDocument> documentLocaleParser;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -77,7 +77,7 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
         this.proxyFilter.beginWikiDocument(name, documentParameters);
 
         // Default document locale
-        this.documentParser.write(defaultDocument, this.filter, this.properties);
+        this.documentLocaleParser.write(defaultDocument, this.filter, this.properties);
 
         List<Locale> locales;
         try {
@@ -90,7 +90,7 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
         for (Locale locale : locales) {
             try {
                 XWikiDocument translationDocument = defaultDocument.getTranslatedDocument(locale, xcontext);
-                this.documentParser.write(translationDocument, this.filter, this.properties);
+                this.documentLocaleParser.write(translationDocument, this.filter, this.properties);
             } catch (XWikiException e) {
                 throw new WikiStreamException("Failed to get document [" + reference + "] for locale [" + locale + "]",
                     e);

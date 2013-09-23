@@ -34,6 +34,10 @@
   #set ($query = $services.query.createQuery($queryString, 'solr'))
   #set ($discard = $query.setLimit($limit))
   #set ($queryFilter = "{!q.op=AND} locales:""$!xcontext.language""")
+  #if (!$xcontext.isMainWiki())
+    ## Subwikis search by default in their content only.
+    #set ($queryFilter = "$queryFilter wiki:$xcontext.database")
+  #end
   #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
     #set ($queryFilter = "$queryFilter hidden:false")
   #end

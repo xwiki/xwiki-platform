@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-tests</artifactId>
   <name>XWiki Platform - Cache - Tests</name>
@@ -36,6 +36,7 @@
   <properties>
     <!-- Don't consider cache test framework as public API since it imposes unnecessary restrictions -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -50,7 +51,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
+      <artifactId>xwiki-commons-test-component</artifactId>
       <version>${commons.version}</version>
       <exclusions>
         <exclusion>
@@ -59,20 +60,6 @@
           <artifactId>oscache</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock</artifactId>
       <scope>compile</scope>
     </dependency>
   </dependencies>

@@ -19,26 +19,13 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.macro;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
-import org.xwiki.gwt.user.client.DeferredUpdater;
 import org.xwiki.gwt.user.client.RichTextAreaCommand;
-import org.xwiki.gwt.user.client.ShortcutKey;
-import org.xwiki.gwt.user.client.ShortcutKeyCommand;
-import org.xwiki.gwt.user.client.Updatable;
-import org.xwiki.gwt.user.client.ShortcutKey.ModifierKey;
-import org.xwiki.gwt.user.client.ui.MenuBar;
 import org.xwiki.gwt.user.client.ui.MenuItem;
-import org.xwiki.gwt.user.client.ui.MenuListener;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.MenuItemUIExtension;
+import org.xwiki.gwt.wysiwyg.client.plugin.internal.MenuItemUIExtensionAdaptor;
 
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.ui.MenuItemSeparator;
-import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.event.logical.shared.AttachEvent;
 
 /**
  * Provides a user interface extension to allow users to manipulate macros using the top-level menu of the WYSIWYG
@@ -46,28 +33,8 @@ import com.google.gwt.user.client.ui.UIObject;
  * 
  * @version $Id$
  */
-public class MacroMenuExtension implements Updatable, MenuListener
+public class MacroMenuExtension extends MenuItemUIExtensionAdaptor
 {
-    /**
-     * The macro menu item that is placed on the top menu bar and which opens the {@link #macroSubMenu}.
-     */
-    private MenuItem macroMenuItem;
-
-    /**
-     * The macro sub-menu, including entries for macro specific operations.
-     */
-    private MenuBar macroSubMenu;
-
-    /**
-     * Menu entries for insert related operations.
-     */
-    private List<UIObject> insertSubMenuEntries;
-
-    /**
-     * Menu entries for edit related operations.
-     */
-    private List<UIObject> editSubMenuEntries;
-
     /**
      * The menu item used to collapse selected macros, or all the macros of no macro is selected.
      */
@@ -89,17 +56,6 @@ public class MacroMenuExtension implements Updatable, MenuListener
     private MenuItem insert;
 
     /**
-     * User interface extension for the editor menu bar.
-     */
-    private final MenuItemUIExtension menuExtension = new MenuItemUIExtension("menu");
-
-    /**
-     * Schedules menu updates and executes only the most recent one. We use the minimum delay because we want the menu
-     * to be update as soon as possible.
-     */
-    private final DeferredUpdater updater = new DeferredUpdater(this, 1);
-
-    /**
      * The macro plug-in associated with this menu extension.
      */
     private final MacroPlugin plugin;
@@ -111,6 +67,9 @@ public class MacroMenuExtension implements Updatable, MenuListener
      */
     public MacroMenuExtension(final MacroPlugin plugin)
     {
+        super("menu");
+
+        setShortcutKeyManager(plugin.getShortcutKeyManager());
         this.plugin = plugin;
 
         MenuItem refresh =
@@ -123,15 +82,15 @@ public class MacroMenuExtension implements Updatable, MenuListener
         expand =
             createMenuItem(Strings.INSTANCE.macroExpandAll(), Strings.INSTANCE.macroExpandAllShortcutKeyLabel(), null,
                 new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.EXPAND), 'E');
-        edit = new MenuItem(Strings.INSTANCE.macroEdit(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.edit();
-            }
-        });
-        edit.setIcon(Images.INSTANCE.macroEdit());
-        edit.setShortcutKeyLabel(Strings.INSTANCE.macroEditShortcutKeyLabel());
+        edit =
+            createMenuItem(Strings.INSTANCE.macroEdit(), Strings.INSTANCE.macroEditShortcutKeyLabel(),
+                Images.INSTANCE.macroEdit(), new com.google.gwt.user.client.Command()
+                {
+                    public void execute()
+                    {
+                        plugin.edit();
+                    }
+                }, (char) 0);
         insert =
             createMenuItem(Strings.INSTANCE.macroInsert(), Strings.INSTANCE.macroInsertShortcutKeyLabel(),
                 Images.INSTANCE.macroInsert(), new com.google.gwt.user.client.Command()
@@ -143,135 +102,51 @@ public class MacroMenuExtension implements Updatable, MenuListener
                         }
                     }
                 }, 'M');
+        MenuItem macroMenu = createMenuItem(Strings.INSTANCE.macro(), Images.INSTANCE.macro());
 
-        insertSubMenuEntries = new ArrayList<UIObject>();
-        insertSubMenuEntries.add(insert);
-        insertSubMenuEntries.add(new MenuItemSeparator());
-        insertSubMenuEntries.add(refresh);
-        insertSubMenuEntries.add(new MenuItemSeparator());
-        insertSubMenuEntries.add(collapse);
-        insertSubMenuEntries.add(expand);
-
-        editSubMenuEntries = new ArrayList<UIObject>();
-        editSubMenuEntries.add(edit);
-        editSubMenuEntries.add(new MenuItemSeparator());
-        editSubMenuEntries.add(collapse);
-        editSubMenuEntries.add(expand);
-
-        macroSubMenu = new MenuBar(true);
-        macroSubMenu.setAnimationEnabled(false);
-        macroSubMenu.addAll(insertSubMenuEntries);
-
-        macroMenuItem = new MenuItem(Strings.INSTANCE.macro(), macroSubMenu);
-        macroMenuItem.setIcon(Images.INSTANCE.macro());
-        macroMenuItem.addMenuListener(this);
-
-        menuExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), macroMenuItem);
-    }
-
-    /**
-     * @param label the label of the menu item
-     * @param shortcutKeyLabel the text used to display the shortcut key associated with the created menu item
-     * @param icon the icon of the menu item
-     * @param command the command triggered by the returned menu item
-     * @param keyCode the shortcut key used to trigger the command associated with the returned menu item
-     * @return a new menu item
-     */
-    private MenuItem createMenuItem(String label, String shortcutKeyLabel, ImageResource icon,
-        com.google.gwt.user.client.Command command, char keyCode)
-    {
-        ShortcutKeyCommand shortcutKeyCommand = new ShortcutKeyCommand(command);
-        plugin.getShortcutKeyManager().put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL, ModifierKey.SHIFT)),
-            shortcutKeyCommand);
-        MenuItem menuItem = new MenuItem(label, shortcutKeyCommand);
-        if (icon != null) {
-            menuItem.setIcon(icon);
-        }
-        if (shortcutKeyLabel != null) {
-            menuItem.setShortcutKeyLabel(shortcutKeyLabel);
-        }
-        return menuItem;
-    }
-
-    /**
-     * Destroy this extension.
-     */
-    public void destroy()
-    {
-        insertSubMenuEntries.clear();
-        insertSubMenuEntries = null;
-
-        editSubMenuEntries.clear();
-        editSubMenuEntries = null;
-
-        macroSubMenu.clearItems();
-        macroSubMenu = null;
-
-        macroMenuItem.getParentMenu().removeItem(macroMenuItem);
-        macroMenuItem.removeMenuListener(this);
-        macroMenuItem = null;
-
-        menuExtension.clearFeatures();
-    }
-
-    /**
-     * @return the menu extension
-     */
-    public MenuItemUIExtension getExtension()
-    {
-        return menuExtension;
+        addFeature(MacroPluginFactory.getInstance().getPluginName(), macroMenu);
+        addFeature("macroRefresh", refresh);
+        addFeature("macroCollapse", collapse);
+        addFeature("macroExpand", expand);
+        addFeature("macroEdit", edit);
+        addFeature("macroInsert", insert);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see MenuListener#onMenuItemSelected(MenuItem)
+     * @see MenuItemUIExtensionAdaptor#onAttach(AttachEvent)
      */
-    public void onMenuItemSelected(MenuItem menuItem)
+    protected void onAttach(AttachEvent event)
     {
-        updater.deferUpdate();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#update()
-     */
-    public void update()
-    {
-        collapse.setEnabled(!plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.COLLAPSE));
-        expand.setEnabled(!plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.EXPAND));
-
-        if (plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.INSERT)) {
-            if (macroSubMenu.getItem(0) != editSubMenuEntries.get(0)) {
-                macroSubMenu.clearItems();
-                macroSubMenu.addAll(editSubMenuEntries);
+        boolean editMode = plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.INSERT);
+        if (collapse.getParentMenu() == event.getSource()) {
+            collapse.setEnabled(!plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.COLLAPSE));
+            if (editMode) {
+                collapse.setText(Strings.INSTANCE.macroCollapse());
+                collapse.setShortcutKeyLabel(Strings.INSTANCE.macroCollapseShortcutKeyLabel());
+            } else {
+                collapse.setText(Strings.INSTANCE.macroCollapseAll());
+                collapse.setShortcutKeyLabel(Strings.INSTANCE.macroCollapseAllShortcutKeyLabel());
             }
-            edit.setEnabled(plugin.getSelector().getMacroCount() == 1);
-            collapse.setText(Strings.INSTANCE.macroCollapse());
-            collapse.setShortcutKeyLabel(Strings.INSTANCE.macroCollapseShortcutKeyLabel());
-            expand.setText(Strings.INSTANCE.macroExpand());
-            expand.setShortcutKeyLabel(Strings.INSTANCE.macroExpandShortcutKeyLabel());
-        } else {
-            if (macroSubMenu.getItem(0) != insertSubMenuEntries.get(0)) {
-                macroSubMenu.clearItems();
-                macroSubMenu.addAll(insertSubMenuEntries);
-            }
-            insert.setEnabled(plugin.getTextArea().getCommandManager().isEnabled(MacroPlugin.INSERT));
-            collapse.setText(Strings.INSTANCE.macroCollapseAll());
-            collapse.setShortcutKeyLabel(Strings.INSTANCE.macroCollapseAllShortcutKeyLabel());
-            expand.setText(Strings.INSTANCE.macroExpandAll());
-            expand.setShortcutKeyLabel(Strings.INSTANCE.macroExpandAllShortcutKeyLabel());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#canUpdate()
-     */
-    public boolean canUpdate()
-    {
-        return plugin.getTextArea().isAttached() && plugin.getTextArea().isEnabled();
+        if (expand.getParentMenu() == event.getSource()) {
+            expand.setEnabled(!plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.EXPAND));
+            if (editMode) {
+                expand.setText(Strings.INSTANCE.macroExpand());
+                expand.setShortcutKeyLabel(Strings.INSTANCE.macroExpandShortcutKeyLabel());
+            } else {
+                expand.setText(Strings.INSTANCE.macroExpandAll());
+                expand.setShortcutKeyLabel(Strings.INSTANCE.macroExpandAllShortcutKeyLabel());
+            }
+        }
+        if (insert.getParentMenu() == event.getSource()) {
+            insert.setEnabled(!editMode && plugin.getTextArea().getCommandManager().isEnabled(MacroPlugin.INSERT));
+            insert.setVisible(!editMode);
+        }
+        if (edit.getParentMenu() == event.getSource()) {
+            edit.setEnabled(editMode && plugin.getSelector().getMacroCount() == 1);
+            edit.setVisible(editMode);
+        }
     }
 }

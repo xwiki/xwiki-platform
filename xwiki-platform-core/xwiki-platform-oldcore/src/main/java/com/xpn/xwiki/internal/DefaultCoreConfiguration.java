@@ -19,16 +19,19 @@
  */
 package com.xpn.xwiki.internal;
 
-import org.apache.commons.lang.StringUtils;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.configuration.ConfigurationSource;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import com.xpn.xwiki.CoreConfiguration;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+
+import com.xpn.xwiki.CoreConfiguration;
 
 /**
  * Configuration for the Core module.
@@ -37,7 +40,8 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
  * @since 1.8RC2
  */
 @Component
-public class DefaultCoreConfiguration extends AbstractLogEnabled implements CoreConfiguration
+@Singleton
+public class DefaultCoreConfiguration implements CoreConfiguration
 {
     /**
      * Prefix for configuration keys for the Core module.
@@ -45,28 +49,38 @@ public class DefaultCoreConfiguration extends AbstractLogEnabled implements Core
     private static final String PREFIX = "core.";
 
     /**
-     * Defines from where to read the rendering configuration data. 
+     * Defines from where to read the rendering configuration data.
      */
-    @Requirement("all")
+    @Inject
+    @Named("all")
     private ConfigurationSource configuration;
 
     /**
      * Used to parse the syntax specified as a String in the configuration.
+     * 
      * @since 2.3M1
      */
-    @Requirement
+    @Inject
     private SyntaxFactory syntaxFactory;
 
     /**
-     * Main XWiki Properties configuration source, see {@link #getDefaultDocumentSyntax()}. 
+     * Main XWiki Properties configuration source, see {@link #getDefaultDocumentSyntax()}.
      */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource xwikiPropertiesConfiguration;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      * @since 2.3M1
      */
+    @Override
     public Syntax getDefaultDocumentSyntax()
     {
         // If the found value is an empty string then default to the configuration value in the main configuration
@@ -75,21 +89,22 @@ public class DefaultCoreConfiguration extends AbstractLogEnabled implements Core
         // When this is implemented modify the code below.
         String key = PREFIX + "defaultDocumentSyntax";
         String syntaxId = this.configuration.getProperty(key, String.class);
-        
+
         if (StringUtils.isEmpty(syntaxId)) {
-            syntaxId = this.xwikiPropertiesConfiguration.getProperty(key, Syntax.XWIKI_2_0.toIdString());
+            syntaxId = this.xwikiPropertiesConfiguration.getProperty(key, Syntax.XWIKI_2_1.toIdString());
         }
 
-        // Try to parse the syntax and if it fails defaults to the XWiki Syntax 2.0
+        // Try to parse the syntax and if it fails defaults to the XWiki Syntax 2.1
         Syntax syntax;
         try {
             syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
         } catch (ParseException e) {
-            getLogger().warn("Invalid default document Syntax [" + syntaxId + "], defaulting to ["
-                + Syntax.XWIKI_2_0.toIdString() + "] instead", e);
-            syntax = Syntax.XWIKI_2_0;
+            this.logger.warn(
+                "Invalid default document Syntax [" + syntaxId + "], defaulting to [" + Syntax.XWIKI_2_1.toIdString()
+                    + "] instead", e);
+            syntax = Syntax.XWIKI_2_1;
         }
 
-        return syntax; 
+        return syntax;
     }
 }

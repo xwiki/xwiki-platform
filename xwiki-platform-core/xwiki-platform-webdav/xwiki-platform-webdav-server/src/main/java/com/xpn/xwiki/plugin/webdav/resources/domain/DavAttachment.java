@@ -48,9 +48,7 @@ public class DavAttachment extends AbstractDavFile
      */
     private XWikiAttachment attachment;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath)
         throws DavException
     {
@@ -78,17 +76,13 @@ public class DavAttachment extends AbstractDavFile
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean exists()
     {
         return this.attachment != null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void spool(OutputContext outputContext) throws IOException
     {
         // Protect against direct url referencing.
@@ -113,9 +107,7 @@ public class DavAttachment extends AbstractDavFile
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void move(DavResource destination) throws DavException
     {
         getContext().checkAccess("edit", attachment.getDoc().getFullName());
@@ -137,9 +129,7 @@ public class DavAttachment extends AbstractDavFile
         clearCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public long getModificationTime()
     {
         if (exists()) {

@@ -21,21 +21,15 @@ package org.xwiki.rendering.internal.configuration;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.transformation.AbstractTransformation;
-import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration}.
@@ -43,18 +37,19 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.0M1
  */
+@AllComponents
+@MockingRequirement(value = DefaultXWikiRenderingConfiguration.class, role = XWikiRenderingConfiguration.class)
 public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement(XWikiRenderingConfiguration.class)
-    private DefaultXWikiRenderingConfiguration configuration;
+    private XWikiRenderingConfiguration configuration;
 
     private ConfigurationSource source;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.setUp();
-        this.source = getComponentManager().lookup(ConfigurationSource.class);
+        this.source = getComponentManager().getInstance(ConfigurationSource.class);
+        this.configuration = getComponentManager().getInstance(XWikiRenderingConfiguration.class);
     }
 
     @Test
@@ -114,27 +109,18 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     }
 
     @Test
-    public void testGetTransformations() throws Exception
+    public void testGetTransformationNames() throws Exception
     {
-        final Transformation expectedTransformation = new AbstractTransformation() {
-            public void transform(Block block, TransformationContext context) throws TransformationException
-            {
-                // Do nothing
-            }
-        };
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(source).getProperty("rendering.transformations", Arrays.asList("macro", "icon"));
                 will(returnValue(Arrays.asList("mytransformation")));
-                oneOf(cm).lookup(Transformation.class, "mytransformation");
-                will(returnValue(expectedTransformation));
             }
         });
 
-        List<Transformation> txs = this.configuration.getTransformations();
+        List<String> txs = this.configuration.getTransformationNames();
         Assert.assertEquals(1, txs.size());
-        Assert.assertSame(expectedTransformation, txs.get(0));
+        Assert.assertEquals("mytransformation", txs.get(0));
     }
 }

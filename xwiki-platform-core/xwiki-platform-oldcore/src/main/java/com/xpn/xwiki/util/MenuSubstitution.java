@@ -16,23 +16,27 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.util;
 
-import com.xpn.xwiki.render.WikiSubstitution;
 import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.PatternMatcherInput;
 
-public class MenuSubstitution extends WikiSubstitution {
+import com.xpn.xwiki.render.WikiSubstitution;
 
-    public MenuSubstitution(com.xpn.xwiki.util.Util util) {
-        super(util,"\\\"\\.\\./\\.\\./view/(.*/.*)\\\"");
+public class MenuSubstitution extends WikiSubstitution
+{
+    public MenuSubstitution(com.xpn.xwiki.util.Util util)
+    {
+        super(util, "\\\"\\.\\./\\.\\./view/(.*/.*)\\\"");
     }
 
-    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i, PatternMatcherInput patternMatcherInput, PatternMatcher patternMatcher, Pattern pattern) {
+    @Override
+    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,
+        PatternMatcherInput patternMatcherInput, PatternMatcher patternMatcher, Pattern pattern)
+    {
         String page = matchResult.group(1);
         stringBuffer.append("\"$xwiki.getURL(\"");
         stringBuffer.append(page.replaceAll("/", "."));

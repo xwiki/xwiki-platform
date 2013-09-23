@@ -19,13 +19,16 @@
  */
 package org.xwiki.rendering.macro.velocity;
 
+import java.util.Collections;
+
 import org.junit.Test;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import static org.xwiki.rendering.test.BlockAssert.*;
 
@@ -43,7 +46,7 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         new ScriptMockSetup(getMockery(), getComponentManager());
-        this.velocityMacro = getComponentManager().lookup(Macro.class, "velocity");
+        this.velocityMacro = getComponentManager().getInstance(Macro.class, "velocity");
     }
 
     @Test
@@ -61,6 +64,7 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
         VelocityMacroParameters params = new VelocityMacroParameters();
         MacroTransformationContext context = new MacroTransformationContext();
         context.setSyntax(Syntax.XWIKI_2_0);
+        context.setCurrentMacroBlock(new MacroBlock("velocity", Collections.<String, String>emptyMap(), false));
 
         // Execute the velocity macro in the context of a first page
         context.setId("page1");
@@ -68,7 +72,9 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
 
         // And then in the context of a second independent page
         context.setId("page2");
-        assertBlocks(expected, this.velocityMacro.execute(params, "#testMacrosAreLocal()", context),
-            getComponentManager().lookup(PrintRendererFactory.class, "event/1.0"));
+        PrintRendererFactory eventRendererFactory =
+            getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
+        assertBlocks(expected,
+            this.velocityMacro.execute(params, "#testMacrosAreLocal()", context), eventRendererFactory);
     }
 }

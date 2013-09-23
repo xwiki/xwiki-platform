@@ -1,0 +1,2 @@
+org.xwiki.wikistream.instance.internal.input.InstanceInputWikiStream
+org.xwiki.wikistream.instance.internal.input.InstanceInputWikiStreamFactory

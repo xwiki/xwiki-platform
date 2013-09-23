@@ -1,0 +1,15 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+{{translation key="some.translation" locale="fr"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [translation] [key=some.translation|locale=fr]
+beginGroup
+onWord [frtranslationmessage]
+endGroup
+endMacroMarkerStandalone [translation] [key=some.translation|locale=fr]
+endDocument

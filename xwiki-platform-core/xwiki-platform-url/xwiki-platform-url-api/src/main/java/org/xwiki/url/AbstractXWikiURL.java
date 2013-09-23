@@ -16,16 +16,16 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.url;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
+
+import org.xwiki.stability.Unstable;
 
 /**
  * Base XWikiURL implementation common to all extending classes. Manages XWiki URL parameters.
@@ -33,13 +33,14 @@ import java.util.Collections;
  * @version $Id$
  * @since 2.0M1
  */
-public class AbstractXWikiURL implements XWikiURL
+@Unstable
+public abstract class AbstractXWikiURL implements XWikiURL
 {
     /**
      * @see #getType()
      */
     private XWikiURLType type;
-    
+
     /**
      * @see #getParameters()
      */
@@ -50,21 +51,18 @@ public class AbstractXWikiURL implements XWikiURL
         setType(type);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.url.XWikiURL#getType()
-     */
+    @Override
     public XWikiURLType getType()
     {
         return this.type;
     }
-    
+
     public void setType(XWikiURLType type)
     {
         this.type = type;
     }
 
+    @Override
     public void addParameter(String name, String value)
     {
         List<String> list = this.parameters.get(name);
@@ -77,31 +75,19 @@ public class AbstractXWikiURL implements XWikiURL
         this.parameters.put(name, list);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.url.XWikiURL#getParameters()
-     */
+    @Override
     public Map<String, List<String>> getParameters()
     {
         return Collections.unmodifiableMap(this.parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see XWikiURL#getParameterValues(String)
-     */
+    @Override
     public List<String> getParameterValues(String name)
     {
         return this.parameters.get(name);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see XWikiURL#getParameterValue(String)
-     */
+    @Override
     public String getParameterValue(String name)
     {
         String result = null;

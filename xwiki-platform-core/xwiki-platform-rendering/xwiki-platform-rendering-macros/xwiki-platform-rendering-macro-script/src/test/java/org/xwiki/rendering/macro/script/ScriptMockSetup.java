@@ -23,11 +23,10 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.wiki.WikiModel;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Dynamic mock setup for script macros.
@@ -45,48 +44,28 @@ public class ScriptMockSetup
 
     public WikiModel wikiModel;
 
-    /**
-     * @since 2.4RC1
-     */
-    public ScriptMockSetup(ComponentManager componentManager) throws Exception
+    public ScriptMockSetup(MockingComponentManager componentManager) throws Exception
     {
         this(new JUnit4Mockery(), componentManager);
     }
 
-    public ScriptMockSetup(Mockery mockery, ComponentManager componentManager) throws Exception
+    public ScriptMockSetup(Mockery mockery, MockingComponentManager cm) throws Exception
     {
         // Document Access Bridge Mock setup
-        bridge = mockery.mock(DocumentAccessBridge.class);
+        this.bridge = cm.registerMockComponent(mockery, DocumentAccessBridge.class);
         mockery.checking(new Expectations() {{
             allowing(bridge).hasProgrammingRights(); will(returnValue(true));
         }});
 
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        componentManager.registerComponent(descriptorDAB, bridge);
-
         // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
-        wikiModel = mockery.mock(WikiModel.class);
-        DefaultComponentDescriptor<WikiModel> descriptorWM =
-            new DefaultComponentDescriptor<WikiModel>();
-        descriptorWM.setRole(WikiModel.class);
-        componentManager.registerComponent(descriptorWM, wikiModel);
+        this.wikiModel = cm.registerMockComponent(mockery, WikiModel.class);
 
         // Use a mock for the AttachmentReference Resolver
-        attachmentReferenceResolver = mockery.mock(AttachmentReferenceResolver.class);
-        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
-            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
-        descriptorARF.setRole(AttachmentReferenceResolver.class);
-        descriptorARF.setRoleHint("current");
-        componentManager.registerComponent(descriptorARF, attachmentReferenceResolver);
+        this.attachmentReferenceResolver =
+            cm.registerMockComponent(mockery, AttachmentReferenceResolver.TYPE_STRING, "current");
 
         // Use a mock for the DocumentReference Resolver
-        documentReferenceResolver = mockery.mock(DocumentReferenceResolver.class);
-        DefaultComponentDescriptor<DocumentReferenceResolver> descriptorDRF =
-            new DefaultComponentDescriptor<DocumentReferenceResolver>();
-        descriptorDRF.setRole(DocumentReferenceResolver.class);
-        descriptorDRF.setRoleHint("current");
-        componentManager.registerComponent(descriptorDRF, documentReferenceResolver);
+        this.documentReferenceResolver =
+            cm.registerMockComponent(mockery, DocumentReferenceResolver.TYPE_STRING, "current");
     }
 }

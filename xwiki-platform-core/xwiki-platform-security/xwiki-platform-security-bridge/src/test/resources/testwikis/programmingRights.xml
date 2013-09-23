@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin">
+    <user name="XWiki.programmer" />
+    <allowUser type="programming" name="XWiki.programmer" />
+  </wiki>
+</wikis>

@@ -1,118 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>OfficeImporterResults</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.OfficeImporter</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1217261425000</creationDate>
-<date>1261481206000</date>
-<contentUpdateDate>1261481206000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.officeimporter.results.title")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
-#if($isguest)
-  #error($msg.get("xe.officeimporter.notallowed"))  
+  <web>XWiki</web>
+  <name>OfficeImporterResults</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.OfficeImporter</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1217261425000</creationDate>
+  <date>1261481206000</date>
+  <contentUpdateDate>1261481206000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.officeimporter.results.title')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if ($isguest)
+  #error($services.localization.render('xe.officeimporter.notallowed'))
 #else
 #########################
 ## Validate Input File ##
 #########################
-  #set($goBack = "[[$msg.get('xe.officeimporter.results.goback')&gt;&gt;XWiki.OfficeImporter]]")  
-  #set($fileUpload=$xwiki.fileupload)
-  #set($fileName=$fileUpload.getFileName("filePath"))
-  #if(! $fileName)
-    {{error}}$msg.get("xe.officeimporter.results.missingfile", [$goBack]){{/error}}
+  #set ($goBack = "[[$services.localization.render('xe.officeimporter.results.goback')&gt;&gt;XWiki.OfficeImporter]]")
+  #set ($fileUpload = $xwiki.fileupload)
+  #set ($fileName = $fileUpload.getFileName("filePath"))
+  #if (!$fileName)
+    {{error}}$services.localization.render('xe.officeimporter.results.missingfile', [$goBack]){{/error}}
   #else
-    #set($void=$fileUpload.loadFileList())
-    #set($officeFileStream=$fileUpload.fileItems.get(0).inputStream)
-  #end 
+    #set ($discard = $fileUpload.loadFileList())
+    #set ($officeFileStream = $fileUpload.fileItems.get(0).inputStream)
+  #end
 ###########################
 ## Validate Target Space ##
 ###########################
-  #if(! $request.targetSpace)
-    {{error}}$msg.get("xe.officeimporter.results.missingspace", [$goBack]){{/error}}
-  #else
-    #set($targetSpace=$request.targetSpace.replaceAll("[:/]", "-"))
+  #set ($parentReference = $services.model.resolveDocument("$!request.parent", 'default'))
+  #set ($targetSpace = $request.targetSpace)
+  #if ("$!targetSpace" == '')
+    ## Use the parent space if the target space is not specified.
+    #set ($targetSpace = $parentReference.lastSpaceReference.name)
   #end
 ##########################
 ## Validate Target Page ##
 ##########################
-  #if(! $request.targetPage)
-    {{error}}$msg.get("xe.officeimporter.results.missingpage", [$goBack]){{/error}}
-  #else
-    #set($targetPage=$request.targetPage.replaceAll("[.:/]", "-"))
-  #end    
+  #set ($targetPage = $request.targetPage)
+  #if ("$!targetPage" == '')
+    ## Use the file name if the target page name is not specified.
+    #set ($targetPage = $stringtool.substringBeforeLast($fileName, '.'))
+  #end
 ##########################
 ## Append Configuration ##
 ##########################
-  #set($appendContent=false)
-  #if($request.appendContent)
-    #set($appendContent=true)
+  #set ($appendContent = false)
+  #if ($request.appendContent)
+    #set ($appendContent = true)
   #end
 #############################
 ## Filtering Configuration ##
 #############################
-  #set($filterStyles=false)
-  #if($request.filterStyles)
-    #set($filterStyles=true)
+  #set ($filterStyles = false)
+  #if ($request.filterStyles)
+    #set ($filterStyles = true)
   #end
 #############################
 ## Splitting Configuration ##
 #############################
-  #set($splitDocument=false)
-  #if($request.splitDocument)
-    #set($splitDocument=true)
-    #set($headingLevels=$request.getParameterValues("headingLevelsToSplit"))
+  #set ($splitDocument = false)
+  #if ($request.splitDocument)
+    #set ($splitDocument = true)
+    #set ($headingLevels = $request.getParameterValues("headingLevelsToSplit"))
+    #if (!$headingLevels)
+      #set ($headingLevels = ['1'])
+    #end
   #end  
 ############
 ## Import ##
 ############
-  #if($fileName &amp;&amp; $targetSpace &amp;&amp; $targetPage)
-    #set($targetDocumentName="${targetSpace}.${targetPage}")
-    #set($targetDocument=$xwiki.getDocument($targetDocumentName))
-    #set($resultDocumentLink="[[**$msg.get('xe.officeimporter.results.result')**&gt;&gt;$targetDocument.getExternalURL('view')]]")
-    #set($xdomOfficeDoc=$officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentName, $filterStyles))
-    #if($xdomOfficeDoc)
-      #if(! $splitDocument)
-        #set($result=$officeimporter.save($xdomOfficeDoc, $targetDocumentName, "xwiki/2.0", null, null, $appendContent))
-        #if($result)          
-          {{info}}$msg.get("xe.officeimporter.results.success", [$resultDocumentLink, $goBack]){{/info}}
+  #if($fileName)
+    #set ($targetDocumentReference = $services.model.createDocumentReference($xcontext.database, $targetSpace, $targetPage))
+    #set ($resultDocumentLink = "[[**$services.localization.render('xe.officeimporter.results.result')**&gt;&gt;doc:$services.model.serialize($targetDocumentReference)]]")
+    #set ($xdomOfficeDoc = $services.officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentReference, $filterStyles))
+    #if ($xdomOfficeDoc)
+      #if (!$splitDocument)
+        #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, "xwiki/2.0", $parentReference, $null, $appendContent))
+        #if ($result)
+          {{info}}$services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack]){{/info}}
         #else
-          {{error}}$officeimporter.errorMessage{{/error}}
+          {{error}}$services.officeimporter.errorMessage{{/error}}
         #end
       #else
-        #set($docsMap=$officeimporter.split($xdomOfficeDoc, $headingLevels, $request.childPagesNamingMethod, $targetDocumentName))
-        #if($docsMap)
-          #foreach($targetDescriptor in $docsMap.keySet())
-            #set($splitXdomOfficeDoc=$docsMap.get($targetDescriptor))
-            #set($target=$targetDescriptor.documentReferenceAsString)
-            #set($parent=$targetDescriptor.parentReferenceAsString)
-            #set($result=$officeimporter.save($splitXdomOfficeDoc, $target, "xwiki/2.0", $parent, null, $appendContent))
-            #if(! $result)
-              {{warning}}$officeimporter.errorMessage{{/warning}}
+        #set ($docsMap = $services.officeimporter.split($xdomOfficeDoc, $headingLevels, $request.childPagesNamingMethod, $targetDocumentReference))
+        #if ($docsMap)
+          #foreach ($targetDescriptor in $docsMap.keySet())
+            #set ($splitXdomOfficeDoc = $docsMap.get($targetDescriptor))
+            #set ($_parentReference = $targetDescriptor.parentReference)
+            #if (!$_parentReference)
+              ## Set the parent for the root document created by the split.
+              #set ($_parentReference = $parentReference)
+            #end
+            #set ($result = $services.officeimporter.save($splitXdomOfficeDoc, $targetDescriptor.documentReference,
+              "xwiki/2.0", $_parentReference, null, $appendContent))
+            #if (!$result)
+              {{warning}}$services.officeimporter.errorMessage{{/warning}}
             #end
           #end
-          {{info}}$msg.get("xe.officeimporter.results.success", [$resultDocumentLink, $goBack]){{/info}}
+          {{info}}$services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack]){{/info}}
         #else
-          {{error}}$officeimporter.errorMessage{{/error}}
+          {{error}}$services.officeimporter.errorMessage{{/error}}
         #end
       #end
     #else
-      {{error}}$officeimporter.errorMessage{{/error}}
+      {{error}}$services.officeimporter.errorMessage{{/error}}
     #end
-  #end  
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

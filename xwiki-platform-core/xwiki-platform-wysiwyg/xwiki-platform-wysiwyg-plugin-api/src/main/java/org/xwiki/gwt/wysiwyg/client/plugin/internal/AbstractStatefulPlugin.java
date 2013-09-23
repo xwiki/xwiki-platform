@@ -43,11 +43,7 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
      */
     private final DeferredUpdater updater = new DeferredUpdater(this);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseUpHandler#onMouseUp(MouseUpEvent)
-     */
+    @Override
     public void onMouseUp(MouseUpEvent event)
     {
         // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
@@ -57,11 +53,7 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getSource() == getTextArea()) {
@@ -69,22 +61,14 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         // ignore
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == getTextArea().getCommandManager()) {
@@ -92,11 +76,7 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#canUpdate()
-     */
+    @Override
     public boolean canUpdate()
     {
         // Always return true. Derived classes should check if their UI is enabled before updating it.
@@ -113,11 +93,7 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
         getTextArea().getCommandManager().addCommandListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         // This should fail silently if we weren't listening to command events.

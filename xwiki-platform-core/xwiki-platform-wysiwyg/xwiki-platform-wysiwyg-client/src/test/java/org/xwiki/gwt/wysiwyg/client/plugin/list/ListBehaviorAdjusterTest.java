@@ -45,8 +45,7 @@ public class ListBehaviorAdjusterTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         if (behaviorAdjuster == null) {
-            behaviorAdjuster = new ListBehaviorAdjuster();
-            behaviorAdjuster.setTextArea(rta);
+            behaviorAdjuster = new ListBehaviorAdjuster(rta);
         }
     }
 

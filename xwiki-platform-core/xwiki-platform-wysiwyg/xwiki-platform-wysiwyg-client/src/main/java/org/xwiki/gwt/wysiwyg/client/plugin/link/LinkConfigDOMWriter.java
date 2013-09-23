@@ -19,9 +19,6 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.link;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
@@ -41,23 +38,9 @@ import com.google.gwt.dom.client.AnchorElement;
 public final class LinkConfigDOMWriter implements ConfigDOMWriter<LinkConfig, AnchorElement>
 {
     /**
-     * The mapping between link types and CSS class names.
-     */
-    private static final Map<LinkType, String> CLASS_NAME_MAPPING;
-
-    /**
      * The value of the link target attribute which indicates that the link should be opened in a new window.
      */
     private static final String TARGET_BLANK = "__blank";
-
-    static {
-        CLASS_NAME_MAPPING = new HashMap<LinkType, String>();
-        CLASS_NAME_MAPPING.put(LinkType.WIKIPAGE, "wikilink");
-        CLASS_NAME_MAPPING.put(LinkType.NEW_WIKIPAGE, "wikicreatelink");
-        CLASS_NAME_MAPPING.put(LinkType.EXTERNAL, "wikiexternallink");
-        CLASS_NAME_MAPPING.put(LinkType.ATTACHMENT, CLASS_NAME_MAPPING.get(LinkType.EXTERNAL));
-        CLASS_NAME_MAPPING.put(LinkType.EMAIL, CLASS_NAME_MAPPING.get(LinkType.EXTERNAL));
-    }
 
     /**
      * {@inheritDoc}
@@ -96,9 +79,7 @@ public final class LinkConfigDOMWriter implements ConfigDOMWriter<LinkConfig, An
         DocumentFragment metaData = document.createDocumentFragment();
         metaData.appendChild(document.createComment("startwikilink:" + EscapeUtils.escapeComment(reference)));
         metaData.appendChild(document.createSpanElement());
-        if (CLASS_NAME_MAPPING.containsKey(linkType)) {
-            Element.as(metaData.getChild(1)).setClassName(CLASS_NAME_MAPPING.get(linkType));
-        }
+        Element.as(metaData.getChild(1)).setClassName(linkType.getClassName());
         metaData.getChild(1).appendChild(document.createTextNode(Element.INNER_HTML_PLACEHOLDER));
         metaData.appendChild(document.createComment("stopwikilink"));
         Element.as(anchor).setMetaData(metaData);

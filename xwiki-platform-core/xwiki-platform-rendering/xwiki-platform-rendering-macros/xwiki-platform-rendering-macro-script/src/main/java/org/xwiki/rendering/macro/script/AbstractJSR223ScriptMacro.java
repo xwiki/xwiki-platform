@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
@@ -32,8 +33,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.apache.commons.lang.StringUtils;
-import org.xwiki.component.annotation.Requirement;
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -58,9 +59,14 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     private static final String EXECUTION_CONTEXT_ENGINE_KEY = "scriptEngines";
 
     /**
+     * The JSR223 Script Engine Manager we use to evaluate JSR223 scripts.
+     */
+    protected ScriptEngineManager scriptEngineManager;
+
+    /**
      * Used to get the current script context to give to script engine evaluation method.
      */
-    @Requirement
+    @Inject
     private ScriptContextManager scriptContextManager;
 
     /**
@@ -113,11 +119,14 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+        this.scriptEngineManager = new ScriptEngineManager();
+    }
+
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
@@ -145,11 +154,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         return this.scriptContextManager.getScriptContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext)
-     */
     @Override
     protected List<Block> evaluateBlock(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
@@ -212,8 +216,8 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
                 result = ((XDOM) scriptResult).getChildren();
             } else if (scriptResult instanceof Block) {
                 result = Collections.singletonList((Block) scriptResult);
-            } else if (scriptResult instanceof List && !((List<?>) scriptResult).isEmpty()
-                && ((List<?>) scriptResult).get(0) instanceof Block) {
+            } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
+                && ((List< ? >) scriptResult).get(0) instanceof Block) {
                 result = (List<Block>) scriptResult;
             } else {
                 // Run the wiki syntax parser on the script-rendered content
@@ -230,9 +234,8 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * @param engineName the script engine name (eg "groovy", etc)
      * @return the Script engine to use to evaluate the script
-     * @throws MacroExecutionException in case of an error in parsing the jars parameter
      */
-    private ScriptEngine getScriptEngine(String engineName) throws MacroExecutionException
+    private ScriptEngine getScriptEngine(String engineName)
     {
         // Look for a script engine in the Execution Context since we want the same engine to be used
         // for all evals during the same execution lifetime.
@@ -253,8 +256,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         ScriptEngine engine = scriptEngines.get(engineName);
 
         if (engine == null) {
-            ScriptEngineManager sem = new ScriptEngineManager();
-            engine = sem.getEngineByName(engineName);
+            engine = this.scriptEngineManager.getEngineByName(engineName);
             scriptEngines.put(engineName, engine);
         }
 

@@ -1,12 +1,31 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.globalsearch;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -14,9 +33,9 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchQuery;
 import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchResult;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * API tool to be able to make and merge multi wikis search queries.
@@ -38,12 +57,12 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
     /**
      * Logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(GlobalSearchPluginApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchPluginApi.class);
 
     /**
-     * The plugin internationalization service.
+     * Used to access translations.
      */
-    private XWikiPluginMessageTool messageTool;
+    private ContextualLocalizationManager localizationManager;
 
     /**
      * Tool to be able to make and merge multi wikis search queries.
@@ -60,12 +79,9 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
     {
         super(plugin, context);
 
-        // Message Tool
-        Locale locale = (Locale) context.get("locale");
-        this.messageTool = new GlobalSearchMessageTool(locale, plugin, context);
-        context.put(GlobalSearchMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
 
-        this.search = new GlobalSearch(this.messageTool);
+        this.search = new GlobalSearch();
     }
 
     /**
@@ -76,7 +92,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
      */
     public void logError(String errorMessage, XWikiException e)
     {
-        LOG.error(errorMessage, e);
+        LOGGER.error(errorMessage, e);
 
         context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
         context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -116,7 +132,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
                 results = Collections.emptyList();
             }
         } catch (GlobalSearchException e) {
-            logError(this.messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
+            logError(this.localizationManager.getTranslationPlain(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             results = Collections.emptyList();
         }
@@ -153,7 +169,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
                 documentList.add(doc.newDocument(this.context));
             }
         } catch (GlobalSearchException e) {
-            logError(this.messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
+            logError(this.localizationManager.getTranslationPlain(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             documentList = Collections.emptyList();
         }
@@ -185,7 +201,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
         try {
             results = this.search.searchDocumentsNames(query, distinctbylanguage, false, checkRight, this.context);
         } catch (GlobalSearchException e) {
-            logError(this.messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
+            logError(this.localizationManager.getTranslationPlain(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             results = Collections.emptyList();
         }

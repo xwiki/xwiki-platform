@@ -40,25 +40,19 @@ public abstract class AbstractQueryManager implements QueryManager
      */
     protected abstract QueryExecutorManager getQueryExecutorManager();
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Set<String> getLanguages()
     {
         return getQueryExecutorManager().getLanguages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean hasLanguage(String language)
     {
         return getLanguages().contains(language);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query createQuery(String statement, String language) throws QueryException
     {
         if (hasLanguage(language)) {
@@ -68,9 +62,7 @@ public abstract class AbstractQueryManager implements QueryManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Query getNamedQuery(String queryName) throws QueryException
     {
         return new DefaultQuery(queryName, getQueryExecutorManager());

@@ -10,8 +10,10 @@
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [code] [] []
-beginGroup [[class]=[box code]]
-endGroup [[class]=[box code]]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [code] [] []
 beginMacroMarkerStandalone [code] []
 endMacroMarkerStandalone [code] []

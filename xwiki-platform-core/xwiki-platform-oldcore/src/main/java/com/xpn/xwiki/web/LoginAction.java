@@ -16,16 +16,23 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class LoginAction extends XWikiAction {
-	public String render(XWikiContext context) throws XWikiException {
-		context.getResponse().setStatus(401);
+/**
+ * Action for displaying the login form.
+ * 
+ * @version $Id$
+ */
+public class LoginAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        context.getResponse().setStatus(401);
         return "login";
-	}
+    }
 }

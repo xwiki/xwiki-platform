@@ -31,9 +31,7 @@ import org.apache.jackrabbit.webdav.WebdavRequest;
  */
 public class XWikiDavSessionProvider implements DavSessionProvider
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean attachSession(WebdavRequest request) throws DavException
     {
         // Retrieve the workspace name.
@@ -47,9 +45,7 @@ public class XWikiDavSessionProvider implements DavSessionProvider
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void releaseSession(WebdavRequest request)
     {
         DavSession ds = request.getDavSession();

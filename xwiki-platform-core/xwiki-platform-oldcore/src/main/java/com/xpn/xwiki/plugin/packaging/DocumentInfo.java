@@ -16,13 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.plugin.packaging;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -30,7 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class DocumentInfo
 {
-    private static final Log log = LogFactory.getLog(DocumentInfo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentInfo.class);
 
     private XWikiDocument doc;
 
@@ -111,9 +109,9 @@ public class DocumentInfo
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
-        if (log.isDebugEnabled()) {
-            log.debug("Package test install document " + ((doc == null) ? "" : getFullName())
-                + " " + ((doc == null) ? "" : getLanguage()));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Package test install document " + ((doc == null) ? "" : getFullName()) + " "
+                + ((doc == null) ? "" : getLanguage()));
         }
 
         installable = INSTALL_IMPOSSIBLE;
@@ -145,9 +143,9 @@ public class DocumentInfo
             installable = INSTALL_OK;
             return installable;
         } finally {
-            if (log.isDebugEnabled()) {
-                log.debug("Package test install document " + ((doc == null) ? "" : getFullName())
-                    + " " + ((doc == null) ? "" : getLanguage()) + " result " + installable);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Package test install document " + ((doc == null) ? "" : getFullName()) + " "
+                    + ((doc == null) ? "" : getLanguage()) + " result " + installable);
             }
         }
     }

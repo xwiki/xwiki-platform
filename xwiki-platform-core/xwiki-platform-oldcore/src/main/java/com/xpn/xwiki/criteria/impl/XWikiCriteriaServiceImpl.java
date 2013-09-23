@@ -1,5 +1,6 @@
 /*
- * Copyright 2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -15,34 +16,45 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.criteria.impl;
 
-import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 
 public class XWikiCriteriaServiceImpl implements XWikiCriteriaService
 {
-    public XWikiCriteriaServiceImpl(XWikiContext context) {}
-    
-    public DurationFactory getDurationFactory() {
+    public XWikiCriteriaServiceImpl(XWikiContext context)
+    {
+    }
+
+    @Override
+    public DurationFactory getDurationFactory()
+    {
         return new DurationFactory();
     }
 
-    public PeriodFactory getPeriodFactory() {
+    @Override
+    public PeriodFactory getPeriodFactory()
+    {
         return new PeriodFactory();
     }
 
-    public RangeFactory getRangeFactory() {
+    @Override
+    public RangeFactory getRangeFactory()
+    {
         return new RangeFactory();
     }
 
-    public RevisionCriteriaFactory getRevisionCriteriaFactory() {
+    @Override
+    public RevisionCriteriaFactory getRevisionCriteriaFactory()
+    {
         return new RevisionCriteriaFactory();
     }
 
-    public ScopeFactory getScopeFactory() {
+    @Override
+    public ScopeFactory getScopeFactory()
+    {
         return new ScopeFactory();
     }
 }

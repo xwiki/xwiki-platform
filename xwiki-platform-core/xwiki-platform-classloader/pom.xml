@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-classloader</artifactId>
   <name>XWiki Platform - ClassLoader - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - ClassLoader - Parent POM</description>
   <modules>
-    <module>xwiki-platform-classloader-api</module>
     <module>xwiki-platform-classloader-protocols</module>
+    <module>xwiki-platform-classloader-xwiki</module>
   </modules>
 </project>

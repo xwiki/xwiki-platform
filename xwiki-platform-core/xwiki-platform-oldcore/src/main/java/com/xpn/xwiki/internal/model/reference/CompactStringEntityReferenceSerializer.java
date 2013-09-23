@@ -19,32 +19,34 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Generate an entity reference string that doesn't contain reference parts that are the same as the current entity in
- * the execution context. Note that the terminal part is always kept (eg the document's page for a document reference or
- * the attachment's filename for an attachment reference).
+ * Generate an entity reference string that doesn't contain reference parts that are the same as either the current
+ * entity in the execution context or as the passed entity reference (if any).
+ * Note that the terminal part is always kept (eg the document's page for a document reference or the attachment's
+ * filename for an attachment reference).
  * 
  * @version $Id$
  * @since 2.2M1
  */
-@Component("compact")
+@Component
+@Singleton
+@Named("compact")
 public class CompactStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private EntityReferenceValueProvider provider;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer#serializeEntityReference(org.xwiki.model.reference.EntityReference, java.lang.StringBuilder, boolean, java.lang.Object[])
-     */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
@@ -57,7 +59,7 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
 
-        if (currentReference.getChild() == null || isLastReference || representation.length() > 0) {
+        if (isLastReference || representation.length() > 0) {
             shouldPrint = true;
         } else {
             String defaultName = resolveDefaultValue(currentReference.getType(), parameters);

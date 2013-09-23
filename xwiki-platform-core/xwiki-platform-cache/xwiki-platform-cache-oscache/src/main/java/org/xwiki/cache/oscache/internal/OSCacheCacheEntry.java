@@ -51,31 +51,19 @@ public class OSCacheCacheEntry<T> implements org.xwiki.cache.CacheEntry<T>
         this.entry = entry;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheEntry#getCache()
-     */
+    @Override
     public Cache<T> getCache()
     {
         return this.cache;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheEntry#getValue()
-     */
+    @Override
     public T getValue()
     {
         return (T) entry.getContent();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheEntry#getKey()
-     */
+    @Override
     public String getKey()
     {
         return this.cache.apiKey(entry.getKey());

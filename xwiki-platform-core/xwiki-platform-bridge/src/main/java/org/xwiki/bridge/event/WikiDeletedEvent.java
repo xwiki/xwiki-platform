@@ -36,9 +36,7 @@ public class WikiDeletedEvent extends AbstractWikiEvent
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructor initializing the event filter with an
-     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other document delete event.
+     * Matches all {@link WikiDeletedEvent} events.
      */
     public WikiDeletedEvent()
     {

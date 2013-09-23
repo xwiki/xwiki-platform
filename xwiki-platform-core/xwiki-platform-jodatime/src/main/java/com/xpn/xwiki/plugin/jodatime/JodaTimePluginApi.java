@@ -22,7 +22,9 @@ package com.xpn.xwiki.plugin.jodatime;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.MutableDateTime;
+import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -157,5 +159,32 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
     public DateTimeZone getTimezone(int offsetHours, int offsetMinutes)
     {
         return getProtectedPlugin().getTimezone(offsetHours, offsetMinutes);
+    }
+
+    /**
+     * @see org.joda.time.Duration#Duration(long)
+     * @see JodaTimePlugin#getDuration(long)
+     */
+    public Duration getDuration(long millis)
+    {
+        return getProtectedPlugin().getDuration(millis);
+    }
+
+    /**
+     * @see org.joda.time.Duration#Duration(ReadableInstant, ReadableInstant)
+     * @see JodaTimePlugin#getDuration(ReadableInstant, ReadableInstant)
+     */
+    public Duration getDuration(ReadableInstant from, ReadableInstant to)
+    {
+        return getProtectedPlugin().getDuration(from, to);
+    }
+
+    /**
+     * @return an ISO8601 date time formatter
+     * @since 5.2RC1
+     */
+    public DateTimeFormatter getISODateTimeFormatter()
+    {
+        return getProtectedPlugin().getISODateTimeFormatter();
     }
 }

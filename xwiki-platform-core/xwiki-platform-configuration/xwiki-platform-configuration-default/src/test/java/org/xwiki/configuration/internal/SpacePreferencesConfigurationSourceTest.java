@@ -21,11 +21,15 @@ package org.xwiki.configuration.internal;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 /**
  * Unit tests for {@link org.xwiki.configuration.internal.SpacePreferencesConfigurationSource}.
@@ -33,36 +37,37 @@ import org.xwiki.test.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.4M2
  */
-public class SpacePreferencesConfigurationSourceTest extends AbstractComponentTestCase
+@MockingRequirement(SpacePreferencesConfigurationSource.class)
+public class SpacePreferencesConfigurationSourceTest extends AbstractMockingComponentTestCase
 {
-    private DocumentAccessBridge bridge;
+    private ConfigurationSource source;
 
-    @Override
-    protected void registerComponents() throws Exception
+    @Before
+    public void configure() throws Exception
     {
-        super.registerComponents();
-        this.bridge = registerMockComponent(DocumentAccessBridge.class);
+        this.source = getComponentManager().getInstance(ConfigurationSource.class, "space");
     }
 
     @Test
-    public void testGetPropertyForStringWhenExists() throws Exception
+    public void getPropertyForStringWhenExists() throws Exception
     {
-        ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class, "space");
-
         final DocumentReference webPreferencesReference = new DocumentReference("wiki", "space", "WebPreferences");
+        final DocumentReference xwikiPreferencesReference = new DocumentReference("wiki", "XWiki", "XWikiPreferences");
         final DocumentReference currentDocument = new DocumentReference("wiki", "space", "page");
 
+        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
         getMockery().checking(new Expectations() {{
-            allowing(bridge).getCurrentDocumentReference();
+            allowing(dab).getCurrentDocumentReference();
                 will(returnValue(currentDocument));
-            oneOf(bridge).getProperty(webPreferencesReference, webPreferencesReference, "key");
+            allowing(modelContext).getCurrentEntityReference();
+                will(returnValue(new WikiReference("wiki")));
+            oneOf(dab).getProperty(webPreferencesReference, xwikiPreferencesReference, "key");
                 will(returnValue("value"));
         }});
 
-        String result = source.getProperty("key", String.class);
+        String result = this.source.getProperty("key", String.class);
 
         Assert.assertEquals("value", result);
-        // Check that the current document reference is not modified
-        Assert.assertEquals(currentDocument.getName(), currentDocument.getParent().getChild().getName());
     }
 }

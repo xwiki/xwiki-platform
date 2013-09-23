@@ -21,7 +21,7 @@ package org.xwiki.observation.remote;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Provide configuration for remote observation manager.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M3
  */
-@ComponentRole
+@Role
 public interface RemoteObservationManagerConfiguration
 {
     /**

@@ -49,11 +49,7 @@ public class DefaultRemoteObservationManagerContext implements RemoteObservation
     @Inject
     private Execution execution;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManagerContext#isRemoteState()
-     */
+    @Override
     public boolean isRemoteState()
     {
         ExecutionContext context = this.execution.getContext();
@@ -61,21 +57,13 @@ public class DefaultRemoteObservationManagerContext implements RemoteObservation
         return context != null && context.getProperty(REMOTESTATE) == Boolean.TRUE;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManagerContext#pushRemoteState()
-     */
+    @Override
     public void pushRemoteState()
     {
         this.execution.getContext().setProperty(REMOTESTATE, Boolean.TRUE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManagerContext#popRemoteState()
-     */
+    @Override
     public void popRemoteState()
     {
         this.execution.getContext().setProperty(REMOTESTATE, Boolean.FALSE);

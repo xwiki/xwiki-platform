@@ -19,23 +19,22 @@
  */
 package org.xwiki.gwt.wysiwyg.client.widget.wizard.util;
 
-import java.util.EnumSet;
-
-import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
- * Abstract {@link WizardStep} to implement basic selector functions (storing edited data on
+ * Abstract interactive wizard step to implement basic selector functions (storing edited data on
  * {@link #init(Object, AsyncCallback)} and returning on {@link #getResult()}, step names, directions, initialization),
  * regardless of the actual selecting method.
  * 
  * @param <T> the type of data edited by this wizard step
  * @version $Id$
  */
-public abstract class AbstractSelectorWizardStep<T> implements WizardStep
+public abstract class AbstractSelectorWizardStep<T> extends AbstractInteractiveWizardStep
 {
     /**
      * The data edited by this wizard step.
@@ -43,7 +42,29 @@ public abstract class AbstractSelectorWizardStep<T> implements WizardStep
     private T data;
 
     /**
+     * Default constructor.
+     */
+    public AbstractSelectorWizardStep()
+    {
+        this(new FlowPanel());
+    }
+
+    /**
+     * Creates a new step that uses the given panel.
+     * 
+     * @param panel the panel where to place the step's widgets
+     */
+    public AbstractSelectorWizardStep(FlowPanel panel)
+    {
+        super(panel);
+
+        setDirectionName(NavigationDirection.NEXT, Strings.INSTANCE.select());
+    }
+
+    /**
      * {@inheritDoc}
+     * 
+     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
      */
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
@@ -55,7 +76,7 @@ public abstract class AbstractSelectorWizardStep<T> implements WizardStep
     /**
      * Initializes the selection on {@link #init(Object, AsyncCallback)} time.
      * 
-     * @param initCallback the initialization callback, to handle asynchronous initialization.
+     * @param initCallback the initialization callback, to handle asynchronous initialization
      */
     protected void initializeSelection(AsyncCallback< ? > initCallback)
     {
@@ -64,17 +85,8 @@ public abstract class AbstractSelectorWizardStep<T> implements WizardStep
 
     /**
      * {@inheritDoc}
-     */
-    public String getDirectionName(NavigationDirection direction)
-    {
-        if (direction == NavigationDirection.NEXT) {
-            return Strings.INSTANCE.select();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
+     * 
+     * @see AbstractInteractiveWizardStep#getResult()
      */
     public Object getResult()
     {
@@ -82,15 +94,7 @@ public abstract class AbstractSelectorWizardStep<T> implements WizardStep
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public EnumSet<NavigationDirection> getValidDirections()
-    {
-        return EnumSet.of(NavigationDirection.NEXT, NavigationDirection.PREVIOUS, NavigationDirection.CANCEL);
-    }
-
-    /**
-     * @return the data configured by this {@link WizardStep}
+     * @return the data configured by this wizard step
      */
     public T getData()
     {

@@ -19,12 +19,10 @@
  */
 package org.xwiki.model.reference;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 
-import java.util.Arrays;
-import java.util.List;
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link AttachmentReference}.
@@ -52,7 +50,7 @@ public class AttachmentReferenceTest
             new AttachmentReference("filename", null);
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [null] for an attachment reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [null] in an attachment reference", expected.getMessage());
         }
     }
 
@@ -63,8 +61,8 @@ public class AttachmentReferenceTest
             new AttachmentReference(new EntityReference("filename", EntityType.ATTACHMENT, new WikiReference("wiki")));
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [name = [wiki], type = [WIKI], parent = [null]] for an "
-                + "attachment reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [Wiki wiki] in an attachment reference",
+                expected.getMessage());
         }
     }
 }

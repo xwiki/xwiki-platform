@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.util.Enumeration;
@@ -31,21 +29,25 @@ public class MyFilterConfig implements FilterConfig
 {
     protected Hashtable params = new Hashtable();
 
+    @Override
     public String getFilterName()
     {
         return null;
     }
 
+    @Override
     public ServletContext getServletContext()
     {
         return null;
     }
 
+    @Override
     public String getInitParameter(String s)
     {
         return (String) params.get(s);
     }
 
+    @Override
     public Enumeration getInitParameterNames()
     {
         return params.keys();

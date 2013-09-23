@@ -43,11 +43,6 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Mock mockXWiki;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {

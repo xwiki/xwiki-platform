@@ -78,7 +78,8 @@ public class EmptyLinkFilter implements CommandListener
      */
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
-        if (SUBMIT.equals(command)) {
+        // We can assert if a link is visible only if the rich text area is visible.
+        if (SUBMIT.equals(command) && rta.isAttached() && rta.getElement().getOffsetWidth() > 0) {
             for (Element anchor : getEmptyAnchors()) {
                 anchor.getParentNode().removeChild(anchor);
             }

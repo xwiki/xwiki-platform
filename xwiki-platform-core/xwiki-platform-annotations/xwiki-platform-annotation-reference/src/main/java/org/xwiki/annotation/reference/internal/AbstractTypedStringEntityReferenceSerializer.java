@@ -35,6 +35,7 @@ public abstract class AbstractTypedStringEntityReferenceSerializer implements Ty
      * 
      * @see TypedStringEntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference)
      */
+    @Override
     public String serialize(EntityReference reference)
     {
         // serialize

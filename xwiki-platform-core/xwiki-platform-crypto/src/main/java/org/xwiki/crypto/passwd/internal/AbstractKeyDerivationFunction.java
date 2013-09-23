@@ -54,31 +54,19 @@ public abstract class AbstractKeyDerivationFunction implements KeyDerivationFunc
     /** The default length in bytes of the derived key (output). */
     private final transient int defaultDerivedKeyLength = 32;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see: org.xwiki.crypto.KeyDerivationFunction#serialize()
-     */
+    @Override
     public byte[] serialize() throws IOException
     {
         return SerializationUtils.serialize(this);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see KeyDerivationFunction#init()
-     */
+    @Override
     public void init()
     {
         this.init(this.getDefaultMillisecondsOfProcessorTime(), this.getDefaultDerivedKeyLength());
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see KeyDerivationFunction#init(Properties)
-     */
+    @Override
     public void init(Properties parameters)
     {
         int keyLength = this.getDefaultDerivedKeyLength();
@@ -98,11 +86,7 @@ public abstract class AbstractKeyDerivationFunction implements KeyDerivationFunc
         this.init(milliseconds, keyLength);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see KeyDerivationFunction#init(int, int)
-     */
+    @Override
     public void init(final int millisecondsOfProcessorTimeToSpend,
                      final int derivedKeyLength)
     {

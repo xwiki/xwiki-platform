@@ -20,16 +20,15 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.image.ui;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
-import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
@@ -46,14 +45,14 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Wizard step to configure the image parameters.
  * 
  * @version $Id$
  */
-public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, SourcesNavigationEvents
+public class ImageConfigWizardStep extends AbstractInteractiveWizardStep implements KeyPressHandler,
+    SourcesNavigationEvents
 {
     /**
      * The style for the information labels.
@@ -98,19 +97,16 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
     private TextBox altTextBox;
 
     /**
-     * The panel holding the input for the label of the built link.
-     */
-    private final Panel mainPanel = new FlowPanel();
-
-    /**
      * Default constructor.
      */
     public ImageConfigWizardStep()
     {
-        mainPanel.addStyleName("xImageConfig");
-        mainPanel.add(getSizePanel());
-        mainPanel.add(getAltTextPanel());
-        mainPanel.add(getAlignmentPanel());
+        setStepTitle(Strings.INSTANCE.imageConfigTitle());
+
+        display().addStyleName("xImageConfig");
+        display().add(getSizePanel());
+        display().add(getAltTextPanel());
+        display().add(getAlignmentPanel());
     }
 
     /**
@@ -307,14 +303,6 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
     /**
      * {@inheritDoc}
      */
-    public Widget display()
-    {
-        return mainPanel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         String altText = altTextBox.getText().trim();
@@ -340,45 +328,6 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
     public Object getResult()
     {
         return entityLink;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getNextStep()
-    {
-        // This is the last step in the wizard.
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.imageConfigTitle();
-    }
-
-    /**
-     * {@inheritDoc}. Configure this as the last wizard step, by default, allowing to finish, cancel or go to previous
-     * step if the navigation stack is not empty at this point.
-     */
-    public EnumSet<NavigationDirection> getValidDirections()
-    {
-        return EnumSet.of(NavigationDirection.FINISH, NavigationDirection.CANCEL, NavigationDirection.PREVIOUS);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDirectionName(NavigationDirection direction)
-    {
-        switch (direction) {
-            case FINISH:
-                return Strings.INSTANCE.imageCreateImageButton();
-            default:
-                return null;
-        }
     }
 
     /**

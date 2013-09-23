@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>ClassSheetGenerator</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1319614909000</creationDate>
+  <date>1319622530000</date>
+  <contentUpdateDate>1319622530000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity filter="none"}}
+#**
+ * Generic property display.
+ *#
+#macro(displayProperty $property $indentation)
+${indentation}; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;##
+#if ("$!property.hint" != '')${escapetool.h}${escapetool.h}
+${indentation}  (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
+#else
+
+#end
+${indentation}: ${escapetool.d}doc.display('$property.name')
+#end
+#**
+ * Unfortunately the custom display mechanism for properties doesn't offer a clean way to overwrite the display only when
+ * some conditions are met (e.g. a specific action) so we're putting the custom display code in the sheet.
+ *#
+#macro(displayBooleanProperty $property)
+  ${escapetool.h}if (${escapetool.d}context.display == 'edit')
+    ; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}doc.display('$property.name')${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;
+#if ("$!property.hint" != '')
+    : (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
+#end
+  ${escapetool.h}else
+#displayProperty($property '    ')
+  ${escapetool.h}end
+#end
+{{{##
+{{velocity}}
+{{html wiki="true"}}
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use('$doc.fullName'))
+#set ($translationBundleId = "$stringtool.removeEnd($doc.fullName, 'Class')Translations")
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '$translationBundleId'))
+## We don't have access to the form element to set the CSS class for the vertical form layout standard.
+(% class="xform" %)
+(((
+#foreach($property in $doc.getxWikiClass().properties)
+#set($displayFormType = $property.getProperty('displayFormType'))
+#if($property.type.indexOf('Boolean') != -1 &amp;&amp; "$!displayFormType.value" == 'checkbox')
+#displayBooleanProperty($property)
+#else
+#displayProperty($property '  ')
+#end
+#end
+)))
+{{/html}}
+{{/velocity}}##
+}}}
+{{/velocity}}</content>
+</xwikidoc>

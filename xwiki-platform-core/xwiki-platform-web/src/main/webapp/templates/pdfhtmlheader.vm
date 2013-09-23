@@ -14,13 +14,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>
-##
-## We'll keep calling the next line before each property display. This is intentional, since one of the fields could
-## also call doc.use with a different object, thus setting a different current object. Don't try to optimize by
-## reducing the duplication!
-##
-$pdfdoc.use('XWiki.PDFClass')
-#set ($title = $pdfdoc.display('title', 'rendered'))
+## NOTE: We intentionally use the signature with 4 arguments (3 strings and an object) because the signature without the
+## prefix (empty string here) is mistaken with the 3-strings signature if the passed object is null (i.e. Velocity
+## considers the null object a string).
+#set ($title = $pdfdoc.display('title', 'rendered', '', $pdfobj))
 #if ((!$title) || ($title == ''))
   $!{escapetool.xml($doc.space)} - $!{escapetool.xml($tdoc.plainTitle)}
 #else
@@ -28,11 +25,11 @@ $pdfdoc.use('XWiki.PDFClass')
 #end
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=${xwiki.encoding}" />
+<meta name="language" content="$!{xcontext.language}" />
 </head>
 <body id="body" class="${xcontext.action}body" pdfcover="${displayPdfCover}" pdftoc="${displayPdfToc}">
 <div class="pdfheader">
-$pdfdoc.use('XWiki.PDFClass')
-#set ($pdfheader = $pdfdoc.display('header', 'rendered'))
+#set ($pdfheader = $pdfdoc.display('header', 'rendered', '', $pdfobj))
 #if ($pdfheader == '')
   #template("pdfheader.vm")
 #else
@@ -40,8 +37,7 @@ $pdfdoc.use('XWiki.PDFClass')
 #end
 </div>
 <div class="pdffooter">
-$pdfdoc.use('XWiki.PDFClass')
-#set ($pdffooter = $pdfdoc.display('footer', 'rendered'))
+#set ($pdffooter = $pdfdoc.display('footer', 'rendered', '', $pdfobj))
 #if ($pdffooter == '')
   #template("pdffooter.vm")
 #else
@@ -50,8 +46,7 @@ $pdfdoc.use('XWiki.PDFClass')
 </div>
 #if ($displayPdfCover == 1)
   <div class="pdfcover">
-  $pdfdoc.use('XWiki.PDFClass')
-  #set ($pdfcover = $pdfdoc.display('cover', 'rendered'))
+  #set ($pdfcover = $pdfdoc.display('cover', 'rendered', '', $pdfobj))
   #if ($pdfcover == '')
     #template("pdfcover.vm")
   #else
@@ -61,8 +56,7 @@ $pdfdoc.use('XWiki.PDFClass')
 #end
 #if ($displayPdfToc == 1)
   <div class="pdftoc">
-  $pdfdoc.use('XWiki.PDFClass')
-  #set ($pdftoc = $pdfdoc.display('toc', 'rendered'))
+  #set ($pdftoc = $pdfdoc.display('toc', 'rendered', '', $pdfobj))
   #if ($pdftoc == '')
     #template("pdftoc.vm")
   #else

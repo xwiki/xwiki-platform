@@ -30,18 +30,29 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeTypes;
-import org.xwiki.container.Container;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * Action responsible for downloading temporary resources created by various modules. Refer JIRA issue:
- * <a>http://jira.xwiki.org/jira/browse/XWIKI-5227</a>.
+ * Action responsible for downloading temporary resources created by various modules. The temporary resource is put
+ * in the temporary directory in a directory named "temp" and in subdirectories
+ * "(module)/(wiki)/(space)/(page)/(file)" where:
+ * <ul>
+ *   <li>(module): it's the 3rd path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ *   <li>(wiki): the name of the current wiki (extracted from the URL too)</li>
+ *   <li>(space): it's the 1st path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ *   <li>(page): it's the 2nd path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ *   <li>(file): it's the 4th path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
+ * </ul>
+ * <p/>
+ * For example if the URL is {@code http://localhost:8080/xwiki/bin/temp/Main/WebHome/test/test.png} then the resource
+ * will be fetched from {@code TMPDIR/temp/test/xwiki/Main/WebHome/test.png}.
  * 
  * @version $Id$
  * @since 2.4M1
@@ -61,7 +72,7 @@ public class TempResourceAction extends XWikiAction
     /**
      * Logging support.
      */
-    private static final Log LOG = LogFactory.getLog(TempResourceAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TempResourceAction.class);
 
     /**
      * Used for detecting mime-types of files.
@@ -69,13 +80,11 @@ public class TempResourceAction extends XWikiAction
     private Tika tika = new Tika();
 
     /**
-     * Used to resolve temporary working dir.
+     * Used to find the temporary dir.
      */
-    private Container container = Utils.getComponent(Container.class);
+    private Environment environment = Utils.getComponent(Environment.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
@@ -95,8 +104,9 @@ public class TempResourceAction extends XWikiAction
         try {
             contentType = tika.detect(tempFile);
         } catch (IOException ex) {
-            LOG.warn(String.format("Unable to determine mime type for temporary resource [%s]", tempFile
-                .getAbsolutePath()), ex);
+            LOGGER.warn(
+                String.format("Unable to determine mime type for temporary resource [%s]", tempFile.getAbsolutePath()),
+                ex);
         }
         response.setContentType(contentType);
         try {
@@ -115,7 +125,6 @@ public class TempResourceAction extends XWikiAction
      * @param uri request URI.
      * @param context xwiki context.
      * @return temporary file corresponding to the specified URI or null if no such file can be located.
-     * @throws UnsupportedEncodingException
      */
     protected File getTemporaryFile(String uri, XWikiContext context)
     {
@@ -135,7 +144,7 @@ public class TempResourceAction extends XWikiAction
             String prefix = String.format("temp/%s/%s/%s/%s/", module, wiki, space, page);
             String path = URI.create(prefix + filePath).normalize().toString();
             if (path.startsWith(prefix)) {
-                result = new File(container.getApplicationContext().getTemporaryDirectory(), path);
+                result = new File(this.environment.getTemporaryDirectory(), path);
                 result = result.exists() ? result : null;
             }
         }

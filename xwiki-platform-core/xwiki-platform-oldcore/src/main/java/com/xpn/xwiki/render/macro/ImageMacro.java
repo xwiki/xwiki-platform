@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -54,6 +54,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class ImageMacro extends BaseLocaleMacro
 {
+    @Override
     public String getLocaleKey()
     {
         return "macro.image";

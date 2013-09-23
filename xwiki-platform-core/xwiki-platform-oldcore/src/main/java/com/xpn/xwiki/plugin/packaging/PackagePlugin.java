@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.plugin.packaging;
 
 import com.xpn.xwiki.XWikiContext;
@@ -28,18 +26,19 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
-
     public PackagePlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
     }
 
+    @Override
     public String getName()
     {
         return "package";
     }
 
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         try {
@@ -49,10 +48,12 @@ public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         }
     }
 
+    @Override
     public void flushCache()
     {
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);

@@ -19,15 +19,15 @@
  */
 package org.xwiki.container.servlet.filters;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
-
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Allows to save a request and restore it later from the stored request identifier (SRID).
@@ -39,15 +39,18 @@ public final class SavedRequestManager
 {
     /** The name of the parameter used for identifying a saved request in a new request. */
     private static final String SAVED_REQUESTS_IDENTIFIER = "srid";
-    
+
     /** The key used for storing request data in the HTTP session. */
     private static final String SAVED_REQUESTS_KEY = SavedRequest.class.getCanonicalName() + "_SavedRequests";
 
     /**
      * Saved request data. Only request parameter are stored, along with the requested URL.
      */
-    public static class SavedRequest
+    public static class SavedRequest implements Serializable
     {
+        /** Unique serialization identifier. */
+        private static final long serialVersionUID = 8779129900717599986L;
+
         /** Saved request data. */
         private Map<String, String[]> parameters;
 
@@ -206,4 +209,3 @@ public final class SavedRequestManager
         return null;
     }
 }
-

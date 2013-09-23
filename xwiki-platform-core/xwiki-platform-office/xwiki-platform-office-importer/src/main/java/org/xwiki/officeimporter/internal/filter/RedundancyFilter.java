@@ -52,14 +52,13 @@ public class RedundancyFilter extends AbstractHTMLFilter
         TAG_EM, TAG_STRONG, TAG_DFN, TAG_CODE, TAG_SAMP, TAG_KBD, TAG_VAR, TAG_CITE, TAG_ABBR,
         TAG_ACRONYM, TAG_ADDRESS, TAG_BLOCKQUOTE, TAG_Q, TAG_PRE, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6};
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         List<Element> elementsWithNoAttributes =
             filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_ATTRIBUTES_TAGS, new ElementSelector()
             {
+                @Override
                 public boolean isSelected(Element element)
                 {
                     return !element.hasAttributes();
@@ -71,6 +70,7 @@ public class RedundancyFilter extends AbstractHTMLFilter
         List<Element> elementsWithNoContent =
             filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_CONTENT_TAGS, new ElementSelector()
             {
+                @Override
                 public boolean isSelected(Element element)
                 {
                     return element.getTextContent().trim().equals("");

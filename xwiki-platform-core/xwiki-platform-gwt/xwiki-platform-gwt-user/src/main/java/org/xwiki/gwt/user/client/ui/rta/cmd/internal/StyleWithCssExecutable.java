@@ -47,11 +47,7 @@ public class StyleWithCssExecutable extends AbstractRichTextAreaExecutable
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         boolean styleWithCSS = Boolean.valueOf(parameter);
@@ -62,11 +58,7 @@ public class StyleWithCssExecutable extends AbstractRichTextAreaExecutable
         return success;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         String parameter = rta.getDocument().queryCommandValue(Command.STYLE_WITH_CSS.toString());
@@ -79,33 +71,21 @@ public class StyleWithCssExecutable extends AbstractRichTextAreaExecutable
         return parameter;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return super.isEnabled() && rta.getDocument().queryCommandEnabled(Command.STYLE_WITH_CSS.toString())
             || rta.getDocument().queryCommandEnabled(USE_CSS.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         return rta.getDocument().queryCommandState(Command.STYLE_WITH_CSS.toString())
             || rta.getDocument().queryCommandState(USE_CSS.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return super.isSupported()

@@ -1,0 +1,35 @@
+#if ("$!{request.forceTestRights}" == "1")#template("xwikivars.vm")#end
+#set($attachments = $sorttool.sort($doc.attachmentList, ['date:desc']))
+#if($attachments.size() > 0)
+  <ul class="xlist">
+  #foreach ($attach in $attachments)
+    #set($url = $doc.getURL('import', "${baseQueryString}&amp;file=${escapetool.url($attach.filename).replace('+', '%20')}"))
+    #if("$!request.file" == "$!attach.filename") #set($extra = 'active') #else #set($extra = '') #end
+    <li class="xitem xhighlight">
+      <div class="xitemcontainer package $!extra">
+        <div class="name">
+          <a href="$!url" class="package" title="$services.localization.render('core.importer.selectThisPackage')">
+            #set($maxnamelength = 40)
+            #packName($attach.filename)
+          </a>
+          <span class="version">$attach.version</span>
+          <span class="xwikibuttonlinks">
+            #set($redirect = $doc.getURL('import', 'section=Import'))
+            #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}&amp;form_token=$!{services.csrf.getToken()}"))
+            <a class="deletelink" href="${attachurl}"
+               title="$services.localization.render('core.viewers.attachments.delete.title')"></a>
+          </span>
+        </div>
+        <div class="infos">
+          $services.localization.render('core.importer.packageInformationExtract', [
+            $xwiki.getUserName($attach.author, true),
+            $!xwiki.formatDate($attach.date)
+          ]) - <span class="size">(#dynamicsize($attach.filesize))</span>
+        </div>
+      </div>
+    </li>
+  #end
+  </ul>
+#else
+  #warning($services.localization.render('core.importer.noPackageAvailable'))
+#end

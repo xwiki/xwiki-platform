@@ -27,26 +27,29 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>3.1-SNAPSHOT</version>
-    <relativePath>../xwiki-commons/xwiki-commons-pom</relativePath>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>3.1-SNAPSHOT</version>
+  <version>5.2-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
+    <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
+    <platform.version>${commons.version}</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
-    <rendering.version>${project.version}</rendering.version>
-    <commons.version>${project.version}</commons.version>
-    <!-- The previous stable version of this project, used to catch API breakages. -->
-    <clirr.previous.version>3.0</clirr.previous.version>
+    <rendering.version>${platform.version}</rendering.version>
+    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
+    <hsqldb.version>2.3.0</hsqldb.version>
+    <!-- Version of SmartGWT that we use in platform for the XWiki Explorer Tree. -->
+    <smartgwt.version>3.1</smartgwt.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
-    <url>https://github.com/xwiki/xwiki-platform</url>
+    <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -56,4 +59,67 @@
     <module>xwiki-platform-tools</module>
     <module>xwiki-platform-core</module>
   </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <!-- Check license headers -->
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <includes>
+            <!-- At the moment, only check the license headers in Java file since we need to fix other types of files
+                 first -->
+            <include>**/*.java</include>
+            <include>**/*.bat</include>
+            <include>**/*.sh</include>
+          </includes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <!-- Verify that all org.xwiki.commons dependencies in Commons have a version specified either as:
+               - ${commons.version}
+               - a value not starting with $ (we want to allow supporting ranges)
+               Also verifies that all org.xwiki.rendering dependencies in Commons have a version specified either as:
+               - ${rendering.version}
+               - a value not starting with $ (we want to allow supporting ranges)
+               Also verifies that all org.xwiki.platform dependencies in Commons have a version specified either as:
+               - ${project.version}
+               - a value not starting with $ (we want to allow supporting ranges)
+          -->
+          <execution>
+            <id>check-dependency-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
+                    <allowedVersionRegex>\$\{commons.version\}|[^$].*</allowedVersionRegex>
+                  </versionCheck>
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.rendering</groupIdPrefix>
+                    <allowedVersionRegex>\$\{rendering.version\}|[^$].*</allowedVersionRegex>
+                  </versionCheck>
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.platform</groupIdPrefix>
+                    <allowedVersionRegex>\$\{project.version\}|[^$].*</allowedVersionRegex>
+                  </versionCheck>
+                </validateDependencyVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

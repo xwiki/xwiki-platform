@@ -16,15 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.xpn.xwiki.util.Util;
 
@@ -62,6 +60,8 @@ public class EditForm extends XWikiForm
 
     private String syntaxId;
 
+    private String hidden;
+
     @Override
     public void readRequest()
     {
@@ -81,6 +81,7 @@ public class EditForm extends XWikiForm
         setLockForce("1".equals(request.getParameter("force")));
         setMinorEdit(request.getParameter("minorEdit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
+        setHidden(request.getParameter("xhidden"));
     }
 
     public void setTags(String[] parameter)
@@ -268,4 +269,15 @@ public class EditForm extends XWikiForm
     {
         this.syntaxId = syntaxId;
     }
+
+    public String getHidden()
+    {
+        return this.hidden;
+    }
+
+    public void setHidden(String hidden)
+    {
+        this.hidden = hidden;
+    }
+
 }

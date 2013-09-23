@@ -16,12 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.doc;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.dom4j.Document;
@@ -94,7 +94,7 @@ public class LazyXWikiDocument extends XWikiDocument
                 (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
 
             XWikiDocument doc = new XWikiDocument(getDocumentReference());
-            doc.setLanguage(this.language);
+            doc.setLocale(getLocale());
 
             String currentWiki = context.getDatabase();
             try {
@@ -133,26 +133,6 @@ public class LazyXWikiDocument extends XWikiDocument
         return this.document;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getLanguage()
-     */
-    @Override
-    public String getLanguage()
-    {
-        if (this.language == null) {
-            return getDocument().getLanguage();
-        } else {
-            return this.language;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getRCSVersion()
-     */
     @Override
     public Version getRCSVersion()
     {
@@ -163,397 +143,216 @@ public class LazyXWikiDocument extends XWikiDocument
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getContent()
-     */
     @Override
     public String getContent()
     {
         return getDocument().getContent();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getXObjects()
-     */
     @Override
     public Map<DocumentReference, List<BaseObject>> getXObjects()
     {
         return getDocument().getXObjects();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getXClass()
-     */
     @Override
     public BaseClass getXClass()
     {
         return getDocument().getXClass();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getXClassXML()
-     */
     @Override
     public String getXClassXML()
     {
         return getDocument().getXClassXML();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getAuthor()
-     */
     @Override
-    public String getAuthor()
+    public DocumentReference getAuthorReference()
     {
-        return getDocument().getAuthor();
+        return getDocument().getAuthorReference();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getContentAuthor()
-     */
     @Override
-    public String getContentAuthor()
+    public DocumentReference getContentAuthorReference()
     {
-        return getDocument().getContentAuthor();
+        return getDocument().getContentAuthorReference();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getCreator()
-     */
     @Override
-    public String getCreator()
+    public DocumentReference getCreatorReference()
     {
-        return getDocument().getCreator();
+        return super.getCreatorReference();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getDate()
-     */
     @Override
     public Date getDate()
     {
         return getDocument().getDate();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getCreationDate()
-     */
     @Override
     public Date getCreationDate()
     {
         return getDocument().getCreationDate();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getContentUpdateDate()
-     */
     @Override
     public Date getContentUpdateDate()
     {
         return getDocument().getContentUpdateDate();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getMeta()
-     */
     @Override
     public String getMeta()
     {
         return getDocument().getMeta();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getTitle()
-     */
     @Override
     public String getTitle()
     {
         return getDocument().getTitle();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getFormat()
-     */
     @Override
     public String getFormat()
     {
         return getDocument().getFormat();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getDefaultLanguage()
-     */
     @Override
-    public String getDefaultLanguage()
+    public Locale getDefaultLocale()
     {
-        return getDocument().getDefaultLanguage();
+        return getDocument().getDefaultLocale();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getTranslation()
-     */
     @Override
     public int getTranslation()
     {
         return getDocument().getTranslation();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getCustomClass()
-     */
     @Override
     public String getCustomClass()
     {
         return getDocument().getCustomClass();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getRelativeParentReference()
-     */
     @Override
     protected EntityReference getRelativeParentReference()
     {
         return getDocument().getRelativeParentReference();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getParentReference()
-     */
     @Override
     public DocumentReference getParentReference()
     {
         return getDocument().getParentReference();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getElements()
-     */
     @Override
     public int getElements()
     {
         return getDocument().getElements();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getDefaultTemplate()
-     */
     @Override
     public String getDefaultTemplate()
     {
         return getDocument().getDefaultTemplate();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getValidationScript()
-     */
     @Override
     public String getValidationScript()
     {
         return getDocument().getValidationScript();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getComment()
-     */
     @Override
     public String getComment()
     {
         return getDocument().getComment();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getSyntax()
-     */
     @Override
     public Syntax getSyntax()
     {
         return getDocument().getSyntax();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#isHidden()
-     */
     @Override
     public Boolean isHidden()
     {
         return getDocument().isHidden();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getDocumentArchive()
-     */
     @Override
     public XWikiDocumentArchive getDocumentArchive()
     {
         return getDocument().getDocumentArchive();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#loadArchive(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void loadArchive(XWikiContext context) throws XWikiException
     {
         getDocument().loadArchive(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getDocumentArchive(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiDocumentArchive getDocumentArchive(XWikiContext context) throws XWikiException
     {
         return getDocument().getDocumentArchive(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getStore()
-     */
     @Override
     public XWikiStoreInterface getStore()
     {
         return getDocument().getStore();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getId()
-     */
     @Override
     public long getId()
     {
         return getDocument().getId();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getStore(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return getDocument().getStore(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getXDOM()
-     */
     @Override
     public XDOM getXDOM()
     {
         return getDocument().getXDOM();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getTags(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public String getTags(XWikiContext context)
     {
         return getDocument().getTags(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getTagsPossibleValues(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public List<String> getTagsPossibleValues(XWikiContext context)
     {
         return getDocument().getTagsPossibleValues(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#isFromCache()
-     */
     @Override
     public boolean isFromCache()
     {
         return getDocument().isFromCache();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#isMostRecent()
-     */
     @Override
     public boolean isMostRecent()
     {
         return getDocument().isMostRecent();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#toXMLDocument(boolean, boolean, boolean, boolean,
-     *      com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException
@@ -562,11 +361,6 @@ public class LazyXWikiDocument extends XWikiDocument
             .toXMLDocument(bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getWikiNode()
-     */
     @Override
     public Object getWikiNode()
     {

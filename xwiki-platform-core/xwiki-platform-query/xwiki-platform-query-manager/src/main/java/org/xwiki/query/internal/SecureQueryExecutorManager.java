@@ -22,9 +22,12 @@ package org.xwiki.query.internal;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
@@ -34,50 +37,60 @@ import org.xwiki.query.QueryExecutorManager;
  *
  * @version $Id$
  */
-//Note that we force the Component annotation so that this component is only registered as a QueryExecutorManager
-//and not a QueryExecutor too since we don't want this manager to be visible to users as a valid QueryExecutor
-//component.
-@Component(value = "secure", roles = { QueryExecutorManager.class })
+// Note that we force the Component annotation so that this component is only registered as a QueryExecutorManager
+// and not a QueryExecutor too since we don't want this manager to be visible to users as a valid QueryExecutor
+// component.
+@Component(roles = { QueryExecutorManager.class })
+@Named("secure")
+@Singleton
 public class SecureQueryExecutorManager implements QueryExecutorManager
 {
     /**
      * Nested {@link QueryExecutorManager}.
      */
-    @Requirement
+    @Inject
     private QueryExecutorManager nestedQueryExecutorManager;
 
     /**
-     * Bridge to xwiki-core for check programming right.
+     * Bridge to xwiki-core for checking programming right.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge bridge;
 
     /**
-     * {@inheritDoc}
+     * @param statement the statement to evaluate.
+     * @return true if the statement is complete, false otherwise.
      */
+    private boolean isShortFormStatement(String statement)
+    {
+        boolean isShortStatement = false;
+        String lcStatement = statement.trim().toLowerCase();
+
+        isShortStatement |= lcStatement.startsWith(", ");
+        isShortStatement |= lcStatement.startsWith("from");
+        isShortStatement |= lcStatement.startsWith("where");
+        isShortStatement |= lcStatement.startsWith("order");
+
+        return isShortStatement;
+    }
+
+    @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
-        if (query.getWiki() != null && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Query#setWiki requires programming right", query, null);
-        }
         if (query.isNamed() && !getBridge().hasProgrammingRights()) {
             throw new QueryException("Named queries requires programming right", query, null);
         }
-        // TODO: Make it possible to use HQL without programming rights for non-full statements.
-        if (!Query.XWQL.equals(query.getLanguage()) && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Query languages others than XWQL require programming right", query, null);
+        if (!Query.XWQL.equals(query.getLanguage()) && !Query.HQL.equals(query.getLanguage())
+                && !getBridge().hasProgrammingRights()) {
+            throw new QueryException("Query languages others than XWQL or HQL require programming right", query, null);
         }
-        // Note: We only need to check for select (and not update, delete, etc) since the XWQL parser only supports
-        // SELECT statements. 
-        if (query.getStatement().trim().toLowerCase().startsWith("select") && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Full form XWQL statements requires programming right", query, null);
+        if (!isShortFormStatement(query.getStatement()) && !getBridge().hasProgrammingRights()) {
+            throw new QueryException("Full form statements requires programming right", query, null);
         }
         return getNestedQueryExecutorManager().execute(query);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Set<String> getLanguages()
     {
         return getNestedQueryExecutorManager().getLanguages();
@@ -88,7 +101,7 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
      */
     protected DocumentAccessBridge getBridge()
     {
-        return bridge;
+        return this.bridge;
     }
 
     /**
@@ -96,6 +109,6 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
      */
     protected QueryExecutorManager getNestedQueryExecutorManager()
     {
-        return nestedQueryExecutorManager;
+        return this.nestedQueryExecutorManager;
     }
 }

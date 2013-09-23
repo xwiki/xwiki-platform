@@ -72,3 +72,44 @@ table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
 *+html #changes-info-box-to {
   margin-left: 0;
 }
+
+/* ----------------CSS3 adjustments----------------*/
+input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
+  #css_filterGradient($theme.buttonPrimaryGradientColor, $theme.buttonPrimaryBackgroundColor)
+}
+input.button:hover, .buttonwrapper a:hover{
+  #css_filterGradient($theme.buttonPrimaryBackgroundColor, $theme.buttonPrimaryGradientColor)
+}
+.buttonwrapper input.secondary, .buttonwrapper a.secondary, 
+.buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
+.buttonwrapper a.secondary:active /* Needed for IE6 */ {
+  #css_filterGradient($theme.buttonSecondaryGradientColor, $theme.buttonSecondaryBackgroundColor)
+}
+.actionmenu .tmCreate:hover .tme-extensible, .tmCreate  .tme-extensible {
+  #css_filterGradient('#4dececec','#00ececec')
+}
+.globalsearch input.button, .buttonwrapper a.attachment-picker-start {
+  filter: none;
+}
+/* Gradients containers for IE browsers */
+/* IE6-9 doesn't have support for CSS3 properties. Filters affect also child elements, so we can't apply filters on #mainmenu or #content because it will make the submenus inaccesible. The solution is a container that only holds the gradient colors. */
+#mainmenu .gradientfilterIE, #contentmenu .gradientfilterIE, #editmenu .gradientfilterIE {
+  min-height: 22px;
+  width: 100%;
+}
+#mainmenu .gradientfilterIE {
+  #css_filterGradient($theme.menuGradientColor, $theme.menuBackgroundColor)
+}
+#contentmenu .gradientfilterIE, #editmenu .gradientfilterIE, ul.xwikitabbar  {
+  #css_filterGradient($theme.menuContentGradientColor, $theme.menuContentBackgroundColor)
+ }
+h1.xwikipaneltitle {
+  #css_filterGradient($theme.panelHeaderGradientColor, $theme.panelHeaderBackgroundColor)
+ }
+.collapsed h1.xwikipaneltitle {
+  #css_filterGradient($theme.panelCollapsedGradientColor, $theme.panelCollapsedBackgroundColor)
+ }
+#mainmenu .componentcontainer, #contentmenu .componentcontainer, #editmenu .componentcontainer {
+  margin-top: -22px;
+}
+/* end IE gradient containers rules*/

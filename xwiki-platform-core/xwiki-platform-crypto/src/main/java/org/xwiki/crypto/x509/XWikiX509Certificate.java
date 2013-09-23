@@ -111,20 +111,12 @@ public class XWikiX509Certificate extends AbstractX509CertificateWrapper
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.crypto.data.internal.AbstractX509CertificateWrapper#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return this.fingerprint.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.crypto.data.internal.AbstractX509CertificateWrapper#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -138,10 +130,6 @@ public class XWikiX509Certificate extends AbstractX509CertificateWrapper
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see java.security.cert.Certificate#toString()
-     */
     @Override
     public String toString()
     {

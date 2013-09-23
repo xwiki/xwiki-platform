@@ -19,15 +19,15 @@
  */
 package com.xpn.xwiki.content.parsers;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Contains results data when parsing text in wiki syntax. The reason is that there can be syntax
- * errors found while parsing and we don't want to stop the parsing when these happen. Instead we
- * want to let the caller code be handle those errors as it sees fit. This is why we're returning
- * both the valid parsed elements in addition to the parsing errors.
- *
+ * Contains results data when parsing text in wiki syntax. The reason is that there can be syntax errors found while
+ * parsing and we don't want to stop the parsing when these happen. Instead we want to let the caller code be handle
+ * those errors as it sees fit. This is why we're returning both the valid parsed elements in addition to the parsing
+ * errors.
+ * 
  * @version $Id$
  */
 public class ParsingResultCollection
@@ -35,12 +35,12 @@ public class ParsingResultCollection
     /**
      * @see #getValidElements()
      */
-    private List validElements = new ArrayList();
+    private List<Object> validElements = new ArrayList<Object>();
 
     /**
-     * @see #getInvalidElementIds() 
+     * @see #getInvalidElementIds()
      */
-    private List invalidElementIds = new ArrayList();
+    private List<String> invalidElementIds = new ArrayList<String>();
 
     /**
      * @param validObject the object parsed when successful
@@ -51,8 +51,8 @@ public class ParsingResultCollection
     }
 
     /**
-     * @param elementId the id representing the source content which lead to a parsing error.
-     *        Usually this is the source content itself.
+     * @param elementId the id representing the source content which lead to a parsing error. Usually this is the source
+     *            content itself.
      */
     void addInvalidElementId(String elementId)
     {
@@ -68,8 +68,7 @@ public class ParsingResultCollection
     }
 
     /**
-     * @return the parsing errors returned as ids. Usually the id is the source content that was
-     *         supposed to be parsed
+     * @return the parsing errors returned as ids. Usually the id is the source content that was supposed to be parsed
      */
     public List getInvalidElementIds()
     {

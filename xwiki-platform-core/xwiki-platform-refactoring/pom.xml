@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring</artifactId>
   <name>XWiki Platform - Refactoring</name>
   <description>XWiki Platform - Refactoring</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -46,20 +49,8 @@
 
     <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
@@ -72,6 +63,19 @@
         <configuration>
           <excludes>
             <exclude>**/Abstract*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/refactoring/splitter/criterion/naming/HeadingNameNamingCriterion.java,
+            org/xwiki/refactoring/splitter/criterion/naming/PageIndexNamingCriterion.java,
+            org/xwiki/refactoring/splitter/criterion/SplittingCriterion.java,
+            org/xwiki/refactoring/WikiDocument.java
           </excludes>
         </configuration>
       </plugin>

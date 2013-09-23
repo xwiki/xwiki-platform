@@ -16,14 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +33,10 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -58,18 +58,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * modified, its content is cached again next time a key is asked.
  * 
  * @version $Id$
+ * @deprecated since 4.3M2 use {@link LocalizationManager} component instead
  */
+@Deprecated
 public class XWikiMessageTool
 {
     /**
-     * The encoding used for storing unicode characters as bytes.
-     */
-    public static final String BYTE_ENCODING = "UTF-8";
-
-    /**
      * Log4J logger object to log messages in this class.
      */
-    private static final Logger LOG = Logger.getLogger(XWikiMessageTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiMessageTool.class);
 
     /**
      * Property name used to defined internationalization document bundles in either XWikiProperties ("documentBundles")
@@ -90,6 +87,7 @@ public class XWikiMessageTool
     /**
      * The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading documents.
      */
+    @Deprecated
     protected XWikiContext context;
 
     /**
@@ -113,6 +111,21 @@ public class XWikiMessageTool
     private Set<Long> docsToRefresh = new HashSet<Long>();
 
     /**
+     * The localization manager.
+     */
+    private ContextualLocalizationManager localization;
+
+    /**
+     * @param localization the localization manager
+     * @param componentManager used to get the proper renderer
+     * @param context the XWiki context
+     */
+    public XWikiMessageTool(ContextualLocalizationManager localization)
+    {
+        this.localization = localization;
+    }
+
+    /**
      * @param bundle the default Resource Bundle to fall back to if no document bundle is found when trying to get a key
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
      *            documents
@@ -123,6 +136,11 @@ public class XWikiMessageTool
         this.context = context;
     }
 
+    protected XWikiContext getXWikiContext()
+    {
+        return this.context;
+    }
+
     /**
      * @param key the key identifying the message to look for
      * @return the message in the defined language. The message should be a simple string without any parameters. If you
@@ -131,14 +149,20 @@ public class XWikiMessageTool
      */
     public String get(String key)
     {
-        String translation = getTranslation(key);
-        if (translation == null) {
-            try {
-                translation = this.bundle.getString(key);
-            } catch (Exception e) {
-                translation = key;
+        String translation;
+        if (this.localization != null) {
+            translation = get(key, ArrayUtils.EMPTY_OBJECT_ARRAY);
+        } else {
+            translation = getTranslation(key);
+            if (translation == null) {
+                try {
+                    translation = this.bundle.getString(key);
+                } catch (Exception e) {
+                    translation = key;
+                }
             }
         }
+
         return translation;
     }
 
@@ -158,10 +182,34 @@ public class XWikiMessageTool
      */
     public String get(String key, List< ? > params)
     {
-        String translation = get(key);
-        if (params != null) {
-            translation = MessageFormat.format(translation, params.toArray());
+        return get(key, params.toArray());
+    }
+
+    /**
+     * Find a translation and then replace any parameters found in the translation by the passed parameters. The format
+     * is the one used by {@link java.text.MessageFormat}.
+     * 
+     * @param key the key of the string to find
+     * @param params the list of parameters to use for replacing "{N}" elements in the string. See
+     *            {@link java.text.MessageFormat} for the full syntax
+     * @return the translated string with parameters resolved
+     */
+    public String get(String key, Object... params)
+    {
+        String translation;
+        if (this.localization != null) {
+            translation = this.localization.getTranslationPlain(key, params);
+            if (translation == null) {
+                translation = key;
+            }
+        } else {
+            translation = get(key);
+
+            if (params != null && translation != null) {
+                translation = MessageFormat.format(translation, params);
+            }
         }
+
         return translation;
     }
 
@@ -174,9 +222,11 @@ public class XWikiMessageTool
     {
         List<String> docNamesList;
 
-        String docNames = this.context.getWiki().getXWikiPreference(KEY, this.context);
+        XWikiContext context = getXWikiContext();
+
+        String docNames = context.getWiki().getXWikiPreference(KEY, context);
         if (docNames == null || "".equals(docNames)) {
-            docNames = this.context.getWiki().Param("xwiki." + KEY);
+            docNames = context.getWiki().Param("xwiki." + KEY);
         }
 
         if (docNames == null) {
@@ -194,6 +244,8 @@ public class XWikiMessageTool
      */
     public List<XWikiDocument> getDocumentBundles()
     {
+        XWikiContext context = getXWikiContext();
+
         String defaultLanguage = context.getWiki().getDefaultLanguage(context);
         List<XWikiDocument> result = new ArrayList<XWikiDocument>();
         for (String docName : getDocumentBundleNames()) {
@@ -212,7 +264,7 @@ public class XWikiMessageTool
                     } else {
                         // The document listed as a document bundle doesn't exist. Do nothing
                         // and log.
-                        LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
+                        LOGGER.warn("The document [" + docBundle.getFullName() + "] is listed "
                             + "as an internationalization document bundle but it does not " + "exist.");
                     }
                 }
@@ -237,14 +289,16 @@ public class XWikiMessageTool
             docBundle = null;
         } else {
             try {
+                XWikiContext context = getXWikiContext();
+
                 // First, looks for a document suffixed by the language
-                docBundle = this.context.getWiki().getDocument(documentName, this.context);
-                docBundle = docBundle.getTranslatedDocument(this.context);
+                docBundle = context.getWiki().getDocument(documentName, context);
+                docBundle = docBundle.getTranslatedDocument(context);
             } catch (XWikiException e) {
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOG.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
+                LOGGER.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
                 docBundle = null;
             }
         }
@@ -267,12 +321,14 @@ public class XWikiMessageTool
 
         if (documentName.length() != 0) {
             try {
+                XWikiContext context = getXWikiContext();
+
                 // First, looks for a document suffixed by the language
-                XWikiDocument docBundle = this.context.getWiki().getDocument(documentName, this.context);
-                XWikiDocument tdocBundle = docBundle.getTranslatedDocument(this.context);
+                XWikiDocument docBundle = context.getWiki().getDocument(documentName, context);
+                XWikiDocument tdocBundle = docBundle.getTranslatedDocument(context);
                 list.add(tdocBundle);
                 if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
-                    XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, this.context);
+                    XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, context);
                     if (tdocBundle != defdocBundle) {
                         list.add(defdocBundle);
                     }
@@ -282,7 +338,7 @@ public class XWikiMessageTool
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOG.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
+                LOGGER.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
             }
         }
 
@@ -297,19 +353,12 @@ public class XWikiMessageTool
     {
         Properties props = new Properties();
         String content = docBundle.getContent();
-        byte[] docContent;
         try {
-            docContent = content.getBytes(BYTE_ENCODING);
-        } catch (UnsupportedEncodingException ex) {
-            LOG.error("Error splitting the document into bytes", ex);
-            docContent = content.getBytes();
-        }
-        InputStream is = new ByteArrayInputStream(docContent);
-        try {
-            props.load(is);
+            props.load(new StringReader(content));
         } catch (IOException e) {
-            // Cannot do anything
+            LOGGER.error("Failed to parse content of document [" + docBundle + "] as translation content", e);
         }
+
         return props;
     }
 
@@ -339,19 +388,15 @@ public class XWikiMessageTool
                         // gets from cache
                         props = this.propsCache.get(docId);
                     }
-                    String translation = props.getProperty(key);
-                    if (translation != null) {
-                        returnValue = translation;
-                        try {
-                            returnValue = new String(returnValue.getBytes("ISO-8859-1"), BYTE_ENCODING);
-                        } catch (UnsupportedEncodingException ex) {
-                            LOG.error("Error recombining the value from bytes", ex);
-                        }
+
+                    returnValue = props.getProperty(key);
+                    if (returnValue != null) {
                         break;
                     }
                 }
             }
         }
+
         return returnValue;
     }
 }

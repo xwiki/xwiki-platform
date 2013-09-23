@@ -19,6 +19,8 @@
  */
 package org.xwiki.wysiwyg.server;
 
+import java.lang.reflect.Type;
+
 import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.SerializationException;
@@ -41,18 +43,14 @@ public class XWikiRemoteServiceServlet extends RemoteServiceServlet
      */
     private static final long serialVersionUID = 1911611911891893986L;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RemoteServiceServlet#processCall(String)
-     */
+    @Override
     public String processCall(String payload) throws SerializationException
     {
         try {
             RPCRequest req = RPC.decodeRequest(payload, null, this);
-            RemoteService service = (RemoteService) Utils.getComponent(req.getMethod().getDeclaringClass());
-            return RPC.invokeAndEncodeResponse(service, req.getMethod(), req.getParameters(), req
-                .getSerializationPolicy());
+            RemoteService service = (RemoteService) Utils.getComponent((Type) req.getMethod().getDeclaringClass());
+            return RPC.invokeAndEncodeResponse(service, req.getMethod(), req.getParameters(),
+                req.getSerializationPolicy());
         } catch (IncompatibleRemoteServiceException ex) {
             log("IncompatibleRemoteServiceException in the processCall(String) method.", ex);
             return RPC.encodeResponseForFailure(null, ex);

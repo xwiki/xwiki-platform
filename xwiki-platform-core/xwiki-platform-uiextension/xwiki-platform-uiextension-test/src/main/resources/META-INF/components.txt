@@ -1,0 +1,2 @@
+org.xwiki.uiextension.internal.HelloWorldUIExtension
+

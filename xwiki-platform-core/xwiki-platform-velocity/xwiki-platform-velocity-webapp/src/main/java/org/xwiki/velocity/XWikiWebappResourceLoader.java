@@ -23,9 +23,8 @@ import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.tools.view.servlet.WebappLoader;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletApplicationContext;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 
 /**
  * Extends the Velocity Tool's {@link WebappLoader} by adding the ServletContext to the Velocity Engine's Application
@@ -38,31 +37,28 @@ import org.xwiki.container.servlet.ServletApplicationContext;
  */
 public class XWikiWebappResourceLoader extends WebappLoader
 {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init(ExtendedProperties configuration)
     {
-        ApplicationContext context = getContainer().getApplicationContext();
-        if (context instanceof ServletApplicationContext) {
+        Environment environment = getEnvironment();
+        if (environment instanceof ServletEnvironment) {
             this.rsvc.setApplicationAttribute("javax.servlet.ServletContext",
-                ((ServletApplicationContext) context).getServletContext());
+                ((ServletEnvironment) environment).getServletContext());
         }
 
         super.init(configuration);
     }
 
     /**
-     * @return the Container component implementation retrieved from the Component Manager
+     * @return the Environment component implementation retrieved from the Component Manager
      */
-    private Container getContainer()
+    private Environment getEnvironment()
     {
         try {
-            return getComponentManager().lookup(Container.class);
+            return getComponentManager().getInstance(Environment.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException(
-                "Cannot initialize Velocity subsystem: missing Container component implementation");
+                "Cannot initialize Velocity subsystem: missing Environment component implementation");
         }
     }
 

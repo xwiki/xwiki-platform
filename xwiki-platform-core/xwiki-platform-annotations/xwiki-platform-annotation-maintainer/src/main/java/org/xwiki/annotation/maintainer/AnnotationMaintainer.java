@@ -19,7 +19,7 @@
  */
 package org.xwiki.annotation.maintainer;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Interface defining the annotation maintainer service, which should be able to update the annotations on a specified
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface AnnotationMaintainer
 {
     /**

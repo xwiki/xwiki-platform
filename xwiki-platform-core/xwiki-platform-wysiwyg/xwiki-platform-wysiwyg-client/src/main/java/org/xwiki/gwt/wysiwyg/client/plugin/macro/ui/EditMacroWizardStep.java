@@ -167,7 +167,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         macroDescriptor = null;
 
         // Reset the UI.
-        getPanel().clear();
+        display().clear();
         parameterDisplayers.clear();
         contentDisplayer = null;
 
@@ -253,7 +253,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         // Display the macro description.
         Label macroDescription = new Label(macroDescriptor.getDescription());
         macroDescription.addStyleName("xMacroDescription");
-        getPanel().add(macroDescription);
+        display().add(macroDescription);
 
         // Display the macro parameters.
         for (Map.Entry<String, ParameterDescriptor> entry : macroDescriptor.getParameterDescriptorMap().entrySet()) {
@@ -265,14 +265,14 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
             }
             displayer.setValue(value);
             parameterDisplayers.add(displayer);
-            getPanel().add(displayer.getWidget());
+            display().add(displayer.getWidget());
         }
 
         // Display the content of the macro.
         if (macroDescriptor.getContentDescriptor() != null) {
             contentDisplayer = new ParameterDisplayer(macroDescriptor.getContentDescriptor());
             contentDisplayer.setValue(macroCall.getContent());
-            getPanel().add(contentDisplayer.getWidget());
+            display().add(contentDisplayer.getWidget());
         }
 
         // Focus the first input control.

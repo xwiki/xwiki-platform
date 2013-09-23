@@ -21,10 +21,13 @@ package org.xwiki.rendering.internal.macro.container;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.container.AbstractContainerMacro;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
@@ -39,7 +42,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.5M2
  */
-@Component(ContainerMacro.MACRO_NAME)
+@Component
+@Named(ContainerMacro.MACRO_NAME)
+@Singleton
 public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParameters>
 {
     /**
@@ -62,7 +67,7 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
     /**
      * Used to parse the macro content.
      */
-    @Requirement
+    @Inject
     private MacroContentParser contentParser;
 
     /**
@@ -74,29 +79,16 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
             ContainerMacroParameters.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.AbstractContainerMacro
-     *      #getContent(org.xwiki.rendering.macro.container.ContainerMacroParameters, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
     @Override
     protected List<Block> getContent(ContainerMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        return this.contentParser.parse(content, context, false, false);
+        return this.contentParser.parse(content, context, false, false).getChildren();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#getPriority()
-     */
     @Override
     public int getPriority()
     {
         return 750;
     }
-
 }

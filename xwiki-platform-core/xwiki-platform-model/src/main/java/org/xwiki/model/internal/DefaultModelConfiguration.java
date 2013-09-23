@@ -19,17 +19,19 @@
  */
 package org.xwiki.model.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Get configuration data from the XWiki configuration using a {@link ConfigurationSource}. If no
@@ -44,33 +46,44 @@ import java.util.Map;
  * @since 2.2M1
  */
 @Component
-public class DefaultModelConfiguration extends AbstractLogEnabled implements ModelConfiguration
+@Singleton
+public class DefaultModelConfiguration implements ModelConfiguration
 {
     /**
      * Prefix for configuration keys for the Model module.
      */
     private static final String PREFIX = "model.";
 
-    private static final Map<EntityType, String> DEFAULT_VALUES = new HashMap<EntityType, String>() {{
-        put(EntityType.WIKI, "xwiki");
-        put(EntityType.SPACE, "Main");
-        put(EntityType.DOCUMENT, "WebHome");
-        put(EntityType.ATTACHMENT, "filename");
-        put(EntityType.OBJECT, "object");
-        put(EntityType.OBJECT_PROPERTY, "property");
-    }};
+    /**
+     * Default values for all the Entity types, see {@link #getDefaultReferenceValue(org.xwiki.model.EntityType)}.
+     */
+    private static final Map<EntityType, String> DEFAULT_VALUES = new HashMap<EntityType, String>()
+    {
+        {
+            put(EntityType.WIKI, "xwiki");
+            put(EntityType.SPACE, "Main");
+            put(EntityType.DOCUMENT, "WebHome");
+            put(EntityType.ATTACHMENT, "filename");
+            put(EntityType.OBJECT, "object");
+            put(EntityType.OBJECT_PROPERTY, "property");
+            put(EntityType.CLASS_PROPERTY, get(EntityType.OBJECT_PROPERTY));
+        }
+    };
 
     /**
      * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available
      * in the system. This is why we lazy load the ConfigurationSource component.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.model.ModelConfiguration#getDefaultReferenceValue(org.xwiki.model.EntityType)
+     * The logger to log.
      */
+    @Inject
+    private Logger logger;
+
+    @Override
     public String getDefaultReferenceValue(EntityType type)
     {
         String name;
@@ -79,12 +92,12 @@ public class DefaultModelConfiguration extends AbstractLogEnabled implements Mod
             // Wiki, Space and User preferences cause some cyclic dependencies (we'll be able to do that when all
             // code has been migrated to use References instead of Strings).
             ConfigurationSource configuration =
-                this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties");
+                this.componentManager.getInstance(ConfigurationSource.class, "xwikiproperties");
             name = configuration.getProperty(PREFIX + "reference.default." + type.toString().toLowerCase(),
                 DEFAULT_VALUES.get(type));
         } catch (ComponentLookupException e) {
             // Failed to load the component, use default values
-            getLogger().debug("Failed to load [" + ConfigurationSource.class.getName()
+            this.logger.debug("Failed to load [" + ConfigurationSource.class.getName()
                 + "]. Using default Model values", e);
             name = DEFAULT_VALUES.get(type);
         }

@@ -35,41 +35,31 @@ import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
  */
 public abstract class AbstractDavFile extends AbstractDavResource
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         throw new DavException(DavServletResponse.SC_BAD_REQUEST);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource member) throws DavException
     {
         throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isCollection()
     {
         return false;

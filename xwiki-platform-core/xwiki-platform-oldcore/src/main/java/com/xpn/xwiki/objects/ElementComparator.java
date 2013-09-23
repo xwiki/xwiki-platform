@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import java.util.Comparator;
@@ -37,6 +35,7 @@ public class ElementComparator implements Comparator
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    @Override
     public int compare(Object o1, Object o2)
     {
         // Get a null comparator that is backed by a static "natural" comparator

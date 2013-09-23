@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
@@ -28,7 +28,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
  * @version $Id$
  * @since 2.0M1
  */
-@ComponentRole
+@Role
 public interface XWikiRenderingConfiguration extends RenderingConfiguration
 {
     /**

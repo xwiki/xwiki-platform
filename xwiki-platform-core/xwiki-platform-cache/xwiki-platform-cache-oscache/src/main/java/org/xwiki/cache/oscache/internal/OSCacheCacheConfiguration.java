@@ -26,8 +26,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -48,7 +48,7 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
     /**
      * The logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(OSCacheCacheConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OSCacheCacheConfiguration.class);
 
     /**
      * The folder containing OSCache properties files.
@@ -187,8 +187,8 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
         try {
             loadConfig(defaultConfig, getDefaultPropsId());
         } catch (PropertiesLoadingCacheException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Could not load default cache properties", e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Could not load default cache properties", e);
             }
         }
 
@@ -204,8 +204,8 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
      */
     private Properties getConfig(String propertiesId) throws PropertiesLoadingCacheException
     {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Loading cache properties: " + propertiesId);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Loading cache properties: " + propertiesId);
         }
 
         Properties props = getDefaultConfig();
@@ -245,8 +245,8 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
 
             props.load(is);
 
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Properties loaded: " + propertiesFilename);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Properties loaded: " + propertiesFilename);
             }
         } catch (Exception e) {
             throw new PropertiesLoadingCacheException("Error when trying to load configuration file for ["
@@ -256,8 +256,8 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
                 try {
                     is.close();
                 } catch (IOException e) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Failed t close properties file", e);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Failed t close properties file", e);
                     }
                 }
             }

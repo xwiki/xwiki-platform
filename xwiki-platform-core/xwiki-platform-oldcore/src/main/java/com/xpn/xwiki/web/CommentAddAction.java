@@ -16,11 +16,10 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
@@ -46,11 +45,6 @@ public class CommentAddAction extends XWikiAction
     /** The name of the space where user profiles are kept. */
     private static final String USER_SPACE_PREFIX = "XWiki.";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -85,12 +79,15 @@ public class CommentAddAction extends XWikiAction
                 while (author.startsWith(USER_SPACE_PREFIX)) {
                     author = StringUtils.removeStart(author, USER_SPACE_PREFIX);
                 }
+                // We need to make sure the author will fit in a String property, this is mostly a protection against
+                // spammers who try to put large texts in this field
+                author = author.substring(0, Math.min(author.length(), 255));
                 object.set(AUTHOR_PROPERTY_NAME, author, context);
             } else {
                 // A registered user must always post with his name.
                 object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
             }
-            doc.setAuthor(context.getUser());
+            doc.setAuthorReference(context.getUserReference());
             // Consider comments not being content.
             doc.setContentDirty(false);
             // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
@@ -107,11 +104,6 @@ public class CommentAddAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

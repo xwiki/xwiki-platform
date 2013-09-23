@@ -19,14 +19,13 @@
  */
 package org.xwiki.test.integration;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties. These properties are
@@ -47,32 +46,35 @@ import org.apache.commons.logging.LogFactory;
  * </p>
  * 
  * @version $Id$
+ * @deprecated use {@link XWikiExecutorSuite} instead
  */
+@Deprecated
 public class XWikiTestSetup extends TestSetup
 {
-    protected static final Log LOG = LogFactory.getLog(XWikiTestSetup.class);
-
     private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
 
-    public XWikiTestSetup(Test test)
+    public XWikiTestSetup(Test test) throws Exception
     {
         this(test, 1);
     }
 
-    public XWikiTestSetup(Test test, int nb)
+    public XWikiTestSetup(Test test, int nb) throws Exception
     {
         super(test);
 
         for (int i = 0; i < nb; ++i) {
-            this.executors.add(new XWikiExecutor(i));
+            XWikiExecutor executor = new XWikiExecutor(i);
+
+            PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
+            // Don't set any extension repository since we don't need it and we don't want to require internet
+            // connection for the tests.
+            properties.setProperty("extension.repositories", "");
+            executor.saveXWikiProperties(properties);
+
+            this.executors.add(executor);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.extensions.TestSetup#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -81,11 +83,6 @@ public class XWikiTestSetup extends TestSetup
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.extensions.TestSetup#tearDown()
-     */
     @Override
     protected void tearDown() throws Exception
     {

@@ -45,11 +45,6 @@ public class DefaultCommandManagerTest extends UserTestCase
      */
     private final List<String> log = new ArrayList<String>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UserTestCase#gwtSetUp()
-     */
     @Override
     protected void gwtSetUp() throws Exception
     {

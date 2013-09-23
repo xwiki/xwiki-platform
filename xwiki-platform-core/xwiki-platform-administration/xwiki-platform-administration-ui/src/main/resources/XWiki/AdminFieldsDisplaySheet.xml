@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>AdminFieldsDisplaySheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.AdminSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1364502206000</creationDate>
+  <date>1364568675000</date>
+  <contentUpdateDate>1364568675000</contentUpdateDate>
+  <version>1.1</version>
+  <title>AdminFieldsDisplaySheet</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
+#if ("$!section" != '')
+  ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
+  {{html clean="false"}}
+  &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
+    #set($prefsClassName = 'XWiki.XWikiPreferences')
+    #set($obj = $doc.getObject($prefsClassName))
+    #foreach ($entry in $params.entrySet())
+      #set ($fields = $entry.value)
+      &lt;fieldset class="$entry.key"&gt;
+      ## If there is only one section, don't display the legend
+      #if ($params.size() &gt; 1)
+        &lt;legend&gt;$services.localization.render("admin.$entry.key")&lt;/legend&gt;
+      #end
+      #if ($fields.size() &gt; 0)
+        &lt;dl&gt;
+      #end
+      #foreach($field in $fields)
+        #set($prop = $obj.xWikiClass.get($field))
+        #set($title = $services.localization.render($field))
+        #if ($title == $field &amp;&amp; $prop)
+          #set ($title = $!prop.prettyName)
+        #end
+        #if($services.localization.get("${obj.xWikiClass.name}_${field}"))
+          #set ($title = $services.localization.render("${obj.xWikiClass.name}_${field}"))
+        #end
+        #set($hint = $services.localization.render("${obj.xWikiClass.name}_${field}.hint"))
+        #if($hint == "${obj.xWikiClass.name}_${field}.hint") #set($hint = $NULL) #end
+        &lt;dt&gt;
+        &lt;label #if($prop)for="${prefsClassName}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
+        #if($field == 'skin')
+          #set ($skin = $xwiki.skin)
+          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+        #end
+        #if($field == 'colorTheme')
+          #if ($editor == 'globaladmin')
+            #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
+          #else
+            #set ($colorThemeName = $xwiki.getSpacePreference('colorTheme'))
+            #set ($wikiColorTheme = $xwiki.getDocument($xwiki.getXWikiPreference('colorTheme')))
+            #if (!$wikiColorTheme.isNew())
+              #set ($colorThemeHint = $services.localization.render('admin.colortheme.wikiSetting', ["&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"]))
+            #end
+          #end
+          #if($xwiki.exists('ColorThemes.WebHome'))
+            #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL('ColorThemes.WebHome')""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+          #end
+          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+        #end
+        &lt;/label&gt;
+        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
+        &lt;/dt&gt;
+        #if ($prop)
+          &lt;dd&gt;$doc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;
+          #if($field == 'colorTheme' &amp;&amp; $colorThemeHint)
+            &lt;dd class="xHint"&gt;$colorThemeHint&lt;/dd&gt;
+          #end
+        #end
+      #end
+      #if ($fields.size() &gt; 0)
+        &lt;/dl&gt;
+      #end
+      &lt;/fieldset&gt;
+    #end
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
+      &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
+      &lt;input type="hidden" name="classname" value="$prefsClassName" /&gt;
+    &lt;/div&gt;
+    &lt;div class="bottombuttons"&gt;
+      &lt;p class="admin-buttons"&gt;
+        &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" value="$services.localization.render('admin.save')" /&gt;&lt;/span&gt;
+      &lt;/p&gt;
+    &lt;/div&gt; ## bottombuttons
+  &lt;/form&gt;
+  {{/html}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

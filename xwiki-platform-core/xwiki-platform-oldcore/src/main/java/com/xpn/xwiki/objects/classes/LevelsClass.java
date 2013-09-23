@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
@@ -5,14 +24,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -21,9 +42,11 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class LevelsClass extends ListClass
 {
+    private static final String XCLASSNAME = "levelslist";
+
     public LevelsClass(PropertyMetaClass wclass)
     {
-        super("levelslist", "Levels List", wclass);
+        super(XCLASSNAME, "Levels List", wclass);
         setSize(6);
     }
 
@@ -63,7 +86,9 @@ public class LevelsClass extends ListClass
     @Override
     public BaseProperty newProperty()
     {
-        return new StringProperty();
+        BaseProperty property = new StringProperty();
+        property.setName(getName());
+        return property;
     }
 
     @Override
@@ -102,6 +127,7 @@ public class LevelsClass extends ListClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setAttributeFilter(new XMLAttributeValueFilter());
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
         select.setName(prefix + name);
@@ -122,7 +148,8 @@ public class LevelsClass extends ListClass
         for (String value : list) {
             String display = getText(value, context);
             option option = new option(display, value);
-            option.addElement(display);
+            option.setAttributeFilter(new XMLAttributeValueFilter());
+            option.addElement(XMLUtils.escape(display));
             // If we don't have this option in the list then add it
             if (!list.contains(value)) {
                 list.add(value);
@@ -135,6 +162,7 @@ public class LevelsClass extends ListClass
 
         buffer.append(select.toString());
         input in = new input();
+        in.setAttributeFilter(new XMLAttributeValueFilter());
         in.setType("hidden");
         in.setName(prefix + name);
         in.setDisabled(isDisabled());

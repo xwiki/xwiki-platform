@@ -42,4 +42,10 @@ public interface WikiMacro extends Macro<WikiMacroParameters>
      * @since 2.3M1
      */
     DocumentReference getDocumentReference();
+
+    /**
+     * @return the author of the Wiki Macro
+     * @since 4.2M1
+     */
+    DocumentReference getAuthorReference();
 }

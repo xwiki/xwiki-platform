@@ -16,60 +16,78 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.xml.XMLUtils;
 
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
  * @version $Id$
  */
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden
-public class BaseProperty extends BaseElement implements PropertyInterface, Serializable, Cloneable
+public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface, Serializable,
+    Cloneable
 {
     private BaseCollection object;
 
-    private int id;
+    private long id;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#getObject()
+     * Set to true if value is not the same as the database value.
      */
+    private boolean isValueDirty = true;
+
+    /**
+     * The owner document, if this object was obtained from a document.
+     */
+    private transient XWikiDocument ownerDocument;
+
+    @Override
+    protected R createReference()
+    {
+        R reference;
+        if (this.object.getReference() instanceof ObjectReference) {
+            reference = (R) new ObjectPropertyReference(getName(), (ObjectReference) this.object.getReference());
+        } else {
+            reference = super.createReference();
+        }
+
+        return reference;
+    }
+
+    @Override
     public BaseCollection getObject()
     {
         return this.object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#setObject(com.xpn.xwiki.objects.BaseCollection)
-     */
+    @Override
     public void setObject(BaseCollection object)
     {
         this.object = object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object el)
     {
@@ -91,7 +109,8 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
         return (getId() == ((BaseProperty) el).getId());
     }
 
-    public int getId()
+    @Override
+    public long getId()
     {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
@@ -102,23 +121,14 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#setId(int)
-     */
-    public void setId(int id)
+    @Override
+    public void setId(long id)
     {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
         this.id = id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
@@ -136,17 +146,30 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#clone()
-     */
     @Override
-    public Object clone()
+    public BaseProperty clone()
     {
-        BaseProperty property = (BaseProperty) super.clone();
+        BaseProperty<R> property = (BaseProperty<R>) super.clone();
+
+        property.ownerDocument = null;
+
+        cloneInternal(property);
+
+        property.isValueDirty = isValueDirty;
+        property.ownerDocument = ownerDocument;
+
         property.setObject(getObject());
+
         return property;
+    }
+
+    /**
+     * Subclasses override this to copy values during cloning.
+     *
+     * @param clone The cloned value.
+     */
+    protected void cloneInternal(BaseProperty clone)
+    {
     }
 
     public Object getValue()
@@ -158,28 +181,20 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#toXML()
-     */
+    @Override
     public Element toXML()
     {
         Element el = new DOMElement(getName());
-        Object value = getValue();
-        el.setText((value == null) ? "" : value.toString());
+
+        el.setText(toText());
 
         return el;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.PropertyInterface#toFormString()
-     */
+    @Override
     public String toFormString()
     {
-        return Utils.formEncode(toText());
+        return XMLUtils.escape(toText());
     }
 
     public String toText()
@@ -207,11 +222,6 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
@@ -221,5 +231,123 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     public Object getCustomMappingValue()
     {
         return getValue();
+    }
+
+    @Override
+    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
+    {
+        super.merge(previousElement, newElement, configuration, context, mergeResult);
+
+        // Value
+        Object previousValue = ((BaseProperty<R>) previousElement).getValue();
+        Object newValue = ((BaseProperty<R>) newElement).getValue();
+        if (previousValue == null) {
+            if (newValue != null) {
+                if (getValue() == null) {
+                    setValue(newValue);
+                } else {
+                    // XXX: collision between current and new
+                    mergeResult.error(new CollisionException("Collision found on property [" + getName()
+                        + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+                }
+            }
+        } else if (newValue == null) {
+            if (ObjectUtils.equals(previousValue, getValue())) {
+                setValue(null);
+            } else {
+                // XXX: collision between current and new
+                mergeResult.error(new CollisionException("Collision found on property [" + getName()
+                    + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+            }
+        } else {
+            if (ObjectUtils.equals(previousValue, getValue())) {
+                setValue(newValue);
+            } else if (previousValue.getClass() != newValue.getClass()) {
+                // XXX: collision between current and new
+                mergeResult.error(new CollisionException("Collision found on property [" + getName()
+                    + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+            } else if (!ObjectUtils.equals(newValue, getValue())) {
+                mergeValue(previousValue, newValue, mergeResult);
+            }
+        }
+    }
+
+    /**
+     * Try to apply 3 ways merge on property value.
+     * 
+     * @param previousValue the previous version of the value
+     * @param newValue the new version of the value
+     * @param mergeResult merge report
+     * @since 3.2M1
+     */
+    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    {
+        // XXX: collision between current and new: don't know how to apply 3 way merge on unknown type
+        mergeResult.error(new CollisionException("Collision found on property [" + getName() + "] between from value ["
+            + getValue() + "] and to [" + newValue + "]"));
+    }
+
+    @Override
+    public boolean apply(ElementInterface newProperty, boolean clean)
+    {
+        boolean modified = super.apply(newProperty, clean);
+
+        BaseProperty<R> newBaseProperty = (BaseProperty<R>) newProperty;
+
+        // Value
+        if (ObjectUtils.notEqual(newBaseProperty.getValue(), getValue())) {
+            setValue(newBaseProperty.getValue());
+            modified = true;
+        }
+
+        return modified;
+    }
+
+    /**
+     * @return {@literal true} if the property value doesn't match the value in the database.
+     * @since 4.3M2
+     */
+    public boolean isValueDirty()
+    {
+        return isValueDirty;
+    }
+
+    /**
+     * Set the dirty flag if the new value isn't equal to the old value.
+     *
+     * @param newValue The new value.
+     */
+    protected void setValueDirty(Object newValue)
+    {
+        if (!isValueDirty && !ObjectUtils.equals(newValue, getValue())) {
+            setValueDirty(true);
+        }
+    }
+
+    /**
+     * @param valueDirty Indicate if the dirty flag should be set or cleared.
+     * @since 4.3M2
+     */
+    public void setValueDirty(boolean valueDirty)
+    {
+        isValueDirty = valueDirty;
+        if (valueDirty && ownerDocument != null) {
+            ownerDocument.setMetaDataDirty(true);
+        }
+    }
+
+    /**
+     * Set the owner document of this base property.
+     *
+     * @param ownerDocument The owner document.
+     * @since 4.3M2
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
+        this.ownerDocument = ownerDocument;
+        if (ownerDocument != null && isValueDirty) {
+            ownerDocument.setMetaDataDirty(true);
+        }
     }
 }

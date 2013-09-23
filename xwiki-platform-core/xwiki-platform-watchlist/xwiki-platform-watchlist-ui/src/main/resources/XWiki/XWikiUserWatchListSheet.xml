@@ -1,45 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>XWikiUserWatchListSheet</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.XWikiUserSheet</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1264167993000</creationDate>
-<date>1303989085000</date>
-<contentUpdateDate>1303989085000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>XWikiUserWatchListSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiUserSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1264167993000</creationDate>
+  <date>1303989085000</date>
+  <contentUpdateDate>1303989085000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 #set($obj = $doc.getObject("XWiki.XWikiUsers"))
 #if(!$obj)
-= $msg.get('xe.admin.users.sheet') =
+= $services.localization.render('xe.admin.users.sheet') =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
+{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
 #else
 #set($watchOject = $doc.getObject('XWiki.WatchListClass'))
 {{html clean="false" wiki="true"}}
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
-  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
+  &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class="watchlistManagement"&gt;
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end
-      &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
         #set($notifierDocs = $xwiki.watchlist.getNotifiers())
         #set($currentNotifier = $watchOject.getProperty('interval').getValue())
         &lt;dd&gt;
@@ -60,7 +61,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
             &lt;/select&gt;
           #end
         &lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label#if($context.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$msg.get('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label#if($xcontext.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$services.localization.render('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;
           $watchOject.automaticwatch
         &lt;/dd&gt;
@@ -68,15 +69,18 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
     &lt;/div&gt;
   &lt;/div&gt;
   #if ($xcontext.action == 'view')
-    &lt;div class="half column"&gt;
+    ## The live table display doesn't adapt when the available width is limited so we need to ensure this column takes
+    ## at least half of the container width (unlike the rest of the columns). The result is that this column will be
+    ## displayed below the previous one when the page width is reduced.
+    &lt;div class="min-half column"&gt;
       &lt;div class="watchlistRss"&gt;
-        &lt;h1&gt;$msg.get('watchlist.staytuned.rss')&lt;/h1&gt;
-        &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;
+        &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
+        &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
       &lt;/div&gt;
     #end
     #if ($xcontext.action == 'view')
       &lt;div class="watchlistElements"&gt;
-        &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
         #set($collist = ["type", "wiki","space", "document", "actions"])
         #set($colprops = { 
                   "type": { "sortable":false },
@@ -102,10 +106,11 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
                                     tr.insert(new Element('td').update(row.pageName));
                                   }
                                   var deleteLink = new Element('a', {
-                                    href : row.deleteUrl
+                                    href : row.deleteUrl,
+                                    title : '$escapetool.javascript($services.localization.render('platform.core.profile.watchlist.unwatch'))'
                                   });
                                   deleteLink.insert(new Element('img', {
-                                    'src' : '${xwiki.getSkinFile('icons/silk/cross.gif')}'
+                                    'src' : '${xwiki.getSkinFile('icons/silk/cross.png')}'
                                   }));
                                   deleteLink.observe('click', function(event) {
                                     Event.stop(event);
@@ -138,4 +143,5 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
 {{/html}}##
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

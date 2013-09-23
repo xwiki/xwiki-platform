@@ -25,13 +25,14 @@ import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.dom.client.Text;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 
 /**
- * Analyzes the passed subtree and detects the link structures and transforms them in minimal HTML elements with
- * metafragments attached, so that the editor operates with minimal HTML.
+ * Analyzes the passed subtree and detects the link structures and transforms them in minimal HTML elements with meta
+ * fragments attached, so that the editor operates with minimal HTML.
  * 
  * @version $Id$
  */
@@ -53,50 +54,62 @@ public class LinkMetaDataExtractor implements InnerHTMLListener
     }
 
     /**
-     * Processes the passed anchor looking for the wrapping span and neighbour comments to encapsulate it all in a
-     * metafragment and leave only the anchor in the tree.
+     * Processes the passed anchor looking for the wrapping span and neighbor comments to encapsulate it all in a meta
+     * fragment and leave only the anchor in the tree.
      * 
      * @param anchor the anchor element found
      */
     private void processElement(Element anchor)
     {
-        // search for parent span and surrounding comments
+        // Search for parent span and surrounding comments.
         Element parentNode = anchor.getParentElement().cast();
-        boolean foundWikiLink = parentNode != null && parentNode.getNodeName().equalsIgnoreCase("span");
-        String spanClass = parentNode.getClassName();
-        foundWikiLink &=
-            spanClass.contains("wikilink") || spanClass.contains("wikicreatelink")
-                || spanClass.contains("wikiexternallink");
-        Node previousSibling = null;
-        Node nextSibling = null;
-        if (foundWikiLink) {
-            // test the surrounding comments
-            previousSibling = parentNode.getPreviousSibling();
-            foundWikiLink &=
-                previousSibling != null && previousSibling.getNodeType() == DOMUtils.COMMENT_NODE
-                    && previousSibling.getNodeValue().startsWith("startwikilink");
-            nextSibling = parentNode.getNextSibling();
-            foundWikiLink &=
-                nextSibling != null && nextSibling.getNodeType() == DOMUtils.COMMENT_NODE
-                    && nextSibling.getNodeValue().startsWith("stopwikilink");
-        }
-
-        if (!foundWikiLink) {
+        if (parentNode == null || !"span".equalsIgnoreCase(parentNode.getNodeName())
+            || LinkType.getByClassName(parentNode.getClassName()) == null || !hasLinkMarkers(parentNode)) {
             return;
         }
 
         DocumentFragment metaFragment = ((Document) anchor.getOwnerDocument()).createDocumentFragment();
-        // put the end comments in
-        metaFragment.appendChild(previousSibling);
-        // create the placeholder and replace the anchor
+        // Move the link markers.
+        metaFragment.appendChild(parentNode.getPreviousSibling());
+        metaFragment.appendChild(parentNode.getNextSibling());
+        // Create the place-holder and replace the anchor.
         Text placeholder = (Text) ((Document) anchor.getOwnerDocument()).createTextNode(Element.INNER_HTML_PLACEHOLDER);
         parentNode.replaceChild(placeholder, anchor);
-        // replace the parent node with the anchor
+        // Replace the parent node with the anchor.
         parentNode.getParentElement().replaceChild(anchor, parentNode);
-        // put parent node in meta fragment
-        metaFragment.appendChild(parentNode);
-        // put the end comment in
-        metaFragment.appendChild(nextSibling);
+        // Put the parent node in the meta fragment.
+        metaFragment.insertAfter(parentNode, metaFragment.getFirstChild());
         anchor.setMetaData(metaFragment);
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node is wrapped by the link marker comments, {@code false} otherwise
+     */
+    private boolean hasLinkMarkers(Node node)
+    {
+        return hasLinkStartMarker(node) && hasLinkStopMarker(node);
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node is preceded by the link start marker, {@code false} otherwise
+     */
+    private boolean hasLinkStartMarker(Node node)
+    {
+        Node previousSibling = node.getPreviousSibling();
+        return previousSibling != null && previousSibling.getNodeType() == DOMUtils.COMMENT_NODE
+            && previousSibling.getNodeValue().startsWith("startwikilink");
+    }
+
+    /**
+     * @param node a DOM node
+     * @return {@code true} if the given node is followed by the link stop marker, {@code false} otherwise
+     */
+    private boolean hasLinkStopMarker(Node node)
+    {
+        Node nextSibling = node.getNextSibling();
+        return nextSibling != null && nextSibling.getNodeType() == DOMUtils.COMMENT_NODE
+            && nextSibling.getNodeValue().startsWith("stopwikilink");
     }
 }

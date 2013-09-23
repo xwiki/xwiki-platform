@@ -22,7 +22,7 @@ package org.xwiki.annotation.renderer;
 import java.util.Collection;
 
 import org.xwiki.annotation.Annotation;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.renderer.PrintRenderer;
 
 /**
@@ -31,7 +31,7 @@ import org.xwiki.rendering.renderer.PrintRenderer;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface AnnotationPrintRenderer extends PrintRenderer
 {
     /**

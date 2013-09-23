@@ -19,7 +19,7 @@
  */
 package org.xwiki.wysiwyg.server;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -27,7 +27,7 @@ import org.xwiki.script.service.ScriptService;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface WysiwygEditorScriptService extends ScriptService
 {
     /**

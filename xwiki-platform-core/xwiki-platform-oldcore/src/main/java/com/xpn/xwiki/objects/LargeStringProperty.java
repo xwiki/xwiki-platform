@@ -16,14 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
-public class LargeStringProperty extends BaseStringProperty {
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.merge.MergeUtils;
 
-    public LargeStringProperty() {
-      super();
-    }   
+public class LargeStringProperty extends BaseStringProperty
+{
+    @Override
+    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    {
+        setValue(MergeUtils.mergeLines((String) previousValue, (String) newValue, getValue(), mergeResult));
+    }
 }

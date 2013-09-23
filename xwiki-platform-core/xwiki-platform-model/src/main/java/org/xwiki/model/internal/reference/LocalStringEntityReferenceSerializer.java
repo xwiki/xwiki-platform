@@ -37,11 +37,6 @@ import org.xwiki.model.reference.EntityReference;
 @Component("local")
 public class LocalStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference
-     */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)

@@ -35,22 +35,12 @@ import com.sun.syndication.io.SyndFeedInput;
  */
 public class RSSValidator extends AbstractXMLValidator
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.framework.AbstractXMLValidator#createXMLErrorHandler()
-     */
     @Override
     protected XMLErrorHandler createXMLErrorHandler()
     {
         return new RSSErrorHandler();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.framework.AbstractXMLValidator#validate(org.w3c.dom.Document)
-     */
     @Override
     protected void validate(Document document)
     {
@@ -69,11 +59,7 @@ public class RSSValidator extends AbstractXMLValidator
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#getName()
-     */
+    @Override
     public String getName()
     {
         return "RSS";

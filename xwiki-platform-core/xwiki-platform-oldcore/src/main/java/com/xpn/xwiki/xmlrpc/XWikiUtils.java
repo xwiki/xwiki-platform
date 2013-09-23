@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.xmlrpc;
 
@@ -28,7 +27,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import org.apache.xmlrpc.XmlRpcException;
 import org.xwiki.xmlrpc.model.XWikiExtendedId;
 
 import com.xpn.xwiki.XWikiContext;

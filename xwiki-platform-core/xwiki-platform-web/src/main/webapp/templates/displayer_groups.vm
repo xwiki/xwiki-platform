@@ -1,0 +1,51 @@
+#if ($type == 'edit' || $type == 'search')
+  #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
+  #userPicker_import($isMultiSelect)
+  #set($id = $escapetool.xml("${prefix}${name}"))
+  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
+    class="suggestGroups#if ($isMultiSelect) multipleSelection#end" />
+#elseif ($type == 'view' || $type == 'rendered')
+  #set ($values = $value.split('\s*,\s*'))
+  #set ($selectedGroups = [])
+  #foreach ($value in $values)
+    #if ($value.length() > 0)
+      #set ($discard = $selectedGroups.add($value))
+    #end
+  #end
+  #if ($selectedGroups.size() > 0)
+    #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+    <ul class="users">
+    #foreach ($group in $selectedGroups)
+      #set ($groupReference = $services.model.resolveDocument($group))
+      #set ($groupName = $xwiki.getDocument($groupReference).plainTitle)
+      #if ("$!groupName" == '')
+        #set ($groupName = $groupReference.name)
+      #end
+      <li class="user">
+        <div class="user-avatar-wrapper">
+          #getUserAvatarURL($groupReference $avatarURL 30)
+          <img src="$escapetool.xml($avatarURL.url)" class="icon"
+            alt="$escapetool.xml($groupName)" />
+        </div>
+        <div class="user-name">
+          <a href="$escapetool.xml($xwiki.getURL($groupReference))">$escapetool.xml($groupName)</a>
+        </div>
+        <div>
+          <span class="user-alias">$escapetool.xml($groupReference.name)</span>
+          ## Display the wiki only for local groups.
+          #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
+            <span class="user-wiki">$escapetool.xml($groupReference.wikiReference.name)</span>
+          #end
+        </div>
+      </li>
+    #end
+    </ul>
+  #end
+#elseif ($type == 'hidden')
+  #set($id = $escapetool.xml("${prefix}${name}"))
+  <input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml($value)" />
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end

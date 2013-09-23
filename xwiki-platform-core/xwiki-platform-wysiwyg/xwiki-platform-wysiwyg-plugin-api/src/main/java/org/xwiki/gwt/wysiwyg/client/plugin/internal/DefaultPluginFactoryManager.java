@@ -39,31 +39,19 @@ public final class DefaultPluginFactoryManager implements PluginFactoryManager
      */
     private Map<String, PluginFactory> factories = new HashMap<String, PluginFactory>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactoryManager#addPluginFactory(PluginFactory)
-     */
+    @Override
     public PluginFactory addPluginFactory(PluginFactory factory)
     {
         return factories.put(factory.getPluginName(), factory);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactoryManager#getPluginFactory(String)
-     */
+    @Override
     public PluginFactory getPluginFactory(String pluginName)
     {
         return factories.get(pluginName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactoryManager#removePluginFactory(String)
-     */
+    @Override
     public PluginFactory removePluginFactory(String pluginName)
     {
         return factories.remove(pluginName);

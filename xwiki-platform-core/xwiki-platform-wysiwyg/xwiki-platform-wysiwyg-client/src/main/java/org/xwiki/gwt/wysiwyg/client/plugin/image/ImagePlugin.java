@@ -34,6 +34,8 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Image;
@@ -126,6 +128,15 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
             // add the menu extension
             menuExtension = new ImageMenuExtension(this);
             getUIExtensionList().add(menuExtension);
+            // Hack: We can access the menus where each menu item was placed only after the main menu bar is
+            // initialized, which happens after all the plugins are loaded.
+            Scheduler.get().scheduleDeferred(new ScheduledCommand()
+            {
+                public void execute()
+                {
+                    menuExtension.registerAttachHandlers();
+                }
+            });
 
             imageWizard = new ImageWizard(getConfig(), wikiService);
             imageWizard.addWizardListener(this);
@@ -160,7 +171,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
         toolBarExtension.clearFeatures();
 
         if (menuExtension != null) {
-            menuExtension.destroy();
+            menuExtension.clearFeatures();
         }
 
         // If a metadata extractor was created and setup, remove it
@@ -193,13 +204,45 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
     {
         ImageConfig imageConfig;
         String imageJSON = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+        String startStep = ImageWizardStep.ATTACHED_IMAGE_SELECTOR.toString();
         if (imageJSON != null) {
+            startStep = ImageWizardStep.IMAGE_REFERENCE_PARSER.toString();
             imageConfig = imageConfigJSONParser.parse(imageJSON);
         } else {
             imageConfig = new ImageConfig();
             imageConfig.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
         }
-        imageWizard.start(ImageWizardStep.IMAGE_SELECTOR.toString(), imageConfig);
+        imageWizard.start(startStep, imageConfig);
+    }
+
+    /**
+     * Start the edit image wizard.
+     */
+    public void onImageEdit()
+    {
+        String imageJSON = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+        ImageConfig imageConfig = imageConfigJSONParser.parse(imageJSON);
+        imageWizard.start(ImageWizardStep.IMAGE_REFERENCE_PARSER.toString(), imageConfig);
+    }
+
+    /**
+     * Start the insert attached image wizard.
+     */
+    public void onAttachedImage()
+    {
+        ImageConfig imageConfig = new ImageConfig();
+        imageConfig.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+        imageWizard.start(ImageWizardStep.ATTACHED_IMAGE_SELECTOR.toString(), imageConfig);
+    }
+
+    /**
+     * Start the insert external image wizard.
+     */
+    public void onURLImage()
+    {
+        ImageConfig imageConfig = new ImageConfig();
+        imageConfig.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+        imageWizard.start(ImageWizardStep.URL_IMAGE_SELECTOR.toString(), imageConfig);
     }
 
     /**

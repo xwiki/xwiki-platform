@@ -27,14 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering</artifactId>
   <name>XWiki Platform - Rendering - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Rendering - Parent POM</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-rendering-macros</module>
+    <module>xwiki-platform-rendering-transformations</module>
     <module>xwiki-platform-rendering-xwiki</module>
     <module>xwiki-platform-rendering-wikimacro</module>
   </modules>

@@ -32,6 +32,7 @@ public class DefaultDeletedAttachmentFileProvider extends DefaultAttachmentFileP
 {
     /**
      * This stores the metadata for the deleted attachment such as who deleted it.
+     *
      * @see #metaFileForDeletedAttachment(XWikiAttachment, Date)
      */
     private static final String DELETED_ATTACH_META_FILENAME = "~DELETED_ATTACH_METADATA.xml";
@@ -42,17 +43,12 @@ public class DefaultDeletedAttachmentFileProvider extends DefaultAttachmentFileP
      * @param attachmentDir the location where the information about the deleted attachment will be stored.
      * @param fileName the name of the attachment file.
      */
-    public DefaultDeletedAttachmentFileProvider(final File attachmentDir,
-                                                final String fileName)
+    public DefaultDeletedAttachmentFileProvider(final File attachmentDir, final String fileName)
     {
         super(attachmentDir, fileName);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see DeletedAttachmentFileProvider#getDeletedAttachmentMetaFile()
-     */
+    @Override
     public File getDeletedAttachmentMetaFile()
     {
         return new File(this.getAttachmentDir(), DELETED_ATTACH_META_FILENAME);

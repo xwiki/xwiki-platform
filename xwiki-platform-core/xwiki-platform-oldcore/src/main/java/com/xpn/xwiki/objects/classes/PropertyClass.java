@@ -19,27 +19,33 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.mapping.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.ClassPropertyReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.DeprecatedContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.Utils;
 
@@ -49,14 +55,36 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
-public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface,
+public class PropertyClass extends BaseCollection<ClassPropertyReference> implements PropertyClassInterface,
     Comparable<PropertyClass>
 {
-    private BaseClass object;
+    /**
+     * Logging helper object.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyClass.class);
 
-    private int id;
+    /**
+     * Identifier used to specify that the property has a custom displayer in the XClass itself.
+     */
+    private static final String CLASS_DISPLAYER_IDENTIFIER = "class";
+
+    /**
+     * Identifier prefix used to specify that the property has a custom displayer in a wiki document.
+     */
+    private static final String DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX = "doc:";
+
+    /**
+     * Identifier prefix used to specify that the property has a custom displayer in a velocity template.
+     */
+    private static final String TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX = "template:";
+
+    private BaseClass xclass;
+
+    private long id;
 
     private PropertyMetaClass pMetaClass;
+
+    protected String cachedCustomDisplayer;
 
     public PropertyClass()
     {
@@ -64,12 +92,23 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public PropertyClass(String name, String prettyname, PropertyMetaClass xWikiClass)
     {
-        super();
         setName(name);
         setPrettyName(prettyname);
         setxWikiClass(xWikiClass);
         setUnmodifiable(false);
         setDisabled(false);
+    }
+
+    @Override
+    protected ClassPropertyReference createReference()
+    {
+        return new ClassPropertyReference(getName(), this.xclass.getReference());
+    }
+
+    @Override
+    public BaseClass getXClass(XWikiContext context)
+    {
+        return getxWikiClass();
     }
 
     public BaseClass getxWikiClass()
@@ -86,14 +125,16 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         this.pMetaClass = (PropertyMetaClass) xWikiClass;
     }
 
+    @Override
     public BaseCollection getObject()
     {
-        return this.object;
+        return this.xclass;
     }
 
+    @Override
     public void setObject(BaseCollection object)
     {
-        this.object = (BaseClass) object;
+        this.xclass = (BaseClass) object;
     }
 
     public String getFieldFullName()
@@ -105,7 +146,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     @Override
-    public int getId()
+    public long getId()
     {
         if (getObject() == null) {
             return this.id;
@@ -114,16 +155,18 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     @Override
-    public void setId(int id)
+    public void setId(long id)
     {
         this.id = id;
     }
 
+    @Override
     public String toString(BaseProperty property)
     {
         return property.toText();
     }
 
+    @Override
     public BaseProperty fromString(String value)
     {
         return null;
@@ -135,13 +178,15 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return fromString(value);
     }
 
+    @Override
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
         input input = new input();
-        PropertyInterface prop = object.safeget(name);
+        input.setAttributeFilter(new XMLAttributeValueFilter());
+        BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("hidden");
@@ -150,22 +195,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
-    {
-        input input = new input();
-        input.setType("text");
-        input.setName(prefix + name);
-        input.setID(prefix + name);
-        input.setSize(20);
-        String fieldFullName = getFieldFullName();
-        Object value = criteria.getParameter(fieldFullName);
-        if (value != null) {
-            input.setValue(value.toString());
-        }
-        buffer.append(input.toString());
-    }
-
+    @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -174,13 +204,15 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         }
     }
 
+    @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilter(new XMLAttributeValueFilter());
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("text");
@@ -200,18 +232,6 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     public String displayHidden(String name, BaseCollection object, XWikiContext context)
     {
         return displayHidden(name, "", object, context);
-    }
-
-    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        StringBuffer buffer = new StringBuffer();
-        displaySearch(buffer, name, prefix, criteria, context);
-        return buffer.toString();
-    }
-
-    public String displaySearch(String name, XWikiCriteria criteria, XWikiContext context)
-    {
-        return displaySearch(name, "", criteria, context);
     }
 
     public String displayView(String name, String prefix, BaseCollection object, XWikiContext context)
@@ -240,31 +260,54 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public boolean isCustomDisplayed(XWikiContext context)
     {
-        String disp = getCustomDisplay();
-        return disp != null && disp.length() > 0;
+        return (StringUtils.isNotEmpty(getCachedDefaultCustomDisplayer(context)));
     }
 
     public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type, BaseObject object,
         XWikiContext context) throws XWikiException
     {
-        String content = getCustomDisplay();
-
+        String content = "";
         try {
             VelocityContext vcontext = Utils.getComponent(VelocityManager.class).getVelocityContext();
             vcontext.put("name", fieldName);
             vcontext.put("prefix", prefix);
+            // The PropertyClass instance can be used to access meta properties in the custom displayer (e.g.
+            // dateFormat, multiSelect). It can be obtained from the XClass of the given object but only if the property
+            // has been added to the XClass. We need to have it in the Velocity context for the use case when an XClass
+            // property needs to be previewed before being added to the XClass.
+            vcontext.put("field", new com.xpn.xwiki.api.PropertyClass(this, context));
             vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
             vcontext.put("type", type);
-            vcontext.put("context", new com.xpn.xwiki.api.Context(context));
+            vcontext.put("context", new DeprecatedContext(context));
+            vcontext.put("xcontext", new Context(context));
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {
                 vcontext.put("value", prop.getValue());
+            } else {
+                // The $value property can exist in the velocity context, we overwrite it to make sure we don't get a
+                // wrong value in the displayer when the property does not exist yet.
+                vcontext.put("value", null);
             }
 
-            String classSyntax =
-                context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
-            content = context.getDoc().getRenderedContent(content, classSyntax, context);
+            String customDisplayer = getCachedDefaultCustomDisplayer(context);
+            if (StringUtils.isNotEmpty(customDisplayer)) {
+                if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
+                    content = getCustomDisplay();
+                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
+                        .getSyntax().toIdString();
+                    content = context.getDoc().getRenderedContent(content, classSyntax, context);
+                } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
+                    XWikiDocument displayerDoc = context.getWiki().getDocument(
+                        StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
+                    content = displayerDoc.getContent();
+                    String classSyntax = displayerDoc.getSyntax().toIdString();
+                    content = context.getDoc().getRenderedContent(content, classSyntax, context);
+                } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
+                    content = context.getWiki().evaluateTemplate(
+                        StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
+                }
+            }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                 XWikiException.ERROR_XWIKI_CLASSES_CANNOT_PREPARE_CUSTOM_DISPLAY,
@@ -272,12 +315,6 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
         }
         buffer.append(content);
-    }
-
-    @Override
-    public BaseClass getxWikiClass(XWikiContext context)
-    {
-        return getxWikiClass();
     }
 
     @Override
@@ -383,21 +420,40 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         setIntValue("number", number);
     }
 
+    /**
+     * Each type of XClass property is identified by a string that specifies the data type of the property value (e.g.
+     * 'String', 'Number', 'Date') without disclosing implementation details. The internal implementation of an XClass
+     * property type can change over time but its {@code classType} should not.
+     * <p>
+     * The {@code classType} can be used as a hint to lookup various components related to this specific XClass property
+     * type. See {@link com.xpn.xwiki.internal.objects.classes.PropertyClassProvider} for instance.
+     * 
+     * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
+     */
     public String getClassType()
     {
-        return getClass().getName();
+        // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
+        // (without the package). Subclasses can overwrite this method to use a different hint format.
+        return StringUtils.removeEnd(getClass().getSimpleName(), "Class");
     }
 
+    /**
+     * Sets the property class type.
+     * 
+     * @param type the class type
+     * @deprecated since 4.3M1, the property class type cannot be modified
+     */
+    @Deprecated
     public void setClassType(String type)
     {
+        LOGGER.warn("The property class type cannot be modified!");
     }
 
     @Override
-    public Object clone()
+    public PropertyClass clone()
     {
         PropertyClass pclass = (PropertyClass) super.clone();
         pclass.setObject(getObject());
-        pclass.setClassType(getClassType());
         return pclass;
     }
 
@@ -407,6 +463,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return toXML();
     }
 
+    @Override
     public Element toXML()
     {
         Element pel = new DOMElement(getName());
@@ -419,7 +476,13 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             pel.add(bprop.toXML());
         }
         Element el = new DOMElement("classType");
-        el.addText(getClassType());
+        String classType = getClassType();
+        if (this.getClass().getSimpleName().equals(classType + "Class")) {
+            // Keep exporting the full Java class name for old/default property types to avoid breaking the XAR format
+            // (to allow XClasses created with the current version of XWiki to be imported in an older version).
+            classType = this.getClass().getName();
+        }
+        el.addText(classType);
         pel.add(el);
         return pel;
     }
@@ -447,6 +510,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         }
     }
 
+    @Override
     public String toFormString()
     {
         return toString();
@@ -510,6 +574,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return true;
     }
 
+    @Override
     public BaseProperty fromValue(Object value)
     {
         BaseProperty property = newProperty();
@@ -517,17 +582,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return property;
     }
 
+    @Override
     public BaseProperty newProperty()
     {
         return new BaseProperty();
-    }
-
-    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
-    {
-    }
-
-    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
-    {
     }
 
     public void setValidationRegExp(String validationRegExp)
@@ -574,8 +632,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         }
     }
 
+    @Override
     public void flushCache()
     {
+        this.cachedCustomDisplayer = null;
     }
 
     /**
@@ -587,6 +647,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
      * @see #getNumber()
      * @since 2.4M2
      */
+    @Override
     public int compareTo(PropertyClass other)
     {
         int result = this.getNumber() - other.getNumber();
@@ -598,8 +659,100 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
         return result;
     }
-    
-    protected String getFullQueryPropertyName() {
+
+    protected String getFullQueryPropertyName()
+    {
         return "obj." + getName();
+    }
+
+    /**
+     * Returns the current cached default custom displayer for the PropertyClass. The result will be cached and can be
+     * flushed using {@link #flushCache()}. If it returns the empty string, then there is no default custom displayer
+     * for this class.
+     * 
+     * @param context the current request context
+     * @return An identifier for the location of a custom displayer. This can be {@code class} if there's custom display
+     *         code specified in the class itself, {@code page:currentwiki:XWiki.BooleanDisplayer} if such a document
+     *         exists in the current wiki, {@code page:xwiki:XWiki.StringDisplayer} if such a document exists in the
+     *         main wiki, or {@code template:displayer_boolean.vm} if a template on the filesystem or in the current
+     *         skin exists.
+     */
+    protected String getCachedDefaultCustomDisplayer(XWikiContext context)
+    {
+        // First look at custom displayer in class. We should not cache this one.
+        String customDisplay = getCustomDisplay();
+        if (StringUtils.isNotEmpty(customDisplay)) {
+            return CLASS_DISPLAYER_IDENTIFIER;
+        }
+
+        // Then look for pages or templates
+        if (this.cachedCustomDisplayer == null) {
+            this.cachedCustomDisplayer = getDefaultCustomDisplayer(getTypeName(), context);
+        }
+        return this.cachedCustomDisplayer;
+    }
+
+    /**
+     * Method to find the default custom displayer to use for a specific Property Class.
+     * 
+     * @param propertyClassName the type of the property; this is defined in each subclass, such as {@code boolean},
+     *        {@code string} or {@code dblist}
+     * @param context the current request context
+     * @return An identifier for the location of a custom displayer. This can be {@code class} if there's custom display
+     *         code specified in the class itself, {@code page:currentwiki:XWiki.BooleanDisplayer} if such a document
+     *         exists in the current wiki, {@code page:xwiki:XWiki.StringDisplayer} if such a document exists in the
+     *         main wiki, or {@code template:displayer_boolean.vm} if a template on the filesystem or in the current
+     *         skin exists.
+     */
+    protected String getDefaultCustomDisplayer(String propertyClassName, XWikiContext context)
+    {
+        LOGGER.debug("Looking up default custom displayer for property class name [{}]", propertyClassName);
+
+        try {
+            // First look into the current wiki
+            String pageName = StringUtils.capitalize(propertyClassName) + "Displayer";
+            DocumentReference reference = new DocumentReference(context.getDatabase(), "XWiki", pageName);
+            if (context.getWiki().exists(reference, context)) {
+                LOGGER.debug("Found default custom displayer for property class name in local wiki: [{}]", pageName);
+                return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + "XWiki." + pageName;
+            }
+
+            // Look in the main wiki
+            if (!context.isMainWiki()) {
+                reference = new DocumentReference(context.getMainXWiki(), "XWiki", pageName);
+                if (context.getWiki().exists(reference, context)) {
+                    LOGGER.debug("Found default custom displayer for property class name in main wiki: [{}]", pageName);
+                    return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + context.getMainXWiki() + ":XWiki." + pageName;
+                }
+            }
+
+            // Look in templates
+            String template = "displayer_" + propertyClassName + ".vm";
+            String result = "";
+            try {
+                result = context.getWiki().evaluateTemplate(template, context);
+                if (StringUtils.isNotEmpty(result)) {
+                    LOGGER.debug("Found default custom displayer for property class name as template: [{}]", template);
+                    return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + template;
+                }
+            } catch (IOException e) {
+            }
+        } catch (Throwable e) {
+            // If we fail we consider there is no custom displayer
+            LOGGER.error("Error while trying to evaluate if a property has a custom displayer", e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a short name identifying this type of property. This is derived from the java class name, lowercasing the
+     * part before {@code Class}.
+     * 
+     * @return a string, for example {@code string}, {@code dblist}, {@code number}
+     */
+    private String getTypeName()
+    {
+        return StringUtils.substringBeforeLast(this.getClass().getSimpleName(), "Class").toLowerCase();
     }
 }

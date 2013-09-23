@@ -24,8 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
@@ -55,7 +56,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
     /**
      * The component manager used to dynamically fetch components (syntax parsers, in this case).
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
@@ -63,7 +64,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
      * 
      * @param name the name of the macro
      * @param description the description of the macro
-     * @param contentDescriptor the descriptor of the content of this macro 
+     * @param contentDescriptor the descriptor of the content of this macro
      * @param parametersBeanClass the type of parameters of this macro
      */
     protected AbstractContainerMacro(String name, String description, ContentDescriptor contentDescriptor,
@@ -72,9 +73,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         super(name, description, contentDescriptor, parametersBeanClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -99,7 +98,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
         }
 
         // add the css class, if any, to the container root
-        if (!StringUtils.isEmpty(parameters.getCssClass())) {
+        if (StringUtils.isNotEmpty(parameters.getCssClass())) {
             containerRoot.setParameter(CLASS_ATTRIBUTE, parameters.getCssClass());
         }
 
@@ -114,7 +113,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
     protected LayoutManager getLayoutManager(String layoutStyle)
     {
         try {
-            return getComponentManager().lookup(LayoutManager.class, layoutStyle);
+            return getComponentManager().getInstance(LayoutManager.class, layoutStyle);
         } catch (ComponentLookupException e) {
             // TODO: maybe should log?
             return null;
@@ -138,12 +137,10 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
      */
     protected ComponentManager getComponentManager()
     {
-        return componentManager;
+        return this.componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;

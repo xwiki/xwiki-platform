@@ -38,9 +38,10 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
      * We also need this method to be able to hook simplification of the DOM tree storing meta data in elements.
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#setHTMLImpl(String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
+     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3147"
+     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3156"
      */
+    @Override
     protected void setHTMLImpl(String html)
     {
         if (elem.getPropertyBoolean(RichTextArea.DIRTY)) {
@@ -49,11 +50,7 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#initElement()
-     */
+    @Override
     public native void initElement()
     /*-{
         var iframe = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
@@ -77,11 +74,6 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
         }, false);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#setEnabledImpl(boolean)
-     */
     @Override
     protected void setEnabledImpl(boolean enabled)
     {
@@ -90,22 +82,13 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#isEnabledImpl()
-     */
     @Override
     protected boolean isEnabledImpl()
     {
         return ((Document) IFrameElement.as(elem).getContentDocument()).isDesignMode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#hookEvents()
-     */
+    @Override
     protected void hookEvents()
     {
         // JSNI doesn't support super.*
@@ -140,13 +123,10 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
 
         wnd.addEventListener('dblclick', elem.__gwt_handler, true);
         wnd.addEventListener('paste', elem.__gwt_handler, true);
+        wnd.addEventListener('copy', elem.__gwt_handler, true);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#unhookEvents()
-     */
+    @Override
     protected void unhookEvents()
     {
         // Double click event is not caught by default.
@@ -165,13 +145,9 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         elem.contentWindow.removeEventListener('dblclick', elem.__gwt_handler, true);
         elem.contentWindow.removeEventListener('paste', elem.__gwt_handler, true);
+        elem.contentWindow.removeEventListener('copy', elem.__gwt_handler, true);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#setFocus(boolean)
-     */
     @Override
     public void setFocus(boolean focused)
     {

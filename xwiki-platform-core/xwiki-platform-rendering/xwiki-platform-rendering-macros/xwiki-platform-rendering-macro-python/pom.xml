@@ -27,11 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>  
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-python</artifactId>
   <name>XWiki Platform - Rendering - Macro - Python</name>
-  <description>XWiki Platform - Rendering - Macro - Python</description>
+  <description>Adds ability to write scripts in Python in wiki pages</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Python Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -42,7 +47,6 @@
       <groupId>org.python</groupId>
       <artifactId>jython-standalone</artifactId>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -52,9 +56,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -22,17 +22,16 @@ package com.xpn.xwiki.web;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
-import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
@@ -52,41 +51,9 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
      */
     private File base;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractBridgedComponentTestCase#registerComponents()
-     */
+    private ExecutionContext executionContext;
+
     @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        final Container mockContainer = registerMockComponent(Container.class);
-        final ApplicationContext mockAppContext = registerMockComponent(ApplicationContext.class);
-        final ExecutionContextManager mockExecutionContextManager =
-            registerMockComponent(ExecutionContextManager.class);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockExecutionContextManager).initialize(with(any(ExecutionContext.class)));
-                ignoring(mockContainer).setApplicationContext(with(any(ApplicationContext.class)));
-                allowing(mockContainer).getApplicationContext();
-                will(returnValue(mockAppContext));
-                allowing(mockAppContext).getTemporaryDirectory();
-                will(returnValue(base));
-            }
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractBridgedComponentTestCase#setUp()
-     */
-    @Override
-    @Before
     public void setUp() throws Exception
     {
         base = new File(getClass().getResource("/").toURI());
@@ -94,6 +61,33 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
         super.setUp();
 
         action = new TempResourceAction();
+    }
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        this.executionContext = new ExecutionContext();
+
+        // Configure Servlet Environment defined in AbstractBridgedComponentTestCase so that it returns a good
+        // temporary directory
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
+        environment.setTemporaryDirectory(base);
+
+        final ExecutionContextManager mockExecutionContextManager =
+            registerMockComponent(ExecutionContextManager.class);
+        final Execution mockExecution = registerMockComponent(Execution.class);
+        
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockExecutionContextManager).initialize(with(any(ExecutionContext.class)));
+
+                allowing(mockExecution).getContext(); will(returnValue(executionContext));
+                allowing(mockExecution).removeContext();
+            }
+        });
     }
 
     /**

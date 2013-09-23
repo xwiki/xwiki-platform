@@ -27,28 +27,30 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.slf4j.Logger;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.handler.packager.xml.RootHandler;
 import org.xwiki.extension.xar.internal.handler.packager.xml.UnknownRootElement;
@@ -57,168 +59,232 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XARImportedEvent;
+import com.xpn.xwiki.internal.event.XARImportingEvent;
 
+/**
+ * Default implementation of {@link Packager}.
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 @Component
 @Singleton
-public class DefaultPackager extends AbstractLogEnabled implements Packager, Initializable
+public class DefaultPackager implements Packager, Initializable
 {
     @Inject
     private ComponentManager componentManager;
 
     @Inject
-    private Execution execution;
+    @Named("explicit")
+    private DocumentReferenceResolver<EntityReference> resolver;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     @Inject
-    @Named("explicit/reference")
-    private DocumentReferenceResolver<EntityReference> resolver;
+    private ObservationManager observation;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private DocumentMergeImporter importer;
+
+    @Inject
+    private MandatoryDocumentInitializerManager initializerManager;
 
     private SAXParserFactory parserFactory;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         this.parserFactory = SAXParserFactory.newInstance();
     }
 
-    public void importXAR(File xarFile, String wiki) throws IOException, XWikiException
+    @Override
+    public void importXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException,
+        ComponentLookupException
     {
-        if (wiki == null) {
-            XWikiContext context = getXWikiContext();
-            if (context.getWiki().isVirtualMode()) {
-                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+        if (configuration.getWiki() == null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(context.getMainXWiki())) {
-                    importXARToWiki(xarFile, context.getMainXWiki());
-                }
-
-                for (String subwiki : wikis) {
-                    importXARToWiki(xarFile, subwiki);
-                }
-            } else {
-                importXARToWiki(xarFile, context.getMainXWiki());
+            for (String subwiki : wikis) {
+                importXARToWiki(xarFile, subwiki, configuration);
             }
         } else {
-            importXARToWiki(xarFile, wiki);
+            importXARToWiki(xarFile, configuration.getWiki(), configuration);
         }
     }
 
-    public void importXARToWiki(File xarFile, String wiki) throws IOException
+    private XarMergeResult importXARToWiki(File xarFile, String wiki, PackageConfiguration configuration)
+        throws IOException, ComponentLookupException
     {
         FileInputStream fis = new FileInputStream(xarFile);
-        ZipInputStream zis = new ZipInputStream(fis);
-
         try {
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                if (!entry.isDirectory()) {
-                    try {
-                        DocumentImporterHandler documentHandler =
-                            new DocumentImporterHandler(this.componentManager, wiki);
+            return importXARToWiki(fis, wiki, configuration);
+        } finally {
+            fis.close();
+        }
+    }
 
-                        parseDocument(zis, documentHandler);
-                    } catch (NotADocumentException e) {
-                        // Impossible to know that before parsing
-                    } catch (Exception e) {
-                        getLogger().error("Failed to parse document [" + entry.getName() + "]", e);
+    private XarMergeResult importXARToWiki(InputStream xarInputStream, String wiki, PackageConfiguration configuration)
+        throws IOException, ComponentLookupException
+    {
+        XarMergeResult mergeResult = new XarMergeResult();
+
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarInputStream);
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        String currentWiki = xcontext.getDatabase();
+        try {
+            xcontext.setDatabase(wiki);
+
+            this.observation.notify(new XARImportingEvent(), null, xcontext);
+
+            for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+                if (!entry.isDirectory()) {
+                    // Only import what should be imported
+                    if (configuration.getEntriesToImport() == null
+                        || configuration.getEntriesToImport().contains(entry.getName())) {
+                        DocumentImporterHandler documentHandler =
+                            new DocumentImporterHandler(this, this.componentManager, wiki, this.importer);
+
+                        try {
+                            documentHandler.setConfiguration(configuration);
+
+                            parseDocument(zis, documentHandler);
+
+                            if (documentHandler.getMergeResult() != null) {
+                                mergeResult.addMergeResult(documentHandler.getMergeResult());
+                            }
+
+                            if (configuration.isLogEnabled()) {
+                                this.logger.info("Successfully imported document [{}] in language [{}]",
+                                    documentHandler.getDocument().getDocumentReference(), documentHandler.getDocument()
+                                        .getRealLocale());
+                            }
+                        } catch (NotADocumentException e) {
+                            // Impossible to know that before parsing
+                            this.logger.debug("Entry [" + entry + "] is not a document", e);
+                        } catch (Exception e) {
+                            this.logger.error("Failed to parse document [" + entry.getName() + "]", e);
+
+                            if (configuration.isLogEnabled()) {
+                                this.logger.info("Failed to import document [{}] in language [{}]", documentHandler
+                                    .getDocument().getDocumentReference(), documentHandler.getDocument()
+                                    .getRealLocale());
+                            }
+                        }
                     }
                 }
             }
         } finally {
-            zis.close();
+            this.observation.notify(new XARImportedEvent(), null, xcontext);
+
+            xcontext.setDatabase(currentWiki);
         }
+
+        return mergeResult;
     }
 
-    public void unimportXAR(File xarFile, String wiki) throws IOException, XWikiException
+    @Override
+    public void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException
     {
-        if (wiki == null) {
-            XWikiContext context = getXWikiContext();
-            if (context.getWiki().isVirtualMode()) {
-                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+        if (configuration.getWiki() == null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(context.getMainXWiki())) {
-                    unimportXARFromWiki(xarFile, context.getMainXWiki());
-                }
-
-                for (String subwiki : wikis) {
-                    unimportXARFromWiki(xarFile, subwiki);
-                }
-            } else {
-                unimportXARFromWiki(xarFile, context.getMainXWiki());
+            for (String subwiki : wikis) {
+                unimportXARFromWiki(xarFile, subwiki, configuration);
             }
         } else {
-            unimportXARFromWiki(xarFile, wiki);
+            unimportXARFromWiki(xarFile, configuration.getWiki(), configuration);
         }
     }
 
-    public void unimportXARFromWiki(File xarFile, String wiki) throws IOException
+    private void unimportXARFromWiki(File xarFile, String wiki, PackageConfiguration configuration) throws IOException
     {
-        unimportPagesFromWiki(getEntries(xarFile), wiki);
+        unimportPagesFromWiki(getEntries(xarFile), wiki, configuration);
     }
 
-    public void unimportPages(Collection<XarEntry> pages, String wiki) throws XWikiException
+    @Override
+    public void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException
     {
-        if (wiki == null) {
-            XWikiContext context = getXWikiContext();
-            if (context.getWiki().isVirtualMode()) {
-                List<String> wikis = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(context);
+        if (configuration.getWiki() == null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
 
-                if (!wikis.contains(context.getMainXWiki())) {
-                    unimportPagesFromWiki(pages, context.getMainXWiki());
-                }
-
-                for (String subwiki : wikis) {
-                    unimportPagesFromWiki(pages, subwiki);
-                }
-            } else {
-                unimportPagesFromWiki(pages, context.getMainXWiki());
+            for (String subwiki : wikis) {
+                unimportPagesFromWiki(pages, subwiki, configuration);
             }
         } else {
-            unimportPagesFromWiki(pages, wiki);
+            unimportPagesFromWiki(pages, configuration.getWiki(), configuration);
         }
     }
 
-    public void unimportPagesFromWiki(Collection<XarEntry> pages, String wiki)
+    private void unimportPagesFromWiki(Collection<XarEntry> pages, String wiki, PackageConfiguration configuration)
     {
         WikiReference wikiReference = new WikiReference(wiki);
 
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xcontextProvider.get();
         for (XarEntry xarEntry : pages) {
-            DocumentReference documentReference = this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference);
-            try {
-                XWikiDocument document = getXWikiContext().getWiki().getDocument(documentReference, xcontext);
+            // Only delete what should be deleted.
+            if (configuration.getEntriesToImport() == null
+                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
+                DocumentReference documentReference =
+                    this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference);
 
-                if (!document.isNew()) {
-                    String language = xarEntry.getLanguage();
-                    if (language != null) {
-                        document = document.getTranslatedDocument(language, xcontext);
-                        getXWikiContext().getWiki().deleteDocument(document, xcontext);
-                    } else {
-                        getXWikiContext().getWiki().deleteAllDocuments(document, xcontext);
+                if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
+                    try {
+                        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+                        if (!document.isNew()) {
+                            Locale locale = xarEntry.getLocale();
+                            if (locale != null && !Locale.ROOT.equals(locale)) {
+                                document = document.getTranslatedDocument(locale, xcontext);
+                            }
+
+                            xcontext.getWiki().deleteDocument(document, xcontext);
+
+                            this.logger.info("Successfully deleted document [{}] in language [{}]",
+                                document.getDocumentReference(), document.getRealLocale());
+                        }
+                    } catch (XWikiException e) {
+                        this.logger.error("Failed to delete document [{}]", documentReference, e);
                     }
                 }
-            } catch (XWikiException e) {
-                getLogger().error("Failed to delete document [" + documentReference + "]", e);
             }
         }
     }
 
+    private boolean isMandatoryDocument(DocumentReference documentReference)
+    {
+        return this.initializerManager.getMandatoryDocumentInitializer(documentReference) != null;
+    }
+
+    @Override
     public List<XarEntry> getEntries(File xarFile) throws IOException
     {
         List<XarEntry> documents = null;
 
         FileInputStream fis = new FileInputStream(xarFile);
-        ZipInputStream zis = new ZipInputStream(fis);
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
 
         try {
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                if (!entry.isDirectory()) {
+            for (ZipArchiveEntry zipEntry = zis.getNextZipEntry(); zipEntry != null; zipEntry = zis.getNextZipEntry()) {
+                if (!zipEntry.isDirectory()) {
                     try {
                         XarPageLimitedHandler documentHandler = new XarPageLimitedHandler(this.componentManager);
 
@@ -229,24 +295,24 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
                         }
 
                         XarEntry xarEntry = documentHandler.getXarEntry();
-                        xarEntry.setPath(entry.getName());
+                        xarEntry.setEntryName(zipEntry.getName());
 
                         documents.add(xarEntry);
                     } catch (NotADocumentException e) {
                         // Impossible to know that before parsing
                     } catch (Exception e) {
-                        getLogger().error("Failed to parse document [" + entry.getName() + "]", e);
+                        this.logger.error("Failed to parse document [" + zipEntry.getName() + "]", e);
                     }
                 }
             }
         } finally {
-            zis.close();
+            fis.close();
         }
 
         return documents != null ? documents : Collections.<XarEntry> emptyList();
     }
 
-    private void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
+    public void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
         SAXException, IOException, NotADocumentException
     {
         SAXParser saxParser = this.parserFactory.newSAXParser();
@@ -261,15 +327,5 @@ public class DefaultPackager extends AbstractLogEnabled implements Packager, Ini
         } catch (UnknownRootElement e) {
             throw new NotADocumentException("Failed to parse stream", e);
         }
-    }
-
-    private ExecutionContext getExecutionContext()
-    {
-        return this.execution.getContext();
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) getExecutionContext().getProperty("xwikicontext");
     }
 }

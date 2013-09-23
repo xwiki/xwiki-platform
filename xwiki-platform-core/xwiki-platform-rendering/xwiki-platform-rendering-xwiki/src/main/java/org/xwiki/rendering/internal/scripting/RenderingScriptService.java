@@ -19,16 +19,28 @@
  */
 package org.xwiki.rendering.internal.scripting;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -37,14 +49,28 @@ import org.xwiki.script.service.ScriptService;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("rendering")
+@Component
+@Named("rendering")
+@Singleton
 public class RenderingScriptService implements ScriptService
 {
     /**
      * Used to lookup parsers and renderers to discover available syntaxes.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
+
+    /**
+     * @see #getDefaultTransformationNames()
+     */
+    @Inject
+    private RenderingConfiguration configuration;
+
+    /**
+     * @see #resolveSyntax(String)
+     */
+    @Inject
+    private SyntaxFactory syntaxFactory;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -53,7 +79,7 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (Parser parser : this.componentManager.lookupList(Parser.class)) {
+            for (Parser parser : this.componentManager.<Parser>getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
             }
         } catch (ComponentLookupException e) {
@@ -70,7 +96,8 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (PrintRendererFactory factory : this.componentManager.lookupList(PrintRendererFactory.class)) {
+            List<PrintRendererFactory> factories = this.componentManager.getInstanceList(PrintRendererFactory.class);
+            for (PrintRendererFactory factory : factories) {
                 syntaxes.add(factory.getSyntax());
             }
         } catch (ComponentLookupException e) {
@@ -78,5 +105,73 @@ public class RenderingScriptService implements ScriptService
         }
 
         return syntaxes;
+    }
+
+    /**
+     * @return the names of Transformations that are configured in the Rendering Configuration and which are used by
+     *         the Transformation Manager when running all transformations
+     */
+    public List<String> getDefaultTransformationNames()
+    {
+        return this.configuration.getTransformationNames();
+    }
+
+    /**
+     * Parses a text written in the passed syntax.
+     *
+     * @param text the text to parse
+     * @param syntaxId the id of the syntax in which the text is written in
+     * @return the XDOM representing the AST of the parsed text or null if an error occurred
+     * @since 3.2M3
+     */
+    public XDOM parse(String text, String syntaxId)
+    {
+        XDOM result;
+        try {
+            Parser parser = this.componentManager.getInstance(Parser.class, syntaxId);
+            result = parser.parse(new StringReader(text));
+        } catch (Exception e) {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Render a list of Blocks into the passed syntax.
+     *
+     * @param block the block to render
+     * @param outputSyntaxId the syntax in which to render the blocks
+     * @return the string representing the passed blocks in the passed syntax or null if an error occurred
+     * @since 3.2M3
+     */
+    public String render(Block block, String outputSyntaxId)
+    {
+        String result;
+        WikiPrinter printer = new DefaultWikiPrinter();
+        try {
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, outputSyntaxId);
+            renderer.render(block, printer);
+            result = printer.toString();
+        } catch (Exception e) {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Converts a Syntax specified as a String into a proper Syntax object.
+     *
+     * @param syntaxId the syntax as a string (eg "xwiki/2.0", "html/4.01", etc)
+     * @return the proper Syntax object representing the passed syntax
+     */
+    public Syntax resolveSyntax(String syntaxId)
+    {
+        Syntax syntax;
+        try {
+            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+        } catch (ParseException exception) {
+            syntax = null;
+        }
+        return syntax;
     }
 }

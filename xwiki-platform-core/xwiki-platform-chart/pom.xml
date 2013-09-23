@@ -27,14 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-chart</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Chart - Parent POM</name>
   <description>Support for generating charts inside XWiki</description>
   <modules>
-    <module>xwiki-platform-chart-renderer</module>
+    <!-- Sorted alphabetically -->
     <module>xwiki-platform-chart-macro</module>
+    <module>xwiki-platform-chart-plugin</module>
+    <module>xwiki-platform-chart-renderer</module>
   </modules>
 </project>

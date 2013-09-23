@@ -33,11 +33,7 @@ import com.google.gwt.dom.client.Node;
  */
 public class MozillaBehaviorAdjuster extends BehaviorAdjuster
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BehaviorAdjuster#navigateOutsideTableCell(Event, boolean)
-     */
+    @Override
     protected void navigateOutsideTableCell(Event event, boolean before)
     {
         super.navigateOutsideTableCell(event, before);

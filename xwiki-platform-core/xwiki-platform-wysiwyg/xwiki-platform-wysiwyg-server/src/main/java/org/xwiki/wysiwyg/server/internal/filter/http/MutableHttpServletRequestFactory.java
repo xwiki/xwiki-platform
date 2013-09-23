@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.wysiwyg.server.filter.MutableServletRequest;
 import org.xwiki.wysiwyg.server.filter.MutableServletRequestFactory;
 
-
 /**
  * {@link MutableServletRequestFactory} implementation for the HTTP protocol.
  * 
@@ -35,11 +34,7 @@ import org.xwiki.wysiwyg.server.filter.MutableServletRequestFactory;
 @Component(hints = {"HTTP/1.1", "HTTP/1.0" })
 public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableServletRequestFactory#newInstance(ServletRequest)
-     */
+    @Override
     public synchronized MutableServletRequest newInstance(ServletRequest request)
     {
         if (request instanceof HttpServletRequest) {

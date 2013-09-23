@@ -1,2 +1,0 @@
-org.xwiki.cache.jbosscache.internal.DefaultJBossCacheCacheFactory
-org.xwiki.cache.jbosscache.internal.LocalJBossCacheCacheFactory

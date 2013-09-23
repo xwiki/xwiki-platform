@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,22 +28,26 @@ public class XWikiJSPRenderer implements XWikiRenderer
     {
     }
 
+    @Override
     public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
     {
         return content;
     }
 
+    @Override
     public void flushCache()
     {
         // To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
         return allcontent;
     }
 
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {

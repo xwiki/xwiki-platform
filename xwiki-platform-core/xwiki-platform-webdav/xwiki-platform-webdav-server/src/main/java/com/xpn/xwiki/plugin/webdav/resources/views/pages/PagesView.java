@@ -47,9 +47,7 @@ public class PagesView extends AbstractDavView
      */
     private static final Logger logger = LoggerFactory.getLogger(PagesView.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -65,9 +63,7 @@ public class PagesView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();
@@ -85,9 +81,7 @@ public class PagesView extends AbstractDavView
         return new DavResourceIteratorImpl(children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof PagesBySpaceNameSubView) {
@@ -101,9 +95,7 @@ public class PagesView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource member) throws DavException
     {
         XWikiDavResource davResource = (XWikiDavResource) member;

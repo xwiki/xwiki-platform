@@ -19,6 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.script;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
@@ -31,7 +34,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.7M3
  */
-@Component("script")
+@Component
+@Named("script")
+@Singleton
 public class DefaultScriptMacro extends AbstractJSR223ScriptMacro<DefaultScriptMacroParameters>
 {
     /**
@@ -59,12 +64,6 @@ public class DefaultScriptMacro extends AbstractJSR223ScriptMacro<DefaultScriptM
             DefaultScriptMacroParameters.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro#getScriptEngineName(org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
     @Override
     protected String getScriptEngineName(DefaultScriptMacroParameters parameters, MacroTransformationContext context)
     {

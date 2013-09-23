@@ -19,39 +19,51 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.CoreConfiguration;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.util.XWikiStubContextProvider;
-import com.xpn.xwiki.web.Utils;
+import java.io.File;
+
+import javax.servlet.ServletContext;
+
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.api.Imposteriser;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
+
+import com.xpn.xwiki.CoreConfiguration;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Same as {@link com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase} but for JUnit 4.x and JMock 2.x.
- *
+ * 
  * @version $Id$
  * @since 2.2M2
+ * @deprecated sine 5.2M1 use {@link MockitoOldcoreRule} instead
  */
+@Deprecated
 public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 {
     private XWikiContext context;
 
-    private Mockery mockery = new Mockery()
+    protected AbstractBridgedComponentTestCase()
     {
-        {
-            // Used to be able to mock class instances (and not only interfaces).
-            setImposteriser(ClassImposteriser.INSTANCE);
-        }
-    };
+        // We often need to mock com.xpn.xwiki.XWiki class
+        this(ClassImposteriser.INSTANCE);
+    }
 
+    protected AbstractBridgedComponentTestCase(Imposteriser imposteriser)
+    {
+        getMockery().setImposteriser(imposteriser);
+    }
+
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -70,20 +82,31 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getContext().put(ComponentManager.class.getName(), getComponentManager());
 
         // Bridge with old XWiki Context, required for old code.
-        Execution execution = getComponentManager().lookup(Execution.class);
+        Execution execution = getComponentManager().getInstance(Execution.class);
         execution.getContext().setProperty("xwikicontext", this.context);
-        getComponentManager().lookup(XWikiStubContextProvider.class).initialize(this.context);
+        XWikiStubContextProvider stubContextProvider =
+            getComponentManager().getInstance(XWikiStubContextProvider.class);
+        stubContextProvider.initialize(this.context);
 
-        // Set a simple application context, as some components fail to start without one.
-        Container c = getComponentManager().lookup(Container.class);
-        c.setApplicationContext(new TestApplicationContext());
+        // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
+        // correctly with a Servlet Context.
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
+        final ServletContext mockServletContext = getMockery().mock(ServletContext.class);
+        environment.setServletContext(mockServletContext);
+        getMockery().checking(new Expectations() {{
+            allowing(mockServletContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
+            will(returnValue(null));
+            allowing(mockServletContext).getAttribute("javax.servlet.context.tempdir");
+                will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
+        }});
 
         final CoreConfiguration mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockCoreConfiguration).getDefaultDocumentSyntax(); will(returnValue(Syntax.XWIKI_1_0));
         }});
     }
 
+    @Override
     @After
     public void tearDown() throws Exception
     {
@@ -94,10 +117,5 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
     public XWikiContext getContext()
     {
         return this.context;
-    }
-
-    public Mockery getMockery()
-    {
-        return this.mockery;
     }
 }

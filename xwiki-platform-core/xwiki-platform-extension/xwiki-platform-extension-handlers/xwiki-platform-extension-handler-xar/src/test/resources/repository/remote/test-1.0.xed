@@ -4,9 +4,13 @@
   <id>test</id>
   <version>1.0</version>
   <type>xar</type>
-  <dependency>false</dependency>
-  <installed>true</installed>
   <description>description</description>
   <author>author</author>
   <website>http://website</website>
+  <dependencies>
+    <dependency>
+      <id>dependency</id>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
 </extension>

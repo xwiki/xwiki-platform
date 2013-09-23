@@ -23,8 +23,11 @@ package com.xpn.xwiki.plugin.applicationmanager;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Application Manager plugin translation messages manager.
@@ -34,7 +37,9 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  * 
  * @version $Id$
  * @since 1.1
+ * @deprecated since 5.0M1 use {@link org.xwiki.localization.LocalizationManager} instead
  */
+@Deprecated
 public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
 {
     /**
@@ -106,58 +111,57 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_APPDOESNOTEXISTS = "applicationmanager.plugin.error.applicationdoesnotexists";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when application creation failed.
+     * Used as log message when application creation failed.
      */
     public static final String LOG_CREATEAPP = "applicationmanager.plugin.log.createapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when application delete failed.
+     * Used as log message when application delete failed.
      */
     public static final String LOG_DELETEAPP = "applicationmanager.plugin.log.deleteapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting all application descriptors failed.
+     * Used as log message when getting all application descriptors failed.
      */
     public static final String LOG_GETALLAPPS = "applicationmanager.plugin.log.getallapplications";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting application descriptor failed.
+     * Used as log message when getting application descriptor failed.
      */
     public static final String LOG_GETAPP = "applicationmanager.plugin.log.getapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when exporting application failed.
+     * Used as log message when exporting application failed.
      */
     public static final String LOG_EXPORTAPP = "applicationmanager.plugin.log.exportapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when importing application failed.
+     * Used as log message when importing application failed.
      */
     public static final String LOG_IMPORTAPP = "applicationmanager.plugin.log.importapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when reloading application failed.
+     * Used as log message when reloading application failed.
      */
     public static final String LOG_RELOADAPP = "applicationmanager.plugin.log.reloadapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when reloading all applications failed.
+     * Used as log message when reloading all applications failed.
      */
     public static final String LOG_REALOADALLAPPS = "applicationmanager.plugin.log.realoadallapplications";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when automatically updating application translations
-     * informations failed.
+     * Used as log message when automatically updating application translations information failed.
      */
     public static final String LOG_AUTOUPDATETRANSLATIONS = "applicationmanager.plugin.log.autoupdatetranslations";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when refreshing all applications translations pages.
+     * Used as log message when refreshing all applications translations pages.
      */
     public static final String LOG_REFRESHALLTRANSLATIONS = "applicationmanager.plugin.log.refreshalltranslations";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting wiki root application failed.
+     * Used as log message when getting wiki root application failed.
      */
     public static final String LOG_GETROOTAPP = "applicationmanager.plugin.log.getrootapplication";
 
@@ -167,11 +171,18 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     private static final ApplicationManagerMessageTool DEFAULTMESSAGETOOL = new ApplicationManagerMessageTool();
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system {@link Locale}.
      */
     private ApplicationManagerMessageTool()
     {
         super(ResourceBundle.getBundle(ApplicationManagerPlugin.PLUGIN_NAME + "/ApplicationResources"));
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -186,6 +197,20 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     ApplicationManagerMessageTool(Locale locale, ApplicationManagerPlugin plugin, XWikiContext context)
     {
         super(locale, plugin, context);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
+    }
+
+    @Override
+    public String get(String key)
+    {
+        return this.localizationManager.getTranslationPlain(key);
+    }
+
+    @Override
+    public String get(String key, Object... params)
+    {
+        return this.localizationManager.getTranslationPlain(key, params);
     }
 
     /**

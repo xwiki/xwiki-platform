@@ -58,6 +58,7 @@ public class BlockStyleExecutable extends AbstractBlockExecutable
      * 
      * @see AbstractStyleExecutable#execute(Node, int, int, String)
      */
+    @Override
     protected void execute(Node node, int startOffset, int endOffset, String value)
     {
         Node ancestor = node;
@@ -96,6 +97,7 @@ public class BlockStyleExecutable extends AbstractBlockExecutable
      * 
      * @see AbstractStyleExecutable#getParameter(Node)
      */
+    @Override
     protected String getParameter(Node node)
     {
         Element element = (Element) domUtils.getNearestBlockContainer(node);

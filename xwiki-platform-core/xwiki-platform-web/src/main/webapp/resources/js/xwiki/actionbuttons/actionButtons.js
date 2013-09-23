@@ -2,16 +2,11 @@
 // Form buttons: shortcuts, AJAX improvements and form validation
 // To be completed.
 
-// Make sure the XWiki 'namespace' exists.
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the actionButtons 'namespace' exists.
-if (typeof(XWiki.actionButtons) == 'undefined') {
-  XWiki.actionButtons = new Object();
-}
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
-XWiki.actionButtons.EditActions = Class.create({
+actionButtons.EditActions = Class.create({
   initialize : function() {
     this.addListeners();
     this.addShortcuts();
@@ -33,14 +28,14 @@ XWiki.actionButtons.EditActions = Class.create({
   },
   addShortcuts : function() {
     var shortcuts = {
-      'action_cancel' : "$msg.get('core.shortcuts.edit.cancel')",
-      'action_preview' : "$msg.get('core.shortcuts.edit.preview')",
+      'action_cancel' : "$services.localization.render('core.shortcuts.edit.cancel')",
+      'action_preview' : "$services.localization.render('core.shortcuts.edit.preview')",
       // The following 2 are both "Back to edit" in the preview mode, depending on the used editor
-      'action_edit' : "$msg.get('core.shortcuts.edit.backtoedit')",
-      'action_inline' : "$msg.get('core.shortcuts.edit.backtoedit')",
-      'action_save' : "$msg.get('core.shortcuts.edit.saveandview')",
-      'action_propupdate' : "$msg.get('core.shortcuts.edit.saveandview')",
-      'action_saveandcontinue' : "$msg.get('core.shortcuts.edit.saveandcontinue')"
+      'action_edit' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
+      'action_inline' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
+      'action_save' : "$services.localization.render('core.shortcuts.edit.saveandview')",
+      'action_propupdate' : "$services.localization.render('core.shortcuts.edit.saveandview')",
+      'action_saveandcontinue' : "$services.localization.render('core.shortcuts.edit.saveandcontinue')"
     }
     for (var key in shortcuts) {
       var targetButtons = $$("input[name=" + key + "]");
@@ -51,15 +46,15 @@ XWiki.actionButtons.EditActions = Class.create({
       }
     }
   },
-  validators : new Array(), 
+  validators : new Array(),
   addValidators : function() {
     // Add live presence validation for inputs with classname 'required'.
-    var inputs = $(document.body).select("input.required");
+    var inputs = $('body').select("input.required");
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
       var validator = new LiveValidation(input, { validMessage: "" });
       validator.add(Validate.Presence, {
-        failureMessage: "$msg.get('core.validation.required.message')"
+        failureMessage: "$services.localization.render('core.validation.required.message')"
       });
       validator.validate();
       this.validators.push(validator);
@@ -71,25 +66,17 @@ XWiki.actionButtons.EditActions = Class.create({
         return false;
       }
     }
-    #if($xwiki.isEditCommentMandatory())
-      var commentField = form.comment
-      while (commentField.value == "") {
-        var response = prompt("${msg.get('core.comment.prompt')}");
+    var commentField = form.comment;
+    if (commentField && ($xwiki.isEditCommentSuggested() || $xwiki.isEditCommentMandatory())) {
+      while (commentField.value == '') {
+        var response = prompt("$services.localization.render('core.comment.prompt')", '');
         if (response === null) {
           return false;
         }
         commentField.value = response;
+        if (!$xwiki.isEditCommentMandatory()) break;
       }
-    #elseif($xwiki.isEditCommentSuggested())
-      var commentField = form.comment
-      if (commentField.value == "") {
-        var response = prompt("${msg.get('core.comment.prompt')}");
-        if (response === null) {
-          return false;
-        }
-        commentField.value = response;
-      }
-    #end
+    }
     return true;
   },
   onCancel : function(event) {
@@ -113,6 +100,8 @@ XWiki.actionButtons.EditActions = Class.create({
     if (location.indexOf('?') == -1) {
       location += '?';
     }
+    // Prevent a redundant request to remove the edit lock when the page unloads.
+    XWiki.EditLock && XWiki.EditLock.setLocked(false);
     window.location = location + '&action_cancel=true' + fragmentId;
   },
   onPreview : function(event) {
@@ -148,15 +137,15 @@ XWiki.actionButtons.EditActions = Class.create({
 
 // ======================================
 // Save and continue button: Ajax improvements
-XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
+actionButtons.AjaxSaveAndContinue = Class.create({
   initialize : function() {
     this.createMessages();
     this.addListeners();
   },
   createMessages : function() {
-    this.savingBox = new XWiki.widgets.Notification("Saving...", "inprogress", {inactive: true});
-    this.savedBox = new XWiki.widgets.Notification("Saved", "done", {inactive: true});
-    this.failedBox = new XWiki.widgets.Notification("Failed to save the document. Reason: <span id=\"ajaxRequestFailureReason\"></span>", "error", {inactive: true});
+    this.savingBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.inprogress'))", "inprogress", {inactive: true});
+    this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
+    this.failedBox = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""/>"]))', "error", {inactive: true});
   },
   addListeners : function() {
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
@@ -213,6 +202,9 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     this.savingBox.replace(this.failedBox);
     if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
       $('ajaxRequestFailureReason').update('Server not responding');
+    } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
+      // Regard the body of plain text responses as custom status messages.
+      $('ajaxRequestFailureReason').update(response.responseText);
     } else {
       $('ajaxRequestFailureReason').update(response.statusText);
     }
@@ -220,10 +212,37 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     document.fire("xwiki:document:saveFailed", {'response' : response});
   }
 });
-document.observe('dom:loaded', function() {
-  new XWiki.actionButtons.EditActions();
+
+function init() {
+  new actionButtons.EditActions();
   // In preview mode, the &continue part of the save&continue should lead back to the edit action.
-  if (!$(document.body).hasClassName("previewbody")) {
-    new XWiki.actionButtons.AjaxSaveAndContinue();
+  if (!$('body').hasClassName("previewbody")) {
+    new actionButtons.AjaxSaveAndContinue();
   }
-});
+  return true;
+}
+
+// When the document is loaded, install action buttons
+(XWiki.domIsLoaded && init())
+|| document.observe('xwiki:dom:loaded', init );
+
+function updateForShortcut() {
+  if (typeof(Wysiwyg) == 'undefined') {
+    return;
+  }
+  var editors = Wysiwyg.getInstances();
+  for(var hookId in editors) {
+    var editor = editors[hookId];
+    var plainTextArea = editor.getPlainTextArea();
+    if(plainTextArea && !plainTextArea.disabled) {
+      $(hookId).value = plainTextArea.value;
+    } else {
+      editor.getCommandManager().execute('submit');
+    }
+  }
+}
+document.observe("xwiki:actions:save", updateForShortcut);
+document.observe("xwiki:actions:preview", updateForShortcut);
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.image.ui;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,19 +30,20 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AttachmentSelectorAggregatorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.LinkUploadWizardStep;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.ResourceReferenceSerializerWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.user.client.ui.Image;
 
 /**
- * The link wizard, used to configure image parameters in a
- * {@link org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig} object, in successive steps. This class extends the
- * {@link Wizard} class by encapsulating {@link WizardStepProvider} behavior specific to images.
+ * The link wizard, used to configure image parameters in a {@link ImageConfig} object, in successive steps. This class
+ * extends the {@link Wizard} class by encapsulating {@link WizardStepProvider} behavior specific to images.
  * 
  * @version $Id$
  */
@@ -52,10 +54,23 @@ public class ImageWizard extends Wizard implements WizardStepProvider
      */
     public static enum ImageWizardStep
     {
-        /**
-         * Steps managed by this wizard: the image selector, the image parameters step and the new image upload step.
-         */
-        IMAGE_SELECTOR, IMAGE_CONFIG, IMAGE_UPLOAD
+        /** The step that parses the image reference. Loaded when editing an image. */
+        IMAGE_REFERENCE_PARSER,
+
+        /** The step that selects an attached image. */
+        ATTACHED_IMAGE_SELECTOR,
+
+        /** The step that selects an external image specified by its URL. */
+        URL_IMAGE_SELECTOR,
+
+        /** The step that uploads a new image. */
+        IMAGE_UPLOAD,
+
+        /** The step that configures the image parameters. */
+        IMAGE_CONFIG,
+
+        /** The step that serializes the image reference. */
+        IMAGE_REFERENCE_SERIALIZER
     };
 
     /**
@@ -98,35 +113,129 @@ public class ImageWizard extends Wizard implements WizardStepProvider
         ImageWizardStep requestedStep = parseStepName(name);
         WizardStep step = stepsMap.get(requestedStep);
         if (step == null) {
-            switch (requestedStep) {
-                case IMAGE_SELECTOR:
-                    boolean selectionLimitedToCurrentPage = "currentpage".equals(config.getParameter("insertimages"));
-                    boolean allowExternalImages = Boolean.valueOf(config.getParameter("allowExternalImages", "true"));
-                    step =
-                        new ImageSelectorAggregatorWizardStep(selectionLimitedToCurrentPage, allowExternalImages,
-                            wikiService);
-                    break;
-                case IMAGE_CONFIG:
-                    step = new ImageConfigWizardStep();
-                    break;
-                case IMAGE_UPLOAD:
-                    LinkUploadWizardStep<ImageConfig> imageUploadStep =
-                        new LinkUploadWizardStep<ImageConfig>(wikiService);
-                    imageUploadStep.setFileHelpLabel(Strings.INSTANCE.imageUploadHelpLabel());
-                    imageUploadStep.setNextStep(ImageWizardStep.IMAGE_CONFIG.toString());
-                    step = imageUploadStep;
-                    break;
-                default:
-                    // nothing here, leave it null
-                    break;
-            }
-            // if something has been created, add it in the map
+            step = getStep(requestedStep);
+            // If the step instance was created then cache it.
             if (step != null) {
                 stepsMap.put(requestedStep, step);
             }
         }
-        // return the found or newly created step
         return step;
+    }
+
+    /**
+     * @param requestedStep the requested wizard step
+     * @return an instance of the specified wizard step
+     */
+    private WizardStep getStep(ImageWizardStep requestedStep)
+    {
+        WizardStep step = null;
+        switch (requestedStep) {
+            case IMAGE_REFERENCE_PARSER:
+                step = createImageDispatcherStep();
+                break;
+            case ATTACHED_IMAGE_SELECTOR:
+                step = createAttachedImageSelectorStep();
+                break;
+            case URL_IMAGE_SELECTOR:
+                step = createURLImageSelectorStep();
+                break;
+            case IMAGE_UPLOAD:
+                step = createImageUploadStep();
+                break;
+            case IMAGE_CONFIG:
+                step = createImageConfigStep();
+                break;
+            case IMAGE_REFERENCE_SERIALIZER:
+                step = createImageReferenceSerializerStep();
+                break;
+            default:
+                break;
+        }
+        return step;
+    }
+
+    /**
+     * @return a wizard step that parses the image reference and forwards the control to the next step based on the
+     *         image type
+     */
+    private WizardStep createImageDispatcherStep()
+    {
+        boolean allowExternalImages = Boolean.valueOf(config.getParameter("allowExternalImages", "true"));
+        ImageDispatcherWizardStep imageDispatcher = new ImageDispatcherWizardStep(allowExternalImages, wikiService);
+        // Display the next step title in case of an error.
+        imageDispatcher.setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
+        return imageDispatcher;
+    }
+
+    /**
+     * @return a wizard step that selects an attached image
+     */
+    private WizardStep createAttachedImageSelectorStep()
+    {
+        boolean selectionLimitedToCurrentPage = "currentpage".equals(config.getParameter("insertimages"));
+        AttachmentSelectorAggregatorWizardStep<ImageConfig> attachedImageSelector =
+            new AttachmentSelectorAggregatorWizardStep<ImageConfig>(selectionLimitedToCurrentPage);
+        attachedImageSelector.setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
+        attachedImageSelector.setValidDirections(EnumSet.of(NavigationDirection.NEXT));
+        attachedImageSelector.setCurrentPageSelector(new CurrentPageImageSelectorWizardStep(wikiService, false));
+        if (!selectionLimitedToCurrentPage) {
+            attachedImageSelector.setAllPagesSelector(new ImagesExplorerWizardStep(false, wikiService));
+        }
+        return attachedImageSelector;
+    }
+
+    /**
+     * @return a wizard step that selects an external image specified by its URL
+     */
+    private WizardStep createURLImageSelectorStep()
+    {
+        URLImageSelectorWizardStep urlImageSelector = new URLImageSelectorWizardStep();
+        urlImageSelector.setNextStep(ImageWizardStep.IMAGE_CONFIG.toString());
+        urlImageSelector.setValidDirections(EnumSet.of(NavigationDirection.NEXT, NavigationDirection.FINISH));
+        urlImageSelector.setDirectionName(NavigationDirection.NEXT, Strings.INSTANCE.imageSettingsLabel());
+        urlImageSelector.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.imageCreateImageButton());
+        return urlImageSelector;
+    }
+
+    /**
+     * @return a wizard step that configures an image
+     */
+    private WizardStep createImageConfigStep()
+    {
+        ImageConfigWizardStep imageConfigStep = new ImageConfigWizardStep();
+        imageConfigStep.setNextStep(ImageWizardStep.IMAGE_REFERENCE_SERIALIZER.toString());
+        imageConfigStep.setValidDirections(EnumSet.of(NavigationDirection.FINISH, NavigationDirection.PREVIOUS));
+        imageConfigStep.setDirectionName(NavigationDirection.PREVIOUS, Strings.INSTANCE.imageChangeImageButton());
+        imageConfigStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.imageCreateImageButton());
+        return imageConfigStep;
+    }
+
+    /**
+     * @return a wizard step that uploads a new image
+     */
+    private WizardStep createImageUploadStep()
+    {
+        LinkUploadWizardStep<ImageConfig> imageUploadStep = new LinkUploadWizardStep<ImageConfig>(wikiService);
+        imageUploadStep.setFileHelpLabel(Strings.INSTANCE.imageUploadHelpLabel());
+        imageUploadStep.setNextStep(ImageWizardStep.IMAGE_CONFIG.toString());
+        imageUploadStep.setValidDirections(EnumSet.of(NavigationDirection.PREVIOUS, NavigationDirection.NEXT,
+            NavigationDirection.FINISH));
+        imageUploadStep.setDirectionName(NavigationDirection.NEXT, Strings.INSTANCE.imageSettingsLabel());
+        imageUploadStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.imageCreateImageButton());
+        return imageUploadStep;
+    }
+
+    /**
+     * @return a wizard step that serializes the image reference
+     */
+    private WizardStep createImageReferenceSerializerStep()
+    {
+        ResourceReferenceSerializerWizardStep<ImageConfig> imageRefSerializer =
+            new ResourceReferenceSerializerWizardStep<ImageConfig>(wikiService);
+        imageRefSerializer.setValidDirections(EnumSet.of(NavigationDirection.PREVIOUS, NavigationDirection.FINISH));
+        // Display the previous step title in case of an error.
+        imageRefSerializer.setStepTitle(Strings.INSTANCE.imageConfigTitle());
+        return imageRefSerializer;
     }
 
     /**
@@ -143,6 +252,7 @@ public class ImageWizard extends Wizard implements WizardStepProvider
         origin.setPageName(config.getParameter("page"));
 
         ResourceReference destination = new ResourceReference();
+        destination.setEntityReference(origin.getEntityReference().clone());
         destination.setType(ResourceType.ATTACHMENT);
         destination.setTyped(false);
 

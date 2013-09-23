@@ -76,11 +76,7 @@ public class DefaultAnnotationService implements AnnotationService
     @Inject
     private IOTargetService targetIoService;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AnnotationService#addAnnotation(String, String, String, int, String, Map)
-     */
+    @Override
     public void addAnnotation(String target, String selection, String selectionContext, int offset, String author,
         Map<String, Object> metadata) throws AnnotationServiceException
     {
@@ -110,12 +106,7 @@ public class DefaultAnnotationService implements AnnotationService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.AnnotationService#getAnnotatedRenderedContent(java.lang.String, java.lang.String,
-     *      java.lang.String, Collection)
-     */
+    @Override
     public String getAnnotatedRenderedContent(String sourceReference, String sourceSyntax, String outputSyntax,
         Collection<Annotation> annotations) throws AnnotationServiceException
     {
@@ -127,19 +118,19 @@ public class DefaultAnnotationService implements AnnotationService
                 sourceSyntaxId = targetIoService.getSourceSyntax(sourceReference);
             }
 
-            Parser parser = componentManager.lookup(Parser.class, sourceSyntaxId);
+            Parser parser = componentManager.getInstance(Parser.class, sourceSyntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
             // run transformations
-            SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
+            SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
             Syntax sSyntax = syntaxFactory.createSyntaxFromIdString(sourceSyntaxId);
-            TransformationManager transformationManager = componentManager.lookup(TransformationManager.class);
+            TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
             transformationManager.performTransformations(xdom, sSyntax);
 
             // build the annotations renderer hint for the specified output syntax
             String outputSyntaxId = "annotations-" + outputSyntax;
             AnnotationPrintRenderer annotationsRenderer =
-                componentManager.lookup(AnnotationPrintRenderer.class, outputSyntaxId);
+                componentManager.getInstance(AnnotationPrintRenderer.class, outputSyntaxId);
             WikiPrinter printer = new DefaultWikiPrinter();
             annotationsRenderer.setPrinter(printer);
             // set the annotations for this renderer
@@ -153,21 +144,13 @@ public class DefaultAnnotationService implements AnnotationService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.AnnotationService#getAnnotatedHTML(String)
-     */
+    @Override
     public String getAnnotatedHTML(String sourceReference) throws AnnotationServiceException
     {
         return getAnnotatedRenderedContent(sourceReference, null, "xhtml/1.0", getValidAnnotations(sourceReference));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.AnnotationService#getAnnotations(String)
-     */
+    @Override
     public Collection<Annotation> getAnnotations(String target) throws AnnotationServiceException
     {
         try {
@@ -177,11 +160,7 @@ public class DefaultAnnotationService implements AnnotationService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.AnnotationService#getValidAnnotations(String)
-     */
+    @Override
     public Collection<Annotation> getValidAnnotations(String target) throws AnnotationServiceException
     {
         try {
@@ -197,11 +176,7 @@ public class DefaultAnnotationService implements AnnotationService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.AnnotationService#removeAnnotation(String, String)
-     */
+    @Override
     public void removeAnnotation(String target, String annotationID) throws AnnotationServiceException
     {
         try {
@@ -211,11 +186,7 @@ public class DefaultAnnotationService implements AnnotationService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.AnnotationService#updateAnnotation(java.lang.String, org.xwiki.annotation.Annotation)
-     */
+    @Override
     public void updateAnnotation(String target, Annotation annotation) throws AnnotationServiceException
     {
         try {
@@ -225,11 +196,7 @@ public class DefaultAnnotationService implements AnnotationService
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.AnnotationService#getAnnotation(java.lang.String, java.lang.String)
-     */
+    @Override
     public Annotation getAnnotation(String target, String id) throws AnnotationServiceException
     {
         try {

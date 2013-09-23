@@ -25,12 +25,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Office - Importer</description>
+  <properties>
+    <!-- Skipping CLIRR since xwiki-platform-legacy-office-importer wraps this module and runs CLIRR on it -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -53,13 +58,8 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -79,8 +79,9 @@
         We use a custom build that includes:
           * a fix for http://code.google.com/p/jodconverter/issues/detail?id=75
           * a fix for http://jira.xwiki.org/jira/browse/XWIKI-5979
+          * a fix for http://jira.xwiki.org/jira/browse/XWIKI-6583
       -->
-      <version>3.0-beta-3.20110210</version>
+      <version>3.0-beta-4-xwiki-20110822</version>
     </dependency>
     <dependency>
       <!--
@@ -90,7 +91,7 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20080701</version>
-      <!-- This this provided as a transitive dependency of xwiki-platform-rest-server -->
+      <!-- This is provided as a transitive dependency of xwiki-platform-rest-server -->
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -104,10 +105,35 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
     </dependency>
+    <dependency>
+      <!-- Used to detect the encoding of the HTML byte array produced by the office server. -->
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-parsers</artifactId>
+    </dependency>
+    <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
+    <dependency>
+      <groupId>org.gagravarr</groupId>
+      <artifactId>vorbis-java-core</artifactId>
+      <version>0.1</version>
+    </dependency>
+    <!-- Replace a runtime transitive dependency of tika-parsers because it includes old bcprov/bcmail classes. -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk16</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcmail-jdk16</artifactId>
+    </dependency>
+    <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
+    <dependency>
+      <groupId>de.l3s.boilerpipe</groupId>
+      <artifactId>boilerpipe</artifactId>
+    </dependency>
     <!-- Runtime dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -126,18 +152,9 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includeTestSourceDirectory>false</includeTestSourceDirectory>
-          <!--
-            Notes:
-              - DefaultOfficeImporter class has a fan-out of 22 (max 20) which is little hard to fix with the current API.
-              - DefaultXDOMOfficeDocumentSplitter class has a fan-out of 21 (max 20). Needs refactoring. There are TODOs
-                in the code from Asiri that say: "This code needs to be refactored along with the xwiki-refactoring
-                module code."
-           -->
           <excludes>
             <!-- Has too many dependencies, especially on the rendering module -->
-            org/xwiki/officeimporter/internal/builder/DefaultPresentationBuilder.java,
-            <!-- Needs to be refactored into a ScriptService -->
-            org/xwiki/officeimporter/OfficeImporterVelocityBridge.java
+            org/xwiki/officeimporter/internal/builder/DefaultPresentationBuilder.java
           </excludes>
         </configuration>
       </plugin>

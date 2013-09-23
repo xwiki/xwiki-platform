@@ -1,6 +1,9 @@
-// Make sure the XWiki 'namespace' and the ModalPopup class exist.
-if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeof(XWiki.widgets.ModalPopup) == "undefined") {
-  if (typeof console != "undefined" && typeof console.warn == "function") {
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
+// Make sure the ModalPopup class exist.
+if (!XWiki.widgets.ModalPopup) {
+  if (console && console.warn) {
     console.warn("[JumpToPage widget] Required class missing: XWiki.widgets.ModalPopup");
   }
 } else {
@@ -8,7 +11,7 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
  * "Jump to page" behavior. Allows the users to jump to any other page by pressing a shortcut, entering a page name, and
  * pressing enter. It also enables a Suggest behavior on the document name selector, for easier selection.
  */
-XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
+widgets.JumpToPage = Class.create(widgets.ModalPopup, {
   /** The template of the XWiki URL. */
   urlTemplate : "$xwiki.getURL('__space__.__document__', '__action__')",
   /** Constructor. Registers the key listener that pops up the dialog. */
@@ -17,11 +20,11 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
     this.input = new Element("input", {
       "type" : "text",
       "id" : "jmp_target",
-      "title" : "$msg.get('core.viewers.jump.dialog.input.tooltip')"
+      "title" : "$services.localization.render('core.viewers.jump.dialog.input.tooltip')"
     });
     content.appendChild(this.input);
-    this.viewButton = this.createButton("button", "$msg.get('core.viewers.jump.dialog.actions.view')", "$msg.get('core.viewers.jump.dialog.actions.view.tooltip')", "jmp_view");
-    this.editButton = this.createButton("button", "$msg.get('core.viewers.jump.dialog.actions.edit')", "$msg.get('core.viewers.jump.dialog.actions.edit.tooltip')", "jmp_edit");
+    this.viewButton = this.createButton("button", "$services.localization.render('core.viewers.jump.dialog.actions.view')", "$services.localization.render('core.viewers.jump.dialog.actions.view.tooltip')", "jmp_view");
+    this.editButton = this.createButton("button", "$services.localization.render('core.viewers.jump.dialog.actions.edit')", "$services.localization.render('core.viewers.jump.dialog.actions.edit.tooltip')", "jmp_edit");
     var buttonContainer = new Element("div", {"class" : "buttons"});
     buttonContainer.appendChild(this.viewButton);
     buttonContainer.appendChild(this.editButton);
@@ -29,12 +32,12 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
     $super(
       content,
       {
-        "show" : { method : this.showDialog, keys : [$msg.get('core.viewers.jump.shortcuts')] },
-        "view" : { method : this.openDocument, keys : [$msg.get('core.viewers.jump.dialog.actions.view.shortcuts')] },
-        "edit" : { method : this.openDocument, keys : [$msg.get('core.viewers.jump.dialog.actions.edit.shortcuts')] }
+        "show" : { method : this.showDialog, keys : [$services.localization.render('core.viewers.jump.shortcuts')] },
+        "view" : { method : this.openDocument, keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')] },
+        "edit" : { method : this.openDocument, keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')] }
       },
       {
-        title : "$msg.get('core.viewers.jump.dialog.content')",
+        title : "$services.localization.render('core.viewers.jump.dialog.content')",
         verticalPosition : "top"
       }
     );
@@ -53,18 +56,22 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
       // Create the Suggest.
       new XWiki.widgets.Suggest(this.input, {
         // This document also provides the suggestions.
-        script: "${request.contextPath}/rest/wikis/${context.database}/search?scope=name&number=10&media=json&",
+        // Trick so that Velocity will get executed but Javascript lint will not choke on it... Note that we cannot
+        // use a standard javascript comment ("//") since the minification process removes comments ;)
+        // We use the special construct ("/*!") which tells yuicompressor to not compress this part...
+        /*!#set ($restURL = "${request.contextPath}/rest/wikis/${xcontext.database}/search?scope=name&number=10&")*/
+        script: "$response.encodeURL($restURL)",
         // Prefixed with & since the current (as of 1.7) Suggest code does not automatically append it.
         varname: "q",
-        noresults: "$msg.get('core.viewers.jump.suggest.noResults')",
-        icon: "${xwiki.getSkinFile('icons/silk/page_white_text.gif')}",
+        noresults: "$services.localization.render('core.viewers.jump.suggest.noResults')",
+        icon: "${xwiki.getSkinFile('icons/silk/page_white_text.png')}",
         json: true,
         resultsParameter : "searchResults",
         resultId : "id",
         resultValue : "pageFullName",
         resultInfo : "pageFullName",
         timeout : 30000,
-        parentContainer : this.dialog
+        parentContainer : this.dialogBox
       });
     }
   },
@@ -79,7 +86,7 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
   },
   /**
    * Open the selected document in the specified mode.
-   * 
+   *
    * @param {Event} event The event that triggered this action. Either a keyboard shortcut or a button click.
    * @param {String} mode The mode that the document should be opened in. One of "view" or "edit". Note that on the
    *     server side, "edit" could be replaced with "inline" if the document is sheet-based.
@@ -93,7 +100,7 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
   addQuickLinksEntry : function() {
     $$(".panel.QuickLinks .xwikipanelcontents").each(function(item) {
       var jumpToPageActivator = new Element('span', {'class': "jmp-activator"});
-      jumpToPageActivator.update("$msg.get('core.viewers.jump.quickLinksText')");
+      jumpToPageActivator.update("$services.localization.render('core.viewers.jump.quickLinksText')");
       Event.observe(jumpToPageActivator, "click", function(event) {
         this.showDialog(event);
       }.bindAsEventListener(this));
@@ -102,8 +109,15 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
   }
 });
 
+function init() {
+  return new widgets.JumpToPage();
+}
+
 // When the document is loaded, enable the keyboard listener that triggers the dialog.
-document.observe("xwiki:dom:loaded", function() {
-  new XWiki.widgets.JumpToPage();
-});
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
 } // if the parent widget is defined
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link CompositeConfigurationSource}.
@@ -48,12 +48,13 @@ public class CompositeConfigurationSourceTest extends AbstractComponentTestCase
 
     private Configuration config2;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
         this.composite = new CompositeConfigurationSource();
-        ConverterManager converterManager = getComponentManager().lookup(ConverterManager.class);
+        ConverterManager converterManager = getComponentManager().getInstance(ConverterManager.class);
 
         CommonsConfigurationSource source1 = new CommonsConfigurationSource();
         ReflectionUtils.setFieldValue(source1, "converterManager", converterManager);

@@ -22,10 +22,13 @@ package org.xwiki.annotation.internal.content;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.filter.Filter;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Space normalizer content alterer. Will trim all leading and trailing white spaces in the passed sequence along with
@@ -35,20 +38,19 @@ import org.xwiki.component.annotation.Requirement;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("space-normalizer")
+@Component
+@Named("space-normalizer")
+@Singleton
 public class SpaceNormalizerContentAlterer extends AbstractContentAlterer
 {
     /**
      * The whitespace filter, to identify all characters which are whitespace.
      */
-    @Requirement("whitespace")
+    @Inject
+    @Named("whitespace")
     private Filter whitespaceFilter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.ContentAlterer#alter(java.lang.CharSequence)
-     */
+    @Override
     public AlteredContent alter(CharSequence sequence)
     {
         // same as filtering only that on encountering the first space in a series of whitespace, only print the first

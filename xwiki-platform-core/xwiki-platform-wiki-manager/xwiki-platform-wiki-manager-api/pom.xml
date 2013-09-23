@@ -27,23 +27,29 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-manager</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-manager-api</artifactId>
   <name>XWiki Platform - Wiki Manager - API</name>
   <description>XWiki Platform - Wiki Manager - API</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform.plugins:xwiki-plugin-wiki-manager</xwiki.extension.features>
+
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Manager API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.09</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-application-manager-api</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- Test dependencies -->
@@ -60,12 +66,6 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -73,6 +73,11 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              **/WikiManagerScriptService.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

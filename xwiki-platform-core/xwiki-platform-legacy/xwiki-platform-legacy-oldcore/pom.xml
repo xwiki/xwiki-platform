@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-legacy</artifactId>
+    <version>5.2-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-legacy-oldcore</artifactId>
+  <name>XWiki Platform - Legacy - Old Core</name>
+  <packaging>jar</packaging>
+  <description>xwiki-platform-oldcore repackaging including legacy aspects</description>
+  <properties>
+    <!-- The features provided by this module so that it's found when resolving extension that pretty much never depend on this one -->
+    <xwiki.extension.features>
+      org.xwiki.platform:xwiki-platform-oldcore,
+      com.xpn.xwiki.platform:xwiki-core
+    </xwiki.extension.features>
+  </properties>
+  <dependencies>
+    <!-- We need this dependency so that the wrapped module is built before this one -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <!-- We don't want to draw this dependency since we're wrapping it -->
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Version 1.1 of jackrabbit core needs to be uploaded to central repository. In addition there was a  POM
+         issue in version 1.0.1, see http://jira.codehaus.org/browse/MEV-453 -->
+    <!-- TODO: Version 1.4.2 is published in the central repo, can we use that? -->
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-core</artifactId>
+      <version>1.1-xwiki</version>
+    </dependency>
+    
+    <!-- There's no release of Graffito yet (http://incubator.apache.org/graffito/jcr-mapping/index.html) -->
+    <dependency>
+      <groupId>org.apache.portals</groupId>
+      <artifactId>graffito-jcr-mapping</artifactId>
+      <version>1.0-a1-amelentev-dev</version>
+    </dependency>
+    
+    <!-- See http://jira.codehaus.org/browse/MEV-488 -->
+    <dependency>
+      <groupId>javax.jcr</groupId>
+      <artifactId>jcr</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <!-- Build tools -->
+    <!-- Needed for backward compatibility Aspects -->
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed by the legacy XWikiTest test -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Apply Backward compatibility Aspects using the strategy described at
+        http://blogs.sonatype.com/john/2007/11/09/1194630418546.html -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>backward-compatibility-aspects</id>
+            <configuration>
+              <weaveDependencies>
+                <weaveDependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-oldcore</artifactId>
+                </weaveDependency>
+              </weaveDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/builddef.lst</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Merge components.txt files -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <configuration>
+              <target>
+                <!-- Add a line separator before appending the legacy components.
+                     NOTE: The following solutions didn't work:
+                     * the fixlastline parameter of the concat task affects only the appended files, NOT the destination
+                       file; we need the new line at the end of the destination file!
+                     * the text content of the header element inside the concat task is trimmed when the POM is parsed.
+                       See http://jira.codehaus.org/browse/PLX-461 -->
+                <echo message="${line.separator}" file="${project.build.directory}/classes/META-INF/components.txt" append="true" />
+                <concat destfile="${project.build.directory}/classes/META-INF/components.txt" append="true">
+                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt" />
+                </concat>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Make sure we run the tests only with the aspectified JARs since otherwise components will be registered
+           twice for example. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-oldcore:jar</classpathDependencyExcludes>
+          </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

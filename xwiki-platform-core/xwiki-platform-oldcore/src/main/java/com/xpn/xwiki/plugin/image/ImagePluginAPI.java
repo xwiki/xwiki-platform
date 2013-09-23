@@ -16,12 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.image;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
@@ -34,20 +33,21 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
+@Deprecated
 public class ImagePluginAPI extends PluginApi<ImagePlugin>
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(ImagePluginAPI.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImagePluginAPI.class);
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * Creates a new instance of this plugin API.
@@ -102,7 +102,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
      */
     private XWikiAttachment getAttachment(String pageName, String attachmentName) throws XWikiException
     {
-        DocumentReference documentReference = currentMixedDocumentReferenceResolver.resolve(pageName);
+        DocumentReference documentReference = this.currentMixedDocumentReferenceResolver.resolve(pageName);
         XWikiDocument document = getXWikiContext().getWiki().getDocument(documentReference, getXWikiContext());
         return document.getAttachment(attachmentName);
     }

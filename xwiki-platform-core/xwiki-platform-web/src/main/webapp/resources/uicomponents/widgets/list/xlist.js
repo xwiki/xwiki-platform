@@ -7,16 +7,16 @@
  *         new XWiki.widgets.XListItem( "A second element", {'value' : '10'} ),
  *         "A third item passed as string content",
  *         new Element("blink").update('An hip-hop item passed as DOM element')
- *      ], 
+ *      ],
  *      { // options
  *         numbered: false,
- *         icon: "$xwiki.getSkinFile('icons/silk/sport_basketball.gif')",
+ *         icon: "$xwiki.getSkinFile('icons/silk/sport_basketball.png')",
  *         classes : "myListExtraClass",
  *         itemClasses : "myListItemExtraClasses",
  *         eventListeners : {
  *           // Event listeners defined for each of this list items.
  *           // listeners call backs are bound to the list item object (XWiki.widgets.XListItem) from which they emerge
- *           'click' : function() { console.log('clicked !', this); }, 
+ *           'click' : function() { console.log('clicked !', this); },
  *           'mouseover' : function() { console.log('mouse over !', this); }
  *         }
  *      });
@@ -25,7 +25,7 @@
  *
  * xlist.addItem(
  *   new XWiki.widgets.XListItem('A fifth element added later', {
- *     icon : "$xwiki.getSkinFile('icons/silk/bomb.gif')", // this overrides the one defined for the whole list
+ *     icon : "$xwiki.getSkinFile('icons/silk/bomb.png')", // this overrides the one defined for the whole list
  *     eventListeners: {
  *       // Event listeners defined just for this specific list item
  *       'mouseout' : function() { console.log('just this list item is bound to this event', this); }
@@ -36,9 +36,9 @@
  */
 
 var XWiki = function(XWiki){
-    
+
     var widgets = XWiki.widgets = XWiki.widgets || {};
-    
+
     widgets.XList = Class.create({
         initialize: function(items, options) {
           this.items = items || [];
@@ -67,13 +67,13 @@ var XWiki = function(XWiki){
           if (this.options.icon && !this.options.icon.blank()) {
             item.setIcon(this.options.icon, this.options.overrideItemIcon);
           }
-          item.list = this; // associate list item to this XList 
+          item.list = this; // associate list item to this XList
         },
         getElement: function() {
           return this.listElement;
         }
     });
-    
+
     widgets.XListItem = Class.create({
         initialize: function(content, options) {
           this.options = options || {};
@@ -117,11 +117,11 @@ var XWiki = function(XWiki){
         bindEventListeners: function(eventListeners) {
           var events = Object.keys(eventListeners);
           for (var i=0;i<events.length;i++) {
-            this.listItemElement.observe(events[i], eventListeners[events[i]].bind(this.options.eventCallbackScope ? this.options.eventCallbackScope : this));
+            this.listItemElement.observe(events[i], eventListeners[events[i]].bindAsEventListener(this.options.eventCallbackScope ? this.options.eventCallbackScope : this));
           }
         }
     });
-    
+
     return XWiki;
-    
+
 }(XWiki || {});

@@ -19,8 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.velocity;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
 
@@ -31,6 +33,7 @@ import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
  * @since 2.0M1
  */
 @Component
+@Singleton
 public class DefaultVelocityMacroConfiguration implements VelocityMacroConfiguration
 {
     /**
@@ -46,13 +49,10 @@ public class DefaultVelocityMacroConfiguration implements VelocityMacroConfigura
     /**
      * Defines from where to read the rendering configuration data. 
      */
-    @Requirement
+    @Inject
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     * @see VelocityMacroConfiguration#getFilter()
-     */
+    @Override
     public String getFilter()
     {
         return this.configuration.getProperty(PREFIX + "filter", DEFAULT_FILTER);

@@ -60,9 +60,8 @@ a.tag-delete, a.tag-delete:visited {
 }
 
 .tag-add-form .input-tag {
-  width: 16em;
-  height: 80%;
   margin: 0 3px .3em 0;
+  width: 16em;
 }
 
 .tag-add-form .buttonwrapper {

@@ -19,8 +19,11 @@
  */
 package org.xwiki.query.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
@@ -28,21 +31,22 @@ import org.xwiki.query.QueryExecutorManager;
 /**
  * QueryManager implementation to use in scripts (uses a secure {@link org.xwiki.query.QueryExecutorManager} which
  * performs checks for rights).
- *
+ * 
  * @version $Id$
  */
-@Component("secure")
+@Component
+@Named("secure")
+@Singleton
 public class SecureQueryManager extends AbstractQueryManager
 {
     /**
      * {@link QueryExecutorManager} for execute Queries.
      */
-    @Requirement("secure")
+    @Inject
+    @Named("secure")
     protected QueryExecutorManager queryExecutorManager;
 
-    /**
-     * @return {@link QueryExecutorManager}
-     */
+    @Override
     protected QueryExecutorManager getQueryExecutorManager()
     {
         return this.queryExecutorManager;
@@ -52,7 +56,7 @@ public class SecureQueryManager extends AbstractQueryManager
      * @param statement XWQL statement
      * @return Query
      * @throws QueryException if any errors
-     * @see {@link #createQuery(String, String)}
+     * @see #createQuery(String, String)
      * @deprecated it's now available from {@link org.xwiki.query.internal.QueryManagerScriptService} since 2.4M2
      */
     @Deprecated

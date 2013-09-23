@@ -62,17 +62,14 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
      */
     protected abstract String generateLink(String url, String resourceName, XWikiContext context);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
-     */
     @Override
     public String getLink(String resourceName, XWikiContext context)
     {
         // If the current user has access to Main.WebHome, we will use this document in the URL
         // to serve the resource. This way, the resource can be efficiently cached, since it has a
         // common URL for any page.
+        // Otherwise, we link to the current document, which means that the extension will be accessible if the current
+        // document is accessible as well.
         try {
             String page = context.getWiki().getDefaultSpace(context) + "." + context.getWiki().getDefaultPage(context);
             if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), page, context)) {

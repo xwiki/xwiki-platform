@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.doc;
 
@@ -77,11 +76,6 @@ public class XWikiLink implements Serializable
         this.fullName = fullName;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -89,11 +83,6 @@ public class XWikiLink implements Serializable
         return (objlink.getDocId() == getDocId() && objlink.getLink().equals(getLink()));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

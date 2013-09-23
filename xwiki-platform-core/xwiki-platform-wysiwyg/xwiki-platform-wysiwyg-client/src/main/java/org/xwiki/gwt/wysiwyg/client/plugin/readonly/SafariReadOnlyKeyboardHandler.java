@@ -25,6 +25,8 @@ import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
+import com.google.gwt.dom.client.Node;
+
 /**
  * Custom implementation of {@link ReadOnlyKeyboardHandler} for WebKit-based browsers.
  * 
@@ -73,6 +75,29 @@ public class SafariReadOnlyKeyboardHandler extends ReadOnlyKeyboardHandler
         } else {
             range.setEndAfter(element);
         }
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * WebKit browsers don't keep the caret where we put it (before/after the macro container) so we have to add a text
+     * node and select it to be sure the caret remains outside of the macro.
+     */
+    @Override
+    protected void moveCaretOutside(Node node, boolean before)
+    {
+        Document document = node.getOwnerDocument().cast();
+        Node nonBreakingSpace = document.createTextNode("\u00A0");
+        if (before) {
+            node.getParentNode().insertBefore(nonBreakingSpace, node);
+        } else {
+            node.getParentNode().insertAfter(nonBreakingSpace, node);
+        }
+        Range range = document.createRange();
+        range.selectNodeContents(nonBreakingSpace);
+        Selection selection = document.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
     }

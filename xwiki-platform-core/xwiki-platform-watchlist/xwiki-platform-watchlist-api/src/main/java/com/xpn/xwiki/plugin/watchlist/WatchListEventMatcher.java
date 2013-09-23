@@ -25,9 +25,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,7 +49,7 @@ public class WatchListEventMatcher
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(WatchListEventMatcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListEventMatcher.class);
 
     /**
      * Events to match.
@@ -104,7 +104,7 @@ public class WatchListEventMatcher
             }
 
         } catch (ActivityStreamException e) {
-            LOG.error("Failed to retrieve updated documents from activity stream");
+            LOGGER.error("Failed to retrieve updated documents from activity stream");
             e.printStackTrace();
         }
     }

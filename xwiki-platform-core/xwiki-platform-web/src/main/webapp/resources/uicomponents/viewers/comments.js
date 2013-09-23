@@ -32,6 +32,7 @@ viewers.Comments = Class.create({
     this.loadIDs();
     this.addDeleteListener();
     this.addReplyListener();
+    this.addPermalinkListener();
     this.addSubmitListener(this.form);
     this.addCancelListener();
     this.addEditListener();
@@ -83,8 +84,14 @@ viewers.Comments = Class.create({
                   this.resetForm();
                 }
                 // Replace the comment with a "deleted comment" placeholder
-                comment.replace(this.createNotification("$msg.get('core.viewers.comments.commentDeleted')"));
+                comment.replace(this.createNotification("$services.localization.render('core.viewers.comments.commentDeleted')"));
                 this.updateCount();
+                // fire an event for the annotations to know when a comment / annotation is deleted
+                // FIXME: This is not the best way to go because the Annotations system should be in charge of properly deleting annotations,
+                // not the Comments system. Try to find an alternative for the future.
+                if (comment.hasClassName('annotation')) {
+                  document.fire("xwiki:annotation:tab:deleted");
+                }
               }.bind(this),
               onComplete : function() {
                 // In the end: re-enable the button
@@ -93,10 +100,10 @@ viewers.Comments = Class.create({
             },
             /* Interaction parameters */
             {
-               confirmationText: "$msg.get('core.viewers.comments.delete.confirm')",
-               progressMessageText : "$msg.get('core.viewers.comments.delete.inProgress')",
-               successMessageText : "$msg.get('core.viewers.comments.delete.done')",
-               failureMessageText : "$msg.get('core.viewers.comments.delete.failed')"
+               confirmationText: "$services.localization.render('core.viewers.comments.delete.confirm')",
+               progressMessageText : "$services.localization.render('core.viewers.comments.delete.inProgress')",
+               successMessageText : "$services.localization.render('core.viewers.comments.delete.done')",
+               failureMessageText : "$services.localization.render('core.viewers.comments.delete.failed')"
             }
           );
         }
@@ -136,7 +143,7 @@ viewers.Comments = Class.create({
               onCreate : function() {
                 // Disable the button, to avoid a cascade of clicks from impatient users
                 item.disabled = true;
-                item._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.editForm.fetch.inProgress')", "inprogress");
+                item._x_notification = new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.editForm.fetch.inProgress')", "inprogress");
               },
               onSuccess : function(response) {
                 // Hide other comment editing forms (allow only one comment to be edited at a time)
@@ -160,7 +167,7 @@ viewers.Comments = Class.create({
                 if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                   failureReason = 'Server not responding';
                 }
-                item._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.editForm.fetch.failed')" + failureReason, "error"));
+                item._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason, "error"));
               }.bind(this),
               on0 : function (response) {
                 response.request.options.onFailure(response);
@@ -194,29 +201,7 @@ viewers.Comments = Class.create({
   addReplyListener : function() {
     if (this.form) {
       $$(this.xcommentSelector).each(function(item) {
-        // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
-        // Quick fix until Prototype 1.6.1 is integrated.
-        item = item.down('a.commentreply');
-        if (!item) {
-          return;
-        }
-        item.observe('click', function(event) {
-          item.blur();
-          event.stop();
-          // If the form was already displayed as a reply, re-enable the Reply button for the old location
-          if (this.form.up('.commentthread')) {
-            this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
-          }
-          // Insert the form on top of that comment's discussion
-          item.up(this.xcommentSelector).next('.commentthread').insert({'top' : this.form});
-          // Set the replyto field to the replied comment's number
-          this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
-          // Clear the contents and focus the textarea
-          this.form["XWiki.XWikiComments_comment"].value = "";
-          this.form["XWiki.XWikiComments_comment"].focus();
-          // Hide the reply button
-          item.hide();
-        }.bindAsEventListener(this));
+        this.addReplyListenerToComment(item);
       }.bind(this));
     } else {
       // If, for some reason, the form is missing, hide the reply functionality from the user
@@ -224,6 +209,57 @@ viewers.Comments = Class.create({
         item.hide();
       });
     }
+  },
+
+  addReplyListenerToComment : function(item) {
+    // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
+    // Quick fix until Prototype 1.6.1 is integrated.
+    item = item.down('a.commentreply');
+    if (!item) {
+      return;
+    }
+    item.observe('click', function(event) {
+      item.blur();
+      event.stop();
+      // If the form was already displayed as a reply, re-enable the Reply button for the old location
+      if (this.form.up('.commentthread')) {
+        this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
+      }
+      // Insert the form on top of that comment's discussion
+      item.up(this.xcommentSelector).next('.commentthread').insert({'top' : this.form});
+      // Set the replyto field to the replied comment's number
+      this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
+      // Clear the contents and focus the textarea
+      this.form["XWiki.XWikiComments_comment"].value = "";
+      this.form["XWiki.XWikiComments_comment"].focus();
+      // Hide the reply button
+      item.hide();
+    }.bindAsEventListener(this));
+  },
+  /**
+   * Permalink: Display a modal popup providing the permalink.
+   */
+  addPermalinkListener : function() {
+    $$(this.xcommentSelector + ' a.permalink').each(function(item) {
+      item.observe('click', function(event) {
+        item.blur();
+        event.stop();
+        var permalinkBox = new XWiki.widgets.ConfirmationBox(
+        {
+          onYes : function () {
+            window.location = item.href;
+          }
+        },
+        /* Interaction parameters */
+        {
+          confirmationText: "$services.localization.render('core.viewers.comments.permalink'): <input type='text' class='full' value='" + item.href + "'/>",
+          yesButtonText: "$services.localization.render('core.viewers.comments.permalink.goto')",
+          noButtonText : "$services.localization.render('core.viewers.comments.permalink.hide')"
+        });
+        permalinkBox.dialog.addClassName('permalinkBox')
+        permalinkBox.dialog.down('input[type="text"]').select();
+      });
+    });
   },
   /**
    * When pressing Submit, check that the comment is not empty. Submit the form with ajax and update the whole comments
@@ -240,11 +276,13 @@ viewers.Comments = Class.create({
           // Allows CommentAddAction to parse a template which will return a message telling if the captcha was wrong.
           formData.set('xpage', 'xpart');
           formData.set('vm', this.generatorTemplate);
-          // Strip whatever query string is supplied by the form so it doesn't override the formData.
-          var url = form.action.replace(/\?.*/, '');
+          // Strip form parameters from the form action query string to prevent them from being overwriten.
+          var queryStringParams = $H(form.action.toQueryParams());
+          formData.keys().each(queryStringParams.unset.bind(queryStringParams));
+          var url = form.action.replace(/\?.*/, '?' + queryStringParams.toQueryString());
           formData.unset('action_cancel');
           // Create a notification message to display to the user when the submit is being sent
-          form._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.inProgress')", "inprogress");
+          form._x_notification = new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.add.inProgress')", "inprogress");
           form.disable();
           this.restartNeeded = false;
           new Ajax.Request(url, {
@@ -253,14 +291,14 @@ viewers.Comments = Class.create({
             onSuccess : function () {
               this.restartNeeded = true;
               this.editing = false;
-              form._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.done')", "done"));
+              form._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.add.done')", "done"));
             }.bind(this),
             onFailure : function (response) {
               var failureReason = response.statusText;
               if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                 failureReason = 'Server not responding';
               }
-              form._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.failed')" + failureReason, "error"));
+              form._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.add.failed')" + failureReason, "error"));
             }.bind(this),
             on0 : function (response) {
               response.request.options.onFailure(response);
@@ -300,10 +338,10 @@ viewers.Comments = Class.create({
     if (!form || !XWiki.hasEdit) {
       return;
     }
-    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent($$("meta[name=space]")[0].content)).replace("__page__", encodeURIComponent($$("meta[name=page]")[0].content));
+    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent(XWiki.currentSpace)).replace("__page__", encodeURIComponent(XWiki.currentPage));
     form.commentElt = form.down('textarea');
     var buttons = form.down('input[type=submit]').up('div');
-    form.previewButton = new Element('span', {'class' : 'buttonwrapper'}).update(new Element('input', {'type' : 'button', 'class' : 'button', 'value' : "$msg.get('core.viewers.comments.preview.button.preview')"}));
+    form.previewButton = new Element('span', {'class' : 'buttonwrapper'}).update(new Element('input', {'type' : 'button', 'class' : 'button', 'value' : "$services.localization.render('core.viewers.comments.preview.button.preview')"}));
     form.previewButton._x_modePreview = false;
     form.previewContent = new Element('div', {'class' : 'commentcontent commentPreview'});
     form.commentElt.insert({'before' : form.previewContent});
@@ -312,10 +350,10 @@ viewers.Comments = Class.create({
     form.previewButton.observe('click', function() {
       if (!form.previewButton._x_modePreview && !form.previewButton.disabled) {
          form.previewButton.disabled = true;
-         var notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.preview.inProgress')", "inprogress");
+         var notification = new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.preview.inProgress')", "inprogress");
          new Ajax.Request(previewURL, {
             method : 'post',
-            parameters : {'xpage' : 'plain', 'content' : form.commentElt.value},
+            parameters : {'xpage' : 'plain', 'sheet' : '', 'content' : form.commentElt.value},
             onSuccess : function (response) {
               this.doPreview(response.responseText, form);
               notification.hide();
@@ -331,7 +369,7 @@ viewers.Comments = Class.create({
               if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                 failureReason = 'Server not responding';
               }
-              notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.preview.failed')" + failureReason, "error"));
+              notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.preview.failed')" + failureReason, "error"));
             },
             on0 : function (response) {
               response.request.options.onFailure(response);
@@ -347,7 +385,7 @@ viewers.Comments = Class.create({
   },
   /**
    * Display the comment preview instead of the comment textarea.
-   * 
+   *
    * @param content the rendered comment, as HTML text
    * @param form the form for which the preview is done
    */
@@ -356,7 +394,7 @@ viewers.Comments = Class.create({
     form.previewContent.update(content);
     form.previewContent.show();
     form.commentElt.hide();
-    form.previewButton.down('input').value = "$msg.get('core.viewers.comments.preview.button.back')";
+    form.previewButton.down('input').value = "$services.localization.render('core.viewers.comments.preview.button.back')";
   },
   /**
    * Display the comment textarea instead of the comment preview.
@@ -368,7 +406,7 @@ viewers.Comments = Class.create({
     form.previewContent.hide();
     form.previewContent.update('');
     form.commentElt.show();
-    form.previewButton.down('input').value = "$msg.get('core.viewers.comments.preview.button.preview')";
+    form.previewButton.down('input').value = "$services.localization.render('core.viewers.comments.preview.button.preview')";
   },
   resetForm : function (event) {
     if (event) {
@@ -386,10 +424,10 @@ viewers.Comments = Class.create({
   },
   updateCount : function() {
     if ($("Commentstab") && $("Commentstab").down(".itemCount")) {
-      $("Commentstab").down(".itemCount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
+      $("Commentstab").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
     }
     if ($("commentsshortcut") && $("commentsshortcut").down(".itemCount")) {
-      $("commentsshortcut").down(".itemCount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
+      $("commentsshortcut").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
     }
   },
   /**
@@ -413,11 +451,15 @@ viewers.Comments = Class.create({
     return msg;
   }
 });
+
+function init() {
+  return new viewers.Comments();
+}
+
+// When the document is loaded, trigger the Comments form enhancements.
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
-// ======================================
-// Comment actions enhancements
-document.observe('xwiki:dom:loaded', function() {
-  new XWiki.viewers.Comments();
-});

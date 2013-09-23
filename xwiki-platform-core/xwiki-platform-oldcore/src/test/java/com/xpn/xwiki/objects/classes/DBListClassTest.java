@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.classes;
 
@@ -42,6 +41,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
 {
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -59,6 +59,7 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
         mockXWikiRenderingEngine.stubs().method("interpretText").will(
             new CustomStub("Implements XWikiRenderingEngine.interpretText")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return invocation.parameterValues.get(0);
@@ -248,5 +249,70 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Items were not ordered by ID.", "[a, b, c, d]", dblc.getList(getContext()).toString());
         dblc.setSort("value");
         assertEquals("Items were not ordered by value.", "[a, b, d, c]", dblc.getList(getContext()).toString());
+    }
+
+    public void testReturnColWithOneColumn()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("select doc.fullName from XWikiDocument as doc", true));
+        assertEquals("-", dblc.returnCol("select doc.fullName from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithOneColumnAndExtraWhitespace()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("select   doc.fullName   from XWikiDocument as doc", true));
+        assertEquals("-", dblc.returnCol("select   doc.fullName   from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithOneColumnAndUppercaseTokens()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("SELECT doc.fullName FROM XWikiDocument as doc", true));
+        assertEquals("-", dblc.returnCol("SELECT doc.fullName FROM XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithTwoColumns()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("select doc.fullName, doc.title from XWikiDocument as doc", true));
+        assertEquals("doc.title", dblc.returnCol("select doc.fullName, doc.title from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithTwoColumnsAndExtraWhitespace()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName",
+            dblc.returnCol("select   doc.fullName  ,  doc.title  from XWikiDocument as doc", true));
+        assertEquals("doc.title",
+            dblc.returnCol("select   doc.fullName  ,  doc.title  from XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithTwoColumnsAndUppercaseTokens()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("doc.fullName", dblc.returnCol("SELECT doc.fullName, doc.title FROM XWikiDocument as doc", true));
+        assertEquals("doc.title", dblc.returnCol("SELECT doc.fullName, doc.title FROM XWikiDocument as doc", false));
+    }
+
+    public void testReturnColWithNullQuery()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("-", dblc.returnCol(null, true));
+        assertEquals("-", dblc.returnCol(null, false));
+    }
+
+    public void testReturnColWithEmptyQuery()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("-", dblc.returnCol("", true));
+        assertEquals("-", dblc.returnCol("", false));
+    }
+
+    public void testReturnColWithInvalidQuery()
+    {
+        DBListClass dblc = new DBListClass();
+        assertEquals("-", dblc.returnCol("do something", true));
+        assertEquals("-", dblc.returnCol("do something", false));
     }
 }

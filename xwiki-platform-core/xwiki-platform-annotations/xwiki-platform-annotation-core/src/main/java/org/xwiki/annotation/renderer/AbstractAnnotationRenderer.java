@@ -21,10 +21,12 @@ package org.xwiki.annotation.renderer;
 
 import java.util.Collection;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.annotation.internal.renderer.AnnotationGeneratorChainingListener;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
@@ -50,13 +52,15 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
      * TODO: not really sure if this is the right place for this pull, but the annotations generator is not a component
      * so it cannot 'require' it.
      */
-    @Requirement("whitespace")
+    @Inject
+    @Named("whitespace")
     protected ContentAlterer selectionAlterer;
 
     /**
      * Plain text parser used to parse generated link labels.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     protected StreamParser plainTextParser;
 
     /**
@@ -64,11 +68,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
      */
     protected AnnotationGeneratorChainingListener annotationsGenerator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         ListenerChain chain = new ListenerChain();
@@ -116,11 +116,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
      */
     public abstract LinkLabelGenerator getLinkLabelGenerator();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.renderer.AnnotationPrintRenderer#setAnnotations(java.util.Collection)
-     */
+    @Override
     public void setAnnotations(Collection<Annotation> annotations)
     {
         this.annotationsGenerator.setAnnotations(annotations);

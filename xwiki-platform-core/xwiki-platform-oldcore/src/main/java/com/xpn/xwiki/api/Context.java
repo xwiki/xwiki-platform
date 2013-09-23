@@ -16,16 +16,16 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.api;
 
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Programming;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -124,9 +124,9 @@ public class Context extends Api
 
     /**
      * Returns the current database name. If {@link #isMainWiki()} returns <code>true</code> then the current database
-     * name is the same as {@link #getMainWikiName()}. Otherwise, in virtual mode, each virtual wiki has it's own
-     * database. In this case the returned string identifies the current virtual wiki we operate on and prefixes
-     * document names like in <i>databaseName:spaceName.pageName</i>.
+     * name is the same as {@link #getMainWikiName()}. Otherwise, each virtual wiki has it's own database. In this case
+     * the returned string identifies the current virtual wiki we operate on and prefixes document names like in
+     * <i>databaseName:spaceName.pageName</i>.
      * 
      * @return The current database name.
      * @see #isMainWiki()
@@ -176,10 +176,10 @@ public class Context extends Api
 
     /**
      * Returns the URL factory matching both the protocol used to make the current request and the container or
-     * environment in which XWiki is running. The most used concrete implementations of the <code>XWikiURLFactory</code>
-     * are <code>XWikiServletURLFactory</code> and <code>XWikiPortletURLFactory</code>. <code>XWikiURLFactory</code>
-     * offers a generic way of creating XWiki specific URLs that should be chosen instead of the basic string
-     * concatenation. Hard-coding the protocol used, like HTTP, inside wiki pages should be avoided.
+     * environment in which XWiki is running. The most used concrete implementation of the <code>XWikiURLFactory</code>
+     * is <code>XWikiServletURLFactory</code>. <code>XWikiURLFactory</code> offers a generic way of creating XWiki
+     * specific URLs that should be chosen instead of the basic string concatenation. Hard-coding the protocol used,
+     * like HTTP, inside wiki pages should be avoided.
      * 
      * @return The URL factory.
      */
@@ -286,10 +286,11 @@ public class Context extends Api
 
     /**
      * Returns the current user which made the request. If there's no currently logged in user in XWiki then the
-     * returned string is <i>XWiki.XWikiGuest</i> which represents any anonymous user. Otherwise the returned string has
-     * the format <i>databaseName:XWiki.UserLoginName</i> when XWiki runs in virtual mode, or simply
-     * <i>XWiki.UserLoginName</i> in non-virtual mode. At the same time this method returns the name of the document
-     * containing the current user's profile so in Velocity you can do, for instance,
+     * returned string is <i>XWiki.XWikiGuest</i> which represents any anonymous user. The name of the user is returned
+     * relative to the current wiki so if the user is in the current wiki or in non-virtual mode the name will be of the
+     * form <code>XWiki.UserLogin</code>. If the user comes from another wiki the full prefixed name will be returned as
+     * in <code>wikiid:XWiki.UserLogin</code>. At the same time this method returns the name of the document containing
+     * the current user's profile so in Velocity you can do, for instance,
      * <code>$xwiki.getDocument($context.user)</code> to find out more about the current user, like his/hers real name
      * or e-mail address.
      * 
@@ -300,6 +301,19 @@ public class Context extends Api
     public String getUser()
     {
         return getXWikiContext().getUser();
+    }
+
+    /**
+     * Returns the document reference for the profile page of the current user which made the request. The returned
+     * reference can always be considered an absolute document reference, meaning that
+     * <code>getUserReference().getWikiReference().getName()</code> will always return the name of the user's wiki.
+     * 
+     * @return The document reference for the current logged in user which made the request or <code>null</code> if
+     *         there is no currently logged in user (anonymous/guest user).
+     */
+    public DocumentReference getUserReference()
+    {
+        return getXWikiContext().getUserReference();
     }
 
     /**
@@ -355,7 +369,7 @@ public class Context extends Api
      * @param key The key to look for in the context.
      * @return The value associated with the given key in the XWiki context, if you have programming rights, or
      *         <code>null</code> otherwise.
-     * @see #put(String, Object)
+     * @see #put(String, java.lang.Object)
      */
     @Programming
     public java.lang.Object get(String key)
@@ -534,22 +548,9 @@ public class Context extends Api
     }
 
     /**
-     * Returns an instance of the {@link com.xpn.xwiki.util.Util} class.
-     * 
-     * @return an instance of the {@link com.xpn.xwiki.util.Util} class
-     * @see Util
-     * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
-     */
-    @Deprecated
-    public Util getUtil()
-    {
-        return this.context.getUtil();
-    }
-
-    /**
      * Sets the default field display mode, when using {@link Document#display(String)} or
-     * {@link Document#display(String, Object)}. It is automatically set to "edit" when the action is "inline", and to
-     * "view" in all other cases.
+     * {@link Document#display(String, Object)}. It is automatically set to "edit" when the action is "edit" or
+     * "inline", and to "view" in all other cases.
      * 
      * @param mode the display mode, one of "view", "edit", "hidden", "search", "rendered".
      */
@@ -561,8 +562,8 @@ public class Context extends Api
     /**
      * Retrieves the information about the currently executing macro. This method is only useful inside wiki macros.
      * 
-     * @return macro information, normally a {@link java.util.Map} containing the macro {@code content}, the {@code
-     *         params}, and the macro execution {@code context}
+     * @return macro information, normally a {@link java.util.Map} containing the macro {@code content}, the
+     *         {@code params}, and the macro execution {@code context}
      */
     public java.lang.Object getMacro()
     {
@@ -570,22 +571,17 @@ public class Context extends Api
     }
 
     /**
-     * After this is called:
-     * 1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.
-     * 2. {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(org.xwiki.model.reference.DocumentReference)},
-     *    {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(String)},
-     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor()},
-     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String)},
-     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String, boolean)},
-     *    and {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will perform all of their actions as
-     *    if the document's content author was the guest user (XWiki.XWikiGuest).
-     *
-     * In effect, no code requiring "programming right" will run, and if the document content author
-     * (see: {@link com.xpn.xwiki.api.Document#getContentAuthor()}) is a user who has "programming right",
-     * there will be no way for code following this call to save another document as this user, blessing
-     * it too with programming right.
-     *
-     * Once dropped, permissions cannot be regained for the duration of the request.
+     * After this is called: 1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false. 2.
+     * {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(org.xwiki.model.reference.DocumentReference)},
+     * {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(String)}, {@link com.xpn.xwiki.api.Document#saveAsAuthor()},
+     * {@link com.xpn.xwiki.api.Document#saveAsAuthor(String)},
+     * {@link com.xpn.xwiki.api.Document#saveAsAuthor(String, boolean)}, and
+     * {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will perform all of their actions as if the document's
+     * content author was the guest user (XWiki.XWikiGuest). In effect, no code requiring "programming right" will run,
+     * and if the document content author (see: {@link com.xpn.xwiki.api.Document#getContentAuthor()}) is a user who has
+     * "programming right", there will be no way for code following this call to save another document as this user,
+     * blessing it too with programming right. Once dropped, permissions cannot be regained for the duration of the
+     * request.
      * 
      * @since 2.5M2
      */

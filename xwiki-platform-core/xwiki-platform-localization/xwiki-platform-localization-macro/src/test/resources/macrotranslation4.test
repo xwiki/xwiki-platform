@@ -1,0 +1,17 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+{{translation key="unexisting.translation"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [translation] [key=unexisting.translation]
+beginParagraph
+onWord [unexisting]
+onSpecialSymbol [.]
+onWord [translation]
+endParagraph
+endMacroMarkerStandalone [translation] [key=unexisting.translation]
+endDocument

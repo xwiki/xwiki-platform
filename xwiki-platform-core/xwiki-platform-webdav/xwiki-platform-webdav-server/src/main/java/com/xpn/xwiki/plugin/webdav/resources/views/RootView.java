@@ -48,9 +48,7 @@ public class RootView extends AbstractDavView
      */
     private static final Logger logger = LoggerFactory.getLogger(RootView.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -77,9 +75,7 @@ public class RootView extends AbstractDavView
         return last ? resource : resource.decode(tokens, next + 1);        
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();

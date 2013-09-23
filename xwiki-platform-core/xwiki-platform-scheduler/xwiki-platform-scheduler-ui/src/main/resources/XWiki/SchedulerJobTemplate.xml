@@ -1,134 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>XWiki</web>
-<name>SchedulerJobTemplate</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.SchedulerJobClass</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1252454400000</date>
-<contentUpdateDate>1252454400000</contentUpdateDate>
-<version>1.1</version>
-<title>Scheduler Job Template</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.SchedulerJobClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<contextDatabase>
-<name>contextDatabase</name>
-<number>9</number>
-<prettyName>Job execution context database</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</contextDatabase>
-<contextLang>
-<name>contextLang</name>
-<number>8</number>
-<prettyName>Job execution context lang</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</contextLang>
-<contextUser>
-<name>contextUser</name>
-<number>7</number>
-<prettyName>Job execution context user</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</contextUser>
-<cron>
-<name>cron</name>
-<number>5</number>
-<prettyName>Cron Expression</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</cron>
-<jobClass>
-<name>jobClass</name>
-<number>3</number>
-<prettyName>Job Class</prettyName>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</jobClass>
-<jobDescription>
-<name>jobDescription</name>
-<number>2</number>
-<prettyName>Job Description</prettyName>
-<rows>10</rows>
-<size>45</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</jobDescription>
-<jobName>
-<name>jobName</name>
-<number>1</number>
-<prettyName>Job Name</prettyName>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</jobName>
-<script>
-<name>script</name>
-<number>6</number>
-<prettyName>Job Script</prettyName>
-<rows>10</rows>
-<size>45</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</script>
-<status>
-<name>status</name>
-<number>4</number>
-<prettyName>Status</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</status>
-</class>
-<name>XWiki.SchedulerJobTemplate</name>
-<number>0</number>
-<className>XWiki.SchedulerJobClass</className>
-<guid>8d588ee0-c34d-4616-a74e-822491343730</guid>
-<property>
-<cron>0 0 12 * * ?</cron>
-</property>
-<property>
-<jobClass>com.xpn.xwiki.plugin.scheduler.GroovyJob</jobClass>
-</property>
-<property>
-<jobDescription></jobDescription>
-</property>
-<property>
-<jobName></jobName>
-</property>
-<property>
-<script></script>
-</property>
-<property>
-<status></status>
-</property>
-</object>
-<content>{{include document="XWiki.SchedulerJobSheet"/}}</content></xwikidoc>
+  <web>XWiki</web>
+  <name>SchedulerJobTemplate</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.SchedulerJobClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Scheduler Job Template</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.SchedulerJobClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <contextDatabase>
+        <name>contextDatabase</name>
+        <number>9</number>
+        <prettyName>Job execution context database</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </contextDatabase>
+      <contextLang>
+        <name>contextLang</name>
+        <number>8</number>
+        <prettyName>Job execution context lang</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </contextLang>
+      <contextUser>
+        <name>contextUser</name>
+        <number>7</number>
+        <prettyName>Job execution context user</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </contextUser>
+      <cron>
+        <name>cron</name>
+        <number>5</number>
+        <prettyName>Cron Expression</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </cron>
+      <jobClass>
+        <name>jobClass</name>
+        <number>3</number>
+        <prettyName>Job Class</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </jobClass>
+      <jobDescription>
+        <name>jobDescription</name>
+        <number>2</number>
+        <prettyName>Job Description</prettyName>
+        <rows>10</rows>
+        <size>45</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </jobDescription>
+      <jobName>
+        <name>jobName</name>
+        <number>1</number>
+        <prettyName>Job Name</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </jobName>
+      <script>
+        <name>script</name>
+        <number>6</number>
+        <prettyName>Job Script</prettyName>
+        <rows>10</rows>
+        <size>45</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </script>
+      <status>
+        <name>status</name>
+        <number>4</number>
+        <prettyName>Status</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </status>
+    </class>
+    <name>XWiki.SchedulerJobTemplate</name>
+    <number>0</number>
+    <className>XWiki.SchedulerJobClass</className>
+    <guid>8d588ee0-c34d-4616-a74e-822491343730</guid>
+    <property>
+      <cron>0 0 12 * * ?</cron>
+    </property>
+    <property>
+      <jobClass>com.xpn.xwiki.plugin.scheduler.GroovyJob</jobClass>
+    </property>
+    <property>
+      <jobDescription/>
+    </property>
+    <property>
+      <jobName/>
+    </property>
+    <property>
+      <script/>
+    </property>
+    <property>
+      <status/>
+    </property>
+  </object>
+  <content>{{include document="XWiki.SchedulerJobSheet"/}}</content>
+</xwikidoc>

@@ -21,22 +21,29 @@ package org.xwiki.chart.internal.plot;
 
 import java.util.Map;
 
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating line charts.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
-public class LinePlotGenerator extends AbstractXYPlotGenerator
+@Component
+@Named("line")
+@Singleton
+public class LinePlotGenerator extends AbstractCategoryPlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected XYItemRenderer getXYItemRenderer(Map<String, String> parameters)
+    @Override
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
-        return new XYLineAndShapeRenderer();
-    } 
+        boolean linesVisible = !Boolean.valueOf(parameters.get("hideLines"));
+        boolean shapesVisible = !Boolean.valueOf(parameters.get("hideShapes"));
+        return new LineAndShapeRenderer(linesVisible, shapesVisible);
+    }
 }

@@ -1,0 +1,2283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Main</web>
+  <name>Activity</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1364502176000</creationDate>
+  <date>1364560703000</date>
+  <contentUpdateDate>1364560203000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.activity')</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>5c505c61-ae77-44de-b1b0-f9fcaca3b2b6</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+XWiki.Activity = Class.create({
+  initialize : function() {
+    this.initHandlers();
+    this.attachDeleteHandlers();
+  },
+  initHandlers: function() {
+    $$('.activityHeader').each(function(activityHeader){
+      if(activityHeader.up().hasClassName('collapsed')){
+        activityHeader.observe('click', this.toggle.bind(this, activityHeader.up()));
+      }
+    }.bind(this));
+
+    document.observe('xwiki:activity:newActivity', function(event) {
+      // Update all activity streams to display the new message
+      $$('.activity').each(this.updateActivity.bind(this));
+    }.bind(this));
+  },
+  toggle: function() {
+    var collapsable = arguments[0];
+    if (collapsable.hasClassName('collapsed')) {
+      collapsable.removeClassName('collapsed');
+      collapsable.down('.toolExpand').update('&amp;#9650;');
+    } else {
+      collapsable.addClassName('collapsed');
+      collapsable.down('.toolExpand').update('&amp;#9660;');
+    }
+  },
+  updateActivity: function(activityContainer) {
+    var updateURL = activityContainer.down('.updateURL').value;
+    new Ajax.Updater(
+      {success: activityContainer},
+      updateURL, {
+        onCreate: function() {
+          // NOTE: Do we need any progress/success notification at this level or do we do it only in the "calling" component?
+          //activityContainer._notification = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');
+        },
+        onSuccess: function() {
+          if (activityContainer &amp;&amp; activityContainer._notification) {
+            activityContainer._notification.hide();
+          }
+        },
+        onFailure: function(response) {
+          var failureReason = '';
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          } else {
+            failureReason = response.statusText;
+          }
+          if (activityContainer) {
+            if (activityContainer._notification) {
+              activityContainer._notification.hide();
+            }
+            activityContainer._notification = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, 'error');
+          }
+        },
+        on1223 : function(response) { /*SUCCESS*/
+          response.request.options.onSuccess(response);
+        },
+        on0 : function(response) {  /*FAILURE*/
+          response.request.options.onFailure(response);
+        },
+        onComplete: function(response) {
+          // The newly retrieved activity element is inserted after onSuccess is called, so we must handle it here instead of in onSuccess.
+          if (response.request.success()) {
+            // The remplacement activity has a default updateURL. We discard that and replace it with the updateURL of the original activity so that, at each update, the URL stays the same.
+            var newActivity = activityContainer.next();
+            if (newActivity) {
+              newActivity.down('.updateURL').value = updateURL;
+            }
+
+            // Remove the old activity element.
+            activityContainer.remove();
+
+            this.attachDeleteHandlers();
+          }
+        }.bind(this),
+        insertion: 'after'
+      }
+    );
+  },
+  attachDeleteHandlers : function () {
+    $$('.activity .activityItem .toolDelete').invoke('observe', 'click', function (event) {
+      event.stop();
+      var trigger = event.element();
+      trigger.blur();
+      if (trigger.disabled) {
+        // Do nothing if the button was already clicked and it's waiting for a response from the server.
+        return;
+      } else {
+        new XWiki.widgets.ConfirmedAjaxRequest(
+          /* Ajax request URL */
+          trigger.href.replace(/xredirect=.*$/, 'xpage=plain&amp;confirm=1'),
+          /* Ajax request parameters */
+          {
+            onCreate : function() {
+              // Disable the button, to avoid a cascade of clicks from impatient users
+              trigger.disabled = true;
+            },
+            onSuccess : function() {
+              // Remove the corresponding HTML element from the UI
+              trigger.up("li").remove();
+            },
+            onComplete : function() {
+              // In the end: re-enable the button
+              trigger.disabled = false;
+            }
+          },
+          /* Interaction parameters */
+          {
+            confirmationText: "$services.localization.render('xe.activity.messages.delete.confirm')"
+          }
+        );
+      }
+    });
+  }
+});
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
+
+document.observe('xwiki:dom:loaded', function() {
+  new XWiki.Activity();
+});</code>
+    </property>
+    <property>
+      <name>Expand and Collapse</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>36962c0c-7460-4536-9d05-a6381b65a37f</guid>
+    <property>
+      <level>programming</level>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>ab40f34b-0de4-4e6a-a6c8-f03dce1d6db5</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+#macro (__css3 $rule)
+  -moz-${rule};
+  -webkit-${rule};
+  ${rule};
+#end
+
+.rssURL{
+  padding-top: 5px;
+  text-align: right;
+}
+
+ul.activityList {
+  list-style: none;
+  margin: 0;
+}
+
+.activityItem {
+  margin: 0 0 5px;
+  padding: 5px 0;
+  position: relative;
+}
+
+.activityItem .activityItem {
+  margin: 0;
+}
+
+.activityPage:hover , .activityApplication:hover , .activityUser:hover {
+  background: $theme.highlightColor;
+}
+
+.activityApplication, .activityUser, .activityPage .activityItem {
+  display: block;
+  padding-left: 75px;
+  position: relative;
+}
+
+.activityUser {
+  padding-left: 0;
+  width: 100%;
+}
+.activityUser .activityContent {
+  padding: 0.5em 0 0.5em 75px;
+}
+
+.activitySummary {
+  min-height: 35px;
+  padding-top: 5px;
+}
+
+.activitySummary , .activityPage .activityAction {
+  padding-left: 25px;
+}
+
+.activityPage ul .activityAction {
+  padding-left: 0;
+}
+
+.activityAuthor , .activityAction{
+  display: block;
+}
+
+.activityAuthor {
+  padding-right: 8em;
+}
+
+.activityPage .activityAuthor {
+  padding-left: 25px;
+  text-indent: -25px;
+}
+
+.activityPage .activityContent .activityAuthor {
+  padding-left: 0;
+  text-indent: 0;
+}
+
+.activityAction, .activityTime {
+  color: $theme.textSecondaryColor;
+  font-size: .8em;
+}
+
+.activityTime {
+  padding: 5px 15px 0 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.activitySnapshot {
+  height: 30px;
+  left: 0;
+  margin: 5px 0 0 25px;
+  position: absolute;
+}
+
+.activitySummary .activitySnapshot {
+  display: inline-block;
+  margin: 0 17px 0 0;
+  position: relative;
+}
+
+.activityItem .activityItem .activitySnapshot {
+  margin-top: 2px;
+}
+
+.activitySnapshot img {
+  height: 30px;
+  width: 30px;
+}
+
+.activitySnapshot .activityActionAvatar {
+  background: $theme.pageContentBackgroundColor;
+  border-color: $theme.pageContentBackgroundColor;
+  border-style: solid;
+  border-width: 4px 1px 1px 3px;
+  bottom: -5px;
+  height: 16px;
+  position: absolute;
+  right: -10px;
+  width: 16px;
+}
+
+/** &lt;start&gt; Inside activityContent **/
+.activityApplication .activityContent,
+.activityUser .activityContent,
+.activityList .annotated,
+.activityList .annotation,
+.activityList .attachment,
+.activityList .comment {
+  font-size: .9em;
+  padding-right: 15px;
+}
+
+.collapsed .activityContent, .activitySummary {
+  display: none;
+}
+
+.collapsed .activitySummary {
+  display: block;
+}
+
+.activityList .annotated {
+  background-color: #FFEE99;
+  padding: 3px 15px 3px 5px;
+}
+
+.activityList .attachment {
+  margin: 0;
+  padding: 3px 0 0;
+}
+
+.activityList .message {
+  /* Preserve the white-space because messages are written in plain text. */
+  white-space: pre;
+}
+/** &lt;end&gt; **/
+
+/** &lt;start&gt; Tools **/
+/** &lt;start&gt; Expand Tool **/
+.toolExpand{
+  color: $theme.textColor;
+  cursor: pointer;
+  font-size: .6em;
+  padding: 0 3px;
+  position: absolute;
+  right: 0;
+  top: 7px;
+  visibility: hidden;
+}
+
+.toolExpand:hover {
+  text-decoration: none;
+}
+
+.activityList:hover .toolExpand  {
+  visibility: visible;
+}
+/** &lt;/end&gt; Expand Tool **/
+/** &lt;start&gt; Filter Tool **/
+.toolFilter {
+  cursor: pointer;
+  float: right;
+  padding-right: 13px;
+  position: relative;
+}
+
+.toolFilter .toolExpand{
+  color: transparent;
+}
+
+h1:hover .toolFilter .toolExpand {
+  color: $theme.textColor;
+}
+
+.toolFilter  .toolExpand {
+  font-size: 0.3em;
+  line-height: 4em;
+  top: 5px;
+}
+/** &lt;/end&gt; Filter Tool **/
+/** &lt;start&gt; Delete Tool **/
+.toolDelete {
+  color: $theme.notificationErrorColor !important;
+  cursor: pointer;
+  font-size: .9em;
+  font-weight: bold;
+  padding: 0 4px;
+  position: absolute;
+  right: 0;
+  top: 2px;
+  visibility: hidden;
+  z-index: 1;
+}
+
+.activityItem:hover .toolDelete {
+  visibility: visible;
+}
+
+.toolDelete:hover {
+  text-decoration: none;
+}
+/** &lt;/end&gt; Delete Tool **/
+/** &lt;/end&gt; Tools **/
+
+/** &lt;start&gt; Action Types **/
+.type {
+  background: none no-repeat scroll 4px 0 transparent;
+  padding-left: 25px;
+}
+
+.typePage {
+  background-image:url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
+}
+
+/** &lt;/end&gt; Action Types **/
+
+/** CSS 3**/
+.activitySnapshot .activityActionAvatar {
+  #__css3('border-radius: 10px 10px 0 10px')
+  #__css3('box-shadow: -1px 1px 1px rgba(128, 128, 128, 0.6)')
+}
+
+.activitySnapshot img {
+  #__css3('box-shadow: 0 0 2px 1px rgba(128, 128, 128, 0.6)')
+}
+
+/** IE6, IE7 **/
+* html ul.activityList  {
+  list-style-position: outside; /* IE6 */
+}
+
+* html .activityItem ,  * html  .activityHeader, * html  .activityContent ul{
+  display: inline-block;
+}
+
+* html .activityAuthor {
+  float: left;
+}
+*+html .activityAuthor {
+  float: left;
+}
+
+* html .activityTime {
+  float: right;
+}
+
+* html .activityItem {
+  float: right;
+}
+
+* html .activityContent {
+  line-height: 1%;
+}
+
+* html .activityAction {
+  clear: left;
+}
+
+* html .activitySummary {
+  height: 40px; /* IE 6 */
+}
+</code>
+    </property>
+    <property>
+      <name>Activity CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>9</number>
+        <prettyName>Macro code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentDescription>
+        <disabled>0</disabled>
+        <name>contentDescription</name>
+        <number>8</number>
+        <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </contentDescription>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>7</number>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Optional|Mandatory|No content</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <defaultCategory>
+        <disabled>0</disabled>
+        <name>defaultCategory</name>
+        <number>4</number>
+        <prettyName>Default category</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultCategory>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Macro description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Macro id</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Macro name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <supportsInlineMode>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>supportsInlineMode</name>
+        <number>5</number>
+        <prettyName>Supports inline mode</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </supportsInlineMode>
+      <visibility>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>visibility</name>
+        <number>6</number>
+        <prettyName>Macro visibility</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Current User|Current Wiki|Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>8891cf6c-541d-4e15-8986-ca230207525e</guid>
+    <property>
+      <code>{{velocity output=false}}
+##
+##
+## Skin Extensions
+##--------------------------------------------------------------
+$xwiki.jsx.use('Main.Activity')##
+$xwiki.ssx.use('Main.Activity')##
+##
+## Icons
+##--------------------------------------------------------------
+## Some events are not implemented yet in the activitystream plugin: TODO: application | activityApplication, user | activityUser
+#set ($activityActionsMap = {
+  'create':           'icons/silk/page_white_add.png',
+  'delete':           'icons/silk/page_white_delete.png',
+  'update':           'icons/silk/page_white_edit.png',
+  'addAnnotation':    'icons/silk/note_add.png',
+  'deleteAnnotation': 'icons/silk/note_delete.png',
+  'updateAnnotation': 'icons/silk/note_edit.png',
+  'addAttachment':    'icons/xwiki/attach_add.png',
+  'deleteAttachment': 'icons/xwiki/attach_delete.png',
+  'updateAttachment': 'icons/xwiki/attach_edit.png',
+  'addComment':       'icons/silk/comment_add.png',
+  'deleteComment':    'icons/silk/comment_delete.png',
+  'updateComment':    'icons/silk/comment_edit.png',
+  'publicMessage':    'icons/silk/user_comment.png',
+  'personalMessage':  'icons/silk/user_comment.png',
+  'directMessage':    'icons/silk/user_go.png',
+  'groupMessage':     'icons/silk/group_go.png'
+})
+#macro (initDateVariables)
+##
+## Date Time
+##--------------------------------------------------------------
+#set ($currentTime = $xwiki.jodatime.getDateTime())
+#set ($now = $datetool.date)
+#set ($todayYear = $datetool.getYear($now))
+#set ($todayMonth = $datetool.getMonth($now) + 1)
+#set ($todayMidnight = $currentTime.toDateMidnight())
+#set ($yesterdayMidnight = $todayMidnight.minusDays(1))
+#end
+##
+## Formatters
+##--------------------------------------------------------------
+#set ($eventDateFormatter = 'dd MMM, HH:mm')
+#set ($eventFullDateFormatter = 'yyyy/MM/dd HH:mm')
+#set ($activityListDateFormatter = 'dd MMM')
+##
+## User status configuration
+## -------------------------------------------------------------
+#set ($config = 'XWiki.MessageStreamConfig')
+#set ($configClass = $xwiki.getDocument($config).getxWikiClass())
+#set ($configObj = $xwiki.getDocument($config).getObject($config))
+#set ($isMessageStreamActive = ("$configObj.getProperty('active').value" == '1'))
+## TODO: filter out user statuses from the activity stream if inactive
+##
+##
+#set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
+##
+## Filter clause
+##--------------------------------------------------------------
+#set ($filterClause = '1=1')
+#set ($filterParameters = [])
+##
+## Get values from request/macro param
+##--------------------------------------------------------------
+## Number of entries to display
+#readVariableFromRequest('aEntries' 'entries' 20)
+#if ($aEntries == 20 &amp;&amp; $xcontext.macro.params.get('entries'))
+  #set ($aEntries = $mathtool.toInteger($xcontext.macro.params.get('entries')))
+#end
+## Number of activities to display for each entry
+#readVariableFromRequest('aSubEntries' 'subentries' 10)
+#if ($aSubEntries == 10 &amp;&amp; $xcontext.macro.params.get('subentries'))
+  #set ($aSubEntries = $mathtool.toInteger($xcontext.macro.params.get('subentries')))
+#end
+## Wikis
+#readVariableFromRequest('aWikis' 'wikis' [])
+#if ($aWikis.size() == 0)
+  #set ($aWikisString = $xcontext.macro.params.get('wikis'))
+  #asList('aWikis' $aWikisString)
+  #if ($aWikis.size() == 0)
+    $aWikis.add($xcontext.database)
+  #end
+#end
+## Spaces
+#readVariableFromRequest('aSpaces' 'spaces' [])
+#if ($aSpaces.size() == 0)
+  #set ($aSpacesString = $xcontext.macro.params.get('spaces'))
+  #asList('aSpaces' $aSpacesString)
+#end
+## Authors
+#readVariableFromRequest('aAuthors' 'authors' [])
+#if ($aAuthors.size() == 0)
+  #set ($aAuthorsString = $xcontext.macro.params.get('authors'))
+  #asList('aAuthors' $aAuthorsString)
+#end
+## Tags
+#readVariableFromRequest('aTags' 'tags' [])
+#if ($aTags.size() == 0)
+  #set ($aTagsString = $xcontext.macro.params.get('tags'))
+  #asList('aTags' $aTagsString)
+#end
+## Minor versions
+#readVariableFromRequest('aMinor' 'minor' false)
+#if (!$aMinor &amp;&amp; $xcontext.macro.params.get('minor'))
+  #set ($aMinor = $xcontext.macro.params.get('minor'))
+#end
+## RSS link
+#readVariableFromRequest('aRSS' 'rss' false)
+#if (!$aRSS &amp;&amp; $xcontext.macro.params.get('rss'))
+  #set ($aRSS = $xcontext.macro.params.get('rss'))
+#end
+##
+## Filter by
+## ------------------------------------------------------------
+## Authors
+#if ($aAuthors.size() &gt; 0)
+  #set ($toUsersParameters = [])
+  #set ($fromUsersParameters = [])
+  #set ($usersQuery = '')
+  #set ($hasDifferentUsers = false)
+  #foreach ($u in $aAuthors)
+    #if ("$!u" != '')
+      #set ($usersQuery = $usersQuery.concat(',?'))
+      #set ($discard = $fromUsersParameters.add($u))
+      #set ($discard = $toUsersParameters.add("${u}^XWiki.XWikiUsers"))
+      #if ($services.model.serialize($services.model.resolveDocument($u), 'default') != $currentUser)
+        #set ($hasDifferentUsers = true)
+      #end
+    #end
+  #end
+  #if ($usersQuery.length() &gt; 1)
+    ## Remove the first comma
+    #set ($usersQuery = $usersQuery.substring(1))
+    #if (!$isGuest)
+      #if ($hasDifferentUsers)
+        ## Direct messages from the current user to the filtered users
+        #set ($filterClause = $filterClause + " and ((act.application = 'MessageStream' and act.type = 'directMessage' and act.user = ? and act.param2 in (${usersQuery})) or act.user in (${usersQuery}))")
+        #set ($discard = $filterParameters.add($currentUser))
+        #set ($discard = $filterParameters.addAll($toUsersParameters))
+      #else
+        ## All direct messages to the current user
+        #set ($filterClause = $filterClause + " and ((act.application = 'MessageStream' and act.type = 'directMessage' and act.param2 = ?) or act.user in (${usersQuery}))")
+        #set ($discard = $filterParameters.add("${currentUser}^XWiki.XWikiUsers"))
+      #end
+    #else
+      #set ($filterClause = $filterClause + " and act.user in (${usersQuery})")
+    #end
+    #set ($discard = $filterParameters.addAll($fromUsersParameters))
+  #end
+#end
+## Spaces
+#updateFilterClause('space' $aSpaces false)
+## BLACKLISTED SPACES - exclude them
+#if ($blacklistedSpaces &amp;&amp; $blacklistedSpaces.size() &gt; 0)
+  #set ($filterClause = $filterClause + ' and (act.application = ''MessageStream'' or 1=1 ')
+  #updateFilterClause('space' $blacklistedSpaces true)
+  #set ($filterClause = $filterClause + ')')
+#end
+## Wikis
+#updateFilterClause('wiki' $aWikis false)
+## Tags
+#if ($xwiki.getPlugin('tag') &amp;&amp; $aTags.size() &gt; 0)
+  #set ($docsWithTag = [])
+  #foreach ($item in $aTags)
+    #set ($discard = $docsWithTag.addAll($xwiki.tag.getDocumentsWithTag($item)))
+  #end
+  ## Since there is no 'tag' field in the database schema, we can only use the page field in order to filter the query. In order to get no results when there are no documents with the requested tags, we use a fake document name
+  #if ($docsWithTag.size() == 0)
+    #set ($discard = $docsWithTag.add("XWiki.FakeDocumentToMakeQueryReturnNoResults${mathtool.random(1,999)}"))
+  #end
+  #updateFilterClause('page' $docsWithTag false)
+#end
+## Minor versions
+#if ("$!aMinor" == 'false')
+  #set ($filterClause = $filterClause + " and not (act.version not like '%.1' and act.type = 'update')")
+#end
+##
+## MessageStream filtering
+## ------------------------------------------------------------
+## The scope filtering is already handled by the "Filter by" section: specific space, specific user...
+##
+## Public messages should be visible to everyone
+#set ($messageFilter = "act.type = 'publicMessage'")
+#if ($isMessageStreamActive)
+  #if (!$isGuest)
+    ##
+    ## A user should see all his messages
+    #set ($messageFilter = "$messageFilter or act.user = ?")
+    #set ($discard = $filterParameters.add(${currentUser}))
+    ##
+    ## A user should see direct messages for him
+    #set ($messageFilter = "$messageFilter or (act.type = 'directMessage' and act.param2 = ?)")
+    #set ($discard = $filterParameters.add("${currentUser}^XWiki.XWikiUsers"))
+    ##
+    ## A user should see personal messages from followed users
+    #if ($xwiki.watchlist.getWatchedUsers().size() &gt; 0)
+      #set ($messageFilter = "$messageFilter or (act.type = 'personalMessage' and act.user in (")
+      #foreach ($u in $xwiki.watchlist.getWatchedUsers())
+        #if ($velocityCount &gt; 1)
+          #set ($messageFilter = $messageFilter.concat(','))
+        #end
+        #set ($messageFilter = $messageFilter.concat('?'))
+        #set ($discard = $filterParameters.add($u))
+      #end
+      #set ($messageFilter = $messageFilter.concat('))'))
+    #end
+    ##
+    ## A user should see messages for his groups
+    #set ($usersGroups = $xwiki.rightsmanager.getAllGroupsNamesForMember($xcontext.user))
+    #if ($usersGroups.size() &gt; 0)
+      #set ($messageFilter = "$messageFilter or (act.type = 'groupMessage' and act.param2 in (")
+      #foreach ($g in $usersGroups)
+        #if ($velocityCount &gt; 1)
+          #set ($messageFilter = $messageFilter.concat(','))
+        #end
+        #set ($messageFilter = $messageFilter.concat('?'))
+        #set ($discard = $filterParameters.add("${services.model.serialize($services.model.resolveDocument($g), 'default')}^XWiki.XWikiGroups"))
+      #end
+      #set ($messageFilter = $messageFilter.concat('))'))
+    #end
+  #end
+  #set ($filterClause = $filterClause + " and (act.application &lt;&gt; 'MessageStream' or (act.application = 'MessageStream' and (${messageFilter})))")
+#else
+  #set ($filterClause = $filterClause + " and act.application &lt;&gt; 'MessageStream'")
+#end
+##
+## Macros
+## -------------------------------------------------------------
+#*
+ * Gets the list (java.util.List) of elements in $arrayAsString, and puts them in the $list.
+ *
+ * @param $arrayAsString the string form of the array, similar to the java syntax for a macro ({elt1, elt2, etc}), or without the {}
+ * @param $resultVariableName the name of the variable to put the resulted list into.
+ * FIXME: this is gonna fail for lists with '{' in the string or ','. Need to escape
+ *#
+#macro(asList $resultVariableName $arrayAsString)
+  #set ($list = [])
+  #if ("$!arrayAsString" != '')
+    ## if the string is surrounded by {}, eliminate and then parse as list
+    #if ($arrayAsString.startsWith('{') &amp;&amp; $arrayAsString.endWith('}'))
+      #set ($endIndex = $arrayAsString.length() - 1)
+      #set ($arrayAsString = $arrayAsString.substring(1, $endIndex))
+    #end
+    ## parse the array serialized as string and fill in the list
+    #set ($valuesArray = $arrayAsString.split(','))
+    #foreach ($value in $valuesArray)
+      #if ($value.trim().length())
+        #set ($dispose = $list.add($value.trim()))
+      #end
+    #end
+  #end
+  #setVariable("$resultVariableName", $list)
+#end
+#**
+  * Build query filter clause
+  * @colName The name of the collumn in the database table
+  * @colValues The values to match with
+  * @exclude If true, exclude the given column values
+  *#
+#macro(updateFilterClause $colName $colValues $exclude)
+  #if ($colValues.class == 'class java.lang.String')
+    #set ($filterClause = $filterClause + " and act.${colName}=?")
+    #set ($discard = $filterParameters.add(${colValues}))
+  #else
+    #foreach ($colValue in $colValues)
+      #if ($velocityCount == 1)
+        #set ($filterCondition = 'in')
+        #if ($exclude)
+          #set ($filterCondition = 'not ' + $filterCondition)
+        #end
+        #set ($filterClause = $filterClause + " and act.${colName} ${filterCondition} (")
+      #end
+      #if ("$!colValue" != '')
+        #if ($velocityCount &gt; 1)
+          #set ($filterClause = $filterClause + ',')
+        #end
+        #set ($filterClause = $filterClause + '?')
+        #set ($discard = $filterParameters.add(${colValue}))
+      #end
+      #if ($velocityCount == $colValues.size())
+         #set ($filterClause = $filterClause + ')')
+      #end
+    #end
+  #end
+#end
+#**
+  * Check if the document version exists
+  *#
+#macro(isDocumentVersionValid $event)
+  #set ($isDocumentVersionValid = false)
+  #set ($pageDoc = $xwiki.getDocument($event.page))
+  #set ($versions = $pageDoc.getRevisions())
+  #foreach ($version in $versions)
+    #if ($event.version == $version)
+      #set ($isDocumentVersionValid = true)
+    #end
+  #end
+#end
+#**
+  * Check if the current page event list entry is expandable (there are at least 2 events for the current page) or not.
+  *#
+#macro(isPageEntryExpandable)
+  #set ($isPageEntryExpandable = false)
+  #if ($events.size() &gt; 1)
+    #set ($isPageEntryExpandable = true)
+  #end
+#end
+#**
+  * Get unique page event users
+  * -&gt; used to display the message: 'X changes by Y user(s)'
+  *#
+#macro (getUniqueEventUsers)
+  #set ($eventUsers = [])
+  #foreach ($event in $events)
+    #if (!$eventUsers.contains($xwiki.getUserName($event.user)))
+      #set ($discard = $eventUsers.add($xwiki.getUserName($event.user)))
+    #end
+  #end
+#end
+#**
+  * Check if the current page event happen today
+  *#
+#macro(isToday)
+  #set ($isToday = false)
+  #set ($timeAgoMsg = '')
+  #if ($mathtool.sub($eventTimeDiff.getDayOfYear(), 1) == 0 &amp;&amp;
+      ($eventDateTime.isAfter($todayMidnight) ||
+       $eventDateTime.isEqual($todayMidnight)))
+    #if ($eventTimeDiff.getHourOfDay() == 0)
+      ##
+      ## Few seconds ago
+      ## ---------------------------------------------------------------
+      #set ($timeAgoMsg = $services.localization.render('timeAgo.minutesAgo', [$eventTimeDiff.getMinuteOfHour()]))
+    #else
+      ##
+      ## Number of minutes ago
+      ## ---------------------------------------------------------------
+      #set ($hoursAgo = $eventTimeDiff.getHourOfDay())
+      #set ($timeAgoMsg = $services.localization.render('timeAgo.hoursAgo', [$hoursAgo]))
+    #end
+    #set ($isToday = true)
+  #end
+#end
+#**
+  * Check if the current page event happen yesterday
+  *#
+#macro(isYesterday)
+  #set ($isYesterday = false)
+  #if (($mathtool.sub($eventTimeDiff.getDayOfYear(), 1) == 0 &amp;&amp;
+      $eventDateTime.isBefore($todayMidnight)
+      ) ||
+      ($mathtool.sub($eventTimeDiff.getDayOfYear(), 2) == 0 &amp;&amp;
+      ($eventDateTime.isAfter($yesterdayMidnight) ||
+       $eventDateTime.isEqual($yesterdayMidnight)
+      )))
+    #set ($isYesterday = true)
+  #end
+#end
+#**
+  * Check if the current event is of type 'addAttachment' or 'updateAttachment' or 'deleteAttachment'
+  * @param event The current event
+  *#
+#macro(isAttachmentEvent $event)
+  #set ($isAttachmentEvent = false)
+  #if ($event.type == 'addAttachment' || $event.type == 'updateAttachment' || $event.type == 'deleteAttachment')
+    #set ($isAttachmentEvent = true)
+  #end
+#end
+#**
+  * Check if the current event is of type 'addComment' or 'updateComment' or 'deleteComment'
+  *#
+#macro(isCommentEvent)
+  #set ($isCommentEvent = false)
+  #if ($event.type == 'addComment' || $event.type == 'updateComment' || $event.type == 'deleteComment')
+    #set ($isCommentEvent = true)
+  #end
+#end
+#**
+  * Check if the current event is of type 'addAnnotation' or 'updateAnnotation' or 'deleteAnnotation'
+  *#
+#macro(isAnnotationEvent)
+  #set ($isAnnotationEvent = false)
+  #if ($event.type == 'addAnnotation' || $event.type == 'updateAnnotation' || $event.type == 'deleteAnnotation')
+    #set ($isAnnotationEvent = true)
+  #end
+#end
+#**
+  * Check if the current event is a message in the MessageStream application
+  *#
+#macro(isMessageEvent)
+  #set ($isMessageEvent = false)
+  #if ($event.application == 'MessageStream')
+    #set ($isMessageEvent = true)
+  #end
+#end
+#**
+  * Get comment content
+  *#
+#macro(getCommentContent $event $commentContent)
+  #set ($commentContent = '')
+  #isDocumentVersionValid($event)
+  #if ($isDocumentVersionValid)
+    #set ($pageDocRevision = $xwiki.getDocument($xwiki.getDocument($event.page), $event.version))
+    #set ($commentContent = $!pageDocRevision.getObject('XWiki.XWikiComments', $mathtool.toInteger($event.param2)).getProperty('comment').value)
+  #end
+#end
+#**
+  * Get annotation text and selection
+  *#
+#macro(getAnnotation $event $annotationText $annotationSelection $annotationTextSyntaxId)
+  #set ($annotationText = '')
+  #set ($annotationSelection = '')
+  #set ($annotationTextSyntaxId = '')
+  #isDocumentVersionValid($event)
+  #if ($isDocumentVersionValid)
+    #set ($pageDocRevision = $xwiki.getDocument($xwiki.getDocument($event.page), $event.version))
+    ## FIXME: Should we query the Annotations application's' configuration for the configured annotation class instead of hardcoding the default one? What about custom annotations?
+    #set ($annotationObject = $pageDocRevision.getObject('XWiki.XWikiComments', $mathtool.toInteger($event.param2)))
+    #set ($annotationSelection = $annotationObject.getProperty('selection').value)
+    #set ($annotationText = $annotationObject.getProperty('comment').value)
+    #set ($annotationTextSyntaxId = $pageDocRevision.getSyntax().toIdString())
+  #end
+#end
+#**
+  * Remove duplicated 'update' and 'addAttachment' events for the current page entry
+  * NOTE: each time an event != 'update' (like 'addAttachment, updateComment' ...) is fired, an extra 'update' event is fired too (for backward compatibility reasons)
+  *#
+#macro(removeDuplicatedEvents)
+  ## TO DO - fix XWIKI-5632
+  ## Because of this issue, related 'updateAnnotation' events are not included in the list (for flooding reasons)
+  #set ($newList = [])
+  #set ($previousEventInOldList = $NULL)
+  #set ($previousEventInNewList = $NULL)
+  #foreach ($event in $events)
+    #set ($isUpdateRelatedEvent = false)
+    #set ($isConsecutiveUpdateEvent = false)
+    #set ($isCreateOrDeleteRelatedEvent = false)
+    ##
+    ## Get consecutive 'update' events having the same user (-&gt; only the latest such event will be taken in account)
+    ## ---------------------------------------------------------------
+    #if ($event.type == 'update'
+        &amp;&amp; $event.requestId != $previousEventInNewList.requestId
+        &amp;&amp; $event.type == $previousEventInNewList.type
+        &amp;&amp; $event.user == $previousEventInNewList.user)
+      #set ($isConsecutiveUpdateEvent = true)
+    #end
+    #if (!$isConsecutiveUpdateEvent)
+      #checkRelatedEvents()
+      ##
+      ## Build the clean event list
+      ## ---------------------------------------------------------------
+      #if (!$isUpdateRelatedEvent
+          &amp;&amp; !($isCreateOrDeleteRelatedEvent &amp;&amp; $event.type != 'create' &amp;&amp; $event.type != 'delete')
+          &amp;&amp; $newList.size() &lt; $aSubEntries)
+        #set ($discard = $newList.add($event))
+        #set ($previousEventInNewList = $event)
+      #end
+      #if ($newList.size() &gt;= $aSubEntries)
+        ## number of subentries reached
+        #break
+      #end
+    #end
+    #set ($previousEventInOldList = $event)
+  #end
+  ## Set the $events reference to the new list
+  #set ($events = $newList)
+#end
+#**
+  * checks the condition of the related events
+  *#
+#macro(checkRelatedEvents)
+  ## load related events
+  #set ($relatedEvents = $xwiki.activitystream.getRelatedEvents($event))
+  #if ($relatedEvents.size() &gt; 1)
+    #if ($event.type == 'update')
+      #foreach ($relatedEvent in $relatedEvents)
+        #if ($relatedEvent.type != 'update')
+          #set ($isUpdateRelatedEvent = true)
+          #break
+        #end
+      #end
+    #end
+    ## Get 'create' and 'delete' related event (-&gt; in order to remove duplicated events in the case of import, rename, delete page)
+    ## ---------------------------------------------------------------
+    #if ($event.type != 'create' &amp;&amp; $event.type != 'delete')
+      #foreach ($relatedEvent in $relatedEvents)
+        #if ($relatedEvent.type == 'create' || $relatedEvent.type == 'delete')
+          #set ($isCreateOrDeleteRelatedEvent = true)
+          #break
+        #end
+      #end
+    #end
+  #end
+#end
+#**
+  * Initialize event variables
+  *#
+#macro(initializeEvent)
+  #set ($yearMsg = '')
+  #set ($timeAgoMsg = '')
+  #set ($eventDateTime = $xwiki.jodatime.getDateTime($event.date.getTime()))
+  #set ($eventTimeDiff = $currentTime.minus($eventDateTime.millis).withZone($xwiki.jodatime.getUTCTimezone()))
+  #set ($eventYear = $eventDateTime.year)
+  #if ($eventYear != $todayYear)
+    #set ($yearMsg = $eventYear)
+  #end
+  #isToday()
+  #isYesterday()
+  #isMessageEvent()
+  #isCommentEvent()
+  #isAnnotationEvent()
+  #if("$!timeAgoMsg" == '')
+    #set ($timeAgoMsg = $xwiki.formatDate($event.date, $eventDateFormatter) + " $!yearMsg")
+  #end
+  #set ($iterationDate = $xwiki.formatDate($event.date, $activityListDateFormatter) + " $!yearMsg")
+  #set ($eventFullDate = $xwiki.formatDate($event.date, $eventFullDateFormatter) + " $!yearMsg")
+#end
+#**
+  * Display the arrow used to expand the event list
+  *#
+#macro(toolExpand)
+  &lt;a class='toolExpand'&gt;&amp;#9660;&lt;/a&gt;
+#end
+#**
+  * Display the delete tool for own event messages
+  *#
+#macro(toolDelete $eventID)
+  &lt;a class='toolDelete' href="$doc.getURL($xcontext.action, "$!{request.queryString}&amp;amp;xaction=deleteMessage&amp;amp;id=$eventID&amp;amp;xredirect=$escapetool.url($doc.getURL($xcontext.action, $request.queryString))")" title="$services.localization.render('xe.activity.messages.delete')"&gt;x&lt;/a&gt;
+#end
+#**
+  * Display RSS URL
+  *#
+#macro(displayRSSURL)
+  #set ($rssURL = '')
+  #set ($parameters = 'xpage=plain&amp;outputSyntax=plain')
+  #if ($aTags.size() &gt; 0)
+    #set ($parameters = "${parameters}&amp;tag=$listtool.get($aTags, 0)")
+  #end
+  #if ($aSpaces.size() &gt; 0)
+    #set ($parameters = "${parameters}&amp;space=$listtool.get($aSpaces, 0)")
+  #end
+  #set ($rssURL = $xwiki.getURL('Main.WebRss', 'view', $parameters))
+  &lt;div class="rssURL"&gt;
+    &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.png')" alt="RSS icon"/&gt;$services.localization.render('xe.activity.rssfeed')&lt;/a&gt;
+  &lt;/div&gt;
+#end
+#**
+  * Display mimetype and name for the given event of type attachment
+  *#
+#macro(displayAttachment $event)
+  #set ($pageDoc = $xwiki.getDocument($event.page))
+  #set ($attach = $pageDoc.getAttachment($event.param2))
+  &lt;div class="attachment"&gt;
+    #mimetypeimg($attach.getMimeType().toLowerCase() $event.param2)
+    #if ($attach.version)
+      &lt;a href="$pageDoc.getAttachmentURL($event.param2)"&gt;$!{escapetool.xml($event.param2)}&lt;/a&gt;
+    #else
+      $!{escapetool.xml($event.param2)}
+    #end
+  &lt;/div&gt;
+#end
+#**
+  * Display a user message
+  *#
+#macro(displayMessage $event)
+  &lt;div class="message"&gt;$!{escapetool.xml($event.getBody())}&lt;/div&gt;
+#end
+#**
+  * Display comment
+  *#
+#macro(displayComment $event)
+  #getCommentContent($event $commentContent)
+  #if ("$!commentContent" != '')
+    &lt;div class="comment"&gt;
+     $doc.getRenderedContentRestricted($commentContent, $doc.getSyntax().toIdString())
+    &lt;/div&gt;
+  #end
+#end
+#**
+  * Display annotation
+  *#
+#macro(displayAnnotation $event)
+  #getAnnotation($event $annotationText $annotationSelection)
+  #if ("$!annotationText" != '' || "$!annotationSelection" != '')
+    &lt;div class="annotated"&gt;$!{escapetool.xml($annotationSelection)}&lt;/div&gt;
+    &lt;div class="annotation"&gt;$!{doc.getRenderedContentRestricted($annotationText, $annotationTextSyntaxId)}&lt;/div&gt;
+  #end
+#end
+#**
+  * Display user avatar and action message
+  *#
+#macro(activitySnapshot $eventUser $eventType)
+  &lt;span class="activitySnapshot"&gt;
+    #if ($eventUser != 'XWiki.XWikiGuest')
+      &lt;a href="$xwiki.getURL($eventUser)"&gt;#smallUserAvatar("$!eventUser")&lt;/a&gt;
+    #else
+      #smallUserAvatar("$!eventUser")
+    #end
+    &lt;img class="activityActionAvatar" src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
+  &lt;/span&gt;
+#end
+#**
+  * Display the summary (avatars with action icon) for the current entry
+  *#
+#macro(displayActivityListItemSummary)
+  &lt;div class="activitySummary"&gt;
+    #foreach ($event in $events)
+      #set ($relatedEventsNo = $xwiki.activitystream.getRelatedEvents($event).size() / 2)
+      #activitySnapshot($event.user $event.type)
+    #end
+  &lt;/div&gt;
+#end
+#**
+  * Check if the current subentry is expandable
+  *#
+#macro(isEventEntryExpandable $event)
+  #set ($isEventEntryExpandable = false)
+  #if ($isAnnotationEvent)
+    #getAnnotation($event $annotationText $annotationSelection)
+    #if ("$!annotationText" != '' || "$!annotationSelection" != '')
+      #set ($isEventEntryExpandable = true)
+    #end
+  #elseif ($isAttachmentEvent &amp;&amp; "$!event.param2" != '')
+    #set ($isEventEntryExpandable = true)
+  #elseif ($isCommentEvent)
+    #getCommentContent($event $commentContent)
+    #if ("$!commentContent" != '')
+      #set ($isEventEntryExpandable = true)
+    #end
+  #end
+#end
+#**
+  * Display the content for the current event
+  *#
+#macro(displayEventContent)
+  #set ($isEventEntryExpandable = false)
+  #isAttachmentEvent($event)
+  #isEventEntryExpandable($event)
+  &lt;li class="activityItem #if($isEventEntryExpandable) collapsed #end"&gt;
+    #displayActivityListItemHeader(false false $isEventEntryExpandable)
+    #if ($isEventEntryExpandable || $isMessageEvent)
+      &lt;div class="activityContent"&gt;
+        #if ($isAttachmentEvent)
+          #foreach ($event in $xwiki.activitystream.getRelatedEvents($event))
+            #isAttachmentEvent($event)
+            #if ($isAttachmentEvent)
+              #displayAttachment($event)
+            #end
+          #end
+        #end
+        #if ($isMessageEvent)
+          #displayMessage($event)
+        #elseif ($isCommentEvent)
+          #displayComment($event)
+        #elseif ($isAnnotationEvent &amp;&amp; $isEventEntryExpandable)
+          #displayAnnotation($event)
+        #end
+      &lt;/div&gt;
+    #end
+  &lt;/li&gt;
+  #set ($previousEventType = $event.type)
+  #set ($previousEventUser = $event.user)
+#end
+#**
+  * Display the header structure for the given event
+  * @param isPageEntryExpandable if true, the curent item is expandable
+  * @param isFirstEntry if true, the current item is the first entry of a list formed by a single event -&gt; do not display user avatar
+  *#
+#macro(displayActivityListItemHeader $isPageEntryExpandable $isFirstEntry $isEventEntryExpandable)
+  #set ($relatedEventsNo = $xwiki.activitystream.getRelatedEvents($event).size() / 2)
+  &lt;div class="activityHeader"&gt;
+    #if (!$isPageEntryExpandable &amp;&amp; !$isFirstEntry)
+      #activitySnapshot($event.user $event.type)
+    #end
+    &lt;span class="activityAuthor"&gt;
+      #if ($isFirstEntry)
+        #if ($event.application != 'MessageStream')
+          #set ($pageFullName = "$!{event.wiki}:$!{pageName}")
+          #set ($pageTitle = "$!{xwiki.getDocument($pageFullName).plainTitle}")
+          #if ($pageTitle == '')
+            #set ($pageTitle = $pageName)
+          #end
+          &lt;a href="$xwiki.getURL(${pageFullName})" class="typePage type"&gt;
+            $!{escapetool.xml($pageTitle)}
+          &lt;/a&gt;
+        #end
+      #else
+        $xwiki.getUserName($!event.user)
+      #end
+    &lt;/span&gt;
+    #if(!$isFirstEntry || $isPageEntryExpandable)
+      &lt;span class="activityAction"&gt;
+        #isAttachmentEvent($event)
+        #if ($isPageEntryExpandable)## display entry summary
+          $!services.localization.render('xe.activity.action.summary', [$events.size(), $eventUsers.size()])
+        #else
+          $!services.localization.render("xe.activity.action.${event.type}", [$relatedEventsNo])
+          #if ($event.type == 'update' &amp;&amp; $event.version != '1.1')
+            #set ($pageFullName = "$!{event.wiki}:$!{pageName}")
+            &amp;#183; &lt;a href="$xwiki.getDocument($pageFullName).getURL('view', "viewer=changes&amp;rev2=${event.version}")"&gt;$services.localization.render('xe.activity.action.seechanges')&lt;/a&gt;
+          #end
+        #end
+      &lt;/span&gt;
+    #end
+    #if ("$!timeAgoMsg" != '')
+      &lt;span class='activityTime' title="$eventFullDate"&gt;$!timeAgoMsg&lt;/span&gt;
+    #end
+    #if ($isPageEntryExpandable)
+      #toolExpand('')
+      #displayActivityListItemSummary()
+    #end
+    #if ($isEventEntryExpandable)
+      #toolExpand('')
+    #end
+    ## Users can delete their own messages from the stream
+    #if (($event.application == 'MessageStream') &amp;&amp; $isFirstEntry &amp;&amp; ($xwiki.getDocument("$!{event.user}").prefixedFullName == $xwiki.getDocument("$!{xcontext.user}").prefixedFullName))
+       #toolDelete($event.getEventId())
+    #end
+  &lt;/div&gt;
+#end
+#**
+  * Display the list of events for the current page
+  *#
+#macro(displayEvents)
+  ##
+  ## Display events for the current page
+  ## -------------------------------------------------------------------
+  #foreach ($event in $events)
+    ##
+    ## Event variables
+    ## -------------------------------------------------------------------
+    #initializeEvent()
+    ##
+    ## Date header + Start list
+    ## -------------------------------------------------------------------
+    #if ($isToday &amp;&amp; $displayToday)
+      #if ($closeList)## there are events from the future
+        &lt;/ul&gt;
+      #else
+        #set ($closeList = true)## a new list will be opened
+      #end
+      &lt;h2&gt;$services.localization.render('timeAgo.today')&lt;/h2&gt;&lt;ul class='activityList'&gt;  ## display 'Today' message
+      #set ($displayToday = false)
+    #elseif ($isYesterday &amp;&amp; $displayYesterday)## display 'Yesterday' message
+      #if ($closeList)## there are events today
+        &lt;/ul&gt;
+      #else
+        #set ($closeList = true)## a new list will be opened
+      #end
+      &lt;h2&gt;$services.localization.render('timeAgo.yesterday')&lt;/h2&gt;&lt;ul class='activityList'&gt;
+      #set ($displayYesterday = false)
+    #elseif (!$isToday &amp;&amp; !$isYesterday &amp;&amp; $iterationDate != $displayDate)## display date message
+      #set ($displayDate = $iterationDate)
+      #if ($closeList)## there are events today or/and yesterday
+        &lt;/ul&gt;
+      #else
+        #set ($closeList = true)## a new list will be opened
+      #end
+      &lt;h2&gt;$!iterationDate&lt;/h2&gt;&lt;ul class='activityList'&gt;
+    #end
+    ##
+    ## Open event list + Display first event
+    ## -------------------------------------------------------------------
+    #if ($velocityCount == 1)
+      &lt;li class="activityItem activityPage #if($isPageEntryExpandable)collapsed#end"&gt;
+        #displayActivityListItemHeader($isPageEntryExpandable true false)
+        #if (!$isPageEntryExpandable)
+          ## single entry
+          #set($timeAgoMsg = '')
+        #end
+        &lt;div class="activityContent"&gt;
+          &lt;ul class="activityList"&gt;
+    #end
+    ##
+    ## Display other events (inside the expanded list)
+    ## -------------------------------------------------------------------
+    #displayEventContent()
+    ##
+    ## Close page event list
+    ## -------------------------------------------------------------------
+    #if ($velocityCount == $events.size())
+          &lt;/ul&gt;
+        &lt;/div&gt;
+      &lt;/li&gt;
+    #end
+  #end
+#end
+#**
+  * Display activity event list
+  *#
+#macro (displayActivity)
+  #set ($iterationDate = '')
+  #set ($displayDate = '')
+  #set ($iterationDocuments = [])
+  #set ($displayToday = true)
+  #set ($displayYesterday = true)
+  #set ($closeList = false)
+  ##
+  ## Get distinct pages with activity
+  ## -------------------------------------------------------------------
+  #set ($pages = $xwiki.activitystream.searchDailyPages("$!filterClause", $filterParameters, $aEntries, 0))
+  #if ($pages.size() &gt; 0)
+    #foreach ($page in $pages)
+      ##
+      ## Extract page name and event date
+      ## -------------------------------------------------------------------
+      #set ($pageName = $page.get(0))
+      #set ($pageDate = $page.get(1))
+      ## If the affected document name matches ".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}" then it is a GUID corresponding to message stream events, and not a real document.
+      ## Always assume access to messages. For the rest of the documents, check access.
+      #if ($pageName.matches(".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}") || ($xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${pageName}") &amp;&amp; !$iterationDocuments.contains($pageName)))
+        ##
+        ## Get event list for the current page
+        ## -------------------------------------------------------------------
+        #set ($whereClause = " AND $!filterClause AND day(date)=" + ${xwiki.formatDate($pageDate, 'd')})
+        #set ($whereClause = $whereClause + " AND month(date)=" + ${xwiki.formatDate($pageDate, 'M')})
+        #set ($whereClause = $whereClause + " AND year(date)=" + ${xwiki.formatDate($pageDate, 'yyyy')})
+        #set ($whereClause = "act.page=? AND act.space&lt;&gt;'Scheduler'" + $!whereClause)
+        #set ($subqueryParameters = [$pageName])
+        #set ($discard = $subqueryParameters.addAll($filterParameters))
+        #set ($events= $xwiki.activitystream.searchEvents("$!whereClause", false, 0, 0, $subqueryParameters))
+        #if ($events.size() &gt; 0)
+          ##
+          ## Initialize page event vars
+          ## -------------------------------------------------------------------
+          #removeDuplicatedEvents()
+          #isPageEntryExpandable()
+          #getUniqueEventUsers()
+          #displayEvents()
+        #end
+      #end
+    #end
+    #if ($closeList)## close the last event list
+      &lt;/ul&gt;
+    #end
+  #else
+    &lt;span class="noitems"&gt;$services.localization.render('xe.activity.noentries')&lt;/span&gt;
+  #end
+  ##
+  ## Display RSS URL
+  ## -------------------------------------------------------------------
+  #if ("$!aRSS" == 'true')
+    #displayRSSURL()
+  #end
+#end
+#**
+  * Handle a message (delete) request if the MessageStream module is active.
+  * @param displayUI output parameter that is true if the Activity Stream UI should be displayed, false otherwise.
+  *          Deppending on the current request, handling the message action could not require displaying the UI (and making all the Activity Stream queries).
+  *#
+#macro(handleMessageAction $displayUI)
+  #set ($displayUI = $NULL)
+  #setVariable("$displayUI", true)
+  #if ($isMessageStreamActive)
+    #set ($xredirect = $doc.getURL($xcontext.action, $!{request.queryString}))
+    #set ($errorMessageKeyPrefix = "activity.deleteMessage.error.")
+    #set ($errorMessage = $request.session.getAttribute("${errorMessageKeyPrefix}${xredirect}"))
+    #if ("$!errorMessage" != '')
+      ## Clean the error and display the message.
+      #set ($discard = $request.session.removeAttribute("${errorMessageKeyPrefix}${xredirect}"))
+      {{error}}$errorMessage{{/error}}
+
+    #elseif ("$!{request.xaction}" == 'deleteMessage')
+      #if ($request.confirm == '1')
+        #if (!$services.messageStream.deleteMessage(${request.id}))
+          #if ($request.xpage == 'plain')
+            $response.setStatus(403)## Forbidden
+            {{translation key="xe.activity.messages.delete.failed"/}}
+          #elseif ("$!{request.xredirect}" != '')
+            ## Pass the error message in the xredirect so that we display it in the calling page and not in the macro page.
+            $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $services.localization.render('xe.activity.messages.delete.failed'))
+            $response.sendRedirect($request.xredirect)
+          #else
+            {{error}}{{translation key="xe.activity.messages.delete.failed"/}}{{/error}}
+
+          #end
+        #elseif ("$!{request.xredirect}" != '')
+          $response.sendRedirect(${request.xredirect})
+        #elseif ($request.xpage == 'plain')
+          ## Just print something for confirmation.
+          {{translation key="xe.activity.messages.delete.success"/}}
+        #end
+        ## Suppress the UI to avoid useless DB or network access.
+        #if ($request.xpage == 'plain' || "$!{request.xredirect}" != '')
+          #set ($displayUI = $NULL)
+          #setVariable("$displayUI", false)
+        #end
+      #else
+        {{html}}
+        &lt;form action="$doc.getURL($xcontext.action, $!request.queryString))"&gt;
+          &lt;div class='xdialog-box xdialog-box-confirmation'&gt;
+            &lt;div class='xdialog-content'&gt;
+              &lt;div class='question'&gt;$services.localization.render('xe.activity.messages.delete.confirm')&lt;/div&gt;
+              &lt;div class='buttons'&gt;
+                &lt;input type='hidden' name='confirm' value='1'/&gt;
+                &lt;input type='hidden' name='xaction' value='deleteMessage'/&gt;
+                &lt;input type='hidden' name='id' value="$!request.id"/&gt;
+                &lt;input type='hidden' name='xredirect' value="$!request.xredirect"/&gt;
+                &lt;span class='xbuttonwrapper'&gt;&lt;input type='submit' value="$services.localization.render('core.widgets.confirmationBox.button.yes')" class='button'/&gt;&lt;/span&gt;
+                &lt;a class='secondary button' href="$!request.xredirect"/&gt;$services.localization.render('core.widgets.confirmationBox.button.no')&lt;/a&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+       {{/html}}
+
+      #end
+    #end
+  #end
+#end
+#**
+  * Preserves Activity Stream's state (values of macro parameters) in the updateURL that is to be used if the ActivityStream needs to be refreshed.
+  **#
+#macro (addStateHiddenInput)
+  #set ($extraQueryString = '')
+  #foreach ($param in $xcontext.macro.params.getParameterNames())
+    #set ($value = "$!{xcontext.macro.params.get($param)}")
+    #if ($value != '')
+      #foreach($piece in $value.split('\s*,\s*'))
+        #set($extraQueryString = "${param}=$!{piece}&amp;$!{extraQueryString}")
+      #end
+    #end
+  #end
+  #set ($updateURL = $xwiki.getURL('Main.Activity', 'view', "$!{extraQueryString}&amp;xpage=plain"))
+  &lt;input type='hidden' class='updateURL' value="$updateURL" /&gt;
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($displayUI = true)
+#handleMessageAction($displayUI)
+#if ($displayUI)
+  {{html}}
+  &lt;div class='activity'&gt;
+    #initDateVariables()
+    #addStateHiddenInput()
+    #displayActivity()
+  &lt;/div&gt;
+  {{/html}}
+#end
+{{/velocity}}</code>
+    </property>
+    <property>
+      <contentDescription/>
+    </property>
+    <property>
+      <contentType>No content</contentType>
+    </property>
+    <property>
+      <defaultCategory>Content</defaultCategory>
+    </property>
+    <property>
+      <description>The Activity Macro provides information about recent activities done by the users inside the XWiki instance. It lists the create, edit and delete events for pages, as well as comments, attachments and annotations.</description>
+    </property>
+    <property>
+      <id>activity</id>
+    </property>
+    <property>
+      <name>Activity</name>
+    </property>
+    <property>
+      <supportsInlineMode>0</supportsInlineMode>
+    </property>
+    <property>
+      <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>76922370-d2c4-4a50-98f3-2967415e0b73</guid>
+    <property>
+      <defaultValue>20</defaultValue>
+    </property>
+    <property>
+      <description>Number of entries to display the activity for.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>entries</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>dac693ae-b800-4ffc-874f-dbc59db5f32d</guid>
+    <property>
+      <defaultValue>10</defaultValue>
+    </property>
+    <property>
+      <description>Number of activities to show for each entry.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>subentries</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>d5daa5b3-4105-45ca-999d-7dc678073243</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Comma separated list of wikis to display activity for.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>wikis</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>f96d717f-6bc7-465d-ae9e-36cda81cd99b</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Comma separated list of spaces to display the activity for.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>spaces</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>4</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>71dc6bff-7a23-477b-a8a6-bf2bb47596e1</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Comma separated list of authors whose modifications to show.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>authors</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>f5d8e941-1410-413a-a489-e5f2df8912c3</guid>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Comma separated list of tags to display activity for.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>tags</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>6</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>128cca0e-87a2-407a-92fc-5afa6239bdb2</guid>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Whether to show modifications that create minor versions or not.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>minor</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Main.Activity</name>
+    <number>7</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>baa8452c-003a-4189-8268-6cd570f7f152</guid>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Whether to show activity RSS link or not.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>rss</name>
+    </property>
+  </object>
+  <content>{{velocity}}
+##
+## Activity Macro
+##
+## Optional parameters :
+##
+##  - entries (String set to a numerical value): number of entries to display the activity for.
+##  - subentries (String set to a numerical value): number of activities to show for each entry.
+##  - wikis (List of string[s]): comma separated list of wikis to display activity for.
+##  - spaces (List of string[s]): comma separated list of spaces to display the activity for.
+##  - authors (List of string[s]): comma separated list of authors whose modifications to show.
+##  - tags (List of string[s]): comma separated list of tags to display activity for.
+##  - minor (String set to "true" or "false"): whether to show modifications that create minor versions or not.
+##  - rss (String set to "true" or "false"): whether to show activity rss link or not.
+##  - messageSender (String set to "true" or "false"): whether or not to display the message sender input.
+##
+{{/velocity}}
+
+{{activity /}}</content>
+</xwikidoc>

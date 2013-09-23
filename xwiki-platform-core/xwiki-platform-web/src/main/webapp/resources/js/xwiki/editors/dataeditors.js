@@ -1,21 +1,9 @@
-// ======================================
-// Object and Class editor enhancements
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-if (typeof(XWiki.editors) == 'undefined') {
-  XWiki.editors = new Object();
-}
-// ======================================
-//
-XWiki.editors.XDataEditors = Class.create({
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var editors = XWiki.editors = XWiki.editors || {};
+editors.XDataEditors = Class.create({
   initialize : function() {
-    this.classDocument = $$('meta[name=document]')[0].content;
-    this.classDocumentName = $$('meta[name=page]')[0].content;
-    this.classDocumentSpace = $$('meta[name=space]')[0].content;
-    // URL template generated from velocity
-    this.urlEditTemplate = "$xwiki.getURL('__space__.__page__', 'edit')".replace('__space__', this.classDocumentSpace).replace('__page__', this.classDocumentName);
-    this.urlAddPropertyTemplate = "$xwiki.getURL('__space__.__page__', 'propadd')".replace('__space__', this.classDocumentSpace).replace('__page__', this.classDocumentName);
+    this.editedDocument = XWiki.currentDocument;
 
     $$('.xclass').each(function(item) {
       this.enhanceClassUX(item);
@@ -64,7 +52,11 @@ XWiki.editors.XDataEditors = Class.create({
             classNameVal = classNameElt.options[classNameElt.selectedIndex].value;
           }
           validClassName = classNameVal && classNameVal != '-';
-          url = this.urlEditTemplate + "?xpage=editobject&xaction=addObject&className=" + classNameVal;
+          url = this.editedDocument.getURL('edit', Object.toQueryString({
+            xpage: 'editobject',
+            xaction: 'addObject',
+            className: classNameVal
+          }));
         }
         if (!item.disabled && validClassName) {
           new Ajax.Request(
@@ -74,20 +66,25 @@ XWiki.editors.XDataEditors = Class.create({
             {
               onCreate : function() {
                 item.disabled = true;
-                item.notification = new XWiki.widgets.Notification("$msg.get('core.editors.object.add.inProgress')", "inprogress");
+                item.notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.inProgress')", "inprogress");
               },
               onSuccess : function(response) {
                 var activator = item.up('.add_xobject');
                 if(activator) {
                   var insertedElement;
+                  // We don't use Prototype API here because we wan't to move the CSS/JavaScript includes to the page head.
+                  var responseDocumentFragment = this._parseHTMLResponse(response.responseText);
                   if (activator.up('.xclass')) {
-                    activator.insert({before: response.responseText});
+                    // Using plain JavaScript here because Prototype doesn't know how to insert a document fragment..
+                    activator.up().insertBefore(responseDocumentFragment, activator);
                     insertedElement = activator.previous();
                   } else {
-                    activator.insert({after: response.responseText});
+                    activator.up().insertBefore(responseDocumentFragment, activator.nextSibling);
                     insertedElement = activator.next();
                   }
                   if (insertedElement) {
+                    // Notify the listeners that the DOM has been updated. This is needed in order to have pickers.
+                    document.fire('xwiki:dom:updated', {elements: [insertedElement]});
                     var insertedObject;
                     if(insertedElement.hasClassName('xclass')) {
                       this.enhanceClassUX(insertedElement);
@@ -107,14 +104,14 @@ XWiki.editors.XDataEditors = Class.create({
                     insertedObject.up('.xclass').removeClassName('collapsed');
                   }
                 }
-                item.notification.replace(new XWiki.widgets.Notification("$msg.get('core.editors.object.add.done')", "done"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", "done"));
               }.bind(this),
               onFailure : function(response) {
                 var failureReason = response.statusText;
                 if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                   failureReason = 'Server not responding';
                 }
-                item.notification.replace(new XWiki.widgets.Notification("$msg.get('core.editors.object.add.failed')" + failureReason, "error"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.failed')" + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;
@@ -132,6 +129,41 @@ XWiki.editors.XDataEditors = Class.create({
         }
       }.bindAsEventListener(this));
     }.bind(this));
+  },
+  /**
+   * Parses the given HTML, moving the CSS/JavaScript includes in the page head.
+   *
+   * @param html the HTML to parse
+   * @return the document fragment corresponding to the given HTML
+   */
+  _parseHTMLResponse : function(html) {
+    // We don't use Element#update() because it doesn't move external scripts and sheets into HEAD and also because we
+    // don't want to support in-line scripts in property displayers.
+    var container = new Element('div');
+    container.innerHTML = html;
+    var head = document.body.previous('head');
+    head && container.select('link').each(function(link) {
+      head.insert(link);
+    });
+    head && container.select('script').each(function(script) {
+      if (script.src) {
+        // The script is not fetched if we simply move the script element.
+        head.insert(new Element('script', {type: script.type, src: script.readAttribute('src')}));
+      }
+      script.remove();
+    });
+    return this._extractContents(container);
+  },
+  /**
+   * Extracts the children of the given element into a document fragment.
+   *
+   * @param element a DOM element
+   * @return a document fragment containing all the children of the given element, including text nodes
+   */
+  _extractContents : function(element) {
+    var documentFragment = element.ownerDocument.createDocumentFragment();
+    for(; element.firstChild; documentFragment.appendChild(element.firstChild));
+    return documentFragment;
   },
   // ------------------------------------
   // Ajax object deletion
@@ -161,10 +193,10 @@ XWiki.editors.XDataEditors = Class.create({
                 },
                 /* Interaction parameters */
                 {
-                  confirmationText: "$msg.get('core.editors.object.delete.confirm')",
-                  progressMessageText : "$msg.get('core.editors.object.delete.inProgress')",
-                  successMessageText : "$msg.get('core.editors.object.delete.done')",
-                  failureMessageText : "$msg.get('core.editors.object.delete.failed')"
+                  confirmationText: "$services.localization.render('core.editors.object.delete.confirm')",
+                  progressMessageText : "$services.localization.render('core.editors.object.delete.inProgress')",
+                  successMessageText : "$services.localization.render('core.editors.object.delete.done')",
+                  failureMessageText : "$services.localization.render('core.editors.object.delete.failed')"
                 }
               );
       }
@@ -185,19 +217,19 @@ XWiki.editors.XDataEditors = Class.create({
             {
               onCreate : function() {
                 item.disabled = true;
-                item.notification = new XWiki.widgets.Notification("$msg.get('core.editors.object.removeDeprecatedProperties.inProgress')", "inprogress");
+                item.notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.removeDeprecatedProperties.inProgress')", "inprogress");
               },
                onSuccess : function(response) {
                 // Remove deprecated properties box
                 container.select(".deprecatedProperties").invoke("remove");
-                item.notification.replace(new XWiki.widgets.Notification("$msg.get('core.editors.object.removeDeprecatedProperties.done')", "done"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.removeDeprecatedProperties.done')", "done"));
               },
               onFailure : function(response) {
                 var failureReason = response.statusText;
                 if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                   failureReason = 'Server not responding';
                 }
-                item.notification.replace(new XWiki.widgets.Notification("$msg.get('core.editors.object.removeDeprecatedProperties.failed')" + failureReason, "error"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.removeDeprecatedProperties.failed')" + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;
@@ -228,7 +260,17 @@ XWiki.editors.XDataEditors = Class.create({
         item.blur();
         event.stop();
         if (!item.disabled && item._x_propnameElt.value != '' && item._x_proptypeElt.selectedIndex >= 0) {
-          var ref = this.urlAddPropertyTemplate + "?propname=" + item._x_propnameElt.value + "&proptype=" + item._x_proptypeElt.options[item._x_proptypeElt.selectedIndex].value + "&xredirect=" + encodeURIComponent(this.urlEditTemplate + "?xpage=editclass&xaction=displayProperty&propName=" + item._x_propnameElt.value) + "&form_token=" + item._x_form_tokenElt.value;
+          var editURL = this.editedDocument.getURL('edit', Object.toQueryString({
+            xpage: 'editclass',
+            xaction: 'displayProperty',
+            propName: item._x_propnameElt.value
+          }));
+          var ref = this.editedDocument.getURL('propadd', Object.toQueryString({
+            propname: item._x_propnameElt.value,
+            proptype: item._x_proptypeElt.options[item._x_proptypeElt.selectedIndex].value,
+            xredirect: editURL,
+            form_token: item._x_form_tokenElt.value
+          }));
           new Ajax.Request(
             /* Ajax request URL */
             ref,
@@ -236,7 +278,7 @@ XWiki.editors.XDataEditors = Class.create({
             {
               onCreate : function() {
                 item.disabled = true;
-                item.notification = new XWiki.widgets.Notification("$msg.get('core.editors.class.addProperty.inProgress')", "inprogress");
+                item.notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.inProgress')", "inprogress");
               },
               onSuccess : function(response) {
                 $('xclassContent').insert({bottom : response.responseText});
@@ -247,14 +289,14 @@ XWiki.editors.XDataEditors = Class.create({
                 this.makeSortable(insertedPropertyElt);
                 this.ajaxPropertyDeletion(insertedPropertyElt);
                 this.makeDisableVisible(insertedPropertyElt);
-                item.notification.replace(new XWiki.widgets.Notification("$msg.get('core.editors.class.addProperty.done')", "done"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.done')", "done"));
               }.bind(this),
               onFailure : function(response) {
                 var failureReason = response.statusText;
                 if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                   failureReason = 'Server not responding';
                 }
-                item.notification.replace(new XWiki.widgets.Notification("$msg.get('core.editors.class.addProperty.failed')" + failureReason, "error"));
+                item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.failed')" + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;
@@ -298,17 +340,17 @@ XWiki.editors.XDataEditors = Class.create({
           },
           /* Interaction parameters */
           {
-            confirmationText: "$msg.get('core.editors.class.deleteProperty.confirm')",
-            progressMessageText : "$msg.get('core.editors.class.deleteProperty.inProgress')",
-            successMessageText : "$msg.get('core.editors.class.deleteProperty.done')",
-            failureMessageText : "$msg.get('core.editors.class.deleteProperty.failed')"
+            confirmationText: "$services.localization.render('core.editors.class.deleteProperty.confirm')",
+            progressMessageText : "$services.localization.render('core.editors.class.deleteProperty.inProgress')",
+            successMessageText : "$services.localization.render('core.editors.class.deleteProperty.done')",
+            failureMessageText : "$services.localization.render('core.editors.class.deleteProperty.failed')"
           }
         );
       }
     });
   },
   // ------------------------------------
-  // 
+  //
   makeDisableVisible : function(property) {
     property.down('.disabletool input').observe("click", function(event) {
       property.toggleClassName('disabled');
@@ -378,8 +420,12 @@ XWiki.editors.XDataEditors = Class.create({
   //  Expand/collapse classes
   expandCollapseClass : function(xclass) {
     // Classes are expanded by default
-    xclass.addClassName('collapsable');
     var xclassTitle = xclass.down('.xclass-title');
+    if (!xclassTitle) {
+      // No objects...
+      return;
+    }
+    xclass.addClassName('collapsable');
     xclassTitle.observe('click', function(event) {
       xclassTitle.up().toggleClassName('collapsed');
     }.bindAsEventListener());
@@ -387,9 +433,13 @@ XWiki.editors.XDataEditors = Class.create({
   // ------------------------------------
   // Class editor: expand-collapse meta properties
   expandCollapseMetaProperty : function(property) {
+    var propertyTitle = property.down('.xproperty-title');
+    if (!propertyTitle) {
+      // No such object...
+      return;
+    }
     property.addClassName('collapsable');
     property.addClassName('collapsed');
-    var propertyTitle = property.down('.xproperty-title');
     propertyTitle.observe('click', function(event) {
       propertyTitle.up().toggleClassName('collapsed');
     }.bindAsEventListener());
@@ -437,7 +487,7 @@ XWiki.editors.XDataEditors = Class.create({
               }
             },
             /* Interaction parameters */
-            { confirmationText: "$msg.get('core.editors.class.switchClass.confirm')" }
+            { confirmationText: "$services.localization.render('core.editors.class.switchClass.confirm')" }
           );
         }
       }.bindAsEventListener(switcher));
@@ -476,7 +526,7 @@ XWiki.editors.XDataEditors = Class.create({
       }.bindAsEventListener());
     });
     // Attach behavior to the move buttons
-    Sortable.create('xclassContent', {
+    Sortable.create($('xclassContent'), {
       tag : 'div',
       only : 'xproperty',
       handle : 'move',
@@ -509,6 +559,14 @@ XWiki.editors.XDataEditors = Class.create({
   }
 });
 
-document.observe('xwiki:dom:loaded', function() {
-  new XWiki.editors.XDataEditors();
-});
+function init() {
+  return new editors.XDataEditors();
+}
+
+// When the document is loaded, create the Autosave control
+(XWiki.domIsLoaded && init())
+|| document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

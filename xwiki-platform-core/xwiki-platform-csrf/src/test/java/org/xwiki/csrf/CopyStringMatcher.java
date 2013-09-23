@@ -57,6 +57,7 @@ public final class CopyStringMatcher extends BaseMatcher<String> implements Acti
     /**
      * @see org.hamcrest.Matcher#matches(java.lang.Object)
      */
+    @Override
     public boolean matches(Object argument)
     {
         if (argument instanceof String) {
@@ -69,6 +70,7 @@ public final class CopyStringMatcher extends BaseMatcher<String> implements Acti
     /**
      * @see org.hamcrest.SelfDescribing#describeTo(org.hamcrest.Description)
      */
+    @Override
     public void describeTo(Description d)
     {
         d.appendText("COPY VALUE: ");
@@ -78,6 +80,7 @@ public final class CopyStringMatcher extends BaseMatcher<String> implements Acti
     /**
      * @see org.jmock.api.Invokable#invoke(org.jmock.api.Invocation)
      */
+    @Override
     public String invoke(Invocation invocation) throws Throwable
     {
         if (this.value == null) {

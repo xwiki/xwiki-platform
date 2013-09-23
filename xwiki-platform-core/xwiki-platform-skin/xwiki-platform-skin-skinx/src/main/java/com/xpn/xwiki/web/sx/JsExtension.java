@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web.sx;
 
@@ -25,12 +24,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mozilla.javascript.ErrorReporter;
-import org.mozilla.javascript.EvaluatorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
+import com.yahoo.platform.yui.compressor.javascript.ErrorReporter;
+import com.yahoo.platform.yui.compressor.javascript.EvaluatorException;
 
 /**
  * JavaScript extension.
@@ -41,33 +40,21 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 public class JsExtension implements Extension
 {
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(JsExtension.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsExtension.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getClassName()
-     */
+    @Override
     public String getClassName()
     {
         return "XWiki.JavaScriptExtension";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SxSource.Extension#getContentType()()
-     */
+    @Override
     public String getContentType()
     {
         return "text/javascript; charset=UTF-8";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Extension#getCompressor()
-     */
+    @Override
     public SxCompressor getCompressor()
     {
         return new JsCompressor();
@@ -76,11 +63,7 @@ public class JsExtension implements Extension
     /** The JavaScript compressor which is returned by getCompressor. Currently implemented using YUI Compressor. */
     private static class JsCompressor implements SxCompressor
     {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see SxCompressor#compress()
-         */
+        @Override
         public String compress(String source)
         {
             try {
@@ -90,49 +73,37 @@ public class JsExtension implements Extension
                 compressor.compress(out, -1, true, false, false, false);
                 return out.toString();
             } catch (IOException ex) {
-                LOG.info("Failed to write the compressed output: " + ex.getMessage());
+                LOGGER.info("Failed to write the compressed output: " + ex.getMessage());
             } catch (EvaluatorException ex) {
-                LOG.info("Failed to parse the JS extension: " + ex.getMessage());
+                LOGGER.info("Failed to parse the JS extension: " + ex.getMessage());
             } catch (Exception ex) {
-                LOG.warn("Failed to compress JS extension: " + ex.getMessage());
+                LOGGER.warn("Failed to compress JS extension: " + ex.getMessage());
             }
             return source;
         }
 
-        /** A Javascript error reporter which logs errors with log4j. */
+        /** A Javascript error reporter which logs errors with the XWiki logging system. */
         private static class CustomErrorReporter implements ErrorReporter
         {
-            /**
-             * {@inheritDoc}
-             * 
-             * @see ErrorReporter#error(String, String, int, String, int)
-             */
+            @Override
             public void error(String message, String filename, int lineNumber, String context, int column)
             {
-                LOG.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
+                LOGGER.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
                     message, context, lineNumber, column));
             }
 
-            /**
-             * {@inheritDoc}
-             * 
-             * @see ErrorReporter#runtimeError(String, String, int, String, int)
-             */
+            @Override
             public EvaluatorException runtimeError(String message, String filename, int lineNumber,
                 String context, int column)
             {
-                LOG.error(MessageFormat.format("Runtime error minimizing JSX object: {0}", message));
+                LOGGER.error(MessageFormat.format("Runtime error minimizing JSX object: {0}", message));
                 return null;
             }
 
-            /**
-             * {@inheritDoc}
-             * 
-             * @see ErrorReporter#warning(String, String, int, String, int)
-             */
+            @Override
             public void warning(String message, String filename, int lineNumber, String context, int column)
             {
-                LOG.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",
+                LOGGER.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",
                     message, context, lineNumber, column));
             }
         }

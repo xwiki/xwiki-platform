@@ -146,11 +146,7 @@ public class DefaultXWikiX509KeyPair implements XWikiX509KeyPair
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.x509.XWikiX509KeyPair#serializeAsBase64()
-     */
+    @Override
     public String serializeAsBase64() throws IOException
     {
         return   BASE64_HEADER
@@ -158,32 +154,18 @@ public class DefaultXWikiX509KeyPair implements XWikiX509KeyPair
                + BASE64_FOOTER;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.x509.XWikiX509KeyPair#serialize()
-     */
+    @Override
     public byte[] serialize() throws IOException
     {
         return SerializationUtils.serialize(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return this.encodedCertificate.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(final Object obj)
     {
@@ -202,11 +184,6 @@ public class DefaultXWikiX509KeyPair implements XWikiX509KeyPair
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
@@ -222,11 +199,7 @@ public class DefaultXWikiX509KeyPair implements XWikiX509KeyPair
         return builder.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.x509.XWikiX509KeyPair#getCertificate()
-     */
+    @Override
     public XWikiX509Certificate getCertificate()
     {
         if (this.certificate == null) {
@@ -244,21 +217,13 @@ public class DefaultXWikiX509KeyPair implements XWikiX509KeyPair
         return this.certificate;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.x509.XWikiX509KeyPair#getPublicKey()
-     */
+    @Override
     public PublicKey getPublicKey()
     {
         return this.getCertificate().getPublicKey();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.x509.XWikiX509KeyPair#getPrivateKey(java.lang.String)
-     */
+    @Override
     public PrivateKey getPrivateKey(final String password)
         throws GeneralSecurityException
     {
@@ -280,11 +245,7 @@ public class DefaultXWikiX509KeyPair implements XWikiX509KeyPair
         return converter.generatePrivate(spec);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.x509.XWikiX509KeyPair#getFingerprint()
-     */
+    @Override
     public String getFingerprint()
     {
         return this.getCertificate().getFingerprint();

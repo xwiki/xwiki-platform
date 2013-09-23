@@ -25,29 +25,38 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-client</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Client Side</name>
   <packaging>jar</packaging>
   <description>The client side of XWiki's WYSIWYG editor. This is a reusable rich text editor all written in GWT.</description>
   <dependencies>
-    <!-- GWT core dependencies -->
+    <!-- GWT libraries -->
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-gwt-dom</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at build time -->
       <scope>provided</scope>
     </dependency>
-    <!-- GWT libraries -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-gwt-user</artifactId>
       <version>${project.version}</version>
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-plugin-api</artifactId>
       <version>${project.version}</version>
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <!-- SmartGWT is used only for its tree widget. -->
@@ -131,9 +140,6 @@
         <configuration>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            org/xwiki/gwt/wysiwyg/client/diff/**/*,
-            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncPlugin.java,
-            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncTools.java,
             org/xwiki/gwt/wysiwyg/client/Images.java,
             org/xwiki/gwt/wysiwyg/client/Strings.java
           </excludes>

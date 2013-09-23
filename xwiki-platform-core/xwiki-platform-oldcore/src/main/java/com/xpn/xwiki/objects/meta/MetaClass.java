@@ -16,84 +16,120 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.component.manager.ComponentLookupException;
+
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.objects.classes.PropertyClassProvider;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.web.Utils;
 
+/**
+ * A pseudo XClass whose fields are meta properties. In other words, each field of this XClass defines a type of
+ * property that can be added to a standard XClass. This class is being used to lookup XClass property types. New code
+ * should lookup {@link PropertyClassProvider} implementations instead using the component manager.
+ * 
+ * @version $Id$
+ */
 public class MetaClass extends BaseClass
 {
+    /**
+     * The prefix prepended to the property name when setting or retrieving a property meta class.
+     */
+    private static final String PROPERTY_NAME_PREFIX = "meta";
+
+    /**
+     * Logging helper object.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaClass.class);
+
+    /**
+     * A cached instance of this class that can be used to quickly lookup XClass property types.
+     */
     private static MetaClass metaClass = new MetaClass();
 
+    /**
+     * Creates a new instance that has a property for each available property type.
+     */
     public MetaClass()
     {
-        NumberMetaClass numberclass = new NumberMetaClass();
-        safeput(numberclass.getName(), numberclass);
-        StringMetaClass stringclass = new StringMetaClass();
-        safeput(stringclass.getName(), stringclass);
-        TextAreaMetaClass textareaclass = new TextAreaMetaClass();
-        safeput(textareaclass.getName(), textareaclass);
-        PasswordMetaClass passwdclass = new PasswordMetaClass();
-        safeput(passwdclass.getName(), passwdclass);
-        BooleanMetaClass booleanclass = new BooleanMetaClass();
-        safeput(booleanclass.getName(), booleanclass);
-        StaticListMetaClass listclass = new StaticListMetaClass();
-        safeput(listclass.getName(), listclass);
-        DBListMetaClass dblistclass = new DBListMetaClass();
-        safeput(dblistclass.getName(), dblistclass);
-        DBTreeListMetaClass dbtreelistclass = new DBTreeListMetaClass();
-        safeput(dbtreelistclass.getName(), dbtreelistclass);
-        DateMetaClass dateclass = new DateMetaClass();
-        safeput(dateclass.getName(), dateclass);
-        GroupsMetaClass groupsclass = new GroupsMetaClass();
-        safeput(groupsclass.getName(), groupsclass);
-        UsersMetaClass usersclass = new UsersMetaClass();
-        safeput(usersclass.getName(), usersclass);
-        LevelsMetaClass levelsclass = new LevelsMetaClass();
-        safeput(levelsclass.getName(), levelsclass);
+        try {
+            List<PropertyClassProvider> providers =
+                Utils.getComponentManager().getInstanceList(PropertyClassProvider.class);
+            for (PropertyClassProvider provider : providers) {
+                PropertyInterface property = provider.getDefinition();
+                safeput(property.getName(), property);
+            }
+        } catch (ComponentLookupException e) {
+            LOGGER.error("Failed to initialize the meta class.", e);
+        }
     }
 
+    @Override
     public void safeput(String name, PropertyInterface property)
     {
-        addField("meta" + name, property);
+        addField(PROPERTY_NAME_PREFIX + name, property);
         if (property instanceof PropertyClass) {
             ((PropertyClass) property).setObject(this);
             ((BaseProperty) property).setName(name);
         }
     }
 
+    @Override
     public PropertyInterface safeget(String name)
     {
-        return super.safeget("meta" + name);
+        return super.safeget(PROPERTY_NAME_PREFIX + name);
     }
 
+    @Override
     public PropertyInterface get(String name)
     {
-        return safeget(name);
+        PropertyInterface property = safeget(name);
+        if (property == null) {
+            // In previous versions the property name was the full Java class name of the property class implementation.
+            // Extract the actual property name (the hint used to lookup the property class provider) by removing the
+            // Java package prefix and the Class suffix.
+            property = safeget(StringUtils.removeEnd(StringUtils.substringAfterLast(name, "."), "Class"));
+        }
+        return property;
     }
 
+    @Override
     public void put(String name, PropertyInterface property)
     {
         safeput(name, property);
     }
 
+    /**
+     * @return a cached instance of this class that can be used to quickly lookup XClass property types
+     */
     public static MetaClass getMetaClass()
     {
         return metaClass;
     }
 
+    /**
+     * Sets the cached instance of this class.
+     * 
+     * @param metaClass the cached instance
+     */
     public static void setMetaClass(MetaClass metaClass)
     {
         MetaClass.metaClass = metaClass;
     }
 
+    @Override
     public BaseCollection newObject(XWikiContext context)
     {
         return new BaseClass();

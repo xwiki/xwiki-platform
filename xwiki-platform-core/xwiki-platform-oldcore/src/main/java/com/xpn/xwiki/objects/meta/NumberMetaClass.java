@@ -16,46 +16,56 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
+/**
+ * Defines the meta properties of a number XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("Number")
+@Singleton
 public class NumberMetaClass extends PropertyMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Number XClass property.
+     */
     public NumberMetaClass()
     {
-        super();
-        // setType("numbermetaclass");
         setPrettyName("Number");
-        setName(NumberClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        StaticListClass type_class = new StaticListClass(this);
-        type_class.setName("numberType");
-        type_class.setPrettyName("Number Type");
-        type_class.setValues("integer|long|float|double");
-        type_class.setRelationalStorage(false);
-        type_class.setDisplayType("select");
-        type_class.setMultiSelect(false);
-        type_class.setSize(1);
-        safeput("numberType", type_class);
+        StaticListClass typeClass = new StaticListClass(this);
+        typeClass.setName("numberType");
+        typeClass.setPrettyName("Number Type");
+        typeClass.setValues("integer|long|float|double");
+        typeClass.setRelationalStorage(false);
+        typeClass.setDisplayType("select");
+        typeClass.setMultiSelect(false);
+        typeClass.setSize(1);
+        safeput(typeClass.getName(), typeClass);
 
-        NumberClass size_class = new NumberClass(this);
-        size_class.setName("size");
-        size_class.setPrettyName("Size");
-        size_class.setSize(5);
-        size_class.setNumberType("integer");
-
-        safeput("numberType", type_class);
-        safeput("size", size_class);
+        NumberClass sizeClass = new NumberClass(this);
+        sizeClass.setName("size");
+        sizeClass.setPrettyName("Size");
+        sizeClass.setSize(5);
+        sizeClass.setNumberType("integer");
+        safeput(sizeClass.getName(), sizeClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new NumberClass();
     }

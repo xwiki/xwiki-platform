@@ -25,7 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
 
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Tests {@link org.xwiki.crypto.passwd.internal.DefaultPasswordCryptoService}.
@@ -54,7 +54,7 @@ public class DefaultPasswordCryptoServiceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.service = getComponentManager().lookup(PasswordCryptoService.class);
+        this.service = getComponentManager().getInstance(PasswordCryptoService.class);
     }
 
     @Test

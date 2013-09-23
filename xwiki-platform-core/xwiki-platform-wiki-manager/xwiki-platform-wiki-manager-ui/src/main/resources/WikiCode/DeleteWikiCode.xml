@@ -1,40 +1,40 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>WikiCode</web>
-<name>DeleteWikiCode</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WikiCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1190984758000</creationDate>
-<date>1209754566000</date>
-<contentUpdateDate>1209754566000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<content>#if($action &amp;&amp; $action == "delete")
+  <web>WikiCode</web>
+  <name>DeleteWikiCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WikiCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1190984758000</creationDate>
+  <date>1209754566000</date>
+  <contentUpdateDate>1209754566000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>#if($action &amp;&amp; $action == "delete")
   #if($confirm &amp;&amp; $confirm == 1)
     #set($result = $WikiManager.deleteWiki($wikiname))
     #if ($result == $Exception.ERROR_NOERROR)
-      #info($msg.get("wikimanager.successdeletewiki", [$wikiname]))
+      #info($services.localization.render('wikimanager.successdeletewiki', [$wikiname]))
     #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-      #error($msg.get("notallowed"))
+      #error($services.localization.render('notallowed'))
     #else
-      #error($msg.get("wikimanager.errordeletewiki", [$wikiname, $xcontext.lastexception]))
+      #error($services.localization.render('wikimanager.errordeletewiki', [$wikiname, $xcontext.lastexception]))
     #end
   #else
-    #xwikimessagebox($msg.get("wikimanager.answer.deletewiki.title") $msg.get("wikimanager.answer.deletewiki.msg", [$wikiname]) $doc.getURL("view", "$!request.queryString&amp;confirm=1") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
+    #xwikimessagebox($services.localization.render('wikimanager.answer.deletewiki.title') $services.localization.render('wikimanager.answer.deletewiki.msg', [$wikiname]) $doc.getURL("view", "$!request.queryString&amp;confirm=1") $doc.getURL("view") $services.localization.render('yes') $services.localization.render('no'))
   #end
 #end</content>
 </xwikidoc>

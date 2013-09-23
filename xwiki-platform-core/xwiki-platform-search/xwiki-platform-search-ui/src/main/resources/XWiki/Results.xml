@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>Results</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebSearch</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1272990081000</date>
-<contentUpdateDate>1272990081000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("search.page.results")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>XWiki</web>
+  <name>Results</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1272990081000</date>
+  <contentUpdateDate>1272990081000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render("search.page.results")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 {{html}}
 #set($showdata = 0)
 &lt;div id="searchResults"&gt;
@@ -34,7 +35,7 @@
       #set($isLuceneResult = false)
     #end
     #if($isLuceneResult)
-      #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")
+      #set($itemfullname = $services.model.serialize($item.getDocumentReference()))
     #else
       #set($itemfullname = "${xcontext.database}:${item}")
     #end
@@ -57,7 +58,7 @@
         &lt;h2 class="itemTitle"&gt;
           #if($isLuceneResult)
             #if($item.type == 'attachment')
-              &lt;a href="$xwiki.getDocument($itemfullname).getAttachmentURL($item.filename)"&gt;$escapetool.xml($item.filename)&lt;/a&gt;
+              &lt;a href="$xwiki.getDocument($item.getDocumentReference()).getAttachmentURL($item.filename)"&gt;$escapetool.xml($item.filename)&lt;/a&gt;
             #else
               &lt;a href="$xwiki.getURL($itemfullname)"&gt;$escapetool.xml($xwiki.getDocument($itemfullname).plainTitle)&lt;/a&gt;
             #end
@@ -69,7 +70,7 @@
         ## Location                                                ##
         ##*********************************************************##
         &lt;div class="itemLocation"&gt;
-          $msg.get('search.item.location', [
+          $services.localization.render('search.item.location', [
           $escapetool.xml($itemDoc.wiki), $xwiki.getURL("${itemDoc.wiki}:Main.WebHome"),
           $escapetool.xml($itemDoc.space), $xwiki.getURL("${itemDoc.wiki}:${itemDoc.space}.WebHome"),
           $escapetool.xml($itemDoc.name), $xwiki.getURL($itemfullname)])
@@ -79,9 +80,9 @@
         ##*********************************************************##
         &lt;div class="itemModified"&gt;
           #if ($author == 'XWikiGuest')
-            #set($author = $msg.get('search.page.results.guest'))
+            #set($author = $services.localization.render('search.page.results.guest'))
           #end
-          $msg.get('search.item.modified', [$author, $xwiki.formatDate($itemDoc.date, 'dd MMM yyyy')])
+          $services.localization.render('search.item.modified', [$author, $xwiki.formatDate($itemDoc.date, 'dd MMM yyyy')])
         &lt;/div&gt;
 ## TODO: Uncomment when the attachment and comment count will be implemented
 ##         &lt;div class="itemOthers"&gt;
@@ -91,19 +92,19 @@
           #if($xwiki.ratings &amp;&amp; $item.type != 'attachment')
             #set($avarageRating = $xwiki.ratings.getAverageRating($xwiki.getDocument($itemfullname)).averageVote)
             #set($percentageRating = $avarageRating * 20)
-            &lt;span class="itemRating" title="$msg.get('search.item.rating.title')"&gt;
+            &lt;span class="itemRating" title="$services.localization.render('search.item.rating.title')"&gt;
               &lt;span class="currentRating" style="width:$percentageRating%;"&gt;&lt;/span&gt;
             &lt;/span&gt;
           #end
 ##         &lt;/div&gt;
       &lt;/div&gt; ## end &lt;div class="itemDescription"&gt;
-      #if($isScored)
-        #set($resval = $itemDoc.score * 100)
+      #if ($isScored)
+        #set ($resval = $mathtool.min($mathtool.mul($itemDoc.score, 100), 100))
         ##*********************************************************##
         ## Relevance                                               ##
         ##*********************************************************##
         &lt;div class="itemRelevance"&gt;
-          &lt;span class="relevance" title="$msg.get('search.item.relevance.title')"&gt;
+          &lt;span class="relevance" title="$services.localization.render('search.item.relevance.title')"&gt;
             &lt;span class="currentRelevance" style="width:${resval}%;"&gt;&lt;/span&gt;
           &lt;/span&gt;
           &lt;span class="relevanceText"&gt;$resval.intValue()%&lt;/span&gt;
@@ -114,15 +115,15 @@
       ##*********************************************************##
 #*
       #if($xwiki.hasAdminRights())
-          #set($copyURL = $xwiki.getURL('XWiki.CopyDocument', 'view', "sourcedoc=${util.encodeURI($itemfullname)}"))
+          #set($copyURL = $xwiki.getURL('XWiki.CopyDocument', 'view', "sourcedoc=${escapetool.url($itemfullname)}"))
           #set($deleteURL = $xwiki.getDocument($itemfullname).getURL('delete'))
           #set($renameURL = $xwiki.getDocument($itemfullname).getURL('view', 'xpage=rename&amp;amp;step=1'))
           #set($rightsURL = $xwiki.getDocument($itemfullname).getURL('edit', 'editor=rights'))
           &lt;div class="itemActions"&gt;
-            &lt;a href="$copyURL" class="tool copy" title="$msg.get('search.page.results.copy')"&gt;$msg.get('search.page.results.copy')&lt;/a&gt;
-            &lt;a href='$renameURL' class="tool rename" title="$msg.get('search.page.results.rename')"&gt;$msg.get('search.page.results.rename')&lt;/a&gt;
-            &lt;a href="$deleteURL" class="tool delete" title="$msg.get('search.page.results.delete')"&gt;$msg.get('search.page.results.delete')&lt;/a&gt;
-            &lt;a href='$rightsURL' class="tool rights" title="$msg.get('search.page.results.rights')"&gt;$msg.get('search.page.results.rights')&lt;/a&gt;
+            &lt;a href="$copyURL" class="tool copy" title="$services.localization.render('search.page.results.copy')"&gt;$services.localization.render('search.page.results.copy')&lt;/a&gt;
+            &lt;a href='$renameURL' class="tool rename" title="$services.localization.render('search.page.results.rename')"&gt;$services.localization.render('search.page.results.rename')&lt;/a&gt;
+            &lt;a href="$deleteURL" class="tool delete" title="$services.localization.render('search.page.results.delete')"&gt;$services.localization.render('search.page.results.delete')&lt;/a&gt;
+            &lt;a href='$rightsURL' class="tool rights" title="$services.localization.render('search.page.results.rights')"&gt;$services.localization.render('search.page.results.rights')&lt;/a&gt;
           &lt;/div&gt; ## itemActions
         #end ## has admin rights *# ##
       &lt;/div&gt; ## resultContainer
@@ -131,4 +132,5 @@
   #end ## foreach item
 &lt;/div&gt; ## searchResults
 {{/html}}
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

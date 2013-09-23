@@ -16,13 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
@@ -32,18 +32,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.MDC;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.upload.MultipartRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -54,14 +56,14 @@ import com.xpn.xwiki.util.Util;
 
 public class Utils
 {
-    protected static final Log LOG = LogFactory.getLog(Utils.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     /** A key that is used for placing a map of replaced (for protection) strings in the context. */
     private static final String PLACEHOLDERS_CONTEXT_KEY = Utils.class.getCanonicalName() + "_placeholders";
 
     /** Whether placeholders are enabled or not. */
-    private static final String PLACEHOLDERS_ENABLED_CONTEXT_KEY =
-        Utils.class.getCanonicalName() + "_placeholders_enabled";
+    private static final String PLACEHOLDERS_ENABLED_CONTEXT_KEY = Utils.class.getCanonicalName()
+        + "_placeholders_enabled";
 
     /**
      * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
@@ -104,12 +106,19 @@ public class Utils
     {
         XWikiResponse response = context.getResponse();
 
-        // Set content-type and encoding (this can be changed later by pages themselves)
-        if (context.getResponse() instanceof XWikiPortletResponse) {
-            response.setContentType("text/html");
-        } else {
-            response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
+        // If a Redirect has already been sent then don't process the template since it means and we shouldn't write
+        // anymore to the servlet output stream!
+        // See: http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#sendRedirect(String)
+        // "After using this method, the response should be considered to be committed and should not be written
+        // to."
+        if ((response instanceof XWikiServletResponse)
+            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND)
+        {
+            return;
         }
+
+        // Set content-type and encoding (this can be changed later by pages themselves)
+        response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
 
         String action = context.getAction();
         if ((!"download".equals(action)) && (!"skin".equals(action))) {
@@ -151,15 +160,16 @@ public class Utils
         enablePlaceholders(context);
         String content = "";
         try {
+            // Note: This line below can change the state of the response. For example a vm file can have a call to
+            // sendRedirect. In this case we need to be careful to not write to the output stream since it's already
+            // been committed. This is why we do a check below before calling response.getOutputStream().write().
             content = context.getWiki().evaluateTemplate(template + ".vm", context);
             // Replace all placeholders with the protected values
             content = replacePlaceholders(content, context);
             disablePlaceholders(context);
             content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
         } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("IOException while evaluating template [" + template + "] from /templates/", e);
-            }
+            LOGGER.debug("IOException while evaluating template [{}] from /templates/", template, e);
 
             // get Error template "This template does not exist
             try {
@@ -181,7 +191,12 @@ public class Utils
                 }
             }
 
-            if (write) {
+            // We only write if the caller has asked.
+            // We also make sure to verify that there hasn't been a call to sendRedirect before since it would mean the
+            // response has already been written to and we shouldn't try to write in it.
+            if (write && ((response instanceof XWikiServletResponse)
+                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND))
+            {
                 try {
                     try {
                         response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));
@@ -238,8 +253,36 @@ public class Utils
      */
     public static String getRedirect(String action, String queryString, XWikiContext context)
     {
-        String redirect = context.getRequest().getParameter("xredirect");
-        if (StringUtils.isBlank(redirect)) {
+        return getRedirect(action, queryString, "xredirect");
+    }
+
+    /**
+     * Retrieve the URL to which the client should be redirected after the successful completion of the requested
+     * action. If any of the specified {@code redirectParameters} (in order) is present in the query string, it is
+     * returned as the redirect destination. If none of the parameters is set, compose an URL back to the current
+     * document using the specified action and query string, and return it.
+     * 
+     * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
+     * @param queryString the query parameters to append to the fallback URL
+     * @param redirectParameters list of request parameters to look for as the redirect destination; each of the
+     *            parameters is tried in the order they are passed, and the first one set to a non-empty value is
+     *            returned, if any
+     * @return the destination URL, as specified in one of the {@code redirectParameters}, or computed using the current
+     *         document and the specified action and query string
+     */
+    public static String getRedirect(String action, String queryString, String... redirectParameters)
+    {
+        XWikiContext context = getContext();
+        XWikiRequest request = context.getRequest();
+        String redirect = null;
+        for (String p : redirectParameters) {
+            redirect = request.getParameter(p);
+            if (StringUtils.isNotEmpty(redirect)) {
+                break;
+            }
+        }
+
+        if (StringUtils.isEmpty(redirect)) {
             redirect = context.getDoc().getURL(action, queryString, true, context);
         }
 
@@ -341,10 +384,6 @@ public class Utils
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
 
-        // Push the URL into the Log4j MDC context so that we can display it in the generated logs using the
-        // %X{url} syntax.
-        MDC.put("url", url);
-
         context.setEngineContext(engine_context);
         context.setRequest(request);
         context.setResponse(response);
@@ -354,8 +393,6 @@ public class Utils
         int mode = 0;
         if (request instanceof XWikiServletRequest) {
             mode = XWikiContext.MODE_SERVLET;
-        } else if (request instanceof XWikiPortletRequest) {
-            mode = XWikiContext.MODE_PORTLET;
         }
         context.setMode(mode);
 
@@ -564,8 +601,8 @@ public class Utils
         try {
             if (request instanceof MultipartRequestWrapper) {
                 fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
-                fileupload.loadFileList(context);
                 context.put("fileuploadplugin", fileupload);
+                fileupload.loadFileList(context);
                 MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
                 List<FileItem> fileItems = fileupload.getFileItems(context);
                 for (FileItem item : fileItems) {
@@ -581,7 +618,7 @@ public class Utils
                 && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE)) {
                 context.put("exception", e);
             } else {
-                e.printStackTrace();
+                LOGGER.error("Failed to process MultiPart request", e);
             }
         }
         return fileupload;
@@ -598,7 +635,9 @@ public class Utils
 
     /**
      * @return the component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
+    @Deprecated
     public static ComponentManager getComponentManager()
     {
         return componentManager;
@@ -612,23 +651,12 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
+     * @deprecated since 4.0M1 use {@link #getComponent(Type, String)} instead
      */
+    @Deprecated
     public static <T> T getComponent(Class<T> role, String hint)
     {
-        T component = null;
-        if (componentManager != null) {
-            try {
-                component = componentManager.lookup(role, hint);
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to load component [" + role.getName() + "] for hint [" + hint + "]",
-                    e);
-            }
-        } else {
-            throw new RuntimeException("Component manager has not been initialized before lookup for ["
-                + role.getName() + "] for hint [" + hint + "]");
-        }
-
-        return component;
+        return getComponent((Type) role, hint);
     }
 
     /**
@@ -638,10 +666,57 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
+     * @deprecated since 4.0M1 use {@link #getComponent(Type)} instead
      */
+    @Deprecated
     public static <T> T getComponent(Class<T> role)
     {
-        return getComponent(role, "default");
+        return getComponent((Type) role);
+    }
+
+    /**
+     * Lookup a XWiki component by role and hint.
+     * 
+     * @param roleType the class (aka role) that the component implements
+     * @param roleHint a value to differentiate different component implementations for the same role
+     * @return the component's instance
+     * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
+     *             initialized
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     */
+    @Deprecated
+    public static <T> T getComponent(Type roleType, String roleHint)
+    {
+        T component;
+
+        if (componentManager != null) {
+            try {
+                component = componentManager.getInstance(roleType, roleHint);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to load component for type [" + roleType + "] for hint [" + roleHint
+                    + "]", e);
+            }
+        } else {
+            throw new RuntimeException("Component manager has not been initialized before lookup for [" + roleType
+                + "] for hint [" + roleHint + "]");
+        }
+
+        return component;
+    }
+
+    /**
+     * Lookup a XWiki component by role (uses the default hint).
+     * 
+     * @param roleType the class (aka role) that the component implements
+     * @return the component's instance
+     * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
+     *             initialized
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     */
+    @Deprecated
+    public static <T> T getComponent(Type roleType)
+    {
+        return getComponent(roleType, "default");
     }
 
     /**
@@ -651,13 +726,15 @@ public class Utils
      * @throws RuntimeException if some of the components cannot be found/initialized, or if the component manager is
      *             not initialized
      * @since 2.0M3
+     * @deprecated since 4.0M1 use {@link #getComponentManager()} instead
      */
+    @Deprecated
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
         if (componentManager != null) {
             try {
-                components = componentManager.lookupList(role);
+                components = componentManager.getInstanceList(role);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load components with role [" + role.getName() + "]", e);
             }
@@ -667,6 +744,23 @@ public class Utils
         }
 
         return components;
+    }
+
+    /**
+     * Helper method for obtaining a valid xcontext from the execution context.
+     * <p>
+     * NOTE: Don't use this method to access the XWiki context in a component because
+     * {@link #setComponentManager(ComponentManager)} is not called when running component unit tests. You have to take
+     * the XWiki context yourself from the injected Execution when inside a component. This method should be used only
+     * by non-component code.
+     * 
+     * @return the current context or {@code null} if the execution context is not yet initialized
+     * @since 3.2M3
+     */
+    public static XWikiContext getContext()
+    {
+        ExecutionContext ec = getComponent(Execution.class).getContext();
+        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     /**

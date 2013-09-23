@@ -19,13 +19,15 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager.xml;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -34,13 +36,21 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.properties.ConverterManager;
 
 import com.xpn.xwiki.XWikiContext;
 
+/**
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class AbstractHandler extends DefaultHandler
 {
-    @Inject
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHandler.class);
+
     private ComponentManager componentManager;
+
+    private ConverterManager converterManager;
 
     private Object currentBean;
 
@@ -59,6 +69,12 @@ public class AbstractHandler extends DefaultHandler
     public AbstractHandler(ComponentManager componentManager)
     {
         this.componentManager = componentManager;
+
+        try {
+            this.converterManager = this.componentManager.getInstance(ConverterManager.class);
+        } catch (ComponentLookupException e) {
+            LOGGER.error("Failed to get default implementation of component role [{}]", ConverterManager.class);
+        }
     }
 
     public AbstractHandler(ComponentManager componentManager, Object currentBean)
@@ -133,19 +149,23 @@ public class AbstractHandler extends DefaultHandler
     {
         --this.depth;
 
-        if (this.currentHandler != null) {
-            this.currentHandler.endElement(uri, localName, qName);
+        try {
+            if (this.currentHandler != null) {
+                this.currentHandler.endElement(uri, localName, qName);
 
-            if (this.depth == this.currentHandlerLevel) {
-                endElementInternal(uri, localName, qName);
-                this.currentHandler = null;
+                if (this.depth == this.currentHandlerLevel) {
+                    endElementInternal(uri, localName, qName);
+                    this.currentHandler = null;
+                }
+            } else {
+                if (this.depth == 0) {
+                    endHandlerElement(uri, localName, qName);
+                } else if (this.depth == 1) {
+                    endElementInternal(uri, localName, qName);
+                }
             }
-        } else {
-            if (this.depth == 0) {
-                endHandlerElement(uri, localName, qName);
-            } else if (this.depth == 1) {
-                endElementInternal(uri, localName, qName);
-            }
+        } finally {
+            this.value = null;
         }
     }
 
@@ -173,13 +193,34 @@ public class AbstractHandler extends DefaultHandler
     protected void endElementInternal(String uri, String localName, String qName) throws SAXException
     {
         if (this.currentBean != null && this.value != null) {
-            Method setter;
             try {
-                setter = this.currentBean.getClass().getMethod("set" + StringUtils.capitalize(qName), String.class);
-                setter.invoke(this.currentBean, this.value.toString());
+                callMethod(qName);
                 currentBeanModified();
             } catch (Exception e) {
-                // TODO: LOG warn "Unknown element [" + qName + "]"
+                LOGGER.warn("Failed to set property [{}]", qName, e);
+            }
+        }
+    }
+
+    protected void callMethod(String name) throws IllegalArgumentException, IllegalAccessException,
+        InvocationTargetException
+    {
+        String methodName = "set" + StringUtils.capitalize(name);
+
+        try {
+            Method setter = this.currentBean.getClass().getMethod(methodName, String.class);
+            setter.invoke(this.currentBean, this.value.toString());
+        } catch (NoSuchMethodException e) {
+            for (Method medthod : this.currentBean.getClass().getMethods()) {
+                if (medthod.getGenericParameterTypes().length == 1 && medthod.getName().equals(methodName)) {
+                    Type type = medthod.getGenericParameterTypes()[0];
+
+                    if (type == String.class) {
+                        medthod.invoke(this.currentBean, this.value.toString());
+                    } else {
+                        medthod.invoke(this.currentBean, converterManager.convert(type, this.value.toString()));
+                    }
+                }
             }
         }
     }
@@ -215,7 +256,7 @@ public class AbstractHandler extends DefaultHandler
 
     protected ExecutionContext getExecutionContext() throws ComponentLookupException
     {
-        return this.componentManager.lookup(Execution.class).getContext();
+        return getComponentManager().<Execution> getInstance(Execution.class).getContext();
     }
 
     protected XWikiContext getXWikiContext() throws ComponentLookupException

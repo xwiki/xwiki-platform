@@ -41,13 +41,14 @@ public class OfficeImporterException extends Exception
     {
         super(message);
     }
-    
+
     /**
      * Constructs a new exception with the specified cause.
      * 
      * @param throwable The underlying cause for this exception.
      */
-    public OfficeImporterException(Throwable throwable) {
+    public OfficeImporterException(Throwable throwable)
+    {
         super(throwable);
     }
 

@@ -19,19 +19,25 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager.xml;
 
+import java.util.Locale;
+
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.localization.LocaleUtils;
+import org.xwiki.model.reference.LocalDocumentReference;
 
+/**
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarPageLimitedHandler extends AbstractHandler
 {
     private XarEntry xarEntry = new XarEntry();
 
-    private EntityReference pageReference;
+    private String spaceName;
 
-    private EntityReference spaceReference;
+    private LocalDocumentReference pageReference;
 
     public XarPageLimitedHandler(ComponentManager componentManager)
     {
@@ -39,13 +45,11 @@ public class XarPageLimitedHandler extends AbstractHandler
 
         setCurrentBean(this);
 
-        this.spaceReference = new EntityReference("space", EntityType.SPACE);
-        this.pageReference = new EntityReference("page", EntityType.DOCUMENT, this.spaceReference);
+        this.pageReference = new LocalDocumentReference("space", "page");
 
         addsupportedElements("name");
         addsupportedElements("web");
         addsupportedElements("language");
-        addsupportedElements("defaultLanguage");
     }
 
     public XarEntry getXarEntry()
@@ -53,23 +57,33 @@ public class XarPageLimitedHandler extends AbstractHandler
         return this.xarEntry;
     }
 
+    private Locale toLocale(String str)
+    {
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(str);
+        } catch (Exception e) {
+            locale = Locale.ROOT;
+        }
+
+        return locale;
+    }
+
     @Override
-    public void endElementInternal(String uri, String localName, String qName) throws SAXException
+    protected void endElementInternal(String uri, String localName, String qName) throws SAXException
     {
         if (qName.equals("language")) {
             if (this.value.length() > 0) {
-                this.xarEntry.setLanguage(this.value.toString());
-            }
-        } else if (qName.equals("defaultLanguage")) {
-            if (this.xarEntry.getLanguage() == null) {
-                this.xarEntry.setLanguage(this.value.toString());
+                this.xarEntry.setLocale(toLocale(this.value.toString()));
+            } else {
+                this.xarEntry.setLocale(Locale.ROOT);
             }
         } else if (qName.equals("name")) {
+            this.pageReference = new LocalDocumentReference(this.spaceName, this.value.toString());
             this.xarEntry.setDocumentReference(this.pageReference);
-            this.pageReference.setName(this.value.toString());
         } else if (qName.equals("web")) {
+            this.spaceName = this.value.toString();
             this.xarEntry.setDocumentReference(this.pageReference);
-            this.spaceReference.setName(this.value.toString());
         } else {
             super.endElementInternal(uri, localName, qName);
         }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>ColorThemes</web>
+  <name>WizardWebColors</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>ColorThemes.ColorThemeSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1262108187000</creationDate>
+  <date>1262108187000</date>
+  <contentUpdateDate>1262108187000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.themes.colors.webColors.title')</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set($webColors =
+  [
+    "#000000","#444444","#666666","#999999","#CCCCCC","#EEEEEE","#FFFFFF",
+    "#EA9999","#F9CB9C","#FFE599","#B6D7A8","#A2C4C9","#9FC5E8","#B4A7D6",
+    "#E06666","#F6B26B","#FFD966","#93C47D","#76A5AF","#6FA8DC","#8E7CC3",
+    "#CC0000","#E69138","#F1C232","#6AA84F","#45818E","#3D85C6","#674EA7",
+    "#990000","#B45F06","#BF9000","#38761D","#134F5C","#0B5394","#351C75"
+  ]
+)
+{{/velocity}}</content>
+</xwikidoc>

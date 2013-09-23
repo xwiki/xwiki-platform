@@ -16,43 +16,55 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+/**
+ * Defines the meta properties of a string XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("String")
+@Singleton
 public class StringMetaClass extends PropertyMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a String XClass property.
+     */
     public StringMetaClass()
     {
-        super();
-        // setType("stringmetaclass");
         setPrettyName("String");
-        setName(StringClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        NumberClass size_class = new NumberClass(this);
-        size_class.setName("size");
-        size_class.setPrettyName("Size");
-        size_class.setSize(5);
-        size_class.setNumberType("integer");
-        safeput("size", size_class);
+        NumberClass sizeClass = new NumberClass(this);
+        sizeClass.setName("size");
+        sizeClass.setPrettyName("Size");
+        sizeClass.setSize(5);
+        sizeClass.setNumberType("integer");
+        safeput(sizeClass.getName(), sizeClass);
 
-        BooleanClass picker_class = new BooleanClass(this);
-        picker_class.setName("picker");
-        picker_class.setPrettyName("Use Suggest");
-        picker_class.setDisplayType("yesno");
-        picker_class.setDisplayFormType("checkbox");
-        picker_class.setDefaultValue(1);
-        safeput("picker", picker_class);
+        BooleanClass pickerClass = new BooleanClass(this);
+        pickerClass.setName("picker");
+        pickerClass.setPrettyName("Use Suggest");
+        pickerClass.setDisplayType("yesno");
+        pickerClass.setDisplayFormType("checkbox");
+        pickerClass.setDefaultValue(1);
+        safeput(pickerClass.getName(), pickerClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new StringClass();
     }

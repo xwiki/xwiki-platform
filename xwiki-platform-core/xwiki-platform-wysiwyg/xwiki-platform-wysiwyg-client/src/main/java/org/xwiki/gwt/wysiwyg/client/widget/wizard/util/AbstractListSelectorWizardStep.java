@@ -26,9 +26,9 @@ import org.xwiki.gwt.user.client.ui.ListBox;
 import org.xwiki.gwt.user.client.ui.ListItem;
 import org.xwiki.gwt.user.client.ui.VerticalResizePanel;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -38,7 +38,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Generic wizard step for selecting from a list of items: it handles list creation and population along with item
@@ -56,11 +55,6 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
      * The style for an field in error.
      */
     private static final String FIELD_ERROR_STYLE = "xErrorField";
-
-    /**
-     * The main panel of this wizard step.
-     */
-    private VerticalResizePanel mainPanel = new VerticalResizePanel();
 
     /**
      * The list of items to select from.
@@ -88,18 +82,20 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
      */
     public AbstractListSelectorWizardStep()
     {
+        super(new VerticalResizePanel());
+
         Label helpLabel = new Label(getSelectHelpLabel());
         helpLabel.addStyleName("xHelpLabel");
-        mainPanel.add(helpLabel);
+        display().add(helpLabel);
 
         errorLabel.addStyleName("xErrorMsg");
         errorLabel.setVisible(false);
-        mainPanel.add(errorLabel);
+        display().add(errorLabel);
 
         list.addKeyUpHandler(this);
         list.addDoubleClickHandler(this);
-        mainPanel.add(list);
-        mainPanel.setExpandingWidget(list, false);
+        display().add(list);
+        display().setExpandingWidget(list, false);
     }
 
     /**
@@ -114,6 +110,8 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
 
     /**
      * {@inheritDoc}
+     * 
+     * @see AbstractSelectorWizardStep#init(Object, AsyncCallback)
      */
     public void init(final Object data, final AsyncCallback< ? > cb)
     {
@@ -146,10 +144,12 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         {
             public void onSuccess(List<L> result)
             {
-                fillList(result, selectedData);
+                ListItem<L> selectedItem = fillList(result, selectedData);
                 if (cb != null) {
                     cb.onSuccess(null);
                 }
+                // Select the item after the step is displayed, to be able to scroll the item into view.
+                list.setSelectedItem(selectedItem);
                 // Set this as active, by default setting focus on the list.
                 setActive();
             }
@@ -171,12 +171,13 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
     protected abstract void fetchData(AsyncCallback<List<L>> callback);
 
     /**
-     * Fills the list with the given data and selects the specified item.
+     * Fills the list with the given data and returns the item that matches the specified item.
      * 
      * @param dataList the list of data to fill the list
-     * @param selectedData the data to be selected
+     * @param selectedData the data to be matched
+     * @return the list item that matches the given data
      */
-    protected void fillList(List<L> dataList, L selectedData)
+    protected ListItem<L> fillList(List<L> dataList, L selectedData)
     {
         ListItem<L> selectedItem = null;
         int selectedPriority = 0;
@@ -201,7 +202,7 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
                 selectedItem = newOptionListItem;
             }
         }
-        list.setSelectedItem(selectedItem);
+        return selectedItem;
     }
 
     /**
@@ -231,14 +232,8 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
 
     /**
      * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return mainPanel;
-    }
-
-    /**
-     * {@inheritDoc}
+     * 
+     * @see AbstractSelectorWizardStep#onCancel()
      */
     public void onCancel()
     {
@@ -246,6 +241,8 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
 
     /**
      * {@inheritDoc}
+     * 
+     * @see AbstractSelectorWizardStep#onSubmit(AsyncCallback)
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
@@ -279,7 +276,7 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
     {
         errorLabel.setVisible(true);
         list.addStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
+        display().refreshHeights();
     }
 
     /**
@@ -289,7 +286,7 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
     {
         errorLabel.setVisible(false);
         list.removeStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
+        display().refreshHeights();
     }
 
     /**
@@ -350,11 +347,14 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
     }
 
     /**
-     * @return the mainPanel of this wizard step, for the subclasses to append items or change its settings
+     * {@inheritDoc}
+     * 
+     * @see AbstractSelectorWizardStep#display()
      */
-    protected VerticalResizePanel getMainPanel()
+    @Override
+    public VerticalResizePanel display()
     {
-        return mainPanel;
+        return (VerticalResizePanel) super.display();
     }
 
     /**

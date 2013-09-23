@@ -39,11 +39,10 @@ public class PropertyPrinter
             String className = prop.getType();
             if (className != null) {
                 prop.alias = printer.getContext().getAliasGenerator().generate(prop.object.alias + "_" + prop.name);
-                printer.from.append(", ")
-                    .append(className).append(" as ").append(prop.alias);
-                printer.where.append(" and ")
-                    .append(prop.alias).append(".id.id=").append(prop.object.alias).append(".id").append(" and ")
-                    .append(prop.alias).append(".id.name").append("='").append(prop.name).append("'");
+                printer.from.append(", ").append(className).append(" as ").append(prop.alias);
+                printer.where.append(" and ").append(prop.alias).append(".id.id=").append(prop.object.alias)
+                    .append(".id").append(" and ").append(prop.alias).append(".id.name").append("='").append(prop.name)
+                    .append("'");
                 // rewrite nodes
                 for (PPath p : prop.locations) {
                     String s = prop.alias + "." + prop.getValueField();

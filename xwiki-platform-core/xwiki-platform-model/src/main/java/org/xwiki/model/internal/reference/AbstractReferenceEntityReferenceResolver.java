@@ -32,12 +32,18 @@ import org.xwiki.model.reference.InvalidEntityReferenceException;
 
 /**
  * Resolve an {@link EntityReference} into a valid and absolute reference (with all required parents filled in).
- * 
+ * Generic implementation deferring default values for unspecified reference parts to extending classes.
+ *
+ * @see AbstractEntityReferenceResolver
  * @version $Id$
  * @since 2.2.3
  */
-public abstract class AbstractReferenceEntityReferenceResolver implements EntityReferenceResolver<EntityReference>
+public abstract class AbstractReferenceEntityReferenceResolver extends AbstractEntityReferenceResolver
+    implements EntityReferenceResolver<EntityReference>
 {
+    /**
+     * Map defining the parent relationship between reference types.
+     */
     private Map<EntityType, List<EntityType>> nextAllowedEntityTypes = new HashMap<EntityType, List<EntityType>>()
     {
         {
@@ -50,18 +56,7 @@ public abstract class AbstractReferenceEntityReferenceResolver implements Entity
         }
     };
 
-    /**
-     * @param type the entity type for which to return the default value to use (since the use has not specified it)
-     * @param parameters optional parameters. Their meaning depends on the resolver implementation
-     * @return the default value to use
-     */
-    protected abstract String getDefaultValue(EntityType type, Object... parameters);
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve
-     */
+    @Override
     public EntityReference resolve(EntityReference referenceToResolve, EntityType type, Object... parameters)
     {
         EntityReference normalizedReference;
@@ -73,33 +68,18 @@ public abstract class AbstractReferenceEntityReferenceResolver implements Entity
             // reference.
             if (type.ordinal() > referenceToResolve.getType().ordinal()) {
                 normalizedReference =
-                    new EntityReference(resolveDefaultValue(type, parameters), type, referenceToResolve.clone());
+                    new EntityReference(resolveDefaultValue(type, parameters), type, referenceToResolve);
             } else {
-                normalizedReference = referenceToResolve.clone();
+                normalizedReference = referenceToResolve;
             }
         }
 
         // Check all references and parent references which have a NULL name and replace them with default values.
         // In addition insert references where needed.
-        EntityReference reference = normalizedReference;
-        while (reference != null) {
-            List<EntityType> types = this.nextAllowedEntityTypes.get(reference.getType());
-            if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
-                // The parent reference isn't the allowed parent: insert an allowed reference
-                EntityReference newReference =
-                    new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0), reference
-                        .getParent());
-                reference.setParent(newReference);
-            } else if (reference.getParent() == null && !types.isEmpty()) {
-                // The top reference isn't the allowed top level reference, add a parent reference
-                EntityReference newReference =
-                    new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0));
-                reference.setParent(newReference);
-            } else if (reference.getParent() != null && types.isEmpty()) {
-                // There's a parent but not of the correct type... it means the reference is invalid
-                throw new InvalidEntityReferenceException("Invalid reference [" + referenceToResolve + "]");
-            }
-            reference = reference.getParent();
+        try {
+            normalizedReference = normalizeReference(normalizedReference, parameters);
+        } catch (InvalidEntityReferenceException e) {
+            throw new InvalidEntityReferenceException("Invalid reference [" + referenceToResolve + "]");
         }
 
         if (referenceToResolve != null) {
@@ -112,22 +92,41 @@ public abstract class AbstractReferenceEntityReferenceResolver implements Entity
         return normalizedReference;
     }
 
-    private String resolveDefaultValue(EntityType type, Object... parameters)
+    /**
+     * Normalize the provided reference, filling missing names, and gaps in the parent chain.
+     * @param referenceToResolve the reference to normalize, if the first parameter is an entity reference, it is used
+     * to compute default names.
+     * @param parameters optional parameters,
+     * @return a normalized reference chain
+     */
+    private EntityReference normalizeReference(EntityReference referenceToResolve,
+        Object[] parameters)
     {
-        String resolvedDefaultValue = null;
-        if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
-            // Try to extract the type from the passed parameter.
-            EntityReference referenceParameter = (EntityReference) parameters[0];
-            EntityReference extractedReference = referenceParameter.extractReference(type);
-            if (extractedReference != null) {
-                resolvedDefaultValue = extractedReference.getName();
+        EntityReference normalizedReference = referenceToResolve;
+        EntityReference reference = normalizedReference;
+        while (reference != null) {
+            List<EntityType> types = this.nextAllowedEntityTypes.get(reference.getType());
+            if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
+                // The parent reference isn't the allowed parent: insert an allowed reference
+                EntityReference newReference =
+                    new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0), reference
+                        .getParent());
+                normalizedReference = normalizedReference.replaceParent(reference.getParent(), newReference);
+                reference = newReference;
+            } else if (reference.getParent() == null && !types.isEmpty()) {
+                // The top reference isn't the allowed top level reference, add a parent reference
+                EntityReference newReference =
+                    new EntityReference(resolveDefaultValue(types.get(0), parameters), types.get(0));
+                normalizedReference = normalizedReference.appendParent(newReference);
+                reference = newReference;
+            } else if (reference.getParent() != null && types.isEmpty()) {
+                // There's a parent but no one is allowed
+                throw new InvalidEntityReferenceException();
+            } else {
+                // Parent is ok, check next
+                reference = reference.getParent();
             }
         }
-
-        if (resolvedDefaultValue == null) {
-            resolvedDefaultValue = getDefaultValue(type, parameters);
-        }
-
-        return resolvedDefaultValue;
+        return normalizedReference;
     }
 }

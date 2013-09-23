@@ -19,7 +19,7 @@
  */
 package org.xwiki.observation.remote;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Handle all the actual communication with the network.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0RC1
  */
-@ComponentRole
+@Role
 public interface NetworkAdapter
 {
     /**

@@ -35,6 +35,16 @@ public class CacheMacroParameters
     private String id;
 
     /**
+     * @see #getTimeToLive()
+     */
+    private int timeToLive = 300;
+
+    /**
+     * @see #getMaxEntries()
+     */
+    private int maxEntries = 1000;
+
+    /**
      * @return the optional unique id to use to cache the content. If not defined then use the content itself as the id
      *         but this doesn't guarantee unicity since the same content could be located on several pages with
      *         different results. Also note that the id is considered containing wiki syntax; this is done so that the
@@ -54,4 +64,37 @@ public class CacheMacroParameters
         this.id = id;
     }
 
+    /**
+     * @return the number of seconds to cache the content
+     */
+    public int getTimeToLive()
+    {
+        return this.timeToLive;
+    }
+
+    /**
+     * @param timeToLive refer to {@link #getTimeToLive()}
+     */
+    @PropertyDescription("the number of seconds to cache the content")
+    public void setTimeToLive(int timeToLive)
+    {
+        this.timeToLive = timeToLive;
+    }
+
+    /**
+     * @return the maximum number of entries in the cache (Least Recently Used entries are ejected)
+     */
+    public int getMaxEntries()
+    {
+        return this.maxEntries;
+    }
+
+    /**
+     * @param maxEntries refer to {@link #getMaxEntries()}
+     */
+    @PropertyDescription("the maximum number of entries in the cache (Least Recently Used entries are ejected)")
+    public void setMaxEntries(int maxEntries)
+    {
+        this.maxEntries = maxEntries;
+    }
 }

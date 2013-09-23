@@ -2,16 +2,18 @@
 
 div.suggestItems.searchSuggest {
   border-top: 1px solid $theme.borderColor;
-  -moz-box-shadow:3px 3px 5px;
-  -webkit-box-shadow:3px 3px 5px;
   box-shadow:3px 3px 5px;
 }
 
-ul.xlist li.showAllResuts {
+ul.xlist li.showAllResults {
   padding:0;
 }
 
-ul.xlist li.showAllResuts div.xitemcontainer {
+ul.xlist li.showAllResults.loading {
+  background-position:6px center;
+}
+
+ul.xlist li.showAllResults div.xitemcontainer {
   margin-left:0;
   padding-left:10px;
   border: 1px solid #EEEEEE;

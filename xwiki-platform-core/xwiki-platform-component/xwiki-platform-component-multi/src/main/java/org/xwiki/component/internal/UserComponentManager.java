@@ -19,55 +19,67 @@
  */
 package org.xwiki.component.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current user in the
  * Execution Context. These Component Managers are created on the fly the first time a component is registered for the
  * current user.
- *  
+ * 
  * @version $Id$
  * @since 2.1RC1
  */
-@Component("user")
+@Component
+@Named(UserComponentManager.ID)
+@Singleton
 public class UserComponentManager extends AbstractGenericComponentManager implements Initializable
 {
     /**
+     * The identifier of this {@link ComponentManager}.
+     */
+    public static final String ID = "user";
+
+    /**
      * Used to access the current user in the Execution Context.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * Used to serialize the user reference.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> referenceSerializer;
 
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
-    @Requirement("wiki")
-    private ComponentManager wikiComponentManager;
-    
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+    @Inject
+    @Named(DocumentComponentManager.ID)
+    private ComponentManager documentComponentManager;
+
+    @Override
     public void initialize() throws InitializationException
     {
         // Set the parent to the Wiki Component Manager since if a component isn't found for a particular user
         // we want to check if it's available in the current wiki and if not then in the Wiki Component Manager's
         // parent.
-        setInternalParent(this.wikiComponentManager);
+        setInternalParent(this.documentComponentManager);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractGenericComponentManager#getKey()
-     */
     @Override
     protected String getKey()
     {
-        return this.documentAccessBridge.getCurrentUser();
+        return ID + ':' + this.referenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
     }
 }

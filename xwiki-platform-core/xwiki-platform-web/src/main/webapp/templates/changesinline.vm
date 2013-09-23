@@ -12,7 +12,7 @@
 ## Check all possible problems with the specified versions.
 #if($validVersions.size() < 2)
   ## Not enough versions, show all the content introduced by the first (if any) version of the document
-  #set($origdoc = $util.null)
+  #set($origdoc = $NULL)
   #set($newdoc = $tdoc)
   #set($rev1 = '0')
   #set($rev2 = $tdoc.version)
@@ -47,6 +47,10 @@
   #set($rev2 = $validVersions.get($toIndex))
   #set($origdoc = $xwiki.getDocument($tdoc, $rev1))
   #set($newdoc = $xwiki.getDocument($tdoc, $rev2))
+#end
+#if ($request.queryString.indexOf("rev1=${rev1}") < 0 && $request.queryString.indexOf("rev2=${rev2}") < 0)
+  $response.sendRedirect($doc.getURL('view', "viewer=changes&rev1=${rev1}&rev2=${rev2}"))
+  #stop
 #end
 #template('changesdoc.vm')
 </div>

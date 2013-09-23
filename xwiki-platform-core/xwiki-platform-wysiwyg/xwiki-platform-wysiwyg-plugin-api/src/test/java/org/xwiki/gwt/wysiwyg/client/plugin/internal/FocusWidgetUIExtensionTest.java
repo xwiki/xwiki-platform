@@ -33,9 +33,7 @@ import com.google.gwt.user.client.ui.ToggleButton;
  */
 public class FocusWidgetUIExtensionTest extends AbstractUIExtensionTest
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected UIExtension newUIExtension()
     {
         FocusWidgetUIExtension uie = new FocusWidgetUIExtension("roleA");

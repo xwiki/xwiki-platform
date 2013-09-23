@@ -16,139 +16,106 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.pdf.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
- * Special URL Factory used during exports, which stores referenced attachments on the filesystem so that they can be
- * included in the export result.
+ * Computes Image and Link URLs for attachments by using an absolute URLs but stores a Map in the XWiki Context to
+ * associate attachment URLs to Attachment Entity References so that when executing a PDF export the custom URI Resolver
+ * we use can stream image attachment content so that they are embedded in the PDF.
  * 
  * @version $Id$
  */
-public class PdfURLFactory extends XWikiServletURLFactory
+public class PdfURLFactory extends FileSystemURLFactory
 {
-    /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(PdfURLFactory.class);
+    /**
+     * We delegate to the XWiki Servlet URL Factory for the creation of attachment URLs since we want links to
+     * attachments to be absolute. Image URLs are converted by the {@link PDFURIResolver}.
+     */
+    private XWikiServletURLFactory servletURLFactory = new XWikiServletURLFactory();
 
-    private static final String SEPARATOR = "/";
+    @Override
+    public void init(XWikiContext context)
+    {
+        super.init(context);
+        this.servletURLFactory.init(context);
+    }
 
     /**
-     * {@inheritDoc}
+     * Key used to save image attachment data.
+     * @see #saveAttachmentReference(java.net.URL, String, String, String, String, com.xpn.xwiki.XWikiContext)
      */
+    static final String PDF_EXPORT_CONTEXT_KEY = "pdfExportImageURLMap";
+
     @Override
     public URL createAttachmentURL(String filename, String space, String name, String action, String querystring,
         String wiki, XWikiContext context)
     {
-        try {
-            return getURL(wiki, space, name, filename, null, context);
-        } catch (Exception ex) {
-            LOG.warn("Failed to save image for PDF export", ex);
-            return super.createAttachmentURL(filename, space, name, action, null, wiki, context);
-        }
+        URL url = this.servletURLFactory.createAttachmentURL(filename, space, name, action, querystring, wiki, context);
+        saveAttachmentReference(url, wiki, space, name, filename, context);
+        return url;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public URL createAttachmentRevisionURL(String filename, String space, String name, String revision, String wiki,
         XWikiContext context)
     {
-        try {
-            return getURL(wiki, space, name, filename, revision, context);
-        } catch (Exception ex) {
-            LOG.warn("Failed to save image for PDF export: " + ex.getMessage());
-            return super.createAttachmentRevisionURL(filename, space, name, revision, wiki, context);
-        }
+        URL url = this.servletURLFactory.createAttachmentURL(filename, space, name, revision, wiki, context);
+        saveAttachmentReference(url, wiki, space, name, filename, context);
+        return url;
     }
 
-    /**
-     * Store the requested attachment on the filesystem and return a {@code file://} URL where FOP can access that file.
-     * 
-     * @param wiki the name of the owner document's wiki
-     * @param space the name of the owner document's space
-     * @param name the name of the owner document
-     * @param filename the name of the attachment
-     * @param revision an optional attachment version
-     * @param context the current request context
-     * @return a {@code file://} URL where the attachment has been stored
-     * @throws Exception if the attachment can't be retrieved from the database and stored on the filesystem
-     */
-    public URL getURL(String wiki, String space, String name, String filename, String revision, XWikiContext context)
-        throws Exception
-    {
-        @SuppressWarnings("unchecked")
-        Map<String, File> usedFiles = (Map<String, File>) context.get("pdfexport-file-mapping");
-        String key = getAttachmentKey(space, name, filename, revision);
-        if (!usedFiles.containsKey(key)) {
-            File tempdir = (File) context.get("pdfexportdir");
-            File file = File.createTempFile("pdf", "." + FilenameUtils.getExtension(filename), tempdir);
-            XWikiDocument doc = context.getWiki().getDocument(
-                new DocumentReference(StringUtils.defaultString(wiki, context.getDatabase()), space, name), context);
-            XWikiAttachment attachment = doc.getAttachment(filename);
-            if (StringUtils.isNotEmpty(revision)) {
-                attachment = attachment.getAttachmentRevision(revision, context);
-            }
-            FileOutputStream fos = new FileOutputStream(file);
-            IOUtils.copy(attachment.getContentInputStream(context), fos);
-            fos.close();
-            usedFiles.put(key, file);
-        }
-        return usedFiles.get(key).toURI().toURL();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public String getURL(URL url, XWikiContext context)
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+        String querystring, String xwikidb, XWikiContext context)
     {
-        if (url == null) {
-            return "";
-        }
-        return Util.escapeURL(url.toString());
+        URL url = this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, querystring,
+            xwikidb, context);
+        saveAttachmentReference(url, xwikidb, web, name, filename, context);
+        return url;
+    }
+
+    @Override
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, long recycleId,
+        String querystring, String xwikidb, XWikiContext context)
+    {
+        URL url = this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, recycleId,
+            querystring, xwikidb, context);
+        saveAttachmentReference(url, xwikidb, web, name, filename, context);
+        return url;
     }
 
     /**
-     * Computes a safe identifier for an attachment, guaranteed to be collision-free.
-     * 
-     * @param space the name of the owner document's space
-     * @param name the name of the owner document
-     * @param filename the name of the attachment
-     * @param revision an optional attachment version
-     * @return an identifier for this attachment
+     * @param url the URL to save in the attachment map
+     * @param wiki the wiki where the attachment is located
+     * @param space the space where the attachment is located
+     * @param page the page where the attachment is located
+     * @param fileName the name of the attachment file
+     * @param context the XWiki Context where to find the attachment map that we add to
+     * @see PDFURIResolver
      */
-    private String getAttachmentKey(String space, String name, String filename, String revision)
+    private void saveAttachmentReference(URL url, String wiki, String space, String page, String fileName,
+        XWikiContext context)
     {
-        try {
-            return URLEncoder.encode(space, "UTF-8") + SEPARATOR
-                + URLEncoder.encode(name, "UTF-8") + SEPARATOR
-                + URLEncoder.encode(filename, "UTF-8") + SEPARATOR
-                + URLEncoder.encode(StringUtils.defaultString(revision), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            // This should never happen, UTF-8 is always available
-            return space + SEPARATOR + name + SEPARATOR + filename + SEPARATOR + StringUtils.defaultString(revision);
+        // Save Entity Reference pointed to by this URL in the Context so that it can be used at export time in the
+        // PDF URIResolver code.
+        Map<String, AttachmentReference> attachmentMap =
+            (Map<String, AttachmentReference>) context.get(PDF_EXPORT_CONTEXT_KEY);
+        if (attachmentMap == null) {
+            attachmentMap = new HashMap<String, AttachmentReference>();
+            context.put(PDF_EXPORT_CONTEXT_KEY, attachmentMap);
         }
+
+        attachmentMap.put(url.toString(), new AttachmentReference(fileName, new DocumentReference(wiki, space, page)));
     }
 }

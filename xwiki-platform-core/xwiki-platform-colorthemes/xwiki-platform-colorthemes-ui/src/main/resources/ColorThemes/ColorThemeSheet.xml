@@ -1,0 +1,1624 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>ColorThemes</web>
+  <name>ColorThemeSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>ColorThemes.ColorThemeClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1251108485000</creationDate>
+  <date>1251108485000</date>
+  <contentUpdateDate>1251108485000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#sheetTitle('xe.themes.colors.sheet.title' $doc.name.equals('ColorThemeSheet'))</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>ColorThemes.ColorThemeSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>2fcb4790-0b18-41ad-8fdc-42f3062a8025</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Make sure the XWiki 'namespace' exists.
+if(typeof(XWiki) == 'undefined') {
+  XWiki = new Object();
+}
+// Make sure the editors 'namespace' exists.
+if(typeof(XWiki.editors) == 'undefined') {
+  XWiki.editors = new Object();
+}
+
+#includeTopic('ColorThemes.WizardPropertyMapping')
+#template("colorThemeInit.vm")
+
+/**
+ * Javascript enhancements of the color theme wizard:
+ * real-time preview when changing property values
+ */
+XWiki.editors.ColorThemeWizard = Class.create({
+  classPrefix : '.colorthemewizard-',
+  /* Usually ColorThemes.ColorThemeClass_0_ */
+  inputNamePrefix : '$!{request.propertyPrefix}',
+  propertyMap : new Object(),
+  defaultValues : new Object(),
+  initialize : function() {
+    // Initialize widget selectors
+    this.pickerSelector  = this.classPrefix + 'picker';
+    this.triggerSelector = this.classPrefix + 'trigger';
+    this.maquetteSelector = this.classPrefix + 'page';
+    this.tipSelector = this.classPrefix + 'tip';
+    this.editableGroupSelector = this.classPrefix + 'editable-group';
+    this.visibleTriggerSelector = this.triggerSelector + '-visible';
+
+    this.logoProperty = 'logoImage';
+    this.logoSelector = this.classPrefix.substring(1) + 'logo';
+    this.logoPropertySelector = this.classPrefix + this.logoProperty;
+    this.defaultLogoURL = "$!{logoURL}"; // value computed in global.vm
+
+    // Generate default values for the theme properties
+    this.generateDefaultValues();
+
+    // Create a mapping from maquette elements to a map between
+    // the css properties that need to be set and the list
+    // of corresponding theme properties that compose their value.
+    // The map is generated using the definition from ColorThemes.WizardPropertyMapping
+    this.createPropertyMap();
+
+    // Hide 35 color palettes and other unnecessary elements
+    this.hideCSSVersionPickers();
+
+    // Attach image selectors, position pickers
+    // [TODO]
+    // Color pickers are already attached, because the corresponding
+    //   input elements have the class 'procolor', so they are
+    //   automatically detected by the Procolor extension
+    // TO BE IMPLEMENTED:
+    //   - image selector from attachment list (with previews) and new image attachment dialog
+    //   - image position and repeat pattern selector
+
+    // Attach listeners to display the pickers when clicking on the editable groups
+    // (necessary for CSS-stupid browsers)
+    // Also: force the pickers to remain visible when Procolor is active
+    this.redefineActivation();
+
+    // Attach change event listeners to all the inputs
+    this.attachChangeListeners();
+
+    // Make fullscreen
+    // TODO fix me!
+    /*
+    var fs = new XWiki.editors.FullScreenEditing();
+    $$(this.maquetteSelector).each(function(item){
+      fs.makeFullScreen(item);
+    });
+    $('mainmenu').style['z-index'] = '0';
+    */
+  },
+  generateDefaultValues : function() {
+    // Generated from the $theme object defined in colorThemeInit.vm
+    #foreach ($prop in $theme.keySet())
+      this.defaultValues['$prop'] = '${theme.get($prop)}';
+    #end
+  },
+  createPropertyMap : function() {
+    // Generated from the $elementStylingPropertyMap defined in WizardPropertyMapping
+    var cssProp;
+    #foreach($element in $elementStylingPropertyMap.keySet())
+      this.propertyMap['$element'] = new Object();
+      this.propertyMap['$element'].cssProperties = new Array();
+      #foreach($cssProp in $elementStylingPropertyMap.get($element).keySet())
+        cssProp = "${cssProp}".camelize();
+        this.propertyMap['$element'].cssProperties.push(cssProp);
+        this.propertyMap['$element'][cssProp] = new Array();
+        #set($themeProps = $elementStylingPropertyMap.get($element).get($cssProp))
+        #foreach ($themeProp in $themeProps)
+          this.propertyMap['$element'][cssProp].push('$themeProp');
+        #end
+      #end
+    #end
+  },
+  hideCSSVersionPickers : function() {
+    $$(this.classPrefix + 'picker-noscript').each(function(item){ item.hide(); });
+    // TODO: make sure all elements that must be hidden have this class!
+  },
+  fastUp : function(element, className) {
+    while (element != document.documentElement) {
+      if (element.hasClassName(className)) {
+        break;
+      }
+      element = element.up();
+    }
+    return element;
+  },
+  fastDown : function(element, className) {
+    var i, l;
+    var classNameMatcher = new RegExp("(^|\\s)" + className + "(\\s|$)");
+
+    for (i = 0, l = element.childNodes.length; i &lt; l; ++i) {
+      if (element.childNodes[i].nodeType == 1 &amp;&amp; classNameMatcher.test(element.childNodes[i].className)) {
+        return element.childNodes[i];
+      }
+    }
+  },
+  getMainClassName : function(element) {
+    return element.className.substring(0, element.className.indexOf(' '));
+  },
+  getMarker : function(element) {
+    return element.className.substring(this.classPrefix.length - 1, element.className.indexOf(' '));
+  },
+  redefineActivation : function() {
+    if (!$('body').hasClassName('inlinebody') &amp;&amp; !$('body').hasClassName('editbody')) {
+      return;
+    }
+
+    // Make sure only one trigger is visible at a time;
+    // Hide the triggers of the containers of the topmost hovered element
+    $$(this.editableGroupSelector).each(function(group){
+      group.observe('mouseover', function(event){
+        var cleanClassPrefix = this.getMainClassName(group);
+        var triggerID = cleanClassPrefix + '-trigger';
+        var trigger = $(triggerID);
+        if (this.fastUp(Event.element(event), this.editableGroupSelector.substring(1)) == group) {
+          group.removeClassName(cleanClassPrefix + '-unhover');
+        } else {
+          if(this.fastDown(this.fastDown(group, "colorthemewizard-trigger"), "colorthemewizard-picker").style.display != 'block') {
+            group.addClassName(cleanClassPrefix + '-unhover');
+          }
+        }
+      }.bindAsEventListener(this));
+
+      // Enable "tooltips"
+      var trigger = $(this.fastDown(group, this.triggerSelector.substring(1)));
+      trigger.observe('mouseover', function(event) {
+        if (this.fastDown(trigger, this.pickerSelector.substring(1)).style['display'] == 'none') {
+          this.fastDown(trigger, this.tipSelector.substring(1)).style['display'] = 'block';
+        }
+      }.bindAsEventListener(this));
+      trigger.observe('mouseout', function(event) {
+        if (this.fastDown(trigger, this.pickerSelector.substring(1)).style['display'] != 'none' ||
+          (!event.toElement ||
+             !($(event.toElement).descendantOf(parent) || event.toElement == parent)
+          )
+        ) {
+          this.fastDown(trigger, this.tipSelector.substring(1)).style['display'] = '';
+        }
+      }.bindAsEventListener(this));
+      // Display pickers when clicking on the triggers
+      trigger.observe('click', this.displayPicker.bindAsEventListener(this, trigger));
+      // Hide pickers when pressing 'Esc'
+      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+        shortcut.add('Esc', this.hidePicker.bindAsEventListener(this, trigger), {type: 'keyup'});
+      } else {
+        shortcut.add('Esc', this.hidePicker.bindAsEventListener(this, trigger), {type: 'keypress'});
+      }
+
+      // Create close buttons for each picker
+      var picker = $(this.fastDown(trigger, this.pickerSelector.substring(1)));
+      var closeButton = new Element('div', {'class' : 'close-button', 'title' : "$services.localization.render('xe.themes.colors.wizard.close')"}).update('X');
+      picker.insert({top: closeButton});
+      closeButton.observe('click', this.hidePicker.bindAsEventListener(this, this.fastUp(closeButton, this.triggerSelector.substring(1))));
+      // To override the no-script activation css rule (hover), hide the pickers from the inline style;
+      picker.style['display'] = 'none';
+    }.bind(this));
+  },
+  displayPicker : function(event, trigger) {
+    if (event) {
+      Event.stop(event);
+      if (event.element() != trigger) {
+        return;
+      }
+    }
+    // First hide open pickers
+    $$(this.visibleTriggerSelector).each(function(item){
+      this.hidePicker(null, item);
+    }.bind(this));
+    trigger.addClassName(this.visibleTriggerSelector.substring(1));
+    // Keep the trigger and the picker
+    this.fastDown(trigger, this.pickerSelector.substring(1)).style['display'] = 'block';
+    // Hide tooltip
+    this.fastDown(trigger, this.tipSelector.substring(1)).style['display'] = '';
+  },
+  hidePicker : function(event, trigger) {
+    if (event) {
+      Event.stop(event);
+    }
+    trigger.removeClassName(this.visibleTriggerSelector.substring(1));
+    this.fastDown(trigger, this.pickerSelector.substring(1)).style['display'] = 'none';
+
+    // Reset undo button values to the ones prior to the picker display
+    trigger.select('input[type=text]').each(function(input) {
+      input._x_undoButton._x_value = input.value;
+      // This should be done by procolor, but it fails to observe some changes:
+      if (/Color$/.test(input.id)) {
+        input.style['backgroundColor'] = input.value;
+        if (ProColor) {
+          var textColor = ProColor.prototype.computeTextColor(ProColor.prototype.decodeHexColor(input.value));
+          textColor = '#' + textColor.r.toColorPart() + textColor.g.toColorPart() + textColor.b.toColorPart();
+          input.style['color'] = textColor;
+        }
+      }
+      input._x_undoButton.style.visibility = "hidden";
+    }.bind(this));
+  },
+  attachChangeListeners : function() {
+    var monitoredEvents = ['keyup', 'keypress', 'procolor:changed', 'procolor:closed'];
+    $$(this.maquetteSelector + ' input[type=text]').each(function(item) {
+      monitoredEvents.each(function(monitoredEvent) {
+        item.observe(monitoredEvent, this.inputValueChanged.bindAsEventListener(this, item));
+      }.bind(this));
+      // Create undo buttons
+      item._x_undoButton = new Element('button', {'class' : 'undo', 'title' : "$services.localization.render('xe.themes.colors.wizard.undo')"}).update("$services.localization.render('xe.themes.colors.wizard.undo')");
+      item._x_undoButton._x_input = item;
+      item._x_undoButton._x_value = item.value;
+      item._x_undoButton.style.visibility = "hidden";
+      item.insert({after : item._x_undoButton})
+      item._x_undoButton.observe('click', function(event){
+        item.value = item._x_undoButton._x_value;
+        this.inputValueChanged(null, item);
+        item._x_undoButton.style.visibility = "hidden";
+      }.bindAsEventListener(this));
+    }.bind(this));
+
+    // Listen to clicks on the form reset button and recompute the style on reset
+    // (!) We don't listen to the 'reset' event on the form; because apparently this
+    //     event is sent before the actual reset is done...
+    //     Instead, listen to click on the reset buton, stop the event, call form.reset()
+    //     and then update the styles from the maquette.
+
+    $$('input[type=reset]').each(function(btn) {
+      btn.observe('click', function(event) {
+        event.stop();
+        btn.form.reset();
+        $$(this.maquetteSelector + ', ' + this.maquetteSelector + ' *').each(function(item) {
+          this.refreshStyle(item);
+        }.bind(this));
+      }.bindAsEventListener(this));
+    }.bind(this));
+  },
+  retrievePropertyName : function(inputName) {
+    // Expected name: className_objectNumber_propertyName
+    return inputName.substring(this.inputNamePrefix.length);
+  },
+  inputValueChanged : function(event, input) {
+    // The theme property edited in this field, e.g. textColor
+    var propName = this.retrievePropertyName(input.name);
+    if (propName == this.logoProperty) {
+       if (input.value.strip() != '') {
+         $(this.logoSelector).src = this.wrapImagePropertyValue(propName, input.value);
+       } else {
+         $(this.logoSelector).src = this.defaultLogoURl;
+       }
+    } else {
+      // The CSS classname identifying the elements affected by this property, e.g. colorthemewizard-textColor
+      var affectedElementsClassname = this.classPrefix + propName;
+      $$(affectedElementsClassname).each(function(item) {
+        this.refreshStyle(item);
+      }.bind(this));
+    }
+    input._x_undoButton.style.visibility = "visible";
+  },
+  refreshStyle : function(item) {
+    if (this.propertyMap[this.getMarker(item)]) {
+      this.propertyMap[this.getMarker(item)].cssProperties.each(function(prop) {
+        var value = '';
+        this.propertyMap[this.getMarker(item)][prop].each(function(themeProp) {
+          var input = $(this.inputNamePrefix + themeProp);
+          var propvalue = '';
+          if (input) {
+            propvalue = input.value;
+          }
+          if (!propvalue || propvalue == ''){
+            propvalue = this.defaultValues[themeProp];
+            // Old themes don't have values for gradients. Also images are theme dependant, so gradient colors and images are not inherited from DefaultColorTheme
+            if ((themeProp.indexOf('Gradient') &gt;= 0) || (themeProp.indexOf('Image') &gt;= 0)) {
+              propvalue = '';
+            }
+          }
+          if (propvalue &amp;&amp; propvalue != '') {
+            value += ' ' + this.wrapCSSPropertyValue(themeProp, propvalue);
+          }
+        }.bind(this));
+        value = value.strip();
+        if (value != '') {
+          try {
+            if (prop === 'backgroundImage') {
+              // Gradients need a special wrapping to assure cross browser support (adding browser specific sufixes)
+              value = this.wrapGradients(value);
+              item.style.cssText = item.style.cssText + ' ' + value;
+            }
+            else {
+              item.style[prop] = value;
+            }
+          } catch (exception) {
+            // Ignore invalid values, for example when the user is typing and the value is still incomplete
+          }
+        }
+      }.bind(this));
+    }
+  },
+  wrapGradients : function(value) {
+    #set($gradient1Placeholder = '__gradient1__name__placeholder__')
+    #set($gradient2Placeholder = '__gradient2__name__placeholder__')
+    var gradient1PlaceholderRegEx = new RegExp("$gradient1Placeholder",'g');
+    var gradient2PlaceholderRegEx = new RegExp("$gradient2Placeholder",'g');
+    ## #css3_backgroundLinearGradient macro (defined in macros.vm) used for the majority of browsers (FF, Chrome, Opera, IE10) that support CSS3 properties
+    #set($backgroundLinearGradientRaw= "#css3_backgroundLinearGradient({
+         'to': 'bottom',
+         'colors': [
+          {'color': ${gradient1Placeholder}, 'position': '0%'},
+          {'color': ${gradient2Placeholder}, 'position': '100%'}
+        ]
+      })")
+    var backgroundLinearGradient = "$escapetool.javascript($backgroundLinearGradientRaw)";
+    ## #css_filterGradient macro (defined in macros.vm) used for the IE8, IE9 browsers that don t support CSS3 properties
+    #set($filterGradientRaw= "#css_filterGradient(${gradient1Placeholder}, ${gradient2Placeholder})")
+    var filterGradient = "$escapetool.javascript($filterGradientRaw)";
+    ## Gradients are using 2 values that are passed to the suggested macros
+    var gradientValues = value.split(' ');
+    if (gradientValues.size() &gt;= 2) {
+      if (gradientValues[0] != '' &amp;&amp; gradientValues[1] != '') {
+        var constructedStyle = backgroundLinearGradient.replace(gradient1PlaceholderRegEx,gradientValues[1]).replace(gradient2PlaceholderRegEx,gradientValues[0]);
+        ## for IE browsers
+        constructedStyle = constructedStyle + filterGradient.replace(gradient1PlaceholderRegEx,gradientValues[1]).replace(gradient2PlaceholderRegEx,gradientValues[0]);
+        return constructedStyle;
+      }
+    }
+    // Other values remain unchanged
+    return value;
+  },
+  wrapCSSPropertyValue : function(propName, value) {
+    // Images need to be referenced using 'url()' and their full path
+    if (propName.indexOf('Image') &gt;= 0) {
+      return 'url(' + this.wrapImagePropertyValue(propName, value) + ')';
+    }
+    // Other values remain unchanged
+    return value;
+  },
+  wrapImagePropertyValue : function(propName, value) {
+    // Images need to be referenced using their full path
+    if (propName.indexOf('Image') &gt;= 0) {
+      // An url template is generated from velocity;
+      // in js, replace the attachmentNamePlaceholder with the actual attachment name given as a parameter
+      #set($attachmentNamePlaceholder = '__attachment__name__placeholder__')
+      return "${xwiki.getAttachmentURL(${request.themeDoc}, ${attachmentNamePlaceholder})}".replace("$attachmentNamePlaceholder", value);
+    }
+    // Other values remain unchanged
+    return value;
+  },
+  // for debug only, to be removed
+  info : function(message) {
+    new XWiki.widgets.Notification(message, 'info', {timeout : false});
+  }
+});
+
+document.observe('xwiki:dom:loaded', function(){
+  /** Force ProColor to fire an event when changing the input value */
+  if (ProColor) {
+    ProColor.prototype.options.onChanged = function(t, evtname) {
+      Event.fire(t.input || t, 'procolor:changed');
+    };
+    ProColor.prototype.options.onClosed = function(t, evtname) {
+      Event.fire(t.input || t, 'procolor:closed');
+    };
+    ProColor.prototype.options.onCancelClick = function(t, evtname) {
+      Event.fire(t.input || t, 'procolor:closed');
+    };
+  }
+
+  new XWiki.editors.ColorThemeWizard();
+});</code>
+    </property>
+    <property>
+      <name>Live preview in the color theme editor</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>ColorThemes.ColorThemeSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>bb54e5ea-3751-424b-b8dc-b3d7dee268f6</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+##
+## Velocity stuff
+##
+## Widgets color scheme
+#set($widgetsColors = {
+  'text'           : '#000',
+  'border'         : '#999',
+  'background'     : '#EEE',
+  'tipBackground'  : '#FEB',
+  'activeBorder'   : '#333',
+  'selectedBorder' : '#F60'
+})
+##
+## Define a mapping between:
+## - elements and the color theme properties that affect them: $elementStylingPropertyMap
+## - elements and the color theme properties are configured from them: $elementPropertyMap
+## to be used in both CSS-only version and JavaScript-enhanced version
+#includeTopic('ColorThemes.WizardPropertyMapping')
+##
+## CSS Selectors specific to IE versions
+#set($ie6 = '* html')
+#set($ie7 = '*+html')
+##
+## Elements with large padding.
+#set($paddedElements = ['mainmenu', 'panelheader', 'panelcontents', 'collapsedpanel', 'contentmenu', 'textlink', 'titlebox', 'info', 'details', 'highlight'])
+## Elements without padding.
+#set($notPaddedElements = ['headerbox', 'boxes', 'buttonbox', 'secondaryButtonbox', 'extratabs'])
+## Large containers.
+#set($largeContainers = ['page', 'content'])
+##
+##
+## CSS stuff
+##
+##
+/*==========================================
+ *
+ *  Generic stuff
+ *
+ *==========================================
+ */
+/* Form reset */
+.colorthemewizard-reset {
+  text-align: right;
+}
+.colorthemewizard-reset input {
+  border: none;
+  padding: 4px 0 4px 18px;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/cancel.png')") left center no-repeat;
+  color: $theme.linkColor;
+  cursor: pointer;
+}
+.colorthemewizard-reset input:hover {
+  text-decoration: underline;
+}
+/*
+ * Palette triggers and pickers
+ */
+/* The trigger is a small icon that appears in the corner of an editable element. */
+.colorthemewizard-trigger {
+  /* Initially hidden, will be displayed when hovering over the target element */
+  display: none;
+  position: absolute;
+  ##top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9998;
+  width: 18px;
+  height: 18px;
+  background: $widgetsColors.background url("$xwiki.getSkinFile('icons/silk/palette.png')") 1px 1px no-repeat;
+  border: 1px outset $widgetsColors.border;
+  cursor: pointer;
+  /* Overrides styles inherited from the parent elements. */
+  text-transform: none;
+  font-size: x-small;
+  color: $widgetsColors.text;
+  font-weight: normal;
+  font-style: normal;
+}
+.colorthemewizard-trigger-visible {
+  background: transparent;
+  border: 0 none;
+  display: block;
+  z-index: 10000;
+}
+/* While for most elements the trigger is in the upper left corner, for large containers it is placed at the bottom left. */
+#foreach($i in $largeContainers)
+#colorthemewizard-${i}-trigger,
+#colorthemewizard-${i}-trigger .colorthemewizard-picker {
+  top: auto;
+  bottom: 0 !important;
+}
+#end
+/* In IE6/7 the z-index property does not properly work with positioned elements, thus we don't use absolute positioning. */
+#foreach($ie in [$ie6, $ie7])
+$ie .colorthemewizard-trigger {
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  margin: -18px 0 0 !important;
+}
+#foreach($i in $paddedElements)
+#if($velocityCount &gt; 1),
+#end$ie #colorthemewizard-${i}-trigger#end {
+  margin-top: -15px !important;
+}
+#end
+/* The picker is an area containing various value selectors for theme properties, displayed when activating the trigger. */
+.colorthemewizard-picker {
+  /* Initially hidden, will be displayed when activating the trigger */
+  display: none;
+  position: absolute;
+  ## /* The picker element is inside the trigger element, in HTML. Because the trigger has a 1px border, shift the picker to
+  ##    overlap the border. */
+  ## top: -1px;
+  /* Place the picker under the trigger, so that the element being edited remains visible */
+  top: 19px;
+  left: -1px;
+  /* Z-index higher than the triggers', to prevent other triggers from appearing through the visible pickers. */
+  z-index: 9999;
+  background: $widgetsColors.background url("$xwiki.getSkinFile('icons/silk/palette.png')") 1px 1px no-repeat;
+  border: 1px solid $widgetsColors.border;
+  padding: 6px;
+  width: 160px;
+  cursor: default;
+}
+.colorthemewizard-panelheader:hover .colorthemewizard-picker {
+  top: 18px;
+}
+.colorthemewizard-picker .close-button {
+  cursor: pointer;
+  font-weight: bold;
+  position:absolute;
+  right: 4px;
+  top: 4px;
+}
+.colorthemewizard-picker input {
+    width: 160px;
+}
+.colorthemewizard-picker .procolor {
+    width: 92px;
+}
+/* A picker displays selectors for several properties, each one placed in it's own section. */
+.colorthemewizard-picker-section {
+  margin: 12px 0;
+}
+
+.colorthemewizard-trigger label {
+  display: block;
+  font-weight: bold;
+}
+.colorthemewizard-trigger label .more-details {
+  display: block;
+  font-weight: normal;
+  font-size: 0.9em;
+  line-height: 1.2em;
+}
+/* The tip is an informative text concerning the properties that can be edited from each element */
+.colorthemewizard-tip {
+  /* Initially hidden. Not visible in the CSS-only version, because there the picker already shows up on hover.
+     Will be displayed as a tooltip via js.*/
+  display: none;
+  position: absolute;
+  top: -1px;
+  left: 20px;
+  width: 200px;
+  padding: 4px 6px 4px 24px;
+  background: $widgetsColors.tipBackground url("$xwiki.getSkinFile('icons/silk/information.png')") 5px 5px no-repeat;
+  border: 1px outset $widgetsColors.border;
+}
+.colorthemewizard-tip ul {
+  margin: 0;
+  font-weight: bold;
+}
+.colorthemewizard-tip ul .more-details {
+  font-weight: normal;
+}
+/* Undo button : resets the value of the correspunding input. Only available in the JS version */
+.colorthemewizard-picker .undo {
+  width: 18px;
+  height: 18px;
+  background: $widgetsColors.background url("$xwiki.getSkinFile('icons/silk/arrow_undo.png')") center center no-repeat;
+  border: 1px solid $widgetsColors.background;
+  text-indent: -1000em;
+  cursor: pointer;
+  margin: 0 4px;
+  padding: 0;
+}
+.colorthemewizard-picker .undo:hover {
+  border: 1px outset $widgetsColors.border;
+}
+/* Enable the palette trigger for each editable element. */
+#foreach($element in $elementPropertyMap.keySet())
+#if($velocityCount != 1),
+#end
+.inlinebody .colorthemewizard-${element}:hover #colorthemewizard-${element}-trigger, .editbody .colorthemewizard-${element}:hover #colorthemewizard-${element}-trigger#end
+ {
+  display: block;
+  /* When hovering the element, a border is displayed reducing 2px from the padding. The triggers are shifted to compensate this difference. */
+  margin: -2px;
+}
+/* Display the picker when hovering the trigger. */
+.colorthemewizard-trigger:hover .colorthemewizard-picker {
+  display: block;
+}
+
+/* All ".colorthemewizard-editable-group"s have this style. */
+.colorthemewizard-editable-group {
+  position: relative;
+  overflow: visible;
+  cursor: default;
+}
+/* In IE6/7 the z-index property does not properly work with positioned elements, thus we don't use positioning. */
+#foreach($ie in [$ie6, $ie7])
+$ie .colorthemewizard-editable-group {
+  position: static;
+}
+#end
+/* Re-redefine the position in IE6/7 for large containers, which can be positioned. */
+#foreach($i in $largeContainers)
+#body .colorthemewizard-${i} {
+  position: relative;
+}
+#end
+
+/* Set the padding and border for padded elements. */
+#foreach($i in $paddedElements)
+#if($velocityCount &gt; 1),
+#end.colorthemewizard-$i#end {
+  padding: 3px 10px;
+}
+#foreach($i in $paddedElements)
+#if($velocityCount &gt; 1),
+#end.inlinebody .colorthemewizard-$i:hover, .editbody .colorthemewizard-$i:hover#end {
+  padding: 1px 8px;
+  border: 2px dotted $widgetsColors.selectedBorder !important;
+}
+/* For IE6/7, where the trigger is not absolutely positioned, we must shift it to overlap the padding. */
+#foreach($ie in [$ie6, $ie7])
+#foreach($i in $paddedElements)
+#if($velocityCount &gt; 1),
+#end$ie #colorthemewizard-${i}-trigger#end {
+  margin-left: -10px !important;
+}
+#end
+/* Set the margin and border for not padded elements. */
+#foreach($i in $notPaddedElements)
+#if($velocityCount &gt; 1),
+#end.colorthemewizard-$i#end {
+  padding: 2px;
+}
+#foreach($i in $notPaddedElements)
+#if($velocityCount &gt; 1),
+#end.inlinebody .colorthemewizard-$i:hover, .editbody .colorthemewizard-$i:hover#end {
+  padding: 0;
+  border: 2px dotted $widgetsColors.selectedBorder;
+}
+/* Set the border for large containers. */
+#foreach($i in $largeContainers)
+#if($velocityCount &gt; 1),
+#end.inlinebody .colorthemewizard-$i:hover, .editbody .colorthemewizard-$i:hover#end {
+  border: 2px dotted $widgetsColors.selectedBorder;
+}
+
+#foreach($i in $largeContainers)
+.inlinebody .colorthemewizard-${i}-unhover, .editbody .colorthemewizard-${i}-unhover {
+  border-color: $widgetsColors.border !important;
+}
+#end
+#foreach($i in $largeContainers)
+.colorthemewizard-${i}-unhover #colorthemewizard-${i}-trigger {
+  display: none !important;
+}
+#end
+/*==========================================
+ *
+ *  Maquette layout
+ *
+ * (!) No colors are defined for the elements in this stylesheet.
+ *     All the colors are set through inline style, using the
+ *     properties of the color theme being edited.
+ *
+ *==========================================
+ */
+/*
+ * Page
+ */
+.colorthemewizard-page {
+  font-size: 0.75em;
+  padding: 0;
+  /* 'Invisible' border. */
+  border: 2px solid $theme.pageContentBackgroundColor;
+}
+.inlinebody .colorthemewizard-page, .editbody .colorthemewizard-page {
+  border: 2px dotted $theme.pageContentBackgroundColor; ## $widgetsColors.activeBorder;
+}
+/* Do not shift the page trigger, since there is no change in this element's padding on hover. */
+.inlinebody .colorthemewizard-page:hover #colorthemewizard-page-trigger, .editbody .colorthemewizard-page:hover #colorthemewizard-page-trigger {
+  margin: 0;
+}
+/* Display the tip above the bottom of the page */
+#colorthemewizard-page-trigger .colorthemewizard-tip {
+  top: auto;
+  bottom: 0;
+}
+/*
+ * Menu
+ */
+.colorthemewizard-mainmenu,
+.colorthemewizard-contentmenu {
+  text-transform: uppercase;
+  font-weight: bold;
+  /* Re-define the padding, to also apply to the contentmenu, which is not an editable element. */
+  padding: 3px 10px;
+}
+.colorthemewizard-menuentry {
+  padding: 0 0.25em;
+}
+.colorthemewizard-menuaddentry {
+  padding: 3px 0.5em;
+}
+/*
+ * Header
+ */
+/* The border for the header is on the outside to prevent from shifting the header background image. */
+.colorthemewizard-headerbox {
+  margin: -2px;
+}
+/* The header trigger needs extra-shifting to align with the menu trigger, since the headerbox has a -2px margin. */
+#colorthemewizard-headerbox-trigger {
+  margin: 2px;
+}
+.inlinebody .colorthemewizard-headerbox:hover #colorthemewizard-headerbox-trigger, .editbody .colorthemewizard-headerbox:hover #colorthemewizard-headerbox-trigger {
+  margin: 0;
+}
+/*
+ * Panels
+ */
+.colorthemewizard-panels {
+  float: left;
+  width: 150px;
+  padding: 9px 7px;
+}
+/* IE6 box model discrepancies fix. */
+$ie6 .colorthemewizard-panels {
+  width: 164px;
+}
+
+.colorthemewizard-panelheader {
+  padding-bottom: 2px;
+  border-bottom: 1px dotted;
+}
+
+.colorthemewizard-panelheader,
+.colorthemewizard-collapsedpanel {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.colorthemewizard-collapsedpanel {
+  margin: 7px 0 0 0;
+}
+/*
+ * Main column (content + tabs)
+ */
+.colorthemewizard-maincolumn {
+  margin: 0 7px 0 170px;
+}
+/*
+ * XWiki content
+ */
+.colorthemewizard-content {
+  margin: 9px 2px;
+}
+/* Reduce 2px from the margin to make room for the border. */
+.inlinebody .colorthemewizard-content:hover, .editbody .colorthemewizard-content:hover {
+  margin: 7px 0;
+}
+
+/* In IE7 a strange float bug occurs: the content overlaps the extra tabs area when not hovering. A transparent bottom border seems to fix it. */
+$ie7 .colorthemewizard-content {
+  border-bottom: 1px solid transparent;
+}
+/* Do not shift the page trigger, since there is no change in this element's padding on hover. */
+.inlinebody .colorthemewizard-content:hover #colorthemewizard-content-trigger, .editbody .colorthemewizard-content:hover #colorthemewizard-content-trigger {
+  margin: 0;
+}
+.colorthemewizard-xwikicontent {
+  padding: 10px;
+}
+/*
+ * Page title
+ */
+.colorthemewizard-title {
+  margin: 0;
+  padding: 0;
+  font-size: 2em;
+  font-weight: bold;
+}
+/* Move the elements under the title closer to the title. */
+.colorthemewizard-info,
+.colorthemewizard-details {
+  margin-top: -3px;
+  font-size: 0.9em;
+}
+.colorthemewizard-info {
+  float: left;
+}
+.colorthemewizard-details {
+  float: right;
+}
+/* The details element is aligned to the right. Its picker and tooltip will be expanded towards the left in order to fit inside the page. */
+#colorthemewizard-details-picker {
+  left: auto;
+  right: 20px;
+}
+#colorthemewizard-details-trigger .colorthemewizard-tip {
+  left: auto;
+  right: 20px;
+}
+.colorthemewizard-message {
+  margin: 0 0 1em;
+  padding: 8px 8px 8px 22px;
+  /* Rules set with !important so they won't be overwritten by the inline background rule */
+  background-image: url($xwiki.getSkinFile('icons/silk/information.png')) !important;
+  background-position: 2px center !important;
+  background-repeat: no-repeat !important;
+  border: 1px dotted;
+}
+/* This fixes the IE7 hover bug, when hover occurs only when hovering the text inside an element, not its background/padding/border. */
+$ie7 .colorthemewizard-message, *+html .colorthemewizard-message * {
+  zoom: 1;
+}
+.colorthemewizard-boxes,
+.colorthemewizard-highlighted,
+.colorthemewizard-textlink {
+  margin: 1em 0;
+}
+.colorthemewizard-link{
+  text-decoration: underline;
+}
+.colorthemewizard-table {
+  margin: 0 !important;
+}
+.colorthemewizard-button,
+.colorthemewizard-secondaryButton {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.9em;
+  border: none;
+  padding: 3px 8px;
+  margin: 0;
+}
+.colorthemewizard-buttonbox,
+.colorthemewizard-secondaryButtonbox {
+  float: left;
+  margin: 9px 6px;
+  display: inline;
+}
+/* IE7 has a cloned-margin bug on floated input elements. */
+$ie7 .colorthemewizard-buttonbox,
+$ie7 .colorthemewizard-secondaryButtonbox {
+##  float: none;
+}
+/*
+ * Extra tabs - comments/attachments/history/information
+ */
+.colorthemewizard-extratabs {
+  margin: 0 2px 9px;
+}
+.colorthemewizard-tabshead {
+  padding: 3px 10px 0;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.colorthemewizard-tabscontent {
+  padding: 10px;
+}
+.colorthemewizard-tabentry,
+.colorthemewizard-tabentryactive {
+  display: inline-block;
+  padding: 1px 5px 3px;
+  margin-bottom: -3px;
+}
+
+/*==========================================
+ *
+ *  Property pickers
+ *
+ *==========================================
+ */
+/*
+ * Color palette
+ */
+.colorthemewizard-palette table tbody {
+  border: 1px solid $widgetsColors.border;
+}
+.colorthemewizard-palette table tr {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.colorthemewizard-palette table td {
+  margin: 0;
+  padding: 1px;
+  border: none;
+}
+.colorthemewizard-palette a {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 1px solid $widgetsColors.background;
+}
+.colorthemewizard-palette a:hover {
+  border: 1px solid $widgetsColors.selectedBorder;
+}
+.colorthemewizard-palette a.current {
+  border: 1px solid $widgetsColors.activeBorder;
+}
+/*  Palette Colors */
+#includeTopic('ColorThemes.WizardWebColors')
+##
+##
+#set($lastColorIndex = $webColors.size() - 1)
+#foreach($colorID in [0..$lastColorIndex])
+.colorthemewizard-palette a.color${colorID} {
+  background-color: $webColors.get($colorID);
+}
+#end
+input.procolor {
+  background-image: none;
+}</code>
+    </property>
+    <property>
+      <name>Color theme wizard display style</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity output="false"}}
+##=======================================================
+##
+## INITIALIZATION
+##
+## Mode
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+  #set ($sheetMode = 'edit')
+#else
+  #set ($sheetMode = 'view')
+#end
+## The color theme class and object
+#set($classname = 'ColorThemes.ColorThemeClass')
+#set($class = $xwiki.getDocument($classname).getxWikiClass())
+#set($obj = $doc.getObject($classname))
+#set($propPrefix = "${classname}_${obj.number}_")
+##
+## Color theme initialization:
+## force the use of the default colors whenever this theme has undefined properties
+#set($defaultColorTheme = 'ColorThemes.DefaultColorTheme')
+#set($themeObj = $xwiki.getDocument($defaultColorTheme).getObject($classname))
+#template("colorThemeInit.vm")
+##
+## Default color palette
+#includeTopic('ColorThemes.WizardWebColors')
+##
+## Define a mapping between:
+## - elements and the color theme properties that affect them: $elementStylingPropertyMap
+## - elements and the color theme properties configured from them: $elementPropertyMap
+## to be used in both CSS-only version and JavaScript-enhanced version
+#includeTopic('ColorThemes.WizardPropertyMapping')
+##
+## Wizard stylesheet; defines the layout.
+$xwiki.ssx.use('ColorThemes.ColorThemeSheet')##
+##
+##
+##
+## Hashmap: property number -&gt; property name
+## In the request string, the ids are used because they are much shorter,
+## thus allowing more parameters to fit in the restricted size of the query string.
+#set($propNumberNameMap = {})
+#foreach($prop in $class.properties)
+  #set($discard = $propNumberNameMap.put(${prop.number}, ${prop.name}))
+#end
+##
+## The property values given as query parameters
+#set($requestDefinedValues = {})
+#foreach($propID in $request.getParameterNames())
+  #set($propname = "$!{propNumberNameMap.get($mathtool.toInteger($propID))}")
+  #if($propname.indexOf('Color') &gt;= 0)
+    #set($colorID  = $mathtool.toInteger("$!{request.get($propID)}"))
+    #if($colorID &gt;= 0 &amp;&amp; $colorID &lt; $webColors.size())
+      #set($color    = "$!{webColors.get($colorID)}")
+      #if("$!{propname}" != '' &amp;&amp; "$!{color}" != '')
+        #set($discard = $requestDefinedValues.put($propname, $color))
+      #end
+    #end
+  #else
+    ## TODO Other property types
+  #end
+#end
+##
+##
+## Javascript enhancements of the wizard
+## - Color pickers
+$xwiki.jsfx.use('uicomponents/widgets/colorpicker/procolor.js', true)##
+## - Live preview
+##   Parameters:
+##      colorTheme     - when this theme has undefined properties, force the use of the default
+##                       colors by ignoring the current configured color theme of the wiki;
+##                       colorThemeInit.vm will see this parameter in the URL and use it
+##      themeDoc       - the current document, needed for generating image URL templates
+##      propertyPrefix - "classname_objectnumber_" - needed to identify inputs
+$xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
+       'colorTheme'     : 'ColorThemes.DefaultColorTheme',
+       'themeDoc'       : $doc.fullName,
+       'propertyPrefix' : $propPrefix
+})##
+## ===============================================================
+##
+## MACROS
+##
+#**
+ * Prints a colors palette
+ *
+ * @param propname The property for which the palette is defined
+ *#
+#macro(printColorThemeWizardPalette $propname)
+  #set($rows = 5)
+  #set($columns = 7)
+  ## The Velocity foreach iterator includes the end of the range, so we define the last inclusive element
+  #set($lastRow = $rows - 1)
+  #set($lastColumn = $columns - 1)
+  #set($propID = "$!class.get(${propname}).number")
+  #set($propValue = "$!{requestDefinedValues.get($propname)}")
+  #if($propValue == '')
+    #if("$!{obj.getProperty($propname).value}" == '')
+      ##Old colorthemes (before 3.4) shared values for #mainmenu and #contentmenu
+      #if ($propname.equals('menuContentLinkColor'))
+        #set($propValue = $!{obj.getProperty('menuLinkColor').value})
+      #elseif ($propname.equals('menuContentBackgroundColor') || $propname.equals('submenuContentBackgroundColor'))
+        #set($propValue = $!{obj.getProperty('menuBackgroundColor').value})
+      #elseif (!$propname.endsWith('GradientColor'))
+        ## Old colorthemes (before 3.4) don t have values set for GradientColor variables - leave this inputs empty
+        #set($propValue = $theme.get($propname))
+      #end
+    #end
+  #end
+  #if($propValue != '')
+    $obj.set($propname, $propValue)
+  #end
+  &lt;div class="colorthemewizard-picker-section colorthemewizard-palette"&gt;
+    #printPropertyLabel($propname)
+    ## Not using $doc.display($propname) because it generates an annoying
+    ## &lt;pre&gt; around the input (among other problems)
+    ## Also, set the class 'procolor', to be recognized by the color picker
+    &lt;input type="text" size="9" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}" class="procolor"/&gt;
+    &lt;table class="colorthemewizard-picker-noscript" summary="35 Color Palette"&gt;
+      &lt;tbody&gt;
+        #foreach ($row in [0..$lastRow])
+          &lt;tr&gt;
+          #foreach ($cell in [0..$lastColumn])
+             #set($colorID = $mathtool.mul($row, $columns) + $cell)
+             #set($params = "$!{request.queryString}")
+             #set($params = $params.replaceAll("(^|&amp;)${propID}=[^&amp;]*", ""))
+             #set($params = $params.replaceAll("&amp;", "&amp;amp;"))
+             #set($params = "${params}&amp;amp;${propID}=${colorID}")
+             &lt;td&gt;&lt;a href="$doc.getURL('edit', $params)" class="color${colorID}#if("$!{obj.getProperty($propname).value}" == "$!{webColors.get($colorID)}") current#end"&gt;&lt;/a&gt;&lt;/td&gt;
+          #end
+         &lt;/tr&gt;
+        #end
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+#end
+##
+##
+##
+#**
+ * Prints a css dropdown displaying the names (and thumbnail previews?)
+ * of all the images attached to the current ColorTheme document
+ *
+ * @param propname The property for which the image picker is defined
+ *
+ * TODO write me!
+ *#
+#macro(printImageSelector $propname)
+   &lt;div class="colorthemewizard-picker-section"&gt;
+     #printPropertyLabel($propname)
+     &lt;input type="text" size="15" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}" class="colorthemewizard-backgroundImage"/&gt;
+##     &lt;div style="color: red;"&gt;TODO: display friendly selector&lt;/div&gt;
+   &lt;/div&gt;
+#end
+##
+##
+##
+
+#**
+ * Allows to choose possible positions and repeat patterns for the background images
+ *
+ * left    center   right
+ * +--+-----+--+-----+--+
+ * |  |     |  |     |  | top
+ * +--+     +--+     +--+
+ * |                    |
+ * +--+     +--+     +--+
+ * |  |     |  |     |  | center
+ * +--+     +--+     +--+
+ * |                    |
+ * +--+     +--+     +--+
+ * |  |     |  |     |  | bottom
+ * +--+-----+--+-----+--+
+ *
+ * @param propname The property for which the position selector is defined
+ *
+ * TODO write me!
+ *#
+#macro(printPositionSelector $propname)
+   &lt;div class="colorthemewizard-picker-section"&gt;
+     #printPropertyLabel($propname)
+     &lt;input type="text" size="15" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}"/&gt;
+##     &lt;div style="color: red;"&gt;TODO: display friendly selector&lt;/div&gt;
+   &lt;/div&gt;
+#end
+##
+##
+##
+#**
+ * Chooses the right picker for each type of property.
+ * Right now, the choice is based on keywords present in the property name:
+ * color, image, position
+ *
+ * @param $propname The property name
+ *#
+#macro(printPropertyPicker $propname)
+  #if($propname.contains('Color'))
+    #printColorThemeWizardPalette($propname)
+  #elseif($propname.contains('Image'))
+    #printImageSelector($propname)
+  #elseif($propname.contains('Position'))
+    #printPositionSelector($propname)
+  #end
+#end
+##
+##
+##
+#**
+ * Obtains the prettyName of the property and processes it in order to display any text
+ * appearing in '()' in smaller print
+ *
+ * @param propname The name of the color theme property
+ *#
+#macro(printPropertyPrettyname $propname)$doc.displayPrettyName($propname).replaceAll("\((.*)\)", "&lt;span class='more-details'&gt;($1)&lt;/span&gt;")#end
+#**
+ * Generates the label for the input correspinding to a given property
+ *
+ * @param propname The name of the color theme property
+ *#
+#macro(printPropertyLabel $propname)
+   &lt;label for="${propPrefix}${propname}"&gt;#printPropertyPrettyname($propname)&lt;/label&gt;
+#end
+##
+##
+#**
+ * Prints the container of ColorTheme properties for an element.
+ * These properties are retrieved from the previously defined map $elementPropertyMap.
+ *
+ * @param element The target element
+ *#
+#macro(printColorThemeWizard $element)
+  ## Only generate the palettes in edit mode
+  #if ($sheetMode == 'edit')
+    #set($propnames = '')
+    #set($propnames = $!elementPropertyMap.get($element))
+    #if("$!{propnames}" != '' &amp;&amp; $propnames.size() &gt; 0)
+    &lt;div id="colorthemewizard-${element}-trigger" class="colorthemewizard-trigger"&gt;
+      &lt;div class="colorthemewizard-tip"&gt;
+        $services.localization.render('xe.themes.colors.wizard.choose'):
+        &lt;ul&gt;
+          #foreach($propname in $propnames)
+            &lt;li&gt;#printPropertyPrettyname($propname)&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div id="colorthemewizard-${element}-picker" class="colorthemewizard-picker"&gt;
+        &lt;fieldset&gt;
+          ##&lt;legend&gt;$!{element}&lt;/legend&gt;
+          #foreach($propname in $propnames)
+            #printPropertyPicker($propname)
+          #end
+        &lt;/fieldset&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    #end
+  #end
+#end
+##
+##
+##
+#**
+ * Generates inline style for a given element in the maquette.
+ * Search for values in the following order:
+ * - request parameters
+ * - color theme properties from the current document
+ * - default color theme
+ * The properties that affect it and their corresponding css rules are retrieved from
+ * the previously defined $elementStylingPropertyMap.
+ *
+ * @param $element The element for which we generate the inline style.
+ *###
+#macro(inlineStyle $element)
+  #set($style = '')
+  #foreach($cssProp in $elementStylingPropertyMap.get($element).keySet())
+    #set($cssValue = '')
+    #set($themeProps = $elementStylingPropertyMap.get($element).get($cssProp))
+    #foreach ($themeProp in $themeProps)
+      #set($themeValue = "$!{requestDefinedValues.get($themeProp)}")
+      #if($themeValue == '')
+        #set($themeValue = "$!{obj.getProperty($themeProp).value}")
+        #if($themeValue == '')
+          ## Old colorthemes (before 3.4) shared values for #mainmenu and #contentmenu
+          #if ($themeProp.equals('menuContentLinkColor'))
+            #set($themeValue = "$!{obj.getProperty('menuLinkColor').value}")
+          #elseif ($themeProp.equals('menuContentBackgroundColor'))
+            #set($themeValue = "$!{obj.getProperty('menuBackgroundColor').value}")
+          #end
+        #end
+      #end
+      #if($themeValue == '' &amp;&amp; !$themeProp.endsWith('GradientColor'))
+        ## Old colorthemes (before 3.4) don t have values set for GradientColor variables - don t fallback on these values
+        #set($themeValue = "${theme.get($themeProp)}")
+      #end
+      #if($themeValue != '' &amp;&amp; $themeProp.indexOf('Image') &gt;= 0)
+        #set($themeValue = "url($doc.getAttachmentURL($themeValue))")
+      #end
+      #set($cssValue = "${cssValue} $!{themeValue}")
+    #end
+    #if($cssValue.trim() != '')
+      #if (!$cssProp.equals('background-image'))
+        #set($style = "$!{style} ${cssProp}:${cssValue};")
+      #else
+        ## 'background-image' css properties need to be specially constructed in order to add the gradient definition 
+        #set ($gradientValues = $cssValue.trim().split(' '))
+        #if ($gradientValues.size() &gt;= 2)
+          #if ($gradientValues[0] != '' &amp;&amp; $gradientValues[1] != '')
+            ## #css3_backgroundLinearGradient macro (defined in macros.vm) used for the majority of browsers (FF, Chrome, Opera, IE10) that support CSS3 properties
+            #set($style = "$!{style} #css3_backgroundLinearGradient({
+               'to': 'bottom',
+               'colors': [
+                {'color': $gradientValues[1], 'position': '0%'},
+                {'color': $gradientValues[0], 'position': '100%'}
+              ]
+            })")
+            ## #css_filterGradient macro (defined in macros.vm) used for the IE 6-9 browsers that don't support CSS3 properties
+            #set($style = "$!{style} #css_filterGradient(${gradientValues[1]}, ${gradientValues[0]})")
+          #end
+        #end
+      #end
+    #end
+  #end
+  #if ("$!{style}" != '')
+    #set($style = "style='${style}'")
+  #end
+  $style ##
+#end
+##
+##
+##
+#**
+ * Generates the classes corresponding to each theme property that 'affects' an element.
+ * These properties are retrieved from the previously defined map $elementStylingPropertyMap.
+ * The classname is constructed as "colorthemewizard-${propertyName}".
+ * Also sets the implicit class "colorthemewizard-${element}".
+ * In addition, if the element should display editable pickers for one or more theme properties,
+ * as defined in $elementPropertyMap, it will also have the class "colorthemewizard-editable-group".
+ *
+ * @param $element The element for which we generate the class names.
+ *#
+#macro(themePropertyClasses $element)
+  #set($classes = "colorthemewizard-${element}")
+  #set($attachedProps = '')
+  #set($attachedProps = $elementPropertyMap.get($element))
+  #if("$!{attachedProps}" != '' &amp;&amp; $attachedProps.size() &gt; 0)
+    #set($classes = "${classes} colorthemewizard-editable-group")
+  #end
+  #foreach($themeProps in $elementStylingPropertyMap.get($element))
+    #foreach ($property in $themeProps)
+      #set($classes = "$!{classes} colorthemewizard-${property}")
+    #end
+  #end
+  class="$!{classes}" ##
+#end
+##
+##
+##
+#**
+ * Generates the class and inline style for an element.
+ * @see #themePropertyClasses
+ * @see #inlineStyle
+ *
+ * @param $element The element for which we generate the metadata.
+ *#
+#macro(elementMetaData $element)
+  #themePropertyClasses($element) #inlineStyle($element)##
+#end
+##
+##
+##
+##
+{{/velocity}}
+
+{{velocity}}
+## ===============================================================
+##
+## PAGE MAQUETTE
+##
+{{html clean="false" wiki="false"}}
+##
+##
+#if($sheetMode == 'edit')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
+&lt;div #elementMetaData('page')&gt;
+  #printColorThemeWizard('page')
+  ## Main menu
+  &lt;div #elementMetaData('mainmenu')&gt;
+   &lt;div&gt;
+    $services.localization.render('xe.themes.colors.wizard.mainMenu')
+    &lt;span #elementMetaData('menuaddentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#$services.localization.render('core.menu.create')&lt;/span&gt;
+    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
+    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
+   &lt;/div&gt;
+   #printColorThemeWizard('mainmenu')
+  &lt;/div&gt;
+  ## Page header
+  &lt;div #elementMetaData('headerbox')&gt;
+    &lt;div #elementMetaData('header')&gt;
+      ## Page Header
+      #set($themeLogoImage = $doc.getAttachment("$!{obj.getProperty('logoImage').value}"))
+      #if ("$!{themeLogoImage}" != '')
+        #set($themeLogoImage = $doc.getAttachmentURL($!{obj.getProperty('logoImage').value}))
+      #else
+        ## If the logo is not configured, use the one in the skin or the one set by default
+        ## For this $logoname is already set in global.vm
+        #set($themeLogoImage = "$xwiki.getSkinFile($logoname)")
+      #end
+      &lt;img id="colorthemewizard-logo" src="$themeLogoImage" alt="$services.localization.render('xe.themes.colors.wizard.logo')"/&gt;
+    &lt;/div&gt;
+    #printColorThemeWizard('headerbox')
+  &lt;/div&gt;
+  ## Panels
+  &lt;div #elementMetaData('panels')&gt;
+    ## Expanded panel
+    &lt;div #elementMetaData('panel')&gt;
+      ## Expanded panel header
+      &lt;div #elementMetaData('panelheader')&gt;
+        &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel')&lt;/div&gt;
+        #printColorThemeWizard('panelheader')
+      &lt;/div&gt;
+      ## Expanded panel contents
+      &lt;div #elementMetaData('panelcontents')&gt;
+        &lt;div&gt;&lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.panel.text')&lt;/span&gt; | &lt;span  #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.panel.link')&lt;/span&gt;&lt;/div&gt;
+        #printColorThemeWizard('panelcontents')
+      &lt;/div&gt;
+    &lt;/div&gt;
+    ## Collapsed panel
+    &lt;div #elementMetaData('collapsedpanel')&gt;
+      &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel.collapsed')&lt;/div&gt;
+      #printColorThemeWizard('collapsedpanel')
+    &lt;/div&gt;
+  &lt;/div&gt; ##panels
+  &lt;div #elementMetaData('maincolumn')&gt;
+    ## XWiki Content
+    &lt;div #elementMetaData('content')&gt;
+      &lt;div #elementMetaData('contentmenu')&gt;
+       $services.localization.render('xe.themes.colors.wizard.menu')
+       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
+       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
+       #printColorThemeWizard('contentmenu')
+      &lt;/div&gt;
+      &lt;div #elementMetaData('xwikicontent')&gt;
+        &lt;div #elementMetaData('titlebox')&gt;
+          &lt;h2 #elementMetaData('title')&gt;$services.localization.render('xe.themes.colors.wizard.title')&lt;/h2&gt;
+          #printColorThemeWizard('titlebox')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('info')&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.informativeText')&lt;/div&gt;
+          #printColorThemeWizard('info')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('details')&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.detailsText')&lt;/div&gt;
+          #printColorThemeWizard('details')
+        &lt;/div&gt;
+        &lt;div class="clearfloats" &gt;&lt;/div&gt;
+        &lt;div #elementMetaData('textlink')&gt;
+          &lt;div&gt;
+            &lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.text')&lt;/span&gt; |
+            &lt;span #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.link')&lt;/span&gt;
+          &lt;/div&gt;
+          #printColorThemeWizard('textlink')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('highlight')&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.highlightedText')&lt;/div&gt;
+          #printColorThemeWizard('highlight')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('boxes')&gt;
+          &lt;div #elementMetaData('message')&gt;$services.localization.render('xe.themes.colors.wizard.messageBox')&lt;/div&gt;
+          &lt;table #elementMetaData('table')&gt;
+            &lt;thead&gt;&lt;tr&gt;&lt;th colspan="2" scope="col" #elementMetaData('th')&gt;$services.localization.render('xe.themes.colors.wizard.table')&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+            &lt;tbody&gt;&lt;tr&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#1&lt;/td&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#2&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+          &lt;/table&gt;
+          #printColorThemeWizard('boxes')
+        &lt;/div&gt;
+        &lt;div class="clearfloats" &gt;&lt;/div&gt;
+        &lt;div #elementMetaData('buttonbox')&gt;
+          &lt;div&gt;&lt;input #elementMetaData('button') type="button" value="$services.localization.render('xe.themes.colors.wizard.button')" /&gt;&lt;/div&gt;
+          #printColorThemeWizard('buttonbox')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('secondaryButtonbox')&gt;
+          &lt;div&gt;&lt;input #elementMetaData('secondaryButton') type="button" value="$services.localization.render('xe.themes.colors.wizard.secondaryButton')" /&gt;&lt;/div&gt;
+          #printColorThemeWizard('secondaryButtonbox')
+        &lt;/div&gt;
+        &lt;div class="clearfloats" &gt;&lt;/div&gt;
+      &lt;/div&gt; ## xwikicontent
+      #printColorThemeWizard('content')
+    &lt;/div&gt; ## content
+    ## Extra tabs - comments/attachments/history/information
+    &lt;div  #elementMetaData('extratabs')&gt;
+      &lt;div  #elementMetaData('tabshead')&gt;
+        &lt;span #elementMetaData('tabentryactive')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#1&lt;/span&gt;&lt;/span&gt;
+        &lt;span #elementMetaData('tabentry')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#2&lt;/span&gt;&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div #elementMetaData('tabscontent')&gt;$services.localization.render('xe.themes.colors.wizard.tab.text')&lt;/div&gt;
+      #printColorThemeWizard('extratabs')
+    &lt;/div&gt;
+  &lt;/div&gt; ## main column
+  &lt;div class="clearfloats" &gt;&lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

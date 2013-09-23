@@ -16,88 +16,146 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.classes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ecs.xhtml.input;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
+/**
+ * Defines an XClass property type whose value is a Date.
+ * 
+ * @version $Id$
+ */
 public class DateClass extends PropertyClass
 {
-    private static final Log LOG = LogFactory.getLog(DateClass.class);
+    /** Logging helper object. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DateClass.class);
 
-    public DateClass(PropertyMetaClass wclass)
+    /**
+     * The meta property that specifies if a date picker should be used in edit mode to choose the date.
+     */
+    private static final String META_PROPERTY_PICKER = "picker";
+
+    /**
+     * The meta property that controls the size of the date input in edit mode.
+     */
+    private static final String META_PROPERTY_SIZE = "size";
+
+    /**
+     * The meta property that controls is an empty date value represents the current date.
+     */
+    private static final String META_PROPERTY_EMPTY_IS_TODAY = "emptyIsToday";
+
+    /**
+     * The meta property that specifies the date format.
+     */
+    private static final String META_PROPERTY_DATE_FORMAT = "dateFormat";
+
+    /**
+     * Creates a new Date property that is described by the given meta class.
+     * 
+     * @param metaClass the meta class that defines the list of meta properties associated with this property type
+     */
+    public DateClass(PropertyMetaClass metaClass)
     {
-        super("date", "Date", wclass);
+        super("date", "Date", metaClass);
+
         setSize(20);
         setDateFormat("dd/MM/yyyy HH:mm:ss");
         setEmptyIsToday(1);
         setPicker(1);
     }
 
+    /**
+     * Default constructor.
+     */
     public DateClass()
     {
         this(null);
     }
 
+    /**
+     * @return {@code 1} if a date picker should be used to choose the date, {@code 0} otherwise
+     */
     public int getPicker()
     {
-        return getIntValue("picker");
+        return getIntValue(META_PROPERTY_PICKER);
     }
 
+    /**
+     * Sets whether to use a date picker or not to select the date in edit mode.
+     * 
+     * @param picker {@code 1} to use a date picker, {@code 0} otherwise
+     */
     public void setPicker(int picker)
     {
-        setIntValue("picker", picker);
+        setIntValue(META_PROPERTY_PICKER, picker);
     }
 
+    /**
+     * @return the size of the date input in edit mode
+     */
     public int getSize()
     {
-        return getIntValue("size");
+        return getIntValue(META_PROPERTY_SIZE);
     }
 
+    /**
+     * Sets the size of the date input in edit mode.
+     * 
+     * @param size the size of the date input in edit mode
+     */
     public void setSize(int size)
     {
-        setIntValue("size", size);
+        setIntValue(META_PROPERTY_SIZE, size);
     }
 
+    /**
+     * @return {@code 1} if an empty date value represents the current date, {@code 0} otherwise
+     */
     public int getEmptyIsToday()
     {
-        return getIntValue("emptyIsToday");
+        return getIntValue(META_PROPERTY_EMPTY_IS_TODAY);
     }
 
+    /**
+     * Sets whether an empty date value represents the current date or not.
+     * 
+     * @param emptyIsToday {@code 1} if an empty date value should represent the current date, {@code 0} otherwise
+     */
     public void setEmptyIsToday(int emptyIsToday)
     {
-        setIntValue("emptyIsToday", emptyIsToday);
+        setIntValue(META_PROPERTY_EMPTY_IS_TODAY, emptyIsToday);
     }
 
+    /**
+     * @return the date format
+     */
     public String getDateFormat()
     {
-        return getStringValue("dateFormat");
+        return getStringValue(META_PROPERTY_DATE_FORMAT);
     }
 
-    public void setDateFormat(String dformat)
+    /**
+     * Sets the date format.
+     * 
+     * @param format the new date format
+     */
+    public void setDateFormat(String format)
     {
-        setStringValue("dateFormat", dformat);
+        setStringValue(META_PROPERTY_DATE_FORMAT, format);
     }
 
     @Override
@@ -105,7 +163,7 @@ public class DateClass extends PropertyClass
     {
         BaseProperty property = newProperty();
 
-        if ((value == null) || (value.equals(""))) {
+        if (StringUtils.isEmpty(value)) {
             if (getEmptyIsToday() == 1) {
                 property.setValue(new Date());
             }
@@ -115,10 +173,10 @@ public class DateClass extends PropertyClass
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
             property.setValue(sdf.parse(value));
+            return property;
         } catch (ParseException e) {
             return null;
         }
-        return property;
     }
 
     @Override
@@ -129,127 +187,50 @@ public class DateClass extends PropertyClass
         return property;
     }
 
+    /**
+     * @param property a date property
+     * @return the value of the given date property serialized using the {@link #getDateFormat()} format
+     */
     public String toFormString(BaseProperty property)
     {
-        if (property.getValue() == null) {
-            return "";
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
-        return sdf.format(property.getValue());
+        return property.getValue() == null ? "" : new SimpleDateFormat(getDateFormat()).format(property.getValue());
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * We have to overwrite this method because the value of a date property is not serialized using the date format
+     * specified in the XClass nor the time stamp but a custom hard-coded date format.. Changing this now will break
+     * existing XARs..
+     */
     @Override
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element element)
     {
-        String value = ppcel.getText();
+        String value = element.getText();
         BaseProperty property = newProperty();
 
         if (StringUtils.isEmpty(value)) {
             return property;
         }
 
+        // FIXME: The value of a date property should be serialized using the date timestamp or the date format
+        // specified in the XClass the date property belongs to.
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
         try {
             property.setValue(sdf.parse(value));
         } catch (ParseException e) {
-            SimpleDateFormat sdf2 = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
+            // I suppose this is a date format used a long time ago. DateProperty is using the above date format now.
+            SimpleDateFormat sdfOld = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
+            LOGGER.warn("Failed to parse date [{}] using format [{}]. Trying again with format [{}].", value,
+                sdf.toString(), sdfOld.toString());
             try {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Failed to parse date [" + value + "] using format ["
-                        + sdf.toString() + "]. Trying again with format ["
-                        + sdf2.toString() + "]");
-                }
-                property.setValue(sdf2.parse(value));
-            } catch (ParseException e2) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Failed to parse date [" + value + "] using format ["
-                        + sdf2.toString() + "]. Defaulting to the current date.");
-                }
+                property.setValue(sdfOld.parse(value));
+            } catch (ParseException exception) {
+                LOGGER.warn("Failed to parse date [{}] using format [{}]. Defaulting to the current date.", value,
+                    sdfOld.toString());
                 property.setValue(new Date());
             }
         }
         return property;
-    }
-
-    @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
-    {
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        buffer.append(toFormString(prop));
-    }
-
-    @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
-    {
-        input input = new input();
-
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop != null) {
-            input.setValue(toFormString(prop));
-        }
-
-        input.setType("text");
-        input.setName(prefix + name);
-        input.setID(prefix + name);
-        input.setSize(getSize());
-        input.setDisabled(isDisabled());
-        buffer.append(input.toString());
-    }
-
-    @Override
-    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
-    {
-        input input1 = new input();
-        input1.setType("text");
-        input1.setName(prefix + name + "_morethan");
-        input1.setID(prefix + name);
-        input1.setSize(getSize());
-        String fieldFullName = getFieldFullName();
-
-        Date value = (Date) criteria.getParameter(fieldFullName + "_morethan");
-        if (value != null) {
-            DateProperty dprop = new DateProperty();
-            dprop.setValue(value);
-            input1.setValue(toFormString(dprop));
-        }
-
-        input input2 = new input();
-
-        input2.setType("text");
-        input2.setName(prefix + name + "_lessthan");
-        input2.setID(prefix + name);
-        input2.setSize(getSize());
-        value = (Date) criteria.getParameter(fieldFullName + "_lessthan");
-        if (value != null) {
-            DateProperty dprop = new DateProperty();
-            dprop.setValue(value);
-            input2.setValue(toFormString(dprop));
-        }
-
-        XWikiMessageTool msg = context.getMessageTool();
-        buffer.append((msg == null) ? "from" : msg.get("from"));
-        buffer.append(input1.toString());
-        buffer.append((msg == null) ? "from" : msg.get("to"));
-        buffer.append(input2.toString());
-    }
-
-    @Override
-    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
-    {
-        String[] data = map.get("");
-        if ((data != null) && (data.length == 1)) {
-            query.setParam(getObject().getName() + "_" + getName(), fromString(data[0]).getValue());
-        } else {
-            data = map.get("lessthan");
-            if ((data != null) && (data.length == 1)) {
-                query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(data[0]).getValue());
-            }
-            data = map.get("morethan");
-            if ((data != null) && (data.length == 1)) {
-                query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(data[0]).getValue());
-            }
-
-        }
     }
 }

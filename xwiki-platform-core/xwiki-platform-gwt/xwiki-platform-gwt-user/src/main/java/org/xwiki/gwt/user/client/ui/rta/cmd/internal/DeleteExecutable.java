@@ -46,11 +46,7 @@ public class DeleteExecutable extends DefaultExecutable
         super(rta, Command.DELETE.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         return impl.deleteSelection(rta.getDocument().getSelection()) || super.execute(parameter);

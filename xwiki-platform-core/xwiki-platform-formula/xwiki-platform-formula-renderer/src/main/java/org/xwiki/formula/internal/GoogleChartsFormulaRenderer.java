@@ -55,9 +55,7 @@ public final class GoogleChartsFormulaRenderer extends AbstractFormulaRenderer i
     /** Handles requests to the mathematical formula transformation service. */
     private final HttpClient client = new HttpClient();
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         this.client.getHttpConnectionManager().getParams().setConnectionTimeout(10000);

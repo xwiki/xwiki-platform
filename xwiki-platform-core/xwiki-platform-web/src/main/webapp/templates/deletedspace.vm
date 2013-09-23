@@ -1,0 +1,27 @@
+###
+### Space deleted message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#if($message)
+<div id="xwikimessage">$message</div>
+#end
+#if($xwiki.hasRecycleBin())
+  #set ($confirmationMessage = $services.localization.render('core.space.recyclebin.done', ["<em>${escapetool.xml($doc.space)}</em>"]))
+  #set ($recyclebinViewer = $xwiki.getDocument('Main.AllDocs'))
+  #if (!$recyclebinViewer.isNew())
+    #set ($recyclebinViewer = $recyclebinViewer.getURL('view', "view=deletedDocs#|t=documentsTrash&s=ddoc.fullName&d=asc&ddoc.fullName=${escapetool.url($doc.space)}."))
+    #set ($recyclebinLink = "<a href='$recyclebinViewer' title='$services.localization.render('core.space.recyclebin.show')'>$services.localization.render('core.space.recyclebin.show')</a>")
+    #set ($confirmationMessage = "$confirmationMessage $recyclebinLink")
+  #end
+#else
+  #set($confirmationMessage = $services.localization.render('core.space.delete.done', ["<em>${escapetool.xml($doc.space)}</em>"]))
+#end
+#xwikimessageboxstart($services.localization.render('delete') $!{confirmationMessage})
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

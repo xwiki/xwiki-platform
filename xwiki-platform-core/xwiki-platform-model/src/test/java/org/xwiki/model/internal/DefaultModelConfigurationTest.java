@@ -20,18 +20,16 @@
 package org.xwiki.model.internal;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
+import org.xwiki.test.jmock.JMockRule;
 
 /**
  * Unit tests for {@link DefaultModelConfiguration}.
@@ -39,10 +37,10 @@ import org.xwiki.model.ModelConfiguration;
  * @version $Id$
  * @since 2.2M1
  */
-@RunWith(JMock.class)
 public class DefaultModelConfigurationTest
 {
-    private Mockery mockery = new JUnit4Mockery();
+    @Rule
+    public final JMockRule mockery = new JMockRule();
 
     private ModelConfiguration configuration;
 
@@ -57,7 +55,7 @@ public class DefaultModelConfigurationTest
         final ComponentManager mockCM = this.mockery.mock(ComponentManager.class);
         ReflectionUtils.setFieldValue(this.configuration, "componentManager", mockCM);
         this.mockery.checking(new Expectations() {{
-            allowing(mockCM).lookup(ConfigurationSource.class, "xwikiproperties"); will(returnValue(mockSource));
+            allowing(mockCM).getInstance(ConfigurationSource.class, "xwikiproperties"); will(returnValue(mockSource));
         }});
     }
 

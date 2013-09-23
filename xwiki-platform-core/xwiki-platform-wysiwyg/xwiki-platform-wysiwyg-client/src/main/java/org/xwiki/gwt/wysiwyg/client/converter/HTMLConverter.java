@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.converter;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 @RemoteServiceRelativePath("HTMLConverter.gwtrpc")
 public interface HTMLConverter extends RemoteService
 {

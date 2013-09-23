@@ -19,6 +19,8 @@
  */
 package org.xwiki.cache.internal;
 
+import javax.inject.Singleton;
+
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -31,13 +33,10 @@ import org.xwiki.component.annotation.Component;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultCacheFactory implements CacheFactory
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
-     */
+    @Override
     public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
     {
         return new DefaultCache<T>();

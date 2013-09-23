@@ -30,21 +30,23 @@ package org.xwiki.store;
  */
 public class StartableTransactionRunnable<T> extends ProvidingTransactionRunnable<T, T>
 {
-    /** True after this runnable has been started and once true, this runnable may not be run again. */
+    /**
+     * True after this runnable has been started and once true, this runnable may not be run again.
+     */
     private boolean alreadyRun;
 
     /**
      * Start this TransactionRunnable and all that are chained to it.
      *
      * @throws TransactionException if something goes wrong while pre running, running, committing,
-     *                              rolling back or completeing this or any of the chained runnables.
+     * rolling back or completeing this or any of the chained runnables.
      * @throws IllegalStateException if the same runnable is started more than once.
      */
     public void start() throws TransactionException
     {
         if (this.alreadyRun) {
             throw new IllegalStateException("This TransactionRunnable has already been run and may not "
-                                            + "be run again.");
+                + "be run again.");
         }
         this.alreadyRun = true;
 

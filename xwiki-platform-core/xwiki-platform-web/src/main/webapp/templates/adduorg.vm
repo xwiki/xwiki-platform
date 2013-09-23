@@ -1,15 +1,22 @@
-$response.setContentType("application/x-json")
-#set($uorg = $request.get("uorg"))
-#set($fullname = $request.get("name"))
-
-#if($uorg == "user" || $uorg == "group")
-  ## verify if the user or group is already in the group
-  #set($exists = "$!doc.getObject('XWiki.XWikiGroups', 'member', $fullname)")
-  #if($exists == "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    1
-    #set($obj = $doc.newObject("XWiki.XWikiGroups"))
-    $obj.set("member", $fullname)
-    #set($discard = $doc.save())
-  #else 0
+#set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
+#if ($services.csrf.isTokenValid($request.form_token))
+  #set ($dirty = false)
+  #foreach ($name in $request.getParameterValues('name'))
+    ## Verify if the user or group is already in the target group.
+    #if ($name.trim() != '' && !$doc.getObject('XWiki.XWikiGroups', 'member', $name))
+      #set ($obj = $doc.newObject('XWiki.XWikiGroups'))
+      #set ($discard = $obj.set('member', $name))
+      #set ($dirty = true)
+    #end
   #end
+  #if ($dirty)
+    #set ($discard = $doc.save())
+  #end
+  #if (!$isAjaxRequest)
+    $response.sendRedirect($doc.getURL())
+  #end
+#elseif ($isAjaxRequest)
+  $response.sendError(401, 'CSRF token verification failed!')
+#else
+  $response.sendRedirect($services.csrf.getResubmissionURL())
 #end

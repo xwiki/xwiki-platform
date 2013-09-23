@@ -16,20 +16,41 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import com.xpn.xwiki.web.Utils;
+
 public class ObjectDiff
 {
-    private String className;
+    public static final String ACTION_PROPERTYADDED = "added";
+
+    public static final String ACTION_PROPERTYCHANGED = "changed";
+
+    public static final String ACTION_PROPERTYREMOVED = "removed";
+
+    public static final String ACTION_OBJECTADDED = "object-added";
+
+    public static final String ACTION_OBJECTREMOVED = "object-removed";
+
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.TYPE_STRING, "current");
+
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
+
+    private DocumentReference xClassReference;
 
     private int number;
 
     private String guid;
 
     private String propName;
-    
+
     private String propType;
 
     private Object prevValue;
@@ -44,7 +65,8 @@ public class ObjectDiff
         this(className, number, "", action, propName, "", prevValue, newValue);
     }
 
-    public ObjectDiff(String className, int number, String guid, String action, String propName, String propType, 
+    @Deprecated
+    public ObjectDiff(String className, int number, String guid, String action, String propName, String propType,
         Object prevValue, Object newValue)
     {
         this.setClassName(className);
@@ -57,14 +79,41 @@ public class ObjectDiff
         this.setNewValue(newValue);
     }
 
+    public ObjectDiff(DocumentReference xClassReference, int number, String guid, String action, String propName,
+        String propType, Object prevValue, Object newValue)
+    {
+        this.setXClassReference(xClassReference);
+        this.setNumber(number);
+        this.setGuid(guid);
+        this.setAction(action);
+        this.setPropName(propName);
+        this.setPropType(propType);
+        this.setPrevValue(prevValue);
+        this.setNewValue(newValue);
+    }
+
     public String getClassName()
     {
-        return this.className;
+        DocumentReference xClassReference = getXClassReference();
+
+        return xClassReference != null ? this.localEntityReferenceSerializer.serialize(getXClassReference()) : null;
     }
 
     public void setClassName(String className)
     {
-        this.className = className;
+        DocumentReference xClassReference =
+            className != null ? this.currentDocumentReferenceResolver.resolve(className) : null;
+        setXClassReference(xClassReference);
+    }
+
+    public DocumentReference getXClassReference()
+    {
+        return this.xClassReference;
+    }
+
+    public void setXClassReference(DocumentReference xClassReference)
+    {
+        this.xClassReference = xClassReference;
     }
 
     public int getNumber()
@@ -96,12 +145,12 @@ public class ObjectDiff
     {
         this.propName = propName;
     }
-    
+
     public String getPropType()
     {
         return this.propType;
     }
-    
+
     public void setPropType(String propType)
     {
         this.propType = propType;
@@ -140,14 +189,16 @@ public class ObjectDiff
     @Override
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
+
         buffer.append(getClassName());
         buffer.append(".");
         buffer.append(getPropName());
         buffer.append(": ");
         buffer.append(getPrevValue().toString());
-        buffer.append(" &gt; ");
+        buffer.append(" \u21E8 ");
         buffer.append(getNewValue().toString());
+
         return buffer.toString();
     }
 }

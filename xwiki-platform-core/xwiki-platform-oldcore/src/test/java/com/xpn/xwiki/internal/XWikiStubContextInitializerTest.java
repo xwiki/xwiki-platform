@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal;
 
+import org.jmock.Mock;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -37,29 +38,38 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
 {
     private ExecutionContextManager executionContextManager;
 
+    private Mock mockXWiki;
+
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        this.executionContextManager = getComponentManager().lookup(ExecutionContextManager.class);
+        this.executionContextManager = getComponentManager().getInstance(ExecutionContextManager.class);
     }
 
     public void testWithAndWithoutXWikiContext() throws Exception
     {
         XWikiContext xcontext = new XWikiContext();
         xcontext.put("key", "value");
-        xcontext.setWiki(new XWiki());
+
+        this.mockXWiki = mock(XWiki.class);
+        this.mockXWiki.stubs().method("prepareResources");
+
+        xcontext.setWiki((XWiki) this.mockXWiki.proxy());
 
         ExecutionContext context = new ExecutionContext();
-        context.setProperty("xwikicontext", xcontext);
+        xcontext.declareInExecutionContext(context);
 
-        getComponentManager().lookup(XWikiStubContextProvider.class).initialize(xcontext);
+        XWikiStubContextProvider stubContextProvider =
+            getComponentManager().getInstance(XWikiStubContextProvider.class);
+        stubContextProvider.initialize(xcontext);
 
         final ExecutionContext daemonContext = new ExecutionContext();
 
         Thread thread = new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 try {
@@ -70,7 +80,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
             }
         });
 
-        thread.run();
+        thread.start();
         thread.join();
 
         XWikiContext daemonXcontext = (XWikiContext) daemonContext.getProperty("xwikicontext");

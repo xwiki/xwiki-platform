@@ -16,18 +16,34 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import org.dom4j.Element;
 
-public interface PropertyInterface extends ElementInterface {
-    public int getId();
-    public void setId(int id);
-    public BaseCollection getObject();
-    public void setObject(BaseCollection object);
-    public String toFormString();
-    public Element toXML();
+public interface PropertyInterface extends ElementInterface
+{
+    /**
+     * Returns the identifier of this property for hibernate. The return type is long since 4.0M1
+     * 
+     * @return the identifier of this property
+     */
+    long getId();
+
+    /**
+     * Dummy function to satisfy hibernate requirements.
+     * 
+     * @param id the identifier. A long since 4.0M1
+     */
+    void setId(long id);
+
+    BaseCollection getObject();
+
+    void setObject(BaseCollection object);
+
+    String toFormString();
+
+    Element toXML();
+
+    PropertyInterface clone();
 }

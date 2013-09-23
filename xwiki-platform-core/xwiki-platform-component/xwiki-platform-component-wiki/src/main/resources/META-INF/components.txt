@@ -1,0 +1,8 @@
+org.xwiki.component.wiki.internal.bridge.DefaultContentParser
+org.xwiki.component.wiki.internal.bridge.DefaultWikiComponentBridge
+org.xwiki.component.wiki.internal.DefaultWikiComponentBuilder
+org.xwiki.component.wiki.internal.DefaultWikiComponentBuilderEventListener
+org.xwiki.component.wiki.internal.DefaultWikiComponentManager
+org.xwiki.component.wiki.internal.DefaultWikiComponentManagerContext
+org.xwiki.component.wiki.internal.DefaultWikiComponentManagerEventListener
+org.xwiki.component.wiki.internal.DefaultWikiComponentMethodExecutor

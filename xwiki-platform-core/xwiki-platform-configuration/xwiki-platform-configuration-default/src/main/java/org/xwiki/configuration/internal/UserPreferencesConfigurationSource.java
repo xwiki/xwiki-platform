@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Configuration source taking its data in the User Preferences wiki document (the user profile page) using data from a
@@ -37,20 +38,20 @@ import org.xwiki.model.reference.DocumentReference;
 @Singleton
 public class UserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
+    /**
+     * The local reference of the class containing user preferences.
+     */
+    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
+
     @Override
-    protected DocumentReference getClassReference()
+    protected LocalDocumentReference getClassReference()
     {
-        // TODO: Not enabled yet. See #getDocumentReference().
-        return null;
+        return CLASS_REFERENCE;
     }
 
     @Override
     protected DocumentReference getDocumentReference()
     {
-        // TODO: Not enabled yet. In order to enable it we need to make modifications so that
-        // DAB.getCurrentUser() returns a DocumentReference and not a String as otherwise it will create
-        // a stackoverflow (circular dependency): in order to create a DocumentReference we would need to
-        // use a factory which would need to use this configuration source.
-        return null;
+        return getDocumentAccessBridge().getCurrentUserReference();
     }
 }

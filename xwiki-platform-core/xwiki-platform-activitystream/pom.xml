@@ -27,66 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activitystream</artifactId>
-  <name>XWiki Platform - Activity Stream</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Activity Stream</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-remote</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-annotation-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-scheduler-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-query-manager</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <failsOnError>true</failsOnError>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <excludes>
-            <!-- Some methods in the APIs have more than 7 arguments, the 3 classes bellow can't pass our checkstyle -->
-            com/xpn/xwiki/plugin/activitystream/api/ActivityStream.java,
-            com/xpn/xwiki/plugin/activitystream/impl/ActivityStreamImpl.java,
-            com/xpn/xwiki/plugin/activitystream/plugin/ActivityStreamPluginApi.java
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <name>XWiki Platform - Activity Stream - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Parent POM for Activity Stream modules</description>
+  <modules>
+    <module>xwiki-platform-activitystream-api</module>
+    <module>xwiki-platform-activitystream-ui</module>
+  </modules>
 </project>

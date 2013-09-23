@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.XWikiContext;
@@ -34,11 +32,7 @@ import com.xpn.xwiki.XWikiException;
  */
 public class UnknownAction extends XWikiAction 
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public String render(XWikiContext context) throws XWikiException {
         String defaultAction = context.getWiki().Param("xwiki.unknownActionResponse", "exception");
         // Set the action in the context because code which uses $xcontext.getAction()

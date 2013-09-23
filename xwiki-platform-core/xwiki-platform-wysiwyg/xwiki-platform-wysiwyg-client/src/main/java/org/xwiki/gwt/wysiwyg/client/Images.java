@@ -147,9 +147,6 @@ public interface Images extends ClientBundle
     @Source("superscript.gif")
     ImageResource superscript();
 
-    @Source("sync.gif")
-    ImageResource sync();
-
     @Source("tt.gif")
     ImageResource teletype();
 

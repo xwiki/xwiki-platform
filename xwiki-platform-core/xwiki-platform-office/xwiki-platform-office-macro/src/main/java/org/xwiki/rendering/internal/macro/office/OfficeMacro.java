@@ -23,15 +23,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.office.OfficeMacroParameters;
@@ -43,26 +45,24 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.5M2
  */
-@Component("office")
+@Component
+@Named("office")
+@Singleton
 public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
 {
     /**
-     * The component used to resolve the attachment string reference relative to the current document reference.
-     */
-    @Requirement("explicit")
-    private EntityReferenceResolver<String> explicitStringEntityReferenceResolver;
-
-    /**
-     * The component used to get the current document reference.
-     */
-    @Requirement
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
      * The component used to view the office attachments.
      */
-    @Requirement
+    @Inject
     private OfficeViewer officeViewer;
+
+    /**
+     * Used to transform the passed attachment reference macro parameter into a typed {@link AttachmentReference}
+     * object.
+     */
+    @Inject
+    @Named("macro")
+    private AttachmentReferenceResolver<String> macroAttachmentReferenceResolver;
 
     /**
      * Default constructor.
@@ -75,34 +75,44 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(OfficeMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference currentDocumentReference = documentAccessBridge.getCurrentDocumentReference();
-        AttachmentReference attachmentReference =
-            new AttachmentReference(explicitStringEntityReferenceResolver.resolve(parameters.getAttachment(),
-                EntityType.ATTACHMENT, currentDocumentReference));
+        AttachmentReference attachmentReference = resolve(context.getCurrentMacroBlock(), parameters);
         Map<String, String> viewParameters =
             Collections.singletonMap("filterStyles", String.valueOf(parameters.isFilterStyles()));
         try {
-            return officeViewer.createView(attachmentReference, viewParameters).getChildren();
+            return this.officeViewer.createView(attachmentReference, viewParameters).getChildren();
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to view office attachment.", e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return false;
+    }
+
+    /**
+     * Transform the value of the 'attachment' macro parameter into a typed {@link AttachmentReference} object.
+     * 
+     * @param block an XDOM block that can provide meta data to be used to resolve the attachment reference
+     * @param parameters the macro parameters, including the 'attachment' parameter
+     * @return the typed {@link AttachmentReference} object that points to the office file to display
+     * @throws MacroExecutionException if the attachment parameter is not specified or empty
+     */
+    private AttachmentReference resolve(MacroBlock block, OfficeMacroParameters parameters)
+        throws MacroExecutionException
+    {
+        String reference = parameters.getAttachment();
+
+        if (StringUtils.isEmpty(reference)) {
+            throw new MacroExecutionException(
+                "You must specify the 'attachment' parameter pointing to the office file to display.");
+        }
+
+        return this.macroAttachmentReferenceResolver.resolve(reference, block);
     }
 }

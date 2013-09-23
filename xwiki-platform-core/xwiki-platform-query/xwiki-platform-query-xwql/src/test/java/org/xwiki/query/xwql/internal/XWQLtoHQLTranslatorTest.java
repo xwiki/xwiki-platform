@@ -21,23 +21,21 @@ package org.xwiki.query.xwql.internal;
 
 import static org.junit.Assert.fail;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.xwql.internal.hql.XWQLtoHQLTranslator;
+import org.xwiki.test.jmock.JMockRule;
 
-@RunWith(JMock.class)
 public class XWQLtoHQLTranslatorTest
 {
-    private Mockery context = new JUnit4Mockery();
+    @Rule
+    public final JMockRule mockery = new JMockRule();
 
-    private DocumentAccessBridge dab = context.mock(DocumentAccessBridge.class);
+    private DocumentAccessBridge dab = this.mockery.mock(DocumentAccessBridge.class);
 
     private XWQLtoHQLTranslator translator = new XWQLtoHQLTranslator()
     {
@@ -51,7 +49,7 @@ public class XWQLtoHQLTranslatorTest
     @Before
     public void setUp() throws Exception
     {
-        context.checking(new Expectations()
+        this.mockery.checking(new Expectations()
         {{
                 allowing(dab).getPropertyType(with(any(String.class)), with(equal("number")));
                 will(returnValue(null));
@@ -137,6 +135,19 @@ public class XWQLtoHQLTranslatorTest
     }
 
     @Test
+    public void testObjDeclInWhereWithTwoInstances() throws Exception
+    {
+        assertTranslate(
+            "where doc.object(XWiki.XWikiUsers).email = 'some' and doc.object(XWiki.XWikiUsers).first_name = 'Name'",
+            "select doc.fullName from XWikiDocument as doc , BaseObject as _o1, " +
+            "StringProperty as _o1_email2, StringProperty as _o1_first_name3 " +
+            "where ( _o1_email2.value = 'some' and _o1_first_name3.value = 'Name' ) " +
+            "and doc.fullName=_o1.name and _o1.className='XWiki.XWikiUsers' " +
+            "and _o1_email2.id.id=_o1.id and _o1_email2.id.name='email' " +
+            "and _o1_first_name3.id.id=_o1.id and _o1_first_name3.id.name='first_name'");
+    }
+
+    @Test
     public void testOrderBy() throws Exception
     {
         assertTranslate("order by doc.fullName",
@@ -144,6 +155,29 @@ public class XWQLtoHQLTranslatorTest
         assertTranslate("from doc.object('XWiki.XWikiUsers') as user order by user.firstname",
             "select doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_firstname1 " +
                 "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_firstname1.id.id=user.id and user_firstname1.id.name='firstname' order by user_firstname1.value");
+        assertTranslate("order by lower(doc.fullName)",
+                "select doc.fullName from XWikiDocument as doc order by lower ( doc.fullName )");
+        assertTranslate("order by upper(doc.fullName)",
+                "select doc.fullName from XWikiDocument as doc order by upper ( doc.fullName )");
+        assertTranslate("order by trim(doc.fullName)",
+                "select doc.fullName from XWikiDocument as doc order by trim ( doc.fullName )");
+        assertTranslate("order by abs(doc.elements)",
+                "select doc.fullName from XWikiDocument as doc order by abs ( doc.elements )");
+    }
+
+    @Test
+    public void testGroupBy() throws Exception
+    {
+        assertTranslate("where 1=1 group by doc.space",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by doc.space");
+        assertTranslate("where 1=1 group by upper(doc.space)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by upper ( doc.space )");
+        assertTranslate("where 1=1 group by lower(doc.space)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by lower ( doc.space )");
+        assertTranslate("where 1=1 group by trim(doc.space)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by trim ( doc.space )");
+        assertTranslate("where 1=1 group by abs(doc.elements)",
+                "select doc.fullName from XWikiDocument as doc where 1 = 1 group by abs ( doc.elements )");
     }
 
     @Test

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.classes;
 
@@ -33,62 +32,65 @@ public class ListItem
 {
     /** Comparator that orders two strings in their natural order, keeping nulls at the end. */
     @SuppressWarnings("unchecked")
-    private static final Comparator<String> BASE_COMPARATOR =
-        ComparatorUtils.nullHighComparator(new Comparator<String>()
+    private static final Comparator<String> BASE_COMPARATOR = ComparatorUtils
+        .nullHighComparator(new Comparator<String>()
+        {
+            /**
+             * Case insensitive comparison of two Strings.
+             * 
+             * @param o1 the first item to be compared.
+             * @param o2 the second item to be compared.
+             * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
+             *         greater than the second.
+             */
+            @Override
+            public int compare(String o1, String o2)
             {
-        /**
-         * Case insensitive comparison of two Strings.
-         * 
-         * @param o1 the first item to be compared.
-         * @param o2 the second item to be compared.
-         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
-         *         greater than the second.
-         */
-        public int compare(String o1, String o2)
-                {
-            return o1.compareToIgnoreCase(o2);
-        }
-    });
+                return o1.compareToIgnoreCase(o2);
+            }
+        });
 
     /** Comparator that orders list items on their identifiers, keeping null items at the end. */
     @SuppressWarnings("unchecked")
-    protected static final Comparator<ListItem> ID_COMPARATOR =
-        ComparatorUtils.nullHighComparator(new Comparator<ListItem>()
+    protected static final Comparator<ListItem> ID_COMPARATOR = ComparatorUtils
+        .nullHighComparator(new Comparator<ListItem>()
+        {
+            /**
+             * Sorts the items on their ID: the option with the lower ID (case insensitive String comparison) will be
+             * placed before the other one.
+             * 
+             * @param o1 the first item to be compared.
+             * @param o2 the second item to be compared.
+             * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
+             *         greater than the second.
+             */
+            @Override
+            public int compare(ListItem o1, ListItem o2)
             {
-        /**
-         * Sorts the items on their ID: the option with the lower ID (case insensitive String comparison) will be placed
-         * before the other one.
-         * 
-         * @param o1 the first item to be compared.
-         * @param o2 the second item to be compared.
-         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
-         *         greater than the second.
-         */
-        public int compare(ListItem o1, ListItem o2)
-                {
-            return BASE_COMPARATOR.compare(o1.getId(), o2.getId());
-        }
-    });
+                return BASE_COMPARATOR.compare(o1.getId(), o2.getId());
+            }
+        });
 
     /** Comparator that orders list items on their values, keeping null items at the end. */
     @SuppressWarnings("unchecked")
-    protected static final Comparator<ListItem> VALUE_COMPARATOR =
-        ComparatorUtils.nullHighComparator(new Comparator<ListItem>()
+    protected static final Comparator<ListItem> VALUE_COMPARATOR = ComparatorUtils
+        .nullHighComparator(new Comparator<ListItem>()
+        {
+            /**
+             * Sorts the items on their value: the option with the lower value (case insensitive String comparison) will
+             * be placed before the other one.
+             * 
+             * @param o1 the first item to be compared.
+             * @param o2 the second item to be compared.
+             * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
+             *         greater than the second.
+             */
+            @Override
+            public int compare(ListItem o1, ListItem o2)
             {
-        /**
-         * Sorts the items on their value: the option with the lower value (case insensitive String comparison) will be
-         * placed before the other one.
-         * 
-         * @param o1 the first item to be compared.
-         * @param o2 the second item to be compared.
-         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
-         *         greater than the second.
-         */
-        public int compare(ListItem o1, ListItem o2)
-                {
-            return BASE_COMPARATOR.compare(o1.getValue(), o2.getValue());
-        }
-    });
+                return BASE_COMPARATOR.compare(o1.getValue(), o2.getValue());
+            }
+        });
 
     /** A unique identifier of this item, the actual value stored in the database when selecting items from a list. */
     private String id = "";
@@ -169,11 +171,6 @@ public class ListItem
         this.parent = parent;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#toString()
-     */
     @Override
     public String toString()
     {

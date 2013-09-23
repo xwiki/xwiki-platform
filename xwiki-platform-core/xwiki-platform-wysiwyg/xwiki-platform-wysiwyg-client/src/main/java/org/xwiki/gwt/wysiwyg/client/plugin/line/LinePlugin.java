@@ -30,6 +30,7 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.KeyboardAdaptor;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
@@ -40,20 +41,14 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.regexp.shared.RegExp;
 
 /**
  * Overwrites the behavior of creating new lines of text and merging existing ones.
  * 
  * @version $Id$
  */
-public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpHandler, KeyPressHandler,
-    CommandListener
+public class LinePlugin extends AbstractPlugin implements CommandListener
 {
     /**
      * The command that stores the value of the rich text area in an HTML form field.
@@ -103,100 +98,46 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
     public static final String TH = "th";
 
     /**
+     * A regular expression that matches a string full of whitespace.
+     */
+    private static final RegExp WHITESPACE = RegExp.compile("^\\s+$");
+
+    /**
      * Collection of DOM utility methods.
      */
     protected final DOMUtils domUtils = DOMUtils.getInstance();
 
     /**
-     * Flag used to avoid handling both KeyDown and KeyPress events. This flag is needed because of the inconsistencies
-     * between browsers regarding keyboard events. For instance IE doesn't generate the KeyPress event for backspace key
-     * and generates multiple KeyDown events while a key is hold down. On the contrary, FF generates the KeyPress event
-     * for the backspace key and generates just one KeyDown event while a key is hold down. FF generates multiple
-     * KeyPress events when a key is hold down.
+     * The object used to handle keyboard events.
      */
-    private boolean ignoreNextKeyPress;
+    private final KeyboardAdaptor keyboardAdaptor = new KeyboardAdaptor()
+    {
+        protected void handleRepeatableKey(Event event)
+        {
+            LinePlugin.this.handleRepeatableKey(event);
+        }
+    };
 
-    /**
-     * Flag used to prevent the default browser behavior for the KeyPress event when the KeyDown event has been
-     * canceled. This is needed only in functional tests where keyboard events (KeyDown, KeyPress, KeyUp) are triggered
-     * independently and thus canceling KeyDown doesn't prevent the default KeyPress behavior. Without this flag, and
-     * because we have to handle the KeyDown event besides the KeyPress in order to overcome cross-browser
-     * inconsistencies, simulating keyboard typing in functional tests would trigger our custom behavior but also the
-     * default browser behavior.
-     */
-    private boolean cancelNextKeyPress;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
 
-        saveRegistration(getTextArea().addKeyDownHandler(this));
-        saveRegistration(getTextArea().addKeyUpHandler(this));
-        saveRegistration(getTextArea().addKeyPressHandler(this));
+        saveRegistration(getTextArea().addKeyDownHandler(keyboardAdaptor));
+        saveRegistration(getTextArea().addKeyUpHandler(keyboardAdaptor));
+        saveRegistration(getTextArea().addKeyPressHandler(keyboardAdaptor));
         getTextArea().getCommandManager().addCommandListener(this);
 
         // Adjust the initial content of the rich text area.
         onReset();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         getTextArea().getCommandManager().removeCommandListener(this);
 
         super.destroy();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
-    public void onKeyDown(KeyDownEvent event)
-    {
-        if (event.getSource() == getTextArea()) {
-            ignoreNextKeyPress = true;
-            handleRepeatableKey((Event) event.getNativeEvent());
-            cancelNextKeyPress = ((Event) event.getNativeEvent()).isCancelled();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
-    public void onKeyPress(KeyPressEvent event)
-    {
-        if (event.getSource() == getTextArea()) {
-            if (!ignoreNextKeyPress) {
-                handleRepeatableKey((Event) event.getNativeEvent());
-            } else if (cancelNextKeyPress) {
-                ((Event) event.getNativeEvent()).xPreventDefault();
-            }
-            ignoreNextKeyPress = false;
-            cancelNextKeyPress = false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
-    public void onKeyUp(KeyUpEvent event)
-    {
-        ignoreNextKeyPress = false;
-        cancelNextKeyPress = false;
     }
 
     /**
@@ -206,10 +147,6 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
      */
     protected void handleRepeatableKey(Event event)
     {
-        // Don't handle the key if the event was canceled by a different party.
-        if (event.isCancelled()) {
-            return;
-        }
         switch (event.getKeyCode()) {
             case KeyCodes.KEY_ENTER:
                 onEnter(event);
@@ -309,9 +246,25 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
      */
     protected boolean needsSpace(Node leaf)
     {
+        if (leaf == null) {
+            return false;
+        }
         switch (leaf.getNodeType()) {
             case Node.TEXT_NODE:
-                return leaf.getNodeValue().length() > 0;
+                if (WHITESPACE.test(leaf.getNodeValue())) {
+                    // We have to check if the whitespace is rendered in the current context. Let's wrap the text node
+                    // with a SPAN element and see if it has any width.
+                    Element wrapper = Element.as(leaf.getOwnerDocument().createSpanElement());
+                    leaf.getParentNode().replaceChild(wrapper, leaf);
+                    wrapper.appendChild(leaf);
+                    // Note: We test only the width because an empty SPAN element normally has the height of the line.
+                    boolean needsSpace = wrapper.getOffsetWidth() > 0;
+                    // Unwrap the whitespace text node.
+                    wrapper.getParentNode().replaceChild(leaf, wrapper);
+                    return needsSpace;
+                } else {
+                    return leaf.getNodeValue().length() > 0;
+                }
             case Node.ELEMENT_NODE:
                 Element element = Element.as(leaf);
                 return BR.equalsIgnoreCase(element.getTagName()) || element.getOffsetHeight() > 0
@@ -564,12 +517,41 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         }
 
         // Place the caret after the inserted line break.
-        Node start = lineBreak.getNextSibling();
-        if (start == null || start.getNodeType() != Node.TEXT_NODE) {
-            start = getTextArea().getDocument().createTextNode("");
-            domUtils.insertAfter(start, lineBreak);
+        caret.setStartAfter(lineBreak);
+
+        // In case the line break was inserted at the end of a line..
+        ensureLineBreakIsVisible(lineBreak, container);
+    }
+
+    /**
+     * Ensures that the line created by inserting a line break is visible. This is need especially when the line break
+     * is inserted at the end of an existing line because most browsers don't allow the caret to be placed on invisible
+     * lines.
+     * 
+     * @param lineBreak the line break that was inserted
+     * @param container the container (e.g. the paragraph) where the line break was inserted
+     */
+    protected void ensureLineBreakIsVisible(Node lineBreak, Node container)
+    {
+        Node lastLeaf = null;
+        Node leaf = lineBreak;
+        // Look if there is any visible element on the new line, taking care to remain in the current block container.
+        while (leaf != null && container == domUtils.getNearestBlockContainer(leaf)) {
+            lastLeaf = leaf;
+            leaf = domUtils.getNextLeaf(leaf);
+            if (needsSpace(leaf)) {
+                return;
+            }
         }
-        caret.setStart(start, 0);
+
+        if (lastLeaf != null) {
+            // It seems there's no visible element on the new line. We should add a spacer up in the tree.
+            Node ancestor = lastLeaf;
+            while (ancestor.getParentNode() != container && ancestor.getNextSibling() == null) {
+                ancestor = ancestor.getParentNode();
+            }
+            domUtils.insertAfter(getTextArea().getDocument().createBRElement(), ancestor);
+        }
     }
 
     /**
@@ -617,12 +599,6 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         Element.as(paragraph).ensureEditable();
 
         // Place the caret inside the new container, at the beginning.
-        if (!start.hasChildNodes()) {
-            start.appendChild(getTextArea().getDocument().createTextNode(""));
-        }
-        if (start.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-            start = start.getFirstChild();
-        }
         caret.setStart(start, 0);
     }
 

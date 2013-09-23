@@ -16,19 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ObjectRemoveForm extends ObjectAddForm
 {
     private int classId;
 
-    private static final Log LOG = LogFactory.getLog(ObjectRemoveForm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectRemoveForm.class);
 
     @Override
     public void readRequest()
@@ -38,7 +36,7 @@ public class ObjectRemoveForm extends ObjectAddForm
             setClassId(Integer.parseInt(getRequest().getParameter("classid")));
         } catch (Exception ex) {
             setClassId(-1);
-            LOG.warn("No or bad classid found while processing an objectremove request: "
+            LOGGER.warn("No or bad classid found while processing an objectremove request: "
                 + getRequest().getParameter("classid"));
         }
     }

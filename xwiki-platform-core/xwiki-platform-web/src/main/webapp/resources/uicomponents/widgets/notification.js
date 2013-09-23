@@ -10,6 +10,7 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  * <li>Stacking of multiple notifications on the screen.</li>
  * <li>Possibility to replace a notification with another one, preserving the position.</li>
  * <li>Automatic hide after a configurable period of time.</li>
+ * <li> After hiding, call the function specified in the options.</li>
  * <li>Configurable icon, background and text color.</li>
  * </ul>
  * To display a notification, it suffices to create a new XWiki.widgets.Notification object. Constructor parameters:
@@ -121,6 +122,7 @@ widgets.Notification = Class.create({
       window.clearTimeout(this.timer);
       this.timer = null;
     }
+    (typeof this.options.onHide == 'function') && this.options.onHide();
   },
   /** Silently replace this notification with another one, keeping the same place. */
   replace : function(notification) {
@@ -143,16 +145,7 @@ widgets.Notification.getContainer = function() {
   if (!widgets.Notification.container) {
     widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
     // Insert the container in the document body.
-    $(document.body).insert(widgets.Notification.container);
-    // Register a scroll listener to reposition the notifications at the bottom of the screen in IE.
-    if (Prototype.Browser.IE) {
-      widgets.Notification.container.setStyle({position : 'absolute', 'bottom': '0px'});
-      Event.observe(window, "scroll", function() {
-        var span = new Element("div");
-        widgets.Notification.container.insert({top: span});
-        setTimeout(span.remove.bind(span), 1);
-      });
-    }
+    $('body').insert(widgets.Notification.container);
   }
   return widgets.Notification.container;
 };

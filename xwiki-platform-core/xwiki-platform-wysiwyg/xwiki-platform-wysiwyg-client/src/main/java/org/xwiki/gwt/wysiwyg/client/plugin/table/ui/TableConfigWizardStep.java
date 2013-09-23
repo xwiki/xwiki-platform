@@ -22,11 +22,11 @@ package org.xwiki.gwt.wysiwyg.client.plugin.table.ui;
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.TextBoxNumberFilter;
-import org.xwiki.gwt.user.client.ui.wizard.AbstractNavigationAwareWizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.TableDescriptor;
 
@@ -48,7 +48,7 @@ import com.google.gwt.user.client.ui.TextBox;
  * 
  * @version $Id$
  */
-public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep implements KeyUpHandler,
+public class TableConfigWizardStep extends AbstractInteractiveWizardStep implements KeyUpHandler,
     SourcesNavigationEvents
 {
     /**
@@ -127,16 +127,18 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
      */
     public TableConfigWizardStep()
     {
+        setStepTitle(Strings.INSTANCE.tableInsertDialogTitle());
+
         descriptor = new TableDescriptor();
         descriptor.setRowCount(2);
         descriptor.setColumnCount(2);
         descriptor.setWithHeader(true);
 
-        getPanel().addStyleName("xTableMainPanel");
-        getPanel().add(getRowsPanel());
-        getPanel().add(getColumnsPanel());
+        display().addStyleName("xTableMainPanel");
+        display().add(getRowsPanel());
+        display().add(getColumnsPanel());
         // getPanel().add(getBorderPanel());
-        getPanel().add(getHeaderPanel());
+        display().add(getHeaderPanel());
     }
 
     /**
@@ -154,7 +156,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getResult()
+     * @see AbstractInteractiveWizardStep#getResult()
      */
     public Object getResult()
     {
@@ -164,17 +166,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getStepTitle()
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.tableInsertDialogTitle();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
+     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
      */
     public void init(Object data, AsyncCallback< ? > cb)
     {
@@ -186,7 +178,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onCancel()
+     * @see AbstractInteractiveWizardStep#onCancel()
      */
     public void onCancel()
     {
@@ -196,7 +188,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onSubmit(AsyncCallback)
+     * @see AbstractInteractiveWizardStep#onSubmit(AsyncCallback)
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {

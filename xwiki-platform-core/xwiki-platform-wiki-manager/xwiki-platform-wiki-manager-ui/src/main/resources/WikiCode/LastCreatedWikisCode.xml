@@ -1,29 +1,29 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>WikiCode</web>
-<name>LastCreatedWikisCode</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>WikiCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1221576990000</creationDate>
-<date>1221579217000</date>
-<contentUpdateDate>1221579217000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<content>#############################################################################
+  <web>WikiCode</web>
+  <name>LastCreatedWikisCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WikiCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1221576990000</creationDate>
+  <date>1319464445000</date>
+  <contentUpdateDate>1319464445000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>#############################################################################
 ## Print the list of last created wikis with there respective owner.
 ##
 ## Can use URL parameters :
@@ -31,13 +31,13 @@
 ##
 #############################################################################
 #if ($request.nb)
-  #set($nb = $util.parseInt($request.nb))
+  #set($nb = $mathtool.toInteger($request.nb))
 #end
 #############################################################################
 #includeMacros("WikiCode.Macros")
-#set($WikiManager = $xwiki.wikimanager)
+#set($WikiManager = $services.wikimanager)
 #if(!$WikiManager)
-  #error($msg.get("wikimanager.pluginnotenabled"))
+  #error($services.localization.render('wikimanager.pluginnotenabled'))
 #end
 #set($Exception = $WikiManager.DefaultException)
 ##
@@ -52,7 +52,7 @@
 #end
 ##
 #if(!$creationsortedallwikilist)
-  #sortDocumentByCreationDate($allwikilist $creationsortedallwikilist false)
+  #set ($creationsortedallwikilist = $sorttool.sort($allwikilist, 'creationDate:desc'))
 #end
 ##
 #############################################################################

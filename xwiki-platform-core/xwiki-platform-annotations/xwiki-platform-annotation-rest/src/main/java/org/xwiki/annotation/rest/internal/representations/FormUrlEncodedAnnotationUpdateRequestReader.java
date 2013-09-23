@@ -43,12 +43,6 @@ import org.xwiki.component.annotation.Component;
 public class FormUrlEncodedAnnotationUpdateRequestReader extends
     AbstractFormUrlEncodedAnnotationUpdateRequestReader<AnnotationUpdateRequest>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rest.internal.representations.AbstractFormUrlEncodedAnnotationRequestReader
-     *      #getReadObjectInstance(org.xwiki.annotation.rest.model.jaxb.ObjectFactory)
-     */
     @Override
     protected AnnotationUpdateRequest getReadObjectInstance(ObjectFactory factory)
     {
@@ -60,12 +54,7 @@ public class FormUrlEncodedAnnotationUpdateRequestReader extends
         return updateRequest;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.ws.rs.ext.MessageBodyReader#isReadable(java.lang.Class, java.lang.reflect.Type,
-     *      java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType)
-     */
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         // this reader will only read annotationAddRequests, and none of the superclasses. Superclasses will read

@@ -48,11 +48,7 @@ public class WithName implements NodeFilter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NodeFilter#acceptNode(Node)
-     */
+    @Override
     public Action acceptNode(Node node)
     {
         return lowerCaseNames.contains(node.getNodeName().toLowerCase()) ? Action.ACCEPT : Action.SKIP;

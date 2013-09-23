@@ -29,11 +29,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
  */
 public class DefaultCommandManager extends AbstractCommandManager
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#execute(Command, String)
-     */
+    @Override
     public boolean execute(Command cmd, String param)
     {
         Executable executable = getExecutable(cmd);
@@ -59,11 +55,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         return success;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#isEnabled(Command)
-     */
+    @Override
     public boolean isEnabled(Command cmd)
     {
         Executable executable = getExecutable(cmd);
@@ -73,11 +65,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         return executable.isEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#isExecuted(Command)
-     */
+    @Override
     public boolean isExecuted(Command cmd)
     {
         Executable executable = getExecutable(cmd);
@@ -87,11 +75,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         return executable.isExecuted();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#isSupported(Command)
-     */
+    @Override
     public boolean isSupported(Command cmd)
     {
         Executable executable = getExecutable(cmd);
@@ -101,11 +85,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         return executable.isSupported();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#getStringValue(Command)
-     */
+    @Override
     public String getStringValue(Command cmd)
     {
         Executable executable = getExecutable(cmd);

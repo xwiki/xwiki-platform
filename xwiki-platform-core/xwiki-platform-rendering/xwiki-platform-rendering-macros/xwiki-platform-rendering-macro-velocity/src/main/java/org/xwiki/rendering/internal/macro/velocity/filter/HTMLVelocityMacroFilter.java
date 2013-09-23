@@ -21,9 +21,11 @@ package org.xwiki.rendering.internal.macro.velocity.filter;
 
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
@@ -41,7 +43,7 @@ import org.xwiki.velocity.internal.util.VelocityBlock.VelocityType;
  * @since 2.0M1
  */
 @Component("html")
-public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements VelocityMacroFilter, Initializable
+public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializable
 {
     /**
      * The name of the new line binding.
@@ -69,26 +71,23 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
     private static final Pattern MSNEWLINE_PATTERN = Pattern.compile("\\r\\n|\\r");
 
     /**
+     * The logger to use for logging.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * Used to parser content to clean and match system directives and $nl variables.
      */
     private VelocityParser velocityParser;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
-        this.velocityParser = new VelocityParser(getLogger());
+        this.velocityParser = new VelocityParser();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#after(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String before(String content, VelocityContext velocityContext)
     {
         // Add bindings
@@ -144,7 +143,7 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
                     continue;
                 }
             } catch (InvalidVelocityException e) {
-                getLogger().debug("Not a valid velocity keyword at char [" + i + "]", e);
+                this.logger.debug("Not a valid velocity keyword at char [" + i + "]", e);
             }
 
             flushWhiteSpaces(contentBuffer, filterContext, false);
@@ -256,12 +255,7 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
         filterContext.removeWhiteSpaces = false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#before(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String after(String content, VelocityContext velocityContext)
     {
         velocityContext.remove(BINDING_NEWLINE);

@@ -1,3 +1,10 @@
 org.xwiki.extension.xar.internal.handler.XarExtensionHandler
+org.xwiki.extension.xar.internal.handler.WikiEventListener
+org.xwiki.extension.xar.internal.handler.XarExtensionJobFinishedListener
+org.xwiki.extension.xar.internal.handler.packager.DefaultDocumentMergeImporter
 org.xwiki.extension.xar.internal.handler.packager.DefaultPackager
-org.xwiki.extension.xar.internal.repository.XarLocalExtensionRepository
+org.xwiki.extension.xar.internal.job.RepairXarJob
+org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository
+org.xwiki.extension.xar.internal.script.ConflictQuestionScriptSafeProvider
+org.xwiki.extension.xar.internal.script.DocumentScriptSafeProvider
+org.xwiki.extension.xar.internal.script.XarExtensionScriptService

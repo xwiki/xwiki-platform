@@ -1,2 +1,0 @@
-org.xwiki.bridge.internal.DefaultAttachmentNameFactory
-org.xwiki.bridge.internal.DefaultAttachmentNameSerializer

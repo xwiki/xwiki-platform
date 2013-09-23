@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
@@ -28,22 +26,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
-public class BaseObject extends BaseCollection implements ObjectInterface, Serializable, Cloneable
+public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Serializable, Cloneable
 {
     private String guid = UUID.randomUUID().toString();
 
@@ -52,19 +51,18 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
-     * Used here to merge setName() and setWiki() calls into the DocumentReference.
+     * The owner document, if this object was obtained from a document.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
+    private XWikiDocument ownerDocument;
 
     /**
-     * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
-     *
      * {@inheritDoc}
+     * <p>
+     * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
      * 
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
@@ -76,9 +74,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     }
 
     /**
-     * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
-     * 
      * {@inheritDoc}
+     * <p>
+     * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
      * 
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
@@ -89,42 +87,47 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         DocumentReference reference = getDocumentReference();
 
         if (reference != null) {
-            // Make sure to not modify a reference that could comes from somewhere else
-            reference = new DocumentReference(reference);
             EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-            reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
-            reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
+            reference =
+                new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
+                        .getParent().getParent()));
         } else {
             reference = this.currentMixedDocumentReferenceResolver.resolve(name);
         }
         setDocumentReference(reference);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#hashCode()
-     */
     @Override
-    public int hashCode()
+    protected BaseObjectReference createReference()
     {
-        String str = getName() + getClassName();
-        int nb = getNumber();
-        if (nb > 0) {
-            str += "_" + nb;
+        BaseObjectReference reference;
+
+        if (getXClassReference() != null && getDocumentReference() != null) {
+            reference = new BaseObjectReference(getXClassReference(), getNumber(), getDocumentReference());
+        } else {
+            reference = null;
         }
 
-        return str.hashCode();
+        return reference;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#setId(int)
-     */
     @Override
-    public void setId(int id)
+    public void setNumber(int number)
     {
+        super.setNumber(number);
+
+        // Reset reference cache
+        this.referenceCache = null;
+    }
+
+    @Override
+    public void setXClassReference(EntityReference xClassReference)
+    {
+        super.setXClassReference(xClassReference);
+
+        // Reset reference cache
+        this.referenceCache = null;
     }
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context)
@@ -181,13 +184,8 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         return displayEdit(name, "", context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#clone()
-     */
     @Override
-    public Object clone()
+    public BaseObject clone()
     {
         BaseObject object = (BaseObject) super.clone();
         object.setGuid(getGuid());
@@ -196,14 +194,14 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     }
 
     /**
-     * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the
-     * same data but with a different identity.
-     *
+     * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the same
+     * data but with a different identity.
+     * 
      * @since 2.2.3
      */
     public BaseObject duplicate()
     {
-        BaseObject object = (BaseObject) clone();
+        BaseObject object = clone();
         // Set a new GUID for the duplicate
         object.setGuid(UUID.randomUUID().toString());
 
@@ -220,11 +218,6 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         return object;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -244,11 +237,6 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
-     */
     @Override
     public Element toXML(BaseClass bclass)
     {
@@ -298,6 +286,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         if (cel != null) {
             bclass.fromXML(cel);
             setClassName(bclass.getName());
+        } else {
+            // We need at least to set the class name to avoid some NullPointerExceptions
+            setClassName(oel.elementText("className"));
         }
 
         setName(oel.element("name").getText());
@@ -337,33 +328,35 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() :
-                        pclass.displayView(propertyName, this, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName,
-                        propertyType, "", newPropertyValue));
+                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() : pclass
+                            .displayView(propertyName, this, context);
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
+                        ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() :
-                        pclass.displayView(propertyName, this, context);
+                        (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
+                            propertyName, this, context);
                     String oldPropertyValue =
-                        (oldProperty.getValue() instanceof String || pclass == null) ? oldProperty.toText() :
-                        pclass.displayView(propertyName, oldObject, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
-                        propertyType, oldPropertyValue, newPropertyValue));
+                        (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
+                            propertyName, oldObject, context);
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldPropertyValue,
+                        newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
-                        propertyType, oldProperty.toText(), newProperty.toText()));
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldProperty.toText(),
+                        newProperty.toText()));
                 }
             }
         }
@@ -374,7 +367,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
@@ -382,14 +375,16 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
-                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() :
-                            pclass.displayView(propertyName, oldObject, context);
-                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(),
-                            oldObject.getGuid(), "removed", propertyName, propertyType, oldPropertyValue, ""));
+                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
+                                propertyName, oldObject, context);
+                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject
+                            .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType,
+                            oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(),
-                            oldObject.getGuid(), "removed", propertyName, propertyType, oldProperty.toText(), ""));
+                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject
+                            .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty
+                            .toText(), ""));
                     }
                 }
             }
@@ -420,6 +415,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         }
 
         if (prop != null) {
+            prop.setOwnerDocument(ownerDocument);
             safeput(fieldname, prop);
         }
     }
@@ -432,5 +428,20 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public void setGuid(String guid)
     {
         this.guid = guid;
+    }
+
+    /**
+     * Set the owner document of this base object.
+     * 
+     * @param ownerDocument The owner document.
+     * @since 4.3M2
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
+        this.ownerDocument = ownerDocument;
+        for (String propertyName : getPropertyList()) {
+            BaseProperty property = (BaseProperty) getField(propertyName);
+            property.setOwnerDocument(ownerDocument);
+        }
     }
 }

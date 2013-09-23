@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.internal;
 
@@ -30,24 +29,37 @@ import org.xwiki.container.Response;
 import org.xwiki.container.Session;
 
 /**
- * We're using ThreadLocals to store the request, response and session so that each thread 
- * (i.e. each user request) has its own value for these objects. In addition we sometime need
- * to create a new request, response or session even while in the same thread. For this use case
- * we've added the possibility to push/pop different implementations for these Objects.
+ * We're using ThreadLocals to store the request, response and session so that each thread (i.e. each user request) has
+ * its own value for these objects. In addition we sometime need to create a new request, response or session even while
+ * in the same thread. For this use case we've added the possibility to push/pop different implementations for these
+ * Objects.
  */
 @Component
 public class DefaultContainer implements Container
 {
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
     private ApplicationContext applicationContext;
+
     private ThreadLocal<Stack<Request>> request = new ThreadLocal<Stack<Request>>();
+
     private ThreadLocal<Stack<Response>> response = new ThreadLocal<Stack<Response>>();
+
     private ThreadLocal<Stack<Session>> session = new ThreadLocal<Stack<Session>>();
 
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Override
+    @Deprecated
     public ApplicationContext getApplicationContext()
     {
         return this.applicationContext;
     }
 
+    @Override
     public void pushRequest(Request request)
     {
         Stack<Request> requests = this.request.get();
@@ -55,7 +67,8 @@ public class DefaultContainer implements Container
             requests.push(request);
         }
     }
-    
+
+    @Override
     public void popRequest()
     {
         Stack<Request> requests = this.request.get();
@@ -63,7 +76,8 @@ public class DefaultContainer implements Container
             requests.pop();
         }
     }
-    
+
+    @Override
     public Request getRequest()
     {
         Request result = null;
@@ -74,6 +88,7 @@ public class DefaultContainer implements Container
         return result;
     }
 
+    @Override
     public Response getResponse()
     {
         Response result = null;
@@ -84,6 +99,7 @@ public class DefaultContainer implements Container
         return result;
     }
 
+    @Override
     public void pushResponse(Response response)
     {
         Stack<Response> responses = this.response.get();
@@ -91,7 +107,8 @@ public class DefaultContainer implements Container
             responses.push(response);
         }
     }
-    
+
+    @Override
     public void popResponse()
     {
         Stack<Response> responses = this.response.get();
@@ -100,6 +117,7 @@ public class DefaultContainer implements Container
         }
     }
 
+    @Override
     public Session getSession()
     {
         Session result = null;
@@ -110,6 +128,7 @@ public class DefaultContainer implements Container
         return result;
     }
 
+    @Override
     public void pushSession(Session session)
     {
         Stack<Session> sessions = this.session.get();
@@ -117,7 +136,8 @@ public class DefaultContainer implements Container
             sessions.push(session);
         }
     }
-    
+
+    @Override
     public void popSession()
     {
         Stack<Session> sessions = this.session.get();
@@ -126,23 +146,31 @@ public class DefaultContainer implements Container
         }
     }
 
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Override
+    @Deprecated
     public void setApplicationContext(ApplicationContext context)
     {
         this.applicationContext = context;
     }
 
+    @Override
     public void setRequest(Request request)
     {
         Stack<Request> stack = new Stack<Request>();
         stack.push(request);
         this.request.set(stack);
     }
-    
+
+    @Override
     public void removeRequest()
     {
         this.request.remove();
     }
 
+    @Override
     public void setResponse(Response response)
     {
         Stack<Response> stack = new Stack<Response>();
@@ -150,11 +178,13 @@ public class DefaultContainer implements Container
         this.response.set(stack);
     }
 
+    @Override
     public void removeResponse()
     {
         this.response.remove();
     }
 
+    @Override
     public void setSession(Session session)
     {
         Stack<Session> stack = new Stack<Session>();
@@ -162,6 +192,7 @@ public class DefaultContainer implements Container
         this.session.set(stack);
     }
 
+    @Override
     public void removeSession()
     {
         this.session.remove();

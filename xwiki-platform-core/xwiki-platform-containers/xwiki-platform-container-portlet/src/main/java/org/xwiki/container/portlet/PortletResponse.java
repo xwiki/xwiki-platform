@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.portlet;
 
@@ -41,9 +40,7 @@ public class PortletResponse implements Response
         return this.portletResponse;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public OutputStream getOutputStream() throws IOException
     {
         if (this.portletResponse instanceof RenderResponse) {
@@ -52,17 +49,13 @@ public class PortletResponse implements Response
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentLength(int length)
     {
         // No content length for portlets, do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentType(String mimeType)
     {
         if (this.portletResponse instanceof RenderResponse) {

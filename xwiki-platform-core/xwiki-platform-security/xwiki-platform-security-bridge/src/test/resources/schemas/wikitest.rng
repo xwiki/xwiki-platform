@@ -1,0 +1,125 @@
+<?xml version="1.0" ?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <element name="wikis" >
+      <oneOrMore>
+        <ref name="wiki.element" />
+      </oneOrMore>
+    </element>
+  </start>
+  <define name="wiki.element">
+    <element name="wiki">
+      <attribute name="name">
+        <data type="Name" />
+      </attribute>
+      <attribute name="owner">
+        <data type="Name" />
+      </attribute>
+      <optional>
+        <attribute name="mainWiki">
+          <data type="boolean" />
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="readOnly">
+          <data type="boolean" />
+        </attribute>
+      </optional>
+      <group>
+        <zeroOrMore>
+          <ref name="user.element" />
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="group.element" />
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="right.element" />
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="space.element" />
+        </zeroOrMore>
+      </group>
+    </element>
+  </define>
+  <define name="user.element">
+    <element name="user">
+      <attribute name="name">
+        <data type="Name" />
+      </attribute>
+    </element>
+  </define>
+  <define name="group.element" >
+    <element name="group">
+      <attribute name="name">
+        <data type="Name" />
+      </attribute>
+      <zeroOrMore>
+        <ref name="user.element" />
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="space.element">
+    <element name="space">
+      <attribute name="name">
+        <data type="Name" />
+      </attribute>
+      <group>
+        <zeroOrMore>
+          <ref name="right.element" />
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="document.element" />
+        </zeroOrMore>
+      </group>
+    </element>
+  </define>
+  <define name="document.element">
+    <element name="document">
+      <attribute name="name">
+        <data type="Name" />
+      </attribute>
+      <group>
+        <optional>
+          <element name="creator">
+            <data type="Name" />
+          </element>
+        </optional>
+        <zeroOrMore>
+          <ref name="right.element" />
+        </zeroOrMore>
+      </group>
+    </element>
+  </define>
+  <define name="right.element">
+    <choice>
+      <element name="allowUser">
+        <ref name="right.attributes" />
+      </element>
+      <element name="denyUser">
+        <ref name="right.attributes" />
+      </element>
+      <element name="allowGroup">
+        <ref name="right.attributes" />
+      </element>
+      <element name="denyGroup">
+        <ref name="right.attributes" />
+      </element>
+    </choice>
+  </define>
+  <define name="right.attributes">
+    <attribute name="type">
+      <choice>
+        <value>login</value>
+        <value>register</value>
+        <value>view</value>
+        <value>edit</value>
+        <value>delete</value>
+        <value>admin</value>
+        <value>programming</value>
+      </choice>
+    </attribute>
+    <attribute name="name">
+      <data type="Name" />
+    </attribute>
+  </define>
+</grammar>

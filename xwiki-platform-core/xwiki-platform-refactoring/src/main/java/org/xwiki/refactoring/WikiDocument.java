@@ -82,9 +82,7 @@ public class WikiDocument
         return parent;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean equals(Object obj)
     {
         boolean equals = false;
@@ -94,9 +92,7 @@ public class WikiDocument
         return equals;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int hashCode()
     {
         return getFullName().hashCode();

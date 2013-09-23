@@ -1,0 +1,71 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package com.xpn.xwiki.internal;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.xwiki.context.Execution;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
+
+/**
+ * Provide current {@link XWikiContext} or create one from {@link XWikiStubContextProvider} if there is no current one
+ * yet.
+ * 
+ * @version $Id$
+ */
+public class XWikiContextProvider implements Provider<XWikiContext>
+{
+    /**
+     * Used to create a new {@link XWikiContext}.
+     */
+    @Inject
+    private XWikiStubContextProvider contextProvider;
+
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    private Execution execution;
+
+    @Override
+    public XWikiContext get()
+    {
+        return getXWikiContext();
+    }
+
+    /**
+     * @return current XWikiContext or new one
+     */
+    private XWikiContext getXWikiContext()
+    {
+        XWikiContext context =
+            (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
+        if (context == null) {
+            context = this.contextProvider.createStubContext();
+            this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
+        }
+
+        return context;
+    }
+}

@@ -21,94 +21,53 @@ package org.xwiki.chart.internal.plot;
 
 import java.util.Map;
 
-import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
+import org.xwiki.chart.PlotGeneratorException;
 import org.xwiki.chart.model.ChartModel;
 
 /**
- * An abstract {@link PlotGenerator} for defining various XY type charts.
- *
+ * Generate Plots for XY data sets.
+ * 
  * @version $Id$
- * @since 2.0M1
+ * @since 4.2M1
  */
 public abstract class AbstractXYPlotGenerator implements PlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public Plot generate(ChartModel model, Map<String, String> parameters)
+    @Override
+    public Plot generate(ChartModel model, Map<String, String> parameters) throws PlotGeneratorException
     {
-        NumberAxis domainAxis = new NumberAxis();
-        NumberAxis rangeAxis = new NumberAxis();
-        XYDataset dataset = buildXYDataset(model, parameters);
-        return new XYPlot(dataset, domainAxis, rangeAxis, getXYItemRenderer(parameters));
-    }
+        XYDataset dataset;
+        ValueAxis domainAxis;
+        ValueAxis rangeAxis;
 
-    /**
-     * Builds an {@link XYDataset} corresponding to the provided {@link ChartModel}.
-     * 
-     * @param model the {@link ChartModel} instance.
-     * @param params additional parameters.
-     * @return an {@link XYDataset} corresponding to the provided {@link ChartModel}.
-     */
-    protected XYDataset buildXYDataset(ChartModel model, Map<String, String> params)
-    {
-        String dataSeries = params.get("series");
-        DefaultTableXYDataset dataset = new DefaultTableXYDataset();
-        if (dataSeries.equals("rows")) {
-            extractRows(dataset, model);
+        if (model.getDataset() instanceof XYDataset) {
+            dataset = (XYDataset) model.getDataset();
         } else {
-            extractColumns(dataset, model);
+            throw new PlotGeneratorException("Incompatible dataset for xy plot.");
         }
-        return dataset;
-    }
-    
-    /**
-     * Extracts data rows from the {@link ChartModel} provided and populates the {@link DefaultTableXYDataset}
-     * accordingly.
-     * 
-     * @param model the {@link ChartModel} instance.
-     * @param dataset the {@link DefaultTableXYDataset} to be populated.
-     */
-    private void extractRows(DefaultTableXYDataset dataset, ChartModel model)
-    {
-        for (int row = 0; row < model.getRowCount(); row++) {
-            XYSeries series = new XYSeries(model.getRowHeader(row), false, false);
-            for (int column = 0; column < model.getColumnCount(); column++) {
-                series.add(column, model.getCellValue(row, column));
-            }
-            dataset.addSeries(series);
+
+        if (model.getAxis(0) instanceof ValueAxis) {
+            domainAxis = (ValueAxis) model.getAxis(0);
+        } else {
+            throw new PlotGeneratorException("Incompatible axis 0 for xy plot.");
         }
+
+        if (model.getAxis(1) instanceof ValueAxis) {
+            rangeAxis = (ValueAxis) model.getAxis(1);
+        } else {
+            throw new PlotGeneratorException("Incompatible axis 1 for xy plot.");
+        }
+
+        return new XYPlot(dataset, domainAxis, rangeAxis, getRenderer(parameters));
     }
 
     /**
-     * Extracts data columns from the {@link ChartModel} provided and populates the {@link DefaultTableXYDataset}
-     * accordingly.
-     * 
-     * @param model the {@link ChartModel} instance.
-     * @param dataset the {@link DefaultTableXYDataset} to be populated.
-     */
-    private void extractColumns(DefaultTableXYDataset dataset, ChartModel model)
-    {
-        for (int column = 0; column < model.getColumnCount(); column++) {
-            XYSeries series = new XYSeries(model.getColumnHeader(column), false, false);
-            for (int row = 0; row < model.getRowCount(); row++) {
-                series.add(row, model.getCellValue(row, column));
-            }
-            dataset.addSeries(series);
-        }
-    }    
-    
-    /**
-     * Returns the {@link XYItemRenderer} to be used for plotting the chart.
-     * 
-     * @param parameters additional parameters.
+     * @param parameters used to configure the renderer
      * @return an {@link XYItemRenderer} to be used for plotting the chart.
      */
-    protected abstract XYItemRenderer getXYItemRenderer(Map<String, String> parameters);
+    protected abstract XYItemRenderer getRenderer(Map<String, String> parameters);
 }

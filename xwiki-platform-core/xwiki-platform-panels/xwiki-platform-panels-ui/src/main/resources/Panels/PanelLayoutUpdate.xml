@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Panels</web>
+  <name>PanelLayoutUpdate</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1157450952000</creationDate>
+  <date>1166177445000</date>
+  <contentUpdateDate>1213000374000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('panelwizard.panellayoutupdate')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($place = $request.place)
+##
+## Get the preferences document where the new layout must be saved (XWiki.XWikiPreferences or Space.WebPreferences)
+##
+#if ("$!{request.prefsdoc}" != '')
+  #set ($prefsdocument = $request.prefsdoc)
+#else
+  #set ($prefsdocument = 'XWiki.XWikiPreferences')
+#end
+##
+## Check to see if the current user has admin rights on the current preferences document.
+##
+#if (!$xwiki.hasAccessLevel('admin', $xcontext.user, $prefsdocument))
+  {{html clean="false"}}
+  #xwikimessageboxstart($services.localization.render('panelwizard.placemanager') $services.localization.render('panelwizard.notadmininplace', [$place]))
+  #xwikimessageboxend()
+  {{/html}}
+#elseif ("$!request.xpage" == 'plain')
+  ## Set the current panel layout.
+  #if ("$!place" == '')
+    #set ($prefsdoc = $xwiki.getDocument($prefsdocument))
+  #else
+    #set ($prefsdoc = $xwiki.getDocument("${place}:${prefsdocument}"))
+  #end
+  #set ($discard = $prefsdoc.use('XWiki.XWikiPreferences'))
+  #set ($leftPanels = $request.leftPanels)
+  #set ($rightPanels = $request.rightPanels)
+  #set ($showLeftPanels = $request.showLeftPanels)
+  #set ($showRightPanels = $request.showRightPanels)
+  #if ($leftPanels)
+    #set ($discard = $prefsdoc.set('leftPanels', $leftPanels))
+  #end
+  #if ($showLeftPanels)
+    #set ($discard = $prefsdoc.set('showLeftPanels', $showLeftPanels))
+  #end
+  #if ($rightPanels)
+    #set ($discard = $prefsdoc.set('rightPanels', $rightPanels))
+  #end
+  #if ($showRightPanels)
+    #set ($discard = $prefsdoc.set('showRightPanels', $showRightPanels))
+  #end
+  #if (${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #set ($ok = $prefsdoc.save($services.localization.render('panelwizard.save.versionComment', true)))
+  #else
+    ## CSRF protection
+    $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
+  #end
+  SUCCESS
+#else
+
+= $services.localization.render('panelwizard.panellayoutupdate') =
+
+{{warning}}$services.localization.render('panelwizard.nodirectaccess', ['[[Panel Wizard&gt;&gt;Panels.PanelWizard]]']){{/warning}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

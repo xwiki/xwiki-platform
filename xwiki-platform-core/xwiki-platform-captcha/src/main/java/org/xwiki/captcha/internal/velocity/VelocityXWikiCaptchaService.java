@@ -33,11 +33,6 @@ import org.xwiki.captcha.CaptchaVerifierNotFoundException;
 @Component("velocity")
 public class VelocityXWikiCaptchaService extends DefaultXWikiCaptchaService
 {
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.captcha.DefaultXWikiCaptchaService#getCaptchaVerifier(java.lang.String)
-     */
     @Override
     public CaptchaVerifier getCaptchaVerifier(String captchaName) throws CaptchaVerifierNotFoundException
     {

@@ -31,7 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.LSInput;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link XMLScriptService}.
@@ -46,7 +46,7 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
     @Override
     public void setUp() throws Exception
     {
-        this.xml = (XMLScriptService) getComponentManager().lookup(ScriptService.class, "xml");
+        this.xml = (XMLScriptService) getComponentManager().getInstance(ScriptService.class, "xml");
     }
 
 

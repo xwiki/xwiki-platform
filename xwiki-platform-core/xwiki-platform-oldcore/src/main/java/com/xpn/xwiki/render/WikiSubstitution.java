@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.util.Util;
@@ -91,11 +89,6 @@ public class WikiSubstitution extends Perl5Substitution
         this.pattern = pattern;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.oro.text.regex.Perl5Substitution#appendSubstitution(java.lang.StringBuffer, org.apache.oro.text.regex.MatchResult, int, org.apache.oro.text.regex.PatternMatcherInput, org.apache.oro.text.regex.PatternMatcher, org.apache.oro.text.regex.Pattern)
-     */
     @Override
     public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,
         PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern)

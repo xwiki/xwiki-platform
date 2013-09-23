@@ -86,31 +86,19 @@ public class DragAdaptor implements SourcesDragEvents, MouseDownHandler, MouseMo
         ((HasMouseUpHandlers) adaptee).addMouseUpHandler(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesDragEvents#addDragListener(DragListener)
-     */
+    @Override
     public void addDragListener(DragListener listener)
     {
         dragListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesDragEvents#removeDragListener(DragListener)
-     */
+    @Override
     public void removeDragListener(DragListener listener)
     {
         dragListeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseDownHandler#onMouseDown(MouseDownEvent)
-     */
+    @Override
     public void onMouseDown(MouseDownEvent event)
     {
         if (event.getSource() == adaptee) {
@@ -121,11 +109,7 @@ public class DragAdaptor implements SourcesDragEvents, MouseDownHandler, MouseMo
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseDownHandler#onMouseDown(MouseDownEvent)
-     */
+    @Override
     public void onMouseMove(MouseMoveEvent event)
     {
         if (event.getSource() == adaptee) {
@@ -140,11 +124,7 @@ public class DragAdaptor implements SourcesDragEvents, MouseDownHandler, MouseMo
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseUpHandler#onMouseUp(MouseUpEvent)
-     */
+    @Override
     public void onMouseUp(MouseUpEvent event)
     {
         if (event.getSource() == adaptee) {

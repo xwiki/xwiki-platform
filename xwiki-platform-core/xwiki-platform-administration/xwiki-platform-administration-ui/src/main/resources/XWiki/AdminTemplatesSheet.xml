@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>AdminTemplatesSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiPreferences</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1364502208000</creationDate>
+  <date>1364566487000</date>
+  <contentUpdateDate>1364566487000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Admin Templates Sheet</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+(% class="xform half" %)(((
+== {{translation key="admin.templates.createprovider"/}} ==
+
+{{html}}
+  &lt;form action="$doc.getURL('create')" method="post"&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="space"&gt;$services.localization.render('admin.templates.createprovider.space')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;&lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;&lt;/dd&gt;
+      &lt;dt&gt;&lt;label for="page"&gt;$services.localization.render('admin.templates.createprovider.page')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;&lt;input type="text" id="page" name="page" value="$services.localization.render('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;&lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;div class="buttons"&gt;
+      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
+      &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;input id="createTemplateProvider" type="submit" value="$services.localization.render('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+{{/html}}
+#set($availableProviders = $services.query.hql(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and doc.fullName!='XWiki.TemplateProviderTemplate'").execute())
+#if($availableProviders.size() &gt; 0)
+
+== {{translation key="admin.templates.providerslist"/}} ==
+
+  #foreach($providerFullname in $availableProviders)
+    * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
+  #end
+#end
+)))
+{{/velocity}}</content>
+</xwikidoc>

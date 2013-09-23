@@ -19,9 +19,10 @@
  */
 package org.xwiki.model.reference;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link org.xwiki.model.reference.SpaceReference}.
@@ -49,7 +50,7 @@ public class SpaceReferenceTest
             new SpaceReference("page", (WikiReference) null);
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [null] for a space reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [null] in a space reference", expected.getMessage());
         }
     }
 
@@ -61,8 +62,8 @@ public class SpaceReferenceTest
                 new EntityReference("whatever", EntityType.DOCUMENT, null)));
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [name = [whatever], type = [DOCUMENT], parent = [null]] "
-                + "for a space reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [Document whatever] in a space reference",
+                expected.getMessage());
         }
     }
 }

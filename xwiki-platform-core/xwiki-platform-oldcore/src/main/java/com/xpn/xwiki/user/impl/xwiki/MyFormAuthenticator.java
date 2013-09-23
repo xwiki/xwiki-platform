@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.io.IOException;
@@ -28,14 +26,13 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.securityfilter.authenticator.Authenticator;
+import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +40,7 @@ import com.xpn.xwiki.XWikiException;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
-    private static final Log LOG = LogFactory.getLog(MyFormAuthenticator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
 
     /**
      * Show the login page.
@@ -51,6 +48,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @param request the current request
      * @param response the current response
      */
+    @Override
     public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
         throws IOException
     {
@@ -65,11 +63,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.securityfilter.authenticator.Authenticator#showLogin(HttpServletRequest, HttpServletResponse)
-     */
     @Override
     public void showLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
@@ -92,18 +85,12 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             redirectBack.append(delimiter);
             redirectBack.append(sridParameter);
         }
-        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage
-            + "?" + sridParameter + "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
+        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
+            + sridParameter + "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
 
         return;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.securityfilter.authenticator.FormAuthenticator#processLogin(org.securityfilter.filter.SecurityRequestWrapper,
-     *      javax.servlet.http.HttpServletResponse)
-     */
     @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
     {
@@ -124,6 +111,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @param response
      * @return true if the filter should return after this method ends, false otherwise
      */
+    @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
         throws Exception
     {
@@ -144,21 +132,26 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         // persistent logins are enabled, and the persistent login info is present in this request
         if (this.persistentLoginManager != null) {
             String username =
-                    convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
+                convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
             String password = this.persistentLoginManager.getRememberedPassword(request, response);
 
             Principal principal = request.getUserPrincipal();
 
+            // If cookies are turned on:
             // 1) if user is not already authenticated, authenticate
-            // 2) if authenticated user for this session does not have the same name, authenticate
+            // 2) if the authenticated user for this session does not have the same name as
+            //    the user stored in the cookie, authenticate
             // 3) if xwiki.authentication.always is set to 1 in xwiki.cfg file, authenticate
-            if (principal == null || !StringUtils.endsWith(principal.getName(), "XWiki." + username)
-                || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
+            // If cookies are turned off, don't do anything at this level.
+            if (request.isRequestedSessionIdFromCookie() && (principal == null ||
+                !StringUtils.endsWith(principal.getName(), "XWiki." + username)
+                || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1))
+            {
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("User " + principal.getName() + " has been authentified from cookie");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("User " + principal.getName() + " has been authentified from cookie");
                     }
 
                     // make sure the Principal contains wiki name information
@@ -198,14 +191,15 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @param response
      * @return true if the filter should return after this method ends, false otherwise
      */
+    @Override
     public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
         HttpServletResponse response, XWikiContext context) throws Exception
     {
         Principal principal = authenticate(username, password, context);
         if (principal != null) {
             // login successful
-            if (LOG.isInfoEnabled()) {
-                LOG.info("User " + principal.getName() + " has been logged-in");
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("User " + principal.getName() + " has been logged-in");
             }
 
             // invalidate old session if the user was already authenticated, and they logged in as a different user
@@ -240,8 +234,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         } else {
             // login failed
             // set response status and forward to error page
-            if (LOG.isInfoEnabled()) {
-                LOG.info("User " + username + " login has failed");
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("User " + username + " login has failed");
             }
 
             String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");
@@ -284,11 +278,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         return context.getWiki().getAuthService().authenticate(username, password, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Authenticator#processLogout(SecurityRequestWrapper, HttpServletResponse, URLPatternMatcher)
-     */
     @Override
     public boolean processLogout(SecurityRequestWrapper securityRequestWrapper,
         HttpServletResponse httpServletResponse, URLPatternMatcher urlPatternMatcher) throws Exception

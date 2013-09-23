@@ -25,7 +25,7 @@ import java.text.MessageFormat;
 
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -44,10 +44,7 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
      */
     private static final int TIMEOUT_MILLISECONDS = 5000;
 
-    /**
-     * {@inheritDoc}
-     * @see RomeFeedFactory#createFeed(org.xwiki.rendering.macro.rss.RssMacroParameters)
-     */
+    @Override
     public SyndFeed createFeed(RssMacroParameters parameters) throws MacroExecutionException
     {
         if (StringUtils.isEmpty(parameters.getFeed())) {

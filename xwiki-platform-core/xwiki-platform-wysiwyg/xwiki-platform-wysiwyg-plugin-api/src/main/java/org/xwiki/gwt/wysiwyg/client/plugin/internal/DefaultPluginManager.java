@@ -82,31 +82,19 @@ public class DefaultPluginManager implements PluginManager
         uiExtensions = new HashMap<String, Map<String, UIExtension>>();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#getPluginFactoryManager()
-     */
+    @Override
     public PluginFactoryManager getPluginFactoryManager()
     {
         return pfm;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#setPluginFactoryManager(PluginFactoryManager)
-     */
+    @Override
     public void setPluginFactoryManager(PluginFactoryManager pfm)
     {
         this.pfm = pfm;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#load(String)
-     */
+    @Override
     public void load(String pluginName)
     {
         if (loadedPlugins.containsKey(pluginName)) {
@@ -134,11 +122,7 @@ public class DefaultPluginManager implements PluginManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#unload(String)
-     */
+    @Override
     public void unload(String pluginName)
     {
         Plugin plugin = loadedPlugins.remove(pluginName);
@@ -159,11 +143,7 @@ public class DefaultPluginManager implements PluginManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#unloadAll()
-     */
+    @Override
     public void unloadAll()
     {
         Set<String> pluginNames = new HashSet<String>(loadedPlugins.keySet());
@@ -173,11 +153,7 @@ public class DefaultPluginManager implements PluginManager
         pluginNames.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#getUIExtension(String, String)
-     */
+    @Override
     public UIExtension getUIExtension(String role, String feature)
     {
         return getUIExtensions(role).get(feature);

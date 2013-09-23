@@ -212,6 +212,13 @@ var Wysiwyg =
      */
     getInstance: function(hookId) {
         return this.instances[hookId];
+    },
+
+   /**
+     * @return all the WYSIWYG editor instances
+     */
+    getInstances: function() {
+        return this.instances;
     }
 };
 
@@ -268,5 +275,5 @@ Wysiwyg.onModuleLoad(function() {
 }, true);
 
 #if("$!request.lazy" != "true")
-Wysiwyg.load();
+(XWiki.domIsLoaded && Wysiwyg.load()) || document.observe('xwiki:dom:loaded', Wysiwyg.load.bind(Wysiwyg));
 #end

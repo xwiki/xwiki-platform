@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.export;
 
@@ -25,17 +24,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.artofsolving.jodconverter.document.DocumentFormat;
-import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.server.OfficeServer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -54,50 +51,35 @@ import com.xpn.xwiki.web.Utils;
 public class OfficeExporter extends PdfExportImpl
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(OfficeExporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfficeExporter.class);
 
     /**
      * The component used to access the office document converter.
      */
-    private OpenOfficeManager ooManager = Utils.getComponent(OpenOfficeManager.class);
+    private OfficeServer officeServer = Utils.getComponent(OfficeServer.class);
 
     /**
-     * The object used to get the media type corresponding to a filename extension. This object knows all the document
-     * formats supported by the office converter.
-     * <p>
-     * Note: This is a hack! We rely on the fact that currently the office converter uses JODConverter to convert
-     * from/to office document formats and so we use its {@link DocumentFormatRegistry} class. We can't expose this in
-     * the office importer module because all its interfaces are independent of the underlying tool used for conversion.
-     * Writing our own classes to wrap {@link DocumentFormatRegistry} and {@link DocumentFormat} is not worth at this
-     * point.
-     */
-    private DocumentFormatRegistry documentFormatRegistry = new DefaultDocumentFormatRegistry();
-
-    /**
-     * @param format the export format; usually this is a filename extension
+     * @param extension the output file name extension, which specifies the export format (e.g. pdf, odt)
      * @return the export type matching the specified format, or {@code null} if the specified format is not supported
      */
-    public ExportType getExportType(String format)
+    public ExportType getExportType(String extension)
     {
-        if (ooManager.getState() == ManagerState.CONNECTED) {
-            DocumentFormat documentFormat = documentFormatRegistry.getFormatByExtension(format);
-            if (documentFormat != null) {
-                return new ExportType(documentFormat.getMediaType(), documentFormat.getExtension());
+        if (officeServer.getState() == OfficeServer.ServerState.CONNECTED) {
+            DocumentFormat format = officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
+            if (format != null) {
+                return new ExportType(format.getMediaType(), format.getExtension());
             }
         }
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PdfExportImpl#exportXHTML(String, OutputStream, ExportType, XWikiContext)
-     */
     @Override
     protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
-        exportXHTML(xhtml, out, documentFormatRegistry.getFormatByExtension(type.getExtension()), context);
+        // We assume the office server is connected. The code calling this method should check the server state.
+        exportXHTML(xhtml, out,
+            officeServer.getConverter().getFormatRegistry().getFormatByExtension(type.getExtension()), context);
     }
 
     /**
@@ -113,31 +95,20 @@ public class OfficeExporter extends PdfExportImpl
     private void exportXHTML(String xhtml, OutputStream out, DocumentFormat format, XWikiContext context)
         throws XWikiException
     {
-        String html = xhtml;
-
-        // FIXME: put that in some XSL transformation instead (no time and knowledge to do that before 2.4)
-        // html = applyXsl(xhtml, getXhtmlOfficexsl(context));
-        String pageBreakBeforeMatch = "<p style=\"page-break-before: always;\" />\n$1";
-        html = html.replaceAll("(<div[^>]+class=\"pdftoc\"[^>]*>)", pageBreakBeforeMatch);
-        html = html.replaceAll("(<div[^>]+id=\"xwikimaincontainer\"[^>]*>)", pageBreakBeforeMatch);
-
-        // OpenOffice does not support XHTML so we remove the XML marker and let it parse it as if it was HTML content
-        html = html.substring(xhtml.indexOf("?>") + 2);
-
-        // id attribute on body element makes openoffice converter to fail
-        html = html.replaceFirst("(<body[^>]+)id=\"body\"([^>]*>)", "$1$2");
-
-        OpenOfficeConverter documentConverter = ooManager.getConverter();
+        String html = applyXSLT(xhtml, getOfficeExportXSLT(context));
 
         String inputFileName = "export_input.html";
         String outputFileName = "export_output." + format.getExtension();
 
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
-        inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes()));
+        // We assume that the HTML was generated using the XWiki encoding.
+        Charset charset = Charset.forName(context.getWiki().getEncoding());
+        inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes(charset)));
         addEmbeddedObjects(inputStreams, context);
 
+        OfficeConverter officeConverter = officeServer.getConverter();
         try {
-            Map<String, byte[]> ouput = documentConverter.convert(inputStreams, inputFileName, outputFileName);
+            Map<String, byte[]> ouput = officeConverter.convert(inputStreams, inputFileName, outputFileName);
 
             out.write(ouput.values().iterator().next());
         } catch (Exception e) {
@@ -164,8 +135,20 @@ public class OfficeExporter extends PdfExportImpl
                 // Embedded files are placed in the same folder as the HTML input file during office conversion.
                 inputStreams.put(file.getName(), new FileInputStream(file));
             } catch (Exception e) {
-                LOG.warn(String.format("Failed to embed %s in the office export.", file.getName()), e);
+                LOGGER.warn(String.format("Failed to embed %s in the office export.", file.getName()), e);
             }
         }
+    }
+
+    /**
+     * Get the XSLT for preparing a (valid) XHTML to be converted to an office format.
+     * 
+     * @param context the current request context
+     * @return the content of the XSLT as a byte stream
+     * @see PdfExportImpl#getXslt(String, String, XWikiContext)
+     */
+    private InputStream getOfficeExportXSLT(XWikiContext context)
+    {
+        return getXslt("officeExportXSLT", "officeExport.xsl", context);
     }
 }

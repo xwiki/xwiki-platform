@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>Main</web>
-<name>TagsRss</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.RssFeeds</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1252454400000</creationDate>
-<date>1252454400000</date>
-<contentUpdateDate>1252454400000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.rss.tags.feed")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity}}
+  <web>Main</web>
+  <name>TagsRss</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.RssFeeds</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render("xe.rss.tags.feed")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 #if("$!{request.xpage}" == 'plain' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
   ##
   ## Build document list.
   ##
   #if("$!request.tag" != '')
     #set($sql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' and lower('$request.tag') = lower(item)")
-    #set ($title = $msg.get('xe.tag.rss.tag.title', [$request.tag]))
-    #set ($description = $msg.get('xe.tag.rss.tag.description', [$request.tag]))
+    #set ($title = $services.localization.render('xe.tag.rss.tag.title', [$request.tag]))
+    #set ($description = $services.localization.render('xe.tag.rss.tag.description', [$request.tag]))
   #else
     #set($sql = ", BaseObject as obj, DBStringListProperty as prop where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' and size(prop.list) &gt; 0")
-    #set ($title = $msg.get('xe.tag.rss.tags.title'))
-    #set ($description = $msg.get('xe.tag.rss.tags.description'))
+    #set ($title = $services.localization.render('xe.tag.rss.tags.title'))
+    #set ($description = $services.localization.render('xe.tag.rss.tags.description'))
   #end
   ##
   ## Build feed.
   ##
-  #set ($list = $xwiki.searchDocuments($sql , 20 , 0))
-  #set ($feed = $xwiki.feed.getDocumentFeed($list, $util.getHashMap(), $util.getHashMap()))
-  #set ($feedURI = $xwiki.getDocument("Main.WebHome").getExternalURL("view"))
+  #set ($list = $services.query.hql($sql).setLimit(20).execute())
+  #set ($feed = $xwiki.feed.getDocumentFeed($list, {}, {}))
+  #set ($feedURI = $xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))).getExternalURL("view"))
   #set ($discard = $feed.setLink($feedURI))
   #set ($discard = $feed.setUri($feedURI))
   #set ($discard = $feed.setAuthor('XWiki'))

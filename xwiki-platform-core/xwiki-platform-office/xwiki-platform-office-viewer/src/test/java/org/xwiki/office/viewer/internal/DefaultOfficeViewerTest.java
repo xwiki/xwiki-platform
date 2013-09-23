@@ -19,6 +19,9 @@
  */
 package org.xwiki.office.viewer.internal;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
@@ -28,44 +31,43 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Test case for {@link DefaultOfficeViewer}.
  * 
  * @version $Id$
  */
-public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
+public class DefaultOfficeViewerTest
 {
     /**
      * An attachment reference to be used in tests.
      */
-    private static final AttachmentReference ATTACHMENT_REFERENCE =
-        new AttachmentReference("Test.doc", new DocumentReference("xwiki", "Main", "Test"));
+    private static final AttachmentReference ATTACHMENT_REFERENCE = new AttachmentReference("Test file.doc",
+        new DocumentReference("xwiki", "Main", "Test"));
 
     /**
      * String attachment reference to be used in tests.
      */
-    private static final String STRING_ATTACHMENT_REFERENCE = "xwiki:Main.Test@Test.doc";
+    private static final String STRING_ATTACHMENT_REFERENCE = "xwiki:Main.Test@Test file.doc";
 
     /**
      * The cache key corresponding to {@link #STRING_ATTACHMENT_REFERENCE} and {@link #DEFAULT_VIEW_PARAMETERS}.
@@ -83,20 +85,16 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     private static final Map<String, String> DEFAULT_VIEW_PARAMETERS = Collections.emptyMap();
 
     /**
-     * The {@link DefaultOfficeViewer} instance being tested.
+     * A component manager that automatically mocks all dependencies of {@link DefaultOfficeViewer}.
      */
-    @MockingRequirement
-    private DefaultOfficeViewer defaultOfficeViewer;
+    @Rule
+    public MockitoComponentMockingRule<OfficeViewer> mocker = new MockitoComponentMockingRule<OfficeViewer>(
+        DefaultOfficeViewer.class);
 
     /**
      * The mock {@link DocumentAccessBridge} instance used in tests.
      */
     private DocumentAccessBridge documentAccessBridge;
-
-    /**
-     * The mock {@link EntityReferenceSerializer} instance used in tests.
-     */
-    private EntityReferenceSerializer< ? > entityReferenceSerializer;
 
     /**
      * The mock {@link XDOMOfficeDocumentBuilder} instance used in tests.
@@ -109,41 +107,23 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     private Cache<OfficeDocumentView> cache;
 
     /**
-     * {@inheritDoc}
+     * Test fixture.
      * 
-     * @see AbstractMockingComponentTestCase#setUp()
+     * @throws Exception in case of an exception raised during the fixture preparation
      */
-    @Override
     @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        entityReferenceSerializer = getComponentManager().lookup(EntityReferenceSerializer.class);
-        officeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMockingComponentTestCase#configure()
-     */
-    @SuppressWarnings("unchecked")
-    @Override
     public void configure() throws Exception
     {
-        super.configure();
+        final CacheManager cacheManager = mocker.getInstance(CacheManager.class);
+        cache = mock(Cache.class);
+        when(cacheManager.<OfficeDocumentView> createNewCache(notNull(CacheConfiguration.class))).thenReturn(cache);
 
-        final CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
-        cache = getMockery().mock(Cache.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(cacheManager).createNewCache(with(aNonNull(CacheConfiguration.class)));
-                will(returnValue(cache));
-            }
-        });
+        EntityReferenceSerializer<String> entityReferenceSerializer =
+            mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        when(entityReferenceSerializer.serialize(ATTACHMENT_REFERENCE)).thenReturn(STRING_ATTACHMENT_REFERENCE);
+
+        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
+        officeDocumentBuilder = mocker.getInstance(XDOMOfficeDocumentBuilder.class);
     }
 
     /**
@@ -154,22 +134,12 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testViewNonExistingOfficeAttachment() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
-                will(returnValue(STRING_ATTACHMENT_REFERENCE));
-
-                oneOf(cache).get(CACHE_KEY);
-                will(returnValue(null));
-
-                oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
-                will(returnValue(Collections.EMPTY_LIST));
-            }
-        });
+        when(cache.get(CACHE_KEY)).thenReturn(null);
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Collections.<AttachmentReference> emptyList());
 
         try {
-            defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS);
+            mocker.getComponentUnderTest().createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS);
             Assert.fail("Expected exception.");
         } catch (Exception e) {
             Assert.assertEquals(String.format("Attachment [%s] does not exist.", ATTACHMENT_REFERENCE), e.getMessage());
@@ -184,46 +154,23 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testViewExistingOfficeAttachmentWithCacheMiss() throws Exception
     {
-        final ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
-        final XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(),
-                getComponentManager());
+        when(cache.get(CACHE_KEY)).thenReturn(null);
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Arrays.asList(ATTACHMENT_REFERENCE));
+        when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(ATTACHMENT_VERSION);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
-                will(returnValue(STRING_ATTACHMENT_REFERENCE));
+        ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
+        when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
-                oneOf(cache).get(CACHE_KEY);
-                will(returnValue(null));
+        XDOMOfficeDocument xdomOfficeDocument =
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(), mocker);
+        when(
+            officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
+                ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
 
-                oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
-                will(returnValue(Arrays.asList(ATTACHMENT_REFERENCE)));
+        mocker.getComponentUnderTest().createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS);
 
-                oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
-                will(returnValue(ATTACHMENT_VERSION));
-            }
-        });
-        // Note: We're using two expectation groups to limit the length of the anonymous inner class (max allowed 20)
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(documentAccessBridge).getAttachmentContent(ATTACHMENT_REFERENCE);
-                will(returnValue(attachmentContent));
-
-                oneOf(officeDocumentBuilder).build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
-                    ATTACHMENT_REFERENCE.getDocumentReference(), false);
-                will(returnValue(xdomOfficeDocument));
-
-                oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
-                will(returnValue(ATTACHMENT_VERSION));
-
-                oneOf(cache).set(with(CACHE_KEY), with(aNonNull(OfficeDocumentView.class)));
-            }
-        });
-
-        defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS);
+        verify(cache).set(eq(CACHE_KEY), notNull(OfficeDocumentView.class));
     }
 
     /**
@@ -234,28 +181,16 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testViewExistingOfficeAttachmentWithCacheHit() throws Exception
     {
-        final OfficeDocumentView officeDocumentView =
+        OfficeDocumentView officeDocumentView =
             new OfficeDocumentView(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
                 new HashSet<File>());
+        when(cache.get(CACHE_KEY)).thenReturn(officeDocumentView);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
-                will(returnValue(STRING_ATTACHMENT_REFERENCE));
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Arrays.asList(ATTACHMENT_REFERENCE));
+        when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(ATTACHMENT_VERSION);
 
-                oneOf(cache).get(CACHE_KEY);
-                will(returnValue(officeDocumentView));
-
-                oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
-                will(returnValue(Arrays.asList(ATTACHMENT_REFERENCE)));
-
-                oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
-                will(returnValue(ATTACHMENT_VERSION));
-            }
-        });
-
-        Assert.assertNotNull(defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS));
+        Assert.assertNotNull(mocker.getComponentUnderTest().createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS));
     }
 
     /**
@@ -267,78 +202,45 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testViewANewVersionOfAnExistingOfficeAttachment() throws Exception
     {
-        final OfficeDocumentView officeDocumentView =
+        OfficeDocumentView officeDocumentView =
             new OfficeDocumentView(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
                 new HashSet<File>());
-        final ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
-        final XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(),
-                getComponentManager());
-        final String attachmentVersion = "2.1";
+        when(cache.get(CACHE_KEY)).thenReturn(officeDocumentView);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
-                will(returnValue(STRING_ATTACHMENT_REFERENCE));
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Arrays.asList(ATTACHMENT_REFERENCE));
+        when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn("2.1");
 
-                oneOf(cache).get(CACHE_KEY);
-                will(returnValue(officeDocumentView));
+        ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
+        when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
-                oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
-                will(returnValue(Arrays.asList(ATTACHMENT_REFERENCE)));
+        XDOMOfficeDocument xdomOfficeDocument =
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(), mocker);
+        when(
+            officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
+                ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
 
-                oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
-                will(returnValue(attachmentVersion));
-            }
-        });
-        // Note: We're using two expectation groups to limit the length of the anonymous inner class (max allowed 20)
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(cache).remove(CACHE_KEY);
+        Assert.assertNotNull(mocker.getComponentUnderTest().createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS));
 
-                oneOf(documentAccessBridge).getAttachmentContent(ATTACHMENT_REFERENCE);
-                will(returnValue(attachmentContent));
-
-                oneOf(officeDocumentBuilder).build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
-                    ATTACHMENT_REFERENCE.getDocumentReference(), false);
-                will(returnValue(xdomOfficeDocument));
-
-                oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
-                will(returnValue(attachmentVersion));
-
-                oneOf(cache).set(with(CACHE_KEY), with(aNonNull(OfficeDocumentView.class)));
-            }
-        });
-
-        Assert.assertNotNull(defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS));
+        verify(cache).remove(CACHE_KEY);
+        verify(cache).set(eq(CACHE_KEY), notNull(OfficeDocumentView.class));
     }
 
     /**
-     * A test case for testing the {@link AbstractOfficeViewer#getTemporaryDirectory(AttachmentReference)} method.
+     * A test case for testing the {@link AbstractOfficeViewer#getTemporaryFile(AttachmentReference, String)} method.
      * 
      * @throws Exception if an error occurs.
      */
     @Test
-    public void testGetTemporaryDirectory() throws Exception
+    public void testGetTemporaryFile() throws Exception
     {
-        final Container container = getComponentManager().lookup(Container.class);
-        final ApplicationContext applicationContext = getMockery().mock(ApplicationContext.class);
+        Environment environment = mocker.getInstance(Environment.class);
+        when(environment.getTemporaryDirectory()).thenReturn(new File(System.getProperty("java.io.tmpdir")));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(container).getApplicationContext();
-                will(returnValue(applicationContext));
-
-                oneOf(applicationContext).getTemporaryDirectory();
-                will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
-            }
-        });
-
-        File tempFile = defaultOfficeViewer.getTemporaryDirectory(ATTACHMENT_REFERENCE);
-        Assert.assertTrue(tempFile.getAbsolutePath().endsWith("/temp/officeviewer/xwiki/Main/Test/Test.doc"));
+        DefaultOfficeViewer implementation = (DefaultOfficeViewer) mocker.getComponentUnderTest();
+        File tempFile = implementation.getTemporaryFile(ATTACHMENT_REFERENCE, "some image.png");
+        Assert.assertTrue(tempFile.getAbsolutePath().endsWith(
+            "/temp/officeviewer/xwiki/Main/Test/Test+file.doc/some+image.png"));
     }
 
     /**
@@ -349,16 +251,11 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testBuildURL() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(documentAccessBridge).getDocumentURL(ATTACHMENT_REFERENCE.getDocumentReference(), "temp", null,
-                    null, true);
-                will(returnValue("/xwiki/bin/temp/Main/Test"));
-            }
-        });
+        when(documentAccessBridge.getDocumentURL(ATTACHMENT_REFERENCE.getDocumentReference(), "temp", null, null, true))
+            .thenReturn("/xwiki/bin/temp/Main/Test");
 
-        String url = defaultOfficeViewer.buildURL(ATTACHMENT_REFERENCE, "some_temporary_artifact.gif");
-        Assert.assertEquals("/xwiki/bin/temp/Main/Test/officeviewer/Test.doc/some_temporary_artifact.gif", url);
+        DefaultOfficeViewer implementation = (DefaultOfficeViewer) mocker.getComponentUnderTest();
+        String url = implementation.buildURL(ATTACHMENT_REFERENCE, "some temporary artifact.gif");
+        Assert.assertEquals("/xwiki/bin/temp/Main/Test/officeviewer/Test+file.doc/some+temporary+artifact.gif", url);
     }
 }

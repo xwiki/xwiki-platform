@@ -1,1 +1,51 @@
-## Empty in the old skins, colibri overrides this.
+##
+##
+## Build the list of documents extras to display, if it does not exist (default).
+## List format : ["ExtraAnchor",  "ExtraTabText", numberOfItems]
+##
+#if (!$docextralinks && !$docextras)
+  #set($docextralinks = [])
+  #if($xcontext.action == 'view' && $viewer != 'content')
+    #set ($discard = $docextralinks.add(['content', $services.localization.render('core.links.content'), -1]))
+  #end
+  #if($viewer != 'comments' && $showcomments)
+    #set ($discard = $docextralinks.add(['comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size()]))
+  #end
+  #if($showannotations)
+    #if(!$annotationCount)
+      ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
+      ## defined at this point, we tap into the standard annotation class, and do not load again the 
+      ## config document. This however should not happen.
+      #set($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
+    #end
+    #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount]))
+  #end
+  #if($viewer != 'attachments' && $showattachments)
+    #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size()]))
+  #end
+  #if($viewer != 'history' && $showhistory)
+    #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1]))
+  #end
+  #if($viewer != 'information' && $showinformation)
+    #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1]))
+  #end
+#end
+##
+##
+##  Display the document title, modification date, and shortcuts to comments/attachments...
+##
+  <div id="document-info">
+    <div class="xdocLastModification"> ## Last modification
+      $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+    </div>
+    <div>
+      #foreach($docextralink in $docextralinks)
+        #set ($extraAnchor = $docextralink.get(0))
+        #set ($extraText = $docextralink.get(1))
+        #set ($extraCount = $docextralink.get(2))
+        #if($velocityCount > 1) <span class="separator">&#183;</span> #end
+        <span id="${escapetool.xml(${extraAnchor})}shortcut"><a href="$doc.getURL('view', "viewer=$!{escapetool.url(${extraAnchor})}")">${escapetool.xml(${extraText})}</a>#if($extraCount != -1) <span class="itemCount">(${escapetool.xml(${extraCount})})</span>#end</span>
+      #end
+    </div>
+    <div class="clearfloats"></div>
+  </div>

@@ -16,12 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.web.sx.AbstractSxAction;
 import com.xpn.xwiki.web.sx.CssExtension;
@@ -41,25 +40,17 @@ public class SsxAction extends AbstractSxAction
     public static final CssExtension CSSX = new CssExtension();
 
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(SsxAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SsxAction.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSxAction#getExtensionType()
-     */
     @Override
     public Extension getExtensionType()
     {
         return CSSX;
     }
 
-    /**
-     * @return the logging object for this class.
-     */
     @Override
-    protected Log getLog()
+    protected Logger getLogger()
     {
-        return LOG;
+        return LOGGER;
     }
 }

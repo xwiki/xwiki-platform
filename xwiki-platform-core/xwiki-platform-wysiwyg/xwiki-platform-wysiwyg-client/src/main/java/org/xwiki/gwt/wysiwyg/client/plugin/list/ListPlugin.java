@@ -31,7 +31,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.list.exec.ListExecutable;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
@@ -85,8 +84,7 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickHandler
             getUIExtensionList().add(toolBarExtension);
 
             // Initialize the behavior adjuster and set it up with this text area
-            behaviorAdjuster = (ListBehaviorAdjuster) GWT.create(ListBehaviorAdjuster.class);
-            behaviorAdjuster.setTextArea(getTextArea());
+            behaviorAdjuster = new ListBehaviorAdjuster(textArea);
             // fake a reset command to handle the loaded document
             behaviorAdjuster.onCommand(getTextArea().getCommandManager(), new Command("reset"), null);
             // add key listener to the rta

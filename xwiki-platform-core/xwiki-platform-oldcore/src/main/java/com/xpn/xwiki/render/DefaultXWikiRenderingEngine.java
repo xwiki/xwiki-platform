@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render;
 
 import java.util.ArrayList;
@@ -28,10 +26,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
@@ -47,11 +46,11 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 {
-    private static final Log LOG = LogFactory.getLog(XWikiRenderingEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRenderingEngine.class);
 
     /** The default order in which the rendering engines will be run on the input. */
-    private final String[] defaultRenderingOrder =
-        new String[]{"macromapping", "groovy", "velocity", "plugin", "wiki", "wikiwiki"};
+    private final String[] defaultRenderingOrder = new String[] {"macromapping", "groovy", "velocity", "plugin",
+    "wiki", "wikiwiki"};
 
     private List<XWikiRenderer> renderers = new ArrayList<XWikiRenderer>();
 
@@ -102,6 +101,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         initCache(context);
     }
 
+    @Override
     public void virtualInit(XWikiContext context)
     {
         XWikiMacrosMappingRenderer mmrendered = (XWikiMacrosMappingRenderer) getRenderer("mapping");
@@ -132,7 +132,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             lru.setMaxEntries(iCapacity);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            this.cache = context.getWiki().getCacheFactory().newCache(configuration);
+            this.cache = Utils.getComponent(CacheManager.class).createNewCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to create cache");
@@ -144,22 +144,26 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return this.cache;
     }
 
+    @Override
     public void addRenderer(String name, XWikiRenderer renderer)
     {
         this.renderers.add(renderer);
         this.renderermap.put(name, renderer);
     }
 
+    @Override
     public XWikiRenderer getRenderer(String name)
     {
         return this.renderermap.get(name);
     }
 
+    @Override
     public List<XWikiRenderer> getRendererList()
     {
         return new ArrayList<XWikiRenderer>(this.renderers);
     }
 
+    @Override
     public List<String> getRendererNames()
     {
         return new LinkedList<String>(this.renderermap.keySet());
@@ -174,22 +178,26 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return result;
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         return renderText(doc.getTranslatedContent(context), doc, context);
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiDocument includingdoc, XWikiContext context)
         throws XWikiException
     {
         return renderText(doc.getTranslatedContent(context), includingdoc, context);
     }
 
+    @Override
     public String renderText(String text, XWikiDocument includingdoc, XWikiContext context)
     {
         return renderText(text, includingdoc, includingdoc, context);
     }
 
+    @Override
     public String interpretText(String text, XWikiDocument includingdoc, XWikiContext context)
     {
         return renderText(text, true, includingdoc, includingdoc, context);
@@ -217,6 +225,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         cached.add(key);
     }
 
+    @Override
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context)
     {
         return renderText(text, false, contentdoc, includingdoc, context);
@@ -235,107 +244,106 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         } catch (XWikiException e) {
         }
 
-        synchronized (key) {
-            try {
-                XWikiRenderingCache cacheObject = (this.cache != null) ? this.cache.get(key) : null;
 
-                if (cacheObject != null) {
-                    XWikiRequest request = context.getRequest();
-                    boolean refresh =
-                        (request != null) && ("1".equals(request.get("refresh")))
-                            || "inline".equals(context.getAction()) || "admin".equals(context.getAction());
-                    if ((cacheObject.isValid() && (!refresh))) {
-                        addToCached(key, context);
-                        return cacheObject.getContent();
-                    } else {
-                        addToRefreshed(key, context);
-                    }
+        try {
+            XWikiRenderingCache cacheObject = (this.cache != null) ? this.cache.get(key) : null;
+
+            if (cacheObject != null) {
+                XWikiRequest request = context.getRequest();
+                boolean refresh =
+                    (request != null) && ("1".equals(request.get("refresh")))
+                    || "inline".equals(context.getAction()) || "admin".equals(context.getAction());
+                if ((cacheObject.isValid() && (!refresh))) {
+                    addToCached(key, context);
+                    return cacheObject.getContent();
+                } else {
+                    addToRefreshed(key, context);
                 }
-            } catch (Exception e) {
+            }
+        } catch (Exception e) {
+        }
+
+        MonitorPlugin monitor = Util.getMonitorPlugin(context);
+        try {
+            // We need to make sure we don't use the cache duretion currently in the system
+            context
+                .setCacheDuration((int) context.getWiki().ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
+            // Start monitoring timer
+            if (monitor != null) {
+                monitor.startTimer("rendering");
             }
 
-            MonitorPlugin monitor = Util.getMonitorPlugin(context);
+            String content = text;
+
+            // Which is the current idoc and sdoc
+            XWikiDocument idoc = (XWikiDocument) context.get("idoc");
+            XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
+            // We put the including and security doc in the context
+            // It will be needed to verify programming rights
+            context.put("idoc", includingdoc);
+            context.put("sdoc", contentdoc);
+
+            // Let's call the beginRendering loop
+            context.getWiki().getPluginManager().beginRendering(context);
+
             try {
-                // We need to make sure we don't use the cache duretion currently in the system
-                context
-                    .setCacheDuration((int) context.getWiki().ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
-                // Start monitoring timer
-                if (monitor != null) {
-                    monitor.startTimer("rendering");
-                }
-
-                String content = text;
-
-                // Which is the current idoc and sdoc
-                XWikiDocument idoc = (XWikiDocument) context.get("idoc");
-                XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
-                // We put the including and security doc in the context
-                // It will be needed to verify programming rights
-                context.put("idoc", includingdoc);
-                context.put("sdoc", contentdoc);
-
-                // Let's call the beginRendering loop
-                context.getWiki().getPluginManager().beginRendering(context);
-
-                try {
-                    for (int i = 0; i < this.renderers.size(); i++) {
-                        XWikiRenderer renderer = (this.renderers.get(i));
-                        String rendererName = renderer.getClass().getName();
-                        if (shouldRender(contentdoc, rendererName, context)) {
-                            // Check if only XWikiInterpreter should be executed
-                            if (onlyInterpret) {
-                                if (XWikiInterpreter.class.isAssignableFrom(renderer.getClass())) {
-                                    XWikiInterpreter interpreter = (XWikiInterpreter) renderer;
-                                    content = interpreter.interpret(content, includingdoc, context);
-                                }
-                            } else {
-                                content = renderer.render(content, contentdoc, includingdoc, context);
+                for (int i = 0; i < this.renderers.size(); i++) {
+                    XWikiRenderer renderer = (this.renderers.get(i));
+                    String rendererName = renderer.getClass().getName();
+                    if (shouldRender(contentdoc, rendererName, context)) {
+                        // Check if only XWikiInterpreter should be executed
+                        if (onlyInterpret) {
+                            if (XWikiInterpreter.class.isAssignableFrom(renderer.getClass())) {
+                                XWikiInterpreter interpreter = (XWikiInterpreter) renderer;
+                                content = interpreter.interpret(content, includingdoc, context);
                             }
                         } else {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("skip renderer: " + rendererName + " for the document "
-                                    + contentdoc.getFullName());
-                            }
+                            content = renderer.render(content, contentdoc, includingdoc, context);
+                        }
+                    } else {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("skip renderer: " + rendererName + " for the document "
+                                         + contentdoc.getFullName());
                         }
                     }
-                    content = Utils.replacePlaceholders(content, context);
-                } finally {
-                    // Remove including doc or set the previous one
-                    if (idoc == null) {
-                        context.remove("idoc");
-                    } else {
-                        context.put("idoc", idoc);
-                    }
-
-                    // Remove security doc or set the previous one
-                    if (sdoc == null) {
-                        context.remove("sdoc");
-                    } else {
-                        context.put("sdoc", sdoc);
-                    }
-
-                    // Let's call the endRendering loop
-                    context.getWiki().getPluginManager().endRendering(context);
                 }
-
-                try {
-                    int cacheDuration = context.getCacheDuration();
-                    if (cacheDuration > 0) {
-                        XWikiRenderingCache cacheObject =
-                            new XWikiRenderingCache(key, content, cacheDuration, new Date());
-                        this.cache.set(key, cacheObject);
-                    }
-                } catch (Exception e) {
-                    LOG.error("cache exception", e);
-                }
-                return content;
+                content = Utils.replacePlaceholders(content, context);
             } finally {
-                // We need to make sure we reset the cache Duration
-                context.setCacheDuration(currentCacheDuration);
-
-                if (monitor != null) {
-                    monitor.endTimer("rendering");
+                // Remove including doc or set the previous one
+                if (idoc == null) {
+                    context.remove("idoc");
+                } else {
+                    context.put("idoc", idoc);
                 }
+
+                // Remove security doc or set the previous one
+                if (sdoc == null) {
+                    context.remove("sdoc");
+                } else {
+                    context.put("sdoc", sdoc);
+                }
+
+                // Let's call the endRendering loop
+                context.getWiki().getPluginManager().endRendering(context);
+            }
+
+            try {
+                int cacheDuration = context.getCacheDuration();
+                if (cacheDuration > 0) {
+                    XWikiRenderingCache cacheObject =
+                        new XWikiRenderingCache(key, content, cacheDuration, new Date());
+                    this.cache.set(key, cacheObject);
+                }
+            } catch (Exception e) {
+                LOGGER.error("cache exception", e);
+            }
+            return content;
+        } finally {
+            // We need to make sure we reset the cache Duration
+            context.setCacheDuration(currentCacheDuration);
+
+            if (monitor != null) {
+                monitor.endTimer("rendering");
             }
         }
     }
@@ -357,7 +365,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             }
             return true;
         } catch (Exception e) {
-            LOG.error("Error in the function shouldRender", e);
+            LOGGER.error("Error in the function shouldRender", e);
             return true;
         }
     }
@@ -382,6 +390,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return db + "-" + cdoc + "-" + idoc + "-" + qs + "-" + action + "-" + lang + "-" + text.hashCode();
     }
 
+    @Override
     public void flushCache()
     {
         for (int i = 0; i < this.renderers.size(); i++) {
@@ -393,6 +402,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         }
     }
 
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context)
     {
@@ -405,6 +415,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         }
     }
 
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
         XWikiContext context)
     {

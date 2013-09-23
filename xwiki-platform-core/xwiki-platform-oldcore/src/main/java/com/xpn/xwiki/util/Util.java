@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.util;
 
 import java.io.BufferedReader;
@@ -26,11 +24,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,12 +47,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
 import org.apache.oro.text.perl.Perl5Util;
@@ -62,12 +57,13 @@ import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcherInput;
 import org.apache.oro.text.regex.Perl5Matcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xwiki.container.Container;
 import org.xwiki.xml.XMLUtils;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -83,7 +79,7 @@ public class Util
      */
     private static final String URL_ENCODING = "UTF-8";
 
-    private static final Log LOG = LogFactory.getLog(Util.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
     private static PatternCache patterns = new PatternCacheLRU(200);
 
@@ -147,15 +143,6 @@ public class Util
         matches.addAll(uniqueMatches);
 
         return matches;
-    }
-
-    /**
-     * @deprecated use {@link #getUniqueMatches(String, String, int)} instead
-     */
-    @Deprecated
-    public List<String> getMatches(String content, String spattern, int group) throws MalformedPatternException
-    {
-        return getUniqueMatches(content, spattern, group);
     }
 
     public static String cleanValue(String value)
@@ -245,34 +232,6 @@ public class Util
         getP5util().split(results, pattern, text);
 
         return results;
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToString(File, String)} */
-    @Deprecated
-    public static String getFileContent(File file) throws IOException
-    {
-        return FileUtils.readFileToString(file, XWiki.DEFAULT_ENCODING);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.IOUtils#toString(Reader)} */
-    @Deprecated
-    public static String getFileContent(Reader reader) throws IOException
-    {
-        return IOUtils.toString(reader);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.FileUtils#readFileToByteArray(File)} */
-    @Deprecated
-    public static byte[] getFileContentAsBytes(File file) throws IOException
-    {
-        return FileUtils.readFileToByteArray(file);
-    }
-
-    /** @deprecated Use {@link org.apache.commons.io.IOUtils#toByteArray(InputStream)} */
-    @Deprecated
-    public static byte[] getFileContentAsBytes(InputStream is) throws IOException
-    {
-        return IOUtils.toByteArray(is);
     }
 
     public static boolean contains(String name, String list, String sep)
@@ -570,7 +529,7 @@ public class Util
 
     public static boolean isAlphaNumeric(String text)
     {
-        return StringUtils.isAlphanumeric(text.replaceAll("-", "a").replaceAll("\\.", "a"));
+        return StringUtils.isAlphanumeric(text.replace('-', 'a').replace('.', 'a'));
     }
 
     public static String getName(String name)
@@ -665,14 +624,14 @@ public class Util
     public org.w3c.dom.Document getDOMForString(String str)
     {
         try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-                new InputSource(new StringReader(str)));
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .parse(new InputSource(new StringReader(str)));
         } catch (SAXException ex) {
-            LOG.warn("Cannot parse string:" + str, ex);
+            LOGGER.warn("Cannot parse string:" + str, ex);
         } catch (IOException ex) {
-            LOG.warn("Cannot parse string:" + str, ex);
+            LOGGER.warn("Cannot parse string:" + str, ex);
         } catch (ParserConfigurationException ex) {
-            LOG.warn("Cannot parse string:" + str, ex);
+            LOGGER.warn("Cannot parse string:" + str, ex);
         }
 
         return null;
@@ -688,7 +647,7 @@ public class Util
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException ex) {
-            LOG.warn("Cannot create DOM tree", ex);
+            LOGGER.warn("Cannot create DOM tree", ex);
         }
 
         return null;
@@ -761,8 +720,8 @@ public class Util
 
     /**
      * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of
-     * {@link #encodeURI(String, XWikiContext)}. This uses the UTF-8 encoding, the default encoding for URIs, as
-     * stated in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
+     * {@link #encodeURI(String, XWikiContext)}. This uses the UTF-8 encoding, the default encoding for URIs, as stated
+     * in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
      * 
      * @param text the encoded text
      * @param context the current context
@@ -817,9 +776,9 @@ public class Util
     /**
      * Validate a XML element name. XML elements must follow these naming rules :
      * <ul>
-     * <li>Names can contain letters, numbers, and the following characters [., -, _, :].</li>
+     * <li>Names can contain letters, numbers, and the following characters [., -, _].</li>
      * <li>Names must not start with a number or punctuation character.</li>
-     * <li>Names must not start with the letters xml (or XML, or Xml, etc).</li>
+     * <li>Names must not start (case-insensitive) with the letters xml.</li>
      * <li>Names cannot contain spaces.</li>
      * </ul>
      * 
@@ -829,7 +788,7 @@ public class Util
     public static boolean isValidXMLElementName(String elementName)
     {
         if (elementName == null || elementName.equals("") || elementName.matches("(?i)^(xml).*")
-            || !elementName.matches("(^[a-zA-Z\\-\\_]+[\\w\\.\\-\\_\\:]*$)")) {
+            || !elementName.matches("(^[a-zA-Z\\_]+[\\w\\.\\-]*$)")) {
             return false;
         }
 
@@ -851,7 +810,7 @@ public class Util
             }
         } catch (Exception e) {
             // Probably running under -security, which prevents calling File.exists()
-            LOG.debug("Failed load resource [" + resource + "] using a file path");
+            LOGGER.debug("Failed load resource [" + resource + "] using a file path");
         }
         try {
             Container container = Utils.getComponent(Container.class);
@@ -860,7 +819,7 @@ public class Util
                 return res;
             }
         } catch (Exception e) {
-            LOG.debug("Failed to load resource [" + resource + "] using the application context");
+            LOGGER.debug("Failed to load resource [" + resource + "] using the application context");
         }
 
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
@@ -869,7 +828,9 @@ public class Util
     /**
      * Normalize the given language code. Converts the given language code to lower case and checks its validity (i.e.
      * whether it is an ISO 639 language code or the string "default").
-     * <p><pre>
+     * <p>
+     * 
+     * <pre>
      * Util.normalizeLanguage(null)      = null
      * Util.normalizeLanguage("")        = ""
      * Util.normalizeLanguage("  ")      = ""
@@ -878,7 +839,9 @@ public class Util
      * Util.normalizeLanguage("invalid") = "default"
      * Util.normalizeLanguage("en")      = "en"
      * Util.normalizeLanguage("DE_at")   = "de_AT"
-     * </pre></p>
+     * </pre>
+     * 
+     * </p>
      * 
      * @param languageCode the language code to normalize
      * @return normalized language code or the string "default" if the code is invalid
@@ -912,8 +875,39 @@ public class Util
             l.getISO3Language();
             return result;
         } catch (MissingResourceException ex) {
-            LOG.warn("Invalid language: " + languageCode);
+            LOGGER.warn("Invalid language: " + languageCode);
         }
         return defaultLanguage;
+    }
+
+    /**
+     * Get a likely unique 64bit hash representing the provided uid string. Use the MD5 hashing algorithm.
+     *
+     * @param uid an uid string usually provided by
+     * {@link org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer} or
+     * {@link org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer}
+     * @return 64bit hash
+     * @since 4.0M1
+     */
+    public static long getHash(String uid)
+    {
+        MessageDigest md5 = null;
+        long hash = 0;
+
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+            byte[] digest = md5.digest(uid.getBytes("UTF-8"));
+            for (int l = digest.length, i = Math.max(0, digest.length - 9); i < l; i++) {
+                hash = hash << 8 | ((long) digest[i] & 0xFF);
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            LOGGER.error("Cannot retrieve MD5 provider for hashing", ex);
+            throw new RuntimeException("MD5 hash is required for id hash");
+        } catch (Exception ex) {
+            LOGGER.error("Id computation failed during MD5 processing", ex);
+            throw new RuntimeException("MD5 hash is required for id hash");
+        }
+
+        return hash;
     }
 }

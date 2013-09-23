@@ -16,18 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
@@ -36,9 +37,13 @@ import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
+    private static final String XCLASSNAME = "textarea";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);
+
     public TextAreaClass(PropertyMetaClass wclass)
     {
-        super("textarea", "Text Area", wclass);
+        super(XCLASSNAME, "Text Area", wclass);
 
         setSize(40);
         setRows(5);
@@ -49,11 +54,6 @@ public class TextAreaClass extends StringClass
         this(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.StringClass#newProperty()
-     */
     @Override
     public BaseProperty newProperty()
     {
@@ -159,17 +159,12 @@ public class TextAreaClass extends StringClass
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.StringClass#displayEdit(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         boolean isWysiwyg = isWysiwyg(context);
         textarea textarea = new textarea();
+        textarea.setAttributeFilter(new XMLAttributeValueFilter());
         String tname = prefix + name;
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
@@ -203,15 +198,8 @@ public class TextAreaClass extends StringClass
         buffer.append(textarea.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.classes.PropertyClass#displayView(java.lang.StringBuffer, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
-     */
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         String contentType = getContentType();
         XWikiDocument doc = context.getDoc();
@@ -231,8 +219,8 @@ public class TextAreaClass extends StringClass
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
-                buffer.append(doc.getRenderedContent(result.toString(),
-                    getObjectDocumentSyntax(object, context).toIdString(), context));
+                buffer.append(doc.getRenderedContent(result.toString(), getObjectDocumentSyntax(object, context)
+                    .toIdString(), context));
             } else {
                 buffer.append(result);
             }
@@ -240,8 +228,8 @@ public class TextAreaClass extends StringClass
     }
 
     /**
-     * @return the syntax for the document to which the passed objects belongs to or the XWiki Syntax 1.0 if the
-     *         object document cannot be retrieved
+     * @return the syntax for the document to which the passed objects belongs to or the XWiki Syntax 1.0 if the object
+     *         document cannot be retrieved
      */
     private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
     {
@@ -254,8 +242,8 @@ public class TextAreaClass extends StringClass
             // Used to convert a Document Reference to string (compact form without the wiki part if it matches the
             // current wiki).
             EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
-            LOG.warn("Error while getting the syntax corresponding to object ["
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+            LOGGER.warn("Error while getting the syntax corresponding to object ["
                 + compactWikiEntityReferenceSerializer.serialize(object.getDocumentReference())
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
             syntax = Syntax.XWIKI_1_0;

@@ -32,7 +32,7 @@ import org.xwiki.gwt.dom.client.RangeTest;
 import org.xwiki.gwt.dom.client.SelectionTest;
 import org.xwiki.gwt.dom.client.StyleTest;
 import org.xwiki.gwt.dom.client.TextTest;
-import org.xwiki.gwt.dom.client.internal.ie.IERangeTest;
+import org.xwiki.gwt.dom.client.internal.ie.IEOldRangeTest;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 
@@ -64,7 +64,7 @@ public class DOMTestSuite extends GWTTestSuite
         suite.addTestSuite(ElementTest.class);
         suite.addTestSuite(TextTest.class);
         suite.addTestSuite(RangeTest.class);
-        suite.addTestSuite(IERangeTest.class);
+        suite.addTestSuite(IEOldRangeTest.class);
         suite.addTestSuite(SelectionTest.class);
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);

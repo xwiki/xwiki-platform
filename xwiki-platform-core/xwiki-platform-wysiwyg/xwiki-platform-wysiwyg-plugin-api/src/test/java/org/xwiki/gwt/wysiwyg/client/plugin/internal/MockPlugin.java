@@ -47,31 +47,19 @@ public class MockPlugin implements Plugin
         this.uie = uie;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Plugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         // ignore
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Plugin#getUIExtensions()
-     */
+    @Override
     public UIExtension[] getUIExtensions()
     {
         return new UIExtension[] {uie};
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Plugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         // ignore

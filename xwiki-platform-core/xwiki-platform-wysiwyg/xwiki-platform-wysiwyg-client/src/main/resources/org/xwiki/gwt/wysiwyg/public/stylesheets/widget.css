@@ -24,10 +24,9 @@
   color: gray;
 }
 
-.xSearchBox {
+input.xSearchBox {
   background-image: url(../images/search.gif);
   background-position: 2px center;
   background-repeat: no-repeat;
-  border: 1px solid #666;
   padding: 2px 2px 2px 19px;
 }

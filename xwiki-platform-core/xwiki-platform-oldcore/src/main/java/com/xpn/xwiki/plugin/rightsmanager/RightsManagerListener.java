@@ -23,8 +23,8 @@ package com.xpn.xwiki.plugin.rightsmanager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -46,7 +46,7 @@ public final class RightsManagerListener implements EventListener
     /**
      * The logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(RightsManagerListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RightsManagerListener.class);
 
     /**
      * The name of the listener.
@@ -91,32 +91,19 @@ public final class RightsManagerListener implements EventListener
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         return EVENTS;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         // Only take into account local events
@@ -132,13 +119,13 @@ public final class RightsManagerListener implements EventListener
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
                 } catch (XWikiException e) {
-                    LOG.warn("Error when cleaning for deleted user", e);
+                    LOGGER.warn("Error when cleaning for deleted user", e);
                 }
             } else if (document.getObject("XWiki.XWikiGroups") != null) {
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
                 } catch (XWikiException e) {
-                    LOG.warn("Error when cleaning for deleted group", e);
+                    LOGGER.warn("Error when cleaning for deleted group", e);
                 }
             }
         }
@@ -176,33 +163,16 @@ public final class RightsManagerListener implements EventListener
     private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         boolean user, XWikiContext context) throws XWikiException
     {
-        if (!context.getWiki().isVirtualMode()) {
-            cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
-        } else {
-            List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
+        List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
 
-            String database = context.getDatabase();
-            try {
-                boolean foundMainWiki = false;
-
-                for (String wikiName : wikiList) {
-                    if (context.isMainWiki(wikiName)) {
-                        foundMainWiki = true;
-                    }
-
-                    context.setDatabase(wikiName);
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-                        context);
-                }
-
-                if (!foundMainWiki) {
-                    context.setDatabase(context.getMainXWiki());
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-                        context);
-                }
-            } finally {
-                context.setDatabase(database);
+        String database = context.getDatabase();
+        try {
+            for (String wikiName : wikiList) {
+                context.setDatabase(wikiName);
+                cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
             }
+        } finally {
+            context.setDatabase(database);
         }
     }
 }

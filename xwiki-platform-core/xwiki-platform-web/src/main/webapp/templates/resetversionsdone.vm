@@ -5,7 +5,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-#xwikimessageboxstart($msg.get("resetversions") $msg.get("resetversionsdone"))
+#xwikimessageboxstart($services.localization.render('resetversions') $services.localization.render('resetversionsdone'))
 $!message
 #xwikimessageboxend()
 <div class="clearfloats"></div>

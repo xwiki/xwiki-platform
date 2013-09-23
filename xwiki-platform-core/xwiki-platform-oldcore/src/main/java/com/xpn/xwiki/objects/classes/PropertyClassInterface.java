@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 
 package com.xpn.xwiki.objects.classes;
 
@@ -26,16 +24,32 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectInterface;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.objects.PropertyInterface;
 
-public interface PropertyClassInterface extends ObjectInterface {
+/**
+ * The interface implemented by all XClass properties. An XClass property is at the same time a property (implements
+ * {@link PropertyInterface}) and an instance (object) of a meta class (implements {@link ObjectInterface}), where the
+ * meta class defines the meta properties of an XClass property (e.g. "relational storage", "display type", "separator",
+ * "multiple selection", etc.)
+ * 
+ * @version $Id$
+ */
+public interface PropertyClassInterface extends ObjectInterface, PropertyInterface
+{
     public String toString(BaseProperty property);
+
     public BaseProperty fromString(String value);
+
     public BaseProperty fromValue(Object value);
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
-    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context);
+
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context);
+
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+
     public BaseProperty newProperty();
+
     public void flushCache();
 }

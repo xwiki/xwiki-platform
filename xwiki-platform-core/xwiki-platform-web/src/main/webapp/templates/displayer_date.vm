@@ -1,0 +1,27 @@
+#set ($format = $field.getProperty('dateFormat').value)
+#set ($formattedValue = $escapetool.xml($datetool.format($format, $value)))
+#if ($type == 'edit' || $type == 'search')
+  #set ($picker = $field.getProperty('picker').value == 1)
+  #if ($picker)
+    ## A simple date picker widget.
+    #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
+    ## Used to parse and serialize the selected date using the date format specified in the XClass.
+    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
+    ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
+    #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
+  #end
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  <input type="text" id="$!id" name="$!id" value="$!formattedValue"#if ($picker)
+    class="datetime t$!value.time" title="$!escapetool.xml($format)"#end />
+#elseif ($type == 'view' || $type == 'rendered')
+$!formattedValue##
+#elseif ($type == 'hidden')
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  <input type="hidden" id="$!id" name="$!id" value="$!formattedValue" />
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end

@@ -29,12 +29,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 
 /**
  * Supports the following syntax for JARs attached to wiki pages:
@@ -44,6 +47,7 @@ import org.xwiki.component.annotation.Requirement;
  * @since 2.0.1
  */
 @Component
+@Singleton
 public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoaderFactory
 {
     /**
@@ -56,34 +60,29 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
      * The Stream handler factory to use in the created classloader in order to be able to load our custom 
      * {@code attachmentjar} custom protocol.
      */
-    @Requirement
+    @Inject
     private URLStreamHandlerFactory streamHandlerFactory;
 
     /**
      * The stream handler for our custom {@code attachmentjar} protocol. We use it to get access to the protocol 
      * name and to transform from URI to URL.
      */
-    @Requirement("attachmentjar")
-    private ExtendedURLStreamHandler attachmentJarHander;
+    @Inject
+    @Named("attachmentjar")
+    private ExtendedURLStreamHandler attachmentJarHandler;
     
-    /**
-     * {@inheritDoc}
-     * @see AttachmentClassLoaderFactory#createAttachmentClassLoader(String, ClassLoader)
-     */
+    @Override
     public ExtendedURLClassLoader createAttachmentClassLoader(String jarURLs, ClassLoader parent) throws Exception
     {
         URI[] uris = extractURIs(jarURLs).toArray(new URI[0]);
         return new URIClassLoader(uris, parent, this.streamHandlerFactory);
     }
     
-    /**
-     * {@inheritDoc}
-     * @see AttachmentClassLoaderFactory#extendAttachmentClassLoader(String, ExtendedURLClassLoader)
-     */
+    @Override
     public void extendAttachmentClassLoader(String jarURLs, ExtendedURLClassLoader source) throws Exception
     {
         for (URI uri : extractURIs(jarURLs)) {
-            if (uri.getScheme().equalsIgnoreCase(this.attachmentJarHander.getProtocol())) {
+            if (uri.getScheme().equalsIgnoreCase(this.attachmentJarHandler.getProtocol())) {
                 source.addURL(new URL(null, uri.toString(), 
                     this.streamHandlerFactory.createURLStreamHandler(uri.getScheme())));
             } else {
@@ -102,7 +101,7 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
     {
         // Parse the passed JAR URLs to tokenize it.
         Set<URI> uris = new LinkedHashSet<URI>();
-        if (!StringUtils.isEmpty(jarURLs)) {
+        if (StringUtils.isNotEmpty(jarURLs)) {
             StringTokenizer tokenizer = new StringTokenizer(jarURLs, ",");
             while (tokenizer.hasMoreElements()) {
                 String token = tokenizer.nextToken().trim();
@@ -139,6 +138,6 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
             throw new RuntimeException("Failed to URL encode [" + uriBody + "] using UTF-8.", e);
         }
 
-        return new URI(this.attachmentJarHander.getProtocol() + "://" + uriBody);
+        return new URI(this.attachmentJarHandler.getProtocol() + "://" + uriBody);
     }
 }

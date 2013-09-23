@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
-import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter;
@@ -41,7 +41,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Wizard step responsible for importing copy-pasted office content.
@@ -49,13 +48,8 @@ import com.google.gwt.user.client.ui.Widget;
  * @version $Id$
  * @since 2.0.1
  */
-public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
+public class ImportOfficePasteWizardStep extends AbstractInteractiveWizardStep implements LoadHandler
 {
-    /**
-     * Main UI of this wizard.
-     */
-    private Panel mainPanel;
-
     /**
      * The text area where the user can paste his content.
      */
@@ -90,7 +84,9 @@ public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
     {
         this.importService = importService;
 
-        mainPanel = new FlowPanel();
+        setStepTitle(Strings.INSTANCE.importOfficePasteWizardStepTitle());
+        setValidDirections(EnumSet.of(NavigationDirection.CANCEL, NavigationDirection.FINISH));
+        setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.importWizardImportButtonCaption());
 
         // Info label.
         Panel infoLabel = new FlowPanel();
@@ -99,32 +95,24 @@ public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
         InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
         mandatoryLabel.addStyleName("xMandatory");
         infoLabel.add(mandatoryLabel);
-        mainPanel.add(infoLabel);
+        display().add(infoLabel);
 
         // Help label.
         Label helpLabel = new Label(Strings.INSTANCE.importOfficePasteHelpLabel());
         helpLabel.setStyleName("xHelpLabel");
-        mainPanel.add(helpLabel);
+        display().add(helpLabel);
 
         // Text area panel.
         textArea = new RichTextArea();
         textArea.addStyleName("xImportOfficeContentEditor");
         textArea.addLoadHandler(this);
-        mainPanel.add(textArea);
+        display().add(textArea);
 
         // Filter styles check box.
         this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
         // The filter styles check box should be checked by default.
         this.filterStylesCheckBox.setValue(true);
-        mainPanel.add(filterStylesCheckBox);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return this.mainPanel;
+        display().add(filterStylesCheckBox);
     }
 
     /**
@@ -134,33 +122,6 @@ public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
     {
         textArea.setHTML("");
         cb.onSuccess(null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public EnumSet<NavigationDirection> getValidDirections()
-    {
-        return EnumSet.of(NavigationDirection.CANCEL, NavigationDirection.FINISH);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDirectionName(NavigationDirection direction)
-    {
-        if (direction == NavigationDirection.FINISH) {
-            return Strings.INSTANCE.importWizardImportButtonCaption();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getNextStep()
-    {
-        return null;
     }
 
     /**
@@ -179,14 +140,6 @@ public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
     private void setResult(Object result)
     {
         this.result = result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.importOfficePasteWizardStepTitle();
     }
 
     /**

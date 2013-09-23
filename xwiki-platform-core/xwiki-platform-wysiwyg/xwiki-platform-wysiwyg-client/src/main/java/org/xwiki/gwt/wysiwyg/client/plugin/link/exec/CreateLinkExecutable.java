@@ -135,6 +135,15 @@ public class CreateLinkExecutable extends AbstractInsertElementExecutable<LinkCo
     @Override
     protected AnchorElement newElement()
     {
-        return rta.getDocument().createAnchorElement();
+        AnchorElement anchor = rta.getDocument().createAnchorElement();
+        // Firefox 9 doesn't allow us to insert an empty anchor (no reference and no label) in an empty editable body
+        // element. The call emptyEditableBody.appendChild(emptyAnchor) is simply ignored. I know that, following the
+        // strict DTD, the body element can contain only block-level elements, but in this case inserting an empty image
+        // or a text node works fine. So Firefox 9 has something against inserting an empty anchor in an empty editable
+        // body. As a workaround we set the anchor reference and label to some default values. Note that these values
+        // will be overwritten later because the insert link wizard doesn't accept an empty reference or label.
+        anchor.setHref("http://www.xwiki.org");
+        anchor.setInnerText("XWiki");
+        return anchor;
     }
 }

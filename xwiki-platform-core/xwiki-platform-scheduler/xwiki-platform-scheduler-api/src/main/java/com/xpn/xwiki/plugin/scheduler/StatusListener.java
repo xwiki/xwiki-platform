@@ -19,14 +19,14 @@
  */
 package com.xpn.xwiki.plugin.scheduler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @version $Id$
@@ -36,105 +36,79 @@ public class StatusListener implements SchedulerListener, JobListener
     /**
      * Log4j logger that records events for this class
      */
-    private static final Log LOG = LogFactory.getLog(StatusListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatusListener.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobScheduled(Trigger trigger)
     {
-        LOG.info("Task '" + trigger.getJobName() + "' scheduled");
+        LOGGER.info("Task [{}] scheduled", trigger.getJobName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobUnscheduled(String name, String group)
     {
-        LOG.info("Task '" + name + "' unscheduled");
+        LOGGER.info("Task [{}] unscheduled", name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void triggerFinalized(Trigger trigger)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void triggersPaused(String trigger, String group)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void triggersResumed(String trigger, String group)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobsPaused(String name, String group)
     {
-        LOG.info("Task '" + name + "' paused");
+        LOGGER.info("Task [{}] paused", name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobsResumed(String name, String group)
     {
-        LOG.info("Task '" + name + "' resumed");
+        LOGGER.info("Task [{}] resumed", name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void schedulerError(String message, SchedulerException error)
     {
-        LOG.error(message, error);
+        LOGGER.error(message, error);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void schedulerShutdown()
     {
-        LOG.warn("Scheduler is shutting down");
+        LOGGER.warn("Scheduler is shutting down");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "StatusListener";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobToBeExecuted(JobExecutionContext context)
     {
-        LOG.info("Task '" + context.getJobDetail().getName() + "' is about to be executed");
+        LOGGER.info("Task [{}] is about to be executed", context.getJobDetail().getName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobExecutionVetoed(JobExecutionContext context)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException e)
     {
-        LOG.info("Task '" + context.getJobDetail().getName() + "' executed : " + e);
+        LOGGER.info("Task [{}] executed: ", context.getJobDetail().getName(), e);
     }
 }

@@ -24,14 +24,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.io.IOTargetService;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -48,39 +49,35 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @version $Id$
  * @since 2.3M1
  */
-public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled implements AnnotationMaintainer
+public abstract class AbstractAnnotationMaintainer implements AnnotationMaintainer
 {
     /**
      * Annotations storage service.
      */
-    @Requirement
+    @Inject
     protected IOService ioService;
 
     /**
      * Content storage and manipulation service.
      */
-    @Requirement
+    @Inject
     protected IOTargetService ioContentService;
 
     /**
      * Space stripper content alterer, to be able to map annotations on the content in the same way the rendering
      * mapping does it.
      */
-    @Requirement("whitespace")
+    @Inject
+    @Named("whitespace")
     protected ContentAlterer spaceStripperContentAlterer;
 
     /**
      * The component manager, used to grab the plain text renderer.
      */
-    @Requirement
+    @Inject
     protected ComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.AnnotationMaintainer#updateAnnotations(java.lang.String, java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public void updateAnnotations(String target, String previousContent, String currentContent)
         throws MaintainerServiceException
     {
@@ -140,17 +137,17 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
      */
     private String renderPlainText(String content, String syntaxId) throws Exception
     {
-        PrintRenderer renderer = componentManager.lookup(PrintRenderer.class, "normalizer-plain/1.0");
+        PrintRenderer renderer = componentManager.getInstance(PrintRenderer.class, "normalizer-plain/1.0");
 
         // parse
-        Parser parser = componentManager.lookup(Parser.class, syntaxId);
+        Parser parser = componentManager.getInstance(Parser.class, syntaxId);
         XDOM xdom = parser.parse(new StringReader(content));
 
         // run transformations -> although it's going to be at least strange to handle rendered content since there
         // is no context
-        SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
+        SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
         Syntax sourceSyntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
-        TransformationManager transformationManager = componentManager.lookup(TransformationManager.class);
+        TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, sourceSyntax);
 
         // render

@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
@@ -28,24 +26,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
+import com.xpn.xwiki.web.Utils;
 
 public class DBListClass extends ListClass
 {
-    protected static final String DEFAULT_QUERY = "select doc.name from XWikiDocument doc where 1 = 0";
+    private static final String XCLASSNAME = "dblist";
 
-    private static final Log LOG = LogFactory.getLog(DBListClass.class);
+    /**
+     * Logging helper object.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBListClass.class);
+
+    protected static final String DEFAULT_QUERY = "select doc.name from XWikiDocument doc where 1 = 0";
 
     private List<ListItem> cachedDBList;
 
@@ -56,7 +63,7 @@ public class DBListClass extends ListClass
 
     public DBListClass(PropertyMetaClass wclass)
     {
-        super("dblist", "DB List", wclass);
+        super(XCLASSNAME, "DB List", wclass);
     }
 
     public DBListClass()
@@ -94,20 +101,23 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            XWiki xwiki = context.getWiki();
-            String query = getQuery(context);
+            String hqlQuery = getQuery(context);
 
-            if (query == null) {
+            if (hqlQuery == null) {
                 list = new ArrayList<ListItem>();
             } else {
                 try {
-                    if ((xwiki.getHibernateStore() != null) && (!query.startsWith("/"))) {
-                        list = makeList(xwiki.search(query, context));
-                    } else {
-                        list = makeList(((QueryPlugin) xwiki.getPlugin("query", context)).xpath(query).list());
-                    }
+                    // We need the query manager
+                    QueryManager queryManager = Utils.getComponent(QueryManager.class);
+                    // We create the query
+                    Query query = queryManager.createQuery(hqlQuery, Query.HQL);
+                    // The DBlist may come from an other wiki
+                    String wikiName = getReference().extractReference(EntityType.WIKI).getName();
+                    query.setWiki(wikiName);
+                    // We execute the query to create the list of values.
+                    list = makeList(query.execute());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to get the list", e);
                     list = new ArrayList<ListItem>();
                 }
             }
@@ -203,7 +213,7 @@ public class DBListClass extends ListClass
                     if (hasClassname) {
                         sql =
                             "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
-                            + " where doc.fullName=obj.name and obj.className='" + classname + "'";
+                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the 3 properties is specified, return a query that always
                         // returns no rows.
@@ -296,8 +306,9 @@ public class DBListClass extends ListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOG.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
+            LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
         }
+
         return sql;
     }
 
@@ -363,27 +374,30 @@ public class DBListClass extends ListClass
     public void flushCache()
     {
         this.cachedDBList = null;
+        super.flushCache();
     }
 
     // return first or second column from user query
-    public String returnCol(String hibquery, boolean first)
+    public String returnCol(String hqlQuery, boolean first)
     {
         String firstCol = "-", secondCol = "-";
+        if (StringUtils.isEmpty(hqlQuery)) {
+            return firstCol;
+        }
 
-        int fromIndx = hibquery.indexOf("from");
+        int fromIndx = hqlQuery.toLowerCase().indexOf("from");
 
         if (fromIndx > 0) {
-            String firstPart = hibquery.substring(0, fromIndx);
-            firstPart.replaceAll("\\s+", " ");
-            int comIndx = hibquery.indexOf(",");
+            String beforeFrom = hqlQuery.substring(0, fromIndx).replaceAll("\\s+", " ");
+            int commaIndex = beforeFrom.indexOf(",");
 
-            // there are more than one columns to select- take the second one (the value)
-            if (comIndx > 0 && comIndx < fromIndx) {
-                StringTokenizer st = new StringTokenizer(firstPart, " ,()", true);
+            // There are two columns selected
+            if (commaIndex > 0) {
+                StringTokenizer st = new StringTokenizer(beforeFrom, " ,()", true);
                 ArrayList<String> words = new ArrayList<String>();
 
                 while (st.hasMoreTokens()) {
-                    words.add(st.nextToken().toLowerCase());
+                    words.add(st.nextToken());
                 }
 
                 int comma = words.indexOf(",") - 1;
@@ -408,22 +422,9 @@ public class DBListClass extends ListClass
                     secondCol = words.get(comma).toString().trim();
                 }
             }
-            // has only one column
+            // Only one column selected
             else {
-                int i = fromIndx - 1;
-                while (firstPart.charAt(i) == ' ') {
-                    --i;
-                }
-                String col = " ";
-                while (firstPart.charAt(i) != ' ') {
-                    col += firstPart.charAt(i);
-                    --i;
-                }
-                String reverse = " ";
-                for (i = (col.length() - 1); i >= 0; --i) {
-                    reverse += col.charAt(i);
-                }
-                firstCol = reverse.trim();
+                firstCol = StringUtils.substringAfterLast(beforeFrom.trim(), " ");
             }
         }
         if (first == true) {
@@ -470,6 +471,7 @@ public class DBListClass extends ListClass
         // input display
         if (getDisplayType().equals("input")) {
             input input = new input();
+            input.setAttributeFilter(new XMLAttributeValueFilter());
             input.setType("text");
             input.setSize(getSize());
             boolean changeInputName = false;
@@ -478,7 +480,7 @@ public class DBListClass extends ListClass
             BaseProperty prop = (BaseProperty) object.safeget(name);
             String val = "";
             if (prop != null) {
-                val = prop.toFormString();
+                val = prop.toText();
             }
 
             if (isPicker()) {
@@ -498,6 +500,7 @@ public class DBListClass extends ListClass
                     if (secondCol.compareTo("-") != 0) {
                         changeInputName = true;
                         input hidden = new input();
+                        hidden.setAttributeFilter(new XMLAttributeValueFilter());
                         hidden.setID(prefix + name);
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
@@ -513,8 +516,8 @@ public class DBListClass extends ListClass
                 }
 
                 String script =
-                    "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
-                    + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
+                    "\"" + path + "?xpage=suggest&classname=" + classname + "&fieldname=" + fieldname + "&firCol="
+                        + firstCol + "&secCol=" + secondCol + "&\"";
                 String varname = "\"input\"";
                 String seps = "\"" + this.getSeparators() + "\"";
                 if (isMultiSelect()) {
@@ -546,6 +549,7 @@ public class DBListClass extends ListClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);
         }
     }
@@ -553,36 +557,25 @@ public class DBListClass extends ListClass
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        if (isPicker() && getSql().compareTo("") != 0) {
-            BaseProperty prop = (BaseProperty) object.safeget(name);
-            String val = "";
-            if (prop != null) {
-                val = prop.toFormString();
-            }
-            Map map = getMap(context);
+        List<String> selectlist;
+        String separator = getSeparator();
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        Map<String, ListItem> map = getMap(context);
 
-            String secondCol = returnCol(getSql(), false);
-            if (secondCol.compareTo("-") != 0) {
-                String res = getValue(val, getSql(), context);
-                buffer.append(getDisplayValue(res, name, map, context));
-            } else {
-                buffer.append(getDisplayValue(val, name, map, context));
+        // Skip unset values.
+        if (prop == null) {
+            return;
+        }
+
+        if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
+            List<String> newlist = new ArrayList<String>();
+            for (String entry : selectlist) {
+                newlist.add(getDisplayValue(entry, name, map, context));
             }
+            buffer.append(StringUtils.join(newlist, separator));
         } else {
-            List<String> selectlist;
-            String separator = getSeparator();
-            BaseProperty prop = (BaseProperty) object.safeget(name);
-            Map<String, ListItem> map = getMap(context);
-            if (prop instanceof ListProperty) {
-                selectlist = ((ListProperty) prop).getList();
-                List<String> newlist = new ArrayList<String>();
-                for (String entry : selectlist) {
-                    newlist.add(getDisplayValue(entry, name, map, context));
-                }
-                buffer.append(StringUtils.join(newlist, separator));
-            } else {
-                buffer.append(getDisplayValue(prop.getValue(), name, map, context));
-            }
+            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
     }
 }

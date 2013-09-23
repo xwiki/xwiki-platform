@@ -45,51 +45,31 @@ public class DefaultExecutable extends AbstractRichTextAreaExecutable
         this.command = command;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         return rta.getDocument().execCommand(command, parameter);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         return rta.getDocument().queryCommandValue(command);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return super.isEnabled() && rta.getDocument().queryCommandEnabled(command);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         return rta.getDocument().queryCommandState(command);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return super.isSupported() && rta.getDocument().queryCommandSupported(command);

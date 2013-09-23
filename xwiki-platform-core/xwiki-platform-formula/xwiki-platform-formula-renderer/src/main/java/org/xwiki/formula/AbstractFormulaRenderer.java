@@ -23,9 +23,10 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for all implementations of the {@link FormulaRenderer} component. Provides all the common functionalities
@@ -38,17 +39,13 @@ import org.xwiki.component.annotation.Requirement;
 public abstract class AbstractFormulaRenderer implements FormulaRenderer
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(AbstractFormulaRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFormulaRenderer.class);
 
     /** A storage system for rendered images, for reuse in subsequent requests. */
-    @Requirement
+    @Inject
     private ImageStorage storage;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FormulaRenderer#process(String, boolean, FontSize, Type)
-     */
+    @Override
     public String process(String formula, boolean inline, FontSize size, Type type) throws IllegalArgumentException,
         IOException
     {
@@ -61,11 +58,7 @@ public abstract class AbstractFormulaRenderer implements FormulaRenderer
         return cacheKey;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FormulaRenderer#getImage(String)
-     */
+    @Override
     public ImageData getImage(String imageID)
     {
         return this.storage.get(imageID);
@@ -107,9 +100,9 @@ public abstract class AbstractFormulaRenderer implements FormulaRenderer
             hashAlgorithm.update(formula.getBytes());
             return new String(org.apache.commons.codec.binary.Hex.encodeHex(hashAlgorithm.digest()));
         } catch (NoSuchAlgorithmException ex) {
-            LOG.error("No MD5 hash algorithm implementation", ex);
+            LOGGER.error("No MD5 hash algorithm implementation", ex);
         } catch (NullPointerException ex) {
-            LOG.error("Error hashing image name", ex);
+            LOGGER.error("Error hashing image name", ex);
         }
         // Fallback to a simple hashcode
         final int prime = 37;

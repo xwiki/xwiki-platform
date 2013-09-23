@@ -4,8 +4,10 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
 widgets.ModalPopup = Class.create({
   /** Configuration. Empty values will fall back to the CSS. */
   options : {
+    globalDialog : true,
     title : "",
     displayCloseButton : true,
+    extraClassName : false,
     screenColor : "",
     borderColor : "",
     titleColor : "",
@@ -13,7 +15,8 @@ widgets.ModalPopup = Class.create({
     screenOpacity : "0.5",
     verticalPosition : "center",
     horizontalPosition : "center",
-    removeOnClose : false
+    removeOnClose : false,
+    onClose : Prototype.emptyFunction
   },
   /** Constructor. Registers the key listener that pops up the dialog. */
   initialize : function(content, shortcuts, options) {
@@ -42,8 +45,11 @@ widgets.ModalPopup = Class.create({
     this.dialog.update(screen);
     // The dialog chrome
     this.dialogBox = new Element('div', {'class': 'xdialog-box'});
+    if (this.options.extraClassName) {
+      this.dialogBox.addClassName(this.options.extraClassName);
+    }
     // Insert the content
-    this.dialogBox._x_contentPlug = new Element('div');
+    this.dialogBox._x_contentPlug = new Element('div', {'class' : 'xdialog-content'});
     this.dialogBox.update(this.dialogBox._x_contentPlug);
     this.dialogBox._x_contentPlug.update(this.content);
     // Add the dialog title
@@ -54,10 +60,16 @@ widgets.ModalPopup = Class.create({
     }
     // Add the close button
     if (this.options.displayCloseButton) {
-      var closeButton = new Element('div', {'class': 'xdialog-close', 'title': 'Close'}).update("X");
-      closeButton.setStyle({"color": this.options.titleColor});
+      var closeButton = new Element('div', {'class': 'xdialog-close', 'title': 'Close'}).update("&#215;");
       closeButton.observe("click", this.closeDialog.bindAsEventListener(this));
-      this.dialogBox.insertBefore(closeButton, this.dialogBox.firstChild);
+      if (this.options.title) {
+        title.insert({bottom: closeButton});
+        if (this.options.titleColor) {
+          closeButton.setStyle({"color": this.options.titleColor});
+        }
+      } else {
+        this.dialogBox.insertBefore(closeButton, this.dialogBox.firstChild);
+      }
     }
     this.dialog.appendChild(this.dialogBox);
     this.dialogBox.setStyle({
@@ -90,7 +102,7 @@ widgets.ModalPopup = Class.create({
       break;
     }
     // Append to the end of the document body.
-    document.body.appendChild(this.dialog);
+    $('body').appendChild(this.dialog);
     this.dialog.hide();
   },
   /** Set a class name to the dialog box */
@@ -112,42 +124,35 @@ widgets.ModalPopup = Class.create({
       Event.stop(event);
     }
     // Only do this if the dialog is not already active.
-    if (!widgets.ModalPopup.active) {
-      widgets.ModalPopup.active = true;
-      if (!this.dialog) {
-        // The dialog wasn't loaded, create it.
-        this.createDialog();
+    if (this.options.globalDialog) {
+      if (widgets.ModalPopup.active) {
+        return;
+      } else {
+        widgets.ModalPopup.active = true;
       }
-      // Start listening to keyboard events
-      this.attachKeyListeners();
-      // In IE, position: fixed does not work.
-      if (window.browser.isIE6x) {
-        this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
-        this.dialog._x_scrollListener = this.onScroll.bindAsEventListener(this);
-        Event.observe(window, "scroll", this.dialog._x_scrollListener);
-        $$("select").each(function(item) {
-          item._x_initiallyVisible = item.style.visibility;
-          item.style.visibility = 'hidden';
-        });
+    } else {
+      if (this.active) {
+        return;
+      } else {
+        this.active = true;
       }
-      // Display the dialog
-      this.dialog.show();
     }
-  },
-  onScroll : function(event) {
-    this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
+    if (!this.dialog) {
+      // The dialog wasn't loaded, create it.
+      this.createDialog();
+    }
+    // Start listening to keyboard events
+    this.attachKeyListeners();
+    // Display the dialog
+    this.dialog.show();
   },
   /** Called when the dialog is closed. Disables the key listeners, hides the UI and re-enables the 'Show' behavior. */
   closeDialog : function(event) {
     if (event) {
       Event.stop(event);
     }
-    if (window.browser.isIE6x) {
-      Event.stopObserving(window, "scroll", this.dialog._x_scrollListener);
-      $$("select").each(function(item) {
-        item.style.visibility = item._x_initiallyVisible;
-      });
-    }
+    // Call optional callback
+    this.options.onClose.call(this);
     // Hide the dialog, without removing it from the DOM.
     this.dialog.hide();
     if (this.options.removeOnClose) {
@@ -156,7 +161,11 @@ widgets.ModalPopup = Class.create({
     // Stop the UI shortcuts (except the initial Show Dialog one).
     this.detachKeyListeners();
     // Re-enable the 'show' behavior.
-    widgets.ModalPopup.active = false;
+    if (this.options.globalDialog) {
+      widgets.ModalPopup.active = false;
+    } else {
+      this.active = false;
+    }
   },
   /** Enables all the keyboard shortcuts, except the one that opens the dialog, which is already enabled. */
   attachKeyListeners : function() {
@@ -182,18 +191,22 @@ widgets.ModalPopup = Class.create({
    */
   registerShortcuts : function(action) {
     var shortcuts = this.shortcuts[action].keys;
-    var method = this.shortcuts[action].method;
+    var method = this.shortcuts[action].method.bindAsEventListener(this, action);
+    var type = 'keypress';
+    if ((Prototype.Browser.IE && !window.addEventListener) || Prototype.Browser.WebKit) {
+      // Old IE or WebKit-based.
+      type = 'keyup';
+    } else if (Prototype.Browser.IE) {
+      // New IE
+      type = 'keydown';
+    }
     for (var i = 0; i < shortcuts.size(); ++i) {
-      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-        shortcut.add(shortcuts[i], method.bindAsEventListener(this, action), {type: 'keyup'});
-      } else {
-        shortcut.add(shortcuts[i], method.bindAsEventListener(this, action), {type: 'keypress'});
-      }
+      shortcut.add(shortcuts[i], method, {type: type});
     }
   },
   /**
    * Disables the keyboard shortcuts for a specific action.
-   * 
+   *
    * @param {String} action The action to unregister {@see #shortcuts}
    */
   unregisterShortcuts : function(action) {

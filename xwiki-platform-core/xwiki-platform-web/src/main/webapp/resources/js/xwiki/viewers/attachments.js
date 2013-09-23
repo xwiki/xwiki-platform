@@ -55,10 +55,10 @@ viewers.Attachments = Class.create({
             },
             /* Interaction parameters */
             {
-               confirmationText: "$msg.get('core.viewers.attachments.delete.confirm')",
-               progressMessageText : "$msg.get('core.viewers.attachments.delete.inProgress')",
-               successMessageText : "$msg.get('core.viewers.attachments.delete.done')",
-               failureMessageText : "$msg.get('core.viewers.attachments.delete.failed')"
+               confirmationText: "$services.localization.render('core.viewers.attachments.delete.confirm')",
+               progressMessageText : "$services.localization.render('core.viewers.attachments.delete.inProgress')",
+               successMessageText : "$services.localization.render('core.viewers.attachments.delete.done')",
+               failureMessageText : "$services.localization.render('core.viewers.attachments.delete.failed')"
             }
           );
         }
@@ -67,10 +67,10 @@ viewers.Attachments = Class.create({
   },
   updateCount : function() {
     if ($("Attachmentstab") && $("Attachmentstab").down(".itemCount")) {
-      $("Attachmentstab").down(".itemCount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
+      $("Attachmentstab").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
     }
     if ($("attachmentsshortcut") && $("attachmentsshortcut").down(".itemCount")) {
-      $("attachmentsshortcut").down(".itemCount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
+      $("attachmentsshortcut").down(".itemCount").update("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
     }
   },
   /** Enhance the upload form with JS behaviors. */
@@ -81,10 +81,29 @@ viewers.Attachments = Class.create({
     this.form = $("attachform").up("form");
     this.defaultFileDiv = this.form.down("input[type='file']").up("div");
     this.inputSize = this.form.down("input[type='file']").size;
-    this.addInitialRemoveButton();
-    this.addAddButton();
+
+    var html5Uploader = this.attachHTML5Uploader(this.form.down("input[type='file']"));
+    if (html5Uploader) {
+      this.addDeleteListener = this.addDeleteListener.bindAsEventListener(this);
+      this.form.observe("xwiki:html5upload:done", this.addDeleteListener);
+      html5Uploader.hideFormButtons();
+    } else {
+      this.addInitialRemoveButton();
+      this.addAddButton();
+      this.resetOnCancel();
+    }
     this.blockEmptySubmit();
-    this.resetOnCancel();
+  },
+  /** If available in the current browser, enable HTML5 upload for a given file input */
+  attachHTML5Uploader : function(input) {
+    if (typeof(XWiki.FileUploader) != 'undefined') {
+      input.multiple = true;
+      return new XWiki.FileUploader(input, {
+        'responseContainer' : $('_attachments'),
+        'responseURL' : XWiki.currentDocument.getURL('get', 'xpage=attachmentslist&forceTestRights=1')
+      });
+    }
+    return false;
   },
   /** By default the form contains one upload field. Add a "remove" button for this one, too. */
   addInitialRemoveButton : function() {
@@ -94,7 +113,7 @@ viewers.Attachments = Class.create({
   addAddButton : function() {
     var addButton = new Element("input", {
       type: "button",
-      value: "$msg.get('core.viewers.attachments.upload.addFileInput')",
+      value: "$services.localization.render('core.viewers.attachments.upload.addFileInput')",
       className: "attachmentActionButton add-file-input"
     });
     this.addDiv = new Element("div");
@@ -122,7 +141,7 @@ viewers.Attachments = Class.create({
     // For the moment, specifying a different name is not used anymore.
     var filenameInput = new Element("input", {type: "hidden", name : "filename_" + this.counter});
     var removeButton = this.createRemoveButton();
-    var containerDiv = new Element("div");
+    var containerDiv = new Element("div", {'class' : 'fileupload-field'});
     containerDiv.insert(filenameInput).insert(fileInput).insert(removeButton);
     this.addDiv.parentNode.insertBefore(containerDiv, this.addDiv);
     // Remove the focus border from the button
@@ -137,8 +156,8 @@ viewers.Attachments = Class.create({
   createRemoveButton : function() {
     var removeButton = new Element("input", {
       type: "button",
-      value: "$msg.get('core.viewers.attachments.upload.removeFileInput')",
-      title: "$msg.get('core.viewers.attachments.upload.removeFileInput.title')",
+      value: "$services.localization.render('core.viewers.attachments.upload.removeFileInput')",
+      title: "$services.localization.render('core.viewers.attachments.upload.removeFileInput.title')",
       className: "attachmentActionButton remove-file-input"
     });
     Event.observe(removeButton, "click", this.removeField.bindAsEventListener(this));
@@ -183,9 +202,12 @@ viewers.Attachments = Class.create({
     document.observe("xwiki:docextra:loaded", listener);
   }
 });
+
+// When the document is loaded, trigger the attachment form enhancements.
+(XWiki.domIsLoaded && new viewers.Attachments())
+|| document.observe("xwiki:dom:loaded", function() { new viewers.Attachments(); });
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
 
-// When the document is loaded, trigger the attachment form enhancements.
-document.observe("xwiki:dom:loaded", function() { new XWiki.viewers.Attachments(); });

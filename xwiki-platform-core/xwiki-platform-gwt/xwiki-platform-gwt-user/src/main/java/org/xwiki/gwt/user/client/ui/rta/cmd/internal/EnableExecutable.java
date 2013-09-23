@@ -38,53 +38,33 @@ public class EnableExecutable extends AbstractRichTextAreaExecutable
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         rta.setEnabled(Boolean.parseBoolean(parameter));
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         return Boolean.toString(rta.isEnabled());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         // Always enabled.
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         return rta.isEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         // Always supported.

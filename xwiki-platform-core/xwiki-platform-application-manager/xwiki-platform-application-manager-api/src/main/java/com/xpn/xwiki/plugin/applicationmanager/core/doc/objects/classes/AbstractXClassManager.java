@@ -249,121 +249,73 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         this.classTemplateDefaultContent = "#includeForm(\"" + classSheetFullName + "\")\n";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#getClassSpacePrefix()
-     */
+    @Override
     public String getClassSpacePrefix()
     {
         return this.classSpacePrefix;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassSpace()
-     */
+    @Override
     public String getClassSpace()
     {
         return this.classSpace;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassPrefix()
-     */
+    @Override
     public String getClassPrefix()
     {
         return this.classPrefix;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassName()
-     */
+    @Override
     public String getClassName()
     {
         return this.className;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassFullName()
-     */
+    @Override
     public String getClassFullName()
     {
         return this.classFullName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassTemplateName()
-     */
+    @Override
     public String getClassTemplateSpace()
     {
         return this.classTemplateSpace;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassTemplateName()
-     */
+    @Override
     public String getClassTemplateName()
     {
         return this.classTemplateName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassTemplateFullName()
-     */
+    @Override
     public String getClassTemplateFullName()
     {
         return this.classTemplateFullName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassSheetName()
-     */
+    @Override
     public String getClassSheetSpace()
     {
         return this.classSheetSpace;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassSheetName()
-     */
+    @Override
     public String getClassSheetName()
     {
         return this.classSheetName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassSheetFullName()
-     */
+    @Override
     public String getClassSheetFullName()
     {
         return this.classSheetFullName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#forceValidDocumentName()
-     */
+    @Override
     public boolean forceValidDocumentName()
     {
         return false;
@@ -390,7 +342,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassDocument(XWikiContext context) throws XWikiException
+    protected void checkClassDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClass) {
             return;
@@ -409,29 +361,28 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc = new XWikiDocument();
                 doc.setSpace(getClassSpace());
                 doc.setName(getClassName());
-                doc.setParent(DEFAULT_XWIKICLASS_PARENT);
                 doc.setCreator(XWikiRightService.SUPERADMIN_USER);
                 doc.setAuthor(doc.getCreator());
                 needsUpdate = true;
             }
 
-            this.baseClass = doc.getxWikiClass();
+            if (doc.isNew()) {
+                doc.setParent(DEFAULT_XWIKICLASS_PARENT);
+            }
+
+            this.baseClass = doc.getXClass();
 
             needsUpdate |= updateBaseClass(this.baseClass);
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class document", context);
             }
         } finally {
             this.checkingClass = false;
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassSheetDefaultContent()
-     */
+    @Override
     public String getClassSheetDefaultContent()
     {
         return this.classSheetDefaultContent;
@@ -477,7 +428,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassSheetDocument(XWikiContext context) throws XWikiException
+    protected void checkClassSheetDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClassSheet) {
             return;
@@ -496,7 +447,6 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc = new XWikiDocument();
                 doc.setSpace(getClassSheetSpace());
                 doc.setName(getClassSheetName());
-                doc.setParent(getClassFullName());
                 needsUpdate = true;
             }
 
@@ -506,21 +456,19 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 String content = getResourceDocumentContent(documentContentPath);
                 doc.setContent(content != null ? content : getClassSheetDefaultContent());
                 doc.setSyntax(Syntax.XWIKI_1_0);
+                doc.setParent(getClassFullName());
+                doc.setHidden(true);
             }
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class sheet document", context);
             }
         } finally {
             this.checkingClassSheet = false;
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassTemplateDefaultContent()
-     */
+    @Override
     public String getClassTemplateDefaultContent()
     {
         return this.classTemplateDefaultContent;
@@ -532,7 +480,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * @param context the XWiki context.
      * @throws XWikiException error when saving document.
      */
-    private void checkClassTemplateDocument(XWikiContext context) throws XWikiException
+    protected void checkClassTemplateDocument(XWikiContext context) throws XWikiException
     {
         if (this.checkingClassTemplate) {
             return;
@@ -566,14 +514,14 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                         + DOCUMENTCONTENT_EXT);
                 doc.setContent(content != null ? content : getClassTemplateDefaultContent());
                 doc.setSyntax(Syntax.XWIKI_1_0);
-
                 doc.setParent(getClassFullName());
+                doc.setHidden(true);
             }
 
             needsUpdate |= updateClassTemplateDocument(doc);
 
             if (doc.isNew() || needsUpdate) {
-                xwiki.saveDocument(doc, context);
+                xwiki.saveDocument(doc, "Check class template document", context);
             }
         } finally {
             this.checkingClassTemplate = false;
@@ -685,11 +633,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         return needsUpdate;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getBaseClass()
-     */
+    @Override
     public BaseClass getBaseClass()
     {
         if (this.baseClass == null) {
@@ -700,11 +644,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         return this.baseClass;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassDocument(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public Document getClassDocument(XWikiContext context) throws XWikiException
     {
         check(context);
@@ -712,11 +652,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         return context.getWiki().getDocument(getClassFullName(), context).newDocument(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassSheetDocument(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public Document getClassSheetDocument(XWikiContext context) throws XWikiException
     {
         check(context);
@@ -724,11 +660,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         return context.getWiki().getDocument(getClassSheetFullName(), context).newDocument(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getClassTemplateDocument(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public Document getClassTemplateDocument(XWikiContext context) throws XWikiException
     {
         check(context);
@@ -736,43 +668,27 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         return context.getWiki().getDocument(getClassTemplateFullName(), context).newDocument(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#isInstance(com.xpn.xwiki.doc.XWikiDocument)
-     */
+    @Override
     public boolean isInstance(XWikiDocument doc)
     {
         return doc.getObjectNumbers(getClassFullName()) > 0
             && (!forceValidDocumentName() || isValidName(doc.getFullName()));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#isInstance(com.xpn.xwiki.doc.XWikiDocument)
-     */
+    @Override
     public boolean isInstance(Document doc)
     {
         return doc.getObjectNumbers(getClassFullName()) > 0
             && (!forceValidDocumentName() || isValidName(doc.getFullName()));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#isValidName(java.lang.String)
-     */
+    @Override
     public boolean isValidName(String fullName)
     {
         return getItemDefaultName(fullName) != null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getItemDocumentDefaultName(java.lang.String, XWikiContext)
-     */
+    @Override
     public String getItemDocumentDefaultName(String itemName, XWikiContext context)
     {
         String cleanedItemName =
@@ -782,22 +698,14 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             + cleanedItemName.substring(1).toLowerCase();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#getItemDocumentDefaultFullName(java.lang.String, XWikiContext)
-     */
+    @Override
     public String getItemDocumentDefaultFullName(String itemName, XWikiContext context)
     {
         return getClassSpacePrefix() + XObjectDocument.SPACE_DOC_SEPARATOR
             + getItemDocumentDefaultName(itemName, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#getItemDefaultName(java.lang.String)
-     */
+    @Override
     public String getItemDefaultName(String docFullName)
     {
         String prefix = getClassSpacePrefix() + XObjectDocument.SPACE_DOC_SEPARATOR + getClassPrefix();
@@ -809,12 +717,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         return docFullName.substring(prefix.length()).toLowerCase();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#getXObjectDocument(java.lang.String,
-     *      int, boolean, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public T getXObjectDocument(String itemName, int objectId, boolean validate, XWikiContext context)
         throws XWikiException
     {
@@ -940,44 +843,25 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
-     *      int, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public T newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context) throws XWikiException
     {
         return (T) new DefaultXObjectDocument(this, doc, objId, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocument(java.lang.String,
-     *      int, com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public T newXObjectDocument(String docFullName, int objId, XWikiContext context) throws XWikiException
     {
         return newXObjectDocument(context.getWiki().getDocument(docFullName, context), objId, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XClassManager#newXObjectDocument(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public T newXObjectDocument(XWikiContext context) throws XWikiException
     {
         return newXObjectDocument(new XWikiDocument(), 0, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocumentList(com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<T> newXObjectDocumentList(XWikiDocument document, XWikiContext context) throws XWikiException
     {
         List<XWikiDocument> documents = new ArrayList<XWikiDocument>(1);
@@ -986,12 +870,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         return newXObjectDocumentList(documents, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocumentList(java.util.List,
-     *      com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public List<T> newXObjectDocumentList(List<XWikiDocument> documents, XWikiContext context) throws XWikiException
     {
         List<T> list;

@@ -24,23 +24,23 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
-import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.document.OfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.server.OfficeServer;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test case for {@link DefaultXHTMLOfficeDocumentBuilder}.
- * 
+ *
  * @version $Id$
  * @since 2.1M1
  */
@@ -64,48 +64,42 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
     /**
      * Used to setup a mock document converter.
      */
-    private OpenOfficeManager officeManager;
+    private OfficeServer officeServer;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        this.xhtmlDocumentBuilder = getComponentManager().lookup(XHTMLOfficeDocumentBuilder.class);
-        this.officeManager = getComponentManager().lookup(OpenOfficeManager.class);
+        this.xhtmlDocumentBuilder = getComponentManager().getInstance(XHTMLOfficeDocumentBuilder.class);
+        this.officeServer = getComponentManager().getInstance(OfficeServer.class);
     }
 
     /**
-     * Tests {@link XHTMLOfficeDocument} building.
+     * Tests {@link OfficeDocument} building.
      */
-    @org.junit.Test
-    public void testXHTMLOfficeDocumentBuilding()
+    @Test
+    public void testXHTMLOfficeDocumentBuilding() throws Exception
     {
-        // Create & register a mock document converter to by-pass openoffice server.
+        // Create & register a mock document converter to by-pass the office server.
         final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
         final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
         mockInput.put(INPUT_FILE_NAME, mockOfficeFileStream);
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put(OUTPUT_FILE_NAME, "<html><head><title></tile></head><body></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
+        final OfficeConverter mockDocumentConverter = getMockery().mock(OfficeConverter.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockOpenOfficeManager).getConverter();
+                oneOf(mockOfficeServer).getConverter();
                 will(returnValue(mockDocumentConverter));
 
-                try {
-                    allowing(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
-                    will(returnValue(mockOutput));
-                } catch (OpenOfficeConverterException e) {
-                    Assert.fail(e.getMessage());
-                }
+                allowing(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
+                will(returnValue(mockOutput));
             }
         });
-        ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
+        ReflectionUtils.setFieldValue(officeServer, "converter", mockDocumentConverter);
 
         // Create & register a mock entity reference serializer.
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
@@ -117,13 +111,9 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
             }
         });
 
-        XHTMLOfficeDocument document = null;
-        try {
-            document = xhtmlDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
-        } catch (OfficeImporterException e) {
-            Assert.fail(e.getMessage());
-        }
-        Assert.assertNotNull(document.getContentDocument());
-        Assert.assertEquals(0, document.getArtifacts().size());
+        OfficeDocument document =
+            xhtmlDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
+        assertNotNull(document.getContentDocument());
+        assertEquals(0, document.getArtifacts().size());
     }
 }

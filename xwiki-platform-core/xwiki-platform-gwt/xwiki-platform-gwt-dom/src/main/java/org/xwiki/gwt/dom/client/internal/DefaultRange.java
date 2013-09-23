@@ -33,7 +33,7 @@ import com.google.gwt.dom.client.Node;
  * Acknowledgment to Mozilla Foundation for making nsRange.cpp public.
  * 
  * @version $Id$
- * @see http://hg.mozilla.org/mozilla-central/file/b945b4f67e7e/content/base/src/nsRange.cpp
+ * @see "http://hg.mozilla.org/mozilla-central/file/b945b4f67e7e/content/base/src/nsRange.cpp"
  */
 public class DefaultRange implements Range
 {
@@ -100,11 +100,7 @@ public class DefaultRange implements Range
         positioned = startContainer != null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#cloneContents()
-     */
+    @Override
     public DocumentFragment cloneContents()
     {
         if (detached) {
@@ -136,11 +132,7 @@ public class DefaultRange implements Range
         return contents;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#cloneRange()
-     */
+    @Override
     public Range cloneRange()
     {
         if (detached) {
@@ -154,11 +146,7 @@ public class DefaultRange implements Range
         return clone;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#collapse(boolean)
-     */
+    @Override
     public void collapse(boolean toStart)
     {
         if (detached || !positioned) {
@@ -172,11 +160,7 @@ public class DefaultRange implements Range
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#compareBoundaryPoints(RangeCompare, Range)
-     */
+    @Override
     public short compareBoundaryPoints(RangeCompare how, Range sourceRange)
     {
         if (detached || !positioned) {
@@ -204,11 +188,7 @@ public class DefaultRange implements Range
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#deleteContents()
-     */
+    @Override
     public void deleteContents()
     {
         if (detached || !positioned) {
@@ -297,11 +277,7 @@ public class DefaultRange implements Range
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#detach()
-     */
+    @Override
     public void detach()
     {
         if (detached) {
@@ -312,12 +288,7 @@ public class DefaultRange implements Range
         setRange(null, 0, null, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#extractContents()
-     * @see #deleteContents()
-     */
+    @Override
     public DocumentFragment extractContents()
     {
         if (detached || !positioned) {
@@ -358,11 +329,7 @@ public class DefaultRange implements Range
         return contents;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getCommonAncestorContainer()
-     */
+    @Override
     public Node getCommonAncestorContainer()
     {
         if (detached || !positioned) {
@@ -372,11 +339,7 @@ public class DefaultRange implements Range
         return domUtils.getNearestCommonAncestor(startContainer, endContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getEndContainer()
-     */
+    @Override
     public Node getEndContainer()
     {
         if (!positioned) {
@@ -386,11 +349,7 @@ public class DefaultRange implements Range
         return endContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getEndOffset()
-     */
+    @Override
     public int getEndOffset()
     {
         if (!positioned) {
@@ -400,11 +359,7 @@ public class DefaultRange implements Range
         return endOffset;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getStartContainer()
-     */
+    @Override
     public Node getStartContainer()
     {
         if (!positioned) {
@@ -414,11 +369,7 @@ public class DefaultRange implements Range
         return startContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#getStartOffset()
-     */
+    @Override
     public int getStartOffset()
     {
         if (!positioned) {
@@ -428,11 +379,7 @@ public class DefaultRange implements Range
         return startOffset;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#insertNode(Node)
-     */
+    @Override
     public void insertNode(Node newNode)
     {
         // Compute the number of nodes to insert.
@@ -466,11 +413,7 @@ public class DefaultRange implements Range
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#isCollapsed()
-     */
+    @Override
     public boolean isCollapsed()
     {
         if (detached || !positioned) {
@@ -480,11 +423,7 @@ public class DefaultRange implements Range
         return startContainer == endContainer && startOffset == endOffset;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#selectNode(Node)
-     */
+    @Override
     public void selectNode(Node refNode)
     {
         Node parent = refNode.getParentNode();
@@ -492,21 +431,13 @@ public class DefaultRange implements Range
         setRange(parent, index, parent, index + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#selectNodeContents(Node)
-     */
+    @Override
     public void selectNodeContents(Node refNode)
     {
         setRange(refNode, 0, refNode, domUtils.getLength(refNode));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setEnd(Node, int)
-     */
+    @Override
     public void setEnd(Node refNode, int offset)
     {
         if (!positioned || startContainer.getOwnerDocument() != refNode.getOwnerDocument()
@@ -517,31 +448,19 @@ public class DefaultRange implements Range
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setEndAfter(Node)
-     */
+    @Override
     public void setEndAfter(Node refNode)
     {
         setEnd(refNode.getParentNode(), domUtils.getNodeIndex(refNode) + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setEndBefore(Node)
-     */
+    @Override
     public void setEndBefore(Node refNode)
     {
         setEnd(refNode.getParentNode(), domUtils.getNodeIndex(refNode));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setStart(Node, int)
-     */
+    @Override
     public void setStart(Node refNode, int offset)
     {
         if (!positioned || endContainer.getOwnerDocument() != refNode.getOwnerDocument()
@@ -571,21 +490,13 @@ public class DefaultRange implements Range
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setStartAfter(Node)
-     */
+    @Override
     public void setStartAfter(Node refNode)
     {
         setStart(refNode.getParentNode(), domUtils.getNodeIndex(refNode) + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#setStartBefore(Node)
-     */
+    @Override
     public void setStartBefore(Node refNode)
     {
         setStart(refNode.getParentNode(), domUtils.getNodeIndex(refNode));
@@ -615,11 +526,7 @@ public class DefaultRange implements Range
         return can || (endIsText && endParent != null && endParent == startContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#surroundContents(Node)
-     */
+    @Override
     public void surroundContents(Node newParent)
     {
         // The surroundContents() method raises an exception if the Range partially selects a non-Text node. An example
@@ -648,11 +555,7 @@ public class DefaultRange implements Range
         selectNode(newParent);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#toHTML()
-     */
+    @Override
     public String toHTML()
     {
         if (detached) {
@@ -666,11 +569,7 @@ public class DefaultRange implements Range
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Range#toString()
-     */
+    @Override
     public String toString()
     {
         if (detached) {

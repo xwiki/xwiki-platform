@@ -59,12 +59,7 @@ public class FormUrlEncodedAnnotationAddRequestReader extends
      */
     private static final String SELECTION_FIELD_NAME = "selection";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.ws.rs.ext.MessageBodyReader#isReadable(java.lang.Class, java.lang.reflect.Type,
-     *      java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType)
-     */
+    @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         // this reader will only read annotationAddRequests, and none of the superclasses. Superclasses will read
@@ -72,12 +67,6 @@ public class FormUrlEncodedAnnotationAddRequestReader extends
         return type.equals(AnnotationAddRequest.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rest.internal.representations.AbstractFormUrlEncodedAnnotationRequestReader
-     *      #getReadObjectInstance(org.xwiki.annotation.rest.model.jaxb.ObjectFactory)
-     */
     @Override
     protected AnnotationAddRequest getReadObjectInstance(ObjectFactory factory)
     {
@@ -90,13 +79,6 @@ public class FormUrlEncodedAnnotationAddRequestReader extends
         return addRequest;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rest.internal.representations.AbstractFormUrlEncodedAnnotationRequestReader
-     *      #saveField(java.lang.Object, java.lang.String, java.lang.String,
-     *      org.xwiki.annotation.rest.model.jaxb.ObjectFactory)
-     */
     @Override
     protected boolean saveField(AnnotationAddRequest annotationAddRequest, String key, String value,
         ObjectFactory objectFactory)

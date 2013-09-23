@@ -21,8 +21,8 @@ package org.xwiki.cache.util;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -38,9 +38,9 @@ import org.xwiki.cache.event.CacheEntryListener;
 public abstract class AbstractCache<T> implements Cache<T>
 {
     /**
-     * The logging tool.
+     * The logger to use to log.
      */
-    private static final Log LOG = LogFactory.getLog(AbstractCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCache.class);
 
     /**
      * The configuration used to create the cache.
@@ -52,11 +52,7 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected final EventListenerList cacheEntryListeners = new EventListenerList();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#dispose()
-     */
+    @Override
     public void dispose()
     {
         for (CacheEntryListener<T> listener : this.cacheEntryListeners.getListeners(CacheEntryListener.class)) {
@@ -64,21 +60,13 @@ public abstract class AbstractCache<T> implements Cache<T>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#addCacheEntryListener(org.xwiki.cache.event.CacheEntryListener)
-     */
+    @Override
     public void addCacheEntryListener(CacheEntryListener<T> listener)
     {
         this.cacheEntryListeners.add(CacheEntryListener.class, listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#removeCacheEntryListener(org.xwiki.cache.event.CacheEntryListener)
-     */
+    @Override
     public void removeCacheEntryListener(CacheEntryListener<T> listener)
     {
         cacheEntryListeners.remove(CacheEntryListener.class, listener);
@@ -91,8 +79,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryAddedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener
-                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener : this.cacheEntryListeners
+            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryAdded(event);
         }
     }
@@ -104,8 +92,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryRemovedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener
-                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener : this.cacheEntryListeners
+            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryRemoved(event);
         }
 
@@ -119,8 +107,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryModifiedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener
-                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener : this.cacheEntryListeners
+            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryModified(event);
         }
     }
@@ -136,10 +124,8 @@ public abstract class AbstractCache<T> implements Cache<T>
             try {
                 ((DisposableCacheValue) value).dispose();
             } catch (Throwable e) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Error when trying to dispose a cache object of cache ["
-                        + configuration.getConfigurationId() + "]", e);
-                }
+                LOGGER.warn("Error when trying to dispose a cache object of cache [{}]",
+                    this.configuration.getConfigurationId(), e);
             }
         }
     }

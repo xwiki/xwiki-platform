@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.xmlrpc;
 
@@ -25,13 +24,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.swizzle.confluence.Attachment;
 import org.codehaus.swizzle.confluence.Comment;
 import org.codehaus.swizzle.confluence.SearchResult;
 import org.codehaus.swizzle.confluence.Space;
 import org.codehaus.swizzle.confluence.SpaceSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.query.QueryException;
 import org.xwiki.xmlrpc.model.XWikiClass;
 import org.xwiki.xmlrpc.model.XWikiClassSummary;
@@ -57,7 +56,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public class DomainObjectFactory
 {
-    private static final Log LOG = LogFactory.getLog(DomainObjectFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DomainObjectFactory.class);
 
     /**
      * Create a space summary
@@ -394,7 +393,7 @@ public class DomainObjectFactory
             if (propertyType != null) {
                 result.setPropertyType(propertyName, propertyType.getClass().getName());
             } else {
-                LOG.warn(String.format("Property %s of object %s:%s has a null type", propertyName,
+                LOGGER.warn(String.format("Property %s of object %s:%s has a null type", propertyName,
                     document.getFullName(), object.getPrettyName()));
             }
 

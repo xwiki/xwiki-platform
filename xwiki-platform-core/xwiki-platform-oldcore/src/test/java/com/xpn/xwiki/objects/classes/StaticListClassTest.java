@@ -16,10 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.codehaus.plexus.util.StringUtils;
+import org.jmock.Mock;
+import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
@@ -29,6 +38,11 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
 {
+    /**
+     * Static list values that contain HTML special characters that need to be escaped in the HTML display.
+     */
+    private static final List<String> VALUES_WITH_HTML_SPECIAL_CHARS = Arrays.asList("a<b>c", "1\"2'3", "x{y&z");
+
     /** Tests that {@link StaticListClass#getList} returns values sorted according to the property's sort option. */
     public void testGetListIsSorted()
     {
@@ -42,5 +56,180 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Items were not ordered by ID.", "[a, b, c, d]", listClass.getList(getContext()).toString());
         listClass.setSort("value");
         assertEquals("Items were not ordered by value.", "[a, b, d, c]", listClass.getList(getContext()).toString());
+    }
+
+    /**
+     * Tests that the list values are XML-encoded and joined using the specified separator.
+     */
+    public void testDisplayView()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
+
+        String propertyName = "foo";
+        BaseObject object = new BaseObject();
+        object.addField(propertyName, listProperty);
+
+        StaticListClass staticListClass = new StaticListClass();
+        staticListClass.setSeparator("*");
+        staticListClass.setValues(VALUES_WITH_HTML_SPECIAL_CHARS.get(0) + '|' + VALUES_WITH_HTML_SPECIAL_CHARS.get(1)
+            + '=' + StringUtils.reverse(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)) + '|'
+            + VALUES_WITH_HTML_SPECIAL_CHARS.get(2));
+        assertEquals("a&#60;b&#62;c*3&#39;2&#34;1*x&#123;y&#38;z",
+            staticListClass.displayView(propertyName, "", object, null));
+    }
+
+    /**
+     * Tests the HTML output produced in edit mode.
+     * 
+     * @param displayType the display type (input, radio, select, etc.)
+     * @param selectedValues the selected values
+     * @param expectedHTML the expected HTML output
+     */
+    private void testDisplayEdit(String displayType, List<String> selectedValues, String expectedHTML)
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(selectedValues);
+
+        // Use special XML characters, even if they are not valid inside an XML name, just to test the XML escaping.
+        String propertyName = "b&a<r";
+        String prefix = "w>v";
+        BaseObject object = new BaseObject();
+        object.addField(propertyName, listProperty);
+
+        StaticListClass staticListClass = new StaticListClass();
+        staticListClass.setSize(7);
+        StringBuilder values = new StringBuilder();
+        for (String value : VALUES_WITH_HTML_SPECIAL_CHARS) {
+            if (values.length() > 0) {
+                values.append('|');
+            }
+            values.append(value).append('=').append(StringUtils.reverse(value));
+        }
+        staticListClass.setValues(values.toString());
+
+        staticListClass.setDisplayType(displayType);
+        assertEquals(expectedHTML, staticListClass.displayEdit(propertyName, prefix, object, null));
+    }
+
+    /**
+     * Tests the 'input' display type.
+     */
+    public void testDisplayEditInput()
+    {
+        testDisplayEdit("input", VALUES_WITH_HTML_SPECIAL_CHARS, "<input size='7' id='w&#62;vb&#38;a&#60;r' "
+            + "value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' name='w&#62;vb&#38;a&#60;r' type='text'/>");
+    }
+
+    /**
+     * Tests the 'select' display type.
+     */
+    public void testDisplayEditSelect()
+    {
+        String expectedHTML =
+            "<select id='w&#62;vb&#38;a&#60;r' name='w&#62;vb&#38;a&#60;r' size='7'>"
+                + "<option value='a&#60;b&#62;c' label='c&#62;b&#60;a'>c&#62;b&#60;a</option>"
+                + "<option selected='selected' value='1&#34;2&#39;3' label='3&#39;2&#34;1'>3&#39;2&#34;1</option>"
+                + "<option value='x&#123;y&#38;z' label='z&#38;y&#123;x'>z&#38;y&#123;x</option>"
+                + "</select><input name='w&#62;vb&#38;a&#60;r' type='hidden' value=''/>";
+        testDisplayEdit("select", Arrays.asList(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)), expectedHTML);
+    }
+
+    /**
+     * Tests the 'radio' display type.
+     */
+    public void testDisplayEditRadio()
+    {
+        StringBuilder expectedHTML = new StringBuilder();
+        expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-0\">");
+        expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-0' value='a&#60;b&#62;c'");
+        expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='radio'/>c&#62;b&#60;a</label>");
+        expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-1\">");
+        expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-1' checked='checked' value='1&#34;2&#39;3' ");
+        expectedHTML.append("name='w&#62;vb&#38;a&#60;r' type='radio'/>3&#39;2&#34;1</label>");
+        expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-2\">");
+        expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-2' value='x&#123;y&#38;z'");
+        expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='radio'/>z&#38;y&#123;x</label>");
+        expectedHTML.append("<input name='w&#62;vb&#38;a&#60;r' type='hidden' value=''/>");
+        testDisplayEdit("radio", Arrays.asList(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)), expectedHTML.toString());
+    }
+
+    /**
+     * Tests the 'checkbox' display type.
+     */
+    public void testDisplayEditCheckbox()
+    {
+        StringBuilder expectedHTML = new StringBuilder();
+        expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-0\">");
+        expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-0' value='a&#60;b&#62;c'");
+        expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='checkbox'/>c&#62;b&#60;a</label>");
+        expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-1\">");
+        expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-1' checked='checked' value='1&#34;2&#39;3' ");
+        expectedHTML.append("name='w&#62;vb&#38;a&#60;r' type='checkbox'/>3&#39;2&#34;1</label>");
+        expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-2\">");
+        expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-2' value='x&#123;y&#38;z'");
+        expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='checkbox'/>z&#38;y&#123;x</label>");
+        expectedHTML.append("<input name='w&#62;vb&#38;a&#60;r' type='hidden' value=''/>");
+        testDisplayEdit("checkbox", Arrays.asList(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)), expectedHTML.toString());
+    }
+
+    /**
+     * Tests the hidden display type.
+     */
+    public void testDisplayHidden()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
+
+        // Use special XML characters, even if they are not valid inside an XML name, just to test the XML escaping.
+        String propertyName = "f<o&o";
+        BaseObject object = new BaseObject();
+        object.addField(propertyName, listProperty);
+
+        assertEquals("<input id='f&#60;o&#38;o' value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' "
+            + "name='f&#60;o&#38;o' type='hidden'/>",
+            new StaticListClass().displayHidden(propertyName, "", object, null));
+    }
+
+    /**
+     * Tests the suggest code generated when "use suggest" is set.
+     */
+    public void testDisplayEditWithSuggest()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
+
+        // Use special XML characters, even if they are not valid inside an XML name, just to test the XML escaping.
+        String propertyName = "b&a<r";
+        String prefix = "w>v";
+        BaseObject object = new BaseObject();
+        object.addField(propertyName, listProperty);
+
+        StaticListClass staticListClass = new StaticListClass();
+        BaseClass ownerClass = new BaseClass();
+        ownerClass.setDocumentReference(new DocumentReference("xwiki", "ClassSpace", "ClassName"));
+        staticListClass.setName(propertyName);
+        staticListClass.setObject(ownerClass);
+        staticListClass.setSize(7);
+        StringBuilder values = new StringBuilder();
+        for (String value : VALUES_WITH_HTML_SPECIAL_CHARS) {
+            if (values.length() > 0) {
+                values.append('|');
+            }
+            values.append(value).append('=').append(StringUtils.reverse(value));
+        }
+        staticListClass.setValues(values.toString());
+
+        staticListClass.setDisplayType("input");
+        staticListClass.setPicker(true);
+        Mock xwikiMock = mock(XWiki.class);
+        xwikiMock.stubs().method("getURL").will(returnValue("/xwiki/bin/view/Main/WebHome"));
+        getContext().setWiki((XWiki) xwikiMock.proxy());
+        String output = staticListClass.displayEdit(propertyName, prefix, object, getContext());
+        System.err.println(output);
+        assertTrue(output
+            .contains("new ajaxSuggest(this, &#123;script:&#34;/xwiki/bin/view/Main/WebHome?xpage=suggest&#38;"
+                + "classname=ClassSpace.ClassName&#38;fieldname=b&#38;a&#60;r&#38;firCol=-&#38;"
+                + "secCol=-&#38;&#34;, varname:&#34;input&#34;} )"));
     }
 }

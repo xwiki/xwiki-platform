@@ -99,9 +99,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
         this.prependBasePageName = prependBasePageName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDocumentName(XDOM newDoc)
     {
         String documentName = null;

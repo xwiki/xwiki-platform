@@ -19,50 +19,30 @@
  */
 package org.xwiki.chart.model;
 
+import org.jfree.data.general.Dataset;
+import org.jfree.chart.axis.Axis;
+
 /**
  * Interface defining the input for the chart generator.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
 public interface ChartModel
 {
-    /**
-     * Number of data rows.
-     * 
-     * @return number of data rows present in this model.
-     */
-    int getRowCount();
 
     /**
-     * Number of data columns.
-     * 
-     * @return number of data columns present in this model.
+     * @return the dataset for this chart model.
+     * @since 4.2M1
      */
-    int getColumnCount();
+    Dataset getDataset();
 
     /**
-     * Returns the specified cell value.
-     * 
-     * @param rowIndex row index.
-     * @param columnIndex column index.
-     * @return cell value.
+     * @param index the index of the axis.
+     * @return the axis for this model.  How many axes and the type of each axis is determined by the data source
+     * description.
+     * @since 4.2M1
      */
-    Number getCellValue(int rowIndex, int columnIndex);
+    Axis getAxis(int index);
 
-    /**
-     * Returns the label for the specified data row.
-     * 
-     * @param rowIndex row index.
-     * @return the label for the specified data row.
-     */
-    String getRowHeader(int rowIndex);
-
-    /**
-     * Returns the label for the specified data column.
-     * 
-     * @param columnIndex column index.
-     * @return the label for the specified data column.
-     */
-    String getColumnHeader(int columnIndex);
 }

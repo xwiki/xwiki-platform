@@ -19,20 +19,11 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -40,12 +31,21 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
+
 /**
  * Common code for importing and exporting.
  * 
  * @version $Id$
  */
-public class AbstractPackager
+public abstract class AbstractPackager
 {
     /**
      * @param databaseName some database name (TODO: find out what this name is really)
@@ -55,46 +55,42 @@ public class AbstractPackager
      * @throws Exception failed to initialize context.
      * @todo Replace the Hibernate config file with a list of parameters required for the packaging operation
      */
-    protected XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
+    public XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
     {
-        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
-        ecm.initialize(this.getClass().getClassLoader());
-        Utils.setComponentManager(ecm);
+        // Initialize the Component Manager and Environment
+        ComponentManager cm = org.xwiki.environment.System.initialize();
+        Utils.setComponentManager(cm);
 
-        // We need to initialize the Component Manager so that the components can be looked up
-        XWikiContext context = new XWikiContext();
-        context.put(ComponentManager.class.getName(), ecm);
+        XWikiContext xcontext = new XWikiContext();
+        xcontext.put(ComponentManager.class.getName(), cm);
 
         // Initialize the Container fields (request, response, session).
-        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = Utils.getComponent(Execution.class);
+        ExecutionContextManager ecim = cm.getInstance(ExecutionContextManager.class);
         try {
-            ExecutionContext ec = new ExecutionContext();
+            ExecutionContext econtext = new ExecutionContext();
 
             // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", context);
+            xcontext.declareInExecutionContext(econtext);
 
-            ecim.initialize(ec);
-            execution.setContext(ec);
+            ecim.initialize(econtext);
         } catch (ExecutionContextException e) {
             throw new Exception("Failed to initialize Execution Context.", e);
         }
-        
-        context.setUser("XWiki.superadmin");
-        context.setDatabase(databaseName);
-        context.setMainXWiki(databaseName);
+
+        xcontext.setDatabase(databaseName);
+        xcontext.setMainXWiki(databaseName);
 
         // Use a dummy Request even in daemon mode so that XWiki's initialization can create a Servlet URL Factory.
-        context.setRequest(new XWikiServletRequestStub());
+        xcontext.setRequest(new XWikiServletRequestStub());
 
         // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
         // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.
-        context.setURL(new URL("http://localhost/xwiki/bin/DummyAction/DumySpace/DummyPage"));
+        xcontext.setURL(new URL("http://localhost/xwiki/bin/DummyAction/DumySpace/DummyPage"));
 
         // Set a dummy Document in the context to act as the current document since when a document containing
         // objects is imported it'll generate Object diff events and the algorithm to compute an object diff
         // currently requires rendering object properties, which requires a current document in the context.
-        context.setDoc(new XWikiDocument(new DocumentReference(databaseName, "dummySpace", "dummyPage")));
+        xcontext.setDoc(new XWikiDocument(new DocumentReference(databaseName, "dummySpace", "dummyPage")));
 
         XWikiConfig config = new XWikiConfig();
         config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
@@ -104,15 +100,16 @@ public class AbstractPackager
         config.put("xwiki.store.hibernate.path", hibernateConfigInUnixFormat);
 
         config.put("xwiki.store.hibernate.updateschema", "1");
-        config.put("xwiki.virtual", "1");
 
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");
 
-        new XWiki(config, context, null, true);
+        XWiki xwiki = new XWiki(config, xcontext, null, true);
+
+        xcontext.setUserReference(new DocumentReference("xwiki", "XWiki", "superadmin"));
 
         try {
-            context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
+            xcontext.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
         } catch (MalformedURLException e) {
             // TODO: Remove that way of creating exceptions in XWiki as it's a real plain and
             // doesn't work with external code.
@@ -120,6 +117,30 @@ public class AbstractPackager
                 "Failed to set up URL Factory", e);
         }
 
-        return context;
+        // Trigger extensions that need to initialize the database (create classes, etc.)
+        xwiki.updateDatabase(xcontext.getMainXWiki(), xcontext);
+
+        return xcontext;
     }
+
+    /**
+     * Free resources initialized by {@link #createXWikiContext(String, File)}.
+     * 
+     * @param xcontext the XWiki context
+     * @throws ComponentLookupException when failing to dispose component manager
+     */
+    public void disposeXWikiContext(XWikiContext xcontext) throws ComponentLookupException
+    {
+        ComponentManager componentManager = Utils.getComponentManager();
+
+        // Remove ExecutionContext
+        Execution execution = componentManager.getInstance(Execution.class);
+        execution.removeContext();
+
+        // Dispose component manager
+        org.xwiki.environment.System.dispose(componentManager);
+
+        Utils.setComponentManager(null);
+    }
+
 }

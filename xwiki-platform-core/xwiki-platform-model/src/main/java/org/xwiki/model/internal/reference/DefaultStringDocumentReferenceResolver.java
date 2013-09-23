@@ -19,8 +19,10 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -36,16 +38,16 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * @since 2.2M1
  */
 @Component
+@Singleton
 public class DefaultStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
-    @Requirement
+    /**
+     * Default entity reference resolver used for resolution.
+     */
+    @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
-     */
+    @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
         return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,

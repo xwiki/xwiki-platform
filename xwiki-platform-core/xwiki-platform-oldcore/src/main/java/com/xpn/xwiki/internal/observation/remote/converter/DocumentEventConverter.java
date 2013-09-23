@@ -16,13 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -33,6 +35,7 @@ import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -43,13 +46,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("document")
+@Component
+@Singleton
+@Named("document")
 public class DocumentEventConverter extends AbstractXWikiEventConverter
 {
     /**
      * The events supported by this converter.
      */
-    private Set<Class< ? extends Event>> events = new HashSet<Class< ? extends Event>>()
+    private static final Set<Class< ? extends Event>> EVENTS = new HashSet<Class< ? extends Event>>()
     {
         {
             add(DocumentDeletedEvent.class);
@@ -58,15 +63,10 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         }
     };
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.LocalEventConverter#toRemote(org.xwiki.observation.remote.LocalEventData,
-     *      org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (this.events.contains(localEvent.getEvent().getClass())) {
+        if (EVENTS.contains(localEvent.getEvent().getClass())) {
             // fill the remote event
             remoteEvent.setEvent((Serializable) localEvent.getEvent());
             remoteEvent.setSource(serializeXWikiDocument((XWikiDocument) localEvent.getSource()));
@@ -78,22 +78,21 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.RemoteEventConverter#fromRemote(org.xwiki.observation.remote.RemoteEventData,
-     *      org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (this.events.contains(remoteEvent.getEvent().getClass())) {
+        if (EVENTS.contains(remoteEvent.getEvent().getClass())) {
             // fill the local event
-            XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
+            XWikiContext xcontext = unserializeXWikiContext(remoteEvent.getData());
 
-            if (context != null) {
-                localEvent.setEvent((Event) remoteEvent.getEvent());
-                localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
-                localEvent.setData(unserializeXWikiContext(remoteEvent.getData()));
+            try {
+                if (xcontext != null) {
+                    localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
+                    localEvent.setData(xcontext);
+                    localEvent.setEvent((Event) remoteEvent.getEvent());
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to convert remote event [{}]", remoteEvent, e);
             }
 
             return true;

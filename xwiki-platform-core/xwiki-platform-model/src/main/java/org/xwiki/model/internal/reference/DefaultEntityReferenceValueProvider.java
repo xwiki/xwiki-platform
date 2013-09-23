@@ -38,14 +38,13 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 @Singleton
 public class DefaultEntityReferenceValueProvider implements EntityReferenceValueProvider
 {
+    /**
+     * Configuration option of the model.
+     */
     @Inject
     private ModelConfiguration configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.reference.EntityReferenceValueProvider#getDefaultValue(org.xwiki.model.EntityType)
-     */
+    @Override
     public String getDefaultValue(EntityType type)
     {
         return this.configuration.getDefaultReferenceValue(type);

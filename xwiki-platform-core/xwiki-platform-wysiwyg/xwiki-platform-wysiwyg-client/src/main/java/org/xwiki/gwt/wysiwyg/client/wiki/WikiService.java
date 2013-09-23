@@ -21,7 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.wiki;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -33,13 +33,14 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 @RemoteServiceRelativePath("WikiService.gwtrpc")
 public interface WikiService extends RemoteService
 {
     /**
      * Checks if the editor is running in a multiwiki environment.
      * 
+     * @deprecated Multiwiki is on by default, starting with XWiki 5.0.
      * @return {@code true} if we are in a multiwiki environment, {@code false} otherwise
      */
     Boolean isMultiWiki();
@@ -91,9 +92,7 @@ public interface WikiService extends RemoteService
     EntityConfig getEntityConfig(EntityReference origin, ResourceReference destination);
 
     /**
-     * Returns information about the referenced attachment. Note that the {@code EntityReference#getFileName()} name
-     * will be cleaned to match the attachment names cleaning rules, and the returned attachment serialized reference
-     * and access URL will be generated with the cleaned name.
+     * Returns information about the referenced attachment.
      * 
      * @param attachmentReference an attachment reference
      * @return an {@link Attachment} containing the serialized reference and the access URL of the specified attachment,

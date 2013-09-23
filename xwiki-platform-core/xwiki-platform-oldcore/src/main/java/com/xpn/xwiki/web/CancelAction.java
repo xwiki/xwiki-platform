@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -44,13 +43,17 @@ public class CancelAction extends XWikiAction
         XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
 
         String username = context.getUser();
-        XWikiLock lock = tdoc.getLock(context);
-        if (lock != null && lock.getUserName().equals(username)) {
-            if ("inline".equals(request.get("action"))) {
-                doc.removeLock(context);
-            } else {
-                tdoc.removeLock(context);
+        try {
+            XWikiLock lock = tdoc.getLock(context);
+            if (lock != null && lock.getUserName().equals(username)) {
+                if ("inline".equals(request.get("action"))) {
+                    doc.removeLock(context);
+                } else {
+                    tdoc.removeLock(context);
+                }
             }
+        } catch (Exception ex) {
+            // Just ignore this, locks aren't critical.
         }
 
         // forward to view

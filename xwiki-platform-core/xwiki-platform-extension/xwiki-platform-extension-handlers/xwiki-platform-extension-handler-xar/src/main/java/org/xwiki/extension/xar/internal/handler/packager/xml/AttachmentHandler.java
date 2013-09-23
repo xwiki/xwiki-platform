@@ -23,35 +23,30 @@ import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.IOUtils;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 
+/**
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class AttachmentHandler extends AbstractHandler
 {
     public AttachmentHandler(ComponentManager componentManager)
     {
         super(componentManager, new XWikiAttachment());
+
+        // skip useless known elements
+        this.skippedElements.add("version");
+        this.skippedElements.add("date");
+        this.skippedElements.add("comment");
     }
 
     public XWikiAttachment getAttachment()
     {
         return (XWikiAttachment) getCurrentBean();
-    }
-
-    @Override
-    protected void startElementInternal(String uri, String localName, String qName, Attributes attributes)
-        throws SAXException
-    {
-        if (qName.equals("content")) {
-
-        } else if (qName.equals("versions")) {
-            this.value = null;
-        } else {
-            super.startElementInternal(uri, localName, qName, attributes);
-        }
     }
 
     @Override

@@ -21,9 +21,11 @@ package org.xwiki.crypto.passwd.internal;
 
 import java.util.Properties;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 
 import org.xwiki.crypto.passwd.PasswordCryptoServiceConfiguration;
@@ -37,10 +39,15 @@ import org.xwiki.crypto.passwd.PasswordCiphertext;
  * @version $Id$
  */
 @Component
-public class DefaultPasswordCryptoServiceConfiguration
-    extends AbstractLogEnabled
-    implements PasswordCryptoServiceConfiguration
+@Singleton
+public class DefaultPasswordCryptoServiceConfiguration implements PasswordCryptoServiceConfiguration
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     /**
      * Default {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction}s.
      */
@@ -65,7 +72,8 @@ public class DefaultPasswordCryptoServiceConfiguration
     private final String keyDerivationFunctionClassForEncryption = "keyDerivationFunctionClassForEncryption";
 
     /** Default {@link org.xwiki.crypto.passwd.KeyDerivationFunction} class to use for encryption. */
-    private final Class<?> defaultKeyDerivationFunctionClassForEncryption = ScryptMemoryHardKeyDerivationFunction.class;
+    private final Class<?> defaultKeyDerivationFunctionClassForEncryption =
+        PBKDF2KeyDerivationFunction.class;
 
     /**
      * Key for {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction} 
@@ -93,7 +101,7 @@ public class DefaultPasswordCryptoServiceConfiguration
 
     /** Default {@link org.xwiki.crypto.passwd.KeyDerivationFunction} class to use for password verification. */
     private final Class<?> defaultKeyDerivationFunctionClassForPasswordVerification = 
-        ScryptMemoryHardKeyDerivationFunction.class;
+        PBKDF2KeyDerivationFunction.class;
 
     /**
      * Key for {@link java.util.Properties} for the {@link org.xwiki.crypto.passwd.KeyDerivationFunction} 
@@ -111,14 +119,10 @@ public class DefaultPasswordCryptoServiceConfiguration
 
 
     /** Configuration is loaded from this source. */
-    @Requirement
+    @Inject
     private ConfigurationSource source;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getCipherClass()
-     */
+    @Override
     public Class<? extends PasswordCiphertext> getCipherClass()
     {
         return this.getClass(this.configurationPrefix + this.cipherKey,
@@ -126,11 +130,7 @@ public class DefaultPasswordCryptoServiceConfiguration
                              this.defaultCipherClass);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionClassForEncryption()
-     */
+    @Override
     public Class<? extends KeyDerivationFunction> getKeyDerivationFunctionClassForEncryption()
     {
         return this.getClass(this.configurationPrefix + this.keyDerivationFunctionClassForEncryption,
@@ -138,22 +138,14 @@ public class DefaultPasswordCryptoServiceConfiguration
                              this.defaultKeyDerivationFunctionClassForEncryption);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionPropertiesForEncryption()
-     */
+    @Override
     public Properties getKeyDerivationFunctionPropertiesForEncryption()
     {
         return new Properties(this.source.getProperty(this.keyDerivationFunctionPropertiesForEncryption,
                                                       this.defaultKeyDerivationFunctionPropertiesForEncryption));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getPasswordVerificationFunctionClass()
-     */
+    @Override
     public Class<? extends PasswordVerificationFunction> getPasswordVerificationFunctionClass()
     {
         return this.getClass(this.configurationPrefix + this.passwordVerificationFunctionClass,
@@ -161,11 +153,7 @@ public class DefaultPasswordCryptoServiceConfiguration
                              this.defaultPasswordVerificationFunctionClass);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionClassForPasswordVerification()
-     */
+    @Override
     public Class<? extends KeyDerivationFunction> getKeyDerivationFunctionClassForPasswordVerification()
     {
         return this.getClass(this.configurationPrefix + this.keyDerivationFunctionClassForPasswordVerification,
@@ -173,11 +161,7 @@ public class DefaultPasswordCryptoServiceConfiguration
                              this.defaultKeyDerivationFunctionClassForPasswordVerification);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see PasswordCryptoServiceConfiguration#getKeyDerivationFunctionPropertiesForPasswordVerification()
-     */
+    @Override
     public Properties getKeyDerivationFunctionPropertiesForPasswordVerification()
     {
         return new Properties(
@@ -204,7 +188,7 @@ public class DefaultPasswordCryptoServiceConfiguration
                 return Class.forName(value).asSubclass(mustExtend);
             }
         } catch (Exception e) {
-            this.getLogger().info("Unable to read configuration for [" + configurationKey + "] using default.");
+            this.logger.info("Unable to read configuration for [{}] using default.", configurationKey);
         }
         return defaultOut.asSubclass(mustExtend);
     }

@@ -24,7 +24,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -35,10 +34,12 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.localization.LocalizationContext;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -56,22 +57,19 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     private Map<String, XWikiDocument> documents = new HashMap<String, XWikiDocument>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
         
         this.xwiki = new XWiki();
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
         getContext().setWiki(this.xwiki);
 
         // //////////////////////////////////////////////////
         // XWikiHibernateStore
+
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
@@ -79,6 +77,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -93,6 +92,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -120,35 +120,47 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
         this.xwiki.setRightService(new XWikiRightService()
         {
+            @Override
             public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
             {
                 return true;
             }
 
+            @Override
             public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
                 throws XWikiException
             {
                 return true;
             }
 
+            @Override
             public boolean hasAdminRights(XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public boolean hasProgrammingRights(XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
             {
                 return true;
             }
 
+            @Override
             public List listAllLevels(XWikiContext context) throws XWikiException
             {
                 return Collections.EMPTY_LIST;
+            }
+
+            @Override
+            public boolean hasWikiAdminRights(XWikiContext context)
+            {
+                return true;
             }
         });
     }
@@ -164,7 +176,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentEmpty() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
@@ -182,7 +194,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentDocName() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
@@ -201,12 +213,12 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testInitXObjectDocumentDocNameExists() throws XWikiException
     {
-        documents.clear();
+        this.documents.clear();
 
         // ///
 
-        XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
-        xwiki.saveDocument(doc, getContext());
+        XWikiDocument doc = this.xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
+        this.xwiki.saveDocument(doc, getContext());
 
         XClassManager sclass = XClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc =

@@ -19,7 +19,7 @@
  */
 package org.xwiki.crypto.internal;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Means by which to get a string representation of the user page for the current user for inclusion in a certificate.
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.5M1
  */
-@ComponentRole
+@Role
 public interface UserDocumentUtils
 {
     /** @return The fully qualified name of the current user's document eg: xwiki:XWiki.JohnSmith. */

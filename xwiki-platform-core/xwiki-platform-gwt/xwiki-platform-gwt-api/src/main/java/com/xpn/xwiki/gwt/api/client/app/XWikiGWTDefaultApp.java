@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.gwt.api.client.app;
 
 import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
@@ -52,6 +71,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     public void onModuleLoad() {
     }
 
+    @Override
     public String getName() {
         return (name==null) ? "app" : name;
     }
@@ -121,6 +141,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * Allows to access the name of the translations page provided in gwt parameters
      * @return
      */
+    @Override
     public String getTranslationPage() {
         return getParam("translations", XWikiGWTAppConstants.XWIKI_DEFAULT_TRANSLATIONS_PAGE);
     }
@@ -152,6 +173,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * @param key
      * @return
      */
+    @Override
     public String getTranslation(String key) {
         if (translator!=null) {
             return translator.getTranslation(getName() + "." + key);
@@ -165,6 +187,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * @param key
      * @return
      */
+    @Override
     public String getTranslation(String key, String[] args) {
         if (translator!=null) {
             return translator.getTranslation(getName() + "." + key, args);
@@ -177,6 +200,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * Creates an instance of an XWiki Service
      * @return
      */
+    @Override
     public XWikiServiceAsync getXWikiServiceInstance() {
         if (serviceInstance == null) {
             String moduleBaseURL = GWT.getModuleBaseURL();
@@ -195,6 +219,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * @param file
      * @return
      */
+    @Override
     public String getSkinFile(String file) {
         return getSkinBaseURL() + "/" + file;
     }
@@ -210,6 +235,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     /**
      * Launches the loading box
      */
+    @Override
     public void startLoading() {
         getLoadingDialog().startLoading();
     }
@@ -217,10 +243,12 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     /**
      * Closes the loading box if the number of calls to finish are equal to the number of call to startLoading
      */
+    @Override
     public void finishLoading() {
         getLoadingDialog().finishLoading();
     }
 
+    @Override
     public boolean isTranslatorLoaded() {
         return (translator!=null);
     }
@@ -250,6 +278,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * @param title
      * @param message
      */
+    @Override
     public void showDialog(String title, String message) {
         new ModalMessageDialog(this, title, message);
     }
@@ -258,11 +287,13 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      *
      * @param message
      */
+    @Override
     public void showDialog(String message) {
         new ModalMessageDialog(this, getTranslation("appname"), message);
     }
 
 
+    @Override
     public void showError(Throwable caught) {
         if (caught instanceof XWikiGWTException) {
             XWikiGWTException exp = ((XWikiGWTException)caught);
@@ -283,10 +314,12 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
         }
     }
 
+    @Override
     public void showError(String text) {
         showError("", text);
     }
 
+    @Override
     public void showError(String code, String text) {
         String[] args = new String[1];
         args[0] = code;
@@ -294,6 +327,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
         showDialog(message);
     }
 
+    @Override
     public String getCSSPrefix() {
         return getParam("cssprefix", XWikiGWTAppConstants.XWIKI_DEFAULT_CSS_PREFIX);
     }
@@ -338,6 +372,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     }
 
 
+    @Override
     public String getLocale() {
         return getParam("locale", XWikiGWTAppConstants.XWIKI_DEFAULT_LOCALE);
     }

@@ -21,47 +21,61 @@ package org.xwiki.wysiwyg.server.internal.cleaner;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
-import org.xwiki.xml.html.filter.HTMLFilter;
 
 /**
  * Default HTML cleaner for the WYSIWYG editor's output.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class DefaultHTMLCleaner implements HTMLCleaner
 {
     /**
      * The component used to clean the HTML.
      */
-    @Requirement
+    @Inject
     private org.xwiki.xml.html.HTMLCleaner cleaner;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(String)
+     * The list of WYSIWYG editor specific HTML cleaning filters.
      */
+    @Inject
+    private List<HTMLFilter> specificFilters;
+
+    @Override
     public String clean(String dirtyHTML)
     {
+        // Sort the list of specific filters based on their priority.
+        Collections.sort(specificFilters, new Comparator<HTMLFilter>()
+        {
+            @Override
+            public int compare(HTMLFilter alice, HTMLFilter bob)
+            {
+                return alice.getPriority() - bob.getPriority();
+            }
+        });
+
         // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal
         // reasons, before any cleaning filter is applied. Otherwise cleaning filters might transform these
         // WYSIWYG-specific HTML elements making their removal difficult. We cannot transform the WYSIWYG output on the
         // client side because the editor is a widget that can be used independently inside or outside an HTML form and
         // thus it doesn't know when its current value is submitted.
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
-        List<HTMLFilter> filters = new ArrayList<HTMLFilter>();
-        filters.add(new LineBreakFilter());
-        filters.add(new EmptyLineFilter());
-        filters.add(new StandAloneMacroFilter());
-        filters.add(new EmptyAttributeFilter());
-        filters.add(new NestedAnchorsFilter());
+        List<org.xwiki.xml.html.filter.HTMLFilter> filters = new ArrayList<org.xwiki.xml.html.filter.HTMLFilter>();
+        filters.addAll(specificFilters);
         filters.addAll(config.getFilters());
         config.setFilters(filters);
 

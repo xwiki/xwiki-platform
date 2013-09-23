@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test</artifactId>
   <name>XWiki Platform - Test Framework</name>
@@ -35,8 +35,9 @@
   <description>XWiki Platform - Test Framework</description>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -47,11 +48,77 @@
       <artifactId>cpsuite</artifactId>
       <version>1.2.5</version>
     </dependency>
+    <!-- Used to execute the external XWiki process -->
     <dependency>
-      <groupId>org.apache.ant</groupId>
-      <artifactId>ant</artifactId>
-      <version>1.7.0</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+      <version>1.1</version>
     </dependency>
+
+    <!-- Manipulate xwiki.properrties -->
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
+
+    <!-- Dependencies for the UI test framework -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.detro.ghostdriver</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>1.0.3</version>
+      <!-- Exclude since we want to use our version of Selenium and not the one brought by ghostdriver -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-server</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-remote-driver</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- Make it easy to debug flickering tests by repeating them.
+         See http://tempus-fugit.googlecode.com/svn/site/documentation/annotations.html#aRepeating -->
+    <dependency>
+      <groupId>com.google.code.tempus-fugit</groupId>
+      <artifactId>tempus-fugit</artifactId>
+      <version>1.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- REST. TODO: Find way to not have any dependency on platform modules since this prevents using this test
+         framework in those modules! -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-repository-model</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
@@ -64,7 +131,8 @@
             org/xwiki/test/integration/AntBuildListener.java,
             org/xwiki/test/integration/XWikiExecutor.java,
             org/xwiki/test/integration/XWikiTestSetup.java,
-            org/xwiki/test/integration/XWikiExecutorSuite.java
+            org/xwiki/test/integration/XWikiExecutorSuite.java,
+            org/xwiki/test/ui/**/*.java
           </excludes>
         </configuration>
       </plugin>

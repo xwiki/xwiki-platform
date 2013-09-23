@@ -19,13 +19,13 @@
  */
 package com.xpn.xwiki.content.parsers;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Provides accessors to find all elements that have been replaced successfully when parsing and
- * replacing content. Also returns the modified content after the replacements have been done.
- *
+ * Provides accessors to find all elements that have been replaced successfully when parsing and replacing content. Also
+ * returns the modified content after the replacements have been done.
+ * 
  * @version $Id$
  */
 public class ReplacementResultCollection extends ParsingResultCollection
@@ -33,7 +33,7 @@ public class ReplacementResultCollection extends ParsingResultCollection
     /**
      * @see #getReplacedElements()
      */
-    private List replacedElements = new ArrayList();
+    private List<Object> replacedElements = new ArrayList<Object>();
 
     /**
      * @see #getModifiedContent()
@@ -51,7 +51,7 @@ public class ReplacementResultCollection extends ParsingResultCollection
     /**
      * @return the replaced elements. For example {@link com.xpn.xwiki.content.Link} objects.
      */
-    public List getReplacedElements()
+    public List<Object> getReplacedElements()
     {
         return this.replacedElements;
     }

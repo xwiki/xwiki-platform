@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Panels</web>
+  <name>NewPage</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1154962980000</creationDate>
+  <date>1176301876000</date>
+  <contentUpdateDate>1176301876000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>Panels.PanelClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>5</number>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Information|Navigation|Tools|Administration|Other</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </category>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>4</number>
+        <prettyName>Content</prettyName>
+        <rows>25</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <description>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>2</number>
+        <prettyName>Panel type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>view|edit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <name>Panels.NewPage</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>5ecfa384-8841-413d-957b-f956e8cd0bc2</guid>
+    <property>
+      <category>Tools</category>
+    </property>
+    <property>
+      <content>{{velocity}}
+#if ($hasEdit || $showEmptyPanels)
+#panelheader($services.localization.render('core.create.pageTitle'))
+#set ($panelId = $util.generateRandomString(4))
+{{html clean="false"}}
+&lt;form method="post" action="$doc.getURL('create')" onsubmit="cancelCancelEdit()"&gt;
+{{/html}}
+  (% class="padded centered" %)
+  (((
+    (% class="hidden" %)
+    {{html}}
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="hidden" name="tocreate" value="page"/&gt;
+    &lt;input type="hidden" name="parent" value="$!services.model.serialize($doc.documentReference, 'local')"/&gt;
+    {{/html}}
+    #set ($spaceInputId = "space$!{panelId}")
+    #set ($space = $doc.documentReference.lastSpaceReference.name)
+    #set ($pageInputId = "page$!{panelId}")
+    #set ($pageText = $services.localization.render('core.create.pageText'))
+    ; {{html}}&lt;label for="$spaceInputId"&gt;$services.localization.render('core.create.space')&lt;/label&gt;{{/html}}
+    : {{html}}&lt;input type="text" id="$spaceInputId" name="space" value="$!space" class="suggestSpaces" /&gt;{{/html}}
+    ; {{html}}&lt;label for="$pageInputId"&gt;$services.localization.render('core.create.page')&lt;/label&gt;{{/html}}
+    : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="page" value="$pageText" /&gt;{{/html}}
+
+    {{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
+  )))
+{{html clean="false"}}
+&lt;/form&gt;
+{{/html}}
+#panelfooter()
+#end
+{{/velocity}}</content>
+    </property>
+    <property>
+      <description>Form for creating a new page in the wiki.</description>
+    </property>
+    <property>
+      <name>New Page</name>
+    </property>
+    <property>
+      <type>view</type>
+    </property>
+  </object>
+  <content>{{include document="Panels.PanelSheet"/}}</content>
+</xwikidoc>

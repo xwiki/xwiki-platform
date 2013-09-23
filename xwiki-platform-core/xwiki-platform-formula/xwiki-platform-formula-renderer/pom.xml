@@ -25,17 +25,20 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-formula</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-formula-renderer</artifactId>
   <name>XWiki Platform - Formula - Renderer</name>
   <packaging>jar</packaging>
   <description>XWiki component for rendering mathematical formulae into images</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <!-- Apache commons, helper libraries for keeping the code small -->
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -52,15 +55,16 @@
       <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We only need the -default module (instead of just -api) for the Logging needs -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
+      <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
 
     <!-- SnuggleTeX is a LaTeX to XHTML+MathML converter, which can be combined with JEuclid to transform equations into images -->
@@ -95,21 +99,18 @@
           <groupId>net.sf.saxon</groupId>
           <artifactId>saxon9-dom</artifactId>
         </exclusion>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- JEuclid needs a XPath implementation. Since we're already using xalan, we should just list it here instead of Saxon -->
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
-      <version>2.5.1</version>
       <scope>runtime</scope>
-    </dependency>
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -121,11 +122,4 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <!-- SnuggleTeX repository -->
-    <repository>
-      <id>www.ph.ed.ac.uk-releases</id>
-      <url>http://www.ph.ed.ac.uk/maven2</url>
-    </repository>
-  </repositories>
 </project>

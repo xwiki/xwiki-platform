@@ -17,20 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.api;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -38,24 +39,24 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class XWiki extends Api
 {
     /** Logging helper object. */
-    protected static final Log LOG = LogFactory.getLog(XWiki.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
     /** The internal object wrapped by this API. */
     private com.xpn.xwiki.XWiki xwiki;
@@ -73,24 +74,21 @@ public class XWiki extends Api
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
      */
-    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils
-        .getComponent(DocumentReferenceResolver.class);
+        .getComponent(DocumentReferenceResolver.TYPE_STRING);
 
     /**
      * The object used to serialize entity references into strings. We need it because we have script APIs that work
      * with entity references but have to call older, often internal, methods that still use string references.
      */
-    @SuppressWarnings("unchecked")
-    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class);
+    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer = Utils
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /**
      * XWiki API Constructor
@@ -132,10 +130,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API Allowing to access the current request URL being requested
+     * API Allowing to access the current request URL being requested.
      * 
-     * @return URL
-     * @throws XWikiException
+     * @return the URL
+     * @throws XWikiException failed to create the URL
      */
     public String getRequestURL() throws XWikiException
     {
@@ -143,10 +141,25 @@ public class XWiki extends Api
     }
 
     /**
+     * API Allowing to access the current request URL being requested as a relative URL.
+     * 
+     * @return the URL
+     * @throws XWikiException failed to create the URL
+     * @since 4.0M1
+     */
+    public String getRelativeRequestURL() throws XWikiException
+    {
+        XWikiURLFactory urlFactory = getXWikiContext().getURLFactory();
+
+        return urlFactory.getURL(urlFactory.getRequestURL(getXWikiContext()), getXWikiContext());
+    }
+
+    /**
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
      * @param fullName the full name of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      */
     public Document getDocument(String fullName) throws XWikiException
@@ -169,7 +182,8 @@ public class XWiki extends Api
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
      * @param reference the reference of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M1
      */
@@ -177,7 +191,7 @@ public class XWiki extends Api
     {
         try {
             XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
+            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getPrefixedFullName(),
                 getXWikiContext()) == false) {
                 return null;
             }
@@ -185,7 +199,7 @@ public class XWiki extends Api
             Document newdoc = doc.newDocument(getXWikiContext());
             return newdoc;
         } catch (Exception ex) {
-            LOG.warn("Failed to access document " + reference + ": " + ex.getMessage());
+            LOGGER.warn("Failed to access document " + reference + ": " + ex.getMessage());
             return new Document(new XWikiDocument(reference), getXWikiContext());
         }
     }
@@ -195,7 +209,8 @@ public class XWiki extends Api
      * the currently executing script before sending back the loaded document.
      * 
      * @param fullName the full name of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -220,7 +235,8 @@ public class XWiki extends Api
      * the currently executing script before sending back the loaded document.
      * 
      * @param reference the reference of the XWiki document to be loaded
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -298,7 +314,7 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOG.warn("Failed to retrieve deleted attachments", ex);
+            LOGGER.warn("Failed to retrieve deleted attachments", ex);
         }
         return Collections.emptyList();
     }
@@ -329,7 +345,7 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOG.warn("Failed to retrieve deleted attachments", ex);
+            LOGGER.warn("Failed to retrieve deleted attachments", ex);
         }
         return Collections.emptyList();
     }
@@ -348,7 +364,7 @@ public class XWiki extends Api
                 return new DeletedAttachment(attachment, this.context);
             }
         } catch (Exception ex) {
-            LOG.warn("Failed to retrieve deleted attachment", ex);
+            LOGGER.warn("Failed to retrieve deleted attachment", ex);
         }
         return null;
     }
@@ -388,7 +404,8 @@ public class XWiki extends Api
     public boolean checkAccess(String docname, String right)
     {
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, this.context);
+            DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docReference, this.context);
             return getXWikiContext().getWiki().checkAccess(right, doc, getXWikiContext());
         } catch (XWikiException e) {
             return false;
@@ -400,7 +417,8 @@ public class XWiki extends Api
      * 
      * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
-     * @return a Document object or null if it is not accessible
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
      * @throws XWikiException
      */
     public Document getDocument(String space, String fullname) throws XWikiException
@@ -439,7 +457,7 @@ public class XWiki extends Api
             return revdoc.newDocument(getXWikiContext());
         } catch (Exception e) {
             // Can't read versioned document
-            LOG.error("Failed to read versioned document", e);
+            LOGGER.error("Failed to read versioned document", e);
 
             return null;
         }
@@ -479,12 +497,14 @@ public class XWiki extends Api
 
     /**
      * Privileged API allowing to run a search on the database returning a list of data This search is send to the store
-     * engine (Hibernate HQL, JCR XPATH or other)
+     * engine (Hibernate HQL, JCR XPATH or other).
      * 
      * @param wheresql Query to be run (HQL, XPath)
      * @return A list of rows (Object[])
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String wheresql) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -506,7 +526,9 @@ public class XWiki extends Api
      * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
      *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -525,7 +547,9 @@ public class XWiki extends Api
      * @param start skip the 'start' first elements
      * @return A list of rows (Object[])
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String wheresql, int nb, int start) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -549,7 +573,9 @@ public class XWiki extends Api
      * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
      *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String parameterizedWhereClause, int maxResults, int startOffset,
         List< ? > parameterValues) throws XWikiException
     {
@@ -588,7 +614,9 @@ public class XWiki extends Api
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by "where ..."
      * @return List of document names matching (Main.Page1, Main.Page2)
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String wheresql) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(wheresql, getXWikiContext());
@@ -602,7 +630,9 @@ public class XWiki extends Api
      *            not portable.
      * @return The number of documents that matched the query.
      * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
      */
+    @Deprecated
     public int countDocuments(String wheresql) throws XWikiException
     {
         return this.xwiki.getStore().countDocuments(wheresql, getXWikiContext());
@@ -618,7 +648,9 @@ public class XWiki extends Api
      * @return List of document names matching
      * @throws XWikiException
      * @see List searchDocuments(String where sql)
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String wheresql, int nb, int start) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(wheresql, nb, start, getXWikiContext());
@@ -635,7 +667,9 @@ public class XWiki extends Api
      * @param selectColumns List of columns to add to the result
      * @return List of Object[] with the column values of the matching rows
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -699,7 +733,9 @@ public class XWiki extends Api
      * @param parameterValues the where clause values that replace the question marks (?)
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String parameterizedWhereClause, int maxResults, int startOffset,
         List< ? > parameterValues) throws XWikiException
     {
@@ -711,7 +747,9 @@ public class XWiki extends Api
      * Same as {@link #searchDocuments(String, int, int, java.util.List)} but returns all rows.
      * 
      * @see #searchDocuments(String, int, int, java.util.List)
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String parameterizedWhereClause, List< ? > parameterValues)
         throws XWikiException
     {
@@ -727,7 +765,9 @@ public class XWiki extends Api
      * @param parameterValues The parameter values that replace the question marks.
      * @return The number of documents that matched the query.
      * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
      */
+    @Deprecated
     public int countDocuments(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
     {
         return this.xwiki.getStore().countDocuments(parameterizedWhereClause, parameterValues, getXWikiContext());
@@ -746,7 +786,9 @@ public class XWiki extends Api
      * @return a list of document full names (Space.Name).
      * @see #searchDocuments(String, int, int, java.util.List)
      * @throws XWikiException in case of error while performing the query
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocumentsNames(String wikiName, String parameterizedWhereClause, int maxResults,
         int startOffset, List< ? > parameterValues) throws XWikiException
     {
@@ -779,6 +821,45 @@ public class XWiki extends Api
         return this.xwiki.getStore().search(
             "select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause, nb, start, parameterValues,
             this.context);
+    }
+
+    /**
+     * Search attachments by passing HQL where clause values as parameters. See
+     * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
+     * You can specify properties of attach (the attachment) or doc (the document it is attached to)
+     * 
+     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param nb The number of rows to return. If 0 then all rows are returned
+     * @param start The number of rows to skip at the beginning.
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @return A List of {@link Attachment} objects.
+     * @throws XWikiException in case of error while performing the query
+     * @since 5.0M2
+     */
+    @Unstable
+    public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
+        throws XWikiException
+    {
+        return convertAttachments(
+            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
+    }
+
+    /**
+     * Count attachments returned by a given parameterized query
+     *
+     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see: {@link #searchDocuments(String, int, int, List)}
+     * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
+     * @return int number of attachments found.
+     * @throws XWikiException
+     * @see #searchAttachments(String, int, int, List)
+     * @since 5.0M2
+     */
+    @Unstable
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues)
+        throws XWikiException
+    {
+        return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);
     }
 
     /**
@@ -896,7 +977,7 @@ public class XWiki extends Api
      * exist or is empty, the space preference "skin" is looked up If this parameter does not exist or is empty, the
      * XWiki preference "skin" is looked up If this parameter does not exist or is empty, the xwiki.cfg parameter
      * xwiki.defaultskin is looked up If this parameter does not exist or is empty, the xwiki.cfg parameter
-     * xwiki.defaultbaseskin is looked up If this parameter does not exist or is empty, the skin is "albatross"
+     * xwiki.defaultbaseskin is looked up If this parameter does not exist or is empty, the skin is "colibri"
      * 
      * @return The current skin for this request and user
      */
@@ -908,7 +989,7 @@ public class XWiki extends Api
     /**
      * API to retrieve the current skin for this request and user. Each skin has a skin it is based on. If not the base
      * skin is the xwiki.cfg parameter "xwiki.defaultbaseskin". If this parameter does not exist or is empty, the base
-     * skin is "albatross".
+     * skin is "colibri".
      * 
      * @return The current baseskin for this request and user
      */
@@ -1187,11 +1268,42 @@ public class XWiki extends Api
     /**
      * API to check if wiki is in multi-wiki mode (virtual)
      * 
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      * @return true for multi-wiki/false for mono-wiki
      */
     public boolean isVirtualMode()
     {
         return this.xwiki.isVirtualMode();
+    }
+
+    /**
+     * @return the list of all wiki names, including the main wiki, corresponding to the available wiki descriptors.
+     *         Example: the descriptor for the wiki <i>wikiname</i> is a document in the main wiki, named
+     *         <i>XWiki.XWikiServerWikiname</i>, containing an XWiki.XWikiServerClass object.
+     * @see com.xpn.xwiki.XWiki#getVirtualWikisDatabaseNames(XWikiContext)
+     */
+    public List<String> getWikiNames()
+    {
+        List<String> result = new ArrayList<String>();
+
+        try {
+            result = this.xwiki.getVirtualWikisDatabaseNames(getXWikiContext());
+        } catch (Exception e) {
+            LOGGER.error("Failed to get the list of all wiki names", e);
+        }
+
+        return result;
+    }
+
+    /**
+     * Convenience method to ask if the current XWiki instance contains subwikis (in addition to the main wiki)
+     * 
+     * @return true if at least 1 subwiki exists; false otherwise
+     * @see #getWikiNames()
+     */
+    public boolean hasSubWikis()
+    {
+        return getWikiNames().size() > 1;
     }
 
     /**
@@ -1271,8 +1383,9 @@ public class XWiki extends Api
             if (hasProgrammingRights()) {
                 registerRight = true;
             } else {
-                registerRight = this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
-                    "XWiki.XWikiPreferences", getXWikiContext());
+                registerRight =
+                    this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
+                        "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight) {
@@ -1281,75 +1394,11 @@ public class XWiki extends Api
 
             return -1;
         } catch (Exception e) {
-            LOG.error("Failed to create user", e);
+            LOGGER.error("Failed to create user", e);
 
             return -2;
         }
 
-    }
-
-    /**
-     * Priviledged API to create a new Wiki from an existing wiki This creates the database, copies to documents from a
-     * existing wiki Assigns the admin rights, creates the Wiki identification page in the main wiki
-     * 
-     * @param wikiName Wiki Name to create
-     * @param wikiUrl Wiki URL to accept requests from
-     * @param wikiAdmin Wiki admin user
-     * @param baseWikiName Wiki to copy documents from
-     * @param failOnExist true to fail if the wiki already exists, false to overwrite
-     * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
-     * @throws XWikiException
-     */
-    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName, boolean failOnExist)
-        throws XWikiException
-    {
-        return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, "", null, failOnExist);
-    }
-
-    /**
-     * Priviledged API to create a new Wiki from an existing wiki This creates the database, copies to documents from a
-     * existing wiki Assigns the admin rights, creates the Wiki identification page in the main wiki
-     * 
-     * @param wikiName Wiki Name to create
-     * @param wikiUrl Wiki URL to accept requests from
-     * @param wikiAdmin Wiki admin user
-     * @param baseWikiName Wiki to copy documents from
-     * @param description Description of the Wiki
-     * @param failOnExist true to fail if the wiki already exists, false to overwrite
-     * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
-     * @throws XWikiException
-     */
-    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName,
-        String description, boolean failOnExist) throws XWikiException
-    {
-        return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, null, failOnExist);
-    }
-
-    /**
-     * Priviledged API to create a new Wiki from an existing wiki This creates the database, copies to documents from a
-     * existing wiki Assigns the admin rights, creates the Wiki identification page in the main wiki Copy is limited to
-     * documents of a specified language. If a document for the language is not found, the default language document is
-     * used
-     * 
-     * @param wikiName Wiki Name to create
-     * @param wikiUrl Wiki URL to accept requests from
-     * @param wikiAdmin Wiki admin user
-     * @param baseWikiName Wiki to copy documents from
-     * @param description Description of the Wiki
-     * @param language Language to copy
-     * @param failOnExist true to fail if the wiki already exists, false to overwrite
-     * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
-     * @throws XWikiException
-     */
-    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName,
-        String description, String language, boolean failOnExist) throws XWikiException
-    {
-        if (hasProgrammingRights()) {
-            return this.xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, language,
-                failOnExist, getXWikiContext());
-        }
-
-        return -1;
     }
 
     /**
@@ -1478,7 +1527,8 @@ public class XWiki extends Api
      * API to copy a translation of a document to another document of the same name in another wiki additionally
      * resetting the version and overwriting the previous document
      * 
-     * @param docname source document
+     * @param docname source document name
+     * @param targetdocname target document name
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
      * @param wikilanguage language to copy
@@ -1492,12 +1542,16 @@ public class XWiki extends Api
     {
         DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference.setWikiReference(new WikiReference(sourceWiki));
+            sourceDocumentReference =
+                sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(), new WikiReference(
+                    sourceWiki));
         }
 
         DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference.setWikiReference(new WikiReference(targetWiki));
+            targetDocumentReference =
+                targetDocumentReference.replaceParent(targetDocumentReference.getWikiReference(), new WikiReference(
+                    targetWiki));
         }
 
         return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force);
@@ -1927,8 +1981,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed for the first name and last name of the user The link will
-     * link to the page on the wiki where the user is registered (in virtual wiki mode)
+     * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
+     * will link to the page on the wiki where the user is registered
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1940,9 +1994,8 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * wiki where the user is registered (in virtual wiki mode) The formating is done using the format parameter which
-     * can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city)
+     * wiki where the user is registered. The formating is done using the format parameter which can contain velocity
+     * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -1954,8 +2007,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed for the first name and last name of the user The link will
-     * link to the page on the local wiki even if the user is registered on a different wiki (in virtual wiki mode)
+     * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
+     * will link to the page on the local wiki even if the user is registered on a different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1970,10 +2023,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed with a custom view The link will link to the page on the
-     * local wiki even if the user is registered on a different wiki (in virtual wiki mode) The formating is done using
-     * the format parameter which can contain velocity scripting and access all properties of the User profile using
-     * variables ($first_name $last_name $email $city)
+     * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
+     * local wiki even if the user is registered on a different wiki. The formating is done using the format parameter
+     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
+     * $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -1989,9 +2042,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with the first name and last name of the user With the link param
-     * set to false it will not link to the user page With the link param set to true, the link will link to the page on
-     * the wiki where the user was registered (in virtual wiki mode)
+     * API to retrieve a text representing the user with the first name and last name of the user. With the link param
+     * set to false it will not link to the user page With the link param set to true, the link will link to the page
+     * on the wiki where the user was registered.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
@@ -2003,10 +2056,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view With the link param set to false it will not link
-     * to the user page With the link param set to true, the link will link to the page on the wiki where the user was
-     * registered (in virtual wiki mode) The formating is done using the format parameter which can contain velocity
-     * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
+     * API to retrieve a text representing the user with a custom view With the link param set to false it will not
+     * link to the user page. With the link param set to true, the link will link to the page on the wiki where the
+     * user was registered. The formating is done using the format parameter which can contain velocity scripting
+     * and access all properties of the User profile using variables ($first_name $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -2019,9 +2072,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with the first name and last name of the user With the link param
-     * set to false it will not link to the user page With the link param set to true, the link will link to the page on
-     * the local wiki even if the user is registered on a different wiki (in virtual wiki mode)
+     * API to retrieve a text representing the user with the first name and last name of the user. With the link param
+     * set to false it will not link to the user page. With the link param set to true, the link will link to the page
+     * on the local wiki even if the user is registered on a different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
@@ -2037,11 +2090,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view The formating is done using the format parameter
-     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city) With the link param set to false it will not link to the user page With the link param
-     * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki
-     * (in virtual wiki mode)
+     * API to retrieve a text representing the user with a custom view. The formating is done using the format
+     * parameter which can contain velocity scripting and access all properties of the User profile using variables
+     * ($first_name $last_name $email $city). With the link param set to false it will not link to the user page. With
+     * the link param set to true, the link will link to the page on the local wiki even if the user is registered on a
+     * different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -2163,7 +2216,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, username, password, this.context);
         } catch (Exception e) {
-            LOG.warn("Failed to retrieve content from [" + surl + "]", e);
+            LOGGER.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
         }
     }
@@ -2180,7 +2233,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, this.context);
         } catch (Exception e) {
-            LOG.warn("Failed to retrieve content from [" + surl + "]", e);
+            LOGGER.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
         }
     }
@@ -2395,13 +2448,13 @@ public class XWiki extends Api
      * 
      * @param doc page to rename
      * @param newFullName target page name to move the information to
-     * @throws XWikiException exception if the rename fails
      */
     public boolean renamePage(Document doc, String newFullName)
     {
         try {
-            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService().hasAccessLevel(
-                "delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
+            if (this.xwiki.exists(newFullName, getXWikiContext())
+                && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
+                    getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
@@ -2534,150 +2587,6 @@ public class XWiki extends Api
     }
 
     /**
-     * API to display a select box for the list of available field for a specific class This field data can then be used
-     * to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchColumns(String className, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchColumns(className, "", query, getXWikiContext());
-    }
-
-    /**
-     * API to display a select box for the list of available field for a specific class, optionally adding a prefix This
-     * field data can then be used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param prefix Prefix to add to the field name
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchColumns(String className, String prefix, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchColumns(className, prefix, query, getXWikiContext());
-    }
-
-    /**
-     * API to display a select box for the list of available field for a specific class This field data can then be used
-     * to generate the order element of an XWiki Query showing a table with the relevant data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchOrder(String className, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchOrder(className, "", query, getXWikiContext());
-    }
-
-    /**
-     * API to display a select box for the list of available field for a specific class, optionally adding a prefix This
-     * field data can then be used to generate the order element of an XWiki Query showing a table with the relevant
-     * data
-     * 
-     * @param className XWiki Class Name to display the list of columns for
-     * @param prefix Prefix to add to the field name
-     * @param query Query to pre-select the currently selected columns
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearchOrder(String className, String prefix, XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.displaySearchOrder(className, prefix, query, getXWikiContext());
-    }
-
-    /**
-     * API to display a field in search mode for a specific class without preselected values This field data can then be
-     * used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param fieldname field name in the class
-     * @param className class name to display the field from
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearch(String fieldname, String className) throws XWikiException
-    {
-        return this.xwiki.displaySearch(fieldname, className, getXWikiContext());
-    }
-
-    /**
-     * API to display a field in search mode for a specific class with preselected values This field data can then be
-     * used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param fieldname field name in the class
-     * @param className class name to display the field from
-     * @param criteria XWikiCriteria object (usually the XWikiQuery object) to take the preselected values from
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearch(String fieldname, String className, XWikiCriteria criteria) throws XWikiException
-    {
-        return this.xwiki.displaySearch(fieldname, className, criteria, getXWikiContext());
-    }
-
-    /**
-     * API to display a field in search mode for a specific class with preselected values, optionally adding a prefix to
-     * the field name This field data can then be used to generate an XWiki Query showing a table with the relevant data
-     * 
-     * @param fieldname field name in the class
-     * @param className class name to display the field from
-     * @param prefix prefix to add to the field name
-     * @param criteria XWikiCriteria object (usually the XWikiQuery object) to take the preselected values from
-     * @return text of the select field
-     * @throws XWikiException exception is a failure occured
-     */
-    public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria)
-        throws XWikiException
-    {
-        return this.xwiki.displaySearch(fieldname, className, prefix, criteria, getXWikiContext());
-    }
-
-    /**
-     * API to run a search from an XWikiQuery Object An XWikiQuery object can be created from a request using the
-     * createQueryFromRequest function
-     * 
-     * @param query query to run the search for
-     * @return A list of document names matching the query
-     * @throws XWikiException exception is a failure occured
-     */
-    public <T> List<T> search(XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.search(query, getXWikiContext());
-    }
-
-    /**
-     * API to create a query from a request Object The request object is the result of a form created from the
-     * displaySearch() and displaySearchColumns() functions
-     * 
-     * @param className class name to create the query from
-     * @return an XWikiQuery object matching the selected values in the request object
-     * @throws XWikiException exception is a failure occured
-     */
-    public XWikiQuery createQueryFromRequest(String className) throws XWikiException
-    {
-        return this.xwiki.createQueryFromRequest(className, getXWikiContext());
-    }
-
-    /**
-     * API to run a search from an XWikiQuery Object and display it as a HTML table An XWikiQuery object can be created
-     * from a request using the createQueryFromRequest function
-     * 
-     * @param query query to run the search for
-     * @return An HTML table showing the result
-     * @throws XWikiException exception is a failure occured
-     */
-    public String searchAsTable(XWikiQuery query) throws XWikiException
-    {
-        return this.xwiki.searchAsTable(query, getXWikiContext());
-    }
-
-    /**
      * API to get the Property object from a class based on a property path A property path looks like
      * XWiki.ArticleClass_fieldname
      * 
@@ -2775,7 +2684,8 @@ public class XWiki extends Api
     {
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
-        return new Class(this.xwiki.getDocument(documentName, this.context).getXClass(), this.context);
+        DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(documentName);
+        return new Class(this.xwiki.getDocument(docReference, this.context).getXClass(), this.context);
     }
 
     /**
@@ -2917,23 +2827,29 @@ public class XWiki extends Api
     {
         Syntax syntax = null;
 
-        List<PrintRendererFactory> factories = Utils.getComponentList(PrintRendererFactory.class);
-        for (PrintRendererFactory factory : factories) {
-            Syntax factorySyntax = factory.getSyntax();
-            if (syntaxVersion != null) {
-                if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
-                    && factorySyntax.getVersion().equals(syntaxVersion)) {
-                    syntax = factorySyntax;
-                    break;
-                }
-            } else {
-                // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example. We
-                // should have a Version which implements Comparable like we have SyntaxId in Syntax
-                if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
-                    && (syntax == null || factorySyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
-                    syntax = factorySyntax;
+        try {
+            List<PrintRendererFactory> factories =
+                Utils.getComponentManager().getInstanceList((Type) PrintRendererFactory.class);
+            for (PrintRendererFactory factory : factories) {
+                Syntax factorySyntax = factory.getSyntax();
+                if (syntaxVersion != null) {
+                    if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
+                        && factorySyntax.getVersion().equals(syntaxVersion)) {
+                        syntax = factorySyntax;
+                        break;
+                    }
+                } else {
+                    // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example.
+                    // We
+                    // should have a Version which implements Comparable like we have SyntaxId in Syntax
+                    if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
+                        && (syntax == null || factorySyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
+                        syntax = factorySyntax;
+                    }
                 }
             }
+        } catch (ComponentLookupException e) {
+            LOGGER.error("Failed to lookup available renderer syntaxes", e);
         }
 
         return syntax;
@@ -2974,5 +2890,20 @@ public class XWiki extends Api
     public String getCurrentContentSyntaxId()
     {
         return this.xwiki.getCurrentContentSyntaxId(getXWikiContext());
+    }
+
+    /**
+     * API to parse the message being stored in the Context. A message can be an error message or an information message
+     * either as text or as a message ID pointing to ApplicationResources. The message is also parse for velocity
+     * scripts
+     * 
+     * @return Final message
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
+     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
+     */
+    @Deprecated
+    public String parseMessage()
+    {
+        return this.xwiki.parseMessage(getXWikiContext());
     }
 }

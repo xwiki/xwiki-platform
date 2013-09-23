@@ -1,0 +1,12 @@
+org.xwiki.repository.internal.DefaultRepositoryConfiguration
+org.xwiki.repository.internal.DefaultRepositoryManager
+org.xwiki.repository.internal.ExtensionUpdaterListener
+org.xwiki.repository.internal.RepositoryScriptService
+org.xwiki.repository.internal.reference.ExtensionResourceReferenceTypeParser
+org.xwiki.repository.internal.resources.ExtensionRESTResource
+org.xwiki.repository.internal.resources.ExtensionsRESTResource
+org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource
+org.xwiki.repository.internal.resources.ExtensionVersionRESTResource
+org.xwiki.repository.internal.resources.ExtensionVersionsRESTResource
+org.xwiki.repository.internal.resources.SearchRESTResource
+org.xwiki.repository.internal.xhtml.ExtensionXHTMLLinkTypeRenderer

@@ -22,7 +22,7 @@ package org.xwiki.chart;
 import java.util.Map;
 
 import org.xwiki.chart.model.ChartModel;
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A component interface for defining various chart generators.
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M1
  */
-@ComponentRole
+@Role
 public interface ChartGenerator
 {
     /**
@@ -57,6 +57,13 @@ public interface ChartGenerator
      * Source parameter identifier.
      */
     String SERIES_PARAM = "series";        
+
+    /**
+     * Color parameter identifier. The format is {@code color1,color2,...,colorN} where each color is specified as
+     * a 6 characters string, the first 2 representing in hexadecimal the red percentage, the next two the green
+     * percentage and the last 2 the blue percentage. For example {@code FF0000,00FF00,0000FF} for red, green, blue.
+     */
+    String COLORS_PARAM = "colors";
 
     /**
      * Generates an image of a chart representing the data presented as a {@link ChartModel} and extra formatting

@@ -40,6 +40,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -86,12 +87,11 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         getContext().setRequest(new XWikiServletRequestStub());
         getContext().setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
 
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+        
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
-            protected void registerWikiMacros()
-            {
-            }
-
             // Avoid all the error at XWiki initialization
             @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
@@ -116,6 +116,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -129,6 +130,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -141,6 +143,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("deleteXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -288,24 +291,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, getContext()));
     }
 
-    public void testGetDocumentNameFromPath()
-    {
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("", getContext()));
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/Space/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/view/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/some/ignored/paths",
-            getContext()));
-
-        // Test URL encoding and verify an encoded forward slash ("/" - encoded as %2F) works too.
-        assertEquals("My Space.My/Document",
-            this.xwiki.getDocumentNameFromPath("/My%20Space/My%2FDocument", getContext()));
-    }
-
     /**
      * We only verify here that the saveDocument API calls the Observation component.
      */
@@ -317,7 +302,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         mockListener.expects(once()).method("getEvents")
             .will(returnValue(Arrays.asList(new DocumentCreatedEvent(ref), new DocumentCreatingEvent(ref))));
 
-        ObservationManager om = getComponentManager().lookup(ObservationManager.class);
+        ObservationManager om = getComponentManager().getInstance(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("xwikitest", "Some", "Document"));
@@ -343,7 +328,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         mockListener.expects(once()).method("getEvents")
             .will(returnValue(Arrays.asList(new DocumentDeletedEvent(ref), new DocumentDeletingEvent(ref))));
 
-        ObservationManager om = getComponentManager().lookup(ObservationManager.class);
+        ObservationManager om = getComponentManager().getInstance(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("xwikitest", "Another", "Document"));
@@ -362,7 +347,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.deleteDocument(document, false, getContext());
     }
 
-    public void testLanguageSelection()
+    public void testLanguageSelection() throws Exception
     {
         getContext().setRequest(new XWikiServletRequest(null)
         {
@@ -393,7 +378,29 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                 return null;
             }
         });
+
+        // Set the wiki to multilingual mode.
+        XWikiDocument preferences = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences")) {
+            @Override
+            public BaseObject getXObject()
+            {
+                BaseObject preferencesObject = new BaseObject();
+                preferencesObject.setIntValue("multilingual", 1);
+
+                return preferencesObject;
+            }
+        };
+        this.xwiki.saveDocument(preferences, getContext());
+
         assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
+    }
+
+    /**
+     * XWIKI-8469: Bad default of 1 in XWiki.isMultilingual instead of 0 (when no XWikiPreferences object exists)
+     */
+    public void testIsMultilingualDefaultFalse() throws Exception
+    {
+        assertFalse(this.xwiki.isMultiLingual(getContext()));
     }
 
     public void testGetCurrentContentSyntaxId()
@@ -463,5 +470,40 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         userObject.safeput("validkey", validationKey);
 
         assertEquals(-1, this.xwiki.validateUser(false, getContext()));
+    }
+
+    /**
+     * Tests that XWiki.XWikiPreferences page is not saved each time XWiki is initialized.
+     * 
+     * @throws Exception when any exception occurs inside XWiki
+     */
+    public void testGetPrefsClass() throws Exception
+    {
+        Mock mockStore = registerMockComponent(XWikiStoreInterface.class);
+        this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
+
+        XWikiDocument prefsDoc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"));
+        final Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
+        documents.put(prefsDoc.getDocumentReference(), prefsDoc);
+
+        mockStore.expects(atLeastOnce()).method("loadXWikiDoc").with(NOT_NULL, same(getContext()))
+            .will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
+                    if (!documents.containsKey(document.getDocumentReference())) {
+                        documents.put(document.getDocumentReference(), document);
+                    } else {
+                        document = documents.get(document.getDocumentReference());
+                    }
+                    return document;
+                }
+            });
+        mockStore.expects(once()).method("saveXWikiDoc").with(same(prefsDoc), same(getContext()));
+
+        xwiki.getPrefsClass(getContext());
+        xwiki.getPrefsClass(getContext());
     }
 }

@@ -3,9 +3,9 @@
 ###
 ### Define variables useful for most templates
 ###
-#set($spaceHome = $!xwiki.getDocument("${doc.space}.WebHome").getTranslatedDocument())
+#set($spaceHome = $!xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))).getTranslatedDocument())
 #set($spaceDoc = $!spaceHome)
 #set($parentDoc = $!{xwiki.getDocument($tdoc.parent).getTranslatedDocument()})
-#set($preferencesDoc = $!xwiki.getDocument("XWiki.XWikiPreferences"))
+#set($preferencesDoc = $!xwiki.getDocument('XWiki.XWikiPreferences'))
 #set($crtUserDoc = $!xwiki.getDocument($xcontext.user))
-#set($searchDoc = $!xwiki.getDocument("Main.WebSearch"))
+#set($searchDoc = $!xwiki.getDocument('Main.Search'))

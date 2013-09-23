@@ -1,0 +1,2 @@
+org.xwiki.extension.cluster.internal.ExtensionJobEventConverter
+org.xwiki.extension.cluster.internal.RemoteListener

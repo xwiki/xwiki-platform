@@ -16,47 +16,60 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+/**
+ * Defines the meta properties of a boolean XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("Boolean")
+@Singleton
 public class BooleanMetaClass extends PropertyMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Boolean XClass property.
+     */
     public BooleanMetaClass()
     {
-        super();
         setPrettyName("Boolean");
-        setName(BooleanClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        StaticListClass type_class = new StaticListClass(this);
-        type_class.setName("displayFormType");
-        type_class.setPrettyName("Display Form Type");
-        type_class.setValues("radio|checkbox|select");
-        safeput("displayFormType", type_class);
+        StaticListClass typeClass = new StaticListClass(this);
+        typeClass.setName("displayFormType");
+        typeClass.setPrettyName("Display Form Type");
+        typeClass.setValues("radio|checkbox|select");
+        safeput(typeClass.getName(), typeClass);
 
-        StringClass value_class = new StringClass(this);
-        value_class.setName("displayType");
-        value_class.setPrettyName("Display Type");
-        value_class.setSize(20);
-        safeput("displayType", value_class);
+        StringClass valueClass = new StringClass(this);
+        valueClass.setName("displayType");
+        valueClass.setPrettyName("Display Type");
+        valueClass.setSize(20);
+        safeput(valueClass.getName(), valueClass);
 
-        NumberClass default_value_class = new NumberClass(this);
-        default_value_class.setName("defaultValue");
-        default_value_class.setPrettyName("Default Value");
-        default_value_class.setSize(5);
-        default_value_class.setClassType("integer");
-        safeput("defaultValue", default_value_class);
+        NumberClass defaultValueClass = new NumberClass(this);
+        defaultValueClass.setName("defaultValue");
+        defaultValueClass.setPrettyName("Default Value");
+        defaultValueClass.setSize(5);
+        defaultValueClass.setNumberType("integer");
+        safeput(defaultValueClass.getName(), defaultValueClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new BooleanClass();
     }

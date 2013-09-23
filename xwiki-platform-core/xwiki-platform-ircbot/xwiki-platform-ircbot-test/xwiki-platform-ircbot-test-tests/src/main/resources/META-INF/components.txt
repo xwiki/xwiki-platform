@@ -1,0 +1,3 @@
+500:org.xwiki.ircbot.internal.StubIRCBot
+org.xwiki.ircbot.internal.StubIRCBotScriptService
+500:org.xwiki.ircbot.internal.StubHTTPChecker

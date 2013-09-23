@@ -19,7 +19,7 @@
  */
 package org.xwiki.model;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Provides configuration options for the Model module.
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentRole
+@Role
 public interface ModelConfiguration
 {
     /**

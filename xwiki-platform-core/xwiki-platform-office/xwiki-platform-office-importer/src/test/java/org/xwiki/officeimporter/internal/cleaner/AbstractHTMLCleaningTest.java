@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.w3c.dom.Document;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
@@ -47,23 +47,21 @@ public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTes
     protected String footer = "</body></html>";
 
     /**
-     * {@link OpenOfficeHTMLCleaner} used for tests.
+     * {@link OfficeHTMLCleaner} used for tests.
      */
-    protected HTMLCleaner openOfficeHTMLCleaner;
+    protected HTMLCleaner officeHTMLCleaner;
 
     /**
      * {@link WysiwygHTMLCleaner} used for tests.
      */
     protected HTMLCleaner wysiwygHTMLCleaner;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        this.openOfficeHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "openoffice");
-        this.wysiwygHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
+        this.officeHTMLCleaner = getComponentManager().getInstance(HTMLCleaner.class, "openoffice");
+        this.wysiwygHTMLCleaner = getComponentManager().getInstance(HTMLCleaner.class, "wysiwyg");
     }
 
     /**
@@ -74,7 +72,7 @@ public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTes
      */
     protected void assertCleanHTML(String dirtyHTML, String expectedCleanHTML)
     {
-        Document document = openOfficeHTMLCleaner.clean(new StringReader(header + dirtyHTML + footer));
+        Document document = officeHTMLCleaner.clean(new StringReader(header + dirtyHTML + footer));
         Assert.assertEquals(header + expectedCleanHTML + footer, HTMLUtils.toString(document, true, true).trim());
     }
 }

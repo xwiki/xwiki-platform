@@ -39,7 +39,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public abstract class DOMUtils
+public class DOMUtils
 {
     /**
      * Common error message used when a particular node type is not supported by a method.
@@ -146,11 +146,21 @@ public abstract class DOMUtils
      * case style ({@code fontWeight}) and it is used like this {@code object.style.propertyJSName = value}. The CSS
      * name has dash style ({@code font-weight}) and it is used like this {@code propertyCSSName: value;}.
      * 
-     * @param el the element for which we retrieve the property value.
+     * @param element the element for which we retrieve the property value.
      * @param propertyName the script name of the CSS property whose value is returned.
      * @return the computed value of the specified CSS property for the given element.
      */
-    public abstract String getComputedStyleProperty(Element el, String propertyName);
+    public native String getComputedStyleProperty(Element element, String propertyName)
+    /*-{
+        var computedStyle = element.ownerDocument.defaultView.getComputedStyle(element, null);
+        if (computedStyle) {
+          // We force it to be a string because we treat it as a string in the java code.
+          return '' + computedStyle[propertyName];
+        } else {
+          // Computed style can be null if the element is not displayed.
+          return null;
+        }
+    }-*/;
 
     /**
      * @param node the node from where to begin the search for the next leaf.
@@ -439,6 +449,124 @@ public abstract class DOMUtils
             }
         }
         return textRange;
+    }
+
+    /**
+     * Computes the maximal <strong>sub-range</strong> of the given range that satisfies the following two conditions:
+     * <ul>
+     * <li>the start point is before a <strong>leaf</strong> element node that can't have child nodes (e.g. an image) or
+     * inside a leaf node at position 0 (e.g. an empty span or a text node)</li>
+     * <li>the end point is after a leaf element node that can't have child nodes (e.g. an image) or inside a leaf node
+     * at the end (e.g. inside an empty span or at the end of a text node)</li>
+     * </ul>
+     * . If no such sub-range exists (because the given range doesn't wrap any leaf node and none of its end points
+     * satisfies the corresponding condition) then the given range is returned unmodified.
+     * 
+     * @param range a DOM range
+     * @return the maximal sub-range that selects the same content as the given range
+     */
+    public Range shrinkRange(Range range)
+    {
+        if (range == null || range.isCollapsed()) {
+            return range;
+        }
+
+        // Find the start and end points that satisfy the conditions.
+        Range start = getShrunkenRangeStart(range);
+        Range end = getShrunkenRangeEnd(range);
+
+        // If at least one of the end points moved and the range is still valid.
+        if ((start != range || end != range) && start.compareBoundaryPoints(RangeCompare.END_TO_START, end) <= 0) {
+            Range result = range.cloneRange();
+            result.setStart(start.getEndContainer(), start.getEndOffset());
+            result.setEnd(end.getStartContainer(), end.getStartOffset());
+            return result;
+        }
+        return range;
+    }
+
+    /**
+     * Utility method to get the start point of the shrunken range (obtained with {@link #shrinkRange(Range)}).
+     * 
+     * @param range a DOM range
+     * @return the start point of the range returned by {@link #shrinkRange(Range)}
+     * @see #shrinkRange(Range)
+     */
+    private Range getShrunkenRangeStart(Range range)
+    {
+        Node startContainer = range.getStartContainer();
+        if (startContainer.hasChildNodes()) {
+            if (range.getStartOffset() < startContainer.getChildCount()) {
+                // Before a child node of an element.
+                startContainer = getFirstLeaf(startContainer.getChild(range.getStartOffset()));
+            } else {
+                // After the last child of an element.
+                startContainer = getNextLeaf(startContainer);
+            }
+        } else if (range.getStartOffset() > 0 && range.getStartOffset() == startContainer.getNodeValue().length()) {
+            // At the end of a non-empty text node.
+            startContainer = getNextLeaf(startContainer);
+        }
+
+        if (startContainer != null) {
+            int startOffset = 0;
+            if (startContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(startContainer)) {
+                startOffset = getNodeIndex(startContainer);
+                startContainer = startContainer.getParentNode();
+            }
+
+            // Return a new range only if we managed to move the start.
+            if (startContainer != range.getStartContainer()) {
+                Range start = range.cloneRange();
+                start.setEnd(startContainer, startOffset);
+                start.collapse(false);
+                return start;
+            }
+        }
+
+        return range;
+    }
+
+    /**
+     * Utility method to get the end point of the shrunken range (obtained with {@link #shrinkRange(Range)}).
+     * 
+     * @param range a DOM range
+     * @return the end point of the range returned by {@link #shrinkRange(Range)}
+     * @see #shrinkRange(Range)
+     */
+    private Range getShrunkenRangeEnd(Range range)
+    {
+        Node endContainer = range.getEndContainer();
+        if (endContainer.hasChildNodes()) {
+            if (range.getEndOffset() > 0) {
+                // After a child node of an element.
+                endContainer = getLastLeaf(endContainer.getChild(range.getEndOffset() - 1));
+            } else {
+                // Before the first child of an element.
+                endContainer = getPreviousLeaf(endContainer);
+            }
+        } else if (range.getEndOffset() == 0 && getLength(endContainer) > 0) {
+            // At the start of a non-empty text node.
+            endContainer = getPreviousLeaf(endContainer);
+        }
+
+        if (endContainer != null) {
+            int endOffset = getLength(endContainer);
+            if (endContainer.getNodeType() == Node.ELEMENT_NODE && !canHaveChildren(endContainer)) {
+                endOffset = getNodeIndex(endContainer) + 1;
+                endContainer = endContainer.getParentNode();
+            }
+
+            // Return a new range only if we managed to move the end.
+            if (endContainer != range.getEndContainer()) {
+                Range end = range.cloneRange();
+                end.setStart(endContainer, endOffset);
+                end.collapse(true);
+                return end;
+            }
+        }
+
+        return range;
     }
 
     /**
@@ -895,9 +1023,9 @@ public abstract class DOMUtils
      * Given a subtree specified by its root parent and one of the inner nodes, this method splits the subtree by the
      * path from the given descendant (inner node) to the root parent. Additionally to what
      * {@link #splitNode(Node, Node, int)}) does this method ensures that both subtrees are editable in design mode.
-     * This method is required because some browsers like Firefox prevent the user from placing the caret inside empty
-     * block elements such as paragraphs or headers. This empty block elements can be obtained by splitting at the
-     * beginning or at the end of such a block element.
+     * This method is required because most browsers prevent the user from placing the caret inside empty block elements
+     * such as paragraphs or headers. This empty block elements can be obtained by splitting at the beginning or at the
+     * end of such a block element.
      * 
      * @param parent the parent node of the subtree's root
      * @param descendant an inner node within the specified subtree
@@ -908,9 +1036,37 @@ public abstract class DOMUtils
      */
     public Node splitHTMLNode(Node parent, Node descendant, int offset)
     {
-        // By default we just do the split because browsers shouldn't require any further adjustments.
-        // Those who do require adjustments should overwrite this method.
-        return splitNode(parent, descendant, offset);
+        // Save the length of the descendant before the split to be able to detect where the split took place.
+        int length = getLength(descendant);
+
+        // Split the subtree rooted in the given parent.
+        Node nextLevelSibling = splitNode(parent, descendant, offset);
+
+        // See if the split took place.
+        if (nextLevelSibling != descendant) {
+            if (offset == 0) {
+                // The split took place at the beginning of the descendant. Ensure the first subtree is accessible.
+                // But first see if the first subtree has any leafs besides the descendant.
+                Node child = getChild(parent, descendant);
+                if (!isInline(child) && getFirstLeaf(child) == descendant) {
+                    Node refNode = getFarthestInlineAncestor(descendant);
+                    refNode = refNode == null ? child : refNode.getParentNode();
+                    ensureBlockIsEditable((Element) refNode);
+                }
+            }
+            if (offset == length) {
+                // The split took place at the end of the descendant. Ensure the second subtree is accessible.
+                // But first see if the second subtree has any leafs besides the nextLevelSibling.
+                Node child = getChild(parent, nextLevelSibling);
+                if (!isInline(child) && getLastLeaf(child) == nextLevelSibling) {
+                    Node refNode = getFarthestInlineAncestor(nextLevelSibling);
+                    refNode = refNode == null ? child : refNode.getParentNode();
+                    ensureBlockIsEditable((Element) refNode);
+                }
+            }
+        }
+
+        return nextLevelSibling;
     }
 
     /**
@@ -1091,7 +1247,7 @@ public abstract class DOMUtils
         List<Node> aliceAncestors = getAncestors(alice);
         List<Node> bobAncestors = getAncestors(bob);
 
-        // Test is the input nodes are disconnected.
+        // Test if the input nodes are disconnected.
         int aliceIndex = aliceAncestors.size() - 1;
         int bobIndex = bobAncestors.size() - 1;
         if (aliceAncestors.get(aliceIndex) != bobAncestors.get(bobIndex)) {
@@ -1329,19 +1485,34 @@ public abstract class DOMUtils
             node = node.getParentElement();
         }
         // At this point, we should have an element to scroll into view.
-        ((Element) node).scrollIntoView();
+        scrollIntoView((Element) node);
     }
 
     /**
-     * Ensures the given block-level element can be edited in design mode. This method is required because in some
-     * browsers you can't place the caret inside elements that don't have any visible content and thus you cannot edit
-     * them.
+     * Makes sure that the given DOM element is visible by scrolling it into view.
+     * 
+     * @param element the element to scroll into view
+     */
+    public void scrollIntoView(Element element)
+    {
+        if (element != null) {
+            element.scrollIntoView();
+        }
+    }
+
+    /**
+     * Ensures the given block-level element can be edited in design mode. This method is required because most browsers
+     * don't allow the caret inside elements that don't have any visible content and thus we cannot edit them otherwise.
+     * <p>
+     * The default implementation adds a BR element. Overwrite for browsers that don't like it.
      * 
      * @param block a block-level DOM element
      */
     public void ensureBlockIsEditable(Element block)
     {
-        // Do nothing by default.
+        if (block.canHaveChildren()) {
+            block.appendChild(block.getOwnerDocument().createBRElement());
+        }
     }
 
     /**

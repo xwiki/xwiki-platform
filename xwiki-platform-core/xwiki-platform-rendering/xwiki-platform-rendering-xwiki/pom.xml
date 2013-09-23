@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-xwiki</artifactId>
   <name>XWiki Platform - Rendering - XWiki-specific implementation</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - XWiki-specific implementation</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -50,10 +53,14 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-transformation-icon</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
       <!-- For parsing the CSS from the style attribute. -->
       <groupId>net.sourceforge.cssparser</groupId>
       <artifactId>cssparser</artifactId>
-      <version>0.9.5</version>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>
@@ -64,13 +71,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <artifactId>xwiki-rendering-syntax-annotatedxhtml</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>

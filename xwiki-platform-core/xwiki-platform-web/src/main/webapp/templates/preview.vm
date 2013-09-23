@@ -1,8 +1,10 @@
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 <div class="topbuttons">#template("previewactions.vm")</div>
-$tdoc.getRenderedContent($tdoc.content, $tdoc.getSyntax().toIdString())
+#template("hierarchy.vm")
+#template("contentview.vm")
 <div class="bottombuttons">#template("previewactions.vm")</div>
+</div> ## mainContentArea
 </div> ## main
 #template("endpage.vm")

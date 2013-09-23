@@ -19,6 +19,9 @@
  */
 package org.xwiki.annotation.internal.content.filter;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.annotation.content.filter.Filter;
 import org.xwiki.component.annotation.Component;
 
@@ -28,14 +31,12 @@ import org.xwiki.component.annotation.Component;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("whitespace")
+@Component
+@Named("whitespace")
+@Singleton
 public class WhiteSpaceFilter implements Filter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.filter.Filter#accept(java.lang.Character)
-     */
+    @Override
     public boolean accept(Character c)
     {
         // check it not to be a whitespace but also not a space (should cover all whitespaces + unbreakable spaces)

@@ -16,16 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.eventstream.internal;
 
 import java.util.Date;
 import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
@@ -39,28 +40,25 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultEventFactory implements EventFactory
 {
     /** The key used to store the current event group ID in the execution context. */
     private static final String EVENT_GROUP_ID = Event.class.getCanonicalName().concat("_groupId");
 
     /** Needed for storing the current event group ID. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /** Needed for converting the current username into a proper reference. */
-    @Requirement
+    @Inject
     private EntityReferenceResolver<String> resolver;
 
     /** Needed for retrieving the current user. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge bridge;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventFactory#createEvent()
-     */
+    @Override
     public Event createEvent()
     {
         Event result = new DefaultEvent();
@@ -71,11 +69,7 @@ public class DefaultEventFactory implements EventFactory
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EventFactory#createRawEvent()
-     */
+    @Override
     public Event createRawEvent()
     {
         return new DefaultEvent();

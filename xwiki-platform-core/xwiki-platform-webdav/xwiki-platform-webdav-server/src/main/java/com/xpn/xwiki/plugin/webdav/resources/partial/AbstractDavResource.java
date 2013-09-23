@@ -80,9 +80,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     private XWikiDavContext context;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         DavResourceLocator locator =
@@ -93,9 +91,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(String name, DavResourceLocator locator, XWikiDavContext context) throws DavException
     {
         this.name = name;
@@ -132,10 +128,8 @@ public abstract class AbstractDavResource implements XWikiDavResource
     }
 
     /**
-     * <p>
      * The default decode implementation assumes the next resource in chain to be a temporary resource. Sub classes
      * should override this method to provide their own implementation.
-     * </p>
      */
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
@@ -161,42 +155,32 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return last ? resource : resource.decode(tokens, next + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isLockable(Type type, Scope scope)
     {
         return Type.WRITE.equals(type) && Scope.EXCLUSIVE.equals(scope);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ActiveLock getLock(Type type, Scope scope)
     {
         return getContext().getLockManager().getLock(type, scope, this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ActiveLock[] getLocks()
     {
         ActiveLock writeLock = getLock(Type.WRITE, Scope.EXCLUSIVE);
         return (writeLock != null) ? new ActiveLock[] {writeLock} : new ActiveLock[0];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean hasLock(Type type, Scope scope)
     {
         return getLock(type, scope) != null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ActiveLock lock(LockInfo reqLockInfo) throws DavException
     {
         ActiveLock lock = null;
@@ -208,9 +192,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return lock;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ActiveLock refreshLock(LockInfo reqLockInfo, String lockToken) throws DavException
     {
         if (!exists()) {
@@ -223,9 +205,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return getContext().getLockManager().refreshLock(reqLockInfo, lockToken, this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void unlock(String lockToken) throws DavException
     {
         ActiveLock lock = getLock(Type.WRITE, Scope.EXCLUSIVE);
@@ -234,9 +214,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void copy(DavResource destination, boolean shallow) throws DavException
     {
         throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
@@ -252,25 +230,19 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return getVirtualProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavProperty getProperty(DavPropertyName name)
     {
         return getProperties().get(name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavPropertyName[] getPropertyNames()
     {
         return getProperties().getPropertyNames();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
         throws DavException
     {
@@ -312,113 +284,85 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return new MultiStatusResponse(this, propertyNameSet);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeProperty(DavPropertyName propertyName) throws DavException
     {
         getProperties().remove(propertyName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setProperty(DavProperty property) throws DavException
     {
         getProperties().add(property);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addLockManager(LockManager lockmgr)
     {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDisplayName()
     {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getComplianceClass()
     {
         return COMPLIANCE_CLASS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getSupportedMethods()
     {
         return METHODS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceFactory getFactory()
     {
         return getContext().getResourceFactory();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceLocator getLocator()
     {
         return this.locator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getResourcePath()
     {
         return this.locator.getResourcePath();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getHref()
     {
         return this.locator.getHref(isCollection());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavSession getSession()
     {
         return getContext().getDavSession();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResource getCollection()
     {
         return this.parentResource;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavContext getContext()
     {
         return context;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<XWikiDavResource> getVirtualMembers()
     {
         Map<String, List<XWikiDavResource>> vResourcesMap = getContext().getUserStorage().getResourcesMap();
@@ -428,9 +372,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return vResourcesMap.get(getResourcePath());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavPropertySet getVirtualProperties()
     {
         Map<String, DavPropertySet> vPropertiesMap = getContext().getUserStorage().getPropertiesMap();
@@ -440,17 +382,13 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return vPropertiesMap.get(getResourcePath());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<XWikiDavResource> getInitMembers()
     {
         return new ArrayList<XWikiDavResource>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void clearCache()
     {
         Map<String, List<XWikiDavResource>> vResourcesMap = getContext().getUserStorage().getResourcesMap();
@@ -503,14 +441,26 @@ public abstract class AbstractDavResource implements XWikiDavResource
     }
 
     /**
-     * Checks if the given resource name corresponds to a temporary resource.
-     * 
+     * Checks if the given resource name corresponds to an excluded resource, ie a resource asked by the OS but that
+     * we want to ignore. This is because some WebDAV clients (such as Mac OSX Finder) send PROPFIND requests for
+     * special resources that are not real resources and thus we don't want to handle those.
+     *
+     * Note 1: Mac OSX sends a *lot* of unnecessary PROPFIND requests for special filesystem resources (a.k.a
+     * <a href="http://en.wikipedia.org/wiki/Resource_fork">Resource Forks</a>) + some other exotic stuff. See a
+     * <a href="http://code.google.com/p/sabredav/wiki/Finder">good description</a> for what's happening.
+     *
+     * Note 2: As a consequence this means that XWiki Document names cannot start with ".", end with "~" or match
+     * "mach_kernel" or "Backups.backupdb".
+     *
      * @param resourceName Name of the resource.
      * @return True if the resourceName corresponds to a temporary file / directory. False otherwise.
      */
     public boolean isTempResource(String resourceName)
     {
-        return resourceName.startsWith(".") || resourceName.endsWith("~");
+        return resourceName.startsWith(".")
+            || resourceName.endsWith("~")
+            || resourceName.equals("mach_kernel")
+            || resourceName.equals("Backups.backupdb");
     }
     
     /**
@@ -521,9 +471,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return getResourcePath().hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean equals(Object obj)
     {
         if (obj instanceof DavResource) {

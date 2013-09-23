@@ -16,10 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author jeremi
- * @author ldubost
- *
  */
 package com.xpn.xwiki.gwt.api.client;
 
@@ -36,6 +32,7 @@ import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 public class Api implements EntryPoint {
      XWikiGWTDefaultApp app;
 
+    @Override
     public void onModuleLoad() {
         app = new  XWikiGWTDefaultApp();
         app.setName("gwtapi");
@@ -63,11 +60,13 @@ public class Api implements EntryPoint {
     public void editProperty(final String fullname, final String className, final String propname, final JavaScriptObject callback) {
          if (!app.isTranslatorLoaded()) {
             app.checkTranslator(new XWikiAsyncCallback(app) {
+                @Override
                 public void onFailure(Throwable caught) {
                     super.onFailure(caught);
                     editProperty(fullname, className, propname, callback);
                 }
 
+                @Override
                 public void onSuccess(Object result) {
                     super.onSuccess(result);
                     editProperty(fullname, className, propname, callback);
@@ -77,11 +76,13 @@ public class Api implements EntryPoint {
         }
 
         XWikiService.App.getInstance().getDocument(fullname, true, true, true, false, new XWikiAsyncCallback(app) {
+            @Override
             public void onFailure(Throwable caught) {
                 Window.alert(app.getTranslation("error.failuregetdocument"));
                 super.onFailure(caught);
             }
 
+            @Override
             public void onSuccess(Object result) {
                 super.onSuccess(result);
                 Document doc = (Document) result;
@@ -99,30 +100,36 @@ public class Api implements EntryPoint {
                     dialog.setTitle(app.getTranslation("editfield"));
                     dialog.setMessage("chooseyourvalue", null);
                     dialog.setNextCallback(new AsyncCallback() {
+                        @Override
                         public void onFailure(Throwable throwable) {
                         }
 
+                        @Override
                         public void onSuccess(Object object) {
                             final String value = (String) object;
                             if ((value!=null)&&(value!="undefined")) {
                                 // let's update the property
                                 XWikiService.App.getInstance().updateProperty(fullname, className, propname, value, new XWikiAsyncCallback(app) {
+                                    @Override
                                     public void onFailure(Throwable caught) {
                                         super.onFailure(caught);
                                         Window.alert(app.getTranslation("error.failedupdatingdata"));
                                     }
 
+                                    @Override
                                     public void onSuccess(Object result) {
                                         super.onSuccess(result);
                                         // let's retrieve the new display value now
                                         XWikiService.App.getInstance().getDocument(fullname, true, true, false, false, new XWikiAsyncCallback(app) {
-                                                 public void onFailure(Throwable caught) {
+                                                 @Override
+                                                public void onFailure(Throwable caught) {
                                                      Window.alert(app.getTranslation("error.failuregetdocument"));
                                                      super.onFailure(caught);
                                                      jscallback(callback, value);
                                                  }
 
-                                                 public void onSuccess(Object result) {
+                                                 @Override
+                                                public void onSuccess(Object result) {
                                                      super.onSuccess(result);
                                                      String newValue = value;
                                                      Document doc = (Document) result;

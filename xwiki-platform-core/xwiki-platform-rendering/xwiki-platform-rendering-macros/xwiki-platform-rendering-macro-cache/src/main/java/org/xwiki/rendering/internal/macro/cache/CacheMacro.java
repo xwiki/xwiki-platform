@@ -20,6 +20,12 @@
 package org.xwiki.rendering.internal.macro.cache;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -27,12 +33,9 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.cache.CacheMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -43,12 +46,14 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Provides Caching for the content of the macro.
- *
+ * 
  * @version $Id$
  * @since 3.0M1
  */
-@Component("cache")
-public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements Initializable
+@Component
+@Named("cache")
+@Singleton
+public class CacheMacro extends AbstractMacro<CacheMacroParameters>
 {
     /**
      * The description of the macro.
@@ -63,25 +68,27 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
     /**
      * Used to create the macro content cache.
      */
-    @Requirement
+    @Inject
     private CacheManager cacheManager;
 
     /**
      * The parser used to parse the content (when not cached).
      */
-    @Requirement
+    @Inject
     private MacroContentParser contentParser;
 
     /**
      * Renders the optional id parameter as plain text to use the result as a cache key.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private BlockRenderer plainTextBlockRenderer;
 
     /**
-     * The cache containing all cache macro contents.
+     * Map of all caches. There's one cache per timeToLive/maxEntry combination since currently we cannot set these
+     * configuration values at the cache entry level but only for the whole cache.
      */
-    private Cache contentCache;
+    private Map<CacheKey, Cache<List<Block>>> contentCacheMap = new ConcurrentHashMap<CacheKey, Cache<List<Block>>>();
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -92,50 +99,13 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
         setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
     @Override
-    public void initialize() throws InitializationException
-    {
-        super.initialize();
-
-        // Create Cache
-        CacheConfiguration configuration = new CacheConfiguration();
-
-        // TODO: Make the time to live configurable on a per macro uage. However this is currently not possible since
-        // it would mean creating a new XWiki cache for each cache macro usage and one XWiki Cache currently means
-        // one thread (since the JBoss cache used underneath uses a thread for evicting entries from the cache).
-        // We need to modify our xwiki-cache module to allow setting time to live on cache items, see
-        //
-        LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-        lru.setMaxEntries(1000);
-        lru.setTimeToLive(300);
-        configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-
-        try {
-            this.contentCache = this.cacheManager.createNewLocalCache(configuration);
-        } catch (CacheException e) {
-            throw new InitializationException("Failed to create content cache", e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
     public boolean supportsInlineMode()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(CacheMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -153,15 +123,54 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
             cacheKey = content;
         }
 
-        List<Block> result = (List<Block>) this.contentCache.get(cacheKey);
+        Cache<List<Block>> contentCache = getContentCache(parameters.getTimeToLive(), parameters.getMaxEntries());
+        List<Block> result = contentCache.get(cacheKey);
         if (result == null) {
             // Run the parser for the syntax on the content
-            // We run  the current transformation on the cache macro content. We need to do this since we want to cache
+            // We run the current transformation on the cache macro content. We need to do this since we want to cache
             // the XDOM resulting from the execution of Macros because that's where lengthy processing happens.
-            result = this.contentParser.parse(content, context, true, context.isInline());
-            this.contentCache.set(cacheKey, result);
+            result = this.contentParser.parse(content, context, true, context.isInline()).getChildren();
+            contentCache.set(cacheKey, result);
         }
 
         return result;
+    }
+
+    /**
+     * Get a cache matching the passed time to live and max entries.
+     * <p>
+     * Note that whenever a new cache is created it currently means a new thread is used too (since the JBoss cache
+     * used underneath uses a thread for evicting entries from the cache).
+     * We need to modify our xwiki-cache module to allow setting time to live on cache items, see
+     * http://jira.xwiki.org/jira/browse/XWIKI-5907
+     * </p>
+     *
+     * @param timeToLive the number of seconds to cache the content
+     * @param maxEntries the maximum number of entries in the cache (Least Recently Used entries are ejected)
+     * @return the matching cache (a new cache is created if no existing one is found)
+     * @throws MacroExecutionException in case we fail to create the new cache
+     */
+    private Cache<List<Block>> getContentCache(int timeToLive, int maxEntries) throws MacroExecutionException
+    {
+        CacheKey cacheKey = new CacheKey(timeToLive, maxEntries);
+        Cache<List<Block>> contentCache = this.contentCacheMap.get(cacheKey);
+        if (contentCache == null) {
+            // Create Cache
+            CacheConfiguration configuration = new CacheConfiguration();
+
+            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+            lru.setMaxEntries(maxEntries);
+            lru.setTimeToLive(timeToLive);
+            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+            try {
+                contentCache = this.cacheManager.createNewLocalCache(configuration);
+            } catch (CacheException e) {
+                throw new MacroExecutionException("Failed to create content cache", e);
+            }
+
+            this.contentCacheMap.put(cacheKey, contentCache);
+        }
+        return contentCache;
     }
 }

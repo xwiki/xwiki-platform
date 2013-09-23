@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.maintainer.AnnotationState;
 
 /**
@@ -78,6 +78,11 @@ public class Annotation
      * The name of the field of this annotation serialized date.
      */
     public static final String DATE_FIELD = "date";
+
+    /**
+     * The name of the field of this annotation's reference to the target content.
+     */
+    public static final String TARGET_FIELD = "target";
 
     /**
      * The unique identifier of this annotation, which should be unique among all the annotations on the same target.
@@ -256,11 +261,6 @@ public class Annotation
         return id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
@@ -269,11 +269,6 @@ public class Annotation
             + getSelectionRightContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -292,11 +287,6 @@ public class Annotation
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
 Copyright Antenna House, Inc. (http://www.antennahouse.com) 2001, 2002.
@@ -18,12 +18,13 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 -->
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:svg="http://www.w3.org/2000/svg"
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
                 xmlns:html="http://www.w3.org/1999/xhtml">
 
     <xsl:output method="xml"
                 version="1.0"
-                encoding="iso-8859-1"
+                encoding="UTF-8"
                 indent="no"/>
 
     <!--======================================================================
@@ -57,6 +58,9 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <!-- hyphenate: true | false -->
     <xsl:param name="hyphenate">false</xsl:param>
 
+    <!-- language -->
+    <xsl:param name="language" select="//html:head/html:meta[@name='language']/@content"></xsl:param>
+
 
     <!--======================================================================
     Attribute Sets
@@ -70,7 +74,13 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="writing-mode"><xsl:value-of select="$writing-mode"/></xsl:attribute>
         <xsl:attribute name="hyphenate"><xsl:value-of select="$hyphenate"/></xsl:attribute>
         <xsl:attribute name="text-align"><xsl:value-of select="$text-align"/></xsl:attribute>
-        <xsl:attribute name="font-family">FreeSerif,serif</xsl:attribute>
+        <xsl:attribute name="font-family">
+          <xsl:choose>
+            <xsl:when test="starts-with($language, 'ja')">FreeSerif, IPAMincho, AR PL UMing CN, serif</xsl:when>
+            <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeSerif, Baekmuk Gulim, AR PL UMing CN, serif</xsl:when>
+            <xsl:otherwise>FreeSerif, AR PL UMing CN, serif</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
         <!-- specified on fo:root to change the properties' initial values -->
     </xsl:attribute-set>
 
@@ -107,8 +117,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">1000</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -118,8 +128,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">900</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -129,8 +139,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -140,8 +150,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -151,8 +161,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -162,8 +172,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-style">normal</xsl:attribute>
         <xsl:attribute name="space-before">0.8em</xsl:attribute>
         <xsl:attribute name="space-after">0.2em</xsl:attribute>
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">800</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
         <xsl:attribute name="start-indent">0mm</xsl:attribute>
     </xsl:attribute-set>
 
@@ -191,14 +201,22 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:attribute-set name="pre">
         <xsl:attribute name="font-size">0.83em</xsl:attribute>
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+        <xsl:attribute name="font-family">
+          <xsl:choose>
+            <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+            <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+            <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
         <xsl:attribute name="white-space">pre</xsl:attribute>
         <xsl:attribute name="space-before">1em</xsl:attribute>
         <xsl:attribute name="space-after">1em</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="address">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="hr">
@@ -247,8 +265,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     </xsl:attribute-set>
 
     <xsl:attribute-set name="dt">
-        <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
-        <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="keep-with-next.within-column">1000</xsl:attribute>
+        <xsl:attribute name="keep-together.within-column">1000</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="dd">
@@ -338,37 +356,73 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     </xsl:attribute-set>
 
     <xsl:attribute-set name="strong-em">
-        <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-weight">bold</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="i">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="cite">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="em">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="var">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="dfn">
-        <xsl:attribute name="font-style">italic</xsl:attribute>
+      <xsl:attribute name="font-style">
+        <xsl:if test="not(starts-with($language, 'ja') or starts-with($language, 'kp') or starts-with($language, 'kr') or starts-with($language, 'zh'))">italic</xsl:if>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="tt">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="code">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="kbd">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="samp">
-        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
+      <xsl:attribute name="font-family">
+        <xsl:choose>
+          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
+          <xsl:when test="starts-with($language, 'kp') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
+          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="big">
@@ -420,6 +474,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:attribute-set name="q"/>
     <xsl:attribute-set name="q-nested"/>
+    <xsl:attribute-set name="label"/>
 
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Image
@@ -697,7 +752,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                                           extent="{$page-margin-bottom}"
                                           display-align="after"/>
                         <fo:region-start  extent="{$page-margin-left}"/>
-                        <fo:region-end    extent="{$page-margin-bottom}"/>
+                        <fo:region-end    extent="{$page-margin-right}"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </fo:simple-page-master>
@@ -740,7 +795,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                                           extent="{$page-margin-bottom}"
                                           display-align="after"/>
                         <fo:region-start  extent="{$page-margin-left}"/>
-                        <fo:region-end    extent="{$page-margin-bottom}"/>
+                        <fo:region-end    extent="{$page-margin-right}"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </fo:simple-page-master>
@@ -815,9 +870,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                         <fo:block text-align="left" font-weight="bold" font-size="12pt"  padding-top="10pt" padding-bottom="10pt">
                             <xsl:apply-templates  select="/html:html/html:body/html:div[@class='pdftoc']" mode="pdftoc" />
                         </fo:block>
-                        <xsl:for-each select="/html:html/html:body/html:div[@id='xwikimaincontainer']/html:h1 |
-                                /html:html/html:body/html:div[@id='xwikimaincontainer']/html:h2 |
-                                /html:html/html:body/html:div[@id='xwikimaincontainer']/html:h3">
+                        <xsl:for-each select="//html:div[@id='xwikicontent' or @id='xwikimaincontainerinner']
+                                /html:*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
                             <fo:block font-size="9pt" start-indent="10pt" width="100%" text-align-last="justify" >
                                 <xsl:choose>
                                     <xsl:when test="self::html:h1">
@@ -1564,7 +1618,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     </xsl:template>
 
     <xsl:template match="html:tr[parent::html:table and html:th and not(html:td)]" mode="transform">
-        <fo:table-row xsl:use-attribute-sets="tr" keep-with-next="always">
+        <fo:table-row xsl:use-attribute-sets="tr" keep-with-next="1000">
             <xsl:call-template name="process-table-row"/>
         </fo:table-row>
     </xsl:template>
@@ -1846,6 +1900,12 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         </fo:inline>
     </xsl:template>
 
+    <xsl:template match="html:label" mode="transform">
+        <fo:inline xsl:use-attribute-sets="label">
+            <xsl:call-template name="process-common-attributes-and-children"/>
+        </fo:inline>
+    </xsl:template>
+
     <xsl:template match="html:span[@dir]" mode="transform">
         <fo:bidi-override direction="{@dir}" unicode-bidi="embed">
             <xsl:call-template name="process-common-attributes-and-children"/>
@@ -2043,7 +2103,6 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <xsl:template match="html:param" mode="preprocess"/>
     <xsl:template match="html:map" mode="preprocess"/>
     <xsl:template match="html:area" mode="preprocess"/>
-    <xsl:template match="html:label" mode="preprocess"/>
     <xsl:template match="html:input" mode="preprocess"/>
     <xsl:template match="html:select" mode="preprocess"/>
     <xsl:template match="html:optgroup" mode="preprocess"/>
@@ -2143,4 +2202,21 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
             </xsl:if>
         </fo:inline-container>
     </xsl:template>
-</xsl:stylesheet> 
+
+    <!-- Preserve inline SVG images as <fo:instream-foreign-object>s -->
+    <xsl:template match="html:*/svg:svg" mode="transform">
+        <fo:instream-foreign-object
+          content-width="scale-to-fit" content-height="scale-to-fit"
+          inline-progression-dimension.minimum="auto" inline-progression-dimension.maximum="100%"
+          block-progression-dimension.minimum="auto" block-progression-dimension.maximum="700px">
+            <xsl:copy>
+                <xsl:apply-templates select="@*|node()" mode="svg"/>
+            </xsl:copy>
+        </fo:instream-foreign-object>
+    </xsl:template>
+    <xsl:template match="@*|node()" mode="svg">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()" mode="svg"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:stylesheet>

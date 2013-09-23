@@ -104,11 +104,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
         getDoc().setFullName(docFullName, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XObjectDocument#reload(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void reload(XWikiContext context) throws XWikiException
     {
         if (this.getObjectNumbers(this.sclass.getClassFullName()) == 0) {
@@ -136,31 +132,19 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument#getDocumentApi()
-     */
+    @Override
     public Document getDocumentApi()
     {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument#getObjectId()
-     */
+    @Override
     public int getObjectId()
     {
         return this.objectId;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument#getObjectApi()
-     */
+    @Override
     public com.xpn.xwiki.api.Object getObjectApi()
     {
         BaseObject obj = getBaseObject(false);
@@ -211,32 +195,18 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XObjectDocument#getXClassManager()
-     */
+    @Override
     public XClassManager getXClassManager()
     {
         return this.sclass;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XObjectDocument#isNew()
-     */
     @Override
     public boolean isNew()
     {
         return super.isNew() || this.isNew;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.api.Document#saveDocument(java.lang.String, boolean)
-     */
     @Override
     protected void saveDocument(String comment, boolean minorEdit) throws XWikiException
     {
@@ -244,11 +214,6 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
         this.isNew = false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.api.Document#delete()
-     */
     @Override
     public void delete() throws XWikiException
     {

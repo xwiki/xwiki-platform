@@ -113,31 +113,19 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
         this.removedEvent = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryAdded(org.xwiki.cache.event.CacheEntryEvent)
-     */
+    @Override
     public void cacheEntryAdded(CacheEntryEvent<Object> event)
     {
         this.addedEvent = event;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryModified(org.xwiki.cache.event.CacheEntryEvent)
-     */
+    @Override
     public void cacheEntryModified(CacheEntryEvent<Object> event)
     {
         this.modifiedEvent = event;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryRemoved(org.xwiki.cache.event.CacheEntryEvent)
-     */
+    @Override
     public void cacheEntryRemoved(CacheEntryEvent<Object> event)
     {
         this.removedEvent = event;
@@ -196,11 +184,7 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
             this.run = false;
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see java.lang.Runnable#run()
-         */
+        @Override
         public void run()
         {
             CacheEntryEvent<Object> event;

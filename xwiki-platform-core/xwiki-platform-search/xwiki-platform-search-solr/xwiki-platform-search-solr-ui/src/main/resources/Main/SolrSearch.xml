@@ -1,0 +1,1425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Main</web>
+  <name>SolrSearch</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1368797502000</creationDate>
+  <date>1369664406000</date>
+  <contentUpdateDate>1369664375000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Solr Search</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>dark-grey-disclosure-arrow-down.png</filename>
+    <filesize>94</filesize>
+    <author>XWiki.Admin</author>
+    <date>1368010970000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJUlEQVQIW2OIjIz8jwszAAkGbBJA
+wACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==
+</content>
+  </attachment>
+  <attachment>
+    <filename>dark-grey-disclosure-arrow-left.png</filename>
+    <filesize>2806</filesize>
+    <author>XWiki.Admin</author>
+    <date>1368436548000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAYAAAAvZezQAAAKQ2lDQ1BJQ0MgcHJvZmlsZQAAeNqd
+U3dYk/cWPt/3ZQ9WQtjwsZdsgQAiI6wIyBBZohCSAGGEEBJAxYWIClYUFRGcSFXEgtUKSJ2I4qAo
+uGdBiohai1VcOO4f3Ke1fXrv7e371/u855zn/M55zw+AERImkeaiagA5UoU8Otgfj09IxMm9gAIV
+SOAEIBDmy8JnBcUAAPADeXh+dLA//AGvbwACAHDVLiQSx+H/g7pQJlcAIJEA4CIS5wsBkFIAyC5U
+yBQAyBgAsFOzZAoAlAAAbHl8QiIAqg0A7PRJPgUA2KmT3BcA2KIcqQgAjQEAmShHJAJAuwBgVYFS
+LALAwgCgrEAiLgTArgGAWbYyRwKAvQUAdo5YkA9AYACAmUIszAAgOAIAQx4TzQMgTAOgMNK/4Klf
+cIW4SAEAwMuVzZdL0jMUuJXQGnfy8ODiIeLCbLFCYRcpEGYJ5CKcl5sjE0jnA0zODAAAGvnRwf44
+P5Dn5uTh5mbnbO/0xaL+a/BvIj4h8d/+vIwCBAAQTs/v2l/l5dYDcMcBsHW/a6lbANpWAGjf+V0z
+2wmgWgrQevmLeTj8QB6eoVDIPB0cCgsL7SViob0w44s+/zPhb+CLfvb8QB7+23rwAHGaQJmtwKOD
+/XFhbnauUo7nywRCMW735yP+x4V//Y4p0eI0sVwsFYrxWIm4UCJNx3m5UpFEIcmV4hLpfzLxH5b9
+CZN3DQCshk/ATrYHtctswH7uAQKLDljSdgBAfvMtjBoLkQAQZzQyefcAAJO/+Y9AKwEAzZek4wAA
+vOgYXKiUF0zGCAAARKCBKrBBBwzBFKzADpzBHbzAFwJhBkRADCTAPBBCBuSAHAqhGJZBGVTAOtgE
+tbADGqARmuEQtMExOA3n4BJcgetwFwZgGJ7CGLyGCQRByAgTYSE6iBFijtgizggXmY4EImFINJKA
+pCDpiBRRIsXIcqQCqUJqkV1II/ItchQ5jVxA+pDbyCAyivyKvEcxlIGyUQPUAnVAuagfGorGoHPR
+dDQPXYCWomvRGrQePYC2oqfRS+h1dAB9io5jgNExDmaM2WFcjIdFYIlYGibHFmPlWDVWjzVjHVg3
+dhUbwJ5h7wgkAouAE+wIXoQQwmyCkJBHWExYQ6gl7CO0EroIVwmDhDHCJyKTqE+0JXoS+cR4Yjqx
+kFhGrCbuIR4hniVeJw4TX5NIJA7JkuROCiElkDJJC0lrSNtILaRTpD7SEGmcTCbrkG3J3uQIsoCs
+IJeRt5APkE+S+8nD5LcUOsWI4kwJoiRSpJQSSjVlP+UEpZ8yQpmgqlHNqZ7UCKqIOp9aSW2gdlAv
+U4epEzR1miXNmxZDy6Qto9XQmmlnafdoL+l0ugndgx5Fl9CX0mvoB+nn6YP0dwwNhg2Dx0hiKBlr
+GXsZpxi3GS+ZTKYF05eZyFQw1zIbmWeYD5hvVVgq9ip8FZHKEpU6lVaVfpXnqlRVc1U/1XmqC1Sr
+VQ+rXlZ9pkZVs1DjqQnUFqvVqR1Vu6k2rs5Sd1KPUM9RX6O+X/2C+mMNsoaFRqCGSKNUY7fGGY0h
+FsYyZfFYQtZyVgPrLGuYTWJbsvnsTHYF+xt2L3tMU0NzqmasZpFmneZxzQEOxrHg8DnZnErOIc4N
+znstAy0/LbHWaq1mrX6tN9p62r7aYu1y7Rbt69rvdXCdQJ0snfU6bTr3dQm6NrpRuoW623XP6j7T
+Y+t56Qn1yvUO6d3RR/Vt9KP1F+rv1u/RHzcwNAg2kBlsMThj8MyQY+hrmGm40fCE4agRy2i6kcRo
+o9FJoye4Ju6HZ+M1eBc+ZqxvHGKsNN5l3Gs8YWJpMtukxKTF5L4pzZRrmma60bTTdMzMyCzcrNis
+yeyOOdWca55hvtm82/yNhaVFnMVKizaLx5balnzLBZZNlvesmFY+VnlW9VbXrEnWXOss623WV2xQ
+G1ebDJs6m8u2qK2brcR2m23fFOIUjynSKfVTbtox7PzsCuya7AbtOfZh9iX2bfbPHcwcEh3WO3Q7
+fHJ0dcx2bHC866ThNMOpxKnD6VdnG2ehc53zNRemS5DLEpd2lxdTbaeKp26fesuV5RruutK10/Wj
+m7ub3K3ZbdTdzD3Ffav7TS6bG8ldwz3vQfTw91jicczjnaebp8LzkOcvXnZeWV77vR5Ps5wmntYw
+bcjbxFvgvct7YDo+PWX6zukDPsY+Ap96n4e+pr4i3z2+I37Wfpl+B/ye+zv6y/2P+L/hefIW8U4F
+YAHBAeUBvYEagbMDawMfBJkEpQc1BY0FuwYvDD4VQgwJDVkfcpNvwBfyG/ljM9xnLJrRFcoInRVa
+G/owzCZMHtYRjobPCN8Qfm+m+UzpzLYIiOBHbIi4H2kZmRf5fRQpKjKqLupRtFN0cXT3LNas5Fn7
+Z72O8Y+pjLk722q2cnZnrGpsUmxj7Ju4gLiquIF4h/hF8ZcSdBMkCe2J5MTYxD2J43MC52yaM5zk
+mlSWdGOu5dyiuRfm6c7Lnnc8WTVZkHw4hZgSl7I/5YMgQlAvGE/lp25NHRPyhJuFT0W+oo2iUbG3
+uEo8kuadVpX2ON07fUP6aIZPRnXGMwlPUit5kRmSuSPzTVZE1t6sz9lx2S05lJyUnKNSDWmWtCvX
+MLcot09mKyuTDeR55m3KG5OHyvfkI/lz89sVbIVM0aO0Uq5QDhZML6greFsYW3i4SL1IWtQz32b+
+6vkjC4IWfL2QsFC4sLPYuHhZ8eAiv0W7FiOLUxd3LjFdUrpkeGnw0n3LaMuylv1Q4lhSVfJqedzy
+jlKD0qWlQyuCVzSVqZTJy26u9Fq5YxVhlWRV72qX1VtWfyoXlV+scKyorviwRrjm4ldOX9V89Xlt
+2treSrfK7etI66Trbqz3Wb+vSr1qQdXQhvANrRvxjeUbX21K3nShemr1js20zcrNAzVhNe1bzLas
+2/KhNqP2ep1/XctW/a2rt77ZJtrWv913e/MOgx0VO97vlOy8tSt4V2u9RX31btLugt2PGmIbur/m
+ft24R3dPxZ6Pe6V7B/ZF7+tqdG9s3K+/v7IJbVI2jR5IOnDlm4Bv2pvtmne1cFoqDsJB5cEn36Z8
+e+NQ6KHOw9zDzd+Zf7f1COtIeSvSOr91rC2jbaA9ob3v6IyjnR1eHUe+t/9+7zHjY3XHNY9XnqCd
+KD3x+eSCk+OnZKeenU4/PdSZ3Hn3TPyZa11RXb1nQ8+ePxd07ky3X/fJ897nj13wvHD0Ivdi2yW3
+S609rj1HfnD94UivW2/rZffL7Vc8rnT0Tes70e/Tf/pqwNVz1/jXLl2feb3vxuwbt24m3Ry4Jbr1
++Hb27Rd3Cu5M3F16j3iv/L7a/eoH+g/qf7T+sWXAbeD4YMBgz8NZD+8OCYee/pT/04fh0kfMR9Uj
+RiONj50fHxsNGr3yZM6T4aeypxPPyn5W/3nrc6vn3/3i+0vPWPzY8Av5i8+/rnmp83Lvq6mvOscj
+xx+8znk98ab8rc7bfe+477rfx70fmSj8QP5Q89H6Y8en0E/3Pud8/vwv94Tz+4A5JREAAAAGYktH
+RAD/AP8A/6C9p5MAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfdBQ0JDwtHZQw0AAAANElE
+QVQI11XMsREAMAjDQEG2ZECGYhmnCRxxpy9skogI3nSqagLAdzRMAHhm2gcAG/tj8ALJCRB9gw0S
+owAAAABJRU5ErkJggg==
+</content>
+  </attachment>
+  <attachment>
+    <filename>light-grey-disclosure-arrow-down.png</filename>
+    <filesize>93</filesize>
+    <author>XWiki.Admin</author>
+    <date>1368010970000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzY
+JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
+</content>
+  </attachment>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.SolrSearch</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0e4d1f86-8a36-4c04-9cd6-4a5988f42bc1</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function () {
+  var SearchFilterBehavior = Class.create({
+    initialize: function(container) {
+      this.container = container.hide().addClassName('popup');
+      var toggle = new Element('input', {
+        type: 'button',
+        'class': 'search-filter-toggle',
+        title: "$escapetool.javascript($services.localization.render('solr.filter.toggle'))"
+      });
+      toggle.observe('click', this._onToggle.bindAsEventListener(this));
+      this.container.up('.search-form').down('.search-query').insert({after: toggle});
+    },
+
+    _onToggle: function(event) {
+      this.container.toggle();
+
+      // Fix the height of the document content container (XWIKI-9189). The search filter is displayed with position
+      // absolute so that it floats over the search results (as a popup) and the document content container has
+      // overflow:auto to prevent long text/images/tables from overflowing outside of the content area. Because of this
+      // the content container is not resized when the search filter is displayed. Instead, when there are no search
+      // results, we get a vertical scroll bar.
+      var docContentContainer = $('xwikicontent');
+      docContentContainer &amp;&amp; docContentContainer.setStyle({
+        minHeight: this.container.visible() ? docContentContainer.scrollHeight + 'px' : ''
+      });
+    }
+  });
+
+  var SearchFacetsBehavior = Class.create({
+    initialize: function(container) {
+      this.container = container;
+
+      // Add the global Expand/Collapse toggle.
+      this.globalToggle = new Element('a', {href: '#', style: 'float:right'});
+      this.globalToggle.observe('click', this._onGlobalToggle.bindAsEventListener(this));
+      var clearFloats = new Element('span', {'class': 'clearfloats'});
+      this.container.down('.search-facets-actions').down('p').insert(this.globalToggle).insert(clearFloats);
+      this._updateGlobalToggleState();
+
+      // Add Expand/Collapse toggle for each facet.
+      this.container.select('.search-facet-header').each(function(facetHeader) {
+        facetHeader.observe('click', this._onToggle.bindAsEventListener(this));
+      }.bind(this))
+
+      // Add a check box before each facet value. We do this from JavaScript because the behaviour of a check box inside
+      // a link is not consistent across different browsers (some follow the link when the check box is clicked, others
+      // don't) and having the check box outside the facet value link requires JavaScript to synchronize them.
+      this.container.select('.search-facet-body a').each(function(facetValueAnchor) {
+        var checkBox = new Element('input', {type: 'checkbox'});
+        checkBox.checked = facetValueAnchor.hasClassName('selected');
+        checkBox.observe('click', facetValueAnchor.click.bind(facetValueAnchor));
+        facetValueAnchor.insert({before: checkBox});
+        // Remove the 'selected' class because the selected state is marked using the check box.
+        facetValueAnchor.removeClassName('selected');
+      });
+    },
+
+    _onToggle: function(event) {
+      event.element().up('.search-facet').toggleClassName('expanded');
+      this._updateGlobalToggleState();
+    },
+
+    _onGlobalToggle : function(event) {
+      event.stop();
+      this.container.select('.search-facet').each(function(facetContainer) {
+        if (this.globalToggle._collapse) {
+          facetContainer.removeClassName('expanded');
+        } else {
+          facetContainer.addClassName('expanded');
+        }
+      }.bind(this));
+      this._updateGlobalToggleState();
+    },
+
+    _updateGlobalToggleState: function() {
+      var facetCount = this.container.select('.search-facet').length;
+      var expandedFacetCount = this.container.select('.search-facet.expanded').length;
+      this.globalToggle._collapse = expandedFacetCount &gt; facetCount/2;
+      if (this.globalToggle._collapse) {
+        this.globalToggle.update("$escapetool.javascript($services.localization.render('solr.facets.collapseAll'))");
+      } else {
+        this.globalToggle.update("$escapetool.javascript($services.localization.render('solr.facets.expandAll'))");
+      }
+    }
+  });
+
+  var SearchResultBehavior = Class.create({
+    initialize: function(container) {
+      this.container = container;
+      var highlights = container.down('.search-result-highlights');
+      if (highlights &amp;&amp; highlights.select('.search-result-highlight').size() &gt; 1) {
+        highlights.addClassName('preview');
+        // Workaround for IE8 which doesn't support :first-of-type CSS selector.
+        highlights.down('.search-result-highlight').addClassName('first').up('dd')
+          .addClassName('first').previous('dt').addClassName('first');
+        var highlightAllLink = new Element('a', {
+          'href': '#',
+          'class': 'search-result-highlightAll'
+        }).update("$escapetool.javascript($services.localization.render('solr.result.highlightAll'))".escapeHTML());
+        highlights.insert({after: highlightAllLink});
+        highlightAllLink.observe('click', function(event) {
+          event.stop();
+          highlightAllLink.remove();
+          highlights.removeClassName('preview');
+        });
+      }
+    }
+  });
+
+  var init = function() {
+    var searchFilter = $('body').down('.search-filter');
+    searchFilter &amp;&amp; new SearchFilterBehavior(searchFilter);
+
+    var searchFacets = $('body').down('.search-facets');
+    searchFacets &amp;&amp; new SearchFacetsBehavior(searchFacets);
+
+    $('body').select('.search-result').each(function(searchResult) {
+      new SearchResultBehavior(searchResult);
+    });
+
+    return true;
+  };
+  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+})();</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.SolrSearch</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>eabef30e-f82e-4813-88e7-45db2633610e</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+/* Hide the 'Created by', 'Modified by' and 'Tags' document sections. */
+#document-info, #xdocFooter {
+  display: none;
+}
+
+/**
+ * Search form
+ */
+
+.search-form-container {
+  clear: both;
+  margin: 2em 0 1em;
+}
+
+.search-form {
+  margin: 0 auto;
+  position: relative;
+  width: 55%;
+}
+
+.search-form .search-query {
+  background: transparent url("/xwiki/resources/icons/xwiki/search.png") left center no-repeat;
+  border: 2px solid $theme.borderColor;
+  padding-left: 18px;
+  padding-right: 20px;
+  vertical-align: middle;
+  width: 78%;
+}
+
+.search-bar input[type="submit"].button {
+  margin-left: 1em;
+}
+
+/**
+ * Search filter
+ */
+
+.search-form .search-filter-toggle {
+  background: url("$doc.getAttachmentURL('light-grey-disclosure-arrow-down.png')") no-repeat scroll 50% 50% $theme.pageContentBackgroundColor;
+  border: 0 none;
+  height: 16px;
+  margin: 0 0 0 -20px;
+  padding: 0;
+  vertical-align: middle;
+  width: 16px;
+  z-index: 2;
+}  
+
+.search-form .search-bar:hover .search-filter-toggle {
+  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
+}
+
+.search-filter {
+  background: $theme.backgroundSecondaryColor;
+  border: 1px solid $theme.borderColor;
+  border-radius: 0 0 4px 4px;
+  margin-top: .5em;
+  padding: 0 0.5em 0.5em;
+  width: 76%;
+}
+
+.search-filter.popup {
+  margin-top: -1px;
+  position: absolute;
+  z-index: 3;
+}
+
+.search-filter, .search-facets {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  /* Leave space for the bottom shadow. */
+  margin-bottom: 2px;
+}
+
+.search-filter-header {
+  padding: 1em .5em .5em;
+  border-bottom: 1px solid $theme.borderColor;
+}
+
+.search-filter-header strong,
+.search-facets-header strong {
+  #css_textShadow('0', '1px', '0', $theme.pageContentBackgroundColor)
+}
+
+.search-filter-left, .search-filter-right {
+  float: left;
+  width: 50%;
+}
+
+.search-filter select {
+  border: 2px solid #E8E8E8;
+  color: #636B75;
+  padding: .25em;
+}
+
+/**
+ * Sort
+ */
+
+ul.search-results-sort {
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+  padding: 5px 0 2px 5px;
+  margin: 0;
+}
+.search-results-sort li {
+  display: inline;
+  list-style-type: none;
+  padding-left: 1em;
+}
+.search-results-sort li:first-of-type {
+  padding: 0;
+}
+a.sort-item {
+  color: inherit;
+  text-decoration: none;
+}
+a.sort-item:hover {
+  color: $theme.linkColor;
+  text-decoration: underline;
+}
+a.sort-item.active, a.sort-item.active:hover {
+  font-weight: bold;
+  color: $theme.textColor;
+  text-decoration: none;
+}
+.sort-item-order {
+  font-size: .6em;
+  margin-left: .6em;
+}
+
+/**
+ * Search Results
+ */
+
+.search-results-left {
+  margin: 0.5em 16em 0.5em 0;
+  padding: 0.5em 0.5em 0.5em 0;
+}
+
+.search-results {
+  margin-bottom: 1.5em;
+}
+
+.search-result {
+  display: block;
+  font-size: .9em;
+  margin-top: 1.5em;
+  padding: .2em 0 .2em 25px;
+}
+
+.search-result.type-document,
+.search-result.type-object,
+.search-result.type-object_property,
+.search-result.type-attachment {
+  background: none no-repeat scroll left .4em transparent;
+}
+.search-result.type-document {
+  background-image: url("/xwiki/resources/icons/silk/page_white_text.png");
+}
+.search-result.type-object {
+  background-image: url("/xwiki/resources/icons/silk/page_white_gear.png");
+}
+.search-result.type-object_property {
+  background-image: url("/xwiki/resources/icons/silk/page_white_key.png");
+}
+.search-result.type-attachment {
+  background-image: url("/xwiki/resources/icons/silk/attach.png");
+}
+
+.search-result-title {
+  border: 0;
+  font-weight: bold;
+  font-size: 1.33em;
+  margin: 0;
+}
+
+.search-result-language {
+  font-size: 0.7em;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.search-result-location,
+.search-result-author,
+.search-result-language,
+.search-result-mediaType,
+.search-result-object,
+.search-result-property {
+  color: $theme.textSecondaryColor;
+}
+
+.search-result-location,
+.search-result-author,
+.search-result-mediaType,
+.search-result-object,
+.search-result-property,
+.search-result-highlight {
+  line-height: 1.4em;
+}
+
+blockquote.search-result-highlight {
+  /* Remove the background color. */
+  background-color: transparent;
+  /* Increase the width of the left border. */
+  border-left-width: 3px;
+  margin-top: 0.2em;
+  /* The text should be centered vertically relative to the left border. */
+  padding: 0 0 0 1em;
+}
+
+.search-text-highlight {
+  background-color: $theme.highlightColor;
+  font-weight: bold;
+}
+
+dl.search-result-highlights &gt; dt {
+  color: $theme.textSecondaryColor;
+  font-weight: normal;
+}
+
+dl.search-result-highlights.preview dt,
+dl.search-result-highlights.preview dd &gt; * {
+  display: none;
+}
+
+dl.search-result-highlights.preview dt:first-of-type,
+dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type,
+/* Workaround for IE8 which doesn't support :first-of-type CSS selector. */
+dl.search-result-highlights.preview dt.first,
+dl.search-result-highlights.preview dd.first blockquote.first {
+  display: block;
+}
+
+a.search-result-highlightAll:after {
+  content: ' \bb';
+}
+
+/**
+ * Facets
+ */
+
+.search-facets {
+  float: right;
+  max-width: 15.5em;
+  width: 15.5em;
+  border-radius: 4px;
+}
+
+.search-facets-header,
+.search-facets-actions,
+.search-facet {
+  background-color: $theme.backgroundSecondaryColor;
+  padding: 0.5em 1em;
+  border-bottom: 1px solid $theme.borderColor;
+  border-top: 1px solid $theme.pageContentBackgroundColor;
+  position: relative;
+}
+
+.search-facets-header {
+  border-top: none;
+}
+
+.search-facets-actions &gt; p {
+  font-size: .8em;
+  margin: 0;
+}
+
+.search-facets-actions a {
+  color: $theme.textSecondaryColor;
+  text-decoration: none;
+}
+
+.search-facets-actions a:hover {
+  color: $theme.linkColor;
+  text-decoration: underline;
+}
+
+.search-facets-actions .clearfloats {
+  /* Fix the horizontal scroll bar, caused by the fact that we use a SPAN element instead of a DIV. */
+  display: block;
+  margin: 0;
+}
+
+.search-facet:last-of-type {
+  border-bottom: none;
+}
+
+.search-facet-header {
+  cursor: pointer;
+  background: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-left.png')") no-repeat scroll 100% 50% transparent;
+  color: $theme.titleColor;
+  line-height: 1.4em;
+  text-transform: capitalize;
+}
+
+.search-facet-header:after {
+  border-bottom: 1px dotted $theme.pageContentBackgroundColor;
+  border-top: 1px dotted $theme.borderColor;
+  clear: both;
+  content: "";
+  display: block;
+  height: 0;
+  margin: 2.45em 0 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.search-facet:last-of-type .search-facet-header:after {
+  border: medium none;
+}
+
+.search-facet.expanded:last-of-type .search-facet-header:after {
+  border-bottom: 1px dotted $theme.pageContentBackgroundColor;
+  border-top: 1px dotted $theme.borderColor;
+}
+
+.search-facet-body {
+  overflow: hidden; /* required for effect */
+  display: none;
+  margin-top: .5em;
+}
+
+.search-facet-body ul {
+  font-size: .9em;
+}
+
+.search-facet.expanded .search-facet-header {
+  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
+}
+
+.search-facet.expanded .search-facet-body {
+  display: block;
+}
+
+.search-facet-body ul {
+  color: $theme.textSecondaryColor;
+  list-style: none;
+  display: block;
+  padding: 0.5em 0;
+  margin: 0;
+}
+
+.search-facet-body li {
+  clear: both;
+}
+
+.search-facet-body input[type="checkbox"] {
+  float: left;
+  margin-left: 0;
+}
+
+.search-facet-body a.selected {
+  font-weight: bolder;
+}
+
+.search-facet-body .itemName {
+  float: left;
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+  width: 75%;
+}
+
+.search-facet-body .itemName.empty {
+  color: $theme.textSecondaryColor;
+}
+
+.search-facet-body .itemName {
+  /* Remove link styling */
+  color: $theme.textColor;
+  text-decoration: none;
+}
+
+.search-facet-body .itemName:hover {
+  color: $theme.linkColor;
+  text-decoration: underline;
+}
+
+.search-facet-body .itemCount {
+  float: right;
+}
+
+.search-facet-body .itemName, .search-facet-body .itemCount {
+  padding: 0.2em 0;
+}
+
+.debug  {
+  float: right;
+  position: relative;
+  padding: 5px 10px;
+  margin-right: -10px;
+}
+
+.paginationFilter .resultsNo,
+.paginationFilter .controlPagination,
+.paginationFilter .pagination {
+  line-height: 22px;
+}</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity output='false'}}
+#macro (displaySearchForm)
+  {{html}}
+  &lt;form class="search-form" action=""&gt;
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
+      &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
+    &lt;/div&gt;
+    &lt;div class="search-bar"&gt;
+      &lt;label class="hidden" for="searchQuery"&gt;$services.localization.render('search.page.bar.query.label')&lt;/label&gt;
+      &lt;input type="text" id="searchQuery" name="text" class="search-query withTip useTitleAsTip"
+        title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;##
+      &lt;span class="buttonwrapper"&gt;##
+        &lt;input type="submit" value="$services.localization.render('search.page.bar.submit')"
+          class="button" title="$services.localization.render('search.page.bar.submit.title')" /&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    #displaySearchFilter()
+  &lt;/form&gt;
+  {{/html}}
+#end
+
+#macro (displaySearchFilter)
+  &lt;div class="search-filter xform&gt;
+    &lt;div class="search-filter-header"&gt;
+      &lt;strong&gt;$services.localization.render('solr.filter.title')&lt;/strong&gt;
+      &lt;p class="xHint"&gt;$services.localization.render('solr.filter.hint')&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;dl class="search-filter-left"&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterWiki"&gt;$services.localization.render('solr.filterBy.wiki')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;#wikiSelector()&lt;/dd&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterType"&gt;$services.localization.render('solr.filterBy.type')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select id="searchFilterType" name="type"&gt;
+          &lt;option value=""&gt;$services.localization.render('solr.filterBy.type.all')&lt;/option&gt;
+          #foreach ($aType in ['DOCUMENT', 'ATTACHMENT', 'OBJECT', 'OBJECT_PROPERTY'])
+            &lt;option value="$aType" #if ($aType == $type)selected="selected"#end&gt;
+              $escapetool.xml($services.localization.render("solr.filterBy.type.$aType.toLowerCase()"))
+            &lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
+      #if ($xwiki.isMultiLingual())
+        &lt;dt&gt;
+          &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select id="searchFilterLanguage" name="lang"&gt;
+            &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
+            #getSupportedLanguages()
+            #foreach ($supportedLanguage in $supportedLanguages)
+              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;$supportedLanguage&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+    &lt;dl class="search-filter-right"&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterSpace"&gt;$services.localization.render('solr.filterBy.space')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;#spaceSelector()&lt;/dd&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterFileType"&gt;$services.localization.render('solr.filterBy.fileType')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select id="searchFilterFileType" name="fileType"&gt;
+          &lt;option value=""&gt;$services.localization.render('solr.filterBy.fileType.all')&lt;/option&gt;
+          #set ($fileTypeOptions = $collectionstool.orderedMap)
+          #set ($discard = $fileTypeOptions.put('image*', 'Image'))
+          #set ($discard = $fileTypeOptions.put('audio*', 'Audio'))
+          #set ($discard = $fileTypeOptions.put('video*', 'Video'))
+          #set ($discard = $fileTypeOptions.put('text*', 'Text'))
+          #foreach ($aFileType in ['image', 'audio', 'video', 'text'])
+            &lt;option value="$aFileType*" #if ("$aFileType*" == $fileType)selected="selected"#end&gt;
+              $services.localization.render("solr.filterBy.fileType.$aFileType")
+            &lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;div class="clearfloats"&gt;&lt;/div&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterBoost"&gt;$services.localization.render('solr.filter.queryBoost.label')&lt;/label&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('solr.filter.queryBoost.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input id="searchFilterBoost" name="boost" type="text" value="$escapetool.xml($boost)" /&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+#end
+
+#**
+ * Get the list of supported languages.
+ *#
+#macro (getSupportedLanguages)
+  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
+  #set ($supportedLanguages = [])
+  #foreach ($supportedLanguage in $supportedLanguagesRaw)
+    #if ($supportedLanguage.trim() != '')
+      #set ($discard = $supportedLanguages.add($supportedLanguage))
+    #end
+  #end
+  ## Make sure the default language is included.
+  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
+  #if (!$supportedLanguages.contains($defaultLanguage))
+    #set ($discard = $supportedLanguages.add($defaultLanguage))
+  #end
+  #set ($supportedLanguages = $sorttool.sort($supportedLanguages))
+#end
+
+#macro (wikiSelector )
+  #if ($xcontext.isMainWiki())
+    #set ($wikiNames = $xwiki.wikiNames)
+  #else
+    #set ($wikiNames = [$xcontext.database])
+  #end
+  #set ($wikis = [])
+  #foreach ($wikiName in $wikiNames)
+    #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
+    #if ("$!wikiPrettyName.trim()" == '')
+      #set ($wikiPrettyName = $wikiName)
+    #end
+    #set ($discard = $wikis.add({'value': $wikiName, 'label': $wikiPrettyName}))
+  #end
+  &lt;select id="searchFilterWiki" name="wiki"&gt;
+    #if ($xcontext.isMainWiki() &amp;&amp; $wikis.size() &gt; 1)
+      ## The main wiki can search in all wikis.
+      &lt;option value=""&gt;$services.localization.render('solr.filterBy.wiki.all')&lt;/option&gt;
+    #end
+    #foreach ($aWiki in $sorttool.sort($wikis, 'label'))
+      &lt;option value="$escapetool.xml($aWiki.value)" #if ($wiki == "$!aWiki.value")selected="selected"#end&gt;$escapetool.xml($aWiki.label)&lt;/option&gt;
+    #end
+  &lt;/select&gt;
+#end
+
+#macro(spaceSelector)
+  #set ($spaces = [])
+  #set ($wikiNames = $xwiki.wikiNames)
+  #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
+    #set ($spaces = $xwiki.spaces)
+  #elseif ($wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
+    #set ($spaces = $services.query.xwql('select distinct doc.space from Document as doc order by doc.space').setWiki($wiki).execute())
+  #end
+  &lt;select id="searchFilterSpace" name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
+    &lt;option value="" #if($space == '')selected="selected"#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
+    #foreach ($aSpace in $spaces)
+      #set ($spaceReservedDocRef = $services.model.createDocumentReference($wiki,
+        $aSpace, "DocumentReservedForInternalXWikiUsage$mathtool.random(0, 999)"))
+      #if (!$blacklistedSpaces.contains($aSpace) &amp;&amp; $xwiki.hasAccessLevel('view',
+        $services.model.serialize($spaceReservedDocRef, 'default')))
+        &lt;option value="$escapetool.xml($aSpace)" #if($space == $aSpace)selected="selected"#end&gt;$escapetool.xml($aSpace)&lt;/option&gt;
+      #end
+    #end
+  &lt;/select&gt;
+#end
+
+#macro (displaySearchDebugInfo)
+  (% class="search-debug#if ($debug == '') hidden#end" %)(((
+    Debug is On
+    #set ($debugMap = $searchResponse.debugMap)
+    #if ($debugMap)
+
+      {{html}}
+      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!debugMap.get('QParser')&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!debugMap.get('parsedquery_toString')&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!debugMap.get('timing')&lt;/div&gt;
+      {{/html}}
+    #end
+  )))
+#end
+
+#macro (displaySearchFacets $searchResponse)
+  (% class="search-facets xform" %)(((
+    (% class="search-facets-header" %)(((
+      **{{translation key="solr.facets.title"/}}**
+
+      (% class="xHint" %)
+      {{translation key="solr.facets.hint"/}}
+    )))
+    (% class="search-facets-actions" %)(((
+      #set ($resetParameters = {})
+      #foreach ($parameter in $request.parameterMap.entrySet())
+        #if ($parameter.key.startsWith('f_'))
+          #set ($discard = $resetParameters.put($parameter.key, []))
+        #end
+      #end
+      #extendQueryString($url $resetParameters)
+      [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
+    )))
+    #foreach ($facetField in $searchResponse.facetFields)
+      #displaySearchFacet($facetField)
+    #end
+  )))
+#end
+
+#macro (displaySearchFacet $facetField)
+  #set ($facetValues = $facetField.values)
+  ## Keep only the values that have at least one match.
+  #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
+  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
+  #set ($facetRequestParameter = "f_$facetField.name")
+  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+  #if ($facetRequestValues || $facetValues.size() &gt; 1)
+    (% class="search-facet expanded" %)(((
+      {{html}}
+      #set ($facetPrettyNameKey = "solr.field.$facetField.name")
+      #if ($services.localization.get($facetPrettyNameKey))
+        #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
+      #else
+        #set ($facetPrettyName = $facetField.name)
+      #end
+      &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
+      &lt;div class="search-facet-body"&gt;
+        &lt;ul&gt;
+          #foreach ($facetValue in $facetValues)
+            &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      {{/html}}
+    )))
+  #end
+#end
+
+#macro(displaySearchFacetValue $facetValue)
+  #set ($selectedValues = [])
+  #if ($facetRequestValues)
+    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+  #end
+  #set ($selected = $selectedValues.remove($facetValue.name))
+  #if (!$selected)
+    #set ($discard = $selectedValues.add($facetValue.name))
+  #end
+  ## Reset the pagination because the number of results can change when a facet is applied.
+  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
+    #if ($facetValue.name == '')
+      #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
+      #if (!$services.localization.get($facetPrettyValueKey))
+        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
+      #end
+      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
+    #else
+      #set ($facetPrettyValue = $facetValue.name)
+    #end
+    &lt;span class="itemName#if ($facetValue.name == '') empty#end"&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
+    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
+  &lt;/a&gt;
+#end
+
+#macro (displaySearchResultsSort)
+  #set ($defaultSortOrder = {
+    'score': 'desc',
+    'title_sort' : 'asc',
+    'date' : 'desc',
+    'author_display_sort' : 'asc'
+  })
+  #set ($sortOrderSymbol = {
+    'asc': "\u25B2",
+    'desc': "\u25BC"
+  })
+  (% class="search-results-sort" %)
+  * {{translation key="solr.sortBy"/}}
+  #foreach ($entry in $defaultSortOrder.entrySet())
+    #set ($class = 'sort-item')
+    #set ($sortOrderIndicator = $NULL)
+    #set ($targetSortOrder = $entry.value)
+    #if ($sort == $entry.key)
+      #set ($class = "$class active")
+      #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
+      #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
+      #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
+    #end
+    #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
+    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
+  #end
+#end
+
+#macro (extendQueryString $url $extraParameters)
+  #set ($parameters = {})
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  #set ($discard = $parameters.putAll($extraParameters))
+  #set ($queryString = '')
+  #foreach($parameter in $parameters.entrySet())
+    #foreach ($value in $parameter.value)
+      #set ($queryString = "$queryString&amp;$escapetool.url($parameter.key)=$escapetool.url($value)")
+    #end
+  #end
+  #set ($url = $NULL)
+  #setVariable("$url" $doc.getURL('view', $queryString))
+#end
+
+#macro (displaySearchResults)
+  #set ($results = $searchResponse.results)
+  #set ($paginationParameters = {
+    'url': $doc.getURL('view', "$!request.queryString.replaceAll('firstIndex=[0-9]*', '')"),
+    'totalItems': $results.numFound,
+    'defaultItemsPerPage': $rows,
+    'position': 'top'
+  })
+  {{html}}#pagination($paginationParameters){{/html}}
+  (% class="search-results" %)(((
+    #foreach ($searchResult in $results)
+      #displaySearchResult($searchResult)
+    #end
+  )))
+  #set ($discard = $paginationParameters.put('position', 'bottom'))
+  {{html}}#pagination($paginationParameters){{/html}}
+#end
+
+#macro (displaySearchResult $searchResult)
+  #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki, $searchResult.space, $searchResult.name))
+  #set ($searchResultDocument = $xwiki.getDocument($searchResultDocumentReference))
+  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
+  (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
+    ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
+    {{html}}
+    #displaySearchResultTitle()
+    #displaySearchResultLocation()
+    ##
+    #set ($date = $datetool.format('d MMM yyyy', $searchResultTranslatedDocument.date))
+    ## FIXME: handle multiwiki setup for authors. Better: index absolute authors instead.
+    #set ($author = $xwiki.getUserName($searchResultTranslatedDocument.author))
+    &lt;div class="search-result-author"&gt;$services.localization.render('solr.result.author', [$author, $date])&lt;/div&gt;
+    ##
+    #if ("$!searchResult.mimetype" != '')
+      &lt;div class="search-result-mediaType"&gt;$services.localization.render('solr.result.mediaType',
+        [$escapetool.xml($searchResult.mimetype)])&lt;/div&gt;
+    #end
+    #set ($class = $searchResult.get('class'))
+    #if ("$!class" != '')
+      #set ($classReference = $services.model.resolveDocument($class, $services.model.createWikiReference($searchResult.wiki)))
+      #set ($classLink = "&lt;a href=""$xwiki.getURL($classReference)""&gt;$escapetool.xml($class)&lt;/a&gt;")
+      #set ($propertyName = $searchResult.propertyname)
+      #if ("$!propertyName" == '')
+        &lt;div class="search-result-object"&gt;$services.localization.render('solr.result.object', [$classLink])&lt;/div&gt;
+      #else
+        &lt;div class="search-result-property"&gt;$services.localization.render('solr.result.property',
+          [$classLink, $escapetool.xml($propertyName)])&lt;/div&gt;
+      #end
+    #end
+    #displaySearchResultHighlighting($searchResult)
+    ## Scoring debug data.
+    &lt;div id="debug_$searchResult.id" class="hidden"&gt;
+      $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
+    &lt;/div&gt;
+    {{/html}}
+  )))
+#end
+
+#macro (displaySearchResultTitle)
+  #set ($title = $searchResultTranslatedDocument.plainTitle)
+  #set ($titleURL = $searchResultDocument.getURL())
+  #if ($searchResult.type == 'ATTACHMENT')
+    #set ($title = $searchResult.filename)
+    #set ($titleURL = $searchResultDocument.getAttachmentURL($searchResult.filename))
+  #elseif ($searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != ''
+    &amp;&amp; $xcontext.language != $searchResult.locale)
+    #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
+  #end
+  &lt;h2 class="search-result-title"&gt;
+    &lt;a href="$titleURL"&gt;$escapetool.xml($title)&lt;/a&gt;
+    ## Display document language for document results when multiple language results are requested.
+    #if ($request.lang == '' &amp;&amp; $searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != '')
+      &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
+        class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
+    #end
+  &lt;/h2&gt;
+#end
+
+#macro (displaySearchResultLocation $searchResult)
+  #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($searchResult.wiki).wikiPrettyName)
+  #if ("$!wikiPrettyName.trim()" == '')
+    #set ($wikiPrettyName = $searchResult.wiki)
+  #end
+  #set ($wikiReference = $services.model.createWikiReference($searchResult.wiki))
+  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $wikiReference))
+  #set ($wikiLink = "&lt;a href=""$xwiki.getURL($wikiHomeDocRef)""&gt;$escapetool.xml($wikiPrettyName)&lt;/a&gt;")
+  ##
+  #set ($spaceReference = $services.model.createSpaceReference($searchResult.space, $wikiReference))
+  #set ($spaceHomeDocRef = $services.model.resolveDocument('', 'default', $spaceReference))
+  #set ($spaceLink = "&lt;a href=""$xwiki.getURL($spaceHomeDocRef)""&gt;$escapetool.xml($searchResult.space)&lt;/a&gt;")
+  ##
+  #set ($documentLink = "&lt;a href=""$searchResultDocument.getURL()""&gt;$escapetool.xml($searchResult.name)&lt;/a&gt;")
+  &lt;div class="search-result-location"&gt;$services.localization.render('solr.result.location',
+    [$wikiLink, $spaceLink, $documentLink])&lt;/div&gt;
+#end
+
+#macro (displaySearchResultHighlighting $searchResult)
+  #getSearchResultHighlighting($searchResult $highlighting)
+  #if ($highlighting.size() &gt; 0)
+    &lt;dl class="search-result-highlights"&gt;
+      #foreach ($entry in $highlighting)
+        &lt;dt&gt;
+          #if ($services.localization.get("solr.field.$entry.field"))
+            $services.localization.render("solr.field.$entry.field")
+          #else
+            $entry.field
+          #end
+        &lt;/dt&gt;
+        &lt;dd&gt;#displaySearchResultMatches($entry.matches)&lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+  #end
+#end
+
+#macro (displaySearchResultMatches $matches)
+  #foreach ($match in $matches)
+    #if ($foreach.count &gt; 1)
+      &lt;span class="separator"&gt;&amp;hellip;&lt;/span&gt;
+    #end
+    &lt;blockquote class="search-result-highlight"&gt;$match&lt;/blockquote&gt;
+  #end
+#end
+
+#macro (getSearchResultHighlighting $searchResult $return)
+  #set ($highlighting = $searchResponse.highlighting.get($searchResult.id))
+  #set ($highlightingByLanguage = {})
+  #foreach ($entry in $highlighting.entrySet())
+    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
+    #set ($field = $stringtool.substringBefore($entry.key, '_'))
+    ## Extract the language.
+    #set ($lang = $stringtool.substringAfter($entry.key, '_'))
+    #if ($lang == $field)
+      ## No language.
+      #set ($lang = '_')
+    #end
+    #set ($matchesByLanguage = $highlightingByLanguage.get($field))
+    #if (!$matchesByLanguage)
+      #set ($matchesByLanguage = {})
+      #set ($discard = $highlightingByLanguage.put($field, $matchesByLanguage))
+    #end
+    #set ($discard = $matchesByLanguage.put($lang, $entry.value))
+  #end
+  ## Keep only the matches correspoding to the search result locale.
+  #set ($highlighting = [])
+  ## Fields with a higher index will be displayed first. Fields that are not included will be displayed at the end.
+  #set ($fieldPriority = ['filename', 'attcontent', 'objcontent', 'comment', 'propertyname', 'propertyvalue', 'title', 'doccontent'])
+  #foreach ($entry in $highlightingByLanguage.entrySet())
+    #if ($searchResult.locale != '')
+      #set ($matches = $entry.value.get($searchResult.locale))
+    #else
+      ## No language.
+      #set ($matches = $entry.value.get('_'))
+    #end
+    #if (!$matches)
+      ## This should not happen but let's play safe.
+      #set ($matches = $entry.value.entrySet().iterator().next().value)
+    #end
+    ## Sanitize the matches.
+    #foreach ($match in $matches)
+      #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
+      #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
+      #set ($match = $escapetool.xml($match))
+      #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
+      #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
+      #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
+    #end
+    #set ($discard = $highlighting.add({
+      'field': $entry.key,
+      'priority': $fieldPriority.indexOf($entry.key),
+      'matches': $matches
+    }))
+  #end
+  #set ($highlighting = $sorttool.sort($highlighting, 'priority:desc'))
+  #set ($return = $NULL)
+  #setVariable("$return" $highlighting)
+#end
+
+#macro (getSearchResults)
+  #set ($queryString = "$!{text}")
+  ##
+  ## Create the query and set the query string.
+  #set ($query = $services.query.createQuery($queryString, 'solr'))
+  ##
+  ## Set query parameters.
+  #set ($discard = $query.setLimit($rows))
+  #set ($discard = $query.setOffset($start))
+  #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
+  #if ($boost != '')
+    #set ($discard = $query.bindValue('qf', $boost))
+  #end
+  #if ($debug != '')
+    #set ($discard = $query.bindValue('debugQuery', 'on'))
+  #end
+  ##
+  ## Collect the query filters.
+  #set ($filters = {})
+  #if ($language != '')
+    #set ($discard = $filters.put('locales', [$language]))
+  #end
+  #if ($wiki != '')
+    #set ($discard = $filters.put('wiki', [$wiki]))
+  #end
+  #if ($space != '' &amp;&amp; !$blacklistedSpaces.contains($space))
+    #set ($discard = $filters.put('space_exact', [$space]))
+  #end
+  #if ($type != '')
+    #set ($discard = $filters.put('type', [$type]))
+  #end
+  #if ($fileType != '')
+    #set ($discard = $filters.put('mimetype', [$fileType]))
+  #end
+  #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
+    #set ($discard = $filters.put('hidden', [false]))
+  #end
+  ## Add the facets.
+  #foreach ($parameter in $request.parameterMap.entrySet())
+    #if ($parameter.key.startsWith('f_'))
+      #set ($discard = $filters.put($parameter.key.substring(2), $parameter.value))
+    #end
+  #end
+  ##
+  ## Build the query filter. Use AND as the default operation between different filters/facets.
+  #if ($filters.size() &gt; 0)
+    #set ($queryFilter = '{!q.op=AND}')
+    #foreach ($filter in $filters.entrySet())
+      #if ($filter.value.size() &gt; 1)
+        ## Use OR between different values of the same filter/facet.
+        #set ($queryFilter = "$queryFilter $filter.key:(")
+        #set ($separator = '')
+        #foreach ($value in $filter.value)
+          #set ($queryFilter = "$queryFilter$separator""$value""")
+          #set ($separator = ' OR ')
+        #end
+        #set ($queryFilter = "$queryFilter)")
+      #else
+        #set ($queryFilter = "$queryFilter $filter.key:""$filter.value.get(0)""")
+      #end
+    #end
+    #set ($discard = $query.bindValue('fq', $queryFilter))
+  #end
+  ##
+  ## Execute the query.
+  #set ($searchResponse = $query.execute()[0])
+#end
+
+#macro (processRequestParameters)
+  #set ($text = "$!request.text")
+  #set ($space = "$!request.space")
+  #set ($fileType = "$!request.fileType")
+  #set ($boost = "$!request.boost")
+  #set ($debug = "$!request.debug")
+  #set ($rows = $numbertool.integer($request.rows))
+  #if ("$!rows" == '')
+    #set ($rows = 10)
+  #end
+  #set ($start = $numbertool.integer($request.firstIndex))
+  #if ("$!start" == '')
+    #set ($start = 0)
+  #end
+  #set ($sort = $request.sort)
+  #if ("$!sort" == '')
+    #set ($sort = 'score')
+  #end
+  #set ($sortOrder = $request.sortOrder)
+  #if ("$!sortOrder" == '')
+    #set ($sortOrder = 'desc')
+  #elseif ($sortOrder != 'desc')
+    #set ($sortOrder = 'asc')
+  #end
+  ## Can't use 'language' as request parameter because it's used by view mode to select the display language.
+  #set ($language = $request.lang)
+  ## An empty value for the language parameter means no language query filter (all languages are considered).
+  #if ($language != '' &amp;&amp; "$!language" == '')
+    ## The language parameter is null (not set on the request).
+    #set ($language = "$!xcontext.language")
+  #end
+  #set ($type = $request.type)
+  #if ($type != '' &amp;&amp; "$!type" == '')
+    ## The type parameter is null (not set on the request).
+    #set ($type = 'DOCUMENT')
+  #end
+  ## Subwikis search by default in their content only.
+  #set ($wiki = "$!request.wiki")
+  #if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
+    #set ($wiki = $xcontext.database)
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
+#set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
+## Disable the document extra data: comments, attachments, history...
+#set ($docextras = [])
+#processRequestParameters()
+(% class="search-form-container" %)(((
+  #displaySearchForm()
+  #displaySearchDebugInfo()
+)))
+#if ($text != '')
+  #getSearchResults()
+  (% class="search-results-container" %)(((
+    #displaySearchFacets($searchResponse)
+    (% class="search-results-left" %)(((
+      #displaySearchResultsSort()
+
+      #displaySearchResults()
+    )))
+  )))
+#end
+{{/velocity}}</content>
+</xwikidoc>

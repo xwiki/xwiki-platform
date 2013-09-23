@@ -44,6 +44,7 @@ public abstract class AbstractTypedStringEntityReferenceResolver implements Type
      * 
      * @see TypedStringEntityReferenceResolver#resolve(String, org.xwiki.model.EntityType)
      */
+    @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType defaultType)
     {
         String refToParse = entityReferenceRepresentation;

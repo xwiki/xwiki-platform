@@ -67,11 +67,7 @@ public enum RangeCompare
         this.value = value;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Enum#toString()
-     */
+    @Override
     public String toString()
     {
         return this.value;

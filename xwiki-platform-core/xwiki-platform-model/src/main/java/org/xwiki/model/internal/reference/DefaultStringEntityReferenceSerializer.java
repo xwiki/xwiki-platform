@@ -19,16 +19,16 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPES;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.REPLACEMENTS;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
 
 /**
  * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
@@ -38,68 +38,31 @@ import java.util.Map;
  * @since 2.2M1
  */
 @Component
-public class DefaultStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
+public class DefaultStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
-    private Map<EntityType, List<String>> escapes = new HashMap<EntityType, List<String>>()
-    {
-        {
-            put(EntityType.ATTACHMENT, Arrays.asList("@"));
-            put(EntityType.DOCUMENT, Arrays.asList("."));
-            put(EntityType.SPACE, Arrays.asList(":", "."));
-            put(EntityType.OBJECT, Arrays.asList("^"));
-            put(EntityType.OBJECT_PROPERTY, Arrays.asList("."));
-        }
-    };
-
-    private Map<EntityType, List<String>> replacements = new HashMap<EntityType, List<String>>()
-    {
-        {
-            put(EntityType.ATTACHMENT, Arrays.asList("\\@"));
-            put(EntityType.DOCUMENT, Arrays.asList("\\."));
-            put(EntityType.SPACE, Arrays.asList("\\:", "\\."));
-            put(EntityType.OBJECT, Arrays.asList("\\^"));
-            put(EntityType.OBJECT_PROPERTY, Arrays.asList("\\."));
-        }
-    };
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...) 
-     */
-    public String serialize(EntityReference reference, Object... parameters)
-    {
-        if (reference == null) {
-            return null;
-        }
-
-        EntityReference currentReference = reference.getRoot();
-        StringBuilder representation = new StringBuilder();
-        // While we still have children and they're not the children of the reference to serialize
-        while (currentReference != null && currentReference != reference.getChild()) {
-            serializeEntityReference(currentReference, representation, currentReference == reference, parameters);
-            currentReference = currentReference.getChild();
-        }
-        return representation.toString();
-    }
-
+    @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
-        List<String> currentEscapeChars = this.escapes.get(currentReference.getType());
+        EntityType currentType = currentReference.getType();
+        EntityReference currentParent = currentReference.getParent();
+        String[] currentEscapeChars = ESCAPES.get(currentType);
+
+        // Add my separator if I am not the first one in the representation
+        if (currentParent != null && representation.length() > 0) {
+            if (currentParent.getType() == EntityType.WIKI) {
+                representation.append(WIKISEP);
+            } else {
+                representation.append(currentEscapeChars[0]);
+            }
+        }
 
         // If we're on the Root reference then we don't need to escape anything
         if (currentEscapeChars != null) {
-            representation.append(StringUtils.replaceEach(currentReference.getName(), currentEscapeChars
-                .toArray(new String[0]), this.replacements.get(currentReference.getType()).toArray(new String[0])));
+            representation.append(StringUtils.replaceEach(currentReference.getName(), currentEscapeChars,
+                REPLACEMENTS.get(currentType)));
         } else {
-            representation.append(currentReference.getName());
-        }
-
-        // If the reference is the last one in the chain then don't print the separator char
-        if (!isLastReference && currentReference.getChild() != null) {
-            String separatorChar = this.escapes.get(currentReference.getChild().getType()).get(0);
-            representation.append(separatorChar);
+            representation.append(currentReference.getName().replace(ESCAPE, DBLESCAPE));
         }
     }
 }

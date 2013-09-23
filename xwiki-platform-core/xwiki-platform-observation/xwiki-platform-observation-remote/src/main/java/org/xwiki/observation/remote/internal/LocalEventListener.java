@@ -26,11 +26,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
@@ -47,7 +48,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 @Component
 @Named("observation.remote")
 @Singleton
-public class LocalEventListener extends AbstractLogEnabled implements EventListener
+public class LocalEventListener implements EventListener
 {
     /**
      * The name of the listener.
@@ -67,16 +68,18 @@ public class LocalEventListener extends AbstractLogEnabled implements EventListe
     private ComponentManager componentManager;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * We don't inject {@link RemoteObservationManager} automatically to load it only when necessary (when remote
      * observation manager is enabled).
      */
     private RemoteObservationManager remoteObservationManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
+    @Override
     public List<Event> getEvents()
     {
         List<Event> events;
@@ -90,32 +93,29 @@ public class LocalEventListener extends AbstractLogEnabled implements EventListe
         return events;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
+    @Override
     public String getName()
     {
         return NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (this.remoteObservationManager == null) {
             try {
-                this.remoteObservationManager = this.componentManager.lookup(RemoteObservationManager.class);
-            } catch (ComponentLookupException e) {
-                getLogger().error("Failed to initialize the Remote Observation Manager", e);
-            }
-        }
+                // Make sure to not receive events until RemoteObservationManager is ready
+                ObservationManager om = this.componentManager.getInstance(ObservationManager.class);
+                om.removeListener(getName());
+                this.remoteObservationManager = this.componentManager.getInstance(RemoteObservationManager.class);
+                om.addListener(this);
 
-        this.remoteObservationManager.notify(new LocalEventData(event, source, data));
+                this.remoteObservationManager.notify(new LocalEventData(event, source, data));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to initialize the Remote Observation Manager", e);
+            }
+        } else {
+            this.remoteObservationManager.notify(new LocalEventData(event, source, data));
+        }
     }
 }

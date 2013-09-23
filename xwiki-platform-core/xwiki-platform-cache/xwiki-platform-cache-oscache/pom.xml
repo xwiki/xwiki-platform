@@ -27,13 +27,22 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-oscache</artifactId>
   <name>XWiki Platform - Cache - OSCache</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - OSCache</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
+    <!-- We only need this dependency for the Logging API/Implementation part -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
@@ -44,22 +53,22 @@
       <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- TODO : This need to be upgraded to 2.4.1 as soon as it will be in the maven repository -->
     <dependency>
       <groupId>opensymphony</groupId>
       <artifactId>oscache</artifactId>
-      <version>2.4</version>
+      <version>2.4.1</version>
       <exclusions>
-        <!-- This is needed only whith clustering and can be added only in that case -->
+        <!-- This is needed only with clustering and can be added only in that case -->
         <exclusion>
           <groupId>javax.jms</groupId>
           <artifactId>jms</artifactId>
         </exclusion>
+        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
     </dependency>
     <!--  Test Dependencies -->
     <dependency>

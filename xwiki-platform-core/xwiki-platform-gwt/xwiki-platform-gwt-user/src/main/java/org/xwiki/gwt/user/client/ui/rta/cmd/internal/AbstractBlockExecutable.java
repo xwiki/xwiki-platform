@@ -59,11 +59,7 @@ public abstract class AbstractBlockExecutable extends AbstractSelectionExecutabl
         preserver = new SelectionPreserver(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         preserver.saveSelection();
@@ -132,11 +128,7 @@ public abstract class AbstractBlockExecutable extends AbstractSelectionExecutabl
      */
     protected abstract void execute(Node node, int startOffset, int endOffset, String parameter);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         Selection selection = rta.getDocument().getSelection();

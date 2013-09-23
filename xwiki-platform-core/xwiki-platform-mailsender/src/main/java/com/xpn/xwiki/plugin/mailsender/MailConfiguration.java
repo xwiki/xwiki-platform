@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.api.XWiki;
 

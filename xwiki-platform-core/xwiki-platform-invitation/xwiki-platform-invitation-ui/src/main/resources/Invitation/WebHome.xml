@@ -1,0 +1,1084 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Invitation</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1271083477000</creationDate>
+  <date>1271850308000</date>
+  <contentUpdateDate>1271850308000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>InvitationSectionIcon.png</filename>
+    <filesize>7845</filesize>
+    <author>XWiki.Admin</author>
+    <date>1284985893000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>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</content>
+  </attachment>
+  <class>
+    <name>Invitation.WebHome</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <allowUsersOfOtherWikis>
+      <defaultValue/>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>allowUsersOfOtherWikis</name>
+      <number>4</number>
+      <prettyName>Let users of other wikis send</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </allowUsersOfOtherWikis>
+    <commonPage>
+      <name>commonPage</name>
+      <number>18</number>
+      <picker>0</picker>
+      <prettyName>common</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </commonPage>
+    <emailClass>
+      <name>emailClass</name>
+      <number>5</number>
+      <picker>0</picker>
+      <prettyName>Email message XClass</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </emailClass>
+    <emailContainer>
+      <name>emailContainer</name>
+      <number>9</number>
+      <picker>0</picker>
+      <prettyName>Document containing email XObjects</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </emailContainer>
+    <emailRegex>
+      <name>emailRegex</name>
+      <number>7</number>
+      <picker>0</picker>
+      <prettyName>Regular expression for validating email addresses</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </emailRegex>
+    <from_address>
+      <name>from_address</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Email "from" address</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </from_address>
+    <guestsActionsPage>
+      <name>guestsActionsPage</name>
+      <number>14</number>
+      <picker>0</picker>
+      <prettyName>guestsActions</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </guestsActionsPage>
+    <javamail_extra_props>
+      <editor>---</editor>
+      <name>javamail_extra_props</name>
+      <number>15</number>
+      <picker>0</picker>
+      <prettyName>Javamail extra properties</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </javamail_extra_props>
+    <mainPage>
+      <name>mainPage</name>
+      <number>19</number>
+      <picker>0</picker>
+      <prettyName>mainPage</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </mainPage>
+    <membersActionsPage>
+      <name>membersActionsPage</name>
+      <number>16</number>
+      <picker>0</picker>
+      <prettyName>membersActions</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </membersActionsPage>
+    <membersCommonPage>
+      <name>membersCommonPage</name>
+      <number>17</number>
+      <picker>0</picker>
+      <prettyName>membersCommon</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </membersCommonPage>
+    <messageBodyTemplate>
+      <editor>---</editor>
+      <name>messageBodyTemplate</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>Email message body HTML template</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </messageBodyTemplate>
+    <smtp_port>
+      <name>smtp_port</name>
+      <number>13</number>
+      <picker>0</picker>
+      <prettyName>Smtp port</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </smtp_port>
+    <smtp_server>
+      <name>smtp_server</name>
+      <number>12</number>
+      <picker>0</picker>
+      <prettyName>Smtp server host name</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </smtp_server>
+    <smtp_server_password>
+      <name>smtp_server_password</name>
+      <number>11</number>
+      <picker>0</picker>
+      <prettyName>Smtp password</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </smtp_server_password>
+    <smtp_server_username>
+      <name>smtp_server_username</name>
+      <number>10</number>
+      <picker>0</picker>
+      <prettyName>Smtp username</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </smtp_server_username>
+    <subjectLineTemplate>
+      <name>subjectLineTemplate</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Email subject line template</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </subjectLineTemplate>
+    <usersMayPersonalizeMessage>
+      <defaultValue/>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>usersMayPersonalizeMessage</name>
+      <number>8</number>
+      <prettyName>Let users personalize messages</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </usersMayPersonalizeMessage>
+    <usersMaySendToMultiple>
+      <defaultValue/>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>usersMaySendToMultiple</name>
+      <number>6</number>
+      <prettyName>Let users send to multiple addresses</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </usersMaySendToMultiple>
+    <messageBodyTemplatePlain>
+      <editor>---</editor>
+      <name>messageBodyTemplatePlain</name>
+      <number>20</number>
+      <picker>0</picker>
+      <prettyName>Message body plain text template</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </messageBodyTemplatePlain>
+  </class>
+  <object>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <codeToExecute>
+        <editor>---</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <defaultValue/>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayInSection>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+    </class>
+    <name>Invitation.WebHome</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>1c92a63a-fb97-41e7-8fb5-adb134b4b4f0</guid>
+    <property>
+      <codeToExecute/>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayInSection>Invitation</displayInSection>
+    </property>
+    <property>
+      <heading/>
+    </property>
+    <property>
+      <iconAttachment>InvitationSectionIcon.png</iconAttachment>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.XWikiRights</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <allow>
+        <defaultValue>1</defaultValue>
+        <displayFormType>select</displayFormType>
+        <displayType>allow</displayType>
+        <name>allow</name>
+        <number>4</number>
+        <prettyName>Allow/Deny</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </allow>
+      <groups>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>groups</name>
+        <number>1</number>
+        <prettyName>Groups</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <usesList>1</usesList>
+        <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+      </groups>
+      <levels>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>levels</name>
+        <number>2</number>
+        <prettyName>Levels</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
+      </levels>
+      <users>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>users</name>
+        <number>3</number>
+        <prettyName>Users</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <usesList>1</usesList>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </users>
+    </class>
+    <name>Invitation.WebHome</name>
+    <number>0</number>
+    <className>XWiki.XWikiRights</className>
+    <guid>649d5273-d662-4248-abf0-94953088e98a</guid>
+    <property>
+      <allow>1</allow>
+    </property>
+    <property>
+      <groups>XWiki.XWikiAllGroup,</groups>
+    </property>
+    <property>
+      <levels>view</levels>
+    </property>
+    <property>
+      <users/>
+    </property>
+  </object>
+  <content>{{include document="Invitation.InvitationCommon" /}}
+
+{{include document="Invitation.InvitationMembersCommon" /}}
+
+{{velocity}}
+#*
+ * Invitation Application
+ * This script is only for sending messages and users who are not allowed to send mail need not have access to
+ * view this page.
+ *
+ * Macros in this script don't rely on any variables except those which are passed to them and the following:
+ *
+ * $doc the com.xpn.xwiki.api.Document object representing the document containing this code.
+ * $msg the internationalization message provider containing a get(String) and a get(String, List) function
+ * $xcontext the com.xpn.xwiki.Context object for this request
+ * $xwiki an object of the com.xpn.xwiki.api.XWiki class.
+ *
+ * Macros also depend on other macros but only other macros which are contained in this script.
+ *
+ * This script relies on the following documents:
+ *
+ * InvitationCommon
+ *
+ * InvitationMembersCommon
+ * 
+ *
+ * This script is affected by the following documents:
+ *
+ * InvitationMessages stores all of the mail message objects. If this does not exist it will be created.
+ *                    May be changed in the configuration.
+ *
+ * InvitationMailClass the class for mail message objects. May be changed in the configuration.
+ *
+ * InvitationConfig configuration for this code. Contains an XObject of the class defined in this document.
+ *                  If it does not exist it will be created with default values.
+ *
+ *###
+#if($xcontext.getUser() == 'XWiki.XWikiGuest')
+  ## Only members should ever have access to this document, enforce this through XWiki permissions system,
+  ## this is a last effort in the event of incorrect settings.
+  #stop
+#end
+##
+## is the user a mail admin TODO: change this.
+#set($isAdmin = $hasEdit)
+##
+## Load config and mail.
+#set($config = {})
+#loadInvitationConfig($config)
+#set($mail = {})
+#set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+#loadInvitationMail($config, $emailContainer, $mail)
+##
+## Load CSS
+$xwiki.get('ssx').use($config.get('commonPage'))
+##
+## Don't load comments, history, etc.
+#set($docextras = [])
+##
+#displayInvitationHeader($request.getParameterMap(), $config)
+##
+##---------------------------------------------------------------------
+## Decide what we should do.
+##---------------------------------------------------------------------
+##
+#if($xcontext.getAction() != 'view')
+  ## The administration application includes this page so we will not do anything.
+#elseif(!$isAdmin &amp;&amp; "#isUserReportedSpammer($mail.values())" != 'false')
+  ## The current user has been reported as a spammer, they are not allowed to send more mail until
+  ## the situation has been investigated.
+
+  ## A message which you sent was reported as spam and your privilege to send mail has been suspended...
+  (%id="invitation-permission-error"%)((({{error}}$services.localization.render('xe.invitation.userIsReportedSpammer'){{/error}})))
+  ##
+#elseif(!$isAdmin
+        &amp;&amp; $config.get('allowUsersOfOtherWikis') != '1'
+        &amp;&amp; $doc.getWiki() != $xwiki.getDocument($xcontext.getUser()).getWiki())
+  ## Users of other subwikis are not allowed to send mail.
+  (%id="invitation-permission-error"%)((({{error}}$services.localization.render('xe.invitation.onlyMembersCanSendMail')
+  $services.localization.render('xe.invitation.youAreAMemberOfOtherWiki', [$xwiki.getDocument($xcontext.getUser()).getWiki()]){{/error}})))
+#else
+  ## The user is authorized to send mail &lt;-------------------------------------------------------
+  ## Get the list of email addresses to send to.
+  #set($userMaySendToMultiple = ($isAdmin || $config.get('usersMaySendToMultiple') == '1'))
+  #set($recipientString = $escapetool.xml("$!request.get('recipients')"))
+  #set($recipients = [])
+  #getRecipients($recipientString, $userMaySendToMultiple, $recipients)
+  ##
+  ## get subject line and message body if allowed...
+  #set($userMayPersonalizeMessage = ($isAdmin || $config.get('usersMayPersonalizeMessage') == '1'))
+  #if($userMayPersonalizeMessage)
+    #set($subjectLine = $request.get('subjectLine'))
+    #set($messageBody = $request.get('messageBody'))
+  #else
+    #set($subjectLine = '')
+    #set($messageBody = '')
+  #end
+  ##
+  #if("$!request.get('sendMail')" != ''
+      &amp;&amp; $request.getMethod().toLowerCase() == 'post'
+      &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #generateAndSendMail($config,
+                         $recipients,
+                         $subjectLine,
+                         $messageBody)
+    ## Reload mail so footer information is correct.
+    #set($mail = {})
+    #loadInvitationMail($config, $emailContainer, $mail)
+  #else
+    ## The user wants to write and preview a message.
+    #displayForm($recipientString,
+                 $subjectLine,
+                 $messageBody,
+                 $userMaySendToMultiple,
+                 $userMayPersonalizeMessage)
+    #set($messages = [])
+    ## No recipients ('',) because we are just creating it to preview.
+    #set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+    #generateMailFromTemplate($config.get('subjectLineTemplate'),
+                              $config.get('messageBodyTemplate'),
+                              $config.get('emailClass'),
+                              [],
+                              $config.get('emailRegex'),
+                              $subjectLine,
+                              $messageBody,
+                              $messages,
+                              $emailContainer)
+    #set($invalidAddresses = [])
+    #validateAddressFormat($recipients, $config.get('emailRegex'), $invalidAddresses)
+    #displayMessage($messages.get(0), $recipients, $invalidAddresses)
+  #end
+  #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
+#end##if user has permission to send
+##
+##---------------------------------------------------------------------
+## The macros (Nothing below this point is run directly)
+##---------------------------------------------------------------------
+##
+#*
+ * Generate and send an email message.
+ *
+ * $messages (List&lt;XObject&gt;) a list of invitation email messages.
+ *
+ * $config (XObject) configuration for the inviter.
+ *
+ * $emailContainer (Document) the document contaning the mail message.
+ *###
+#macro(generateAndSendMail, $config, $recipients, $messageSubject, $messageContent)
+  #set($messages = [])
+  #set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+  #generateMailFromTemplate($config.get('subjectLineTemplate'),
+                            $config.get('messageBodyTemplate'),
+                            $config.get('emailClass'),
+                            $recipients,
+                            $config.get('emailRegex'),
+                            $messageSubject,
+                            $messageContent,
+                            $messages,
+                            $emailContainer)
+  ##
+  #if($messages.size() &gt; 0)
+    #sendMail($messages, $config, $emailContainer)
+    #set($errors = [])
+    #foreach($message in $messages)
+      #set($status = $message.getProperty('status').getValue())
+      #if($status != 'pending')
+        #set($discard = $errors.add($message))
+      #end
+    #end
+    (%class="invitation"%)(((
+
+      (%id="invitation-action-message"%)(((##
+      #if($errors.size() &gt; 0)
+        ## An error has occured while sending the message.
+        {{error}}$services.localization.render('xe.invitation.errorWhileSending'){{/error}}##
+      #else
+        ## Your message has been sent.
+        {{info}}$services.localization.render('xe.invitation.successSending'){{/info}}##
+      #end
+      )))
+
+      #displayMessageTable($messages, ['sentDate', 'recipient', 'status'])
+     )))
+    #displayMessage($messages.get(0), $recipients)
+  #else
+
+
+    (%id="invitation-action-message"%)((({{error}}$services.localization.render('xe.invitation.noValidMessagesToSend'){{/error}})))
+
+  #end
+#end
+#*
+ * Send an email message.
+ *
+ * $messages (List&lt;XObject&gt;) a list of invitation email messages.
+ *
+ * $config (XObject) configuration for the inviter.
+ *
+ * $emailContainer (Document) the document contaning the mail messages.
+ *###
+#macro(sendMail, $messages, $config, $emailContainer)
+  ##
+  ## Get mail sender plugin.
+  #set($sender = $xwiki.get('mailsender'))
+  ##
+  ## If parameters are set in the local config, use them, otherwise use global defaults.
+  #set($senderConfig = $sender.createMailConfiguration($xwiki))
+  #if("$!config.get('smtp_server')" != '')
+    $senderConfig.setHost($config.get('smtp_server'))##
+  #end
+  #if("$!config.get('smtp_port')" != '')
+    $senderConfig.setPort($mathtool.toInteger($config.get('smtp_port')))##
+  #end
+  #if("$!config.get('smtp_server_username')" != '')
+    $senderConfig.setSmtpUsername($config.get('smtp_server_username'))##
+  #end
+  #if("$config.containsKey('smtp_server_password')" != '')
+    $senderConfig.setSmtpPassword($config.get('smtp_server_password'))##
+  #end
+  #if("$config.containsKey('javamail_extra_props')" != '')
+    $senderConfig.setExtraProperties($config.get('javamail_extra_props'))##
+  #end
+  ##
+  #foreach($message in $messages)
+    #set($mailObj = $sender.createMail())
+    ##
+    #if("$config.get('from_address')" != '')
+      $mailObj.setFrom($config.get('from_address'))##
+    #end
+    ##
+    ## Set recipients
+    #set($recipient = $message.getProperty('recipient').getValue())##
+    $mailObj.setTo($recipient)##
+    ##
+    ## Set the subject line and message body.
+    $mailObj.setSubject($message.getProperty('subjectLine').getValue())##
+    ##
+    ## If text part is not set then we get an NPE when trying to craft a multipart message.
+    $mailObj.setTextPart('')##
+    ## Put all in email div so that we can apply CSS only to the email and not to the preview.
+    $mailObj.setHtmlPart("&lt;div style='font-size:87.5%;'&gt;$message.getProperty('messageBody').getValue()&lt;/div&gt;")##
+    ##
+    ## Send the message
+    #if("$sender.sendMail($mailObj, $senderConfig)" != 0)
+      #setMessageStatus($message, 'sendingFailed')##
+    #else
+      #setMessageStatus($message, 'pending', $services.localization.render('xe.invitation.messageSentLogEntry'))##
+    #end
+    ## Comment = "Added Email Message."
+    $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.sendMail.addMessageSaveComment'))
+  #end
+#end
+##
+#*
+ * Generate invitation XObjects from a template, user input, and a set of recipients.
+ *
+ * $subjectLineTemplate (String) this will be evaluated as velocity and placed in the email subject line.
+ *                               You may refer to $messageID and $subjectLine in the code.
+ *
+ * $messageBodyTemplate (String) this will be evaluated as velocity and placed in the email message body.
+ *                               You may refer to $messageID, $messageBody, You may also use xwiki2.0 syntax
+ *                               in the template.
+ *
+ * $emailClass (String) the document name of the XClass representing email messages.
+ *
+ * $recipients (List&lt;String&gt;) email addresses to send this message to.
+ *
+ * $emailRegex (String) the regular expression to validate the email addresses against. Undefined behavior will result
+ *                      from an invalid expression.
+ *
+ * $userSuppliedSubject (String) the message subject. This can be modified or ignored by the template.
+ *
+ * $userSuppliedContent (String) the message content. This can be modified or ignored by the template.
+ *
+ * $messages (List&lt;XObject&gt;) this list will be populated with mail objects for each recipient.
+ *
+ * $emailContainer (Document) the document where the mail object will be stored for later review.
+ *###
+#macro(generateMailFromTemplate, $subjectLineTemplate, $messageBodyTemplate, $emailClass, $recipients, $emailRegex, 
+                                 $userSuppliedSubject, $userSuppliedContent, $messages, $emailContainer)
+  #if($recipients &amp;&amp; $recipients.size() &gt; 0)
+    #set($sendTo = [])
+    #set($discard = $sendTo.addAll($recipients))
+    #set($invalid = [])
+    #validateAddressFormat($recipients, $emailRegex, $invalid)
+    #set($discard = $sendTo.removeAll($invalid))
+    #set($messageGroupID = $mathtool.getRandom())
+  #else
+    ## If we're just doing a test run, no recipients but we still want to generate a message.
+    #set($sendTo = [''])
+  #end
+  ##
+  #foreach($recipient in $sendTo)
+    #set($message = $emailContainer.newObject($emailClass))
+    $message.set('sendingUser', $xcontext.getUser())##
+    $message.set('sentDate', '')##
+    $message.set('messageGroupID', $messageGroupID)##
+    $message.set('recipient', $recipient)##
+    ## Set the message id to a random number string, set it to $messageID variable so it can be used by the template.
+    #set($messageID = "$mathtool.getRandom().toString().replaceAll('\.','')##
+                       $mathtool.getRandom().toString().replaceAll('\.','')##
+                       $mathtool.getRandom().toString().replaceAll('\.','')")
+    $message.set('messageID', $messageID)##
+    ##
+    ## Need to make $subjectLine and $messageBody available to $doc.getRenderedContent.
+    #set($subjectLine = "$!userSuppliedSubject")
+    #set($messageBody = "$!userSuppliedContent")
+    ##
+    ## If the subject line provided by the user is empty then there will be trailing whitespace.
+    ## xe.invitation.emailContent.subjectLine={0} has invited you to join {1} {2}
+    #set($subjectLineWithWhitespace = "$doc.getRenderedContent($subjectLineTemplate, 'xwiki/2.0', 'plain/1.0')")
+    ##
+    ## Generate the message from the template - html in the subject line is ignored by the mail client.
+    $message.set('subjectLine', $subjectLineWithWhitespace.trim())##
+    $message.set('messageBody', "$doc.getRenderedContent($messageBodyTemplate, 'xwiki/2.0')")##
+    #set($discard = $messages.add($message))
+  #end
+#end
+##
+#*
+ * Check the format of an email address against a regular expression.
+ *
+ * $allAddresses (List&lt;String&gt;) The list of addresses to validate.
+ *
+ * $emailRegex (String) The regular expression to validate the email addresses agains. Undefined behavior will result
+ *                      from an invalid expression.
+ *
+ * $invalidAddresses (List&lt;String&gt;) this List will be populated with addresses from $allAddresses which are invalid.
+ *###
+#macro(validateAddressFormat, $allAddresses, $emailRegex, $invalidAddresses)
+  ## Perl/javascript regexes look like /^.*/
+  ## java does not like the / at beginning and end.
+  #if($emailRegex.length() &gt; 1)
+    #set($emailRegexInternal = $emailRegex.substring(1, $mathtool.add($emailRegex.length(), -1)))
+  #else
+    ## I don't expect this but want to maintain compatibility.
+    #set($emailRegexInternal = $emailRegex)
+  #end
+  #foreach($address in $allAddresses)
+    #if("$!address" == '')
+      ## Empty address, do nothing.
+    #elseif($regextool.find($address, $emailRegexInternal).size() == 0)
+      #set($discard = $invalidAddresses.add($address))
+    #end
+  #end
+#end
+##
+#*
+ * Display a form for typing up an invitation email.
+ *
+ * $recipientString (String) what should be filled in to the field for recipients.
+ *
+ * $subjectLine (String) what should be put in the subject line by default.
+ *
+ * $messageBody (String) what should be put in the content of the message by default.
+ *
+ * $userMaySendToMultiple (Boolean) true if the current user has permission send to multiple addresses at once.
+ *
+ * $userMayPersonalizeMessage (Boolean) true if the user may add their own subject line and message content.
+ *###
+#macro(displayForm, $recipientString, $subjectLine, $messageBody, $userMaySendToMultiple, $userMayPersonalizeMessage)
+
+  {{html clean="false" wiki="false"}}
+  &lt;form id="invitation-sender-form" action="$doc.getURL('view')" method="post" class="invitation"&gt;
+   &lt;div class="hidden"&gt;&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;&lt;/div&gt;
+   &lt;dl&gt;
+    ## Who you are inviting:
+    &lt;dt&gt;&lt;label for="recipients"&gt;$services.localization.render('xe.invitation.toLabel')&lt;/label&gt;&lt;/dt&gt;
+    ## If the user has edit access on this document, then we should allow them to send to multiple email addresses.
+    #if($userMaySendToMultiple)
+      &lt;dd&gt;
+       &lt;textarea cols="75" name="recipients" rows="3" id="recipients"&gt;##
+        $!recipientString##
+       &lt;/textarea&gt;
+      &lt;/dd&gt;
+    #else
+      &lt;dd&gt;&lt;input type="text" size="54" name="recipients" id="recipients" value="$!recipientString" /&gt;&lt;/dd&gt;
+    #end
+    #if($userMayPersonalizeMessage)
+       ## Subject line:
+       &lt;dt&gt;&lt;label for="subjectLine"&gt;$services.localization.render('xe.invitation.subjectLabel')&lt;/label&gt;&lt;/dt&gt;
+       &lt;dd&gt;
+        &lt;input type="text" size="54" name="subjectLine" id="subjectLine" value="$!escapetool.xml($!subjectLine)" /&gt;
+       &lt;/dd&gt;
+       ## Invitation message:
+       &lt;dt&gt;&lt;label for="messageBody"&gt;$services.localization.render('xe.invitation.contentLabel')&lt;/label&gt;&lt;/dt&gt;
+       &lt;dd&gt;
+        &lt;textarea cols="75" name="messageBody" rows="10" id="messageBody"&gt;##
+         $!escapetool.xml($!messageBody)##
+        &lt;/textarea&gt;
+       &lt;/dd&gt;
+    #end
+   &lt;/dl&gt;
+   &lt;div class="bottombuttons"&gt;
+    &lt;div class="buttons"&gt;
+     &lt;span class="buttonwrapper"&gt;
+      ## Preview
+      &lt;input type="submit" class="button" name="preview" value="$services.localization.render('xe.invitation.displayForm.preview')" /&gt;
+     &lt;/span&gt;
+     &lt;span class="buttonwrapper"&gt;
+      ## Send Mail
+      &lt;input type="submit" class="button" name="sendMail" value="$services.localization.render('xe.invitation.displayForm.sendMail')" /&gt;
+     &lt;/span&gt;
+    &lt;/div&gt;
+   &lt;/div&gt;
+  &lt;/form&gt;
+  {{/html}}
+
+#end
+##
+#*
+ * Has mail sent by the current user been reported as spam?
+ * will return 'false' if not otherwise will return 'true'
+ * if a message was reported as spam but an admin has marked the situation
+ * as handled then this macro will return 'false'
+ *
+ * $messages (Collection&lt;XObject&gt;) objects representing all email messages.
+ *###
+#macro(isUserReportedSpammer, $messages)
+  #set($out = 'false')
+  #foreach($message in $messages)
+     #if($message.getProperty('sendingUser').getValue() == $xcontext.getUser()
+          &amp;&amp; $message.getProperty('status').getValue() == 'reported')
+     ##
+       #set($out = 'true')
+     #end
+  #end
+  $out##
+#end
+##
+#*
+ * Get the list of recipients from the user input string.
+ * Splits on space but is tolerent of commas.
+ * Each email in the list may only appear in the output once (no duplicates.)
+ *
+ * $recipientString (String) the String input by the user eg: "alice@example.com bob@example.com"
+ *
+ * $userMaySendToMultiple (Boolean) is the user allowed to send to multiple addresses at once?
+ *
+ * $recipientsOut (List&lt;String&gt;) is populated with one or more email addresses.
+ *###
+#macro(getRecipients, $recipientString, $userMaySendToMultiple, $recipientsOut)
+  #if($userMaySendToMultiple)
+    #set($recipientsArray = $recipientString.replaceAll(', ', ' ').split(' '))
+    #set($recipientMap = {})
+    #foreach($recip in $recipientsArray)
+      #set($discard = $recipientMap.put($recip, 0))
+    #end
+    #set($discard = $recipientsOut.addAll($recipientMap.keySet()))
+  #else
+    ## If the user can't edit this page, we won't let them sent to multiple addresses.
+    #set($discard = $recipientsOut.add($recipientString))
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

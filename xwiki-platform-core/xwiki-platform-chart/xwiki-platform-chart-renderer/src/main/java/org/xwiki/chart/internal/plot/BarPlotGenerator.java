@@ -21,15 +21,12 @@ package org.xwiki.chart.internal.plot;
 
 import java.util.Map;
 
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.Plot;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.xwiki.chart.model.ChartModel;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating bar charts.
@@ -37,69 +34,14 @@ import org.xwiki.chart.model.ChartModel;
  * @version $Id$
  * @since 2.0M1
  */
-public class BarPlotGenerator implements PlotGenerator
+@Component
+@Named("bar")
+@Singleton
+public class BarPlotGenerator extends AbstractCategoryPlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public Plot generate(ChartModel model, Map<String, String> parameters)
+    @Override
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
-        CategoryItemRenderer renderer = new BarRenderer();
-        CategoryAxis domainAxis = new CategoryAxis();
-        ValueAxis rangeAxis = new NumberAxis();
-        return new CategoryPlot(buildCategoryDataset(model, parameters), domainAxis, rangeAxis, renderer);
-    }
-
-    /**
-     * Builds a new {@link DefaultCategoryDataset} corresponding to the provided {@link ChartModel}.
-     * 
-     * @param model the {@link ChartModel} instance.
-     * @param parameters additional parameters.
-     * @return a {@link DefaultCategoryDataset} corresponding to the provided {@link ChartModel}.
-     */
-    public DefaultCategoryDataset buildCategoryDataset(ChartModel model, Map<String, String> parameters)
-    {
-        String dataSeries = parameters.get("series");
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        if ("rows".equals(dataSeries)) {
-            extractRows(model, dataset);
-        } else {
-            extractColumns(model, dataset);
-        }
-        return dataset;
-    }
-
-    /**
-     * Extracts data rows from the {@link ChartModel} provided and populates the {@link DefaultCategoryDataset}
-     * accordingly.
-     * 
-     * @param model the {@link ChartModel} instance.
-     * @param dataset the {@link DefaultCategoryDataset} to be populated.
-     */
-    private void extractRows(ChartModel model, DefaultCategoryDataset dataset)
-    {
-        for (int row = 0; row < model.getRowCount(); row++) {
-            for (int column = 0; column < model.getColumnCount(); column++) {
-                dataset.addValue(model.getCellValue(row, column), model.getRowHeader(row), model
-                    .getColumnHeader(column));
-            }
-        }
-    }
-
-    /**
-     * Extracts data columns from the {@link ChartModel} provided and populates the {@link DefaultCategoryDataset}
-     * accordingly.
-     * 
-     * @param model the {@link ChartModel} instance.
-     * @param dataset the {@link DefaultCategoryDataset} to be populated.
-     */
-    private void extractColumns(ChartModel model, DefaultCategoryDataset dataset)
-    {
-        for (int row = 0; row < model.getRowCount(); row++) {
-            for (int column = 0; column < model.getColumnCount(); column++) {
-                dataset.addValue(model.getCellValue(row, column), model.getColumnHeader(column), model
-                    .getRowHeader(row));
-            }
-        }
+        return new BarRenderer();
     }
 }

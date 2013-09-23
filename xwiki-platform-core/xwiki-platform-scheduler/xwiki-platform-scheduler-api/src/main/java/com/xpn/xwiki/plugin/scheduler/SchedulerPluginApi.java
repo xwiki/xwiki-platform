@@ -22,9 +22,9 @@ package com.xpn.xwiki.plugin.scheduler;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,7 +49,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     /**
      * Log object to log messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(SchedulerPluginApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerPluginApi.class);
 
     public SchedulerPluginApi(SchedulerPlugin plugin, XWikiContext context)
     {
@@ -78,7 +78,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner value of the state
      * and a String as a human readable representation of that state
      */
-    public JobState getJobStatus(BaseObject object) throws SchedulerException, SchedulerPluginException
+    public JobState getJobStatus(BaseObject object) throws SchedulerException
     {
         return getProtectedPlugin().getJobStatus(object, this.context);
     }
@@ -103,7 +103,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
         try {
 
             XWikiDocument jobHolder = this.context.getWiki().getDocument(docName, this.context);
-            BaseObject jobObject = jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, objNb);
+            BaseObject jobObject = jobHolder.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, objNb);
             return jobObject;
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB,
@@ -154,7 +154,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
         boolean result = true;
         try {
             XWikiDocument doc = this.context.getWiki().getDocument(document.getFullName(), this.context);
-            List<BaseObject> objects = doc.getObjects(SchedulerPlugin.XWIKI_JOB_CLASS);
+            List<BaseObject> objects = doc.getXObjects(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             for (BaseObject object : objects) {
                 result &= scheduleJob(object);
             }
@@ -187,7 +187,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().pauseJob(object, this.context);
-            LOG.debug("Pause Job : " + object.getStringValue("jobName"));
+            LOGGER.debug("Pause Job: [{}]", object.getStringValue("jobName"));
             return true;
         } catch (XWikiException e) {
             this.context.put("error", e.getMessage());
@@ -217,7 +217,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().resumeJob(object, this.context);
-            LOG.debug("Resume Job : " + object.getStringValue("jobName"));
+            LOGGER.debug("Resume Job: [{}]", object.getStringValue("jobName"));
             return true;
         } catch (XWikiException e) {
             this.context.put("error", e.getMessage());
@@ -247,7 +247,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().unscheduleJob(object, this.context);
-            LOG.debug("Delete Job : " + object.getStringValue("jobName"));
+            LOGGER.debug("Delete Job: [{}]", object.getStringValue("jobName"));
             return true;
         } catch (XWikiException e) {
             this.context.put("error", e.getMessage());
@@ -282,7 +282,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().triggerJob(object, this.context);
-            LOG.debug("Trigger Job : " + object.getStringValue("jobName"));
+            LOGGER.debug("Trigger Job: [{}]", object.getStringValue("jobName"));
             return true;
         } catch (XWikiException e) {
             this.context.put("error", e.getMessage());

@@ -37,6 +37,16 @@ public class EntityReference implements IsSerializable
     public static enum EntityType
     {
         /**
+         * Represents a Wiki Entity.
+         */
+        WIKI,
+
+        /**
+         * Represents a Space Entity.
+         */
+        SPACE,
+
+        /**
          * Represents a Document Entity.
          */
         DOCUMENT,

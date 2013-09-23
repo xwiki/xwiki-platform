@@ -37,11 +37,7 @@ public class DefaultSoundCaptchaAction extends AbstractSoundCaptchaAction
     /** The service which provides the captcha, must be static because struts instanciates per request. */
     private static final SoundCaptchaService SERVICE = new DefaultManageableSoundCaptchaService();
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractCaptchaAction#getCaptchaService()
-     */
+    @Override
     SoundCaptchaService getCaptchaService()
     {
         return SERVICE;

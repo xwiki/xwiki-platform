@@ -1,0 +1,79 @@
+#template('colorThemeInit.vm')
+input.suggestUsers, input.suggestGroups {
+  background-position: .3em center;
+  background-repeat: no-repeat;
+  padding-left: 2em;
+}
+input.suggestUsers {
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/users.png')");
+}
+input.suggestGroups {
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/groups.png')");
+}
+.scope {
+  /* Hide the focus border. */
+  color: transparent;
+  /* Display the scope icon over the left border of the text input. */
+  position: absolute;
+}
+.suggestUsers.withScope, .suggestGroups.withScope {
+  /* Leave space for the scope icon. */
+  border-left-width: 25px;
+}
+ul.users {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.accepted-suggestions .user, .suggestItem .user, .users .user {
+  /* Leave space for the user avatar. */
+  min-height: 30px;
+  padding-left: 38px;
+  /* Leave the same space on the right as on the left of the avatar. */
+  padding-right: .2em;
+  /* Needed because the avatar is displayed with absolute position. */
+  position: relative;
+}
+.users .user:hover {
+  background-color: $theme.highlightColor;
+}
+.accepted-suggestions .user, .users .user {
+  margin: .2em 0;
+}
+/* Center the user avatar in a 30px square. */
+.user .user-avatar-wrapper {
+  height: 30px;
+  left: .2em;
+  line-height: 30px;
+  position: absolute;
+  text-align: center;
+  width: 30px;
+}
+/* User avatars are resized on the server but the default no-avatar image is not so it's safer to limit the size here */
+.user .user-avatar-wrapper img {
+  max-height: 30px;
+  max-width: 30px;
+}
+div.suggestItems .user *, .accepted-suggestions .user *, .users .user * {
+  /* Overwrite the line-height from suggest.css */
+  line-height: normal;
+}
+.user .user-alias, .user .user-wiki {
+  color: $theme.textSecondaryColor;
+  font-size: 0.875em;
+  padding-right: .2em;
+}
+.user .user-wiki:before {
+  content: '(';
+}
+.user .user-wiki:after {
+  content: ')';
+}
+.suggestItem .user-name {
+  /* Use a larger font size for the user name only when displayed in the list of suggestions. */
+  font-size: 1.1em;
+}
+.suggestItem .user .user-alias, .suggestItem .user .user-wiki {
+  /* The font size is already small in the list of suggestions. */
+  font-size: inherit;
+}

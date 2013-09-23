@@ -1,31 +1,24 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify filter option is taken into acount
+.# Verify it's possible to share a groovy variable with following velocity script
 .#-----------------------------------------------------
+{{groovy}}
+var = "toto"
+{{/groovy}}
+
 {{velocity}}
-## some comment
-#if (true)
-  text
-#end
+$var
 {{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [## some comment
-#if (true)
-  text
-#end]
+beginMacroMarkerStandalone [groovy] [] [var = "toto"]
+endMacroMarkerStandalone [groovy] [] [var = "toto"]
+beginMacroMarkerStandalone [velocity] [] [$var]
 beginParagraph
-onWord [text]
+onWord [toto]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [## some comment
-#if (true)
-  text
-#end]
+endMacroMarkerStandalone [velocity] [] [$var]
 endDocument
-.#-----------------------------------------------------
-.expect|xhtml/1.0
-.#-----------------------------------------------------
-<p>text</p>

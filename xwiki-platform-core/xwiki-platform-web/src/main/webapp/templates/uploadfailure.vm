@@ -1,0 +1,34 @@
+$response.setStatus(500)##
+<div id="document-title"><h1>$services.localization.render('core.action.upload.failure.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()])</h1></div>
+
+#if (!$wrongFileNames && !$failedFiles)
+  #set ($parameter = $xwiki.getSpacePreference('upload_maxsize'))
+  #if ("$!{parameter}" == '')
+    ## 32MB is the default maximum size used inside the FileUploadPlugin;
+    ## there's no easy way of getting that internal value, so we just assume it didn't change
+    #set ($parameter = 33554432)
+  #else
+    #set ($parameter = $mathtool.toInteger($parameter))
+  #end
+  #set ($parameter = "#dynamicsize($parameter)")
+#else
+  #set ($parameter = $mathtool.add($failedFiles.size(), $wrongFileNames.size()))
+#end
+#xwikimessageboxstart($services.localization.render('notice') $services.localization.render($message, $parameter))
+#if ($wrongFileNames && $wrongFileNames.size() > 0)
+  <p>$services.localization.render('core.action.upload.failure.wrongFileNames')</p>
+  <ul>
+  #foreach ($filename in $wrongFileNames)
+    <li><strong>$escapetool.xml($filename)</strong></li>
+  #end
+  </ul>
+#end
+#if ($failedFiles && $failedFiles.size() > 0)
+  <p>$services.localization.render('core.action.upload.failure.failedFiles')</p>
+  <ul>
+  #foreach ($file in $failedFiles.entrySet())
+    <li><strong>$!{escapetool.xml($file.key)}</strong>: <span class="errormessage">$!{escapetool.xml($file.value)}</span></li>
+  #end
+  </ul>
+#end
+#xwikimessageboxend()

@@ -31,14 +31,19 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
 {
     /**
      * This stores the attachment metadata for each revision of the attachment in XML format.
+     *
      * @see #getAttachmentVersioningMetaFile()
      */
     private static final String ATTACH_ARCHIVE_META_FILENAME = "~METADATA.xml";
 
-    /** The directory where all information about this attachment resides. */
+    /**
+     * The directory where all information about this attachment resides.
+     */
     private final File attachmentDir;
 
-    /** The name of the attached file. */
+    /**
+     * The name of the attached file.
+     */
     private final String attachmentFileName;
 
     /**
@@ -53,13 +58,17 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
         this.attachmentFileName = fileName;
     }
 
-    /** @return the directory where information about this attachment is stored. */
+    /**
+     * @return the directory where information about this attachment is stored.
+     */
     protected File getAttachmentDir()
     {
         return this.attachmentDir;
     }
 
-    /** @return the name of this attachment. */
+    /**
+     * @return the name of this attachment.
+     */
     protected String getAttachmentFileName()
     {
         return this.attachmentFileName;
@@ -108,6 +117,6 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
     public File getAttachmentVersionContentFile(final String versionName)
     {
         return new File(this.attachmentDir,
-                        GenericFileUtils.getVersionedFilename(this.attachmentFileName, versionName));
+            GenericFileUtils.getVersionedFilename(this.attachmentFileName, versionName));
     }
 }

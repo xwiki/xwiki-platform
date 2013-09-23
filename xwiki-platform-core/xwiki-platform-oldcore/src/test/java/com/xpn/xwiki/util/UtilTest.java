@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.util;
 
@@ -45,8 +44,8 @@ public class UtilTest
         Assert.assertTrue(Util.isValidXMLElementName("myprop"));
         Assert.assertTrue(Util.isValidXMLElementName("my_prop"));
         Assert.assertTrue(Util.isValidXMLElementName("my_prop-1"));
-        Assert.assertTrue(Util.isValidXMLElementName("ns:my_prop-1"));
-        Assert.assertTrue(Util.isValidXMLElementName("ns:my_prop-1.1"));
+        Assert.assertTrue(Util.isValidXMLElementName("my_prop-1.1"));
+        Assert.assertFalse(Util.isValidXMLElementName("ns:my_prop-1"));
         Assert.assertFalse(Util.isValidXMLElementName("1prop"));
         Assert.assertFalse(Util.isValidXMLElementName("xmlprop"));
         Assert.assertFalse(Util.isValidXMLElementName("XMLprop"));

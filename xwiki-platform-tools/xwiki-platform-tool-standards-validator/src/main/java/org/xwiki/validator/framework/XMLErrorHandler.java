@@ -47,31 +47,19 @@ public class XMLErrorHandler implements ErrorHandler
         this.errors.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
-     */
+    @Override
     public void warning(SAXParseException e)
     {
         this.errors.add(new ValidationError(Type.WARNING, e));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
-     */
+    @Override
     public void error(SAXParseException e)
     {
         this.errors.add(new ValidationError(Type.ERROR, e));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
-     */
+    @Override
     public void fatalError(SAXParseException e)
     {
         this.errors.add(new ValidationError(Type.FATAL, e));

@@ -19,24 +19,28 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.plugin.packaging.Package;
-import com.xpn.xwiki.plugin.packaging.PackageException;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.HSQLDialect;
+import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.packaging.DocumentInfo;
+import com.xpn.xwiki.plugin.packaging.Package;
+import com.xpn.xwiki.plugin.packaging.PackageException;
+import com.xpn.xwiki.store.XWikiCacheStore;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
  * Import a set of XWiki documents into an existing database.
- *
+ * 
  * @version $Id$
  */
 public class Importer extends AbstractPackager
@@ -59,7 +63,31 @@ public class Importer extends AbstractPackager
      */
     public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig) throws Exception
     {
-        XWikiContext context = createXWikiContext(databaseName, hibernateConfig);
+        importDocuments(sourceDirectory, databaseName, hibernateConfig, null);
+    }
+
+    /**
+     * Import documents defined in an XML file located in the passed document definition directory into a database
+     * defined by its passed name and by an Hibernate configuration file.
+     * <p>
+     * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
+     * allowed for method names though.
+     * </p>
+     * 
+     * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
+     *            located
+     * @param databaseName some database name (TODO: find out what this name is really)
+     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
+     *            password, etc)
+     * @param importUser optionally the user under which to perform the import (useful for example when importing pages
+     *            that need to have Programming Rights and the page author is not the same as the importing user)
+     * @throws Exception if the import failed for any reason
+     * @todo Replace the Hibernate config file with a list of parameters required for the importation
+     */
+    public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig, String importUser)
+        throws Exception
+    {
+        XWikiContext xcontext = createXWikiContext(databaseName, hibernateConfig);
 
         Package pack = new Package();
         pack.setWithVersions(false);
@@ -67,20 +95,81 @@ public class Importer extends AbstractPackager
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
         // See http://jira.xwiki.org/jira/browse/XWIKI-458
         try {
-            pack.readFromDir(sourceDirectory, context);
+            pack.readFromDir(sourceDirectory, xcontext);
         } catch (IOException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to import documents from ["
                 + sourceDirectory + "]", e);
         }
-
-        pack.install(context);
+        installWithUser(importUser, pack, xcontext);
 
         // We MUST shutdown HSQLDB because otherwise the last transactions will not be flushed
         // to disk and will be lost. In practice this means the last Document imported has a
         // very high chance of not making it...
         // TODO: Find a way to implement this generically for all databases and inside
         // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
-        shutdownHSQLDB(context);
+        shutdownHSQLDB(xcontext);
+
+        disposeXWikiContext(xcontext);
+    }
+
+    /**
+     * @param file the XAR file to import
+     * @param importUser optionally the user under which to perform the import (useful for example when importing pages
+     *            that need to have Programming Rights and the page author is not the same as the importing user)
+     * @param context the XWiki context
+     * @return the number of imported documents
+     * @throws XWikiException failed to import the XAR file
+     * @throws IOException failed to parse the XAR file
+     */
+    public int importXAR(File file, String importUser, XWikiContext context) throws XWikiException, IOException
+    {
+        Package pack = new Package();
+        pack.setWithVersions(false);
+
+        // Parse XAR
+        FileInputStream fis = new FileInputStream(file);
+        try {
+            pack.Import(fis, context);
+        } finally {
+            IOUtils.closeQuietly(fis);
+        }
+
+        // Import into the database
+        if (!pack.getFiles().isEmpty()) {
+            installWithUser(importUser, pack, context);
+        }
+
+        return pack.getFiles().size();
+    }
+
+    /**
+     * Install a Package as a backup pack or with the passed user (if any).
+     * 
+     * @param importUser the user to import with or null if it should be imported as a backup pack
+     * @param pack the Package instance performing the import
+     * @param context the XWiki Context
+     * @throws XWikiException if the import failed for any reason
+     */
+    private void installWithUser(String importUser, Package pack, XWikiContext context) throws XWikiException
+    {
+        // Set the current context user if an import user is specified (i.e. not null)
+        DocumentReference currentUserReference = context.getUserReference();
+        if (importUser != null) {
+            pack.setBackupPack(false);
+            // Set the current user in the context to the import user
+            context.setUserReference(new DocumentReference("xwiki", "XWiki", importUser));
+        }
+
+        try {
+            int code = pack.install(context);
+            if (code != DocumentInfo.INSTALL_OK) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Failed to import XAR with code [" + code + "]");
+            }
+        } finally {
+            // Restore context user as before
+            context.setUserReference(currentUserReference);
+        }
     }
 
     /**
@@ -89,7 +178,7 @@ public class Importer extends AbstractPackager
      * @param context the XWiki Context object from which we can retrieve the Store implementation
      * @throws XWikiException in case of shutdown error
      */
-    private void shutdownHSQLDB(XWikiContext context) throws XWikiException
+    public void shutdownHSQLDB(XWikiContext context) throws XWikiException
     {
         XWikiStoreInterface store = context.getWiki().getStore();
         if (XWikiCacheStore.class.isAssignableFrom(store.getClass())) {

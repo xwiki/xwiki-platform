@@ -36,41 +36,31 @@ public class XWikiDavSession implements DavSession
      */
     private final Set<String> lockTokens = new HashSet<String>();
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addReference(Object reference)
     {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeReference(Object reference)
     {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addLockToken(String token)
     {
         lockTokens.add(token);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String[] getLockTokens()
     {
         return lockTokens.toArray(new String[lockTokens.size()]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeLockToken(String token)
     {
         lockTokens.remove(token);

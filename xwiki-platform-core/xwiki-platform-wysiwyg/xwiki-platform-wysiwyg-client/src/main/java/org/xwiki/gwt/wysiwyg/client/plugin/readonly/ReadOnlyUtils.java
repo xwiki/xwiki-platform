@@ -59,7 +59,15 @@ public class ReadOnlyUtils
      */
     public boolean isSelectionBoundaryInsideReadOnlyElement(Document document)
     {
-        Range range = document.getSelection().getRangeAt(0);
+        return isRangeBoundaryInsideReadOnlyElement(document.getSelection().getRangeAt(0));
+    }
+
+    /**
+     * @param range a DOM range
+     * @return {@code true} if the range starts or ends inside a read-only element
+     */
+    public boolean isRangeBoundaryInsideReadOnlyElement(Range range)
+    {
         Element startContainerReadOnlyAncestor = getClosestReadOnlyAncestor(range.getStartContainer());
         Element endContainerReadOnlyAncestor =
             range.getStartContainer() != range.getEndContainer() ? getClosestReadOnlyAncestor(range.getEndContainer())

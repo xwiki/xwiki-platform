@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
@@ -42,28 +41,19 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 @Component
 @Named("currentmixed")
 @Singleton
-public class CurrentMixedStringDocumentReferenceResolver extends AbstractStringEntityReferenceResolver
-    implements DocumentReferenceResolver<String>
+public class CurrentMixedStringDocumentReferenceResolver extends AbstractStringEntityReferenceResolver implements
+    DocumentReferenceResolver<String>
 {
     @Inject
     @Named("currentmixed")
     private EntityReferenceValueProvider provider;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
-     */
+    @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
         return new DocumentReference(resolve(documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultStringEntityReferenceResolver#getDefaultValue
-     */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {

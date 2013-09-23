@@ -25,10 +25,9 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.skinx.SkinExtension;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -41,11 +40,11 @@ import org.xwiki.skinx.SkinExtension;
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    public void initialize(MockingComponentManager componentManager) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();
 
-        final SkinExtension ssfxMock = mockery.mock(SkinExtension.class, "ssfxMock");
+        final SkinExtension ssfxMock = componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx");
 
         mockery.checking(new Expectations()
         {
@@ -55,12 +54,5 @@ public class IntegrationTests
                 allowing(ssfxMock).use(with(cssPath), with(any(Map.class)));
             }
         });
-
-        // and inject these in the test setup
-        DefaultComponentDescriptor<SkinExtension> ssfxDesc = new DefaultComponentDescriptor<SkinExtension>();
-        ssfxDesc.setRole(SkinExtension.class);
-        ssfxDesc.setRoleHint("ssfx");
-
-        componentManager.registerComponent(ssfxDesc, ssfxMock);
     }
 }

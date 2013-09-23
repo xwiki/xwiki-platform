@@ -36,7 +36,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -75,7 +74,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki = new com.xpn.xwiki.XWiki();
         getContext().setWiki(this.xwiki);
         this.xwiki.setConfig(new XWikiConfig());
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
 
         this.apiXWiki = new XWiki(this.xwiki, getContext());
 
@@ -85,6 +83,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public java.lang.Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -98,6 +97,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public java.lang.Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -153,7 +153,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("XWiki.Earth", copy.getCreator());
     }
 
-    public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException
+    public void testCreationDateAfterDocumentCopy() throws XWikiException
     {
         String copyName = this.apiDocument.getName() + "Copy";
         long startTime = (Calendar.getInstance().getTimeInMillis() / 1000) * 1000;

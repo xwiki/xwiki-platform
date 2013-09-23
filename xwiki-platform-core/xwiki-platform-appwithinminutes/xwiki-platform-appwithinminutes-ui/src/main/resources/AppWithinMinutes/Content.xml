@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>Content</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.FormFieldClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1352127541000</creationDate>
+  <date>1352137734000</date>
+  <contentUpdateDate>1352137734000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.appwithinminutes.classEditorContentFieldName')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <class>
+    <name>AppWithinMinutes.Content</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <content>
+      <customDisplay>{{include reference="AppWithinMinutes.Content"/}}</customDisplay>
+      <disabled>0</disabled>
+      <name>content</name>
+      <number>1</number>
+      <prettyName>Content</prettyName>
+      <script/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.ComputedFieldClass</classType>
+    </content>
+  </class>
+  <object>
+    <class>
+      <name>AppWithinMinutes.FormFieldClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <cache>0</cache>
+        <classname>AppWithinMinutes.FormFieldCategoryClass</classname>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>category</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Category</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>1</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </category>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <priority>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>3</number>
+        <numberType>long</numberType>
+        <prettyName>Priority</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
+      <properties>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>properties</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Properties</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </properties>
+    </class>
+    <name>AppWithinMinutes.Content</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldClass</className>
+    <guid>1fc40ef2-e504-46e2-a651-ec26727d2f93</guid>
+    <property>
+      <category>AppWithinMinutes.Document</category>
+    </property>
+    <property>
+      <icon>icons/silk/page_white_edit.png</icon>
+    </property>
+    <property>
+      <priority>0</priority>
+    </property>
+    <property>
+      <properties/>
+    </property>
+  </object>
+  <content>{{velocity}}
+#if ($type == 'edit')
+  #set ($className = $object.getxWikiClass().name)
+  #if ($doc.fullName == $className)
+    ## We are editing the class so the content must be read from / written to the template document.
+    #set ($name = 'templateContent')
+    #set ($editedDocument = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template"))
+    ## Don't load the WYSIWYG editor when editing the class, because it's too heavy.
+    #set ($useWysiwygEditor = false)
+  #else
+    ## We are editing an application entry so the content must be read from / written to the current document.
+    #set ($name = 'content')
+    #set ($editedDocument = $tdoc)
+    ## Use the preferred content editor.
+    #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
+  #end
+  {{html clean="false"}}
+  #if (!$useWysiwygEditor)
+    &lt;div id="xwikieditcontentinner"&gt;
+      ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.
+      #set ($toolBar = "#template('simpleedittoolbar.vm')")
+      $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
+  #end
+  ## The "content" id is expected by some JavaScript and CSS code.
+  &lt;textarea id="content" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
+  #if ($useWysiwygEditor)
+    #wysiwyg_editProperty($editedDocument 'content' true)
+  #else
+    &lt;/div&gt;
+  #end
+  {{/html}}
+#elseif ("$!type" != '')
+  ## Include the content of the current document.
+  {{include reference=""/}}
+#else
+  The display mode is not specified!
+#end
+{{/velocity}}</content>
+</xwikidoc>

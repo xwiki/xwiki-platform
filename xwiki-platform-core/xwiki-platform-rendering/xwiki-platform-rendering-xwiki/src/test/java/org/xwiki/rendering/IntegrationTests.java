@@ -53,9 +53,9 @@ public class IntegrationTests
             will(returnValue(
                 new AttachmentReference("my.png", new DocumentReference("wiki", "Space", "ExistingPage"))));
         }});
-        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARS =
-            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
-        descriptorARS.setRole(AttachmentReferenceResolver.class);
+        DefaultComponentDescriptor<AttachmentReferenceResolver<String>> descriptorARS =
+            new DefaultComponentDescriptor<AttachmentReferenceResolver<String>>();
+        descriptorARS.setRoleType(AttachmentReferenceResolver.TYPE_STRING);
         descriptorARS.setRoleHint("current");
         componentManager.registerComponent(descriptorARS, mockResolver);
 

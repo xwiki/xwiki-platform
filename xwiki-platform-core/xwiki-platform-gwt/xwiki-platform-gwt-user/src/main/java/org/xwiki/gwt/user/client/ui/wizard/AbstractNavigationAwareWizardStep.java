@@ -25,14 +25,12 @@ import java.util.Map;
 
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
-import com.google.gwt.user.client.ui.FlowPanel;
-
 /**
  * An abstract wizard step that is aware of the wizard navigation.
  * 
  * @version $Id$
  */
-public abstract class AbstractNavigationAwareWizardStep extends AbstractCompositeWizardStep
+public abstract class AbstractNavigationAwareWizardStep implements WizardStep
 {
     /**
      * The map used to associate a name to a navigation direction.
@@ -49,29 +47,7 @@ public abstract class AbstractNavigationAwareWizardStep extends AbstractComposit
      */
     private EnumSet<NavigationDirection> validDirections = EnumSet.allOf(NavigationDirection.class);
 
-    /**
-     * Creates a new navigation-aware wizard step.
-     */
-    public AbstractNavigationAwareWizardStep()
-    {
-        super();
-    }
-
-    /**
-     * Creates a new navigation-aware wizard step that uses the given panel to hold its widgets.
-     * 
-     * @param panel the panel where this wizard step will add its widgets
-     */
-    public AbstractNavigationAwareWizardStep(FlowPanel panel)
-    {
-        super(panel);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCompositeWizardStep#getDirectionName(NavigationDirection)
-     */
+    @Override
     public String getDirectionName(NavigationDirection direction)
     {
         return directionName.get(direction);
@@ -89,11 +65,7 @@ public abstract class AbstractNavigationAwareWizardStep extends AbstractComposit
         return directionName.put(direction, name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCompositeWizardStep#getNextStep()
-     */
+    @Override
     public String getNextStep()
     {
         return nextStep;
@@ -109,11 +81,7 @@ public abstract class AbstractNavigationAwareWizardStep extends AbstractComposit
         this.nextStep = nextStep;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCompositeWizardStep#getValidDirections()
-     */
+    @Override
     public EnumSet<NavigationDirection> getValidDirections()
     {
         return validDirections;

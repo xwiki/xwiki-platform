@@ -1,6 +1,6 @@
 // ======================================
 // Ajax tag editing
-// 
+//
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 var viewers = XWiki.viewers = XWiki.viewers || {};
@@ -153,15 +153,20 @@ viewers.Tags = Class.create({
       varname: 'input',
       seps: "${xwiki.getDocument('XWiki.TagClass').xWikiClass.tags.getProperty('separators').value}",
       shownoresults : false,
-      icon: "${xwiki.getSkinFile('icons/silk/tag_yellow.gif')}"
+      icon: "${xwiki.getSkinFile('icons/silk/tag_yellow.png')}"
     });
   }
 });
+
+function init() {
+  return new viewers.Tags();
+}
+
+// When the document is loaded, trigger the Tags enhancements.
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
 
-// Create the tags editing behavior on startup.
-document.observe('xwiki:dom:loaded', function() {
-    new XWiki.viewers.Tags();
-});

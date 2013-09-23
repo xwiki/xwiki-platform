@@ -27,29 +27,66 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-handlers</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-handler-xar</artifactId>
   <name>XWiki Platform - Extension - Handler - XAR</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Handler - XAR</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-properties</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
     </dependency>
-    
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Used to mock XWiki class -->
@@ -59,4 +96,45 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              **/ConflictQuestion.java,
+              **/UnsupportedNamespaceException.java,
+              **/XarExtensionHandler.java,
+              **/XarExtensionJobFinishedListener.java,
+              **/DefaultPackageConfiguration.java,
+              **/DefaultPackager.java,
+              **/NotADocumentException.java,
+              **/PackageConfiguration.java,
+              **/Packager.java,
+              **/PackagerException.java,
+              **/XarEntry.java,
+              **/XarEntryMergeResult.java,
+              **/XarFile.java,
+              **/XarMergeResult.java,
+              **/AbstractHandler.java,
+              **/AttachmentHandler.java,
+              **/DocumentHandler.java,
+              **/DocumentImporterHandler.java,
+              **/RootHandler.java,
+              **/UnknownRootElement.java,
+              **/XarPageLimitedHandler.java,
+              **/XarInstalledExtension.java,
+              **/XarInstalledExtensionRepository.java,
+              **/DocumentScriptSafeProvider.java,
+              **/SafeConflictQuestion.java,
+              **/DefaultDocumentMergeImporter.java,
+              **/WikiEventListener.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

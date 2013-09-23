@@ -19,44 +19,67 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import org.xwiki.model.reference.EntityReference;
+import java.util.Locale;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.model.reference.LocalDocumentReference;
+
+/**
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class XarEntry
 {
-    private EntityReference documentReference;
+    private LocalDocumentReference documentReference;
 
-    private String language;
+    private Locale locale;
 
-    private String path;
+    private String entryName;
 
-    public EntityReference getDocumentReference()
+    public XarEntry()
+    {
+    }
+
+    public XarEntry(String space, String page, Locale locale)
+    {
+        this.documentReference = new LocalDocumentReference(space, page);
+        this.locale = locale;
+    }
+
+    public XarEntry(LocalDocumentReference documentReference, Locale locale)
+    {
+        this.documentReference = documentReference;
+        this.locale = locale;
+    }
+
+    public LocalDocumentReference getDocumentReference()
     {
         return this.documentReference;
     }
 
-    public void setDocumentReference(EntityReference documentReference)
+    public void setDocumentReference(LocalDocumentReference documentReference)
     {
         this.documentReference = documentReference;
     }
 
-    public String getLanguage()
+    public Locale getLocale()
     {
-        return this.language;
+        return this.locale;
     }
 
-    public void setLanguage(String language)
+    public void setLocale(Locale locale)
     {
-        this.language = language;
+        this.locale = locale;
     }
 
-    public String getPath()
+    public String getEntryName()
     {
-        return this.path;
+        return this.entryName;
     }
 
-    public void setPath(String path)
+    public void setEntryName(String entryName)
     {
-        this.path = path;
+        this.entryName = entryName;
     }
 
     // Object
@@ -64,13 +87,18 @@ public class XarEntry
     @Override
     public String toString()
     {
-        return this.documentReference + ", language = [" + getLanguage() + "]";
+        return this.documentReference + ", language = [" + getLocale() + "]";
     }
 
     @Override
     public int hashCode()
     {
-        return toString().hashCode();
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(getDocumentReference());
+        builder.append(getLocale());
+
+        return builder.toHashCode();
     }
 
     @Override
@@ -85,7 +113,7 @@ public class XarEntry
 
             equals =
                 getDocumentReference().equals(xarEntry.getDocumentReference())
-                    && getLanguage().equals(xarEntry.getLanguage());
+                    && getLocale().equals(xarEntry.getLocale());
         }
 
         return equals;

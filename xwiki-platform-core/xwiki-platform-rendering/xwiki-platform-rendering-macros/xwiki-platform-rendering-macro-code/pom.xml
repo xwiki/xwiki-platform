@@ -27,11 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-code</artifactId>
   <name>XWiki Platform - Rendering - Macro - Code</name>
-  <description>XWiki Platform - Rendering - Macro - Code</description>
+  <description>Highlights code</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Code Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
@@ -47,9 +52,9 @@
       <artifactId>jython-standalone</artifactId>
     </dependency>
     <dependency>
-      <groupId>pygments</groupId>
+      <groupId>org.pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.4-xwiki</version>
+      <version>1.6</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

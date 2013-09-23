@@ -23,11 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.container.LayoutManager;
 import org.xwiki.skinx.SkinExtension;
 
@@ -37,7 +41,9 @@ import org.xwiki.skinx.SkinExtension;
  * @version $Id$
  * @since 2.5M2
  */
-@Component("columns")
+@Component
+@Named("columns")
+@Singleton
 public class ColumnsLayoutManager implements LayoutManager
 {
     /**
@@ -48,17 +54,15 @@ public class ColumnsLayoutManager implements LayoutManager
     /**
      * The javascript file skin extension, to fetch the columns layout css.
      */
-    @Requirement("ssfx")
+    @Inject
+    @Named("ssfx")
     private SkinExtension ssfx;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.LayoutManager#layoutContainer(org.xwiki.rendering.block.Block)
-     */
+    @Override
     public void layoutContainer(Block container)
     {
-        List<GroupBlock> innerGroups = container.getChildrenByType(GroupBlock.class, false);
+        List<GroupBlock> innerGroups =
+            container.getBlocks(new ClassBlockMatcher(GroupBlock.class), Block.Axes.CHILD);
         // FIXME Should we cry and throw an exception if ever we meet something else than a group right under
         // the container macro, or automatically put it in a group maybe ?
 
@@ -101,21 +105,13 @@ public class ColumnsLayoutManager implements LayoutManager
         container.addChild(new GroupBlock(clearFloatsParams));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.LayoutManager#getParameter(java.lang.String)
-     */
+    @Override
     public Object getParameter(String parameterName)
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.container.LayoutManager#setParameter(java.lang.String, Object)
-     */
+    @Override
     public void setParameter(String parameterName, Object parameterValue)
     {
     }

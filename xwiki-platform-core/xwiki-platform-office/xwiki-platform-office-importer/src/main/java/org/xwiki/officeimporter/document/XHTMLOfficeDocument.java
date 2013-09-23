@@ -36,45 +36,39 @@ public class XHTMLOfficeDocument implements OfficeDocument
      * Document holding xhtml corresponding to office document content.
      */
     private Document document;
-    
+
     /**
      * Artifacts for this office document.
      */
     private Map<String, byte[]> artifacts;
-    
+
     /**
      * Creates a new {@link XHTMLOfficeDocument}.
      * 
      * @param document the w3c dom representing the office document.
      * @param artifacts artifacts for this office document.
      */
-    public XHTMLOfficeDocument(Document document, Map<String, byte[]> artifacts) 
+    public XHTMLOfficeDocument(Document document, Map<String, byte[]> artifacts)
     {
         this.document = document;
-        this.artifacts = artifacts;        
+        this.artifacts = artifacts;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
+    @Override
     public Document getContentDocument()
     {
         return this.document;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getContentAsString()
     {
         return HTMLUtils.toString(this.document);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Map<String, byte[]> getArtifacts()
     {
         return this.artifacts;
-    }           
+    }
 }

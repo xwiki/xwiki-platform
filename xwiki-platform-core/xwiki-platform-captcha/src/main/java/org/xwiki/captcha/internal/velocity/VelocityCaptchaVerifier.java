@@ -46,11 +46,7 @@ public class VelocityCaptchaVerifier implements CaptchaVerifier
         this.wrappedCaptcha = toWrap;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see CaptchaVerifier#getUserId(HttpServletRequest)
-     */
+    @Override
     public String getUserId(HttpServletRequest request)
     {
         String x = wrappedCaptcha.getUserId(request);
@@ -58,11 +54,7 @@ public class VelocityCaptchaVerifier implements CaptchaVerifier
         return (x == null) ? "" : x;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see CaptchaVerifier#isAnswerCorrect(String, String)
-     */
+    @Override
     public boolean isAnswerCorrect(String userId, String answer)
     {
         try {

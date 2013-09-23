@@ -17,13 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.macro.rss;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
@@ -60,6 +59,11 @@ public class RssMacroParameters
      * The width of the enclosing box containing the RSS macro output.
      */
     private String width = StringUtils.EMPTY;
+
+    /**
+     * @see #setDecoration(boolean)
+     */
+    private boolean decoration = true;
 
     /**
      * The RSS feed URL.
@@ -164,5 +168,23 @@ public class RssMacroParameters
     public boolean isContent()
     {
         return this.content;
+    }
+
+    /**
+     * @param decoration if "true" displays UI decorations around feed and feed entries (RSS feed icon, feed items in
+     *        boxes, etc).
+     */
+    @PropertyDescription("Display UI decorations around feed and feed entries")
+    public void setDecoration(boolean decoration)
+    {
+        this.decoration = decoration;
+    }
+
+    /**
+     * @return true if UI decorations should be displayed
+     */
+    public boolean isDecoration()
+    {
+        return this.decoration;
     }
 }

@@ -21,7 +21,7 @@ package org.xwiki.refactoring.splitter;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
@@ -32,7 +32,7 @@ import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
  * @version $Id$
  * @since 1.9M1
  */
-@ComponentRole
+@Role
 public interface DocumentSplitter
 {
     /**

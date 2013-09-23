@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * @version $Id$
@@ -62,16 +62,11 @@ public class WhiteSpaceContentAltererTest extends AbstractComponentTestCase
         this.altered = altered;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        alterer = getComponentManager().lookup(ContentAlterer.class, "whitespace");
+        alterer = getComponentManager().getInstance(ContentAlterer.class, "whitespace");
     }
 
     /**

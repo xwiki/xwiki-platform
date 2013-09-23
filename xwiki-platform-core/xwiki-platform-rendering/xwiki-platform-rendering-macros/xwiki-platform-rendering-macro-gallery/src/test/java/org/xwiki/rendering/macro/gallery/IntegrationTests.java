@@ -25,10 +25,9 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.skinx.SkinExtension;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -41,34 +40,18 @@ import org.xwiki.skinx.SkinExtension;
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    public void initialize(MockingComponentManager componentManager) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();
-        registerMockSkinExtension(componentManager, mockery, "jsfx");
-        registerMockSkinExtension(componentManager, mockery, "ssfx");
-    }
 
-    /**
-     * Registers a mock skin extension component with the given role hint.
-     *
-     * @param componentManager the component manager where to register the mock skin extension component
-     * @param mockery the object used to mock the skin extension component
-     * @param hint the role hint to use for the skin extension component
-     */
-    @SuppressWarnings("unchecked")
-    private void registerMockSkinExtension(ComponentManager componentManager, Mockery mockery, String hint)
-        throws Exception
-    {
-        final SkinExtension skinExtension = mockery.mock(SkinExtension.class, hint);
-        DefaultComponentDescriptor<SkinExtension> descriptor = new DefaultComponentDescriptor<SkinExtension>();
-        descriptor.setRole(SkinExtension.class);
-        descriptor.setRoleHint(hint);
-        componentManager.registerComponent(descriptor, skinExtension);
+        final SkinExtension jsfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "jsfx", "jsfx");
+        final SkinExtension ssfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx", "ssfx");
 
         mockery.checking(new Expectations()
         {
             {
-                allowing(skinExtension).use(with(aNonNull(String.class)), with(aNonNull(Map.class)));
+                allowing(jsfx).use(with(aNonNull(String.class)), with(aNonNull(Map.class)));
+                allowing(ssfx).use(with(aNonNull(String.class)), with(aNonNull(Map.class)));
             }
         });
     }

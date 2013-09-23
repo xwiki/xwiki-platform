@@ -1,6 +1,7 @@
-org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration
-org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
-org.xwiki.rendering.internal.wiki.XWikiWikiModel
+500:org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration
+500:org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
+500:org.xwiki.rendering.internal.wiki.XWikiWikiModel
+500:org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
+500:org.xwiki.rendering.internal.transformation.macro.XWikiMacroTransformationConfiguration
+500:org.xwiki.rendering.internal.transformation.icon.XWikiIconTransformationConfiguration
 org.xwiki.rendering.internal.scripting.RenderingScriptService
-org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
-org.xwiki.rendering.internal.transformation.macro.XWikiMacroTransformationConfiguration

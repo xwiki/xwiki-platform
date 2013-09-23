@@ -38,6 +38,9 @@ import org.xwiki.gwt.wysiwyg.client.plugin.table.feature.InsertRowBefore;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.feature.InsertTable;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.ui.TableMenuExtension;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+
 /**
  * Plug-in allowing to manipulate tables in the WYSIWYG editor.
  * 
@@ -75,6 +78,15 @@ public class TablePlugin extends AbstractPlugin implements CommandListener
 
         menuExtension = new TableMenuExtension(this);
         getUIExtensionList().add(menuExtension);
+        // Hack: We can access the menus where each menu item was placed only after the main menu bar is initialized,
+        // which happens after all the plugins are loaded.
+        Scheduler.get().scheduleDeferred(new ScheduledCommand()
+        {
+            public void execute()
+            {
+                menuExtension.registerAttachHandlers();
+            }
+        });
 
         // Listen to the "enable" command and disable the browser built-in table editing feature.
         rta.getCommandManager().addCommandListener(this);
@@ -94,6 +106,7 @@ public class TablePlugin extends AbstractPlugin implements CommandListener
             feature.destroy();
         }
         features.clear();
+        menuExtension.clearFeatures();
         getTextArea().getCommandManager().removeCommandListener(this);
         super.destroy();
     }

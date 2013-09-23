@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -25,14 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.util.Util;
 
 public class PropUpdateAction extends XWikiAction
 {
@@ -44,21 +42,21 @@ public class PropUpdateAction extends XWikiAction
         XWikiMessageTool msg = context.getMessageTool();
 
         // Prepare new class
-        BaseClass bclass = doc.getxWikiClass();
-        BaseClass bclass2 = (BaseClass) bclass.clone();
+        BaseClass bclass = doc.getXClass();
+        BaseClass bclass2 = bclass.clone();
         bclass2.setFields(new HashMap());
 
         // Prepare a Map for field renames
         Map<String, String> fieldsToRename = new HashMap<String, String>();
 
         for (PropertyClass originalProperty : (Collection<PropertyClass>) bclass.getFieldList()) {
-            PropertyClass newProperty = (PropertyClass) originalProperty.clone();
+            PropertyClass newProperty = originalProperty.clone();
             String name = newProperty.getName();
             Map<String, ? > map = ((EditForm) form).getObject(name);
-            newProperty.getxWikiClass(context).fromMap(map, newProperty);
+            newProperty.getXClass(context).fromMap(map, newProperty);
             String newName = newProperty.getName();
 
-            if (StringUtils.isBlank(newName) || !newName.matches("[\\w\\.\\-\\_]+")) {
+            if (!Util.isValidXMLElementName(newName)) {
                 context.put("message", "propertynamenotcorrect");
                 return true;
             }
@@ -74,7 +72,7 @@ public class PropUpdateAction extends XWikiAction
             }
         }
 
-        doc.setxWikiClass(bclass2);
+        doc.setXClass(bclass2);
         doc.renameProperties(bclass.getName(), fieldsToRename);
         doc.setMetaDataDirty(true);
         if (doc.isNew()) {
@@ -101,11 +99,6 @@ public class PropUpdateAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -128,11 +121,6 @@ public class PropUpdateAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

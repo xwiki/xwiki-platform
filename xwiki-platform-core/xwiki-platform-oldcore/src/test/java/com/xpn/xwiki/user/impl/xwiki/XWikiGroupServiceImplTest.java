@@ -46,11 +46,6 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
     private XWikiDocument group;
     private BaseObject groupObject;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -59,13 +54,13 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.groupService = new XWikiGroupServiceImpl();
 
         this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWiki.stubs().method("isReadOnly").will(returnValue(false));
         this.mockXWiki.stubs().method("getWikiOwner").will(returnValue(null));
         this.mockXWiki.stubs().method("getMaxRecursiveSpaceChecks").will(returnValue(0));
         this.mockXWiki.stubs().method("getDocument").with(ANYTHING, eq("WebPreferences"), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return new XWikiDocument(new DocumentReference(getContext().getDatabase(),

@@ -31,81 +31,43 @@ import org.xwiki.cache.event.CacheEntryListener;
  */
 public class DefaultCache<T> implements Cache<T>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#remove(java.lang.String)
-     */
+    @Override
     public void remove(String key)
     {
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#set(java.lang.String, java.lang.Object)
-     */
+    @Override
     public void set(String key, T obj)
     {
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#get(java.lang.String)
-     */
+    @Override
     public T get(String key)
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#removeAll()
-     */
+    @Override
     public void removeAll()
     {
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#getSize()
-     */
-    public int getSize()
-    {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#addCacheEntryListener(org.xwiki.cache.event.CacheEntryListener)
-     */
+    @Override
     public void addCacheEntryListener(CacheEntryListener<T> listener)
     {
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#removeCacheEntryListener(org.xwiki.cache.event.CacheEntryListener)
-     */
+    @Override
     public void removeCacheEntryListener(CacheEntryListener<T> listener)
     {
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.Cache#dispose()
-     */
+    @Override
     public void dispose()
     {
 

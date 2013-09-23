@@ -16,52 +16,65 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
+/**
+ * Defines the meta properties of a database list XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("DBList")
+@Singleton
 public class DBListMetaClass extends ListMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Database List XClass property.
+     */
     public DBListMetaClass()
     {
-        super();
         setPrettyName("Database List");
-        setName(DBListClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        TextAreaClass sql_class = new TextAreaClass(this);
-        sql_class.setName("sql");
-        sql_class.setPrettyName("Hibernate Query");
-        sql_class.setSize(80);
-        sql_class.setRows(5);
-        safeput("sql", sql_class);
+        TextAreaClass sqlClass = new TextAreaClass(this);
+        sqlClass.setName("sql");
+        sqlClass.setPrettyName("Hibernate Query");
+        sqlClass.setSize(80);
+        sqlClass.setRows(5);
+        safeput(sqlClass.getName(), sqlClass);
 
-        StringClass classname_class = new StringClass(this);
-        classname_class.setName("classname");
-        classname_class.setPrettyName("XWiki Class Name");
-        classname_class.setSize(20);
-        safeput("classname", classname_class);
+        StringClass classNameClass = new StringClass(this);
+        classNameClass.setName("classname");
+        classNameClass.setPrettyName("XWiki Class Name");
+        classNameClass.setSize(20);
+        safeput(classNameClass.getName(), classNameClass);
 
-        StringClass idfield_class = new StringClass(this);
-        idfield_class.setName("idField");
-        idfield_class.setPrettyName("Id Field Name");
-        idfield_class.setSize(20);
-        safeput("idField", idfield_class);
+        StringClass idFieldClass = new StringClass(this);
+        idFieldClass.setName("idField");
+        idFieldClass.setPrettyName("Id Field Name");
+        idFieldClass.setSize(20);
+        safeput(idFieldClass.getName(), idFieldClass);
 
-        StringClass valuefield_class = new StringClass(this);
-        valuefield_class.setName("valueField");
-        valuefield_class.setPrettyName("Value Field Name");
-        valuefield_class.setSize(20);
-        safeput("valueField", valuefield_class);
+        StringClass valueFieldClass = new StringClass(this);
+        valueFieldClass.setName("valueField");
+        valueFieldClass.setPrettyName("Value Field Name");
+        valueFieldClass.setSize(20);
+        safeput(valueFieldClass.getName(), valueFieldClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new DBListClass();
     }

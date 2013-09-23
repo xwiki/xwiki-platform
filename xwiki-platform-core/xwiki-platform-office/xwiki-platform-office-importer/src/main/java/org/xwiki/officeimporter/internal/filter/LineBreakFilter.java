@@ -52,14 +52,13 @@ public class LineBreakFilter extends AbstractHTMLFilter
         Arrays.sort(BLOCK_ELEMENT_TAGS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         List<Element> lineBreaksToReplace =
             filterDescendants(document.getDocumentElement(), new String[] {TAG_BR}, new ElementSelector()
             {
+                @Override
                 public boolean isSelected(Element element)
                 {
                     Node prev = findPreviousNode(element);
@@ -79,7 +78,7 @@ public class LineBreakFilter extends AbstractHTMLFilter
     /**
      * Finds the previous sibling of the given element which is not a {@code <br/>}, an empty text node or a comment
      * node.
-     * 
+     *
      * @param element the element to be analysed.
      * @return previous sibling of the given element which is not a html line-break, an empty text node or a comment
      *         node.
@@ -94,12 +93,10 @@ public class LineBreakFilter extends AbstractHTMLFilter
     }
 
     /**
-     * Finds the next sibling of the given element which is not a {@code <br/>}, an empty text node or a comment
-     * node.
-     * 
+     * Finds the next sibling of the given element which is not a {@code <br/>}, an empty text node or a comment node.
+     *
      * @param element the element to be analysed.
-     * @return next sibling of the given element which is not a html line-break, an empty text node or a comment
-     *         node.
+     * @return next sibling of the given element which is not a html line-break, an empty text node or a comment node.
      */
     private Node findNextNode(Element element)
     {

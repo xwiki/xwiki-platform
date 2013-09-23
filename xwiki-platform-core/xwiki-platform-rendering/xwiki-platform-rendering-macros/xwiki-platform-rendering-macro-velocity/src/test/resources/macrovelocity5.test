@@ -1,51 +1,59 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify Velocity variables are shared between different 2.0 macros of the same content
+.# Verify indentation is cleaned
 .#-----------------------------------------------------
 {{velocity}}
-#macro(somemacro)
-"macro content"
-#end
-
-#somemacro()
-{{/velocity}}
-
-{{velocity}}
-#somemacro()
+some text #if (true)
+    #if (true)
+      and the end of the sentence indented to be more readable.
+    #end
+  #end
 {{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [#macro(somemacro)
-"macro content"
-#end
-
-#somemacro()]
+beginMacroMarkerStandalone [velocity] [] [some text #if (true)
+    #if (true)
+      and the end of the sentence indented to be more readable.
+    #end
+  #end]
 beginParagraph
-onSpecialSymbol ["]
-onWord [macro]
+onWord [some]
 onSpace
-onWord [content]
-onSpecialSymbol ["]
-endParagraph
-endMacroMarkerStandalone [velocity] [] [#macro(somemacro)
-"macro content"
-#end
-
-#somemacro()]
-beginMacroMarkerStandalone [velocity] [] [#somemacro()]
-beginParagraph
-onSpecialSymbol ["]
-onWord [macro]
+onWord [text]
 onSpace
-onWord [content]
-onSpecialSymbol ["]
+onWord [and]
+onSpace
+onWord [the]
+onSpace
+onWord [end]
+onSpace
+onWord [of]
+onSpace
+onWord [the]
+onSpace
+onWord [sentence]
+onSpace
+onWord [indented]
+onSpace
+onWord [to]
+onSpace
+onWord [be]
+onSpace
+onWord [more]
+onSpace
+onWord [readable]
+onSpecialSymbol [.]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [#somemacro()]
+endMacroMarkerStandalone [velocity] [] [some text #if (true)
+    #if (true)
+      and the end of the sentence indented to be more readable.
+    #end
+  #end]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>"macro content"</p><p>"macro content"</p>
+<p>some text and the end of the sentence indented to be more readable.</p>

@@ -21,7 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.importer;
 
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -32,7 +32,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 @RemoteServiceRelativePath("ImportService.gwtrpc")
 public interface ImportService extends RemoteService
 {

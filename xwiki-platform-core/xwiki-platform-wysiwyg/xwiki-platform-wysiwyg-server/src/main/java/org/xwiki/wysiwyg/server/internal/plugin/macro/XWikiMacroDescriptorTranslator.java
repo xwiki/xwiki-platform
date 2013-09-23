@@ -21,20 +21,22 @@ package org.xwiki.wysiwyg.server.internal.plugin.macro;
 
 import java.util.Map.Entry;
 
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * XWiki specific implementation of {@link MacroDescriptorTranslator}.
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
 {
     /**
@@ -52,25 +54,15 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
      */
     private static final String KEY_RENDERING = "rendering";
 
-    /** Execution context handler, needed for accessing the XWikiMessageTool. */
-    @Requirement
-    private Execution execution;
-
     /**
-     * The object used to lookup translation keys.
+     * The component used to translate the macro descriptor.
      */
-    private XWikiMessageTool messageTool;
+    @Inject
+    private ContextualLocalizationManager localizationManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroDescriptorTranslator#translate(MacroDescriptor)
-     */
+    @Override
     public MacroDescriptor translate(MacroDescriptor macroDescriptor)
     {
-        // Update the message tool.
-        messageTool = ((XWikiContext) execution.getContext().getProperty("xwikicontext")).getMessageTool();
-
         String macroKey = KEY_RENDERING + ".macro." + macroDescriptor.getId();
         macroDescriptor.setName(translate(macroKey + FIELD_NAME, macroDescriptor.getName()));
         macroDescriptor.setDescription(translate(macroKey + FIELD_DESCRIPTION, macroDescriptor.getDescription()));
@@ -81,8 +73,8 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
         ParameterDescriptor contentDescriptor = macroDescriptor.getContentDescriptor();
         if (contentDescriptor != null) {
             contentDescriptor.setName(translate(KEY_RENDERING + ".macroContent", contentDescriptor.getName()));
-            contentDescriptor.setDescription(translate(macroKey + ".content.description", contentDescriptor
-                .getDescription()));
+            contentDescriptor.setDescription(translate(macroKey + ".content.description",
+                contentDescriptor.getDescription()));
         }
 
         for (ParameterDescriptor paramDescriptor : macroDescriptor.getParameterDescriptorMap().values()) {
@@ -110,7 +102,7 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
      */
     private String translate(String key, String defaultValue)
     {
-        String translation = messageTool.get(key);
-        return key.equals(translation) ? defaultValue : translation;
+        String translation = localizationManager.getTranslationPlain(key);
+        return translation == null ? defaultValue : translation;
     }
 }

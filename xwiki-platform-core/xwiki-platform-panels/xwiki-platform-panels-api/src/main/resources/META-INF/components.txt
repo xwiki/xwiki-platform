@@ -1,0 +1,3 @@
+org.xwiki.panels.internal.LeftPanelsUIExtensionManager
+org.xwiki.panels.internal.PanelWikiUIExtensionComponentBuilder
+org.xwiki.panels.internal.RightPanelsUIExtensionManager

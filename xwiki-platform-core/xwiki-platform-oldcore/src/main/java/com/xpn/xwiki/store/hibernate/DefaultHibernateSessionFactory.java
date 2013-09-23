@@ -23,9 +23,18 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+import org.hibernate.util.xml.XmlDocument;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.util.Util;
@@ -38,28 +47,42 @@ import com.xpn.xwiki.util.Util;
  */
 // TODO: This was coded by Artem. Find out why we need this as a component.
 @Component
+@Singleton
 public class DefaultHibernateSessionFactory implements HibernateSessionFactory
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
+     * Used to get Environment permanent directory to evaluate Hibernate properties.
+     */
+    @Inject
+    private org.xwiki.environment.Environment environment;
+
     /**
      * Hibernate configuration object.
      */
     private Configuration configuration = new Configuration()
     {
+        /**
+         * The name of the property for configuring the environment permanent directory.
+         */
+        private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
+
         private static final long serialVersionUID = 1L;
 
         /**
-         * Whether the Hibernate Configuration has alreayd been initialized or not. We do this so that the
-         * Hibernate {@link org.hibernate.cfg.Configuration#configure()} methods can be called several times in a
-         * row without causing some Duplicate Mapping errors, see our overridden
-         * {@link #getConfigurationInputStream(String)} below.
+         * Whether the Hibernate Configuration has already been initialized or not. We do this so that the Hibernate
+         * {@link org.hibernate.cfg.Configuration#configure()} methods can be called several times in a row without
+         * causing some Duplicate Mapping errors, see our overridden {@link #getConfigurationInputStream(String)} below.
          */
         private boolean isConfigurationInitialized;
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure()
-         */
-        @Override public Configuration configure() throws HibernateException
+        @Override
+        public Configuration configure() throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -68,14 +91,12 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
                 configuration = super.configure();
                 this.isConfigurationInitialized = true;
             }
+            replaceVariables(configuration);
             return configuration;
         }
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure(String) 
-         */
-        @Override public Configuration configure(String resource) throws HibernateException
+        @Override
+        public Configuration configure(String resource) throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -84,14 +105,12 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
                 configuration = super.configure(resource);
                 this.isConfigurationInitialized = true;
             }
+            replaceVariables(configuration);
             return configuration;
         }
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure(java.net.URL)
-         */
-        @Override public Configuration configure(URL url) throws HibernateException
+        @Override
+        public Configuration configure(URL url) throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -100,14 +119,12 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
                 configuration = super.configure(url);
                 this.isConfigurationInitialized = true;
             }
+            replaceVariables(configuration);
             return configuration;
         }
 
-        /**
-         * {@inheritDoc}
-         * @see org.hibernate.cfg.Configuration#configure(java.io.File) 
-         */
-        @Override public Configuration configure(File configFile) throws HibernateException
+        @Override
+        public Configuration configure(File configFile) throws HibernateException
         {
             Configuration configuration;
             if (this.isConfigurationInitialized) {
@@ -116,18 +133,100 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
                 configuration = super.configure(configFile);
                 this.isConfigurationInitialized = true;
             }
+            replaceVariables(configuration);
             return configuration;
         }
 
-        // there is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
+        @Override
+        public void add(XmlDocument metadataXml)
+        {
+            Element basePropertyElement = selectChildClassMappingElement(metadataXml.getDocumentTree().getRootElement(),
+                                                                         "class", "com.xpn.xwiki.objects.BaseProperty");
+            if (basePropertyElement != null) {
+                decorateDBStringListMapping(basePropertyElement);
+            }
+
+            super.add(metadataXml);
+        }
+
+        /**
+         * Select the class definition element that is an immediate child element of the given element.
+         *
+         * @param parentElement The parent element.
+         * @param elementName The element name for the given class definition ("class" or "joined-subclass").
+         * @param className The qualified class name to match.
+         */
+        private Element selectChildClassMappingElement(Element parentElement, String elementName, String className)
+        {
+            for (Object elementObj : parentElement.elements(elementName)) {
+                if (elementObj instanceof Element) {
+                    Element element = (Element) elementObj;
+                    Attribute attribute = element.attribute("name");
+                    if (attribute != null && className.equals(attribute.getValue())) {
+                        return element;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Decorate the hibernate mapping for the class DBStringListProperty with a collection-type attribute.
+         *
+         * @param basePropertyElement The element of the base property class mapping.
+         */
+        private void decorateDBStringListMapping(Element basePropertyElement)
+        {
+            final String className = "com.xpn.xwiki.objects.DBStringListProperty";
+            final String collectionType = "com.xpn.xwiki.internal.objects.ListPropertyCollectionType";
+
+            Element listClassElement = selectChildClassMappingElement(basePropertyElement, "joined-subclass",
+                                                                      className);
+
+            if (listClassElement != null) {
+                Element listElement = listClassElement.element("list");
+                if (listElement != null) {
+                    listElement.addAttribute("collection-type",
+                                              collectionType);
+                    logger.debug("Added collection-type attribute [{}] to hibernate mapping for [{}].", collectionType, className);
+                }
+            }
+        }
+
+        // There is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
         @Override
         protected InputStream getConfigurationInputStream(String resource) throws HibernateException
         {
             InputStream stream = Util.getResourceAsStream(resource);
             if (stream == null) {
-                throw new HibernateException("Can't find [" + resource + "] for hibernate configuration");
+                throw new HibernateException(String.format("Can't find [%s] for hibernate configuration", resource));
             }
             return stream;
+        }
+
+        /**
+         * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
+         * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value
+         * coming from the XWiki configuration.
+         *
+         * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
+         */
+        private void replaceVariables(Configuration hibernateConfiguration)
+        {
+            String url = hibernateConfiguration.getProperty(Environment.URL);
+            if (StringUtils.isEmpty(url)) {
+                return;
+            }
+
+            // Replace variables
+            if (url.matches(".*\\$\\{.*\\}.*")) {
+                String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
+                    DefaultHibernateSessionFactory.this.environment.getPermanentDirectory().getAbsolutePath());
+
+                // Set the new URL
+                hibernateConfiguration.setProperty(Environment.URL, newURL);
+                DefaultHibernateSessionFactory.this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+            }
         }
     };
 
@@ -136,28 +235,19 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
      */
     private SessionFactory sessionFactory;
 
-    /**
-     * {@inheritDoc}
-     * @see HibernateSessionFactory#getConfiguration()
-     */
+    @Override
     public Configuration getConfiguration()
     {
         return this.configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see HibernateSessionFactory#getSessionFactory()
-     */
+    @Override
     public SessionFactory getSessionFactory()
     {
         return this.sessionFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see HibernateSessionFactory#setSessionFactory(SessionFactory)
-     */
+    @Override
     public void setSessionFactory(SessionFactory sessionFactory)
     {
         this.sessionFactory = sessionFactory;

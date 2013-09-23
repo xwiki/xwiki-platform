@@ -19,13 +19,19 @@
  */
 package org.xwiki.rendering.internal.macro.script;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -37,45 +43,73 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.5M1
  */
-@Component("permissionchecker")
+@Component
+@Named("permissionchecker")
+@Singleton
 public class PermissionCheckerListener extends AbstractScriptCheckerListener
 {
+    /**
+     * Message sent when the permission to execute the script is refused.
+     */
+    private static final String CANCEL_MESSAGE = "You don't have the right to execute this script";
+
     /** Used to find the type of a Macro defined by a Macro Marker block. */
-    @Requirement
+    @Inject
     private MacroManager macroManager;
 
     /** Used to check if the current document's author has programming rights. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
-    
+
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
+     * Used to get Macro Permission Policy implementations.
      */
+    @Inject
+    private ComponentManager componentManager;
+
+    @Override
     public String getName()
     {
         return "permissionchecker";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.macro.script.AbstractScriptCheckerListener#check(org.xwiki.observation.event.CancelableEvent, org.xwiki.rendering.transformation.MacroTransformationContext, org.xwiki.rendering.macro.script.ScriptMacroParameters)
-     */
     @Override
     protected void check(CancelableEvent event, MacroTransformationContext context,
         ScriptMacroParameters parameters)
     {
+        MacroId currentMacroId = new MacroId(context.getCurrentMacroBlock().getId());
         try {
-            MacroId currentMacro = new MacroId(context.getCurrentMacroBlock().getId());
-            if (!(macroManager.getMacro(currentMacro) instanceof PrivilegedScriptMacro)) {
+            MacroPermissionPolicy mpp =
+                this.componentManager.getInstance(MacroPermissionPolicy.class, currentMacroId.getId());
+            if (!mpp.hasPermission(parameters, context)) {
+                event.cancel(CANCEL_MESSAGE);
+            }
+        } catch (ComponentLookupException e) {
+            // Policy not found for macro, check permission using backward compatibility check
+            backwardCompatibilityCheck(currentMacroId, event);
+        }
+    }
+
+    /**
+     * Used for backward compatibility. Uses the following algorithm:
+     * <ul>
+     *   <li>if the executing Macro doesn't implements PrivilegedScriptMacro then allow execution</li>
+     *   <li>otherwise allow execution only if the current document has Programming Rights</li>
+     * </ul>
+     *
+     * @param macroId the information about the current executing script macro
+     * @param event the script event which we use to cancel script execution if permission is not allowed
+     */
+    private void backwardCompatibilityCheck(MacroId macroId, CancelableEvent event)
+    {
+        try {
+            if (!(macroManager.getMacro(macroId) instanceof PrivilegedScriptMacro)) {
                 // no special permission needed
                 return;
             }
             // with not protected script engine, we are testing if the current dcument's author has "programming" right
             if (!this.documentAccessBridge.hasProgrammingRights()) {
-                event.cancel("You don't have the right to execute this script");
+                event.cancel(CANCEL_MESSAGE);
             }
         } catch (MacroLookupException exception) {
             // should not happen, this method was called from that macro

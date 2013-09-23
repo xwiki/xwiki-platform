@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.servlet.filters.internal;
 
@@ -38,7 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
 
@@ -185,22 +184,13 @@ public class SavedRequestRestorerFilter implements Filter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
-     */
+    @Override
     public void init(FilterConfig filterConfig)
     {
         // Don't do anything, as this filter does not need any resources.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
-     *      javax.servlet.FilterChain)
-     */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException
     {
@@ -220,11 +210,7 @@ public class SavedRequestRestorerFilter implements Filter
         filteredRequest.removeAttribute(ATTRIBUTE_APPLIED);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.Filter#destroy()
-     */
+    @Override
     public void destroy()
     {
         // Don't do anything, as this filter does not use any resources.

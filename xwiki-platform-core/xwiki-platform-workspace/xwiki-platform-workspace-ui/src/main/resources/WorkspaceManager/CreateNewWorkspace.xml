@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>WorkspaceManager</web>
+  <name>CreateNewWorkspace</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WorkspaceManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1308816032000</date>
+  <contentUpdateDate>1308816032000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('workspacemanager.createworkspace')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#######################################################
+##         Create a new (sub)wiki - WIZARD
+##
+## This wizard let user create a new wiki.
+## The 'controller' macro call the good submacro 
+## depending on the step
+##
+#######################################################
+#########################
+## PLUGINS DEPENDANCIES
+#########################
+#set ($WorkspaceManager = $services.workspace)
+#if (!$WorkspaceManager)
+  {{error}}{{translation key="workspacemanager.pluginnotenabled"/}}{{/error}}
+
+#end
+#set ($WikiManager = $services.wikimanager)
+#if (!$WikiManager)
+  {{error}}$services.localization.render('workspacemanager.dependencies.wikimanager.missing'){{/error}}
+
+#end
+#if (!$services.applicationmanager)
+  {{error}}$services.localization.render('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
+
+#end
+#set ($isInstallComplete = ($WorkspaceManager.getWorkspaceTemplates().size() &gt; 0))
+#if (!$isInstallComplete)
+  {{warning}}$services.localization.render('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
+
+#end
+## If all dependancies are OK, we call the controller
+#if($WorkspaceManager &amp;&amp; $WikiManager &amp;&amp; $services.applicationmanager &amp;&amp; $isInstallComplete) 
+  #controller()
+#end
+##################################
+##         CONTROLLER
+##################################
+#macro(controller)  
+  #if($request.step == 'members')
+    #stepMembers()
+  #elseif($request.step == 'create')
+    #create()
+  #else
+    ## Default step
+    #stepType()
+  #end
+#end
+##################################
+##           HEADER
+##
+## Display the wizard header
+##################################
+#macro(wizardHeader $title $currentStepNumber)
+  ## Display a step name in the header
+  #macro(wizardHeaderStep $name $number $currentStepNumber)
+    &lt;li&gt;&lt;span class="number #if($currentStepNumber==$number)active#end"&gt;$number&lt;/span&gt; &lt;span class="name #if($currentStepNumber==$number)active#end"&gt;$name&lt;/span&gt;&lt;/li&gt;
+  #end
+
+  &lt;div class="wizard-header"&gt;
+    &lt;h1&gt;&lt;span&gt;$title&lt;/span&gt;&lt;/h1&gt;
+    &lt;ul class="steps"&gt;
+      #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step1.shortname'), 1, $currentStepNumber)
+      #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step2.shortname'), 2, $currentStepNumber)
+    &lt;/ul&gt;
+    &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+    
+#end
+##################################
+##           FOOTER
+##
+## Display the wizard footer
+##################################
+#macro(wizardFooter $prev $next $create)
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  &lt;div class="wizard-footer buttons"&gt;
+    #if($prev!='')
+      &lt;span class="buttonwrapper left"&gt;      
+        &lt;button value="$prev" title="Previous Step" name="step" id="wizard-next" class="button secondary"&gt;Previous Step&lt;/button&gt;
+      &lt;/span&gt;
+    #end
+    #if($next!='')
+      &lt;span class="buttonwrapper"&gt;
+        &lt;button value="$next" title="Go to next step" name="step" id="wizard-next" class="button"&gt;Go to next step&lt;/button&gt;
+      &lt;/span&gt;
+    #end
+    #if($create!='')
+      &lt;span class="buttonwrapper"&gt;
+        &lt;button value="$create" title="Create" name="step" id="wizard-next" class="button"&gt;Create&lt;/button&gt;
+      &lt;/span&gt;
+    #end
+  &lt;/div&gt;
+#end
+##################################
+##           REQUIRED
+##
+## Add a required message
+##################################
+#macro(required)&lt;span class='xRequired'&gt;($services.localization.render('platform.workspace.requiredField'))&lt;/span&gt;#end
+##################################
+##          STEP TYPE
+##
+## The type is the first step on the creation
+##################################
+#macro(stepType)
+  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+  
+  {{html}}
+    &lt;form class="xform" method="post" action="$doc.getURL()"&gt;      
+      #wizardHeader($services.localization.render('platform.workspace.wizard.step1'), 1)
+      ### WIZARD BODY ###  
+      &lt;div class="wizard-body"&gt;
+        ### SECOND STEP VALUES
+        &lt;input type="hidden" name="XWiki.XWikiServerClass_0_owner" value="$!escapetool.xml($request.getParameter('XWiki.XWikiServerClass_0_owner'))" /&gt;        
+        &lt;input type="hidden" name="WorkspaceManager.WorkspaceClass_0_membershipType" value="$!escapetool.xml($request.getParameter('WorkspaceManager.WorkspaceClass_0_membershipType'))" /&gt;
+        #set ($members = [])
+        #getRequestList($members 'members')
+        #set($membersValue = '')
+        #foreach($m in $members)
+          #if($velocityCount &gt; 1)
+            #set($$membersValue = "${membersValue},")
+          #end
+          #set($$membersValue = "${membersValue}${m}")
+        #end
+        &lt;input type="hidden" name="members" value="$!escapetool.xml($membersValue)" /&gt;
+        ### WIZARD FIRST HALF ###
+        &lt;div class="half"&gt;
+          ### PRETTY NAME ###
+          &lt;div&gt;
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label for="prettyname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiprettyname')#required()&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.desc.wikiprettyname')&lt;/span&gt;
+                &lt;span id="wikiprettynamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                &lt;input size="60" id="prettyname" name="XWiki.XWikiServerClass_0_wikiprettyname" type="text" value="$!escapetool.xml($request.getParameter('XWiki.XWikiServerClass_0_wikiprettyname'))"/&gt;
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          &lt;/div&gt;
+          ### WIKI NAME ###
+          &lt;div&gt;
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label for="wikiname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiname')#required()&lt;/label&gt;
+                &lt;span class='xHint'&gt;$services.localization.render('workspacemanager.doc.createwiki.wikiname')&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                &lt;input size="40" id="wikiname" name="wikiname" type="text"  value="$!escapetool.xml($request.wikiname)"/&gt;
+                &lt;span id="wikinamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;              
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          &lt;/div&gt;
+          ### TEMPLATE ###
+          &lt;div&gt;
+            #set ($templates = $services.workspace.getWorkspaceTemplates())
+            #if ($templates.size() &gt; 1)
+              &lt;dt&gt;
+                &lt;label for="template"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateLabel')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateHint')&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                &lt;select name="template" id="template"&gt;
+                  #foreach ($template in $templates)
+                    #set ($wikiDescriptor = $template.wikiDescriptor)
+                    #set ($name = $wikiDescriptor.wikiName)
+                    #if ($stringtool.isNotBlank("$!wikiDescriptor.wikiPrettyName"))
+                      #set($name = "${wikiDescriptor.wikiPrettyName} (${name})")
+                    #end
+                    #set($selected = '')
+                    #if(($request.template == $wikiDescriptor.wikiName) || ($request.template == '' &amp;&amp; $wikiDescriptor.wikiName == 'workspacetemplate'))
+                      #set($selected = 'selected="selected"')                    
+                    #end
+                    &lt;option value="${wikiDescriptor.wikiName}" $selected&gt;$name&lt;/option&gt;
+                  #end
+                &lt;/select&gt;
+              &lt;/dd&gt;
+            #elseif ($templates.size() == 1)
+              &lt;div&gt;
+                &lt;input id="template" name="template" type="hidden" value="$templates[0].wikiDescriptor.wikiName" #if(!$isInstallComplete)disabled="disabled"#{end} /&gt;
+              &lt;/div&gt;
+            #end
+          &lt;/div&gt;          
+        ### END OF WIZARD FIRST HALF
+        &lt;/div&gt;        
+        ### WIZARD SECOND HALF
+        &lt;div class="half"&gt;
+          ### DESCRIPTION ###
+          &lt;div&gt;
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label for="description"&gt;$services.localization.render('workspacemanager.prop.wiki.description')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.desc.description')&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                &lt;textarea id="description" name="XWiki.XWikiServerClass_0_description" rows="7" cols="45"&gt;$!request.getParameter('XWiki.XWikiServerClass_0_description')&lt;/textarea&gt;
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          &lt;/div&gt;
+        ### END OF WIZARD SECOND HALF
+        &lt;/div&gt;
+      ### END OF WIZARD BODY
+      &lt;/div&gt;
+      #wizardFooter('', 'members', '')
+    &lt;/form&gt;
+  {{/html}}
+  
+  ### I put the javascript here instead of in a JSX object because we may transform this page into a wiki action
+  {{html clean="false"}}
+    &lt;script type="text/javascript"&gt;
+      // &lt;![CDATA[
+      var domainnamesetted = false;
+      var lastwikiname;
+      ## Error messages
+      #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('workspacemanager.wikiname.error.wikialreadyexists')")
+      #set ($MSG_ERROR_DATABASEALREADYEXISTS = "$services.localization.render('workspacemanager.wikiname.error.databasealreadyexists')")
+      #set ($MSG_ERROR_WORKSPACEALREADYEXISTS = "$services.localization.render('workspacemanager.wikiname.error.workspacealreadyexists')")
+      #set ($MSG_ERROR_WIKINAMEALREADYUSED = "$services.localization.render('workspacemanager.wikiname.error.alreadyused')")
+      #set ($MSG_ERROR_WIKINAMEEMPTY = "$services.localization.render('workspacemanager.wikiname.error.empty')")
+      #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$services.localization.render('workspacemanager.wikiprettyname.error.empty')")
+      #set ($MSG_INFO_WIKINAMEVALID = "$services.localization.render('workspacemanager.wikiname.info.valid')")
+      #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WorkspaceManager.IsWikiOrDatabaseOrWorkspaceAvailableService").URL)
+      /**
+       * Init the event handlers
+       */
+      function init() {
+        var prettyName = $('prettyname');
+        prettyName.observe('change', prettyNameChanged);
+        prettyName.observe('keyup', prettyNameChanged);
+        var wikiName   = $('wikiname');
+        wikiName.observe('change', wikiNameChanged);
+        wikiName.observe('keyup', wikiNameChanged);
+        if(prettyName.value.blank() || wikiName.value.blank()){
+          $('wizard-next').disabled = true;
+        } 
+      }
+      (XWiki &amp;&amp; XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+      /**
+       * Pretty name changed
+       */
+      function prettyNameChanged(event){
+        var prettyName = $('prettyname');
+        if(prettyName.value.blank()){
+          $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
+          prettyName.addClassName('xErrorField');          
+        }else{
+          $('wikiprettynamevalidation').innerHTML = '';
+          prettyName.removeClassName('xErrorField');
+          // If the user has manually changed the wikiname, we don't generate it automaticaly anymore
+          if(!domainnamesetted){
+            var wikiName = $('wikiname');
+            wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
+            validateWikiName();
+          }
+        }
+      }
+      /**
+       * Wiki name changed
+       */
+      function wikiNameChanged(event){
+        domainnamesetted = true;
+        validateWikiName();
+      }
+      /**
+       * Validate the wiki name
+       */
+      function validateWikiName(){
+        var wikiNameElement = $('wikiname');
+        var wikiname = wikiNameElement.value; 
+        var filteredWikiName = filterWikiName(wikiname);
+        if (wikiname != filteredWikiName) {
+          wikiNameElement.value = filteredWikiName;
+          wikiname = filteredWikiName;
+        }
+        if (lastwikiname == wikiname){
+          return;
+        }
+        lastwikiname = wikiname;
+        if (wikiname &amp;&amp; !wikiname.blank()) {
+          var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;outputSyntax=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
+          surl += "&amp;form_token=$!{services.csrf.getToken()}";
+          new Ajax.Request(surl, {
+            method: 'get',
+            onSuccess: function(transport) {
+              if (transport.responseText == "true") {
+                $('wikinamevalidation').innerHTML = "";
+                wikiNameElement.removeClassName('xErrorField');
+                  if (!$('prettyname').value.blank()) {
+                    $('wizard-next').disabled = false;
+                  }
+              }
+              else if (transport.responseText == "database"){
+                $('wikinamevalidation').innerHTML = "$MSG_ERROR_DATABASEALREADYEXISTS";
+                wikiNameElement.addClassName('xErrorField');
+                $('wizard-next').disabled = true;
+              }
+              else if (transport.responseText == "wiki"){
+                $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKIALREADYEXISTS";
+                wikiNameElement.addClassName('xErrorField');
+                $('wizard-next').disabled = true;
+              }
+              else if (transport.responseText == "workspace"){
+                $('wikinamevalidation').innerHTML = "$MSG_ERROR_WORKSPACEALREADYEXISTS";
+                wikiNameElement.addClassName('xErrorField');
+                $('wizard-next').disabled = true;
+              }
+              else{
+                $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEALREADYUSED";
+                wikiNameElement.addClassName('xErrorField');
+                $('wizard-next').disabled = true;
+              }
+            }
+          });
+        }
+        else{
+          $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
+          $('wizard-next').disabled = true;
+        }
+      }
+      /**
+       * Filter wiki name
+       */
+      function filterWikiName(wikiName){
+        var result = noaccent(wikiName);
+
+        // The server-side code strips '_' chars from the database name.
+        result = result.replace(/[_]/g, "");
+
+        // Classic requirement for an identifier is to start with a letter.
+        while (result.length &gt; 0 &amp;&amp; !isNaN(result.charAt(0))) {
+          result = result.substring(1);
+        }
+
+        // Out of all databases, Oracle seems to be the least permissive, limiting schema names to 30 chars.
+        if (result.length &gt; 30) {
+          result = result.substring(0, 30);
+        }
+
+        // Keep IDs lowercased.
+        result = result.toLowerCase();
+
+        return result;
+      }
+      // ]]&gt;
+    &lt;/script&gt;
+  {{/html}}
+#end
+##################################
+##          STEP MEMBERS
+##
+## The members step is the lasy
+##################################
+#macro(stepMembers)
+#set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+  
+  {{html}}
+    &lt;form class="xform" method="post" action="$doc.getURL()"&gt;      
+      #wizardHeader($services.localization.render('platform.workspace.wizard.step2'), 2)
+      ### WIZARD BODY ###  
+      &lt;div class="wizard-body"&gt;
+        ### FIRST STEP VALUES
+        &lt;input type="hidden" name="XWiki.XWikiServerClass_0_wikiprettyname" value="$!escapetool.xml($request.getParameter('XWiki.XWikiServerClass_0_wikiprettyname'))" /&gt;
+        &lt;input type="hidden" name="wikiname" value="$!escapetool.xml($request.wikiname)" /&gt;
+        &lt;input type="hidden" name="XWiki.XWikiServerClass_0_description" value="$!escapetool.xml($request.getParameter('XWiki.XWikiServerClass_0_description'))" /&gt;
+        &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;        
+        #userPicker_import(true)
+        ### WIZARD FIRST HALF ###
+        &lt;div class="half"&gt;
+          ### OWNER ###
+          &lt;div&gt;
+            ## Make this section available only to admins, so that only admins can create wikis in the name of other users.
+            #if ($hasAdmin)
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for="owner"&gt;$services.localization.render('workspacemanager.prop.wiki.owner') &lt;span class="xRequired"&gt;($services.localization.render('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.desc.owner')&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  #set($value = $escapetool.xml($request.getParameter('XWiki.XWikiServerClass_0_owner')))
+                  #if("$!value" == "")
+                    #set($value = $escapetool.xml($xcontext.user))
+                  #end
+                  &lt;input type="text" id="owner" name="XWiki.XWikiServerClass_0_owner" value="$!value" class="suggestUsers"/&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            #else              
+              &lt;input id="owner" name="XWiki.XWikiServerClass_0_owner" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}"/&gt;
+            #end
+          &lt;/div&gt;          
+        ### END OF WIZARD FIRST HALF
+        &lt;/div&gt;        
+        ### WIZARD SECOND HALF
+        &lt;div class="half"&gt;
+          ### MEMBERSHIP TYPE
+          &lt;div&gt;
+            #set ($workspaceClass = $xwiki.getDocument('WorkspaceManager.WorkspaceClass').getxWikiClass())
+            #set ($membershipTypeProperty = $workspaceClass.get('membershipType'))
+            #set ($membershipTypeValues = '')
+            #set ($membershipTypeValues = $membershipTypeProperty.getListValues())
+            #set ($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label&gt;$services.localization.render('workspacemanager.prop.workspace.membershipType.label')&lt;/label&gt;
+                &lt;span class='xHint'&gt;$services.localization.render('workspacemanager.prop.workspace.membershipType.hint')&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+              #foreach ($membershipTypeValue in $membershipTypeValues)
+                #set ($membershipTypeValueId = "membershipType_${foreach.index}")
+                &lt;div&gt;
+                  &lt;label for="$membershipTypeValueId"&gt;
+                    #set($checked = '')
+                    #if($request.getParameter('WorkspaceManager.WorkspaceClass_0_membershipType') == $membershipTypeValue || ("$!request.getParameter('WorkspaceManager.WorkspaceClass_0_membershipType')"=='' &amp;&amp; $foreach.index==0))
+                      #set($checked = 'checked="checked"')
+                    #end
+                    &lt;input type="radio" id="$membershipTypeValueId" name="WorkspaceManager.WorkspaceClass_0_membershipType" value="$membershipTypeValue" $checked/&gt;
+                    $membershipTypeDetailsMap.get($membershipTypeValue).getValue()
+                  &lt;/label&gt;
+                &lt;/div&gt;
+              #end
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          &lt;/div&gt;
+          ### MEMBERS
+          &lt;div&gt;
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label for="members"&gt;$services.localization.render('workspacemanager.members')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.members')&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                &lt;input type="text" id="members" name="members" value="$!escapetool.xml($request.members)" class="suggestUsers multipleSelection"/&gt;
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          &lt;/div&gt;
+        ### END OF WIZARD SECOND HALF
+        &lt;/div&gt;
+      ### END OF WIZARD BODY
+      &lt;/div&gt;
+      #wizardFooter('type', '', 'create')
+    &lt;/form&gt;
+  {{/html}}
+#end
+##################################
+##       GET REQUEST LIST
+##
+## Get the values for user pickers with multiple selection
+##################################
+#macro(getRequestList $paramlist $paramname)
+  #set ($paramtable = [])
+  #set ($paramtable = $request.getParameterValues($paramname))
+  #if ($paramtable &amp;&amp; $paramlist)
+    #set ($ok = $paramlist.clear())
+    #foreach($paramvalue in $paramtable)
+      #set ($ok = $paramlist.add($paramvalue))
+    #end
+  #end
+#end
+##################################
+##           CREATE
+##
+## The final step that eventually create the wiki
+##################################
+#macro(create)
+  #set ($ALIASSUFFIX = "")
+  #####################
+  ## REQUEST PARAMETERS
+  #set ($wikidocument = $WikiManager.createWikiDocument())
+  #set ($wikidocumentobject = $wikidocument.updateObjectFromRequest('XWiki.XWikiServerClass'))
+  #set ($wikidocumentWorkspaceObject = $wikidocument.updateObjectFromRequest('WorkspaceManager.WorkspaceClass'))
+  ##
+  ## Set the wiki name from the request and then get it back from the XWikiServer instance because some
+  ## filtering may happen inside the setWikiName method and we want to work with the real databse name.
+  #set ($wikiname = $request.getParameter('wikiname'))
+  #set ($discard = $wikidocument.setWikiName($wikiname))
+  #set ($wikiname = $wikidocument.wikiName)
+  ##
+  ## Make sure to prefix the owner user with the wiki name.
+  #if ($wikidocument.owner == "")
+    #set ($discard = $wikidocument.set('owner', "${xcontext.mainWikiName}:${xcontext.user}"))
+  #elseif (!($wikidocument.owner.startsWith("${xcontext.mainWikiName}:")))
+    #set ($discard = $wikidocument.set('owner', "${xcontext.mainWikiName}:${wikidocument.owner}"))
+  #end
+  #if ($wikidocument.server == '' &amp;&amp; "$!wikiname" != '')
+    #set ($alias = "${wikiname}")
+    #if ("$!ALIASSUFFIX" != '')
+      #set ($alias = "${alias}.${ALIASSUFFIX}")
+    #else
+      #set ($usePath = $xwiki.xWiki.Param('xwiki.virtual.usepath', '1'))
+      #if ($usePath == '0')
+        #set ($serverURL = $xcontext.getURLFactory().getServerURL($xcontext.context))
+        #set ($alias = "${alias}.${serverURL.host}")
+      #end
+    #end
+    #set ($discard = $wikidocument.set('server', "${alias}"))
+  #end
+  ##
+  #set ($members = [])
+  #getRequestList($members 'members')
+  ## Remove any duplicate members (like the owner in some cases).
+  #set ($discard = $members.remove($wikidocument.owner))
+  ## Remove empty strings from the list of members (the user picker submits by default an empty string).
+  #set ($discard = $members.removeAll(['']))
+  ##
+  ## Create the workspace.
+  #set ($templateName = "$!{request.template}")
+  #set ($discard = $WorkspaceManager.createWorkspace($wikidocument, $templateName))
+  ##
+  #if ("$!WorkspaceManager.lastException" == '')
+    ## Add members.
+    #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
+      #set ($workspace = $WorkspaceManager.getWorkspace($wikiname))
+      #set ($groupsClassName = "$wikiname:XWiki.XWikiGroups")
+      #set ($workspaceGroupDocument = $workspace.groupDocument)
+      #foreach ($member in $members)
+        #set($memberObject = $workspaceGroupDocument.newObject($groupsClassName))
+        #if (!$member.startsWith("${xcontext.mainWikiName}:"))
+          #set ($member = "${xcontext.mainWikiName}:${member}")
+        #end
+        #set ($discard = $memberObject.set('member', $member))
+      #end
+      ## Save the group document to preserve the member additions.
+      #set ($discard = $workspaceGroupDocument.save($services.localization.render('platform.workspace.createInitialMembersSaveComment'), true))
+    #end
+    ## Redirect to the new workspace's homepage.
+    #set ($discard = $response.sendRedirect("$wikidocument.getHomePageUrl()"))
+  #else
+    {{error}}$services.localization.render('workspacemanager.errorcreatewiki', [$wikiname, $WorkspaceManager.lastException]){{/error}}
+
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

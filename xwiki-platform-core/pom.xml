@@ -27,59 +27,184 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.2.0</gwt.version>
-    <gwt.maven.plugin.version>2.2.0</gwt.maven.plugin.version>
-    <smartgwt.version>2.4</smartgwt.version>
+    <gwt.version>2.5.1</gwt.version>
+    <gwt.maven.plugin.version>2.5.1</gwt.maven.plugin.version>
+    <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
+         debug profile is active. It can also be used from the command line to skip minification -->
+    <xwiki.minification.skip>false</xwiki.minification.skip>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
-      <!-- Groovy engine -->
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
-        <version>1.7.10</version>
-      </dependency>
       <!-- Jython engine -->
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.2-xwiki</version>
+        <version>2.5.4-rc1</version>
       </dependency>
-      <!-- JFreeChart -->
+      <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
-        <groupId>jfree</groupId>
-        <artifactId>jfreechart</artifactId>
-        <version>1.0.13</version>
+        <groupId>org.jgroups</groupId>
+        <artifactId>jgroups</artifactId>
+        <version>3.3.4.Final</version>
       </dependency>
-      <!-- JFreeChart 1.0.13 has no POM file in the Maven Central Repository and thus we need to manually define
-           its own Maven dependency on JFree Common. Remove this dependency when it's fixed. -->
+      <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
-        <groupId>jfree</groupId>
-        <artifactId>jcommon</artifactId>
-        <version>1.0.15</version>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parsers</artifactId>
+        <version>1.4</version>
+        <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
+          <exclusion>
+            <groupId>org.gagravarr</groupId>
+            <artifactId>vorbis-java-core</artifactId>
+          </exclusion>
+          <!-- Tika Parsers 1.3 depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
+               require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+          </exclusion>
+          <!-- Tika Parsers 1.3 depends on bcmail-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
+               require bcmail-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15</artifactId>
+          </exclusion>
+          <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
+      	  <exclusion>
+      	    <artifactId>asm-debug-all</artifactId>
+      	    <groupId>org.ow2.asm</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!-- See the explanation in the tika-parsers exclusion above -->
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>4.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk16</artifactId>
+        <version>1.46</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcmail-jdk16</artifactId>
+        <version>1.46</version>
+      </dependency>
+      <!-- Rome is used in rss macro and feed api modules and in Tika -->
+      <dependency>
+        <groupId>rome</groupId>
+        <artifactId>rome</artifactId>
+        <version>1.0</version>
+        <exclusions>
+          <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
+          <exclusion>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+          </exclusion>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>rome</groupId>
+        <artifactId>rome-fetcher</artifactId>
+        <version>1.0</version>
+        <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
+        <exclusions>
+          <exclusion>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+          </exclusion>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
+        <groupId>de.l3s.boilerpipe</groupId>
+        <artifactId>boilerpipe</artifactId>
+        <version>1.2.0-xwiki</version>
+        <scope>runtime</scope>
+      </dependency>
+      <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
+      <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>xalan</artifactId>
+        <version>2.7.1</version>
+      </dependency>
+      <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
+      <dependency>
+        <groupId>struts</groupId>
+        <artifactId>struts</artifactId>
+        <version>1.2.9</version>
+        <exclusions>
+          <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
+          <exclusion>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+          </exclusion>
+          <!-- We use a more recent version of Xalan (see above) -->
+          <exclusion>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+          </exclusion>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Standard dependencies used in GWT modules -->
       <dependency>
         <groupId>com.google.gwt</groupId>
         <artifactId>gwt-user</artifactId>
         <version>${gwt.version}</version>
+        <!-- Only needed at build time -->
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.google.gwt</groupId>
         <artifactId>gwt-servlet</artifactId>
-        <version>${gwt.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.gwt</groupId>
-        <artifactId>gwt-dev</artifactId>
         <version>${gwt.version}</version>
       </dependency>
       <dependency>
@@ -88,6 +213,33 @@
         <groupId>com.smartgwt</groupId>
         <artifactId>smartgwt</artifactId>
         <version>${smartgwt.version}</version>
+        <!-- Only needed at build time -->
+        <scope>provided</scope>
+      </dependency>
+      <!-- Used at least in Solr Search and in Infinispan Cache -->
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>woodstox-core-asl</artifactId>
+        <version>4.1.4</version>
+      </dependency>
+      <!-- Drawn by several transitive dependencies -->
+      <dependency>
+        <groupId>javax.transaction</groupId>
+        <artifactId>jta</artifactId>
+        <version>1.1</version>
+      </dependency>
+      <!-- Make sure we exclude iText which we don't need and which incidentally would bring a bad dependency version
+           on bcprov and bcmail for jdk14. -->
+      <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.0.14</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -114,6 +266,21 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>gwt-maven-plugin</artifactId>
           <version>${gwt.maven.plugin.version}</version>
+          <!-- We declare these dependencies here in case we use different value for ${gwt.version} and
+               ${gwt.maven.plugin.version} variables.
+               See http://mojo.codehaus.org/gwt-maven-plugin/user-guide/using-different-gwt-sdk-version.html -->
+          <dependencies>
+            <dependency>
+              <groupId>com.google.gwt</groupId>
+              <artifactId>gwt-user</artifactId>
+              <version>${gwt.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>com.google.gwt</groupId>
+              <artifactId>gwt-dev</artifactId>
+              <version>${gwt.version}</version>
+            </dependency>
+          </dependencies>
           <configuration>
             <mode>htmlunit</mode>
             <testTimeOut>600</testTimeOut>
@@ -152,6 +319,17 @@
             </excludes>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>net.alchim31.maven</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.3.2</version>
+          <configuration>
+            <skip>${xwiki.minification.skip}</skip>
+            <jswarn>false</jswarn>
+            <!-- Overwrite the resource files with the minimized version. -->
+            <nosuffix>true</nosuffix>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -169,9 +347,60 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <!-- List of specific CLIRR excludes. Example:
+
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/ircbot/IRCBot</className>
+              <method>void initialize(java.lang.String)</method>
+              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
+                IRC Bot application in a subwiki</justification>
+            </difference>
+
+             See http://mojo.codehaus.org/clirr-maven-plugin/examples/ignored-differences.html
+          -->
+          <ignored>
+            <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>6006</differenceType>
+              <className>com/xpn/xwiki/XWikiContext</className>
+              <field>TYPE_PROVIDER</field>
+              <justification>This field is not meant to be be modified, the final was just forgotten.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
+              <method>* addHibernateSequenceIfRequired(*)</method>
+              <justification>Not an API. This should be internal.</justification>
+            </difference>
+          </ignored>
+          <excludes>
+            <!-- Has been moved to xwiki-platform-feed-api since it was the only module using it. We also
+                 dropped Tidy in favor of HTMLCleaner.
+
+                 Note: We cannot use a <difference> entry since CLIRR would still try to load the class from version
+                       5.1 and will not find org.w3c.tidy.TidyMessageListener since the dependency on JTidy has been
+                       removed. So we need to tell CLIRR to not load this class at all!
+             -->
+            <exclude>com/xpn/xwiki/util/TidyMessageLogger</exclude>
+            <exclude>**/internal/**</exclude>
+            <exclude>**/test/**</exclude>
+            <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Google API plugin has been retired -->
+            <exclude>com/xpn/xwiki/plugin/google/GooglePlugin*</exclude>
+            <!-- The JPQLParser generates source code (that should be internal but it is not) and the grammar has
+            changed a bit -->
+            <exclude>org/xwiki/query/jpql/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
-    <!-- Needed to add support for the XAR packaging -->
     <extensions>
+      <!-- Needed to add support for the "xar" packaging -->
       <extension>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
@@ -179,140 +408,103 @@
       </extension>
     </extensions>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock-cglib</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit4</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <modules>
     <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-action</module>
+    <module>xwiki-platform-activeinstalls</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
-    <module>xwiki-platform-adwords</module>
-    <module>xwiki-platform-albatross</module>
-    <module>xwiki-platform-alexa</module>
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application-manager</module>
+    <module>xwiki-platform-appwithinminutes</module>
+    <module>xwiki-platform-attachment</module>
+    <module>xwiki-platform-autotag</module>
     <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-cache</module>
-    <module>xwiki-platform-calendar</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-colibri</module>
+    <module>xwiki-platform-colorthemes</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-containers</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
+    <module>xwiki-platform-dashboard</module>
+    <module>xwiki-platform-display</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
+    <module>xwiki-platform-faq</module>
+    <module>xwiki-platform-feed</module>
     <module>xwiki-platform-formula</module>
+    <module>xwiki-platform-git</module>
+    <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
+    <module>xwiki-platform-help</module>
+    <module>xwiki-platform-index</module>
+    <module>xwiki-platform-instance</module>
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-ircbot</module>
+    <module>xwiki-platform-jira</module>
     <module>xwiki-platform-jodatime</module>
-    <module>xwiki-platform-legacy</module>
+    <module>xwiki-platform-ldap</module>
+    <module>xwiki-platform-linkchecker</module>
+    <module>xwiki-platform-livetable</module>
+    <module>xwiki-platform-localization</module>
+    <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
     <module>xwiki-platform-oldcore</module>
     <module>xwiki-platform-panels</module>
-    <module>xwiki-platform-photoalbum</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-refactoring</module>
+    <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
+    <module>xwiki-platform-repository</module>
     <module>xwiki-platform-rest</module>
-    <module>xwiki-platform-s5</module>
+    <module>xwiki-platform-sandbox</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
+    <module>xwiki-platform-security</module>
     <module>xwiki-platform-selenium</module>
+    <module>xwiki-platform-sheet</module>
     <module>xwiki-platform-skin</module>
     <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
-    <module>xwiki-platform-swizzle</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-test</module>
-    <module>xwiki-platform-toucan</module>
+    <module>xwiki-platform-user</module>
+    <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-users</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>
+    <module>xwiki-platform-wikistream</module>
     <module>xwiki-platform-wiki-manager</module>
-    <module>xwiki-platform-workstream</module>
+    <module>xwiki-platform-workspace</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>
+    <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>
+    <!-- Profile to build Legacy modules -->
     <profile>
-      <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
-           Cobertura instrumentation in a special profile (when the Cobertura profile is
-           executed, the Clirr one isn't). -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <skip>${xwiki.clirr.skip}</skip>
-              <comparisonVersion>${clirr.previous.version}</comparisonVersion>
-              <excludes>
-                <exclude>**/internal/**</exclude>
-                <exclude>**/test/**</exclude>
-                <!-- To be removed when we release 3.1 -->
-                <exclude>com/xpn/xwiki/pref/api/XWikiPrefService</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <xwiki.clirr.skip>false</xwiki.clirr.skip>
-      </properties>
+      <id>legacy</id>
+      <modules>
+        <module>xwiki-platform-legacy</module>
+      </modules>
     </profile>
     <profile>
-      <id>gwtTestManual</id>
+      <!-- Allows running GWT tests manually -->
+      <id>gwt-test-manual</id>
       <build>
         <plugins>
           <plugin>
@@ -323,17 +515,11 @@
               <productionMode>true</productionMode>
               <style>DETAILED</style>
               <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
-              <out>target/www-test -port 54321 -codeServerPort 12345 -userAgents gecko1_8</out>
+              <out>target/www-test -port 54321 -codeServerPort 12345</out>
             </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
-  <repositories>
-    <repository>
-      <id>smartgwt-maven</id>
-      <url>http://www.smartclient.com/maven2</url>
-    </repository>
-  </repositories>
 </project>

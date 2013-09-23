@@ -49,9 +49,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
      */
     private static final Logger logger = LoggerFactory.getLogger(PagesByFirstLettersSubView.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
@@ -61,9 +59,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String spaceName = getCollection().getDisplayName();
@@ -80,9 +76,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();
@@ -111,9 +105,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
         return new DavResourceIteratorImpl(children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
@@ -124,9 +116,7 @@ public class PagesByFirstLettersSubView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource member) throws DavException
     {
         if (member instanceof DavTempFile) {

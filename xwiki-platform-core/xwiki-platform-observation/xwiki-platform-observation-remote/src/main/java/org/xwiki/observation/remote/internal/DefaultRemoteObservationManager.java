@@ -22,15 +22,14 @@ package org.xwiki.observation.remote.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -51,8 +50,7 @@ import org.xwiki.observation.remote.converter.EventConverterManager;
  */
 @Component
 @Singleton
-public class DefaultRemoteObservationManager extends AbstractLogEnabled implements RemoteObservationManager,
-    Initializable
+public class DefaultRemoteObservationManager implements RemoteObservationManager, Initializable
 {
     /**
      * Access {@link RemoteObservationManager} configuration.
@@ -97,20 +95,22 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
     private ComponentManager componentManager;
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * The network adapter to use to actually send and receive network messages.
      */
     private NetworkAdapter networkAdapter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         try {
             String networkAdapterHint = this.configuration.getNetworkAdapter();
-            this.networkAdapter = this.componentManager.lookup(NetworkAdapter.class, networkAdapterHint);
+            this.networkAdapter = this.componentManager.getInstance(NetworkAdapter.class, networkAdapterHint);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to initialize network adapter ["
                 + this.configuration.getNetworkAdapter() + "]", e);
@@ -121,16 +121,12 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
             try {
                 startChannel(channelId);
             } catch (RemoteEventException e) {
-                getLogger().error("Failed to start channel [" + channelId + "]", e);
+                this.logger.error("Failed to start channel [" + channelId + "]", e);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#notify(org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public void notify(LocalEventData localEvent)
     {
         if (this.remoteEventManagerContext.isRemoteState()) {
@@ -150,16 +146,12 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
             try {
                 this.networkAdapter.stopAllChannels();
             } catch (RemoteEventException e) {
-                getLogger().error("Failed to stop channels", e);
+                this.logger.error("Failed to stop channels", e);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#notify(org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public void notify(RemoteEventData remoteEvent)
     {
         // Make sure the Execution context is properly initialized
@@ -181,21 +173,13 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#startChannel(java.lang.String)
-     */
+    @Override
     public void startChannel(String channelId) throws RemoteEventException
     {
         this.networkAdapter.startChannel(channelId);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.RemoteObservationManager#stopChannel(java.lang.String)
-     */
+    @Override
     public void stopChannel(String channelId) throws RemoteEventException
     {
         this.networkAdapter.stopChannel(channelId);
@@ -211,11 +195,9 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
 
             try {
                 this.executionContextManager.initialize(context);
-            } catch (ExecutionContextException e) {
-                getLogger().error("failed to initialize execution context", e);
+            } catch (Exception e) {
+                this.logger.error("failed to initialize execution context", e);
             }
-
-            this.execution.setContext(context);
         }
     }
 }

@@ -21,7 +21,7 @@ package org.xwiki.captcha;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Provides access to the classes implementing Captcha.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.2M2
  */
-@ComponentRole
+@Role
 public interface XWikiCaptchaService
 {
     /**

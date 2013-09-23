@@ -20,31 +20,34 @@
 package org.xwiki.rendering.internal.parser.pygments;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
-import java.text.MessageFormat;
-import java.util.Arrays;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleScriptContext;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.python.core.Py;
-import org.python.core.PyObject;
-import org.python.core.PyUnicode;
-import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.NewLineBlock;
-import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.parser.AbstractHighlightParser;
 import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
-import org.xwiki.rendering.parser.Parser;
 
 /**
  * Highlight provided source using Pygments.
@@ -56,22 +59,13 @@ import org.xwiki.rendering.parser.Parser;
 // and not a Parser too since we don't want this parser to be visible to users as a valid standard input parser
 // component.
 @Component(roles = {HighlightParser.class })
+@Singleton
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {
-    /**
-     * The name of the lexer variable in Python code.
-     */
-    private static final String PY_LEXER_VARNAME = "lexer";
-
     /**
      * The name of the style variable in Python code.
      */
     private static final String PY_STYLE_VARNAME = "style";
-
-    /**
-     * The name of the formatter variable in Python code.
-     */
-    private static final String PY_FORMATTER_VARNAME = "formatter";
 
     /**
      * The name of the listener variable in Python code.
@@ -79,45 +73,24 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private static final String PY_LISTENER_VARNAME = "listener";
 
     /**
-     * The name of the variable containing the source code to highlight in PPython code.
+     * The name of the variable containing the source code to highlight in Python code.
      */
     private static final String PY_CODE_VARNAME = "code";
 
     /**
-     * Try part of the initialization.
+     * The name of the variable containing the language of the source.
      */
-    private static final String PY_TRY = " = None\ntry:\n  ";
+    private static final String PY_LANGUAGE_VARNAME = "language";
 
     /**
-     * Try part of the lexer initialization.
+     * The name of the lexer variable in Python code.
      */
-    private static final String PY_LEXER_TRY = PY_LEXER_VARNAME + PY_TRY + PY_LEXER_VARNAME;
+    private static final String PY_LEXER_VARNAME = "pygmentLexer";
 
     /**
-     * Try part of the style initialization.
+     * The identifier of the Java Scripting engine to use.
      */
-    private static final String PY_STYLE_TRY = PY_STYLE_VARNAME + PY_TRY + PY_STYLE_VARNAME;
-
-    /**
-     * Catch part of the initialization.
-     */
-    private static final String PY_CATCH = "\nexcept ClassNotFound:\n  pass";
-
-    /**
-     * Python code to create the lexer.
-     */
-    private static final String PY_LEXER_CREATE = PY_LEXER_TRY + " = get_lexer_by_name(\"{0}\", stripnl=False)"
-        + PY_CATCH;
-
-    /**
-     * Python code to create the style.
-     */
-    private static final String PY_STYLE_CREATE = PY_STYLE_TRY + " = get_style_by_name(\"{0}\")" + PY_CATCH;
-
-    /**
-     * Python code to find the lexer from source.
-     */
-    private static final String PY_LEXER_FIND = PY_LEXER_TRY + " = guess_lexer(code, stripnl=False)" + PY_CATCH;
+    private static final String ENGINE_ID = "python";
 
     /**
      * The syntax identifier.
@@ -125,58 +98,71 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private Syntax syntax;
 
     /**
-     * The Python interpreter used to execute Pygments.
-     */
-    private PythonInterpreter pythonInterpreter;
-
-    /**
      * Used to parse Pygment token values into blocks.
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private Parser plainTextParser;
 
     /**
      * Pygments highligh parser configuration.
      */
-    @Requirement
+    @Inject
     private PygmentsParserConfiguration configuration;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
+     * The JSR223 Script Engine we use to evaluate Python scripts.
      */
-    public void initialize() throws InitializationException
-    {
-        String highlightSyntaxId = getSyntaxId() + "-highlight";
-        this.syntax = new Syntax(new SyntaxType(highlightSyntaxId, highlightSyntaxId), "1.0");
-
-        this.pythonInterpreter = new PythonInterpreter();
-
-        // imports Pygments
-        this.pythonInterpreter.exec("import pygments"
-            + "\nfrom pygments.lexers import guess_lexer"
-            + "\nfrom pygments.lexers import get_lexer_by_name"
-            + "\nfrom pygments.styles import get_style_by_name"
-            + "\nfrom pygments.util import ClassNotFound"
-            + "\nfrom pygments.formatters.xdom import XDOMFormatter");
-    }
+    private ScriptEngine engine;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.parser.Parser#getSyntax()
+     * The Python script used to manipulate Pygments.
      */
+    private String script;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+
+        // Get the script
+        InputStream is = getClass().getResourceAsStream("/pygments/code.py");
+        if (is != null) {
+            try {
+                this.script = IOUtils.toString(is, "UTF8");
+            } catch (Exception e) {
+                throw new InitializationException("Failed to read resource /pygments/code.py resource", e);
+            } finally {
+                IOUtils.closeQuietly(is);
+            }
+        } else {
+            throw new InitializationException("Failed to find resource /pygments/code.py resource");
+        }
+
+        // Get the Python engine
+        this.engine = scriptEngineManager.getEngineByName(ENGINE_ID);
+
+        if (this.engine == null) {
+            throw new InitializationException("Failed to find engine for Python script language");
+        }
+
+        String highlightSyntaxId = getSyntaxId() + "-highlight";
+        this.syntax = new Syntax(new SyntaxType(highlightSyntaxId, highlightSyntaxId), "1.0");
+    }
+
+    @Override
     public Syntax getSyntax()
     {
         return this.syntax;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.parser.HighlightParser#highlight(java.lang.String, java.io.Reader)
-     */
+    @Override
     public List<Block> highlight(String syntaxId, Reader source) throws ParseException
     {
         String code;
@@ -190,10 +176,14 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             return Collections.emptyList();
         }
 
-        List<Block> blocks = highlight(syntaxId, code);
+        List<Block> blocks;
+        try {
+            blocks = highlight(syntaxId, code);
+        } catch (ScriptException e) {
+            throw new ParseException("Failed to highlight code", e);
+        }
 
-        // TODO: there is a bug in Pygments that makes it always put a newline at the end of the content, should be
-        // fixed in Pygments 1.3.
+        // TODO: there is a bug in Pygments that makes it always put a newline at the end of the content
         if (code.charAt(code.length() - 1) != '\n' && !blocks.isEmpty()
             && blocks.get(blocks.size() - 1) instanceof NewLineBlock) {
             blocks.remove(blocks.size() - 1);
@@ -204,100 +194,33 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
 
     /**
      * Return a highlighted version of the provided content.
-     * <p>
-     * This method is synchronized because we reuse the same Jython interpreter (because recreating one eaach time would
-     * be costly) and an interpreter is not thread safe.
      * 
      * @param syntaxId the identifier of the source syntax.
      * @param code the content to highlight.
      * @return the highlighted version of the provided source.
-     * @throws ParseException the highlighting failed.
+     * @throws ScriptException when failed to execute the script
+     * @throws ParseException when failed to parse the content as plain text
      */
-    private synchronized List<Block> highlight(String syntaxId, String code) throws ParseException
+    private List<Block> highlight(String syntaxId, String code) throws ScriptException, ParseException
     {
-        PythonInterpreter interpreter = getPythonInterpreter();
         BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener(this.plainTextParser);
 
-        interpreter.set(PY_LISTENER_VARNAME, listener);
-        interpreter.set(PY_CODE_VARNAME, new PyUnicode(code));
+        ScriptContext scriptContext = new SimpleScriptContext();
 
-        // Resolve lexer
-        PyObject lexer = getLexer(syntaxId);
-        if (lexer == null || lexer == Py.None) {
-            // No lexer found
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug("no lexer found");
-            }
+        scriptContext.setAttribute(PY_LANGUAGE_VARNAME, syntaxId, ScriptContext.ENGINE_SCOPE);
+        scriptContext.setAttribute(PY_CODE_VARNAME, code, ScriptContext.ENGINE_SCOPE);
+        scriptContext.setAttribute(PY_STYLE_VARNAME, this.configuration.getStyle(), ScriptContext.ENGINE_SCOPE);
+        scriptContext.setAttribute(PY_LISTENER_VARNAME, listener, ScriptContext.ENGINE_SCOPE);
 
-            return Collections.<Block> singletonList(new VerbatimBlock(code, true));
-        }
+        this.engine.eval(this.script, scriptContext);
 
-        // Resolve style
-        PyObject style = getStyle();
-
-        if (style == null || style == Py.None) {
-            interpreter.exec(MessageFormat
-                .format("{0} = XDOMFormatter({1})", PY_FORMATTER_VARNAME, PY_LISTENER_VARNAME));
+        List<Block> blocks;
+        if (scriptContext.getAttribute(PY_LEXER_VARNAME) != null) {
+            blocks = listener.getBlocks();
         } else {
-            interpreter.exec(MessageFormat.format("{0} = XDOMFormatter({1}, style={2})", PY_FORMATTER_VARNAME,
-                PY_LISTENER_VARNAME, PY_STYLE_VARNAME));
+            blocks = this.plainTextParser.parse(new StringReader(code)).getChildren().get(0).getChildren();
         }
 
-        interpreter.exec(MessageFormat.format("pygments.highlight({0}, {1}, {2})", PY_CODE_VARNAME, PY_LEXER_VARNAME,
-            PY_FORMATTER_VARNAME));
-
-        List<String> vars = Arrays.asList(PY_LISTENER_VARNAME, PY_CODE_VARNAME, PY_LEXER_VARNAME, PY_FORMATTER_VARNAME);
-        for (String var : vars) {
-            interpreter.exec("del " + var);
-        }
-
-        return listener.getBlocks();
-    }
-
-    /**
-     * Resolve lexer from provided language identifier.
-     * 
-     * @param language the source language
-     * @return the lexer, null or Py.None if none can be found
-     */
-    private PyObject getLexer(String language)
-    {
-        PythonInterpreter interpreter = getPythonInterpreter();
-
-        if (!StringUtils.isEmpty(language)) {
-            interpreter.exec(MessageFormat.format(PY_LEXER_CREATE, language));
-        } else {
-            interpreter.exec(PY_LEXER_FIND);
-        }
-
-        return interpreter.get(PY_LEXER_VARNAME);
-    }
-
-    /**
-     * Resolve style to use to highlight the source.
-     * 
-     * @return the style object
-     */
-    private PyObject getStyle()
-    {
-        PythonInterpreter interpreter = getPythonInterpreter();
-
-        String style = this.configuration.getStyle();
-
-        if (style != null) {
-            interpreter.exec(MessageFormat.format(PY_STYLE_CREATE, style));
-
-            return interpreter.get(PY_STYLE_VARNAME);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @return the python interpreter.
-     */
-    protected PythonInterpreter getPythonInterpreter()
-    {
-        return this.pythonInterpreter;
+        return blocks;
     }
 }

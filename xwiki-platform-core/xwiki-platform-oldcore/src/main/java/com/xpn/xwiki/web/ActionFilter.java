@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -33,10 +32,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.internal.web.XWikiConfigurationService;
 
 /**
  * <p>
@@ -64,7 +64,7 @@ import com.xpn.xwiki.XWiki;
 public class ActionFilter implements Filter
 {
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(ActionFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActionFilter.class);
 
     /** The query property name prefix that indicates the target action. */
     private static final String ACTION_PREFIX = "action_";
@@ -84,22 +84,14 @@ public class ActionFilter implements Filter
      */
     private ServletContext servletContext;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#init(FilterConfig)
-     */
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
         this.servletContext = filterConfig.getServletContext();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-     */
     @SuppressWarnings("unchecked")
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException
     {
@@ -114,7 +106,7 @@ public class ActionFilter implements Filter
                     String targetURL = getTargetURL(hrequest, parameter);
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
                     if (dispatcher != null) {
-                        LOG.debug("Forwarding request to " + targetURL);
+                        LOGGER.debug("Forwarding request to " + targetURL);
                         request.setAttribute(ATTRIBUTE_ACTION_DISPATCHED, "true");
                         dispatcher.forward(hrequest, response);
                         // Allow multiple calls to this filter as long as they are not nested.
@@ -129,11 +121,7 @@ public class ActionFilter implements Filter
         chain.doFilter(request, response);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Filter#destroy()
-     */
+    @Override
     public void destroy()
     {
         // No finalization needed.
@@ -171,7 +159,7 @@ public class ActionFilter implements Filter
         int index = path.indexOf(PATH_SEPARATOR, 1);
 
         // We need to also get rid of the wiki name in case of a XEM in usepath mode
-        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "0", this.servletContext))) {
+        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "1", this.servletContext))) {
             if (servletPath.equals(PATH_SEPARATOR
                 + XWikiConfigurationService.getProperty("xwiki.virtual.usepath.servletpath", "wiki",
                     this.servletContext))) {

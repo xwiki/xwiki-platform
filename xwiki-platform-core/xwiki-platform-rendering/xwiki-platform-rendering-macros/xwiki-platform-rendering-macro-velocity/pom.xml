@@ -27,11 +27,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
   <name>XWiki Platform - Rendering - Macro - Velocity</name>
-  <description>XWiki Platform - Rendering - Macro - Velocity</description>
+  <description>Executes a Velocity script and apply current page parser on the result</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Velocity Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -43,17 +48,10 @@
       <artifactId>xwiki-commons-velocity</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-test</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
@@ -66,8 +64,14 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -90,16 +94,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <!-- Since we currently need the HTML macro for testing the Velocity macro we need to ensure that the
-           enforcer plugin doesn't make the build fail. Note that it would be nice if the enforcer plugin
-           could support banned dependencies for a given scope. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <configuration>
-          <fail>false</fail>
-        </configuration>
       </plugin>
     </plugins>
   </build>

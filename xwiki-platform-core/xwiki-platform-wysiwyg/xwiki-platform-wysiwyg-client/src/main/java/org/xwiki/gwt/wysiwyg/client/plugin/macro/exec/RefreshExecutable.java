@@ -19,13 +19,13 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.macro.exec;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 import org.xwiki.gwt.user.client.Console;
 import org.xwiki.gwt.user.client.ui.LoadingPanel;
 import org.xwiki.gwt.user.client.ui.rta.Reloader;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.SelectionPreserver;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
@@ -37,7 +37,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  * @version $Id$
  */
-public class RefreshExecutable extends AbstractSelectionExecutable
+public class RefreshExecutable extends AbstractSelectionExecutable implements AsyncCallback<Object>
 {
     /**
      * The command used to notify all the plug-ins that the content of the rich text area is about to be submitted.
@@ -60,6 +60,11 @@ public class RefreshExecutable extends AbstractSelectionExecutable
     private final Reloader reloader;
 
     /**
+     * The object used to restore the default selection after the rich text area content is reloaded.
+     */
+    private final SelectionPreserver selectionPreserver;
+
+    /**
      * Creates a new executable that can be used to refresh the specified rich text area. We use a {@link Reloader} to
      * submit the content of the rich text area to the given URL and then use the response to reset the content of the
      * rich text area.
@@ -71,6 +76,7 @@ public class RefreshExecutable extends AbstractSelectionExecutable
     {
         super(rta);
         reloader = new Reloader(rta, url);
+        selectionPreserver = new SelectionPreserver(rta);
     }
 
     /**
@@ -103,29 +109,33 @@ public class RefreshExecutable extends AbstractSelectionExecutable
      */
     private void refresh(String html)
     {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("html", html);
+        reloader.reload(Collections.singletonMap("html", html), this);
+    }
 
-        reloader.reload(params, new AsyncCallback<Object>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                Console.getInstance().error(caught.getLocalizedMessage());
-                // Try to focus the rich text area.
-                rta.setFocus(true);
-                waiting.stopLoading();
-            }
+    @Override
+    public void onFailure(Throwable caught)
+    {
+        Console.getInstance().error(caught.getLocalizedMessage());
+        // Try to focus the rich text area.
+        rta.setFocus(true);
+        waiting.stopLoading();
+    }
 
-            public void onSuccess(Object result)
-            {
-                // Reset the content of the rich text area.
-                rta.getCommandManager().execute(RESET);
-                // Store the initial value of the rich text area in case it is submitted without gaining focus.
-                rta.getCommandManager().execute(SUBMIT, true);
-                // Try to focus the rich text area.
-                rta.setFocus(true);
-                waiting.stopLoading();
-            }
-        });
+    @Override
+    public void onSuccess(Object result)
+    {
+        // Restore the default selection.
+        // Note: We haven't saved the selection before reloading the content because the current implementation of
+        // SelectionPreserver can't save the selection across reloads: it stores references to DOM nodes which are
+        // replaced after the content is reloaded. We use the selection preserver just to be able to restore the default
+        // selection in a consistent manner (without duplicating code).
+        selectionPreserver.restoreSelection();
+        // Reset the content of the rich text area.
+        rta.getCommandManager().execute(RESET);
+        // Store the initial value of the rich text area in case it is submitted without gaining focus.
+        rta.getCommandManager().execute(SUBMIT, true);
+        // Try to focus the rich text area.
+        rta.setFocus(true);
+        waiting.stopLoading();
     }
 }

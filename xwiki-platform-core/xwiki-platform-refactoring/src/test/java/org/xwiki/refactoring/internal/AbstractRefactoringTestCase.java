@@ -24,7 +24,7 @@ import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Common code for all refactoring unit tests.
@@ -63,7 +63,7 @@ public class AbstractRefactoringTestCase extends AbstractComponentTestCase
             allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(false));
         }});
 
-        this.docBridge = getComponentManager().lookup(DocumentAccessBridge.class, "default");
-        this.xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
+        this.docBridge = getComponentManager().getInstance(DocumentAccessBridge.class, "default");
+        this.xwikiParser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
     }
 }

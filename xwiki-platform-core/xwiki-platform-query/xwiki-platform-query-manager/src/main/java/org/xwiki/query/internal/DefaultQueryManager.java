@@ -19,8 +19,10 @@
  */
 package org.xwiki.query.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.QueryExecutorManager;
 
 /**
@@ -30,17 +32,16 @@ import org.xwiki.query.QueryExecutorManager;
  * @since 1.6M1
  */
 @Component
+@Singleton
 public class DefaultQueryManager extends AbstractQueryManager
 {
     /**
      * {@link QueryExecutorManager} for execute Queries.
      */
-    @Requirement
+    @Inject
     protected QueryExecutorManager queryExecutorManager;
 
-    /**
-     * @return {@link QueryExecutorManager}
-     */
+    @Override
     protected QueryExecutorManager getQueryExecutorManager()
     {
         return this.queryExecutorManager;

@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.stats.impl;
 
 import java.net.MalformedURLException;
@@ -33,11 +31,10 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -59,7 +56,7 @@ public final class StatsUtil
     /**
      * Logging tools.
      */
-    private static final Log LOG = LogFactory.getLog(StatsUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatsUtil.class);
 
     /**
      * Default separator for a list.
@@ -440,15 +437,15 @@ public final class StatsUtil
             try {
                 visitStats = findVisitByCookie(cookie.getValue(), context);
             } catch (XWikiException e) {
-                LOG.error("Failed to find visit by cookie", e);
+                LOGGER.error("Failed to find visit by cookie", e);
             }
         } else {
             try {
                 String ip = request.getRemoteAddr();
                 String ua = request.getHeader(REQPROP_USERAGENT);
-                visitStats = findVisitByIPUA(ip + ua, context);
+                visitStats = findVisitByIPUA(computeUniqueID(ip, ua), context);
             } catch (XWikiException e) {
-                LOG.error("Failed to find visit by unique id", e);
+                LOGGER.error("Failed to find visit by unique id", e);
             }
         }
 
@@ -479,8 +476,8 @@ public final class StatsUtil
                 // Let's log a message here
                 // Since the session is also maintained using a cookie
                 // then there is something wrong here
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Found visit with cookie " + visitObject.getCookie() + " in session " + session.getId()
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Found visit with cookie " + visitObject.getCookie() + " in session " + session.getId()
                         + " for request with cookie " + cookie.getValue());
                 }
 
@@ -489,7 +486,7 @@ public final class StatsUtil
                 // If session is longer than 30 minutes we should invalidate it
                 // and create a new one
                 valid = false;
-            } else if (visitObject != null && !context.getUser().equals(visitObject.getName())) {
+            } else if (!context.getUser().equals(visitObject.getName())) {
                 // If the user is not the same, we should invalidate the session
                 // and create a new one
                 valid = false;
@@ -527,7 +524,7 @@ public final class StatsUtil
         if (newcookie) {
             // We cannot yet ID the user using the cookie
             // we need to use the IP and UA
-            uniqueID = ip + ua;
+            uniqueID = computeUniqueID(ip, ua);
         } else {
             // In this case we got the cookie from the request
             // so we id the user using the cookie
@@ -538,6 +535,21 @@ public final class StatsUtil
         visitStats.setEndDate(nowDate);
 
         return visitStats;
+    }
+
+    /**
+     * Compute the unique id for stat visits.
+     * <p/>
+     * TODO: In the future, replace this with a unique random number since this algorithm is not good enough; for
+     * example users in the same company behind a company firewall may get the same IP and same user agent...
+     *
+     * @param ip the IP address of the user
+     * @param ua the user agent of the user
+     * @return the unique ID, limited to 255 characters since that's the max size of the field in the DB
+     */
+    private static String computeUniqueID(String ip, String ua)
+    {
+        return StringUtils.substring(ip + ua, 0, 255);
     }
 
     /**
@@ -570,7 +582,7 @@ public final class StatsUtil
                         .bindValue("fieldName", fieldName).bindValue(sfieldValue, fieldValue)
                         .bindValue(sdate, currentDate).execute();
             } catch (Exception e) {
-                LOG.error("Failed to search visit object in the jcr store from cookie name", e);
+                LOGGER.error("Failed to search visit object in the jcr store from cookie name", e);
             }
         } else if (qm.hasLanguage(Query.HQL)) {
             try {
@@ -580,13 +592,13 @@ public final class StatsUtil
                             + " order by obj.endDate desc", Query.HQL).bindValue(sfieldValue, fieldValue)
                         .bindValue(sdate, currentDate).execute();
             } catch (Exception e) {
-                LOG.error("Failed to search visit object in the database from " + fieldName, e);
+                LOGGER.error("Failed to search visit object in the database from " + fieldName, e);
             }
         } else {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException("The current storage engine does not support querying statistics");
         }
         if (solist != null && solist.size() > 0) {
-            visitStats = (VisitStats) solist.get(0);
+            visitStats = solist.get(0);
         }
 
         return visitStats;
@@ -651,8 +663,8 @@ public final class StatsUtil
             cookie.setDomain(cookieDomain);
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName() + " with domain "
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName() + " with domain "
                 + cookie.getDomain() + " and path " + cookie.getPath() + " and maxage " + cookie.getMaxAge());
         }
 

@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Tests the {@link org.xwiki.annotation.internal.content.SpaceNormalizerContentAlterer}.
@@ -64,16 +64,11 @@ public class SpaceNormalizerContentAltererTest extends AbstractComponentTestCase
         this.altered = altered;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        alterer = getComponentManager().lookup(ContentAlterer.class, "space-normalizer");
+        alterer = getComponentManager().getInstance(ContentAlterer.class, "space-normalizer");
     }
 
     /**

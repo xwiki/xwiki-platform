@@ -16,13 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -34,7 +32,9 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole()
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have
+// Serializer<R, P extends R>. Changing it will thus break all code looking up components implementing this role.
+@ComponentRole
 public interface Serializer<R, P extends R>
 {
     /**
@@ -43,8 +43,8 @@ public interface Serializer<R, P extends R>
      * @param stream an InputStream to parse.
      * @return a new object made by parsing the stream.
      * @throws IOException if the InputStream does not contain the type of object
-     *                     handled by this serializer, the object was serialized with
-     *                     a different Serializer, or something goes wrong along the way.
+     * handled by this serializer, the object was serialized with
+     * a different Serializer, or something goes wrong along the way.
      */
     P parse(final InputStream stream) throws IOException;
 

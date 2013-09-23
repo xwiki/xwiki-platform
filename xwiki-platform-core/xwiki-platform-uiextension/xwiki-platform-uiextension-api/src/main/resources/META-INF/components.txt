@@ -1,0 +1,9 @@
+org.xwiki.uiextension.internal.filter.ExcludeFilter
+org.xwiki.uiextension.internal.filter.SelectFilter
+org.xwiki.uiextension.internal.filter.SortByCustomOrderFilter
+org.xwiki.uiextension.internal.filter.SortByIdFilter
+org.xwiki.uiextension.internal.filter.SortByParameterFilter
+org.xwiki.uiextension.internal.DefaultUIExtensionManager
+org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder
+org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilderEventListener
+org.xwiki.uiextension.internal.scripting.UIExtensionScriptService

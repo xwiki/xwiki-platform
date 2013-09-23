@@ -16,29 +16,34 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render.macro;
 
 import org.radeox.filter.context.FilterContext;
 import org.radeox.macro.code.SourceCodeFormatter;
 
-public class WikiCodeFilter implements SourceCodeFormatter {
+public class WikiCodeFilter implements SourceCodeFormatter
+{
+    public WikiCodeFilter()
+    {
+    }
 
-  public WikiCodeFilter() {
-  }
+    @Override
+    public String getName()
+    {
+        return "wiki";
+    }
 
-  public String getName() {
-    return "wiki";
-  }
-
-  public int getPriority() {
+    @Override
+    public int getPriority()
+    {
         return 0;
     }
 
-  public String filter(String input, FilterContext context) {
-      return input;
-  }
+    @Override
+    public String filter(String input, FilterContext context)
+    {
+        return input;
+    }
 
 }

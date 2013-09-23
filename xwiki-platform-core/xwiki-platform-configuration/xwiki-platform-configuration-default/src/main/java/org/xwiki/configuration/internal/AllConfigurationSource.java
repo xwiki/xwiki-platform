@@ -36,7 +36,7 @@ import org.xwiki.configuration.ConfigurationSource;
  *   <li>wiki preferences wiki page</li>
  *   <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
- * Should be used when a configuration can be overriden by the user in his/her profile.
+ * Should be used when a configuration can be overridden by the user in his/her profile.
  * 
  * @version $Id$
  * @since 2.0M2
@@ -62,11 +62,7 @@ public class AllConfigurationSource extends CompositeConfigurationSource impleme
     @Named("user")
     private ConfigurationSource userPreferencesSource;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // First source is searched first when a property value is requested.

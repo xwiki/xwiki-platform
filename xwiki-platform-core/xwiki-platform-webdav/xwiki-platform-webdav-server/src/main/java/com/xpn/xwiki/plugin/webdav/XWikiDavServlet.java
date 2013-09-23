@@ -86,9 +86,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
      */
     private transient DavSessionProvider sessionProvider;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init() throws ServletException
     {
         super.init();
@@ -97,9 +95,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
         setDavSessionProvider(new XWikiDavSessionProvider());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
@@ -146,9 +142,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected boolean execute(WebdavRequest request, WebdavResponse response, int method,
         DavResource resource) throws ServletException, IOException, DavException
     {        
@@ -156,65 +150,49 @@ public class XWikiDavServlet extends AbstractWebdavServlet
         return super.execute(request, response, method, resource);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected boolean isPreconditionValid(WebdavRequest request, DavResource resource)
     {
         return !resource.exists() || request.matchesIfHeader(resource);
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getAuthenticateHeaderValue()
     {
         return "Basic realm=\"XWiki Webdav Server\"";
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavLocatorFactory getLocatorFactory()
     {        
         return this.locatorFactory;
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setLocatorFactory(DavLocatorFactory locatorFactory)
     {
         this.locatorFactory = locatorFactory;
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceFactory getResourceFactory()
     {        
         return this.resourceFactory;
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setResourceFactory(DavResourceFactory resourceFactory)
     {
         this.resourceFactory = resourceFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public synchronized DavSessionProvider getDavSessionProvider()
     {        
         return this.sessionProvider;
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public synchronized void setDavSessionProvider(DavSessionProvider sessionProvider)
     {
         this.sessionProvider = sessionProvider;

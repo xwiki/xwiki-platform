@@ -27,16 +27,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.artofsolving.jodconverter.document.DocumentFamily;
+import org.artofsolving.jodconverter.document.DocumentFormat;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -47,30 +55,40 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultOfficeViewer extends AbstractOfficeViewer
 {
     /**
-     * File extensions corresponding to presentation office documents.
-     */
-    private static final List<String> PRESENTATION_FORMATS = Arrays.asList("ppt", "pptx", "odp");
-
-    /**
      * Used to build XDOM documents from office documents.
      */
-    @Requirement
+    @Inject
     private XDOMOfficeDocumentBuilder documentBuilder;
 
     /**
      * Used to build XDOM documents from office presentations.
      */
-    @Requirement
+    @Inject
     private PresentationBuilder presentationBuilder;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractOfficeViewer#createOfficeDocumentView(AttachmentReference, Map)
+     * Used to access the document converter.
      */
+    @Inject
+    private OfficeServer officeServer;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * Note that currently only the {@code filterStyles} parameter is supported and if "true" it means that styles will
+     * be filtered to the maximum and the focus will be put on importing only the content.
+     */
+    @Override
     protected OfficeDocumentView createOfficeDocumentView(AttachmentReference attachmentReference,
         Map<String, String> parameters) throws Exception
     {
@@ -96,7 +114,7 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
     {
         // Process all image blocks.
         Set<File> temporaryFiles = new HashSet<File>();
-        List<ImageBlock> imgBlocks = xdom.getChildrenByType(ImageBlock.class, true);
+        List<ImageBlock> imgBlocks = xdom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
         for (ImageBlock imgBlock : imgBlocks) {
             String imageReference = imgBlock.getReference().getReference();
 
@@ -104,12 +122,12 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
             if (artifacts.containsKey(imageReference)) {
                 try {
                     // Write the image into a temporary file.
-                    File tempFile =
-                        saveTemporaryFile(attachmentReference, imageReference, artifacts.get(imageReference));
+                    File tempFile = getTemporaryFile(attachmentReference, imageReference);
+                    createTemporaryFile(tempFile, artifacts.get(imageReference));
 
                     // Create a URL image reference which links to above temporary image file.
                     ResourceReference urlImageReference =
-                        new ResourceReference(buildURL(attachmentReference, tempFile.getName()), ResourceType.URL);
+                        new ResourceReference(buildURL(attachmentReference, imageReference), ResourceType.URL);
                     // XWiki 2.0 doesn't support typed image references. Note that the URL is absolute.
                     urlImageReference.setTyped(false);
 
@@ -121,7 +139,7 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
                     temporaryFiles.add(tempFile);
                 } catch (Exception ex) {
                     String message = "Error while processing artifact image [%s].";
-                    getLogger().error(String.format(message, imageReference), ex);
+                    this.logger.error(String.format(message, imageReference), ex);
                 }
             }
         }
@@ -133,7 +151,9 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
      * Creates a {@link XDOM} representation of the specified office attachment.
      * 
      * @param attachmentReference a reference to the office file to be parsed into XDOM
-     * @param parameters build parameters
+     * @param parameters the build parameters. Note that currently only {@code filterStyles} is supported and if "true"
+     *        it means that styles will be filtered to the maximum and the focus will be put on importing only the
+     *        content
      * @return the {@link XDOMOfficeDocument} corresponding to the specified office file
      * @throws Exception if building the XDOM fails
      */
@@ -160,6 +180,11 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
     private boolean isPresentation(String fileName)
     {
         String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-        return PRESENTATION_FORMATS.contains(extension);
+        OfficeConverter officeConverter = officeServer.getConverter();
+        if (officeConverter != null) {
+            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
+            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+        }
+        return false;
     }
 }

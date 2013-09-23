@@ -41,11 +41,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractJob implements Job
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
-     */
+    @Override
     public final void execute(JobExecutionContext jobContext) throws JobExecutionException
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
@@ -57,15 +53,15 @@ public abstract class AbstractJob implements Job
         // Init execution context
         Execution execution;
         try {
-            ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
-            execution = (Execution) Utils.getComponent(Execution.class);
+            ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+            execution = Utils.getComponent(Execution.class);
 
-            ExecutionContext ec = new ExecutionContext();
+            ExecutionContext context = new ExecutionContext();
+
             // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", xwikiContext);
+            context.setProperty("xwikicontext", xwikiContext);
 
-            ecim.initialize(ec);
-            execution.setContext(ec);
+            ecim.initialize(context);
         } catch (ExecutionContextException e) {
             throw new JobExecutionException("Fail to initialize execution context", e);
         }

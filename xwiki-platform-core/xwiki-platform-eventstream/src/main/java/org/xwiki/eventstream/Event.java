@@ -16,12 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.eventstream;
 
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -45,7 +45,8 @@ import org.xwiki.model.reference.WikiReference;
  * Events contain:
  * <ul>
  * <li>a {@link #getTitle() title}</li>
- * <li>and a {@link #getBody() body}</li>
+ * <li>a {@link #getBody() body}</li>
+ * <li>and a map of {@link #getParameters() parameters}</li>
  * </ul>
  * </p>
  * <p>
@@ -333,4 +334,15 @@ public interface Event
      * @see #getDocumentTitle()
      */
     void setDocumentTitle(String title);
+    
+    /**
+     * @return the named parameters associated with this event as key/value pairs.
+     */
+    Map<String, String> getParameters();
+
+    /**
+     * @param parameters the parameters to associate to the event.
+     * @see #getParameters()
+     */
+    void setParameters(Map<String, String> parameters);
 }

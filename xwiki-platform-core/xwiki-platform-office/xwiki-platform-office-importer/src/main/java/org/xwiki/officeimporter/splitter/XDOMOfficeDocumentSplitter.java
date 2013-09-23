@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.splitter;
 
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -32,7 +32,7 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
  * @version $Id$
  * @since 2.1M1
  */
-@ComponentRole
+@Role
 public interface XDOMOfficeDocumentSplitter
 {
     /**
@@ -42,18 +42,18 @@ public interface XDOMOfficeDocumentSplitter
      * 
      * @param xdomOfficeDocument {@link XDOMOfficeDocument} to be split.
      * @param headingLevelsToSplit heading levels (1..6) to be used as boundaries. The split process is recursive, if
-     *            there are multiple heading levels specified, the original document will be split from the highest
-     *            heading level (lowest value >= 1) first and then the resulting office documents will be re-split from
-     *            the next highest heading level.
+     *        there are multiple heading levels specified, the original document will be split from the highest heading
+     *        level (lowest value >= 1) first and then the resulting office documents will be re-split from the next
+     *        highest heading level.
      * @param namingCriterionHint naming criterion to be used when producing target page names for the newly split
-     *            documents. Currently three schemes are supported:
-     *            <ul>
-     *            <li>headingNames - Uses the first heading name as target document name.</li>
-     *            <li>mainPageNameAndHeading - Base document name followed by heading name.</li>
-     *            <li>mainPageNameAndNumbering - Base document name followed by index.</li>
-     *            </ul>
+     *        documents. Currently three schemes are supported:
+     *        <ul>
+     *        <li>headingNames - Uses the first heading name as target document name.</li>
+     *        <li>mainPageNameAndHeading - Base document name followed by heading name.</li>
+     *        <li>mainPageNameAndNumbering - Base document name followed by index.</li>
+     *        </ul>
      * @param baseDocumentReference base (root) page name to be used when generating target page names for child (newly
-     *            split) documents.
+     *        split) documents.
      * @return a map of page descriptors vs xdom office documents. Each page descriptor describes the target wiki page
      *         name for the corresponding xdom office document.
      * @throws OfficeImporterException if an error occurs while splitting.

@@ -42,7 +42,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Tests the annotation maintainer that updates annotations when documents change.
@@ -182,24 +182,14 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
         return files;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
-     */
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
 
-        annotationMaintainer = getComponentManager().lookup(AnnotationMaintainer.class);
+        annotationMaintainer = getComponentManager().getInstance(AnnotationMaintainer.class);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractComponentTestCase#registerComponents()
-     */
     @Override
     protected void registerComponents() throws Exception
     {
@@ -215,7 +205,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
         // register
         DefaultComponentDescriptor<EntityReferenceSerializer> ersDesc =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        ersDesc.setRole(EntityReferenceSerializer.class);
+        ersDesc.setRoleType(EntityReferenceSerializer.TYPE_STRING);
         getComponentManager().registerComponent(ersDesc, serializerMock);
         // and setup the mock
         setup.getMockery().checking(new Expectations()

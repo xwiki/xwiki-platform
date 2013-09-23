@@ -29,6 +29,9 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.exec.InsertExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.exec.RefreshExecutable;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+
 /**
  * WYSIWYG editor plug-in for inserting macros and for editing macro parameters.
  * 
@@ -127,13 +130,22 @@ public class MacroPlugin extends AbstractPlugin
         }
         getTextArea().getCommandManager().registerCommand(COLLAPSE, new CollapseExecutable(selector, true));
         getTextArea().getCommandManager().registerCommand(EXPAND, new CollapseExecutable(selector, false));
-        getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector));
+        getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector, macroService, config));
 
         saveRegistrations(shortcutKeyManager.addHandlers(getTextArea()));
         saveRegistrations(macroControler.addHadlers());
 
         menuExtension = new MacroMenuExtension(this);
-        getUIExtensionList().add(menuExtension.getExtension());
+        getUIExtensionList().add(menuExtension);
+        // Hack: We can access the menus where each menu item was placed only after the main menu bar is initialized,
+        // which happens after all the plugins are loaded.
+        Scheduler.get().scheduleDeferred(new ScheduledCommand()
+        {
+            public void execute()
+            {
+                menuExtension.registerAttachHandlers();
+            }
+        });
 
         toolBarExtension = new MacroToolBarExtension(this);
         if (toolBarExtension.getExtension().getFeatures().length > 0) {
@@ -148,7 +160,7 @@ public class MacroPlugin extends AbstractPlugin
      */
     public void destroy()
     {
-        menuExtension.destroy();
+        menuExtension.clearFeatures();
         toolBarExtension.destroy();
         shortcutKeyManager.clear();
 

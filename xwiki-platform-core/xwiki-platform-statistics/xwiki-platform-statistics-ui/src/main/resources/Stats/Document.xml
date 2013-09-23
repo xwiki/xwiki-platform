@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Stats</web>
+  <name>Document</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Stats.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1195803878000</creationDate>
+  <date>1196153827000</date>
+  <contentUpdateDate>1196153827000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render("xe.statistics.document")</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="Stats.Macros" /}}
+
+{{velocity}}
+{{html wiki="true"}}
+#if ($xwiki.statsService.enabledForCurrentWiki)
+  #displayPanelLayout(2 ['Stats.MostViewedPages', 'Stats.MostEditedPages', 'Stats.MostViewedSpaces', 'Stats.MostEditedSpaces'])
+#else
+  #printStatisticsDisabled()
+#end
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

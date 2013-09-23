@@ -16,9 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -50,17 +52,23 @@ public class PropAddAction extends XWikiAction
         String propName = ((PropAddForm) form).getPropName();
 
         if (!Util.isValidXMLElementName(propName)) {
-            context.put("message", "propertynamenotcorrect");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST, context.getMessageTool().get(
-                "propertynamenotcorrect"));
+            context.put("message", "action.addClassProperty.error.invalidName");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
+                context.getMessageTool().get("action.addClassProperty.error.invalidName"));
             return true;
         }
 
         String propType = ((PropAddForm) form).getPropType();
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(doc.getFullName());
         if (bclass.get(propName) != null) {
-            // TODO: handle the error of the property already existing when we want to add a class property
+            context.put("message", "action.addClassProperty.error.alreadyExists");
+            List<String> parameters = new ArrayList<String>();
+            parameters.add(propName);
+            context.put("messageParameters", parameters);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
+                context.getMessageTool().get("action.addClassProperty.error.alreadyExists", parameters));
+            return true;
         } else {
             MetaClass mclass = xwiki.getMetaclass();
             PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);
@@ -70,10 +78,9 @@ public class PropAddAction extends XWikiAction
                 pclass.setName(propName);
                 pclass.setPrettyName(propName);
                 bclass.put(propName, pclass);
-                String username = context.getUser();
-                doc.setAuthor(username);
+                doc.setAuthorReference(context.getUserReference());
                 if (doc.isNew()) {
-                    doc.setCreator(username);
+                    doc.setCreatorReference(context.getUserReference());
                 }
                 doc.setMetaDataDirty(true);
                 xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addClassProperty"), true, context);

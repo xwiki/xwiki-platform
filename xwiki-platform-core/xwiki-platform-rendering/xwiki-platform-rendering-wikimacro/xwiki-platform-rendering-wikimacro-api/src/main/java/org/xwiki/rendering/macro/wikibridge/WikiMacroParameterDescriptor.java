@@ -91,61 +91,44 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
         this.defaultValue = defaultValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getId()
     {
         return this.id;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getName()
-     */
+    @Override
     public String getName()
     {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDescription()
     {
         return this.description;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    @Deprecated
     public Class< ? > getType()
     {
         return String.class;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getParameterType()
-     */
+    @Override
     public Type getParameterType()
     {
         return getType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Object getDefaultValue()
     {
         return this.defaultValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isMandatory()
     {
         return mandatory;

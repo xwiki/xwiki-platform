@@ -34,11 +34,10 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 
 /**
- * Starts/Stop XWiki before/after all tests and run all tests found in the current classloader using
- * <a href="http://www.johanneslink.net/projects/cpsuite.jsp">cpsuite</a> (we extend it).
- *
- * Tests can be filtered by passing the "pattern" System Property.
- *
+ * Starts/Stop XWiki before/after all tests and run all tests found in the current classloader using <a
+ * href="http://www.johanneslink.net/projects/cpsuite.jsp">cpsuite</a> (we extend it). Tests can be filtered by passing
+ * the "pattern" System Property.
+ * 
  * @version $Id$
  * @since 3.0RC1
  */
@@ -48,26 +47,38 @@ public class XWikiExecutorSuite extends ClasspathSuite
 
     private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
 
-    public XWikiExecutorSuite(Class<?> klass, RunnerBuilder builder) throws InitializationError
+    public XWikiExecutorSuite(Class< ? > klass, RunnerBuilder builder) throws InitializationError
     {
         super(klass, builder);
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
-    public @interface Executors {
+    public @interface Executors
+    {
+        /**
+         * @return the number of executors to run
+         */
         public int value() default 1;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public static @interface Initialized
+    public static @interface PreStart
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public static @interface PostStart
+    {
+    }
+
+    public List<XWikiExecutor> getExecutors()
+    {
+        return this.executors;
+    }
+
     @Override
     protected List<Runner> getChildren()
     {
@@ -84,10 +95,9 @@ public class XWikiExecutorSuite extends ClasspathSuite
     }
 
     /**
-     * {@inheritDoc}
+     * Called before test execution.
      */
-    @Override
-    public void run(RunNotifier notifier)
+    protected void beforeTests()
     {
         // Construct as many executors as specified in the Executors annotation or 1 if annotation is not present.
         int executorNb = 1;
@@ -100,18 +110,18 @@ public class XWikiExecutorSuite extends ClasspathSuite
             this.executors.add(new XWikiExecutor(i));
         }
 
-        // Callback to setup executors in the suite class.
+        // Callback to setup executors in the suite class before containers are started
         try {
             for (Method method : getTestClass().getJavaClass().getMethods()) {
-                Initialized initializedAnnotation = method.getAnnotation(Initialized.class);
-                if (initializedAnnotation != null) {
+                PreStart preStartAnnotation = method.getAnnotation(PreStart.class);
+                if (preStartAnnotation != null) {
                     // Call it!
                     Object instance = getTestClass().getJavaClass().newInstance();
                     method.invoke(instance, this.executors);
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize XWiki Executors", e);
+            throw new RuntimeException("Failed to initialize XWiki Executors before start", e);
         }
 
         try {
@@ -122,16 +132,47 @@ public class XWikiExecutorSuite extends ClasspathSuite
             throw new RuntimeException("Failed to start XWiki", e);
         }
 
+        // Callback to setup executors in the suite class after containers have been started
+        try {
+            for (Method method : getTestClass().getJavaClass().getMethods()) {
+                PostStart postStartAnnotation = method.getAnnotation(PostStart.class);
+                if (postStartAnnotation != null) {
+                    // Call it!
+                    Object instance = getTestClass().getJavaClass().newInstance();
+                    method.invoke(instance, this.executors);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize XWiki Executors after start", e);
+        }
+    }
+
+    /**
+     * Called after test execution.
+     */
+    protected void afterTests()
+    {
+        try {
+            for (XWikiExecutor executor : this.executors) {
+                executor.stop();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to stop XWiki", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void run(RunNotifier notifier)
+    {
+        beforeTests();
+
         try {
             super.run(notifier);
         } finally {
-            try {
-                for (XWikiExecutor executor : this.executors) {
-                    executor.stop();
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to stop XWiki", e);
-            }
+            afterTests();
         }
     }
 }

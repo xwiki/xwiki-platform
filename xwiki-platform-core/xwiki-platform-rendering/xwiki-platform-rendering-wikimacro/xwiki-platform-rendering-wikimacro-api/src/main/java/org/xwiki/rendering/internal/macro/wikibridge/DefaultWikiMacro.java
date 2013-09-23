@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
@@ -107,6 +109,11 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     private DocumentReference macroDocumentReference;
 
     /**
+     * User to be used to check rights for the macro.
+     */
+    private DocumentReference macroAuthor;
+
+    /**
      * Whether this macro supports inline mode or not.
      */
     private boolean supportsInlineMode;
@@ -137,10 +144,12 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
      * @param componentManager {@link ComponentManager} component used to look up for other components.
      * @since 2.3M1
      */
-    public DefaultWikiMacro(DocumentReference macroDocumentReference, boolean supportsInlineMode,
-        MacroDescriptor descriptor, XDOM macroContent, Syntax syntax, ComponentManager componentManager)
+    public DefaultWikiMacro(DocumentReference macroDocumentReference, DocumentReference macroAuthor,
+        boolean supportsInlineMode, MacroDescriptor descriptor, XDOM macroContent, Syntax syntax,
+        ComponentManager componentManager)
     {
         this.macroDocumentReference = macroDocumentReference;
+        this.macroAuthor = macroAuthor;
         this.supportsInlineMode = supportsInlineMode;
         this.descriptor = descriptor;
         this.content = macroContent;
@@ -148,11 +157,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         this.componentManager = componentManager;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(WikiMacroParameters parameters, String macroContent, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -171,7 +176,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         // Extension point to add more wiki macro bindings
         try {
             List<WikiMacroBindingInitializer> bindingInitializers =
-                this.componentManager.lookupList(WikiMacroBindingInitializer.class);
+                this.componentManager.getInstanceList(WikiMacroBindingInitializer.class);
 
             for (WikiMacroBindingInitializer bindingInitializer : bindingInitializers) {
                 bindingInitializer.initialize(this.macroDocumentReference, parameters, macroContent, context,
@@ -184,25 +189,31 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         // Execute the macro
         ObservationManager observation = null;
         try {
-            observation = this.componentManager.lookup(ObservationManager.class);
+            observation = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             // TODO: maybe log something
         }
 
         try {
-            Transformation macroTransformation = this.componentManager.lookup(Transformation.class, MACRO_HINT);
+            Transformation macroTransformation = this.componentManager.getInstance(Transformation.class, MACRO_HINT);
 
             // Place macro context inside xwiki context ($context.macro).
-            Execution execution = this.componentManager.lookup(Execution.class);
+            Execution execution = this.componentManager.getInstance(Execution.class);
             Map<String, Object> xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
             xwikiContext.put(MACRO_KEY, macroBinding);
 
             MacroBlock wikiMacroBlock = context.getCurrentMacroBlock();
+
             MacroMarkerBlock wikiMacroMarker =
                 new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(),
                     wikiMacroBlock.getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
+
+            // make sure to use provided metadatas
+            MetaDataBlock metaDataBlock =
+                new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
+
             // otherwise the inner macros will not be able to access the parent DOM
-            wikiMacroMarker.setParent(wikiMacroBlock.getParent());
+            metaDataBlock.setParent(wikiMacroBlock.getParent());
 
             if (observation != null) {
                 observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
@@ -210,6 +221,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
 
             // Perform internal macro transformations.
             TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
+            txContext.setId(context.getId());
             macroTransformation.transform(wikiMacroMarker, txContext);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
@@ -327,41 +339,37 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public MacroDescriptor getDescriptor()
     {
         return this.descriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getPriority()
     {
         return 1000;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getId()
     {
         return this.descriptor.getId().getId();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DocumentReference getDocumentReference()
     {
         return this.macroDocumentReference;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public DocumentReference getAuthorReference()
+    {
+        return this.macroAuthor;
+    }
+
+    @Override
     public int compareTo(Macro< ? > macro)
     {
         if (getPriority() != macro.getPriority()) {
@@ -371,9 +379,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return this.supportsInlineMode;

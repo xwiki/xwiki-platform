@@ -19,13 +19,17 @@
  */
 package org.xwiki.url.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
+import org.xwiki.url.XWikiURLManager;
 
 /**
  * Sets the XWiki URL in the Execution Context (if found).
@@ -33,18 +37,18 @@ import org.xwiki.context.ExecutionContextInitializer;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("xwikiurl")
+@Component
+@Named("xwikiurl")
+@Singleton
 public class XWikiURLExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**
      * Used to get access to the Request.
      */
-    @Requirement
+    @Inject
     private Container container;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
         // If there's no Request don't set the XWiki URL in the Execution Context
@@ -52,7 +56,7 @@ public class XWikiURLExecutionContextInitializer implements ExecutionContextInit
         if (request != null) {
             Object xwikiURL = request.getProperty(Request.XWIKI_URL);
             if (xwikiURL != null) {
-                context.setProperty(Request.XWIKI_URL, xwikiURL);
+                context.setProperty(XWikiURLManager.URL_CONTEXT_PROPERTY, xwikiURL);
             }
         }
     }

@@ -22,12 +22,15 @@ package org.xwiki.annotation.internal;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
 import org.xwiki.annotation.AnnotationServiceException;
 import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -40,33 +43,35 @@ import com.xpn.xwiki.XWikiException;
  * Wrapper for the annotation service functions to be exposed to scripting contexts.
  * 
  * @version $Id$
- * @since 3.0-RC1
+ * @since 3.0RC1
  */
-@Component("annotations")
+@Component
+@Named("annotations")
+@Singleton
 public class AnnotationScriptService implements ScriptService
 {
     /**
      * The annotation service to execute annotation functions.
      */
-    @Requirement
+    @Inject
     private AnnotationService annotationService;
 
     /**
      * The annotations rights service.
      */
-    @Requirement
+    @Inject
     private AnnotationRightService rightsService;
 
     /**
      * The execution to get the context.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Entity reference serializer, to create references to the documents to which annotation targets refer.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
@@ -84,12 +89,12 @@ public class AnnotationScriptService implements ScriptService
     public boolean addAnnotation(String target, String selection, String selectionContext, int offset, String author,
         Map<String, Object> metadata)
     {
-        if (!rightsService.canAddAnnotation(target, getCurrentUser())) {
+        if (!this.rightsService.canAddAnnotation(target, getCurrentUser())) {
             setAccessExceptionOnContext();
             return false;
         }
         try {
-            annotationService.addAnnotation(target, selection, selectionContext, offset, author, metadata);
+            this.annotationService.addAnnotation(target, selection, selectionContext, offset, author, metadata);
             return true;
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
@@ -111,12 +116,12 @@ public class AnnotationScriptService implements ScriptService
      */
     public String getAnnotatedHTML(String sourceReference)
     {
-        if (!rightsService.canViewAnnotatedTarget(sourceReference, getCurrentUser())) {
+        if (!this.rightsService.canViewAnnotatedTarget(sourceReference, getCurrentUser())) {
             setAccessExceptionOnContext();
             return null;
         }
         try {
-            return annotationService.getAnnotatedHTML(sourceReference);
+            return this.annotationService.getAnnotatedHTML(sourceReference);
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
             return null;
@@ -142,12 +147,12 @@ public class AnnotationScriptService implements ScriptService
     public String getAnnotatedRenderedContent(String sourceReference, String sourceSyntax, String outputSyntax,
         Collection<Annotation> annotations)
     {
-        if (!rightsService.canViewAnnotatedTarget(sourceReference, getCurrentUser())) {
+        if (!this.rightsService.canViewAnnotatedTarget(sourceReference, getCurrentUser())) {
             setAccessExceptionOnContext();
             return null;
         }
         try {
-            return annotationService.getAnnotatedRenderedContent(sourceReference, sourceSyntax, outputSyntax,
+            return this.annotationService.getAnnotatedRenderedContent(sourceReference, sourceSyntax, outputSyntax,
                 annotations);
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
@@ -166,12 +171,12 @@ public class AnnotationScriptService implements ScriptService
      */
     public Annotation getAnnotation(String target, String id)
     {
-        if (!rightsService.canViewAnnotations(target, getCurrentUser())) {
+        if (!this.rightsService.canViewAnnotations(target, getCurrentUser())) {
             setAccessExceptionOnContext();
             return null;
         }
         try {
-            return annotationService.getAnnotation(target, id);
+            return this.annotationService.getAnnotation(target, id);
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
             return null;
@@ -188,12 +193,12 @@ public class AnnotationScriptService implements ScriptService
      */
     public Collection<Annotation> getAnnotations(String target)
     {
-        if (!rightsService.canViewAnnotations(target, getCurrentUser())) {
+        if (!this.rightsService.canViewAnnotations(target, getCurrentUser())) {
             setAccessExceptionOnContext();
             return null;
         }
         try {
-            return annotationService.getAnnotations(target);
+            return this.annotationService.getAnnotations(target);
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
             return null;
@@ -212,12 +217,12 @@ public class AnnotationScriptService implements ScriptService
      */
     public Collection<Annotation> getValidAnnotations(String target)
     {
-        if (!rightsService.canViewAnnotations(target, getCurrentUser())) {
+        if (!this.rightsService.canViewAnnotations(target, getCurrentUser())) {
             setAccessExceptionOnContext();
             return null;
         }
         try {
-            return annotationService.getValidAnnotations(target);
+            return this.annotationService.getValidAnnotations(target);
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
             return null;
@@ -235,12 +240,12 @@ public class AnnotationScriptService implements ScriptService
      */
     public boolean removeAnnotation(String target, String annotationID)
     {
-        if (!rightsService.canEditAnnotation(annotationID, target, getCurrentUser())) {
+        if (!this.rightsService.canEditAnnotation(annotationID, target, getCurrentUser())) {
             setAccessExceptionOnContext();
             return false;
         }
         try {
-            annotationService.removeAnnotation(target, annotationID);
+            this.annotationService.removeAnnotation(target, annotationID);
             return true;
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
@@ -260,12 +265,12 @@ public class AnnotationScriptService implements ScriptService
      */
     public boolean updateAnnotation(String target, Annotation annotation)
     {
-        if (!rightsService.canEditAnnotation(annotation.getId(), target, getCurrentUser())) {
+        if (!this.rightsService.canEditAnnotation(annotation.getId(), target, getCurrentUser())) {
             setAccessExceptionOnContext();
             return false;
         }
         try {
-            annotationService.updateAnnotation(target, annotation);
+            this.annotationService.updateAnnotation(target, annotation);
             return true;
         } catch (AnnotationServiceException e) {
             setExceptionOnContext(e);
@@ -291,9 +296,9 @@ public class AnnotationScriptService implements ScriptService
     public boolean canEditAnnotation(String annotationId, String wiki, String space, String page)
     {
         DocumentReference docRef = new DocumentReference(wiki, space, page);
-        String serializedDocRef = serializer.serialize(docRef);
+        String serializedDocRef = this.serializer.serialize(docRef);
 
-        return rightsService.canEditAnnotation(annotationId, serializedDocRef, getCurrentUser());
+        return this.rightsService.canEditAnnotation(annotationId, serializedDocRef, getCurrentUser());
     }
 
     /**
@@ -310,9 +315,9 @@ public class AnnotationScriptService implements ScriptService
     public boolean canAddAnnotation(String wiki, String space, String page)
     {
         DocumentReference docRef = new DocumentReference(wiki, space, page);
-        String serializedDocRef = serializer.serialize(docRef);
+        String serializedDocRef = this.serializer.serialize(docRef);
 
-        return rightsService.canAddAnnotation(serializedDocRef, getCurrentUser());
+        return this.rightsService.canAddAnnotation(serializedDocRef, getCurrentUser());
     }
 
     /**
@@ -332,7 +337,7 @@ public class AnnotationScriptService implements ScriptService
      */
     private XWikiContext getXWikiContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
     /**

@@ -98,11 +98,6 @@ public class RemoteEventData implements Serializable
         this.data = data;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

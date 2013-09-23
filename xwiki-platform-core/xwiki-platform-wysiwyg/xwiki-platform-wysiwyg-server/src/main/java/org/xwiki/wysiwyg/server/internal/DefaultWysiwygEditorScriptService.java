@@ -19,8 +19,13 @@
  */
 package org.xwiki.wysiwyg.server.internal;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
@@ -29,14 +34,14 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 import org.xwiki.wysiwyg.server.WysiwygEditorScriptService;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
  * Default implementation of {@link WysiwygEditorScriptService}.
  * 
  * @version $Id$
  */
-@Component("wysiwyg")
+@Component
+@Named("wysiwyg")
+@Singleton
 public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptService
 {
     /**
@@ -50,117 +55,103 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     /**
      * The component manager. We need it because we have to access components dynamically.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
-    /** Execution context handler, needed for accessing the XWikiContext. */
-    @Requirement
+    /** Execution context handler, needed for accessing the XWiki context map. */
+    @Inject
     private Execution execution;
 
     /**
      * The component used to convert HTML to wiki syntax.
      */
-    @Requirement
+    @Inject
     private HTMLConverter htmlConverter;
 
     /**
      * The component used to access the WYSIWYG editor configuration properties.
      */
-    @Requirement
+    @Inject
     private WysiwygEditorConfiguration editorConfiguration;
 
     /**
      * @return the XWiki context
      * @deprecated avoid using this method; try using the document access bridge instead
      */
-    private XWikiContext getXWikiContext()
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    private Map<Object, Object> getXWikiContextMap()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (Map<Object, Object>) this.execution.getContext().getProperty("xwikicontext");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#isSyntaxSupported(String)
-     */
+    @Override
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
-            componentManager.lookup(Parser.class, syntaxId);
-            componentManager.lookup(PrintRendererFactory.class, syntaxId);
+            this.componentManager.getInstance(Parser.class, syntaxId);
+            this.componentManager.getInstance(PrintRendererFactory.class, syntaxId);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#parseAndRender(String, String)
-     */
+    @Override
     public String parseAndRender(String html, String syntax)
     {
         // Save the value of the "is in rendering engine" context property.
-        Object isInRenderingEngine = getXWikiContext().get(IS_IN_RENDERING_ENGINE);
+        Object isInRenderingEngine = getXWikiContextMap().get(IS_IN_RENDERING_ENGINE);
 
         try {
             // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
             // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
             // templates using only Velocity for example).
-            getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
+            getXWikiContextMap().put(IS_IN_RENDERING_ENGINE, true);
 
-            return htmlConverter.parseAndRender(html, syntax);
+            return this.htmlConverter.parseAndRender(html, syntax);
         } catch (Exception e) {
             // Leave the previous HTML in case of an exception.
             return html;
         } finally {
             // Restore the value of the value of the "is in rendering engine" context property.
             if (isInRenderingEngine != null) {
-                getXWikiContext().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+                getXWikiContextMap().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
             } else {
-                getXWikiContext().remove(IS_IN_RENDERING_ENGINE);
+                getXWikiContextMap().remove(IS_IN_RENDERING_ENGINE);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#toAnnotatedXHTML(String, String)
-     */
+    @Override
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
         // Save the value of the "is in rendering engine" context property.
-        Object isInRenderingEngine = getXWikiContext().get(IS_IN_RENDERING_ENGINE);
+        Object isInRenderingEngine = getXWikiContextMap().get(IS_IN_RENDERING_ENGINE);
 
         try {
             // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
             // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
             // templates using only Velocity for example).
-            getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
+            getXWikiContextMap().put(IS_IN_RENDERING_ENGINE, true);
 
-            return htmlConverter.toHTML(source, syntaxId);
+            return this.htmlConverter.toHTML(source, syntaxId);
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;
         } finally {
             // Restore the value of the value of the "is in rendering engine" context property.
             if (isInRenderingEngine != null) {
-                getXWikiContext().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+                getXWikiContextMap().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
             } else {
-                getXWikiContext().remove(IS_IN_RENDERING_ENGINE);
+                getXWikiContextMap().remove(IS_IN_RENDERING_ENGINE);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygEditorScriptService#getConfig()
-     */
+    @Override
     public WysiwygEditorConfiguration getConfig()
     {
-        return editorConfiguration;
+        return this.editorConfiguration;
     }
 }

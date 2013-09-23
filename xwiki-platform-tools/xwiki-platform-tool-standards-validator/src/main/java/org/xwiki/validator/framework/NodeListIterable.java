@@ -79,9 +79,7 @@ public class NodeListIterable implements Iterator<Node>, Iterable<Node>
         return index < nodeList.getLength();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public NodeListIterable iterator() {
         return this;
     }

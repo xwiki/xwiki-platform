@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+    license agreements. See the NOTICE file distributed with this work for additional 
+    information regarding copyright ownership. The ASF licenses this file to 
+    You under the Apache License, Version 2.0 (the "License"); you may not use 
+    this file except in compliance with the License. You may obtain a copy of 
+    the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+    by applicable law or agreed to in writing, software distributed under the 
+    License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+    OF ANY KIND, either express or implied. See the License for the specific 
+    language governing permissions and limitations under the License. -->
+<schema name="xwiki_solrj" version="1.5">
+    <types>
+        <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
+        <fieldType name="string" class="solr.StrField"
+            sortMissingLast="true" />
+
+        <!-- boolean type: "true" or "false" -->
+        <fieldType name="boolean" class="solr.BoolField"
+            sortMissingLast="true" />
+        <!--Binary data type. The data should be sent/retrieved in as Base64 encoded 
+            Strings -->
+        <fieldtype name="binary" class="solr.BinaryField" />
+
+        <!-- Default numeric field types. For faster range queries, consider the 
+            tint/tfloat/tlong/tdouble types. -->
+        <fieldType name="int" class="solr.TrieIntField"
+            precisionStep="0" positionIncrementGap="0" />
+        <fieldType name="float" class="solr.TrieFloatField"
+            precisionStep="0" positionIncrementGap="0" />
+        <fieldType name="long" class="solr.TrieLongField"
+            precisionStep="0" positionIncrementGap="0" />
+        <fieldType name="double" class="solr.TrieDoubleField"
+            precisionStep="0" positionIncrementGap="0" />
+
+        <fieldType name="date" class="solr.TrieDateField"
+            precisionStep="0" positionIncrementGap="0" />
+
+        <!-- A text field with defaults appropriate for English: it tokenizes with 
+            StandardTokenizer, removes English stop words (lang/stopwords_en.txt), down 
+            cases, protects words from protwords.txt, and finally applies Porter's stemming. 
+            The query time analyzer also applies synonyms from synonyms.txt. -->
+        <fieldType name="text_en" class="solr.TextField"
+            positionIncrementGap="100">
+            <analyzer type="index">
+                <tokenizer class="solr.StandardTokenizerFactory" />
+                <filter class="solr.StopFilterFactory" ignoreCase="true"
+                    words="lang/stopwords_en.txt" enablePositionIncrements="true" />
+                <filter class="solr.LowerCaseFilterFactory" />
+                <filter class="solr.EnglishPossessiveFilterFactory" />
+                <filter class="solr.PorterStemFilterFactory" />
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.StandardTokenizerFactory" />
+                <filter class="solr.LowerCaseFilterFactory" />
+                <filter class="solr.EnglishPossessiveFilterFactory" />
+                <filter class="solr.PorterStemFilterFactory" />
+            </analyzer>
+        </fieldType>
+
+        <!-- A general text field that has reasonable, generic cross-language defaults: 
+            it tokenizes with StandardTokenizer, removes stop words from case-insensitive 
+            "stopwords.txt" (empty by default), and down cases. At query time only, it 
+            also applies synonyms. -->
+        <fieldType name="text_general" class="solr.TextField"
+            positionIncrementGap="100">
+            <analyzer type="index">
+                <tokenizer class="solr.StandardTokenizerFactory" />
+                <!-- in this example, we will only use synonyms at query time <filter 
+                    class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" 
+                    expand="false"/> -->
+                <filter class="solr.LowerCaseFilterFactory" />
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.StandardTokenizerFactory" />
+                <filter class="solr.LowerCaseFilterFactory" />
+            </analyzer>
+        </fieldType>
+    </types>
+    <fields>
+        <field name="id" type="string" indexed="true" stored="true"
+            required="true" />
+        <dynamicField name="*_en" type="text_en" indexed="true"
+            stored="true" multiValued="true" />
+        <!-- catchall field, containing all other searchable text fields (implemented 
+            via copyField further on in this schema -->
+        <field name="text" type="text_general" indexed="true" stored="false"
+            multiValued="true" />
+    </fields>
+    <!-- Field to use to determine and enforce document uniqueness. Unless this 
+        field is marked with required="false", it will be a required field -->
+    <uniqueKey>id</uniqueKey>
+</schema>

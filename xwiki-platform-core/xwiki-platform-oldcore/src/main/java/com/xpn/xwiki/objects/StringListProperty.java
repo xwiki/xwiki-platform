@@ -16,20 +16,21 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import com.xpn.xwiki.objects.classes.ListClass;
 
-public class StringListProperty extends ListProperty {
-
-    public Object getCustomMappingValue() {
+public class StringListProperty extends ListProperty
+{
+    @Override
+    public Object getCustomMappingValue()
+    {
         return getTextValue();
     }
 
-    public void setTextValue(String value) {
+    public void setTextValue(String value)
+    {
         setList(ListClass.getListFromString(value));
     }
 

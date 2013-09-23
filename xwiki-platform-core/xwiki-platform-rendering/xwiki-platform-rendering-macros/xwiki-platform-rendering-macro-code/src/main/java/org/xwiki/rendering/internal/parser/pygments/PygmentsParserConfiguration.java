@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.pygments;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Configuration properties for the Pygments based highlight parser.
@@ -31,12 +31,11 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M1
  */
-@ComponentRole
+@Role
 public interface PygmentsParserConfiguration
 {
     /**
-     * @return the hint of the {@link org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter} component to use
-     *         to modify velocity content before or after script execution.
+     * @return the id of the Pygments style to use.
      */
     String getStyle();
 }

@@ -45,6 +45,7 @@ public abstract class AbstractScriptCheckerListener implements EventListener
      * 
      * @see org.xwiki.observation.EventListener#getEvents()
      */
+    @Override
     public List<Event> getEvents()
     {
         return Collections.singletonList((Event) new ScriptEvaluatingEvent());
@@ -57,6 +58,7 @@ public abstract class AbstractScriptCheckerListener implements EventListener
      * 
      * @see org.xwiki.observation.EventListener#onEvent(Event, java.lang.Object, java.lang.Object)
      */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (!(event instanceof ScriptEvaluatingEvent)) {

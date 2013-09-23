@@ -23,9 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.KeyboardAdaptor;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
@@ -34,13 +37,6 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Handles keyboard actions on valid HTML lists, to ensure that the lists stay valid even after keyboard changes such as
@@ -49,7 +45,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @version $Id$
  */
-public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPressHandler, CommandListener
+public class ListBehaviorAdjuster extends KeyboardAdaptor implements CommandListener
 {
     /**
      * List item element name.
@@ -74,7 +70,17 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
     /**
      * The rich text area to do adjustments for.
      */
-    private RichTextArea textArea;
+    private final RichTextArea textArea;
+
+    /**
+     * Creates a new instance.
+     * 
+     * @param textArea the rich text area to do adjustments for
+     */
+    public ListBehaviorAdjuster(RichTextArea textArea)
+    {
+        this.textArea = textArea;
+    }
 
     /**
      * Executes lists clean up on the subtree rooted in the element passed as parameter. Lists cleanup consists of:
@@ -98,6 +104,12 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
         // send them to the actual cleaner
         cleanUpLists(orderedLists);
         cleanUpLists(unorderedLists);
+
+        // Ensure that each list item can be edited.
+        NodeList<com.google.gwt.dom.client.Element> listItems = element.getElementsByTagName(LIST_ITEM_TAG);
+        for (int i = 0; i < listItems.getLength(); i++) {
+            Element.as(listItems.getItem(i)).ensureEditable();
+        }
     }
 
     /**
@@ -168,7 +180,8 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
     protected void onDelete(Element li, Event event)
     {
         // check if we're at the end of the list item and, if so, move the next list item into this one
-        Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
+        Document document = li.getOwnerDocument().cast();
+        Range range = document.getSelection().getRangeAt(0);
         // only handle collapsed ranges. Selection will be deleted as the default browser implementation dictates and
         // resulting list will be cleaned on key up
         if (!range.isCollapsed()) {
@@ -234,7 +247,8 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
     protected void onBackspace(Element li, Event event)
     {
         // check if we're at the end of the list item and, if so, move the next list item into this one
-        Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
+        Document document = li.getOwnerDocument().cast();
+        Range range = document.getSelection().getRangeAt(0);
         // only handle collapsed ranges. Selection will be deleted as the default browser implementation dictates and
         // resulting list will be cleaned on key up
         if (!range.isCollapsed()) {
@@ -337,8 +351,10 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
 
         // restore the position of the cursor
         range.setEnd(endContainer, endOffset);
-        getTextArea().getDocument().getSelection().removeAllRanges();
-        getTextArea().getDocument().getSelection().addRange(range);
+        Document document = reference.getOwnerDocument().cast();
+        Selection selection = document.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
 
         Element liParentElt = (Element) nextLi.getParentElement();
         liParentElt.removeChild(nextLi);
@@ -385,101 +401,41 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
         return node.getNodeName().equalsIgnoreCase("br");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
-    public void onKeyPress(KeyPressEvent event)
+    @Override
+    protected void handleRepeatableKey(Event event)
     {
-        dispatchKey((Widget) event.getSource(), event.getNativeEvent().getKeyCode(), (Event) event.getNativeEvent());
-    }
-
-    /**
-     * Dispatches the passed key pressed on the specified sender, with the specified modifiers. This function does
-     * generalized dispatching, regardless of the actual key event that signals the press of the key. The different
-     * implementations for browsers will use their own key detecting mechanisms, but will use this function to dispatch
-     * it.
-     * 
-     * @param sender the sender widget of the key press event
-     * @param keyCode the code of the key to dispatch
-     * @param originalEvent the original native key event that was fired
-     */
-    protected void dispatchKey(Widget sender, int keyCode, Event originalEvent)
-    {
-        if (textArea != sender) {
-            return;
-        }
-
         // get current range for some checks
-        Range range = textArea.getDocument().getSelection().getRangeAt(0);
+        Document document = Element.as(event.getEventTarget()).getOwnerDocument().cast();
+        Range range = document.getSelection().getRangeAt(0);
         Node li = DOMUtils.getInstance().getFirstAncestor(range.getCommonAncestorContainer(), LIST_ITEM_TAG);
         if (li == null) {
             return;
         }
 
-        switch (keyCode) {
+        switch (event.getKeyCode()) {
             case KeyCodes.KEY_DELETE:
-                onDelete((Element) li, originalEvent);
+                onDelete((Element) li, event);
                 break;
             case KeyCodes.KEY_BACKSPACE:
-                onBackspace((Element) li, originalEvent);
+                onBackspace((Element) li, event);
                 break;
             default:
                 break;
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
-    public void onKeyUp(KeyUpEvent event)
+    @Override
+    public void handleKeyRelease(Event event)
     {
-        // check we're on the right element
-        if (textArea != event.getSource()) {
-            return;
-        }
-
         // Execute cleanup after each delete, enter, backspace key
         boolean needsCleanup =
-            (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && !event.getNativeEvent().getShiftKey())
-                || event.getNativeKeyCode() == KeyCodes.KEY_DELETE
-                || event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE;
+            (event.getKeyCode() == KeyCodes.KEY_ENTER && !event.getShiftKey())
+                || event.getKeyCode() == KeyCodes.KEY_DELETE || event.getKeyCode() == KeyCodes.KEY_BACKSPACE;
         if (needsCleanup) {
             // Clean the whole document as an operation on a list can impact more than one list (two consecutive lists
             // can be impacted by the same delete)
-            cleanUp((Element) textArea.getDocument().getDocumentElement());
-        } else {
-            return;
+            cleanUp(Element.as(Element.as(event.getEventTarget()).getOwnerDocument().getDocumentElement()));
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
-    public void onKeyDown(KeyDownEvent event)
-    {
-        // To be overwritten in derived classes.
-    }
-
-    /**
-     * @return the textArea that this handler is operating on
-     */
-    public RichTextArea getTextArea()
-    {
-        return textArea;
-    }
-
-    /**
-     * @param textArea the textArea to operate on
-     */
-    public void setTextArea(RichTextArea textArea)
-    {
-        this.textArea = textArea;
     }
 
     /**
@@ -505,7 +461,7 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
                 Command.INSERT_UNORDERED_LIST);
         // clean up the lists in the document on delete, indent, outdent and reset
         if (needCleanup.contains(command)) {
-            cleanUp((Element) getTextArea().getDocument().getDocumentElement());
+            cleanUp((Element) textArea.getDocument().getDocumentElement());
         }
     }
 }

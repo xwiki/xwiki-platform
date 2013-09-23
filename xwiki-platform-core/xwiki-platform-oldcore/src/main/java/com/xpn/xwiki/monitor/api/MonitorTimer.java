@@ -24,44 +24,57 @@ import java.util.Date;
 public class MonitorTimer
 {
     private String name;
+
     private String details;
+
     private Date startDate;
+
     private Date endDate;
 
-    public MonitorTimer(String name, String details) {
+    public MonitorTimer(String name, String details)
+    {
         this.setName(name);
         this.setDetails(details);
     }
 
-    public void setStartDate() {
+    public void setStartDate()
+    {
         startDate = new Date();
     }
 
-    public void setEndDate() {
+    public void setEndDate()
+    {
         endDate = new Date();
     }
 
-    public long getDuration() {
-        return endDate.getTime()-startDate.getTime();
+    public long getDuration()
+    {
+        return endDate.getTime() - startDate.getTime();
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public String getDetails() {
+    public String getDetails()
+    {
         return details;
     }
 
-    public void setDetails(String details) {
+    public void setDetails(String details)
+    {
         this.details = details;
     }
 
-    public String toString() {
+    @Override
+    public String toString()
+    {
         StringBuffer str = new StringBuffer();
         str.append(" Name: ");
         str.append(name);
@@ -72,8 +85,9 @@ public class MonitorTimer
         str.append(endDate);
         str.append(" Duration: ");
         try {
-        str.append(endDate.getTime()-startDate.getTime());
-        } catch (Exception e) {}
+            str.append(endDate.getTime() - startDate.getTime());
+        } catch (Exception e) {
+        }
         return str.toString();
     }
 }

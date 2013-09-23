@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macros</artifactId>
   <name>XWiki Platform - Rendering - Macros - Parent POM</name>
@@ -37,26 +37,33 @@
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki2</artifactId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <artifactId>xwiki-rendering-syntax-event</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-annotatedxhtml</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-test</artifactId>
       <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Macro parameters validation -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>4.3.0.Final</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -78,8 +85,12 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html</exclude>
+                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html:*:jar:*</exclude>
                   </excludes>
+                  <message>
+We need to be able to turn off the HTML Macro and still have a working system.
+Thus it is forbidden to depend on the HTML Macro.
+                   </message>
                 </bannedDependencies>
               </rules>
             </configuration>
@@ -100,7 +111,6 @@
     <module>xwiki-platform-rendering-macro-python</module>
     <module>xwiki-platform-rendering-macro-php</module>
     <module>xwiki-platform-rendering-macro-container</module>
-    <module>xwiki-platform-rendering-macro-dashboard</module>
     <module>xwiki-platform-rendering-macro-context</module>
     <module>xwiki-platform-rendering-macro-cache</module>
     <module>xwiki-platform-rendering-macro-gallery</module>

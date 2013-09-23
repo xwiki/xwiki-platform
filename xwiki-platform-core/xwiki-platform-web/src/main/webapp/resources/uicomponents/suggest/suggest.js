@@ -28,7 +28,7 @@ var XWiki = (function(XWiki){
     // Display a "no results" message, or simply hide the suggest box when no suggestions are available
     shownoresults : true,
     // The message to display as the "no results" message
-    noresults : "No results!",
+    noresults : "$services.localization.render('core.widgets.suggest.noResults')",
     maxheight : 250,
     cache : false,
     seps : "",
@@ -45,19 +45,34 @@ var XWiki = (function(XWiki){
     // The name of the JSON parameter or XML attribute holding the result auxiliary information.
     // "info" for the old suggest, "pageFullName" for the REST search.
     resultInfo : "info",
+    // The name of the JSON parameter or XML attribute holding the result icon.
+    resultIcon: "icon",
+    // The name of the JSON parameter or XML attribute holding a potential result hint (displayed next to the value).
+    resultHint: "hint",
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
     highlight: true,
     // Fade the suggestion container on clear
     fadeOnClear: true,
+    // Show a 'hide suggestions' button
+    hideButton: {
+      positions: [ "top" ],
+      text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
+    },
     insertBeforeSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
-    // Display value prefix text 
-    displayValueText: "Value :",
-    // How to align the suggestion list when its with is different than the input field width
-    align: "left"
+    // Display value prefix text
+    displayValueText: "$services.localization.render('core.widgets.suggest.valuePrefix')",
+    // How to align the suggestion list when its width is different from the input field width
+    align: "left",
+    // When there are several suggest sources, should the widget displays only one, unified, "loading" indicator for all requests undergoing,
+    // Or should it displays one loading indicator per request next to the corresponding source.
+    unifiedLoader: false,
+    // The DOM node to use to display the loading indicator when in mode unified loader (it will receive a "loading" class name for the time of the loading)
+    // Default is null, which falls back on the input itself. This option is used only when unifiedLoader is true.
+    loaderNode: null
   },
   sInput : "",
   nInputChars : 0,
@@ -80,7 +95,7 @@ var XWiki = (function(XWiki){
 
     // Clone default options from the prototype so that they are not shared and extend options with passed parameters
     this.options = Object.extend(Object.clone(this.options), param || { });
-    if (typeof this.options.sources == 'object' && this.options.sources.length > 1) {
+    if (typeof this.options.sources == 'object') {
       // We are in multi-sources mode
       this.sources = this.options.sources;
     } else {
@@ -89,7 +104,7 @@ var XWiki = (function(XWiki){
     }
 
     // Flatten sources
-    this.sources = [ this.sources ].flatten().compact(); 
+    this.sources = [ this.sources ].flatten().compact();
 
     // Reset the container if the configured parameter is not valid
     if (!$(this.options.parentContainer)) {
@@ -102,26 +117,41 @@ var XWiki = (function(XWiki){
       this.seps = "";
     }
 
+    // Initialize a request number that will keep track of the latest request being fired.
+    // This will help to discard potential non-last requests callbacks ; this in order to have better performance
+    // (less unneccessary DOM manipulation, and less unneccessary highlighting computation).
+    this.latestRequest = 0;
+
   },
 
   /**
    * Sets or replace the input field associated with this suggest.
    */
   setInputField: function(input){
-    if (this.fld) {
-      this.fld.stopObserving();
-    }
+    this.detach();
     this.fld = $(input);
+    if (this.fld.__x_suggest) {
+      this.fld.__x_suggest.detach();
+    }
+    this.fld.__x_suggest = this;
     // Bind the key listeners on the input field.
-    this.fld.observe("keyup", this.onKeyUp.bindAsEventListener(this));
+    this.onKeyUp = this.onKeyUp.bindAsEventListener(this);
+    this.fld.observe("keyup", this.onKeyUp);
+    this.onKeyPress = this.onKeyPress.bindAsEventListener(this);
     if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-      this.fld.observe("keydown", this.onKeyPress.bindAsEventListener(this));
+      this.fld.observe("keydown", this.onKeyPress);
     } else {
-      this.fld.observe("keypress", this.onKeyPress.bindAsEventListener(this));
+      this.fld.observe("keypress", this.onKeyPress);
     }
 
     // Prevent normal browser autocomplete
     this.fld.setAttribute("autocomplete", "off");
+
+    this.fld.observe("blur", function(event){
+      // Make sure any running request will be dropped after the input field has been left
+      this.latestRequest++;
+
+    }.bind(this));
   },
 
   /**
@@ -175,7 +205,7 @@ var XWiki = (function(XWiki){
 
     switch(key) {
       case Event.KEY_RETURN:
-        if (this.aSuggestions.length == 1) {
+        if (!this.iHighlighted && this.aSuggestions.length == 1) {
           this.highlightFirst();
         }
         this.setHighlightedValue();
@@ -205,19 +235,17 @@ var XWiki = (function(XWiki){
    */
   getSuggestions: function (val)
   {
-    // if input stays the same, do nothing
-    //
-    val = val.strip();
+    // If input stays the same, do nothing.
+    val = val.strip().toLowerCase();
     if (val == this.sInput) {
       return false;
     }
 
-    // input length is less than the min required to trigger a request
-    // reset input string
-    // do nothing
-    //
+    // Input length is less than the min required to trigger a request.
+    // Reset input string, hide the suggestions (if any), and return.
     if (val.length < this.options.minchars) {
       this.sInput = "";
+      this.clearSuggestions();
       return false;
     }
 
@@ -228,7 +256,7 @@ var XWiki = (function(XWiki){
     {
       var arr = [];
       for (var i=0;i<this.aSuggestions.length;i++) {
-        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val.toLowerCase()) {
+        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val) {
           arr.push( this.aSuggestions[i] );
         }
       }
@@ -247,23 +275,33 @@ var XWiki = (function(XWiki){
 
       this.prepareContainer();
 
+      this.latestRequest++;
       var pointer = this;
+      var requestId = this.latestRequest;
       clearTimeout(this.ajID);
-      this.ajID = setTimeout( function() { pointer.doAjaxRequests() }, this.options.delay );
+      this.container.select('.hide-button-wrapper').invoke('hide');
+      this.ajID = setTimeout( function() { pointer.doAjaxRequests(requestId) }, this.options.delay );
+
     }
     return false;
   },
 
   /**
-   * Fire the AJAX Request(s) that will get suggestions
+   * Fire the AJAX Request(s) that will get suggestions.
+   *
+   * @param requestId request identifier, used to ensure that only the latest request is handled, for improved performance
+   * @param ajaxRequestParameters optional AJAX request parameters, in case you need to overwrite the defaults
    */
-  doAjaxRequests: function ()
+  doAjaxRequests: function (requestId, ajaxRequestParameters)
   {
+    if (this.fld.value.length < this.options.minchars) {
+      return;
+    }
+
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
-      
-      // create ajax request
-      var url = source.script + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
+
+      var url = source.script + (source.script.indexOf('?') < 0 ? '?' : '&') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
       var method = source.method || "get";
       var headers = {};
       if (source.json) {
@@ -272,14 +310,21 @@ var XWiki = (function(XWiki){
         headers.Accept = "application/xml";
       }
 
-      var ajx = new Ajax.Request(url, {
+      // Allow the default request parameters to be overwritten.
+      var defaultAjaxRequestParameters = {
         method: method,
         requestHeaders: headers,
-        onSuccess: this.setSuggestions.bindAsEventListener(this, source),
+        onCreate: this.fld.addClassName.bind(this.fld, 'loading'),
+        onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
         onFailure: function (response) {
-          new XWiki.widgets.Notification("Failed to retrieve suggestions : ')" + response.statusText, "error", {timeout: 5});
-        }
-      });
+          new XWiki.widgets.Notification("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
+        },
+        onComplete: this.fld.removeClassName.bind(this.fld, 'loading')
+      }
+      // Inject a reference to the (cloned) default AJAX request parameters to be able
+      // to access the defaults even when they are overwritten by the provided values.
+      defaultAjaxRequestParameters.defaultValues = Object.clone(defaultAjaxRequestParameters);
+      new Ajax.Request(url, Object.extend(defaultAjaxRequestParameters, ajaxRequestParameters || {}));
     }
   },
 
@@ -287,77 +332,98 @@ var XWiki = (function(XWiki){
    * Set suggestions
    *
    * @param {Object} req
+   * @param {Object} source
+   * @param {Number} requestId the identifier of the request for which this callback is triggered.
    */
-  setSuggestions: function (req, source)
+  setSuggestions: function (req, source, requestId)
   {
-    this.aSuggestions = [];
+    // If there has been one or several requests fired in the mean time (between the time the request for which this callback
+    // has been triggered and the time of the callback itself) ; we don't do anything and leave it to following callbacks to
+    // set potential suggestions
+    if (requestId < this.latestRequest) {
+      return;
+    }
 
+    var suggestions = this.parseResponse(req, source);
+    this.aSuggestions = suggestions || [];
+    suggestions && this.createList(this.aSuggestions, source);
+  },
+
+  /**
+   * Builds the list of suggestions by parsing the given response.
+   */
+  parseResponse: function(req, source) {
+    var suggestions = [];
     if (source.json) {
       var jsondata = req.responseJSON;
       if (!jsondata) {
-        return false;
+        return null;
       }
       var results = jsondata[source.resultsParameter || this.options.resultsParameter];
-
       for (var i = 0; i < results.length; i++) {
-        this.aSuggestions.push({
+        suggestions.push({
            'id': results[i][source.resultId || this.options.resultId],
            'value': results[i][source.resultValue || this.options.resultValue],
-           'info': results[i][source.resultInfo || this.options.resultInfo]
+           'info': results[i][source.resultInfo || this.options.resultInfo],
+           'icon' : results[i][source.resultIcon || this.options.resultIcon],
+           'hint' : results[i][source.resultHint || this.options.resultHint]
         });
       }
     } else {
       var xml = req.responseXML;
-
       // traverse xml
-      //
       var results = xml.getElementsByTagName(source.resultsParameter || this.options.resultsParameter)[0].childNodes;
-
       // TODO: This is incompatible with the REST search
       for (var i = 0; i < results.length; i++) {
         if (results[i].hasChildNodes()) {
-          this.aSuggestions.push({
+          suggestions.push({
             'id': results[i].getAttribute('id'),
             'value':results[i].childNodes[0].nodeValue,
-            'info':results[i].getAttribute('info')
+            'info':results[i].getAttribute('info'),
+            'icon':results[i].getAttribute('icon'),
+            'hint':results[i].getAttribute('hint')
           });
         }
       }
-
     }
-    this.createList(this.aSuggestions, source);
+    return suggestions;
   },
 
   /**
    * Creates the container that will hold one or multiple source results.
    */
   prepareContainer: function(){
-    
+
     if (!$(this.options.parentContainer).down('.suggestItems')) {
       // If the suggestion top container is not in the DOM already, we create it and inject it
 
       var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
-    
+
       // Get position of target textfield
-      var pos = this.fld.cumulativeOffset();
+      var pos = $(this.options.parentContainer).tagName.toLowerCase() == 'body' ? this.fld.cumulativeOffset() : this.fld.positionedOffset();
 
       // Container width is passed as an option, or field width if no width provided.
       // The 2px substracted correspond to one pixel of border on each side of the field,
       // this allows to have the suggestion box borders well aligned with the field borders.
       // FIXME this should be computed instead, since border might not always be 1px.
-      var containerWidth = this.options.width ? this.options.width : (this.fld.offsetWidth - 2)
+      var fieldWidth = this.fld.offsetWidth - 2;
+      var containerWidth = this.options.width || fieldWidth;
 
       if (this.options.align == 'left') {
         // Align the box on the left
         div.style.left = pos.left + "px";
+      } else if (this.options.align == "center") {
+        // Align the box to the center
+        div.style.left = pos.left + (fieldWidth - containerWidth) / 2 + "px";
       } else {
         // Align the box on the right.
         // This has a visible effect only when the container width is not the same as the input width
-        div.style.left = (pos.left - containerWidth + this.fld.offsetWidth - 2) + "px";
+        div.style.left = (pos.left + fieldWidth - containerWidth) + "px";
       }
 
       div.style.top = (pos.top + this.fld.offsetHeight + this.options.offsety) + "px";
-      div.style.width = containerWidth + "px";
+      // Don't enforce the width if it wasn't specified to let the container adjust its width to fit the suggest items.
+      div.style[this.options.width ? 'width' : 'minWidth'] = containerWidth + "px";
 
       // set mouseover functions for div
       // when mouse pointer leaves div, set a timeout to remove the list after an interval
@@ -375,7 +441,7 @@ var XWiki = (function(XWiki){
       this.container = div;
 
       if (this.options.insertBeforeSuggestions) {
-	    this.resultContainer.insert(this.options.insertBeforeSuggestions);
+        this.resultContainer.insert(this.options.insertBeforeSuggestions);
       }
 
       document.fire("xwiki:suggest:containerCreated", {
@@ -387,10 +453,10 @@ var XWiki = (function(XWiki){
     if (this.sources.length > 1) {
       // If we are in multi-source mode, we need to prepare a sub-container for each of the suggestion source
       for (var i=0;i<this.sources.length;i++) {
-    
+
         var source = this.sources[i];
         source.id = i
-    
+
         if(this.resultContainer.down('.results' + source.id)) {
           // If the sub-container for this source is already present, we just re-initialize it :
           // - remove its content
@@ -398,13 +464,23 @@ var XWiki = (function(XWiki){
           if (this.resultContainer.down('.results' + source.id).down('ul')) {
             this.resultContainer.down('.results' + source.id).down('ul').remove();
           }
-          this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          if (!this.options.unifiedLoader) {
+            this.resultContainer.down('.results' + source.id).down('.sourceContent').addClassName('loading');
+          }
+          else {
+            (this.options.loaderNode || this.fld).addClassName("loading");
+            this.resultContainer.down('.results' + source.id).addClassName('hidden').addClassName('loading');
+          }
         }
         else {
           // The sub-container for this source has not been created yet
           // Really create the subcontainer for this source and inject it in the global container
           var sourceContainer = new Element('div', {'class' : 'results results' + source.id}),
               sourceHeader = new Element('div', {'class':'sourceName'});
+
+          if (this.options.unifiedLoader) {
+            sourceContainer.addClassName('hidden').addClassName('loading');
+          }
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
@@ -424,14 +500,36 @@ var XWiki = (function(XWiki){
           }
           sourceHeader.insert(source.name)
           sourceContainer.insert( sourceHeader );
-          sourceContainer.insert( new Element('div', {'class':'sourceContent loading'}));
+          var classes = "sourceContent " + (this.options.unifiedLoader ? "" : "loading");
+          sourceContainer.insert( new Element('div', {'class':classes}));
+
+          if (typeof source.before !== 'undefined') {
+            this.resultContainer.insert(source.before);
+          }
           this.resultContainer.insert(sourceContainer);
+          if (typeof source.after !== 'undefined') {
+            this.resultContainer.insert(source.after);
+          }
         }
       }
     } else {
       // In mono-source mode, reset the list if present
       if (this.resultContainer.down("ul")) {
         this.resultContainer.down("ul").remove();
+      }
+    }
+
+    var withEnableButton = typeof this.options.hideButton !== "undefined"
+                        && typeof this.options.hideButton.positions === "object"
+                        && this.options.hideButton.positions.length > 0;
+    if (withEnableButton && !this.container.down('.hide-button')) {
+      var positions = this.options.hideButton.positions;
+      for (var i=0; i< positions.length; i++) {
+        var hideButton = new Element('span', {'class' : 'hide-button'}).update(this.options.hideButton.text),
+            toInsert = {};
+        toInsert[positions[i]] = new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton);
+        hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
+        this.container.insert(toInsert);
       }
     }
 
@@ -444,31 +542,62 @@ var XWiki = (function(XWiki){
   },
 
   /**
-   * Create the HTML list of suggestions.
+   * Create the HTML list of suggestions and then notify that the suggest has been updated if all sources are loaded.
    *
    * @param {Object} arr
    * @param {Object} source the source for data for which to create this list of results.
    */
   createList: function(arr, source)
   {
+    this._createList(arr, source);
+
+    if (this.sources.length == 1 || !this.resultContainer.down('.results.loading')) {
+      document.fire('xwiki:suggest:updated', {
+        'container' : this.container,
+        'suggest' : this
+      });
+    }
+  },
+
+  /**
+   * Create the HTML list of suggestions.
+   *
+   * @param {Object} arr
+   * @param {Object} source the source for data for which to create this list of results.
+   */
+  _createList: function(arr, source)
+  {
     this.isActive = true;
     var pointer = this;
 
     this.killTimeout();
 
-    // if no results, and shownoresults is false, do nothing
-    if (arr.length == 0 && !this.options.shownoresults)
-      return false;
-
-    // create holding div
-    //
+    // Determine the source container.
     if (this.sources.length > 1) {
-      var div = this.resultContainer.down(".results" + source.id);
-      div.down('.sourceContent').removeClassName('loading');
+      var sourceContainer = this.resultContainer.down('.results' + source.id);
+      sourceContainer.removeClassName('loading');
+      sourceContainer.down('.sourceContent').removeClassName('loading');
+      (arr.length > 0 || this.options.shownoresults) && sourceContainer.removeClassName('hidden');
+
+      // If we are in mode "unified loader" (showing one loading indicator for all requests and not one per request)
+      // and there aren't any source still loading, we remove the unified loading status.
+      if (this.options.unifiedLoader && !this.resultContainer.down('.results.loading')) {
+        (this.options.loaderNode || this.fld).removeClassName('loading');
+      }
+    } else {
+      var sourceContainer = this.resultContainer;
     }
-    else {
-      var div = this.resultContainer;
+
+    // if no results, and shownoresults is false, go no further
+    if (arr.length == 0 && !this.options.shownoresults) {
+      return false;
     }
+
+    // Ensure any previous list of results for this source gets removed
+    sourceContainer.down('ul') && sourceContainer.down('ul').remove();
+
+    // Show the "hide suggestions" buttons
+    this.container.select('.hide-button-wrapper').invoke('show');
 
     // create and populate list
     var list = new XWiki.widgets.XList([], {
@@ -483,36 +612,17 @@ var XWiki = (function(XWiki){
     // loop throught arr of suggestions
     // creating an XlistItem for each suggestion
     //
-    for (var i=0;i<arr.length;i++)
+    for (var i=0,len=arr.length;i<len;i++)
     {
-      // format output with the input enclosed in a EM element
-      // (as HTML, not DOM)
-      //
-      if (source.highlight) {
-        // If the source declares that results are matching, we highlight them in the value
-        var val = arr[i].value;
-        var st = val.toLowerCase().indexOf( this.sInput.toLowerCase() );
-        var output = val.substring(0,st) + "<em>" + val.substring(st, st+this.sInput.length) + "</em>" + val.substring(st+this.sInput.length);
-      }
-      else {
-        // Otherwise we just put row result value
-        var output = arr[i].value;
-      }
-      if (!this.options.displayValue) {
-        var displayNode = new Element("span", {'class':'info'}).update(output);
-      }
-      else {
-        var displayNode = new Element("div").insert(new Element('div', {'class':'value'}).update(output))
-                                            .insert(new Element('div', {'class':'info'}).update(
-	                                          "<span class='legend'>" + this.options.displayValueText + "</span>" + arr[i].info)
-	                                        );
-      }
+      var escapeHTML = function(value) {
+        return ((value || '') + '').escapeHTML();
+      };
       var valueNode = new Element('div')
-            .insert(new Element('span', {'class':'suggestId'}).update(arr[i].id))
-            .insert(new Element('span', {'class':'suggestValue'}).update(arr[i].value))
-            .insert(new Element('span', {'class':'suggestInfo'}).update(arr[i].info));
+            .insert(new Element('span', {'class':'suggestId'}).update(escapeHTML(arr[i].id)))
+            .insert(new Element('span', {'class':'suggestValue'}).update(escapeHTML(arr[i].value)))
+            .insert(new Element('span', {'class':'suggestInfo'}).update(escapeHTML(arr[i].info)));
 
-      var item = new XWiki.widgets.XListItem( displayNode , {
+      var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
         containerClasses: 'suggestItem',
         value: valueNode,
         noHighlight: true // we do the highlighting ourselves
@@ -528,9 +638,9 @@ var XWiki = (function(XWiki){
                           'classes' : 'noSuggestion',
                           noHighlight :true }) );
     }
-    div.appendChild( list.getElement() );
+    sourceContainer.appendChild( list.getElement() );
 
-    this.suggest = div;
+    this.suggest = sourceContainer;
 
     // remove list after an interval
     var pointer = this;
@@ -540,12 +650,95 @@ var XWiki = (function(XWiki){
   },
 
   /**
+   * Creates the HTML display for the given suggestion item.
+   *
+   * @param {Object} date the data associated with a suggestion item (id, value, info, icon, etc.)
+   * @param {Object} source the source for the suggeestion item data
+   */
+  createItemDisplay : function(data, source) {
+    var escapedInput = this.sInput ? this.sInput.escapeHTML() : this.sInput;
+    var escapedValue = ((data.value || '') + '').escapeHTML();
+    // Output is either emphasized or raw value depending on source option.
+    var output = source.highlight ? this.emphasizeMatches(escapedInput, escapedValue) : escapedValue;
+    if (data.hint) {
+      var escapedHint = (data.hint + '').escapeHTML();
+      output += "<span class='hint'>" + escapedHint + "</span>";
+    }
+    if (!this.options.displayValue) {
+      var displayNode = new Element("span", {'class':'info'}).update(output);
+    } else {
+      var escapedInfo = ((data.info || '') + '').escapeHTML();
+      var displayNode = new Element("div").insert(new Element('div', {'class':'value'}).update(output))
+        .insert(new Element('div', {'class':'info'}).update("<span class='legend'>"
+        + this.options.displayValueText + "</span>" + escapedInfo));
+    }
+    // If the search result contains an icon information, we insert this icon in the result entry.
+    if (data.icon) {
+      var iconImage = new Element("img", {'src' : data.icon, 'class' : 'icon' });
+      displayNode.insert({top: iconImage});
+    }
+    return displayNode;
+  },
+
+  /**
+   * Emphesize the elements in passed value that matches one of the words typed as input by the user.
+   *
+   * @param String input the (typed) input
+   * @param String value the value to emphasize
+   */
+  emphasizeMatches:function(input, value)
+  {
+    if (!input) {
+      return value;
+    }
+    // If the source declares that results are matching, we highlight them in the value
+    var output = value,
+        // Separate words (called fragments hereafter) in user input
+        fragments = input.split(' ').uniq().compact(),
+        offset = 0,
+        matches = {};
+
+    for (var j=0,flen=fragments.length;j<flen;j++) {
+      // We iterate over each fragments, and try to find one or several matches in this suggestion
+      // item display value.
+      var index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+      while (index >= 0) {
+        // As long as we have matches, we store their index and replace them in the output string with the space char
+        // so that they don't get matched for ever.
+        // Note that the space char is the only one safe to use, as it cannot be part of a fragment.
+        var match = output.substring(index, index + fragments[j].length),
+            placeholder = "";
+        fragments[j].length.times(function(){
+          placeholder += " ";
+        });
+        matches[index] = match;
+        output = output.substring(0, index) + placeholder + output.substring(index + fragments[j].length);
+        index = output.toLowerCase().indexOf(fragments[j].toLowerCase());
+      }
+    }
+    // Now that we have found all matches for all possible fragments, we iterate over them
+    // to construct the final "output String" that will be injected as a suggestion item,
+    // with all matches emphasized
+    Object.keys(matches).sortBy(function(s){return parseInt(s)}).each(function(key){
+      var before = output.substring(0, parseInt(key) + offset);
+      var after = output.substring(parseInt(key) + matches[key].length + offset);
+      // Emphasize the match in the output string that will be displayed
+      output = before + "<em>" + matches[key] + "</em>" + after;
+      // Increase the offset by 9, which correspond to the number of chars in the opening and closing "em" tags
+      // we have introduced for this match in the output String
+      offset += 9;
+    });
+
+    return output;
+  },
+
+  /**
    * Change highlight
    *
    * @param {Object} key
    */
   changeHighlight: function(key)
-  { 
+  {
     var list = this.resultContainer;
     if (!list)
       return false;
@@ -553,29 +746,49 @@ var XWiki = (function(XWiki){
     var n, elem;
 
     if (this.iHighlighted) {
-      if (key == 40) {
-        elem = this.iHighlighted.next() || ((this.iHighlighted.up('div.results') &&
-          this.iHighlighted.up('div.results').next()) ? this.iHighlighted.up('div.results').next().down('li') :
-          list.down('li'));
-      }
-      else if (key == 38) {
-        if (this.iHighlighted.previous()) {
-          elem = this.iHighlighted.previous();
+      // If there is already a highlighted element, we look for the next or previous highlightable item in the list
+      // of results, according to which key has been pressed.
+      if (key == Event.KEY_DOWN) {
+        elem = this.iHighlighted.next();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the next item could not be found and multi-source mode, find the next not empty source
+          var source = this.iHighlighted.up('div.results').next();
+          while (source && !elem) {
+            elem = source.down('li');
+            source = source.next();
+          }
         }
-        else {
-            if ((this.iHighlighted.up('div.results') && this.iHighlighted.up('div.results').previous())) {
-              elem = this.iHighlighted.up('div.results').previous().down('li:last-child');
-            }
-            else {
-              elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
-            }
+        if(!elem) {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP) {
+        elem = this.iHighlighted.previous();
+        if (!elem && this.iHighlighted.up('div.results')) {
+          // if the previous item could not be found and multi-source mode, find the previous not empty source
+          var source = this.iHighlighted.up('div.results').previous();
+          while(source && !elem) {
+            elem = source.down('li:last-child');
+            source = source.previous();
+          }
+        }
+        if (!elem) {
+          elem =  list.select('ul')[list.select('ul').length - 1].down('li:last-child');
         }
       }
     }
     else {
-      if (key == 40)
-        elem = list.down('li');
-      else if (key == 38)
+      // No item is highlighted yet, so we just look for the first or last highlightable item,
+      // according to which key, up or down, has been pressed.
+      if (key == Event.KEY_DOWN) {
+        if (list.down('div.results')) {
+          elem = list.down('div.results').down('li')
+        }
+        else {
+          elem = list.down('li');
+        }
+      }
+      else if (key == Event.KEY_UP)
         if (list.select('li') > 0) {
           elem = list.select('li')[list.select('li').length - 1];
         }
@@ -635,33 +848,41 @@ var XWiki = (function(XWiki){
   {
     if (this.iHighlighted && !this.iHighlighted.hasClassName('noSuggestion'))
     {
-      var selection, newFieldValue
-      if(this.sInput == "" && this.fld.value == "")
-        selection = newFieldValue = this.iHighlighted.down(".suggestValue").innerHTML;
-      else {
-        if(this.seps) {
-           var lastIndx = -1;
-           for(var i = 0; i < this.seps.length; i++)
-             if(this.fld.value.lastIndexOf(this.seps.charAt(i)) > lastIndx)
-               lastIndx = this.fld.value.lastIndexOf(this.seps.charAt(i));
-            if(lastIndx == -1)
-              selection = newFieldValue = this.iHighlighted.down(".suggestValue").innerHTML;
-            else
-            {
-               newFieldValue = this.fld.value.substring(0, lastIndx+1) + this.iHighlighted.down(".suggestValue").innerHTML;
-               selection = newFieldValue.substring(lastIndx+1);
-           }
-        }
-        else
-          selection = newFieldValue = this.iHighlighted.down(".suggestValue").innerHTML;
+      var text = function(element) {
+        return element.textContent || element.innerText;
+      };
+      var icon = this.iHighlighted.down('img.icon');
+      var data = {
+        'suggest' : this,
+        'id': text(this.iHighlighted.down(".suggestId")),
+        'value': text(this.iHighlighted.down(".suggestValue")),
+        'info': text(this.iHighlighted.down(".suggestInfo")),
+        'icon' : icon ? icon.src : ''
       }
 
-      var event = Event.fire(this.fld, "xwiki:suggest:selected", {
-        'suggest' : this,
-        'id': this.iHighlighted.down(".suggestId").innerHTML,
-        'value': this.iHighlighted.down(".suggestValue").innerHTML,
-        'info': this.iHighlighted.down(".suggestInfo").innerHTML
-      });
+      var selection, newFieldValue;
+      if (this.sInput == "" && this.fld.value == "") {
+        selection = newFieldValue = data.value;
+      } else {
+        if (this.seps) {
+           var lastIndx = -1;
+           for (var i = 0; i < this.seps.length; i++) {
+             if (this.fld.value.lastIndexOf(this.seps.charAt(i)) > lastIndx) {
+               lastIndx = this.fld.value.lastIndexOf(this.seps.charAt(i));
+             }
+           }
+           if (lastIndx == -1) {
+              selection = newFieldValue = data.value;
+           } else {
+             newFieldValue = this.fld.value.substring(0, lastIndx+1) + data.value;
+             selection = newFieldValue.substring(lastIndx+1);
+           }
+        } else {
+          selection = newFieldValue = data.value;
+        }
+      }
+
+      var event = Event.fire(this.fld, "xwiki:suggest:selected", Object.clone(data));
 
       if (!event.stopped) {
         this.sInput = selection;
@@ -670,20 +891,14 @@ var XWiki = (function(XWiki){
         this.clearSuggestions();
 
         // pass selected object to callback function, if exists
-        if (typeof(this.options.callback) == "function") {
-          this.options.callback({
-            'id': this.iHighlighted.down(".suggestId").innerHTML,
-            'value': this.iHighlighted.down(".suggestValue").innerHTML,
-            'info': this.iHighlighted.down(".suggestInfo").innerHTML
-          });
-        }
+        typeof this.options.callback == "function" && this.options.callback(Object.clone(data));
 
-        //there is a hidden input
-        if(this.fld.id.indexOf("_suggest") > 0) {
+        // there is a hidden input
+        if (this.fld.id.indexOf("_suggest") > 0) {
           var hidden_id = this.fld.id.substring(0, this.fld.id.indexOf("_suggest"));
           var hidden_inp = $(hidden_id);
           if (hidden_inp) {
-            hidden_inp.value =  this.iHighlighted.down(".suggestInfo").innerHTML;
+            hidden_inp.value =  data.info;
           }
         }
       }
@@ -712,6 +927,7 @@ var XWiki = (function(XWiki){
    * Clear suggestions
    */
   clearSuggestions: function() {
+    this.clearHighlight();
     this.killTimeout();
     this.isActive = false;
     var ele = $(this.container);
@@ -728,6 +944,23 @@ var XWiki = (function(XWiki){
         $(this.container).remove();
       }
       document.fire("xwiki:suggest:clearSuggestions", { 'suggest' : this});
+    }
+  },
+
+  /**
+   * Remove suggest behavior from the target field (detach all listeners and hide the suggest if active)
+   */
+  detach : function() {
+    if (this.fld) {
+      Event.stopObserving(this.fld, "keyup", this.onKeyUp);
+      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+        Event.stopObserving(this.fld, "keydown", this.onKeyPress);
+      } else {
+        Event.stopObserving(this.fld, "keypress", this.onKeyPress);
+      }
+      this.clearSuggestions();
+      this.fld.__x_suggest = null;
+      this.fld.setAttribute("autocomplete", "on");
     }
   }
 

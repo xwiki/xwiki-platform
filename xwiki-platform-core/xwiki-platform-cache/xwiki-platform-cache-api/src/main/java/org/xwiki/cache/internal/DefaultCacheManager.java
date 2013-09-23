@@ -16,9 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.cache.internal;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -27,7 +29,6 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.CacheManagerConfiguration;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
@@ -39,35 +40,28 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 1.7M1
  */
 @Component
+@Singleton
 public class DefaultCacheManager implements CacheManager
 {
     /**
      * The component manager to use to find cache components.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * The configuration component for {@link CacheManager}.
      */
-    @Requirement
+    @Inject
     private CacheManagerConfiguration configuration;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#getCacheFactory()
-     */
+    @Override
     public CacheFactory getCacheFactory() throws ComponentLookupException
     {
         return getCacheFactory(this.configuration.getDefaultCache());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#getLocalCacheFactory()
-     */
+    @Override
     public CacheFactory getLocalCacheFactory() throws ComponentLookupException
     {
         return getCacheFactory(this.configuration.getDefaultLocalCache());
@@ -82,24 +76,16 @@ public class DefaultCacheManager implements CacheManager
      */
     public CacheFactory getCacheFactory(String cacheHint) throws ComponentLookupException
     {
-        return this.componentManager.lookup(CacheFactory.class, cacheHint);
+        return this.componentManager.getInstance(CacheFactory.class, cacheHint);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#createNewCache(org.xwiki.cache.config.CacheConfiguration)
-     */
+    @Override
     public <T> Cache<T> createNewCache(CacheConfiguration config) throws CacheException
     {
         return createNewCache(config, this.configuration.getDefaultCache());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.CacheManager#createNewLocalCache(org.xwiki.cache.config.CacheConfiguration)
-     */
+    @Override
     public <T> Cache<T> createNewLocalCache(CacheConfiguration config) throws CacheException
     {
         return createNewCache(config, this.configuration.getDefaultLocalCache());
@@ -118,7 +104,7 @@ public class DefaultCacheManager implements CacheManager
     {
         CacheFactory cacheFactory;
         try {
-            cacheFactory = this.componentManager.lookup(CacheFactory.class, cacheHint);
+            cacheFactory = this.componentManager.getInstance(CacheFactory.class, cacheHint);
         } catch (ComponentLookupException e) {
             throw new CacheException("Failed to get cache factory for role hint [" + cacheHint + "]", e);
         }

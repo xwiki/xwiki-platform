@@ -16,16 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
-
-import java.util.List;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -56,18 +52,8 @@ public class UndeleteAction extends XWikiAction
             String sindex = request.getParameter("id");
             long index = Long.parseLong(sindex);
             XWikiDocument newdoc = xwiki.getRecycleBinStore().restoreFromRecycleBin(doc, index, context, true);
-            xwiki.saveDocument(newdoc, "restored from recycle bin", context);
+            xwiki.saveDocument(newdoc, "Restored from recycle bin", context);
             xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
-            // Save attachments
-            List<XWikiAttachment> attachlist = newdoc.getAttachmentList();
-            if (attachlist.size() > 0) {
-                for (XWikiAttachment attachment : attachlist) {
-                    // Do not increment attachment version
-                    attachment.setMetaDataDirty(false);
-                    attachment.getAttachment_content().setContentDirty(false);
-                    xwiki.getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
-                }
-            }
         }
         sendRedirect(response, doc.getURL("view", context));
         return false;

@@ -46,7 +46,18 @@ public class X509KeymakerTest
     @Test
     public void testGenerateCertAuthority() throws GeneralSecurityException, IOException
     {
-        KeyPair kp = keyMaker.newKeyPair();
+        KeyPair kp = FastKeySupplier.KEYPAIR; //keyMaker.newKeyPair();
+
+        /*java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
+        oos.writeObject(kp);
+        oos.close();
+        System.out.println("\n\n");
+        System.out.println(org.xwiki.crypto.internal.Convert.toBase64String(baos.toByteArray()));
+        System.out.println("\n\n");*/
+
+
+
         X509Certificate cert = keyMaker.makeCertificateAuthority(kp, 1, "http://my.web.id.com/");
 
         // read Basic Constraints
@@ -59,7 +70,7 @@ public class X509KeymakerTest
     @Test
     public void testClientAndAuthority() throws GeneralSecurityException
     {
-        KeyPair kp = keyMaker.newKeyPair();
+        KeyPair kp = FastKeySupplier.KEYPAIR; //keyMaker.newKeyPair();
         X509Certificate[] certs = keyMaker.makeClientAndAuthorityCertificates(kp.getPublic(),
                                                                               1,
                                                                               true,

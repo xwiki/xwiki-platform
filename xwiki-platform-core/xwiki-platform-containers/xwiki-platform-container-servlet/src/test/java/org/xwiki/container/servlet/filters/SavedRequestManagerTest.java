@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
 
-
 /**
  * Test for {@link SavedRequestManager}.
  * 

@@ -19,28 +19,26 @@
  */
 package org.xwiki.crypto.passwd.internal;
 
-import java.util.Properties;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.xwiki.crypto.internal.SerializationUtils;
 import org.xwiki.crypto.passwd.MemoryHardKeyDerivationFunction;
 
 /**
- * Abstract memory hard key derivation function.
- * to subclass this, simply implement init(int, int, int) from MemoryHardKeyDerivationFunction
- * and isInitialized() and deriveKey(byte[]) from  KeyDerivationFunction.
- * Be careful, this class is serializable, serialization and deserialization should yield a function which provides
- * the same password to key mapping, and make sure fields unnecessary to this are declared transient.
- *
+ * Abstract memory hard key derivation function. to subclass this, simply implement init(int, int, int) from
+ * MemoryHardKeyDerivationFunction and isInitialized() and deriveKey(byte[]) from KeyDerivationFunction. Be careful,
+ * this class is serializable, serialization and deserialization should yield a function which provides the same
+ * password to key mapping, and make sure fields unnecessary to this are declared transient.
+ * 
  * @since 2.5M1
  * @version $Id$
  */
 public abstract class AbstractMemoryHardKeyDerivationFunction implements MemoryHardKeyDerivationFunction
 {
     /**
-     * Fields in this class are set in stone!
-     * Any changes may result in encrypted data becoming unreadable.
-     * This class should be extended if any changes need to be made.
+     * Fields in this class are set in stone! Any changes may result in encrypted data becoming unreadable. This class
+     * should be extended if any changes need to be made.
      */
     private static final long serialVersionUID = 1L;
 
@@ -56,33 +54,20 @@ public abstract class AbstractMemoryHardKeyDerivationFunction implements MemoryH
     /** The default length in bytes of the derived key (output). */
     private final transient int defaultDerivedKeyLength = 32;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see: org.xwiki.crypto.MemoryHardKeyDerivationFunction#serialize()
-     */
+    @Override
     public byte[] serialize() throws IOException
     {
         return SerializationUtils.serialize(this);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see: org.xwiki.crypto.MemoryHardKeyDerivationFunction#init()
-     */
+    @Override
     public void init()
     {
-        this.init(this.getDefaultNumberOfKilobytesOfMemoryToUse(),
-                  this.getDefaultMillisecondsOfProcessorTime(),
-                  this.getDefaultDerivedKeyLength());
+        this.init(this.getDefaultNumberOfKilobytesOfMemoryToUse(), this.getDefaultMillisecondsOfProcessorTime(),
+            this.getDefaultDerivedKeyLength());
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see: org.xwiki.crypto.MemoryHardKeyDerivationFunction#init(Properties)
-     */
+    @Override
     public void init(Properties parameters)
     {
         int keyLength = this.getDefaultDerivedKeyLength();
@@ -107,17 +92,11 @@ public abstract class AbstractMemoryHardKeyDerivationFunction implements MemoryH
         this.init(kilobytes, milliseconds, keyLength);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see: org.xwiki.crypto.MemoryHardKeyDerivationFunction#init(int, int)
-     */
-    public void init(final int millisecondsOfProcessorTimeToSpend,
-                     final int derivedKeyLength)
+    @Override
+    public void init(final int millisecondsOfProcessorTimeToSpend, final int derivedKeyLength)
     {
-        this.init(this.getDefaultNumberOfKilobytesOfMemoryToUse(),
-                  millisecondsOfProcessorTimeToSpend,
-                  derivedKeyLength);
+        this.init(this.getDefaultNumberOfKilobytesOfMemoryToUse(), millisecondsOfProcessorTimeToSpend,
+            derivedKeyLength);
     }
 
     /** @return the number of kilobytes of memory to require by default. */

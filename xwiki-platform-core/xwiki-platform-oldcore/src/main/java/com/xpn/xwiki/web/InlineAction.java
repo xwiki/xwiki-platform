@@ -16,24 +16,30 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
+
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 
-public class InlineAction extends XWikiAction {
-    private static final Log log = LogFactory.getLog(InlineAction.class);
+/**
+ * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead since 3.2
+ */
+@Deprecated
+public class InlineAction extends XWikiAction
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger(InlineAction.class);
 
-    public String render(XWikiContext context) throws XWikiException {
-
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         XWikiDocument doc = context.getDoc();
 
         synchronized (doc) {
@@ -43,7 +49,7 @@ public class InlineAction extends XWikiAction {
             Document vcdoc = (Document) vcontext.get("cdoc");
             EditForm peform = (EditForm) form;
 
-            XWikiDocument doc2 = (XWikiDocument) doc.clone();
+            XWikiDocument doc2 = doc.clone();
             Document vdoc2 = doc2.newDocument(context);
             context.put("doc", doc2);
             vcontext.put("doc", vdoc2);
@@ -71,12 +77,12 @@ public class InlineAction extends XWikiAction {
                 vcontext.put("cdoc", vdoc2);
             } else {
                 XWikiDocument cdoc = vcdoc.getDocument();
-                XWikiDocument cdoc2 = (XWikiDocument) cdoc.clone();
+                XWikiDocument cdoc2 = cdoc.clone();
                 vcontext.put("cdoc", cdoc2.newDocument(context));
                 cdoc2.readFromTemplate(peform, context);
             }
 
-            doc2.readFromForm((EditForm)form, context);
+            doc2.readFromForm((EditForm) form, context);
 
             /* Setup a lock */
             try {
@@ -87,11 +93,12 @@ public class InlineAction extends XWikiAction {
                 e.printStackTrace();
                 // Lock should never make XWiki fail
                 // But we should log any related information
-                log.error("Exception while setting up lock", e);
+                LOGGER.error("Exception while setting up lock", e);
             }
         }
 
-        // Set display context to 'view'
+        // Make sure object property fields are displayed in edit mode.
+        // See XWikiDocument#display(String, BaseObject, XWikiContext)
         context.put("display", "edit");
         return "inline";
     }

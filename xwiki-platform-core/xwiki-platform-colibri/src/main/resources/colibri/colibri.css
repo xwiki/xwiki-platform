@@ -134,6 +134,10 @@ blockquote {
   quotes: none;
 }
 
+li > dl, dt > dl, dd > dl {
+  margin-left: 2em;
+}
+
 dt {
   font-style: normal;
   font-weight: 700;
@@ -141,18 +145,59 @@ dt {
 }
 
 input[type="text"], input[type="password"] {
-  background-color: $theme.pageContentBackgroundColor ;
+  background-color: $theme.pageContentBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.fieldGradientColor, 'position': '1px'},
+      {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
+    ]
+  })
   border: 1px solid $theme.borderColor;
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 0px 1px 2px $theme.borderColor;
   color: $theme.textColor;
+}
+::-webkit-input-placeholder {
+  color: $theme.textSecondaryColor !important;
+}
+:-moz-placeholder {
+  color: $theme.textSecondaryColor !important;
+}
+:-ms-placeholder {
+  color: $theme.textSecondaryColor !important;
+}
+/* For browsers that don't support the placeholder attribute. */
+input[type="text"].empty {
+  color: $theme.textSecondaryColor !important;
 }
 /* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
 textarea, select {
-  background-color: $theme.pageContentBackgroundColor ;
+  background-color: $theme.pageContentBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.fieldGradientColor, 'position': '1px'},
+      {'color': $theme.pageContentBackgroundColor, 'position': '8px'}
+    ]
+  })
   border: 1px solid $theme.borderColor;
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 0px 1px 2px $theme.borderColor;
   color: $theme.textColor;
 }
 textarea {
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
+}
+input, textarea {
+  #css3_boxSizing('border-box')
+  padding: .3em;
+}
+/* IE7 will shrink floated textareas continuously if we set a max-width,
+   since 100% max-width is computed within the border, while the current width includes the border.
+   Disable it since anyway it doesn't support native textarea resizing. */
+*+html textarea {
+  max-width: none;
 }
 
 /* -----------------------Tables-------------------------*/
@@ -197,7 +242,7 @@ tt .wikimodel-verbatim {
 }
 
 .main table {
-  margin: 1em 1px;
+  margin: 1em 0;
 }
 
 .main th, .main td,
@@ -251,7 +296,6 @@ span.wikicreatelink a:after {
 /* ---------------------Lists----------------------------*/
 .main ol, .main ul {
   line-height: 1.4em;
-  list-style-position: inside;
   margin: 1em 0 1em 2em;
 }
 .main ol *, .main ul * {
@@ -273,14 +317,15 @@ span.wikicreatelink a:after {
   visibility:hidden;
 }
 
-.edit_section a {
+.edit_section a, .edit_section span {
   background: transparent url("$xwiki.getSkinFile('icons/xwiki/edit-section.png')") no-repeat left top;
-  line-height: 999px;
+  height: 20px;
   margin: 0;
   overflow: hidden;
   padding: 0;
   position: absolute;
   right: 0;
+  text-indent: -1000em;
   top: 0;
   visibility:visible;
   width: 20px;
@@ -384,12 +429,13 @@ th.avatar {
 
 .globalsearchinput {
   min-height: 16px;
-  padding: 0 18px 0 2px;
+  padding: 2px 18px 2px 2px;
   width: 168px;
 }
 
-.globalsearch input.button {
-  background-color: transparent;
+.globalsearch input.button , .globalsearch input.button:hover{
+  background-color: $theme.pageContentBackgroundColor;
+  background-image: none;
   border: 0;
   height: 16px;
   margin: 0 2px 0 -18px;
@@ -405,8 +451,6 @@ th.avatar {
 
 #headerlanguages a {
   background: $theme.menuBackgroundColor;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
   color: $theme.menuLinkColor;
   display: inline-block;
@@ -464,6 +508,7 @@ th.avatar {
 
 #mainContentArea, #mainEditArea  {
   background: $theme.pageContentBackgroundColor;
+  overflow: auto;
   padding: 10px 25px;
 }
 
@@ -556,16 +601,12 @@ th.avatar {
 /* -----------------Tabs------------------*/
 ul.xwikitabbar {
   background-color: $theme.menuBackgroundColor;
-  height: 20px;
-  line-height: 20px;
   margin: 0;
-  overflow: hidden;
   padding: 3px 0 0 15px;
 }
 
 .xwikitabbar li {
   display: inline-block;
-  float: left;
   height: 20px;
   line-height: 20px;
   list-style-type: none;
@@ -588,6 +629,7 @@ ul.xwikitabbar {
   color: $theme.menuSelectedEntryLinkColor;
   cursor: default;
   text-decoration: none;
+  text-shadow: none;
 }
 
 /* ----------------History----------------*/
@@ -674,44 +716,6 @@ div.buttonwrapper {
   padding: 1.5em 0 1em;
 }
 
-#changescontent table {
-  margin-bottom: 0;
-  width: 100%;
-}
-
-#changescontent th, #changescontent td {
-  border: 1px solid $theme.borderColor;
-  padding: 3px 4px;
-}
-
-#changescontent th {
-  font-size: .85em;
-}
-
-#changescontent  .changes-table-title th {
-  font-size: .9em;
-  text-transform: uppercase;
-}
-
-#changescontent table tr.changes-table-title + tr.changes-table-title th {
-  border-bottom-width: 4px;
-  font-size: .8em;
-}
-
-.diff {
-  overflow: auto;
-  white-space: normal;
-}
-
-.diffaddword {
-  color: $theme.notificationSuccessColor;
-}
-
-.diffremoveword {
-  color: $theme.notificationErrorColor;
-  text-decoration: line-through;
-}
-
 /* --------------Information--------------*/
 #informationcontent dd {
   padding: 0 1em 1em;
@@ -796,7 +800,7 @@ div.buttonwrapper {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')");
 }
 .edit-meta-tools a.hide-edit-parent {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
 /* Parent editing area */
@@ -844,7 +848,7 @@ div.buttonwrapper {
   border: 1px solid $theme.borderColor;
 }
 
-#xwikieditcontent textarea#content {
+#xwikieditcontentinner textarea#content {
   border: 0;
   padding: 0;
   width: 100%;
@@ -873,11 +877,6 @@ iframe.mceEditorIframe, .mceEditor {
 }
 
 /* ----------------New WYSYWYG Editor--------------------*/
-/* Should be in Wysiwyg.css */
-table.xRichTextEditorTabPanel td {
-  background-color: $theme.pageContentBackgroundColor;
-}
-
 /* Should be in RichTextArea.css - for table resizing */
 #body.main table {
   margin: 0;
@@ -888,7 +887,7 @@ table.xRichTextEditorTabPanel td {
 }
 
 .xwikirenderingerror {
-  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/exclamation.gif')") no-repeat 8px 50%;
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/exclamation.png')") no-repeat 8px 50%;
   border: 1px dotted $theme.borderColor;
   color: $theme.notificationErrorColor;
   display: block;
@@ -1016,6 +1015,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu .hasIcon {
   background: no-repeat 0px 3px;
+  padding: 0;
 }
 
 .tme-extensible {
@@ -1122,40 +1122,51 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 /* Icons */
 .actionmenu .tmCreate {
-  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
+  ## We don't use the #css3_backgroundIconAndLinearGradient macro because IE8 will accept the background-image property with multiple images, although it will fail to correctly interpret it
+  #foreach ($prefix in ['-webkit-'])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(to top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
+  #foreach ($prefix in ['-moz-', '-o-', ''])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(bottom, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
 }
 
 .actionmenu .tmWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
 
 .actionmenu .tmAdminWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
 .actionmenu .tmCreateSpace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.png')");
 }
 
 .actionmenu .tmSpace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder.png')");
 }
 
 .actionmenu .tmAdminSpace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
+}
+
+.actionmenu .tmSpaceDelete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
 .actionmenu .tmPage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
 }
 
 .actionmenu .tmCreatePage, .actionmenu .tmCreatePageFromOffice {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_add.png')");
 }
 
 .actionmenu .tmCreateComment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comment_add.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment_add.png')");
 }
 
 .actionmenu .tmCreateAttachment{
@@ -1163,35 +1174,35 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmEdit {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')");
 }
 
 .actionmenu .tmEditWiki, .actionmenu .tmViewSource {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.png')");
 }
 
 .actionmenu .tmEditWysiwyg {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')");
 }
 
 .actionmenu .tmEditInline {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_form.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_form.png')");
 }
 
 .actionmenu .tmEditRights {
-  background-image: url("$xwiki.getSkinFile('icons/silk/lock.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/lock.png')");
 }
 
 .actionmenu .tmEditObject {
-  background-image: url("$xwiki.getSkinFile('icons/silk/brick.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/brick.png')");
 }
 
 .actionmenu .tmEditClass {
-  background-image: url("$xwiki.getSkinFile('icons/silk/box.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/box.png')");
 }
 
 .actionmenu .tmExportPdf {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_acrobat.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_acrobat.png')");
 }
 
 .actionmenu .tmExportOdt {
@@ -1199,47 +1210,47 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmExportRtf {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_word.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_word.png')");
 }
 
 .actionmenu .tmExportHtml {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.png')");
 }
 
 .actionmenu .tmExportXar {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_compressed.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_compressed.png')");
 }
 
 .actionmenu .tmPrintPreview {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_magnify.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_magnify.png')");
 }
 
 .actionmenu .tmActionDelete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
 .actionmenu .tmActionRename {
-  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')");
 }
 
 .actionmenu #tmActionShare {
-  background-image: url("$xwiki.getSkinFile('icons/silk/email_go.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/email_go.png')");
 }
 
 .actionmenu .tmActionCopy {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.png')");
 }
 
 .actionmenu .tmUser {
-  background-image: url("$xwiki.getSkinFile('icons/silk/user.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/user.png')");
 }
 
 .actionmenu .tmProfile {
-  background-image: url("$xwiki.getSkinFile('icons/silk/vcard.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/vcard.png')");
 }
 
 .actionmenu .tmUserPreferences {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
 .actionmenu .tmWatchWiki, .actionmenu .tmWatchSpace, .actionmenu .tmWatchDocument {
@@ -1251,12 +1262,43 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmWikiDocumentIndex, .actionmenu .tmSpaceDocumentIndex {
-  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
 }
 .actionmenu .tmUserNetwork {
-  background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 
+.actionmenu .tmUserDashboard {
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
+}
+
+/* Styles for the floating menu, when scrolling down the page. */
+.floating-menu {
+  margin-top: -18px;
+}
+.floating-menu:hover {
+  margin-top: 0;
+}
+.floating-menu:after {
+  bottom: 0;
+  color: $theme.buttonSecondaryTextColor;
+  background: inherit;
+  content: ".......";
+  display: block;
+  font-size: 0.6em;
+  height: 0.5em;
+  letter-spacing: 0.2em;
+  line-height: 0.3em;
+  padding: 0 0 0.1em;
+  position: absolute;
+  text-align: center;
+  #css_textShadow('0', '1px', '0', $theme.menuContentGradientColor)
+  width: 100%;
+}
+.floating-menu:hover:after {
+  content: "";
+  display: none;
+}
 /* @group FORMS */
 /* --------------------------------------------------------------
   * forms components
@@ -1274,8 +1316,12 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .xform h2 {
   margin: 2em 0 0;
 }
-.xform fieldset h2 {
-  margin: 0;
+/* Legend elements have an intrinsic 8px left padding; compensate that by a negative left margin */
+* html .xform legend {
+  margin-left: -8px;
+}
+*+html .xform legend {
+  margin-left: -8px;
 }
 
 .xform fieldset {
@@ -1291,9 +1337,16 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .xform input[type="text"], .xform input[type="password"] {
   width: 99%;
 }
+.xform label input[type=checkbox], .xform label input[type=radio] {
+  margin: 0 0.2em 0 0;
+  vertical-align: text-bottom;
+}
 /* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
 .xform select, .xform textarea {
   width: 99%;
+}
+.xform textarea {
+  resize: vertical;
 }
 
 .xform dt {
@@ -1337,7 +1390,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .xform .xHelp {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/information.gif')") 0 0 no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/information.png')") 0 0 no-repeat;
   float: right;
   height: 16px;
   line-height: 250px; /* Push the text away. */
@@ -1374,30 +1427,90 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .buttonwrapper .button {
   vertical-align: middle;
 }
-input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
+input.button, .buttonwrapper button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
   background-image: none;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.buttonPrimaryGradientColor, 'position': '0%'},
+      {'color': $theme.buttonPrimaryBackgroundColor, 'position': '100%'}
+    ]
+  })
   border: 1px solid $theme.buttonPrimaryBackgroundColor;
+  border-radius: 3px 3px 3px 3px;
   color: $theme.buttonPrimaryTextColor;
   cursor: pointer;
   display: inline-block;
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 0;
   padding: 2px 3px;
+  #css_textShadow('0', '1px', '0', $theme.buttonPrimaryGradientColor)
   text-transform: uppercase;
 }
 
-input.button:hover , .buttonwrapper  a:hover{
-  background-color: $theme.buttonSecondaryBackgroundColor;
-  color: $theme.buttonSecondaryTextColor;
+input.button:hover, .buttonwrapper button:hover, .buttonwrapper a:hover{
+  background-color: $theme.buttonPrimaryBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.buttonPrimaryBackgroundColor, 'position': '0%'},
+      {'color': $theme.buttonPrimaryGradientColor, 'position': '100%'}
+    ]
+  })
+  box-shadow: 0px 2px 2px $theme.borderColor;
+  color: $theme.buttonPrimaryTextColor;
   text-decoration: none;
 }
 
-.buttonwrapper input.secondary, .buttonwrapper a.secondary, 
+.buttonwrapper input.secondary, .buttonwrapper button.secondary, .buttonwrapper a.secondary,
 .buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
 .buttonwrapper a.secondary:active /* Needed for IE6 */ {
   background-color: $theme.buttonSecondaryBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.buttonSecondaryGradientColor, 'position': '0%'},
+      {'color': $theme.buttonSecondaryBackgroundColor, 'position': '100%'}
+    ]
+  })
+  border-color: $theme.buttonSecondaryBackgroundColor;
+  border-radius: 3px 3px 3px 3px;
   color: $theme.buttonSecondaryTextColor;
+  #css_textShadow('0', '1px', '0', $theme.buttonSecondaryGradientColor)
+}
+
+input.secondary:hover, button.secondary:hover, .buttonwrapper a.secondary:hover {
+  box-shadow: 0px 2px 2px $theme.borderColor;
+}
+
+/* Small icon buttons */
+input.icon-button {
+  background: transparent none center center no-repeat;
+  border: 0 none;
+  font-size: 80%;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  text-indent: -9999px;
+  width: 16px;
+}
+.icon-button.add-button {
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
+}
+.icon-button.remove-button {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+}
+.icon-button.accept-button {
+  background-image: url("$xwiki.getSkinFile('icons/silk/accept.png')");
+}
+.icon-button.search-button {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/search.png')");
+}
+
+*:disabled, input.disabled, button.disabled, .buttonwrapper a.disabled, .edit_section.disabled {
+  opacity: .5;
+  cursor: default;
 }
 
 /* @group VERTICAL MENU */
@@ -1438,12 +1551,19 @@ input.button:hover , .buttonwrapper  a:hover{
 
 /* Section titles */
 .vertical-menu .group {
-  background-color: $theme.panelCollapsedBackgroundColor;
+  background-color: $theme.menuContentBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuContentGradientColor, 'position': '0%'},
+      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
+    ]
+  })
   font-weight: 700;
   font-variant: small-caps;
 }
 .vertical-menu .group * {
-  color: $theme.panelCollapsedTextColor;
+  color: $theme.menuContentLinkColor;
 }
 
 /* Highlight items when hovering */
@@ -1451,10 +1571,17 @@ input.button:hover , .buttonwrapper  a:hover{
   background-color: $theme.highlightColor;
 }
 .vertical-menu .group:hover {
-  background-color: $theme.panelHeaderBackgroundColor;
+  background-color: $theme.menuBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuGradientColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
 }
 .vertical-menu .group:hover * {
-  color: $theme.panelHeaderTextColor;
+  color: $theme.menuLinkColor;
 }
 
 /* Selected item */
@@ -1463,11 +1590,18 @@ input.button:hover , .buttonwrapper  a:hover{
   font-weight: bold;
 }
 .vertical-menu .current-group {
-  background-color: $theme.panelHeaderBackgroundColor;
-  color: $theme.panelHeaderTextColor;
+  background-color: $theme.menuBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuGradientColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+  color: $theme.menuLinkColor;
 }
 .vertical-menu .current-group *, .vertical-menu .current-group *:visited, .vertical-menu .current-group *:active {
-  color: $theme.panelHeaderTextColor;
+  color: $theme.menuLinkColor;
 }
 
 /* Draw an arrow pointing right for the selected item */
@@ -1486,7 +1620,7 @@ input.button:hover , .buttonwrapper  a:hover{
   right: -11px;
 }
 .vertical-menu .current-group:after {
-  border-left-color: $theme.panelHeaderBackgroundColor !important;
+  border-left-color: $theme.menuBackgroundColor !important;
 }
 
 /* @group PANELS */
@@ -1526,14 +1660,14 @@ input.button:hover , .buttonwrapper  a:hover{
 
 h1.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
-  border-bottom: 1px dotted $theme.borderColor;
+  border-bottom: 0;
   color: $theme.panelHeaderTextColor;
   cursor: pointer;
   font-size: .8em;
   font-weight: 700;
   letter-spacing: 0;
   margin: 0;
-  padding: 6px 20px 6px 15px;
+  padding: 5px 20px 5px 15px;
   text-align: left;
   text-transform: uppercase;
 }
@@ -1607,6 +1741,157 @@ h1.xwikipaneltitle {
   border-top: 1px dotted $theme.borderColor;
 }
 
+.DocumentInformation input#xhidden {
+  width: auto;
+  margin-right: 0.5em;
+}
+
+/* @group CONTAINERS GENERAL STYLING */
+/* --------------------------------------------------------------
+  * General rules that applied to different types of containers
+-------------------------------------------------------------- */
+/* -------------- Containers borders -----------------*/
+#contentmenu, #editmenu,
+.xwikipanelcontents, h1.xwikipaneltitle,
+#mainContentArea, #mainEditArea,
+#xdocFooter,
+#docextrapanes, ul.xwikitabbar {
+  border: 1px solid $theme.borderColor;
+}
+
+#docextrapanes {
+  box-shadow: 0px -1px 0px $theme.borderColor; /* #docExtraTabs bottom border */
+}
+
+#contentmenu, #editmenu {
+  border-width: 1px 0 0;
+}
+
+#mainContentArea, #mainEditArea {
+  border-width: 1px;
+}
+
+ul.xwikitabbar {
+  border-width: 1px 1px 0;
+}
+
+.xwikipanelcontents, #docextrapanes, #xdocFooter {
+  border-width: 0 1px 1px;
+  border-radius: 0 0 4px 4px;
+}
+
+.collapsed h1.xwikipaneltitle {
+  border-radius: 4px 4px 4px 4px;
+}
+
+.xwikitabbar li.active a, .xwikitabbar li.active a:active, .xwikitabbar li.active a:visited {
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0px -1px 1px $theme.borderColor;
+}
+
+/* -------------- Containers gradients -----------------*/
+h1.xwikipaneltitle {
+  background-color: $theme.panelHeaderBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
+      {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
+    ]
+  })
+  border-radius: 4px 4px 0 0;
+  color: $theme.panelHeaderTextColor;
+  #css_textShadow('0', '1px', '0', $theme.panelHeaderGradientColor)
+}
+
+.collapsed h1.xwikipaneltitle {
+  background-color: $theme.panelCollapsedBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.panelCollapsedGradientColor, 'position': '0%'},
+      {'color': $theme.panelCollapsedBackgroundColor, 'position': '100%'}
+    ]
+  })
+  color: $theme.panelCollapsedTextColor;
+  #css_textShadow('0', '1px', '0', $theme.panelCollapsedGradientColor)
+}
+
+#contentmenu, #editmenu, ul.xwikitabbar {
+  background-color: $theme.menuContentBackgroundColor;
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuContentGradientColor, 'position': '0%'},
+      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
+    ]
+  })
+  border-radius: 4px 4px 0 0;
+}
+
+#contentmenu.actionmenu a, #contentmenu.actionmenu a:visited, #contentmenu .menuarrow, #contentmenu .tmetype,
+#editmenu.actionmenu a, #editmenu.actionmenu a:visited, #editmenu .menuarrow, #editmenu .tmetype,
+.xwikitabbar li a, .xwikitabbar li a:visited, .xwikitabbar li a:active  {
+  color: $theme.menuContentLinkColor;
+  #css_textShadow('0', '1px', '0', $theme.menuContentGradientColor)
+}
+
+#contentmenu.actionmenu .submenuitem a ,
+#editmenu.actionmenu .submenuitem a {
+  text-shadow: none;
+}
+
+#contentmenu.actionmenu .submenu,
+#editmenu.actionmenu .submenu {
+  background-color: $theme.submenuContentBackgroundColor;
+}
+
+#mainmenu {
+  #css3_backgroundLinearGradient({
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuGradientColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+  box-shadow: 0px 1px 2px $theme.menuGradientColor;
+}
+
+#mainmenu .tmetype, #mainmenu .tme {
+  #css_textShadow('0', '1px', '0', $theme.menuGradientColor)
+}
+
+#mainmenu .tmCreate .tme {
+  text-shadow: none;
+}
+
+#mainmenu .submenu , #contentmenu .submenu  {
+  box-shadow: 0px 1px 1px $theme.borderColor;
+}
+
+.actionmenu .submenu {
+  border-radius: 0 0 10px 10px;
+}
+
+/* Gradients for tmCreate */
+.actionmenu .tmCreate {
+  border-radius: 4px 4px 4px 4px;
+  padding-left: 0;
+}
+
+.actionmenu .tmCreate:hover {
+  border-radius: 4px 4px 0px 0px;
+}
+
+.tmCreate  .tme-extensible {
+  padding-left: 10px;
+}
+
+.tmCreate .submenu {
+  border-radius: 0 10px 10px 10px;
+  border: 2px solid $theme.menuAddEntryBackgroundColor;
+}
+
 /* @group COMPONENTS*/
 /* --------------------------------------------------------------
   * Different classes with specific use
@@ -1630,7 +1915,7 @@ ul.xlist li {
   float: right;
   height: 100%;
   list-style-type: none;
-  padding-top: .2em;
+  padding: .1em 0;
   width: 100% !important;
 }
 
@@ -1640,20 +1925,27 @@ ul.xlist li.space, ul.xlist li.page, ul.xlist li.comment, ul.xlist li.attachment
 }
 
 ul.xlist li.space {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder.png')");
 }
 
 ul.xlist li.page {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
 }
 
 ul.xlist li.comment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comment.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment.png')");
 }
 
 ul.xlist li.attachment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/attach.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/attach.png')");
   padding-bottom: 0;
+}
+
+ul.xlist li.create a {
+  background: url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") 7px 3px no-repeat;
+  color: $theme.textSecondaryColor;
+  text-decoration: none;
+  padding-left: 1.5em;
 }
 
 ul.xlist li.xitem div.xitemcontainer {
@@ -1696,6 +1988,8 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 .errormessage, .warningmessage, .infomessage, .successmessage, .plainmessage {
   background: $theme.backgroundSecondaryColor 6px 8px no-repeat;
   border: 1px dotted $theme.borderColor;
+  border-radius: 4px;
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.1) inset;
   margin: 4px 0;
   overflow: auto;
   padding: 8px 28px;
@@ -1703,22 +1997,22 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .infomessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/information.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
   color: $theme.notificationInfoColor;
 }
 
 .warningmessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/error.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/error.png')");
   color: $theme.notificationWarningColor;
 }
 
 .errormessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
   color: $theme.notificationErrorColor;
 }
 
 .successmessage {
-  background-image: url("$xwiki.getSkinFile('icons/silk/tick.gif')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/tick.png')");
   color: $theme.notificationSuccessColor;
 }
 
@@ -1862,6 +2156,15 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
   vertical-align: middle;
 }
 
+.hasIcon {
+  background: none no-repeat scroll 0 0 transparent;
+  padding-left: 20px;
+}
+
+.iconRSS {
+  background-image: url("$xwiki.getSkinFile('icons/silk/feed.png')");
+}
+
 /* @group MACROS */
 /* --------------------------------------------------------------
   * Different classes for specific macro usage
@@ -1879,7 +2182,7 @@ ol.footnotes {
   border-top: 1px solid $theme.borderColor;
   font-size: 80%;
   margin: 10px 0;
-  padding: 1em;
+  padding: 2em;
 }
 
 .footnotes li {
@@ -1929,6 +2232,12 @@ ol.footnotes {
   border: 1px dotted $theme.borderColor;
   padding: 8px;
   width: 300px;
+}
+
+/* This rule is for allowing the RSS macro to use all width available when inserted as a gadget in a dashboard
+but still maintain the 300 px width when used as a Macro from the WYSIWYG Editor */
+.column .rssfeed {
+  width: auto;
 }
 
 .rssfeed .rsschanneltitle {
@@ -1997,160 +2306,8 @@ ol.footnotes {
   padding: 0;
 }
 
-/* Overwrites usersandgroups.css */
-#tdAddNewUserOrGroup .buttonwrapper  a{
-  background-image: none;
-  display: inline;
-  font-size: .8em;
-  height: auto;
-  width: auto;
-}
-
-/* Overwrites usersandgroups.css */
-#tdAddNewUserOrGroup .buttonwrapper  a:hover {
-  color: $theme.buttonSecondaryTextColor;
-}
-
 #addNewMember table {
   border-collapse: separate;
-}
-
-/* ------------------Panel Wizard------------------------*/
-.panelcontainer {
-  background-color: $theme.pageBackgroundColor;
-  border: 1px solid $theme.borderColor;
-  height: 200px;
-  overflow: hidden;
-  padding: 3px;
-}
-
-.panelitemc .xwikibuttonlink {
-  border: 1px solid $theme.borderColor;
-  border-top: 0;
-  text-align: center;
-}
-
-.panelitemc .xwikibuttonlink a {
-  padding: 0 5px;
-}
-
-.panelitemc {
-  float: left;
-  height: 256px;
-  margin: 0 4px;
-  width: 210px;
-}
-
-.panelitemc .label {
-  color: $theme.textPrimaryColor;
-  font-weight: 700;
-  padding: 2px 0;
-  text-align: center;
-}
-
-.placeholder {
-  background-color: $theme.backgroundSecondaryColor;
-  margin-left: 10px;
-  width: 170px;
-}
-
-#dhtmltooltip {
-  background-color: $theme.highlightColor;
-  border: 1px solid $theme.borderColor;
-  padding: 2px 4px;
-  position: absolute;
-  text-align: justify;
-  z-index: 500;
-}
-
-#panelwizardbuttons {
-  margin: 15px 0 10px;
-}
-
-#PanelListSection, #PageLayoutSection {
-  margin: 15px 0 0;
-}
-
-/* ----------------Page Layout Selection-----------------*/
-.pagelayoutoption {
-  text-align: center;
-  width: 106px;
-}
-
-.pagelayoutoptions  table {
-  margin: 1em 0 0;
-  width: 100%;
-}
-
-.pagelayoutoptions  table td {
-  border: 0;
-}
-
-.pagelayoutoption label {
-  color: $theme.textSecondaryColor;
-}
-
-div.layoutmaquette {
-  height: 100px;
-  padding: 5px;
-  width: 100px;
-}
-
-div.lmcontentcolumn {
-  background-color: #eee;
-  border: 1px solid #aaa;
-  height: 90px;
-}
-
-div.lmleftcolumn, div.lmrightcolumn {
-  background-color: #ddd;
-  border: 1px solid #aaa;
-  float: left;
-  height: 60px;
-  width: 20px;
-}
-
-div.lmrightcolumn {
-  float: right;
-}
-
-#leftcolumn div.lmcontentcolumn {
-  margin-left: 24px;
-}
-
-#rightcolumn div.lmcontentcolumn {
-  margin-right: 24px;
-}
-
-#bothcolumns div.lmcontentcolumn {
-  margin-left: 24px;
-  margin-right: 24px;
-}
-
-div.pagelayoutoption:hover .layoutmaquette {
-  background-color: $theme.highlightColor;
-}
-
-div.pagelayoutoption:hover .lmcontentcolumn {
-  background-color: #ddd;
-}
-
-div.pagelayoutoption:hover .lmleftcolumn,
-  div.pagelayoutoption:hover .lmrightcolumn {
-  background-color: #acf;
-}
-
-#selectedoption .lmcontentcolumn {
-  background-color: #acf;
-}
-
-#selectedoption .lmleftcolumn,
-  #selectedoption .lmrightcolumn {
-  background-color: #369;
-}
-
-#selectedoption label, .pagelayoutoption:hover label {
-  color: $theme.titleColor;
 }
 
 /* @group BLOG  */

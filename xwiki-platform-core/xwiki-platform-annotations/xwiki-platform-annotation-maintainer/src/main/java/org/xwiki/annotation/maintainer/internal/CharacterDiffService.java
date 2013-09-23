@@ -39,11 +39,7 @@ import org.xwiki.component.annotation.Component;
 @Component(hints = {"default", "character" })
 public class CharacterDiffService implements DiffService
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.DiffService#getDifferences(java.lang.String, java.lang.String)
-     */
+    @Override
     public Collection<XDelta> getDifferences(String previous, String current)
     {
         // get differences at character level

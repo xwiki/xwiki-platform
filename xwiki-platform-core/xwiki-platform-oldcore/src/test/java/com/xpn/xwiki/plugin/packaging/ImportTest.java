@@ -20,39 +20,32 @@
 
 package com.xpn.xwiki.plugin.packaging;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.stub.VoidStub;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateRecycleBinStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-public class ImportTest extends AbstractBridgedXWikiComponentTestCase
+public class ImportTest extends AbstractPackageTest
 {
     private Package pack;
 
@@ -68,11 +61,6 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
 
     private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
-     */
     @Override
     protected void setUp() throws Exception
     {
@@ -82,8 +70,10 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki = new XWiki();
         getContext().setWiki(this.xwiki);
         this.xwiki.setConfig(new XWikiConfig());
-        this.xwiki.setNotificationManager(new XWikiNotificationManager());
 
+        Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
+        mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+        
         // mock a store that would also handle translations
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
@@ -91,6 +81,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
@@ -108,6 +99,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -125,6 +117,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("deleteXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -140,6 +133,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("getTranslationList").will(
             new CustomStub("Implements XWikiStoreInterface.getTranslationList")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
@@ -175,7 +169,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         // mock the right service
         this.mockRightService = mock(XWikiRightService.class);
         this.mockRightService.stubs().method("checkAccess").will(returnValue(true));
-        this.mockRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockRightService.stubs().method("hasWikiAdminRights").will(returnValue(true));
         this.mockRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
         this.xwiki.setRightService((XWikiRightService) this.mockRightService.proxy());
     }
@@ -191,6 +185,127 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         doc1.setDefaultLanguage("en");
 
         byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"});
+
+        // make sure no data is in the packager from the other tests run
+        this.pack = new Package();
+        // import and install this document
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
+
+        // check if it is there
+        XWikiDocument foundDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImport"), getContext());
+        assertFalse(foundDocument.isNew());
+
+        XWikiDocument nonExistingDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportNonexisting"), getContext());
+        assertTrue(nonExistingDocument.isNew());
+
+        XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertSame(foundDocument, foundTranslationDocument);
+
+        XWikiDocument doc1Translation = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
+        doc1Translation.setLanguage("fr");
+        doc1Translation.setDefaultLanguage("en");
+        this.xwiki.saveDocument(doc1Translation, getContext());
+        foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertNotSame(foundDocument, foundTranslationDocument);
+    }
+
+    /**
+     * Test the regular document import with non-ascii document title.
+     * 
+     * @throws Exception
+     */
+    public void testImportDocumentNonAsciiTitle() throws Exception
+    {
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
+        doc1.setDefaultLanguage("zh");
+
+        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"UTF-8"}, "UTF-8");
+
+        // make sure no data is in the packager from the other tests run
+        this.pack = new Package();
+        // import and install this document
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
+
+        // check if it is there
+        XWikiDocument foundDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"), getContext());
+        assertFalse(foundDocument.isNew());
+
+        XWikiDocument nonExistingDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportNonexisting"), getContext());
+        assertTrue(nonExistingDocument.isNew());
+
+        XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertSame(foundDocument, foundTranslationDocument);
+
+        XWikiDocument doc1Translation = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
+        doc1Translation.setLanguage("fr");
+        doc1Translation.setDefaultLanguage("zh");
+        this.xwiki.saveDocument(doc1Translation, getContext());
+        foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertNotSame(foundDocument, foundTranslationDocument);
+    }
+
+
+    /**
+     * Test the regular document import with non-ascii document title and non-utf8 platform encoding.
+     * 
+     * @throws Exception
+     */
+    public void testImportDocumentNonAsciiTitleNonUtf8PlatformEncoding() throws Exception
+    {
+        String oldEncoding = System.getProperty("file.encoding");
+        System.setProperty("file.encoding", "ISO-8859-1");
+
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
+        doc1.setDefaultLanguage("zh");
+
+        byte[] zipFile = this.createZipFileUsingCommonsCompress(new XWikiDocument[] {doc1}, new String[] {"UTF-8"}, "UTF-8");
+
+        // make sure no data is in the packager from the other tests run
+        this.pack = new Package();
+
+        // import and install this document
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
+
+        System.setProperty("file.encoding", oldEncoding);
+
+        // check if it is there
+        XWikiDocument foundDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"), getContext());
+        assertFalse(foundDocument.isNew());
+
+        XWikiDocument nonExistingDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportNonexisting"), getContext());
+        assertTrue(nonExistingDocument.isNew());
+
+        XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertSame(foundDocument, foundTranslationDocument);
+
+        XWikiDocument doc1Translation = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
+        doc1Translation.setLanguage("fr");
+        doc1Translation.setDefaultLanguage("zh");
+        this.xwiki.saveDocument(doc1Translation, getContext());
+        foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertNotSame(foundDocument, foundTranslationDocument);
+    }
+
+    /**
+     * Test the regular document import.  Test XAR file built with commons compress.
+     * 
+     * @throws Exception
+     */
+    public void testImportDocumentXarCreatedByCommonsCompress() throws Exception
+    {
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
+        doc1.setDefaultLanguage("en");
+
+        byte[] zipFile = this.createZipFileUsingCommonsCompress(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"});
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
@@ -259,6 +374,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
             this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"), getContext());
         assertFalse(foundOverwritingDoc.isNew());
         assertEquals(foundOverwritingDoc.getContent(), newContent);
+        assertEquals(foundDocument, foundOverwritingDoc.getOriginalDocument());
     }
 
     /**
@@ -305,67 +421,4 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         assertFalse(translationDoc.isNew());
     }
 
-    private String getPackageXML(XWikiDocument docs[])
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-        sb.append("<package>\n").append("<infos>\n").append("<name>Backup</name>\n");
-        sb.append("<description>on Mon Jan 01 01:44:32 CET 2007 by XWiki.Admin</description>\n");
-        sb.append("<licence></licence>\n");
-        sb.append("<author>XWiki.Admin</author>\n");
-        sb.append("<version></version>\n");
-        sb.append("<backupPack>true</backupPack>\n");
-        sb.append("</infos>\n");
-        sb.append("<files>\n");
-        for (int i = 0; i < docs.length; i++) {
-
-            sb.append("<file defaultAction=\"0\" language=\"" + docs[i].getLanguage() + "\">" + docs[i].getFullName()
-                + "</file>\n");
-        }
-        sb.append("</files></package>\n");
-        return sb.toString();
-    }
-
-    private byte[] getEncodedByteArray(String content, String charset) throws IOException
-    {
-        StringReader rdr = new StringReader(content);
-        BufferedReader bfr = new BufferedReader(rdr);
-        ByteArrayOutputStream ostr = new ByteArrayOutputStream();
-        OutputStreamWriter os = new OutputStreamWriter(ostr, charset);
-
-        // Voluntarily ignore the first line... as it's the xml declaration
-        String line = bfr.readLine();
-        os.append("<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n");
-
-        line = bfr.readLine();
-        while (null != line) {
-            os.append(line);
-            os.append("\n");
-            line = bfr.readLine();
-        }
-        os.flush();
-        os.close();
-        return ostr.toByteArray();
-    }
-
-    private byte[] createZipFile(XWikiDocument docs[], String[] encodings) throws Exception
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zos = new ZipOutputStream(baos);
-        ZipEntry zipp = new ZipEntry("package.xml");
-        zos.putNextEntry(zipp);
-        zos.write(getEncodedByteArray(getPackageXML(docs), "ISO-8859-1"));
-        for (int i = 0; i < docs.length; i++) {
-            String zipEntryName = docs[i].getSpace() + "/" + docs[i].getName();
-            if (docs[i].getTranslation() != 0) {
-                zipEntryName += "." + docs[i].getLanguage();
-            }
-            ZipEntry zipe = new ZipEntry(zipEntryName);
-            zos.putNextEntry(zipe);
-            String xmlCode = docs[i].toXML(false, false, false, false, getContext());
-            zos.write(getEncodedByteArray(xmlCode, encodings[i]));
-        }
-        zos.closeEntry();
-        return baos.toByteArray();
-    }
 }

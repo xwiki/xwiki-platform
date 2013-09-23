@@ -17,21 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.tag;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -53,7 +50,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
     /** Logging helper object. */
-    public static final Log LOG = LogFactory.getLog(TagPlugin.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(TagPlugin.class);
 
     /**
      * The identifier for this plugin; used for accessing the plugin from velocity, and as the action returning the
@@ -71,7 +68,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public static final String TAG_PROPERTY = "tags";
 
-    /** L10N key for the "tag added" document edit comment. */
+    /**
+     * L10N key for the "tag added" document edit comment.
+     */
     public static final String DOC_COMMENT_TAG_ADDED = "plugin.tag.editcomment.added";
 
     /**
@@ -87,11 +86,6 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         super(PLUGIN_NAME, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
@@ -150,7 +144,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             PropertyClass tagPropertyDefinition = (PropertyClass) tagClass.getField(TAG_PROPERTY);
             tagProperty = tagPropertyDefinition.newProperty();
         } catch (XWikiException ex) {
-            LOG.warn("Failed to properly create tag property for the tag object, creating a default one");
+            LOGGER.warn("Failed to properly create tag property for the tag object, creating a default one");
             tagProperty = new DBStringListProperty();
         }
         tagProperty.setName(TAG_PROPERTY);
@@ -161,23 +155,14 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     /**
      * Get all tags within the wiki.
-     * 
+     *
      * @param context XWiki context.
      * @return list of tags (alphabetical order).
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
     public List<String> getAllTags(XWikiContext context) throws XWikiException
     {
-        List<String> results;
-
-        String hql =
-            "select distinct elements(prop.list) from BaseObject as obj, "
-            + "DBStringListProperty as prop where obj.className='XWiki.TagClass' "
-            + "and obj.id=prop.id.id and prop.id.name='tags'";
-        results = context.getWiki().search(hql, context);
-        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
-
-        return results;
+        return TagQueryUtils.getAllTags(context);
     }
 
     /**
@@ -228,7 +213,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     /**
      * Get cardinality map of tags matching a parameterized hql query.
-     * 
+     *
      * @param fromHql the <code>from</code> fragment of the hql query
      * @param whereHql the <code>where</code> fragment of the hql query
      * @param parameterValues list of parameter values for the query
@@ -241,53 +226,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,
             XWikiContext context) throws XWikiException
     {
-        List<String> results = null;
-        Map<String, Integer> tagCount = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
-
-        String from = "select elements(prop.list) from BaseObject as tagobject, DBStringListProperty as prop";
-        String where =
-            " where tagobject.className='XWiki.TagClass' and tagobject.id=prop.id.id and prop.id.name='tags'";
-
-        // If at least one of the fragments is passed, the query should be matching XWiki documents
-        if (!StringUtils.isBlank(fromHql) || !StringUtils.isBlank(whereHql)) {
-            from += ", XWikiDocument as doc" + fromHql;
-        }
-        if (!StringUtils.isBlank(whereHql)) {
-            where += " and doc.fullName=tagobject.name and " + whereHql;
-        }
-
-        List<?> params = parameterValues;
-        if (params == null) {
-            params = new ArrayList<String>();
-        }
-        results = context.getWiki().getStore().search(from + where, 0, 0, params, context);
-        Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
-        Map<String, String> processedTags = new HashMap<String, String>();
-
-        // We have to manually build a cardinality map since we have to ignore tags case.
-        for (String result : results) {
-            // This key allows to keep track of the case variants we've encountered.
-            String lowerTag = result.toLowerCase();
-
-            // We store the first case variant to reuse it in the final result set.
-            if (!processedTags.containsKey(lowerTag)) {
-                processedTags.put(lowerTag, result);
-            }
-
-            String tagCountKey = processedTags.get(lowerTag);
-            int tagCountForTag = 0;
-            if (tagCount.get(tagCountKey) != null) {
-                tagCountForTag = tagCount.get(tagCountKey);
-            }
-            tagCount.put(tagCountKey, tagCountForTag + 1);
-        }
-
-        return tagCount;
+        return TagQueryUtils.getTagCountForQuery(fromHql, whereHql, parameterValues, context);
     }
 
     /**
      * Get documents with the given tags.
-     * 
+     *
      * @param tag a list of tags to match.
      * @param context XWiki context.
      * @return list of docNames.
@@ -295,14 +239,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
-        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item "
-            + "where obj.className=? and obj.name=doc.fullName and obj.id=prop.id.id "
-            + "and prop.id.name='tags' and lower(item)=lower(?) order by doc.fullName";
-        List<Object> parameters = new ArrayList<Object>();
-        parameters.add(TAG_CLASS);
-        parameters.add(tag);
-
-        return context.getWiki().getStore().searchDocumentsNames(hql, parameters, context);
+        return TagQueryUtils.getDocumentsWithTag(tag, context);
     }
 
     /**
@@ -366,6 +303,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
             String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
+
+            // Since we're changing the document we need to set the new author
+            document.setAuthorReference(context.getUserReference());
+
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
@@ -418,6 +359,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (added) {
             setDocumentTags(document, documentTags, context);
             String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, Collections.singletonList(tags));
+
+            // Since we're changing the document we need to set the new author
+            document.setAuthorReference(context.getUserReference());
+
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
@@ -484,6 +429,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
             String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
+
+            // Since we're changing the document we need to set the new author
+            document.setAuthorReference(context.getUserReference());
+
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
@@ -516,13 +465,23 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);
             List<String> tags = getTagsFromDocument(doc);
-            for (int i = 0; i < tags.size(); i++) {
-                if (tags.get(i).equalsIgnoreCase(tag)) {
-                    tags.set(i, newTag);
+
+            if (tags.contains(newTag)) {
+                // The new tag might already be present in the document, in this case we just need to remove the old one
+                removeTagFromDocument(tag, doc.getFullName(), context);
+            } else {
+                for (int i = 0; i < tags.size(); i++) {
+                    if (tags.get(i).equalsIgnoreCase(tag)) {
+                        tags.set(i, newTag);
+                    }
                 }
+                setDocumentTags(doc, tags, context);
+
+                // Since we're changing the document we need to set the new author
+                doc.setAuthorReference(context.getUserReference());
+
+                context.getWiki().saveDocument(doc, comment, true, context);
             }
-            setDocumentTags(doc, tags, context);
-            context.getWiki().saveDocument(doc, comment, true, context);
         }
 
         return TagOperationResult.OK;

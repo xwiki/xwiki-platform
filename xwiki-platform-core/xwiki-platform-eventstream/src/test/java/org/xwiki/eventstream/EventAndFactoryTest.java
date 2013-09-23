@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.eventstream;
 
@@ -25,7 +24,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
@@ -40,8 +39,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 /**
  * Tests for the {@link org.xwiki.eventstream.internal.DefaultEvent default event} and
@@ -49,21 +48,20 @@ import org.xwiki.test.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
+@MockingRequirement(DefaultEventFactory.class)
 public class EventAndFactoryTest extends AbstractMockingComponentTestCase
 {
+    private EventFactory factory;
+
     Event defaultEvent;
 
     Event rawEvent;
 
-    @MockingRequirement
-    private DefaultEventFactory factory;
-
-    @Override
     @Before
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-        final DocumentAccessBridge mockDocumentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge =
+            getComponentManager().getInstance(DocumentAccessBridge.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -73,7 +71,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
         });
 
         final ExecutionContext context = new ExecutionContext();
-        final Execution mockExecution = getComponentManager().lookup(Execution.class);
+        final Execution mockExecution = getComponentManager().getInstance(Execution.class);
         getMockery().checking(new Expectations()
                     {
             {
@@ -82,9 +80,8 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
             }
         });
 
-        @SuppressWarnings("unchecked")
         final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().lookup(EntityReferenceResolver.class);
+            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING);
         getMockery().checking(new Expectations()
                     {
             {
@@ -92,6 +89,7 @@ public class EventAndFactoryTest extends AbstractMockingComponentTestCase
                 will(returnValue(new DocumentReference("xwiki", "XWiki", "Admin")));
             }
         });
+        this.factory = getComponentManager().getInstance(EventFactory.class);
         this.defaultEvent = this.factory.createEvent();
         this.rawEvent = this.factory.createRawEvent();
     }

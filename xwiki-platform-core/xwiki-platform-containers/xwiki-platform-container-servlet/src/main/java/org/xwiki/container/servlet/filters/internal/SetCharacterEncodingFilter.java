@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.container.servlet.filters.internal;
 
 import java.io.IOException;
@@ -55,7 +53,6 @@ import javax.servlet.ServletResponse;
  * @author Craig McClanahan
  * @version $Id$
  */
-
 public class SetCharacterEncodingFilter implements Filter
 {
 
@@ -82,6 +79,7 @@ public class SetCharacterEncodingFilter implements Filter
     /**
      * Take this filter out of service.
      */
+    @Override
     public void destroy()
     {
         this.encoding = null;
@@ -98,6 +96,7 @@ public class SetCharacterEncodingFilter implements Filter
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException
     {
@@ -117,6 +116,7 @@ public class SetCharacterEncodingFilter implements Filter
      * 
      * @param filterConfig The filter configuration object
      */
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
         this.filterConfig = filterConfig;

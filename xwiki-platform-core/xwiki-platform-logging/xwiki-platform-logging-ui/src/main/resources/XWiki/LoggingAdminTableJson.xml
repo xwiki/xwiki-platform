@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>LoggingAdminTableJson</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.LoggingAdmin</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1343369697000</creationDate>
+  <date>1344937214000</date>
+  <contentUpdateDate>1344937214000</contentUpdateDate>
+  <version>1.1</version>
+  <title>LoggingAdminTableJson</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity wiki="false"}}
+#if("$!{request.xpage}" == 'plain')
+  $response.setContentType('application/json')
+#end
+##==============================
+## Offset = item # at which to start displaying data
+##==============================
+#set($offset = $mathtool.toInteger($request.offset))
+## If no offset is specified, start at 0
+#if (!$offset)
+  #set($offset = 0)
+#else
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set($offset = $offset - 1)
+  #if($offset &lt; 0)
+    #set($offset = 0)
+  #end
+#end
+##==================
+## Limit = # of items to display
+##==================
+#set($limit = $mathtool.toInteger($request.limit))
+## If no limit is specified, limit at 15 items
+#if (!$limit)
+  #set ($limit = 15)
+#end
+##==================
+## Tag = one parameter per tag
+##==================
+#if($request.tag)
+  #foreach($tag in $request.getParameterValues('tag'))
+    ## TODO: Add code to filter items based on the selected tags
+  #end
+#end
+##==========
+## Sort direction
+##==========
+#set($order = "$!request.sort")
+#if($order != '')
+  #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+  #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
+    #set($orderDirection = 'desc')
+  #end
+#end
+## ===========
+## Filter Data here...
+## ===========
+## TODO: Add code to filter data
+## Each column can be filtered and the filter for a column can be retrieved with:
+## #set($filterValue = "$!{request.get(&lt;columnname&gt;)}")
+## ===
+## JSON
+## ===
+#set ($logger_list = $services.logging.getLevels())
+#set ($logs = $logger_list.entrySet())
+#set ($logsSize = $logs.size())
+## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null
+## properties (it is fixed in VelocityTools 2)
+#foreach ($log in $logs)
+  #if (!$log.value)
+    #set($void = $log.setValue(''))
+  #else
+    #set($void = $log.setValue("${log.value.ordinal()}${log.value.name()}"))
+  #end
+#end
+## Sort
+#if ($request.sort)
+  #if ($request.sort == "logger" )
+    #set( $propertyName = "key" )
+  #else
+    #set( $propertyName = "value" )
+  #end
+
+  #set( $logs = $sorttool.sort($logs, ["${propertyName}:${request.dir}"]) )
+#end
+## Filter
+#set($resultLog = [])
+#foreach($logger in $logs)
+  #set($loggLevelName = "$!logger.value")
+  #if ($limit &lt;= $resultLog.size())
+    #break
+  #end
+  #if ($request.logger &amp;&amp; !$logger.key.toLowerCase().contains($request.logger.toLowerCase()))
+    #set($offset = $offset + 1)
+    #set($logsSize = $logsSize - 1)
+  #elseif ($request.level &amp;&amp; !$loggLevelName.toLowerCase().contains($request.level.toLowerCase()))
+    #set($offset = $offset + 1)
+    #set($logsSize = $logsSize - 1)
+  #else
+    #if ($velocityCount &gt;= $offset)
+      #set($void = $resultLog.add($logger))
+    #end
+  #end
+#end
+{
+  "totalrows": $logsSize,
+  "matchingtags": {},
+  "tags" : [],
+  "returnedrows": $resultLog.size(),
+  "offset": $mathtool.toInteger($request.offset),
+  "sort": "$request.sort",
+  "dir": "$request.dir",
+  "reqNo": $mathtool.toInteger($request.reqNo),
+  "rows": [
+  #foreach( $logger in $resultLog )
+    #if($velocityCount &gt; 1) , #end
+    #set($loggLevelName = "$!logger.value")
+    ## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null
+    ## properties (it is fixed in VelocityTools 2)
+    #if ($loggLevelName != '')
+      #set ($loggLevelName = $loggLevelName.substring(1))
+    #end
+    {
+      "doc_viewable" : true,
+      "logger" : "$escapetool.javascript($logger.key)",
+      "level" : "$loggLevelName",
+      "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
+        &lt;fieldset&gt;
+          &lt;input name='logger_name' value='$logger.key' type='hidden'/&gt;
+          &lt;select name='logger_level' size='1' style='width: 80px'&gt;
+            #if ($loggLevelName != 'TRACE')
+              &lt;option label='TRACE' value='TRACE'&gt;TRACE&lt;/option&gt;
+            #end
+            #if ($loggLevelName != 'DEBUG')
+              &lt;option label='DEBUG' value='DEBUG'&gt;DEBUG&lt;/option&gt;
+            #end
+            #if ($loggLevelName != 'INFO')
+              &lt;option label='INFO' value='INFO'&gt;INFO&lt;/option&gt;
+            #end
+            #if ($loggLevelName != 'WARN')
+              &lt;option label='WARN' value='WARN'&gt;WARN&lt;/option&gt;
+            #end
+            #if ($loggLevelName != 'ERROR')
+              &lt;option label='ERROR' value='ERROR'&gt;ERROR&lt;/option&gt;
+            #end
+            #if ($loggLevelName &amp;&amp; $logger.value != '')
+              &lt;option label='default' value=''&gt;&amp;lt;default&amp;gt;&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+          &lt;span class='buttonwrapper'&gt;&lt;input name='loggeraction_set' value='${escapetool.xml($services.localization.render('logging.admin.livetable.actions.set'))}' class='button' type='submit'&gt;&lt;/span&gt;
+        &lt;/fieldset&gt;
+        &lt;/form&gt;")}"
+    }
+  #end
+  ]
+}
+{{/velocity}}</content>
+</xwikidoc>

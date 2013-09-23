@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.cleaner;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -30,7 +30,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 @RemoteServiceRelativePath("HTMLCleaner.gwtrpc")
 public interface HTMLCleaner extends RemoteService
 {

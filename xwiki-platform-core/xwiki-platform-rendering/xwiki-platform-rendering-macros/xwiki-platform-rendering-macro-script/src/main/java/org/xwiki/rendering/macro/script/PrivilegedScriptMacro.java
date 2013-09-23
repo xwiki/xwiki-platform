@@ -19,15 +19,15 @@
  */
 package org.xwiki.rendering.macro.script;
 
-
 /**
  * An interface used to distinguish privileged macros (those that need programming rights to run) from the normal ones.
  * 
  * @version $Id$
  * @since 2.5M1
+ * @deprecated starting with 4.1M1 use {@link MacroPermissionPolicy} instead
  */
+@Deprecated
 public interface PrivilegedScriptMacro extends ScriptMacro
 {
-
 }
 

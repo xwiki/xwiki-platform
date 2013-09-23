@@ -22,95 +22,81 @@ package org.xwiki.rest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
+import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * <p>
- * Base class for all XWiki-related JAX-RS resources. This class provides to subclasses a set of protected fields to
- * access the XWiki API and a method for retrieving documents in their different incarnations.
- * </p>
- * 
+ * <p> Base class for all XWiki-related JAX-RS resources. This class provides to subclasses a set of protected fields to
+ * access the XWiki API and a method for retrieving documents in their different incarnations. </p>
+ *
  * @version $Id$
  */
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiResource implements XWikiRestComponent, Initializable
 {
     /**
-     * <p>
-     * The actual URI information about the JAX-RS resource being called. This variable is useful when generating links
-     * to other resources in representations.
-     * </p>
+     * <p> The actual URI information about the JAX-RS resource being called. This variable is useful when generating
+     * links to other resources in representations. </p>
      */
     @Context
     protected UriInfo uriInfo;
 
     /**
-     * <p>
-     * The logger to be used to output log messages.
-     * </p>
+     * <p> The logger to be used to output log messages. </p>
      */
     protected Logger logger;
 
     /**
-     * <p>
-     * The object factory for model objects to be used when creating representations.
-     * </p>
+     * <p> The object factory for model objects to be used when creating representations. </p>
      */
     protected ObjectFactory objectFactory;
 
     /**
-     * <p>
-     * The XWiki component manager that is used to lookup XWiki components and context.
-     * </p>
+     * <p> The XWiki component manager that is used to lookup XWiki components and context. </p>
      */
-    @Requirement
+    @Inject
     protected ComponentManager componentManager;
 
     /**
-     * <p>
-     * The query manager to be used to perform low-level queries for retrieving information about wiki content.
+     * <p> The query manager to be used to perform low-level queries for retrieving information about wiki content.
      * </p>
      */
-    @Requirement
+    @Inject
     protected QueryManager queryManager;
 
     /**
-     * <p>
-     * A wrapper class for returning an XWiki document enriched with information about its status.
-     * </p>
+     * <p> A wrapper class for returning an XWiki document enriched with information about its status. </p>
      */
     protected static class DocumentInfo
     {
         /**
-         * <p>
-         * The target XWiki document.
-         * </p>
+         * <p> The target XWiki document. </p>
          */
         private Document document;
 
         /**
-         * <p>
-         * A boolean variable stating if the XWiki document existed already of it is being created. This variable is
+         * <p> A boolean variable stating if the XWiki document existed already of it is being created. This variable is
          * used when building responses in order to understand if a created or modified status code should be sent.
          * </p>
          */
@@ -134,26 +120,25 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     }
 
     /**
-     * <p>
-     * Resource initialization.
-     * </p>
+     * <p> Resource initialization. </p>
      */
+    @Override
     public void initialize() throws InitializationException
     {
         logger = Logger.getLogger(this.getClass().getName());
 
         objectFactory = new ObjectFactory();
 
-        logger.log(Level.FINE, String.format("Resource %s initialized. Serving user: '%s'\n", getClass().getName(),
-            Utils.getXWikiUser(componentManager)));
+        logger.log(
+                Level.FINE,
+                String.format("Resource %s initialized. Serving user: '%s'\n", getClass().getName(),
+                        Utils.getXWikiUser(componentManager)));
     }
 
     /**
-     * <p>
-     * Retrieve a document. This method never returns null. If something goes wrong with respect to some precondition an
-     * exception is thrown.
-     * </p>
-     * 
+     * <p> Retrieve a document. This method never returns null. If something goes wrong with respect to some
+     * precondition an exception is thrown. </p>
+     *
      * @param wikiName The wiki name. Cannot be null.
      * @param spaceName The space name. Cannot be null.
      * @param pageName The page name. Cannot be null.
@@ -163,17 +148,16 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * @param failIfLocked True if an exception should be raised whenever the page is locked.
      * @return A DocumentInfo structure containing the actual document and additional information about it.
      * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
-     * @throws XWikiException
      * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
-     *             PRECONDITION_FAILED if failIfLocked is true and the document is locked.
+     * PRECONDITION_FAILED if failIfLocked is true and the document is locked.
      */
     public DocumentInfo getDocumentInfo(String wikiName, String spaceName, String pageName, String language,
-        String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException
+            String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException
     {
         if ((wikiName == null) || (spaceName == null) || (pageName == null)) {
             throw new IllegalArgumentException(String.format(
-                "wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)", wikiName,
-                spaceName, pageName));
+                    "wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)", wikiName,
+                    spaceName, pageName));
         }
 
         String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
@@ -206,9 +190,9 @@ public class XWikiResource implements XWikiRestComponent, Initializable
                     throw new WebApplicationException(Status.NOT_FOUND);
                 } else {
                     XWikiDocument xwikiDocument =
-                        new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
+                            new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
                     xwikiDocument.setLanguage(language);
-                    doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
+                    doc = new Document(xwikiDocument, getXWikiContext());
 
                     existed = false;
                 }
@@ -231,18 +215,37 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     }
 
     /**
-     * <p>
-     * A special GET method that produces the ad-hoc "uritemplate" media type used for retrieving the URI template
-     * associated to a resource. This is an auxiliary method that is used for documenting the REST API.
-     * </p>
-     * 
+     * <p> A special GET method that produces the ad-hoc "uritemplate" media type used for retrieving the URI template
+     * associated to a resource. This is an auxiliary method that is used for documenting the REST API. </p>
+     *
      * @return The URI template string associated to the requested resource.
      */
     @GET
     @Produces("uritemplate")
     public String getUriTemplate()
     {
-        return this.getClass().getAnnotation(Path.class).value();
+        if (this.getClass().getAnnotation(Path.class) != null) {
+            return this.getClass().getAnnotation(Path.class).value();
+        }
+
+        Class<?>[] interfaces = this.getClass().getInterfaces();
+
+        for (Class<?> i : interfaces) {
+            if (i.getAnnotation(Path.class) != null) {
+                return i.getAnnotation(Path.class).value();
+            }
+        }
+
+        return null;
     }
 
+    /**
+     * Retrieve the XWiki context from the current execution context.
+     *
+     * @return the XWiki context
+     */
+    protected XWikiContext getXWikiContext()
+    {
+        return Utils.getXWikiContext(this.componentManager);
+    }
 }

@@ -16,19 +16,30 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 
 public interface ElementInterface
 {
+    /**
+     * @return the reference of the element
+     * @since 3.2M1
+     */
+    EntityReference getReference();
+
+    @Override
     String toString();
 
     /**
-     * @return the reference to the document in which this element is defined (for elements where this make sense,
-     *         for example for an XClass or a XObject).
+     * @return the reference to the document in which this element is defined (for elements where this make sense, for
+     *         example for an XClass or a XObject).
      * @since 2.2M2
      */
     DocumentReference getDocumentReference();
@@ -45,4 +56,31 @@ public interface ElementInterface
     void setDocumentReference(DocumentReference reference);
 
     void setName(String name);
+
+    /**
+     * Apply a 3 ways merge on the current element based on provided previous and new version of the element.
+     * <p>
+     * All 3 elements are supposed to have the same class and reference.
+     * 
+     * @param previousElement the previous version of the element
+     * @param newElement the next version of the element
+     * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
+     * @param context the XWiki context
+     * @param mergeResult the merge report
+     * @since 3.2M1
+     */
+    void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult);
+
+    /**
+     * Apply the provided element so that the current one contains the same informations and indicate if it was
+     * necessary to modify it in any way.
+     * 
+     * @param newElement the element to apply
+     * @param clean true if informations that are not in the new element should be removed (for example class properties
+     *            not in the new class)
+     * @return true if the element has been modified
+     * @since 4.3M1
+     */
+    boolean apply(ElementInterface newElement, boolean clean);
 }

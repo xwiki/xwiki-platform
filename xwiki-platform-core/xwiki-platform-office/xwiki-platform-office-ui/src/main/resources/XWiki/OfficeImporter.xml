@@ -1,109 +1,261 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>OfficeImporter</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1217261143000</creationDate>
-<date>1288979323000</date>
-<contentUpdateDate>1288979323000</contentUpdateDate>
-<version>1.1</version>
-<title>$msg.get("xe.officeimporter.import.title")</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.StyleSheetExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>XWiki.OfficeImporter</name>
-<number>0</number>
-<className>XWiki.StyleSheetExtension</className>
-<guid>7ee47a14-e816-4742-aaea-ea2e2352d781</guid>
-<property>
-<cache></cache>
-</property>
-<property>
-<code>
-.office_importer_box {
+  <web>XWiki</web>
+  <name>OfficeImporter</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1377854961000</creationDate>
+  <date>1377855795000</date>
+  <contentUpdateDate>1377855795000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.officeimporter.import.title')</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.OfficeImporter</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>aecb3d07-9c3e-4a75-a1d5-026d8c0e91c5</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function() {
+  var onFilePathChange = function() {
+    var targetPageInput = $('targetPageInputId');
+    if (targetPageInput.value != '' &amp;&amp; targetPageInput.value != targetPageInput.__defaultValue) {
+      return;
+    }
+
+    var fileName = XWiki.extractFileName('filepath');
+    var dotIndex = fileName.lastIndexOf(".");
+    if (dotIndex &gt;= 0) {
+      fileName = fileName.substring(0, dotIndex);
+    }
+    targetPageInput.value = fileName;
+    // Save the default value to be able to distinguish it from the value set by the user.
+    targetPageInput.__defaultValue = fileName;
+  };
+
+  var onSubmit = function(event) {
+    if ($('appendContentInputId').checked || $('targetPageInputId').value == '' || $('targetSpaceInputId').value == '') {
+      return
+    }
+    // Check if the target document exists.
+    event.stop();
+    event.element().disable();
+    var url = new XWiki.Document($('targetPageInputId').value, $('targetSpaceInputId').value).getRestURL();
+    new Ajax.Request(url, {
+      // Would be nice to use the HEAD method, but it's not supported currently..
+      method: 'get',
+      onSuccess: function() {
+        // The target document exists.
+        new XWiki.widgets.ConfirmationBox({
+          onYes: function() {
+            // Overwrite the target document.
+            $('targetPageInputId').form.enable().submit();
+          },
+          onNo: function() {
+            // Allow the user to change the target document.
+            $('targetPageInputId').form.enable();
+          }
+        }, {
+          confirmationText: "$escapetool.javascript($services.localization.render('platform.office.importDocumentOverwriteConfirmation'))"
+        });
+      },
+      onFailure: function() {
+        // The target page doesn't exist so we can safely proceed with the import.
+        $('targetPageInputId').form.enable().submit();
+      }
+    });
+  };
+
+  var init = function() {
+    var filePath = $('filepath');
+    if (filePath) {
+      filePath.observe('change', onFilePathChange);
+      filePath.form.observe('submit', onSubmit);
+      return true;
+    }
+    return false;
+  };
+
+  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+})()</code>
+    </property>
+    <property>
+      <name>Code</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.OfficeImporter</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>7ee47a14-e816-4742-aaea-ea2e2352d781</guid>
+    <property>
+      <cache/>
+    </property>
+    <property>
+      <code>.office_importer_box {
   border-radius: 10px;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
@@ -237,7 +389,7 @@ select#childPagesNamingMethod {
   font-weight: normal;
 }
 
-.office_importer_target label span {
+.office_importer_target &gt; label &gt; span {
   display: block;
   float: left;
   display: inline;
@@ -252,92 +404,113 @@ select#childPagesNamingMethod {
 
 }
 </code>
-</property>
-<property>
-<name>OfficeImporterStyle</name>
-</property>
-<property>
-<parse></parse>
-</property>
-<property>
-<use>onDemand</use>
-</property>
-</object>
-<content>#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
-#if($isguest)
-  #error($msg.get("xe.officeimporter.notallowed"))
-#elseif("$!{oomanager.serverState}" != "Connected")
-  #if($hasAdmin)
-    #error($msg.get("xe.officeimporter.error.adminuser"))
+    </property>
+    <property>
+      <name>OfficeImporterStyle</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity}}
+#set ($discard = $xwiki.ssx.use('XWiki.OfficeImporter'))
+#set ($discard = $xwiki.jsx.use('XWiki.OfficeImporter'))
+#if ($isguest)
+  {{error}}$services.localization.render('xe.officeimporter.notallowed'){{/error}}
+#elseif ("$!services.officemanager.serverState" != 'Connected')
+  #if ($hasAdmin)
+    {{error}}$services.localization.render('xe.officeimporter.error.adminuser', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/Extension/Office%20Importer%20Application]]']){{/error}}
   #else
-    #error($msg.get("xe.officeimporter.error.normaluser"))
+    {{error}}$services.localization.render('xe.officeimporter.error.normaluser'){{/error}}
   #end
 #else
-  #if($request.page)
+  #if ($request.page)
     #set($targetdoc = $xwiki.getDocument($request.page))
   #end
+{{html}}
 &lt;div class="office_importer_box"&gt;
-&lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
-&lt;p class="office_importer_document"&gt;
-&lt;label for="filepath"&gt;$msg.get("xe.officeimporter.import.document") : &lt;/label&gt;
-&lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="javascript:XWiki.officeImporter.populateTargetPageInputField(this.value);"/&gt;&lt;/p&gt;
-&lt;h2&gt;$msg.get("xe.officeimporter.import.target")&lt;/h2&gt;
-&lt;p class="office_importer_target"&gt;
-&lt;label for="targetSpaceInputId"  class="inputtext"&gt;
-&lt;span&gt;$msg.get("xe.officeimporter.import.targetspace") : &lt;/span&gt;
-&lt;input id="targetSpaceInputId" type="text" name="targetSpace" class="suggestSpaces suggested" value="$!{targetdoc.space}"/&gt;
-&lt;/label&gt;
-&lt;label for="targetPageInputId" class="inputtext"&gt;
-&lt;span&gt;$msg.get("xe.officeimporter.import.targetpage") : &lt;/span&gt;
-&lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" onchange="javascript:validateUserInputs();"/&gt;
-&lt;/label&gt;
-&lt;label for="appendContentInputId" id="appenContent" class="radio"&gt;
-&lt;span&gt;$msg.get("xe.officeimporter.import.appendresult") : &lt;/span&gt;
-&lt;input id="appendContentInputId" name="appendContent" type="checkbox" value="true" /&gt;&lt;/label&gt;
-&lt;/p&gt;
-&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.target")&lt;/p&gt;
-&lt;h2&gt;$msg.get("xe.officeimporter.import.styles")&lt;/h2&gt;
-&lt;p class="office_importer_styles"&gt;
-&lt;label for="filterStylesInputId" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict"/&gt;&lt;/label&gt;
-&lt;/p&gt;
-&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.styles")&lt;/p&gt;
-&lt;h2&gt;$msg.get("xe.officeimporter.import.splitting")&lt;/h2&gt;
-&lt;div class="office_importer_splittingcontent"&gt;
-&lt;label for="splitDocumentInputId" class="radio"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.splitdocument") : &lt;/span&gt;&lt;input id="splitDocumentInputId" name="splitDocument" type="checkbox" value="true"/&gt;&lt;/label&gt;
-&lt;p class="office_importer_splitting"&gt;
-&lt;label for="headingLevelsToSplitInputId" class="multipleselect"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.headinglevels") : &lt;/span&gt; 
-&lt;select id="headingLevelsToSplitInputId" size="5" multiple="multiple" name="headingLevelsToSplit" class="headingLevelsToSplit"&gt;#foreach($h in [1..6]) &lt;option value="${h}"&gt;$msg.get("xe.officeimporter.import.splitting.heading")-${h}&lt;/option&gt;#end&lt;/select&gt;
-&lt;/label&gt;
-&lt;label for="childPagesNamingMethodInputId" class="select"&gt;&lt;span&gt;
-$msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod"&gt;&lt;option value="headingNames"&gt;$msg.get("xe.officeimporter.import.splitting.naming.headingnames")&lt;/option&gt;&lt;option value="mainPageNameAndHeading"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandheading")&lt;/option&gt;&lt;option value="mainPageNameAndNumbering"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandnumbering")&lt;/option&gt;&lt;/select&gt;
-&lt;/label&gt;
-&lt;/p&gt;&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.splitting")&lt;/p&gt;
-&lt;input type="hidden" name="groovyFilter" value="" /&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+  &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
+    &lt;p class="office_importer_document"&gt;
+      &lt;label for="filepath"&gt;$services.localization.render('xe.officeimporter.import.document'): &lt;/label&gt;
+      &lt;input id="filepath" type="file" name="filePath" value="" size="40" /&gt;
+    &lt;/p&gt;
+
+    &lt;h2&gt;$services.localization.render('xe.officeimporter.import.target')&lt;/h2&gt;
+    &lt;p class="office_importer_target"&gt;
+      &lt;label for="targetSpaceInputId"  class="inputtext"&gt;
+        &lt;span&gt;$services.localization.render('xe.officeimporter.import.targetspace'): &lt;/span&gt;
+        ## Compute the target space where the document will be imported
+        #set ($defaultTargetSpace = $targetdoc.space)
+        #if (!$defaultTargetSpace)
+          ## Get the parent document's space and consider it the space of the document we import
+          #set ($parentReference = $services.model.resolveDocument("$!request.parent", 'default'))
+          #set ($defaultTargetSpace = $parentReference.lastSpaceReference.name)
+        #end
+        &lt;input id="targetSpaceInputId" type="text" name="targetSpace" class="suggestSpaces suggested" value="$!defaultTargetSpace"/&gt;
+      &lt;/label&gt;
+      &lt;label for="targetPageInputId" class="inputtext"&gt;
+        &lt;span&gt;$services.localization.render('xe.officeimporter.import.targetpage'): &lt;/span&gt;
+        &lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" /&gt;
+      &lt;/label&gt;
+      &lt;label for="appendContentInputId" id="appenContent" class="radio"&gt;
+        &lt;span&gt;$services.localization.render('xe.officeimporter.import.appendresult'): &lt;/span&gt;
+        &lt;input id="appendContentInputId" name="appendContent" type="checkbox" value="true" /&gt;
+      &lt;/label&gt;
+    &lt;/p&gt;
+    &lt;p class="help_message"&gt;$services.localization.render('xe.officeimporter.import.help.target')&lt;/p&gt;
+
+    &lt;h2&gt;$services.localization.render('xe.officeimporter.import.styles')&lt;/h2&gt;
+    &lt;p class="office_importer_styles"&gt;
+      &lt;label for="filterStylesInputId" class="radio"&gt;
+        $services.localization.render('xe.officeimporter.import.filterstyles'):
+        &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict" checked="checked"/&gt;
+      &lt;/label&gt;
+    &lt;/p&gt;
+    &lt;p class="help_message"&gt;$services.localization.render('xe.officeimporter.import.help.styles')&lt;/p&gt;
+
+    &lt;h2&gt;$services.localization.render('xe.officeimporter.import.splitting')&lt;/h2&gt;
+    &lt;div class="office_importer_splittingcontent"&gt;
+      &lt;label for="splitDocumentInputId" class="radio"&gt;
+        &lt;span&gt;$services.localization.render('xe.officeimporter.import.splitting.splitdocument'): &lt;/span&gt;
+        &lt;input id="splitDocumentInputId" name="splitDocument" type="checkbox" value="true"/&gt;
+      &lt;/label&gt;
+      &lt;p class="office_importer_splitting"&gt;
+        &lt;label for="headingLevelsToSplitInputId" class="multipleselect"&gt;
+          &lt;span&gt;$services.localization.render('xe.officeimporter.import.splitting.headinglevels'): &lt;/span&gt; 
+          &lt;select id="headingLevelsToSplitInputId" size="5" multiple="multiple" name="headingLevelsToSplit" class="headingLevelsToSplit"&gt;
+          #foreach($h in [1..6])
+            &lt;option value="${h}"#if ($velocityCount == 1) selected="selected"#end&gt;$services.localization.render('xe.officeimporter.import.splitting.heading')-${h}&lt;/option&gt;
+          #end
+          &lt;/select&gt;
+        &lt;/label&gt;
+        &lt;label for="childPagesNamingMethodInputId" class="select"&gt;
+          &lt;span&gt;$services.localization.render('xe.officeimporter.import.splitting.naming'): &lt;/span&gt;
+          &lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod"&gt;
+            &lt;option value="headingNames"&gt;$services.localization.render('xe.officeimporter.import.splitting.naming.headingnames')&lt;/option&gt;
+            &lt;option value="mainPageNameAndHeading"&gt;$services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandheading')&lt;/option&gt;
+            &lt;option value="mainPageNameAndNumbering"&gt;$services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandnumbering')&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/label&gt;
+      &lt;/p&gt;
+      &lt;p class="help_message"&gt;$services.localization.render('xe.officeimporter.import.help.splitting')&lt;/p&gt;
+
+      &lt;input type="hidden" name="groovyFilter" value="" /&gt;
+      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+      ## Normalize the parent reference of the new document so that even in a subwiki it points to the current wiki
+      #set ($normalizedParentReference = $services.model.resolveDocument("$!request.parent", 'current'))
+      &lt;input type="hidden" name="parent" value="$normalizedParentReference" /&gt;
+    &lt;/div&gt;
+    &lt;div class="office_importer_buttons"&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input type="submit" value="$services.localization.render('xe.officeimporter.import.import')" class="button"/&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
 &lt;/div&gt;
-&lt;div class="office_importer_buttons"&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.officeimporter.import.import')" class="button"/&gt;&lt;/span&gt;&lt;/div&gt;
-&lt;/form&gt;
-&lt;/div&gt;
+{{/html}}
 #end
-{pre}
-&lt;script type="text/javascript"&gt;
-/* &lt;![CDATA[ */
-  if (typeof(XWiki) == "undefined") {
-    XWiki = new Object();
-  }
-  if (typeof(XWiki.officeImporter) == 'undefined') {
-    XWiki.officeImporter = new Object();
-  }
-  XWiki.officeImporter.populateTargetPageInputField = function(fileName) {
-    var dot = fileName.lastIndexOf(".");
-    if (-1 != dot) {
-      fileName = fileName.substring(0, dot);
-    }
-    fileName = fileName.replace(/[\.:]/g, "-");
-    document.getElementById("targetPageInputId").value = fileName;
-  }
-/* ]]&gt; */
-&lt;/script&gt;
-{/pre}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

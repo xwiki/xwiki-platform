@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Base class for testing cache component implementation.
@@ -66,9 +66,6 @@ public abstract class AbstractTestCache extends AbstractComponentTestCase
         this.roleHint = roleHint;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void registerComponents() throws Exception
     {
@@ -89,7 +86,7 @@ public abstract class AbstractTestCache extends AbstractComponentTestCase
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
+        CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
 
         CacheFactory factory = cacheManager.getCacheFactory();
 

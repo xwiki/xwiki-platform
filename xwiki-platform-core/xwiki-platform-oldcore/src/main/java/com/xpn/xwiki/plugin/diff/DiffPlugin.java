@@ -22,8 +22,7 @@ package com.xpn.xwiki.plugin.diff;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.diff.Diff;
 import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Chunk;
@@ -39,40 +38,27 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
  * @version $Id$
+ * @deprecated since 4.1 use diff service
  */
+@Deprecated
 public class DiffPlugin extends XWikiDefaultPlugin
 {
     /**
-     * Log4J logger object to log messages in this class.
-     */
-    private static final Logger LOG = Logger.getLogger(DiffPlugin.class);
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @param name the plugin name, usually ignored, since plugins have a fixed name
+     * @param className the name of this class, ignored
+     * @param context the current request context
      */
     public DiffPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
     @Override
     public String getName()
     {
         return "diff";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {

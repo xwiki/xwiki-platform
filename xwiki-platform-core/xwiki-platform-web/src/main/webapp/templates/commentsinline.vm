@@ -64,7 +64,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #end
 ##
 #if("$!author" == '')
-  #set($author = $msg.get('core.viewers.comments.add.guestName.default'))
+  #set($author = $services.localization.render('core.viewers.comments.add.guestName.default'))
 #end
 ##
 #set($xredirect = $!escapetool.xml($request.get("xredirect")))
@@ -135,7 +135,13 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayComment $comment, $commentDoc)
-  <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
+  ## if the current comment is an annotation (i.e. has selection) set a flag to display selection, and add a few classes
+  #set($commentSelection = $comment.getProperty('selection').value)
+  #set($isAnnotation = false)
+  #if ("$!commentSelection" != "")
+    #set($isAnnotation = true)
+  #end
+  <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#mediumUserAvatar($comment.author)#{else}#smallUserAvatar($comment.author)#end</div>
     <div class="commentheader">
       <div>
@@ -145,18 +151,22 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
       <span class="commenttools">
+      <span class="commenttool comment-permalink"><a class="permalink" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.localization.render('core.viewers.comments.permalink')</a></span>
       #if($xwiki.hasAccessLevel('comment'))
-        <span class="commenttool commentreply"><a class="commentreply" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$msg.get('core.viewers.comments.reply')</a></span>
+        <span class="commenttool commentreply"><a class="commentreply" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.localization.render('core.viewers.comments.reply')</a></span>
         #if($comment.author == $xcontext.user && $hasEdit)
-          <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.edit')">$msg.get('core.viewers.comments.edit')</a></span>
+          <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.edit')">$services.localization.render('core.viewers.comments.edit')</a></span>
         #end
       #end
       #if ($hasAdmin || (!$isGuest && $hasEdit && $comment.author == $xcontext.user))
-        <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.delete')">$msg.get('core.viewers.comments.delete')</a></span>
+        <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.delete')">$services.localization.render('core.viewers.comments.delete')</a></span>
       #end
       </span>## commenttools
     </div>## commentheader
-    <div class="commentcontent">$commentDoc.getRenderedContent($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
+    #if ($isAnnotation)
+      <a href="#ID$comment.number"><blockquote class="annotatedText">$!escapetool.xml($commentSelection)</blockquote></a>
+    #end
+    <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
   </div>## xwikicomment
 #end
 ##
@@ -166,29 +176,29 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #if($xwiki.hasAccessLevel('comment'))
     <form action="$doc.getURL('commentadd', "xpage=view&amp;viewer=comments#commentform")" method="post" id="AddComment">
       <fieldset class="expanded" id="commentform">
-        <legend>$msg.get('core.viewers.comments.add.title')</legend>
-        <div class="commentavatar">#mediumUserAvatar($context.user)</div>
+        <legend>$services.localization.render('core.viewers.comments.add.title')</legend>
+        <div class="commentavatar">#mediumUserAvatar($xcontext.user)</div>
         #if($xcontext.user != 'XWiki.XWikiGuest')
-          <label>$msg.get('core.viewers.comments.add.guestName.prompt') $xwiki.getUserName($xcontext.user)</label>
+          <label>$services.localization.render('core.viewers.comments.add.guestName.prompt') $xwiki.getUserName($xcontext.user)</label>
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
-          <label for="${xCommentClass}_author">$msg.get('core.viewers.comments.add.guestName.prompt') <input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author"/></label>
-          <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())")'>$msg.get('login')</a></strong>
+          <label for="${xCommentClass}_author">$services.localization.render('core.viewers.comments.add.guestName.prompt') <input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author" maxlength="255" /></label>
+          <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")'>$services.localization.render('login')</a></strong>
         #end
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
         <input type="hidden" name="${xCommentClass}_date" value=""/>
         <input type="hidden" name="${xCommentClass}_replyto" value="$!replyTo"/>
         <div class="commentcontainer">
-           <label for="${xCommentClass}_comment">$msg.get('core.viewers.comments.add.comment.label')</label>
+           <label for="${xCommentClass}_comment">$services.localization.render('core.viewers.comments.add.comment.label')</label>
            <textarea id='${xCommentClass}_comment' rows='5' cols="80" name='${xCommentClass}_comment'>$!comment</textarea>
         </div>
         #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)
           #displayCaptcha()
         #end
         <div>
-          <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.comments.add.submit')" class="button"/></span>
-          <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('core.viewers.comments.add.cancel')</a></span>
+          <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.viewers.comments.add.submit')" class="button"/></span>
+          <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$services.localization.render('core.viewers.comments.add.cancel')</a></span>
         </div>
       </fieldset>
     </form>
@@ -205,7 +215,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     $('commentCaptcha').style.display = "none";
     var handler = function() {
       var captchaDiv = $('commentCaptcha');
-      var image = new Element('img', {'src' : '$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()', 'alt' : '$escapetool.javascript($msg.get("core.captcha.image.alternateText"))'});
+      var image = new Element('img', {'src' : '$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()', 'alt' : '$escapetool.javascript($services.localization.render("core.captcha.image.alternateText"))'});
       captchaDiv.insertBefore(image, captchaDiv.firstChild);
       Event.observe(image, 'load', function() {
         Effect.SlideDown('commentCaptcha', { duration: 0.7 });
@@ -215,15 +225,15 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     Event.observe($('${xCommentClass}_comment'), 'focus', handler);
     </script>
   #else
-    <img src='$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()' alt='$msg.get("core.captcha.image.alternateText")' />
+    <img src='$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()' alt='$services.localization.render("core.captcha.image.alternateText")' />
   #end
   <input type='hidden' name='captcha_type' value='image'/>
   <br/>
-  <label for='captcha_answer'>$msg.get('core.captcha.image.instruction')</label>
+  <label for='captcha_answer'>$services.localization.render('core.captcha.image.instruction')</label>
   <br/>
   <input id='captcha_answer' name='captcha_answer' type='text'>
   #if($captchaAnswerWrong)
-    <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$msg.get('core.captcha.captchaAnswerIsWrong')</span>
+    <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$services.localization.render('core.captcha.captchaAnswerIsWrong')</span>
   #end
   <div class="wikimodel-emptyline"></div>
   </div>
@@ -248,20 +258,20 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="hidden">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-      <input type="hidden" name="comment" value="$msg.get('core.viewers.comments.edit.versionComment', [${comment.number}])"/>
+      <input type="hidden" name="comment" value="$services.localization.render('core.viewers.comments.edit.versionComment', [${comment.number}])"/>
       <input type="hidden" name="minorEdit" value="true"/>
       <input type="hidden" name="xredirect" value="$xredirect">
     </div>
     <div>
-      <span class="buttonwrapper"><input type="submit" name="action_save" class="button" value="$msg.get('core.viewers.comments.edit.save')"/></span>
-      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL('view', 'viewer=comments')">$msg.get('core.viewers.comments.edit.cancel')</a></span>
+      <span class="buttonwrapper"><input type="submit" name="action_save" class="button" value="$services.localization.render('core.viewers.comments.edit.save')"/></span>
+      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL('view', 'viewer=comments')">$services.localization.render('core.viewers.comments.edit.cancel')</a></span>
     </div>
 
     </div>## xwikicomment
   </form>
   #else
     $response.setStatus(403) ## forbidden
-    #error($msg.get('core.viewers.comments.edit.notAllowed'))
+    #error($services.localization.render('core.viewers.comments.edit.notAllowed'))
   #end
 #end
 ##
@@ -272,7 +282,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #redirectIfActionNotView()
 #set($commentNumber = "$!{request.number}")
 #if($commentNumber != '')
-  #set($commentNumber = $util.parseInt($commentNumber))
+  #set($commentNumber = $mathtool.toInteger($commentNumber))
   #set($comment = $doc.getObject($xCommentClass, $commentNumber))
   #if("$!{comment}" != '')
     #if ("$!{request.xpage}" == '')
@@ -286,7 +296,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #end
   #else
     $response.setStatus(404) ## Comment not found
-    #error($msg.get('core.viewers.comments.edit.notFound'))
+    #error($services.localization.render('core.viewers.comments.edit.notFound'))
   #end
 #else
 #if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
@@ -300,10 +310,10 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   <div id="_comments">
 #if($comments.size() > 0)
   #set($rootKey = "-1")
-  #set($commentThreads = $util.hashMap)
-  #set($discard = $commentThreads.put($rootKey, $util.arrayList))
+  #set($commentThreads = {})
+  #set($discard = $commentThreads.put($rootKey, []))
   #foreach($comment in $comments)
-    #set($discard = $commentThreads.put("${comment.number}", $util.arrayList))
+    #set($discard = $commentThreads.put("${comment.number}", []))
   #end
   #foreach($comment in $comments)
     #addCommentToThreads($comment, $commentThreads, $rootKey)
@@ -314,7 +324,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   ##
   #displayThread($rootKey, $commentThreads, $commentDoc)
 #else
-  <p class="noitems">$msg.get('core.viewers.comments.noComments')</p>
+  <p class="noitems">$services.localization.render('core.viewers.comments.noComments')</p>
 #end
 ##
 ##

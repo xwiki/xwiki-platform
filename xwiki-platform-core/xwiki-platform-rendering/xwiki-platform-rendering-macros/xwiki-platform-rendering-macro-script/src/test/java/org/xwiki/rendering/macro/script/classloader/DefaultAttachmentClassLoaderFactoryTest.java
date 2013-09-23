@@ -21,16 +21,14 @@ package org.xwiki.rendering.macro.script.classloader;
 
 import java.net.URL;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
-import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
-import org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link DefaultAttachmentClassLoaderFactory}.
@@ -42,7 +40,7 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
 {
     private AttachmentClassLoaderFactory factory;
     
-    private AttachmentReferenceResolver arf;
+    private AttachmentReferenceResolver<String> arf;
     
     private DocumentAccessBridge dab;
 
@@ -51,10 +49,10 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
     {
         super.registerComponents();
 
-        this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
+        this.arf = registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
         this.dab = registerMockComponent(DocumentAccessBridge.class);
 
-        this.factory = getComponentManager().lookup(AttachmentClassLoaderFactory.class);
+        this.factory = getComponentManager().getInstance(AttachmentClassLoaderFactory.class);
     }
     
     @org.junit.Test

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
 

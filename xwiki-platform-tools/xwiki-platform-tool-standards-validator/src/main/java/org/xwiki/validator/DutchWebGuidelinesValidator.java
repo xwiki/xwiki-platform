@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
 import javax.xml.xpath.XPathConstants;
 
 import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -58,6 +58,11 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     private static final String CONTENT_CHARSET_FRAGMENT = "charset=";
 
     /**
+     * Character used to mark the beginning of the query string in a URL.
+     */
+    private static final String QUERY_STRING_SEPARATOR = "?";
+
+    /**
      * Message resources.
      */
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
@@ -70,11 +75,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         super(false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#getName()
-     */
+    @Override
     public String getName()
     {
         return "Dutch Web Guidelines";
@@ -94,11 +95,6 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         super.addError(errorType, line, column, this.messages.getString(key));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.framework.AbstractXMLValidator#validate(org.w3c.dom.Document)
-     */
     @Override
     protected void validate(Document document)
     {
@@ -312,29 +308,14 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         NodeListIterable formElements = getElements("form");
 
         for (Node formElement : formElements) {
-            boolean validForm = false;
-
-            if (hasChildElement(formElement, "submit")) {
-                // Form contains a <submit> element.
-                validForm = true;
-            }
-
-            for (Node input : getChildren(formElement, ELEM_INPUT)) {
-                if (hasAttribute(input, ATTR_TYPE)) {
-                    if (getAttributeValue(input, ATTR_TYPE).equals(SUBMIT)) {
-                        // Form contains an <input type="submit" /> element.
-                        validForm = true;
-                    } else if (getAttributeValue(input, ATTR_TYPE).equals("image")) {
-                        if (hasAttribute(input, ATTR_ALT) && !StringUtils.isEmpty(getAttributeValue(input, ATTR_ALT))) {
-                            // Form contains an <input type="image" alt="action" /> element.
-                            // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
-                            validForm = true;
-                        }
-                    }
-                }
-            }
-
-            assertTrue(Type.ERROR, "rpd1s3.formSubmit", validForm);
+            // Look for either a submit input or an image input with the 'alt' attribute specified.
+            // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
+            String inputSubmitOrImage = "//input[@type = 'submit' or (@type = 'image' and @alt != '')]";
+            // The default value of the type attribute of a button element is 'submit'.
+            // See http://www.w3.org/TR/xhtml1/dtds.html#dtdentry_xhtml1-strict.dtd_button
+            String buttonSubmit = "//button[not(@type) or @type = 'submit']";
+            assertTrue(Type.ERROR, "rpd1s3.formSubmit",
+                (Boolean) evaluate(formElement, inputSubmitOrImage + " | " + buttonSubmit, XPathConstants.BOOLEAN));
         }
     }
 
@@ -739,7 +720,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             // Look for images in the link.
             boolean hasNonEmptyAlt = false;
             for (Node child : getChildren(link, ELEM_IMG)) {
-                if (!StringUtils.isEmpty(getAttributeValue(child, ATTR_ALT))) {
+                if (StringUtils.isNotEmpty(getAttributeValue(child, ATTR_ALT))) {
                     hasNonEmptyAlt = true;
                 }
             }
@@ -952,6 +933,9 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             String href = getAttributeValue(link, ATTR_HREF);
             if (href != null && href.startsWith(MAILTO)) {
                 String email = StringUtils.substringAfter(href, MAILTO);
+                if (email.contains(QUERY_STRING_SEPARATOR)) {
+                    email = StringUtils.substringBefore(email, QUERY_STRING_SEPARATOR);
+                }
                 assertTrue(Type.ERROR, "rpd8s16.email", link.getTextContent().contains(email));
             }
         }

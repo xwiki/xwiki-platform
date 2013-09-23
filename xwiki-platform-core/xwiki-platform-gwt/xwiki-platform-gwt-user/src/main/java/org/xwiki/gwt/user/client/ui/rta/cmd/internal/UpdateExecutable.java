@@ -28,55 +28,35 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
  */
 public class UpdateExecutable implements Executable
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         // Always return true. Just notify all the command listeners that they need to update their state.
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         // Always return null, because this executable has no parameter.
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         // Always enabled.
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         // Never executed, because this executable has no state.
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         // Always supported.

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.pdf.api;
 
@@ -78,21 +77,22 @@ public interface PdfExport
     }
 
     /**
-     * Export a wiki Document into PDF. See {@link #export(XWikiDocument, OutputStream, int, XWikiContext)} for more
-     * details about the conversion process.
+     * Export a wiki Document into PDF. See
+     * {@link PdfExport#export(XWikiDocument, OutputStream, ExportType, XWikiContext)} for more details about the
+     * conversion process.
      * 
      * @param doc the document to export
      * @param out where to write the resulting document
      * @param context the current request context
      * @throws XWikiException if the conversion fails for any reason
-     * @see #export(XWikiDocument, OutputStream, int, XWikiContext)
+     * @see PdfExport#export(XWikiDocument, OutputStream, ExportType, XWikiContext)
      */
     void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException;
 
     /**
      * Export a wiki Document into PDF or RTF. The content of the document is rendered into HTML using the
-     * {@code pdf.vm} template, the resulting HTML is cleaned up into valid XHTML using JTidy, and custom CSS is applied
-     * to it. The XHTML document is transformed into an XSL-FO document, which is finally processed using Apache FOP.
+     * {@code pdf.vm} template, the resulting HTML is cleaned up into valid XHTML, and custom CSS is applied to it. The
+     * XHTML document is transformed into an XSL-FO document, which is finally processed using Apache FOP.
      * 
      * @param doc the document to export
      * @param out where to write the resulting document

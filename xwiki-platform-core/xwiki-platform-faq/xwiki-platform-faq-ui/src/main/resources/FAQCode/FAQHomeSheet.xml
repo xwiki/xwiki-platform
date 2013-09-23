@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>FAQCode</web>
+  <name>FAQHomeSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>FAQCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1360482998000</creationDate>
+  <date>1360494327000</date>
+  <contentUpdateDate>1360494327000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$doc.title</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set($faqHome = $doc.getObject("FAQCode.FAQHomeClass"))
+#if($faqHome)
+  $doc.use("FAQCode.FAQHomeClass")
+  $xwiki.jsx.use('FAQCode.SkinExtension')
+  $xwiki.ssx.use('FAQCode.SkinExtension')
+  ## The space where to add and search for FAQ Entries
+  #set ($faqSpace = $doc.space)
+  ## If this page is called with createFAQ=true then create a new page using the FAQTemplate template
+  #if ($request.createFAQ == 'true')
+    #set ($newFAQReference = $services.model.createDocumentReference('', "${faqSpace}", "$!{request.question}"))
+t    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{request.queryString}&amp;title=${escapetool.url($request.question)}"))
+  #end
+  #set ($description = $doc.getValue("description"))
+  #if ("$!description" != "")
+    {{box cssClass="faqAbout"}}
+      $doc.display("description")
+    {{/box}}
+  #end
+
+  (% class="centered" %) (((
+
+  (% class="faq-link search-faq" %)(((
+    $services.localization.render('platform.faq.search.title')
+    (((
+    {{html}}
+    &lt;form action="$xwiki.getURL('FAQCode.FAQSearch')"&gt;
+      &lt;div&gt;
+      &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;
+      &lt;input type="text" name="text" value="$services.localization.render('platform.faq.search.questionHint')" size="25" class="withTip" /&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input class="button" type="submit" value="$services.localization.render('platform.faq.search.submit')" /&gt;
+      &lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+    {{/html}}
+    )))
+  )))
+
+  (% class="faq-link add-faq" %)(((
+    $services.localization.render('platform.faq.create.title')
+
+    (((
+    {{html}}
+    #if ($isGuest)
+      #set($login = ${escapetool.xml($doc.getURL("login", "xredirect=$doc.externalURL"))})
+      #set($register = ${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))})
+      $services.localization.render('platform.faq.need', ["&lt;a href=$login&gt;","&lt;/a&gt;","&lt;a href=$register&gt;","&lt;/a&gt;"])
+    #else
+      &lt;form action="" id="newfaq"&gt;
+        &lt;div&gt;
+          &lt;input type="hidden" name="parent" value="${faqSpace}.WebHome" /&gt;
+          &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
+          &lt;input type="hidden" name="createFAQ" value="true" /&gt;
+          &lt;input class="withTip" type="text" name="question" value="$services.localization.render('platform.faq.create.questionHint')" size="25"/&gt;
+          &lt;span class="buttonwrapper"&gt;
+            &lt;input class="button" type="submit" value="$services.localization.render('platform.faq.create.submit')" /&gt;
+          &lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    #end
+    {{/html}}
+    )))
+  )))
+
+  )))
+
+  (% class="clearfloats" %)((()))(%%)
+
+  {{faq filter="space=${faqSpace}"/}}
+  #else
+    This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
+  #end
+{{/velocity}}</content>
+</xwikidoc>

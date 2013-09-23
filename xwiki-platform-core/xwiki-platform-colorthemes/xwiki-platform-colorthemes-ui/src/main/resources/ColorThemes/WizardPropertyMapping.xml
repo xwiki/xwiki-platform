@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>ColorThemes</web>
+  <name>WizardPropertyMapping</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>ColorThemes.ColorThemeSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1262108187000</creationDate>
+  <date>1262108187000</date>
+  <contentUpdateDate>1262108187000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.themes.colors.mapping.title')</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+##
+##
+## Map maquette elements to the list of theme properties they are affected by.
+##
+## {Layout element -&gt; {CSS property -&gt; [Color theme properties]}}
+##
+#set($elementStylingPropertyMap = {
+  'page'            : {'background': ['pageBackgroundColor', 'pageBackgroundImage', 'pageBackgroundPosition'], 'color': ['textColor']},
+  'mainmenu'        : {'background': ['menuBackgroundColor'], 'color': ['menuLinkColor'], 'background-image': ['menuBackgroundColor', 'menuGradientColor']},
+  'menuaddentry'    : {'background': ['menuAddEntryBackgroundColor'], 'color': ['menuAddEntryLinkColor']},
+  'contentmenu'     : {'background': ['menuContentBackgroundColor'], 'color': ['menuContentLinkColor'], 'background-image': ['menuContentBackgroundColor', 'menuContentGradientColor']},
+  'header'          : {'background': ['pageHeaderBackgroundColor', 'headerBackgroundImage', 'headerBackgroundPosition']},
+  'panelheader'     : {'background': ['panelHeaderBackgroundColor'], 'color': ['panelHeaderTextColor'], 'border-color': ['borderColor'], 'background-image': ['panelHeaderBackgroundColor', 'panelHeaderGradientColor']},
+  'panelcontents'   : {'background': ['panelBackgroundColor'], 'color': ['panelTextColor']},
+  'collapsedpanel'  : {'background': ['panelCollapsedBackgroundColor'], 'color': ['panelCollapsedTextColor'], 'background-image': ['panelCollapsedBackgroundColor', 'panelCollapsedGradientColor']},
+  'content'         : {'background': ['pageContentBackgroundColor'], 'color': ['textColor']},
+  'title'           : {'color': ['titleColor'], 'border-color': ['borderColor']},
+  'link'            : {'color': ['linkColor']},
+  'info'            : {'color': ['textPrimaryColor']},
+  'details'         : {'color': ['textSecondaryColor']},
+  'highlight'       : {'background': ['highlightColor']},
+  'table'           : {'border-color': ['borderColor']},
+  'th'              : {'background': ['backgroundSecondaryColor'], 'border-color': ['borderColor']},
+  'td'              : {'border-color': ['borderColor']},
+  'message'         : {'background': ['backgroundSecondaryColor'], 'border-color': ['borderColor']},
+  'button'          : {'background': ['buttonPrimaryBackgroundColor'], 'color': ['buttonPrimaryTextColor'], 'background-image': ['buttonPrimaryBackgroundColor', 'buttonPrimaryGradientColor']},
+  'secondaryButton' : {'background': ['buttonSecondaryBackgroundColor'], 'color': ['buttonSecondaryTextColor'], 'background-image': ['buttonSecondaryBackgroundColor', 'buttonSecondaryGradientColor']},
+  'tabshead'        : {'background': ['menuContentBackgroundColor'], 'color': ['menuContentLinkColor'], 'background-image': ['menuContentBackgroundColor', 'menuContentGradientColor']},
+  'tabentryactive'  : {'background': ['pageContentBackgroundColor'], 'color': ['menuSelectedEntryLinkColor']},
+  'tabdetails'      : {'color': ['textSecondaryColor']},
+  'tabscontent'     : {'background': ['pageContentBackgroundColor'], 'color': ['textColor']}
+})
+##
+##
+## Map maquette elements to the list of theme properties they display when configured.
+## Each color theme property must appear EXACTLY ONCE in the whole map.
+##
+## {Layout element -&gt; [Color theme properties]}
+##
+#set($elementPropertyMap = {
+  'page'               : ['pageBackgroundColor', 'pageBackgroundImage', 'pageBackgroundPosition'],
+  'mainmenu'           : ['menuBackgroundColor', 'menuGradientColor', 'menuLinkColor', 'menuAddEntryLinkColor', 'menuAddEntryBackgroundColor'],
+  'headerbox'          : ['logoImage', 'pageHeaderBackgroundColor', 'headerBackgroundImage', 'headerBackgroundPosition'],
+  'panelheader'        : ['panelHeaderBackgroundColor', 'panelHeaderGradientColor', 'panelHeaderTextColor'],
+  'panelcontents'      : ['panelBackgroundColor', 'panelTextColor'],
+  'collapsedpanel'     : ['panelCollapsedBackgroundColor', 'panelCollapsedGradientColor', 'panelCollapsedTextColor'],
+  'content'            : ['pageContentBackgroundColor'],
+  'contentmenu'        : ['menuContentBackgroundColor', 'menuContentGradientColor', 'menuContentLinkColor', 'submenuContentBackgroundColor'],
+  'textlink'           : ['textColor', 'linkColor'],
+  'titlebox'           : ['titleColor'],
+  'info'               : ['textPrimaryColor'],
+  'details'            : ['textSecondaryColor'],
+  'highlight'          : ['highlightColor'],
+  'boxes'              : ['backgroundSecondaryColor', 'borderColor'],
+  'buttonbox'          : ['buttonPrimaryBackgroundColor','buttonPrimaryGradientColor', 'buttonPrimaryTextColor'],
+  'secondaryButtonbox' : ['buttonSecondaryBackgroundColor', 'buttonSecondaryGradientColor', 'buttonSecondaryTextColor'],
+  'extratabs'          : ['menuSelectedEntryLinkColor']
+})
+{{/velocity}}</content>
+</xwikidoc>

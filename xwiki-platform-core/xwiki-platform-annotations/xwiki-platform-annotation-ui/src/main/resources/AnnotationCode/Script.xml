@@ -1,108 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
-<web>AnnotationCode</web>
-<name>Script</name>
-<language></language>
-<defaultLanguage></defaultLanguage>
-<translation>0</translation>
-<parent>AnnotationCode.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1264864355000</creationDate>
-<date>1299875556000</date>
-<contentUpdateDate>1299875556000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.JavaScriptExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>AnnotationCode.Script</name>
-<number>0</number>
-<className>XWiki.JavaScriptExtension</className>
-<guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
-<property>
-<cache></cache>
-</property>
-<property>
-<code>var XWiki = (function (XWiki) {
+  <web>AnnotationCode</web>
+  <name>Script</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1264864355000</creationDate>
+  <date>1299875556000</date>
+  <contentUpdateDate>1299875556000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
+    <property>
+      <cache/>
+    </property>
+    <property>
+      <code>var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Selection = Class.create({
   container : false,
@@ -210,7 +231,7 @@ XWiki.Selection = Class.create({
       rangeTextNodes.each(function(text) {
         // clone a highlightWrapper from the template
         var highlightWrapper = highlightWrapperTemplate.clone();
-        highlightWrapper.update(text.textContent);
+        highlightWrapper.update(text.textContent.escapeHTML());
         text.parentNode.replaceChild(highlightWrapper, text);
         this.highlightWrappers.push(highlightWrapper);
       }.bind(this));
@@ -400,7 +421,7 @@ XWiki.Selection = Class.create({
     if (node == this.container) {
       text = this.getLeftDocument(node.parentNode);
     }
-    parent = node.parentNode;
+    var parent = node.parentNode;
     if (parent.childNodes) {
       for (var i = 0; i &lt; parent.childNodes.length &amp;&amp; parent.childNodes[i] != node; ++i) {
         text += parent.childNodes[i].textContent;
@@ -481,106 +502,123 @@ XWiki.Selection = Class.create({
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));</code>
-</property>
-<property>
-<name>Annotation Javascript -- Selection handling code</name>
-</property>
-<property>
-<parse>0</parse>
-</property>
-<property>
-<use>always</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.JavaScriptExtension</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<cache>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>cache</name>
-<number>5</number>
-<prettyName>Caching policy</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>long|short|default|forbid</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</cache>
-<code>
-<disabled>0</disabled>
-<name>code</name>
-<number>2</number>
-<prettyName>Code</prettyName>
-<rows>20</rows>
-<size>50</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</code>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<parse>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<name>parse</name>
-<number>4</number>
-<prettyName>Parse content</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</parse>
-<use>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>use</name>
-<number>3</number>
-<prettyName>Use this extension</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</use>
-</class>
-<name>AnnotationCode.Script</name>
-<number>1</number>
-<className>XWiki.JavaScriptExtension</className>
-<guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
-<property>
-<cache></cache>
-</property>
-<property>
-<code>var XWiki = (function (XWiki) {
+    </property>
+    <property>
+      <name>Annotation Javascript -- Selection handling code</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>AnnotationCode.Script</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
+    <property>
+      <cache/>
+    </property>
+    <property>
+      <code>## Retrieve the annotation settings from the configuration object
+#set($config = 'AnnotationCode.AnnotationConfig')
+#set($configObj = $xwiki.getDocument($config).getObject($config))
+#set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
+#set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
+#set($annotationsActivated = $configObj.getProperty('activated').value)
+#set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
+#set($annotationClass = $configObj.getProperty('annotationClass').value)
+
+var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Annotation = Class.create({
   // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
   annotatedElement : false,
   // tab name of the annotations tab
-  annTabname : 'Annotations',
+  #if ("$!annotationClass" == 'XWiki.XWikiComments')
+    annTabname : 'Comments',
+    annTabTemplate : 'commentsinline.vm',
+  #else
+    annTabname : 'Annotations',
+    annTabTemplate : 'annotationsinline.vm',
+  #end
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,
+  // whether the annotations are being displayed; synchronizes with displayAnnotationsCheckbox if that element exists
+  displayingAnnotations : false,
   // the display annotations check box in the settings panel
   displayAnnotationsCheckbox : false,
   // flag specifying if the annotations are displayed by default or not
@@ -589,6 +627,8 @@ XWiki.Annotation = Class.create({
   displayHighlight : true,
   // add annotation shortcuts
   addAnnotationShortcuts : ['Ctrl+M', 'Meta+M', 'Ctrl+I', 'Meta+I'],
+  // show annotations shortcuts
+  toggleAnnotationsShortcuts : ['Alt+A'],
   // shortcuts for closing the open dialog, be it create, edit or display
   closeDialogShortcuts : ['Esc'],
   // the selection service used to detect and handle selection related functions on the document
@@ -608,7 +648,7 @@ XWiki.Annotation = Class.create({
     if (!this.annotatedElement) {
       // and show a warning if the annotations should be shown by default
       if (this.displayedByDefault) {
-        new XWiki.widgets.Notification("$msg.get('annotations.annotated.error.noannotatedelement')", "warning");
+        new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.noannotatedelement')", 'warning');
       }
       return;
     }
@@ -619,8 +659,12 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
+    // refresh the annotations displayed on the document when an annotation is deleted as a comment, that is from the comments tab when annotations are merged with comments
+    document.observe('xwiki:annotation:tab:deleted', this.refreshAnnotationsOnCommentDelete.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
+    // register the key shortcuts for toggling annotation visibility
+    this.registerToggleAnnotationsShortcut();
     // register the close dialog shortcut
     this.registerCloseDialogShortcut();
 
@@ -630,16 +674,13 @@ XWiki.Annotation = Class.create({
     // listen to the filter change events to re-fetch the annotations when it changes
     document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
 
-    // and put the value of the current page in a variable on XWiki, as it should be set along with the space and wiki values
-    XWiki.currentPage = $$('meta[name=page]')[0].content
-
     // and get the annotations if they're loaded by default
     if (this.displayedByDefault) {
       if (XWiki.docsyntax != 'xwiki/1.0') {
         this.fetchAnnotations(true);
       } else {
         // if the document syntax is 1.0, and annotations should be displayed by default, display a warning, and not display annotations
-        new XWiki.widgets.Notification("$msg.get('annotations.annotated.error.wrongsyntax')", "warning");
+        new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.wrongsyntax')", 'warning');
       }
     }
   },
@@ -662,14 +703,21 @@ XWiki.Annotation = Class.create({
       // create the annotations button
       var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
       var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-      annLink.update("&lt;strong&gt;$msg.get('annotations.title')&lt;/strong&gt;");
+      annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
       annContainer.insert({top: annLink});
       rightMenu.insert({bottom: annContainer});
-  
+
       annLink.observe('click', this.toggleSettingsPanel.bind(this));
     }
   },
-  
+
+  setAnnotationVisibility : function (visibility) {
+    this.displayingAnnotations = visibility;
+    if (this.displayAnnotationsCheckbox) {
+      this.displayAnnotationsCheckbox.checked = visibility;
+    }
+  },
+
   toggleSettingsPanel : function(event) {
     var menu = event.element();
     // prevent link
@@ -685,7 +733,7 @@ XWiki.Annotation = Class.create({
           // disable the button
           menu.disabled = true;
           // show nice loading message at page bottom
-          menu._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.menu.loading')", "inprogress");
+          menu._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.menu.loading')", 'inprogress');
         },
 
         onSuccess: function(response) {
@@ -698,7 +746,7 @@ XWiki.Annotation = Class.create({
           // store the displayed annotations checkbox
           this.displayAnnotationsCheckbox = $('annotationsdisplay');
           // show this checkbox as checked if the annotations are displayed by default and were loaded successfully
-          if (this.displayedByDefault &amp;&amp; this.fetchedAnnotations) {
+          if (this.displayedByDefault || this.displayingAnnotations) {
             this.displayAnnotationsCheckbox.checked = true;
           }
           this.attachSettingsListeners();
@@ -711,7 +759,7 @@ XWiki.Annotation = Class.create({
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          menu._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.menu.loaderror')" + failureReason, "error", {timeout : 5}));
+          menu._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.menu.loaderror')" + failureReason, 'error', {timeout : 5}));
         },
 
         on0: function (response) {
@@ -754,6 +802,7 @@ XWiki.Annotation = Class.create({
     }
     //and toggle all annotation markers
     this.annotatedElement.select('.annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
+    this.displayingAnnotations = visible;
     if (!visible) {
       // also close all open bubbles
       this.bubbles.each(function(bubble){
@@ -769,7 +818,7 @@ XWiki.Annotation = Class.create({
   toggleAnnotationHighlight : function(annotationId, visible) {
     this.annotatedElement.select('.annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
   },
-  
+
   /**
    * Handles the update of the current filter by re-storing the new filter in this object's state info and re-fetching 
    * the annotations.
@@ -793,7 +842,7 @@ XWiki.Annotation = Class.create({
     // TODO: request for color when it will be used by the annotation displayer and sent by the backend
     return [];
   },
-  
+
   /**
    * Returns a map of fieldName, fieldValue pairs that encode the current filter that needs to be applied to the fetched
    * and rendered annotations.
@@ -803,7 +852,7 @@ XWiki.Annotation = Class.create({
     // return the current filter stored from the last update of the filter
     return this.currentFilter;
   },
-  
+
   /**
    * Enriches the set of annotation parameters with the extra requested fields &amp; the filter. The function alters its 
    * hash parameter and returns the altered value.
@@ -827,17 +876,21 @@ XWiki.Annotation = Class.create({
     for (var i = 0; i &lt; extraFields.length; i++) {
       parametersHash.get('request_field').push(extraFields[i]);
     }
-    
+
     return parametersHash;
   },
 
-  fetchAnnotations : function(andShow) {
+  /*
+   * @param andShow whether the annotations should also be shown (highlighted) on the content
+   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)   
+   */
+  fetchAnnotations : function(andShow, force) {
     var getAnnotationsURL = XWiki.contextPath + '/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent(XWiki.currentPage) + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
       parameters: this.prepareRequestParameters(new Hash()), 
       onCreate: function() {
         // show nice loading message at page bottom
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.annotated.loading')", "inprogress");
+        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loading')", 'inprogress');
       }.bind(this),
 
       onSuccess: function(response) {
@@ -847,8 +900,8 @@ XWiki.Annotation = Class.create({
         }
         // hide message at page bottom
         this._x_notification.hide();
-        // load the received annotated content in the page, along with annotations and annotations markers
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow);
+        // load the received annotated content in the page, along with annotations and annotations markers.
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, force);
         // store the state of the annotations
         this.fetchedAnnotations = true;
         if (this.displayAnnotationsCheckbox) {
@@ -862,7 +915,7 @@ XWiki.Annotation = Class.create({
           failureReason = 'Server not responding';
         }
         // show the error message at the bottom
-        this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.annotated.loaderror')" + failureReason, "error", {timeout : 5}));
+        this._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
         if (this.displayAnnotationsCheckbox) {
           this.displayAnnotationsCheckbox.checked = false;
         }
@@ -880,7 +933,7 @@ XWiki.Annotation = Class.create({
       }.bind(this)
     });
   },
-  
+
   /**
    * Checks if the passed response contains a non-zero response code and, in this case, executes the failure callback 
    * of the response.
@@ -894,7 +947,7 @@ XWiki.Annotation = Class.create({
       if (response.responseJSON) {
         response.statusText = response.responseJSON.responseMessage;
       } else {
-        response.statusText = "$msg.get('annotations.annotated.loaderror.wrongresponse')";
+        response.statusText = "$services.localization.render('annotations.annotated.loaderror.wrongresponse')";
       }
       response.request.options.onFailure(response);
       return true;
@@ -914,6 +967,8 @@ XWiki.Annotation = Class.create({
     if ((annotatedContent.annotations &amp;&amp; annotatedContent.annotations.size() &gt; 0) || force) {
       this.annotatedElement.update(annotatedContent.content);
       this.addAnnotationMarkers(annotatedContent.annotations);
+      // Notify the content change.
+      document.fire('xwiki:dom:updated', {elements: [this.annotatedElement]});
       // and also handle the tab 'downstairs' when the annotations list changes
       this.reloadTab(navigateToPane);
     }
@@ -921,7 +976,7 @@ XWiki.Annotation = Class.create({
       this.toggleAnnotations(true);
     }
   },
-  
+
   reloadTab : function(navigateToPane) {
     var annotationsPane = $( this.annTabname + 'pane');
     if (annotationsPane) {
@@ -930,34 +985,39 @@ XWiki.Annotation = Class.create({
       annotationsPane.addClassName('empty');
       if (!annotationsPane.hasClassName('hidden')) {
         // reload
-        XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane);
+        XWiki.displayDocExtra(this.annTabname, this.annTabTemplate, navigateToPane);
       }
     }
   },
 
   addDeleteListenersInTab : function() {
-    $$(".annotation a.delete").each(function(item) {
+    // This applies only to the annotations tab because merged annotations are currently displayed and deleted by the Comments system.
+    // NOTE: don't forget to change this too if, in the future, annotations are no longer deleted by the Comments system from the Comments tab.
+    $$('#Annotationspane .annotation a.delete').each(function(item) {
       this.addDeleteListener(item);
     }.bind(this));
   },
 
   addEditListenersInTab : function() {
-    $$(".annotation a.edit").each(function(item) {
+    // This applies only to the annotations tab because merged annotations are currently displayed and edited by the Comments system.
+    // NOTE: don't forget to change this too if, in the future, annotations are no longer edited by the Comments system from the Comments tab.
+    // NOTE: Doing this does not allow us to see any extra properties that may be added to the XWikiComments class. These properties will still be displayed and editable in the annotation bubble, but not in the tab, because the bubble is handled by the Annotations system, while the tab is handled by the Comments system.
+    $$('#Annotationspane .annotation a.edit').each(function(item) {
       var container = item.up('.annotation');
       // compute annotation id, which is right after annotation_list_ in the container ID... TODO: this is pretty wrongish...
       var annotationId = container.id.substring(16);
       this.addEditListener(item, annotationId, container.up());
     }.bind(this));
   },
-  
+
   addValidateListenersInTab : function() {
-    $$(".annotation a.validate").each(function(item) {
+    $$('.annotation a.validate').each(function(item) {
       var container = item.up('.annotation');
       // compute annotation id, which is right after annotation_list_ in the container ID... TODO: this is pretty wrongish...
       var annotationId = container.id.substring(16);
       this.addValidateListener(item, annotationId, container);
     }.bind(this));
-  },  
+  },
 
   addDeleteListener : function(item, inBubble, container) {
     item.observe('click', function(event) {
@@ -995,16 +1055,16 @@ XWiki.Annotation = Class.create({
           },
           /* Interaction parameters */
           {
-             confirmationText: "$msg.get('annotations.action.delete.confirm')",
-             progressMessageText : "$msg.get('annotations.action.delete.inProgress')",
-             successMessageText : "$msg.get('annotations.action.delete.done')",
-             failureMessageText : "$msg.get('annotations.action.delete.failed')"
+             confirmationText: "$services.localization.render('annotations.action.delete.confirm')",
+             progressMessageText : "$services.localization.render('annotations.action.delete.inProgress')",
+             successMessageText : "$services.localization.render('annotations.action.delete.done')",
+             failureMessageText : "$services.localization.render('annotations.action.delete.failed')"
           }
         );
       }
     }.bindAsEventListener(this));
   },
-  
+
   addValidateListener : function(item, id, container, inBubble) {
     item.observe('click', function(event) {
       item.blur();
@@ -1013,8 +1073,8 @@ XWiki.Annotation = Class.create({
       this.updateAnnotationAsync(container, id, inBubble, item.href, 'POST', 
         new Hash({'state' : 'SAFE', 'originalSelection' : ''}),
         {
-          successText : "$msg.get('annotations.action.validate.success')",
-          failureText : "$msg.get('annotations.action.validate.loaderror')"
+          successText : "$services.localization.render('annotations.action.validate.success')",
+          failureText : "$services.localization.render('annotations.action.validate.loaderror')"
         });
     }.bindAsEventListener(this));
   },
@@ -1053,7 +1113,7 @@ XWiki.Annotation = Class.create({
               failureReason = 'Server not responding';
             }
             // show the error message at the bottom
-            this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.form.loaderror')" + failureReason, "error", {timeout : 5});
+            this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.edit.form.loaderror')" + failureReason, 'error', {timeout : 5});
             // load the original content of the container
             this.fillViewPanel(container, container.originalContentHTML, id, inBubble);
           }.bind(this),
@@ -1081,7 +1141,7 @@ XWiki.Annotation = Class.create({
       var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
       lastSpan.insert({after: markerSpan});
       // annotations are displayed on mouseover
-      markerSpan.observe("mouseover", this.onMarkerMouseOver.bindAsEventListener(this, item.annotationId));
+      markerSpan.observe('mouseover', this.onMarkerMouseOver.bindAsEventListener(this, item.annotationId));
     }.bind(this));
   },
 
@@ -1111,7 +1171,7 @@ XWiki.Annotation = Class.create({
     // and fetch the annotations display in it
     this.fetchAndShowAnnotationDetails(id, newBubble);
   },
-  
+
   fetchAndShowAnnotationDetails : function(annotationId, container) {
     new Ajax.Request('$xwiki.getURL("AnnotationCode.DisplayForm")', {
       parameters: {
@@ -1134,7 +1194,7 @@ XWiki.Annotation = Class.create({
         // hide the loading bubble
         this.hideBubble(newBubble);
         // show the error message at the bottom
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.view.form.loaderror')" + failureReason, "error", {timeout : 5});
+        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.view.form.loaderror')" + failureReason, 'error', {timeout : 5});
       }.bind(this),
 
       on0: function (response) {
@@ -1142,7 +1202,7 @@ XWiki.Annotation = Class.create({
       }.bind(this)
     });
   },
-  
+
   displayLoadingBubble : function(top, left) {
     // create an element with the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
@@ -1153,8 +1213,8 @@ XWiki.Annotation = Class.create({
     // make it hidden for the moment
     bubble.toggleClassName('hidden');
     // position it
-    bubble.style.left = left + "px";
-    bubble.style.top = top + "px";
+    bubble.style.left = left + 'px';
+    bubble.style.top = top + 'px';
     // make it visible
     bubble.toggleClassName('hidden');
     // put this bubble in the bubbles stack
@@ -1179,7 +1239,7 @@ XWiki.Annotation = Class.create({
     container.update(content);
     return true;
   },
-  
+
   /**
    * Fills the edit form in the passed container, with the content passed (which should be the edit form) and sets all 
    * listeners for the annotation with the passed id. If inBubble is true, the edit form is in a bubble, not in the 
@@ -1221,11 +1281,11 @@ XWiki.Annotation = Class.create({
     // aaand update
     this.updateAnnotationAsync(container, annotationId, inBubble, form.action, form.method, formData, 
       {
-        successText : "$msg.get('annotations.action.edit.success')",
-        failureText : "$msg.get('annotations.action.edit.loaderror')"
+        successText : "$services.localization.render('annotations.action.edit.success')",
+        failureText : "$services.localization.render('annotations.action.edit.loaderror')"
       });
   },
-  
+
   /**
    * Handles the asynchronous update of annotation given by annotatinId, to the specified url, sending the specified 
    * parameters and using the passed messages. Container will pass in loading state while the async call takes place, 
@@ -1248,7 +1308,7 @@ XWiki.Annotation = Class.create({
         if (this.checkResponseCodeAndFail(response)) {
           return;
         }
-        this._x_notification = new XWiki.widgets.Notification(messages.successText, "done");
+        this._x_notification = new XWiki.widgets.Notification(messages.successText, 'done');
         if (inBubble) {
           // close the bubble on successful update
           this.hideBubble(container);
@@ -1262,7 +1322,7 @@ XWiki.Annotation = Class.create({
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
         }        
-        this._x_notification.replace(new XWiki.widgets.Notification(messages.failureText + failureReason, "error", {timeout : 5}));
+        this._x_notification.replace(new XWiki.widgets.Notification(messages.failureText + failureReason, 'error', {timeout : 5}));
         if (inBubble) {
           // and close the bubble on failure to update
           this.hideBubble(container);
@@ -1307,6 +1367,31 @@ XWiki.Annotation = Class.create({
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
     }
+    // Annotations can have a reply button when they are merged with comments (and thus stored as comments). Custom annotations will not have this button displayed.
+    var replyButton = container.down('a.commentreply');
+    if (replyButton) {
+      // When a click is done on this button, fire a click on the corresponding button in the comments tab.
+
+      // Locate the button in the comments tab.
+      var replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+
+      // If the replyButtonInTab is not found, then the comments tab is not visible so we hide the reply button as well, otherwise it just does not work.
+      if (!replyButtonInTab) {
+        replyButton.hide();
+      } else {
+        // When the reply button from the bubble is clicked, also click the reply button from the comments tab.
+        replyButton.observe('click', function(event) {
+          // Stop the bubble click event.
+          event.stop();
+
+          // Click the reply button from the comments tab button instead.
+          replyButtonInTab.click();
+
+          // Lose the focus on the bubble so that it can go away.
+          container.blur();
+        });
+      }
+    }
   },
 
   /**
@@ -1325,31 +1410,42 @@ XWiki.Annotation = Class.create({
     }
   },
 
-  registerAddAnnotationShortcut : function() {
-    var method = this.onAddAnnotationShortcut;
-    for (var i = 0; i &lt; this.addAnnotationShortcuts.size(); ++i) {
-      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-        shortcut.add(this.addAnnotationShortcuts[i], method.bindAsEventListener(this), {type: 'keyup'});
-      } else {
-        shortcut.add(this.addAnnotationShortcuts[i], method.bindAsEventListener(this), {type: 'keypress'});
-      }
+  registerShortcuts : function(annotationShorcuts, method) {
+    var eventType = 'keypress';
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+      eventType = 'keyup';
+    }
+    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+      shortcut.add(annotationShorcuts[i], method.bindAsEventListener(this), {type: eventType});
+    }
+  },
+  unregisterShortcuts : function(annotationShorcuts) {
+    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+      shortcut.remove(annotationShorcuts[i]);
     }
   },
 
+  registerAddAnnotationShortcut : function() {
+    this.registerShortcuts(this.addAnnotationShortcuts, this.onAddAnnotationShortcut);
+  },
   unregisterAddAnnotationShortcut : function() {
-    for (var i = 0; i &lt; this.addAnnotationShortcuts.size(); ++i) {
-      shortcut.remove(this.addAnnotationShortcuts[i]);
-    }
+    this.unregisterShortcuts(this.addAnnotationShortcuts);
   },
 
   registerCloseDialogShortcut : function() {
-    var method = this.closeOpenBubble;
-    for (var i = 0; i &lt; this.closeDialogShortcuts.size(); ++i) {
-      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-        shortcut.add(this.closeDialogShortcuts[i], method.bindAsEventListener(this), {type: 'keyup'});
-      } else {
-        shortcut.add(this.closeDialogShortcuts[i], method.bindAsEventListener(this), {type: 'keypress'});
-      }
+    this.registerShortcuts(this.closeDialogShortcuts, this.closeOpenBubble);
+  },
+
+  registerToggleAnnotationsShortcut : function() {
+    this.registerShortcuts(this.toggleAnnotationsShortcuts, this.onToggleAnnotationsShortcut);
+  },
+
+  onToggleAnnotationsShortcut : function() {
+    if (this.fetchedAnnotations) {
+      this.setAnnotationVisibility(!this.displayingAnnotations); 
+      this.toggleAnnotations(this.displayingAnnotations);
+    } else {
+      this.fetchAnnotations(true);
     }
   },
 
@@ -1374,7 +1470,7 @@ XWiki.Annotation = Class.create({
   onAddAnnotationShortcut : function() {
     // if the document is in 1.0 syntax, prevent the create dialog to be displayed, display a warning and stop everything
     if (XWiki.docsyntax == 'xwiki/1.0') {
-      new XWiki.widgets.Notification("$msg.get('annotations.action.create.error.wrongsyntax')", "warning");
+      new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.error.wrongsyntax')", 'warning');
       return;
     }
     // parse the selection
@@ -1382,7 +1478,7 @@ XWiki.Annotation = Class.create({
     var selectionText = this.selectionService.selectionText;
     if (!selectionText) {
       // show an 'invalid selection message'. Shorter time here, otherwise it's a bit confusing...
-      new XWiki.widgets.Notification("$msg.get('annotations.action.create.selection.invalid')", "error", {timeout : 5});
+      new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.selection.invalid')", 'error', {timeout : 5});
     } else {
       this.selectionService.computeContext();
       // fetch the creation for this annotation and display it at the position of the selection
@@ -1405,14 +1501,14 @@ XWiki.Annotation = Class.create({
           // display the annotation creation form
           this.fillCreateForm(this.createPanel, response.responseText);
         }.bind(this),
-   
+
         onFailure: function(response) {
           var failureReason = response.statusText;
           if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, "error", {timeout : 5});
+          this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.form.loaderror')" + failureReason, 'error', {timeout : 5});
           // and hide the create form panel
           this.hideAnnotationCreationForm();
         }.bind(this),
@@ -1426,14 +1522,14 @@ XWiki.Annotation = Class.create({
 
   displayAnnotationCreationForm : function() {
     // TODO: get this color from the color theme
-    this.selectionService.highlightSelection("#FFEE99");
+    this.selectionService.highlightSelection('#FFEE99');
     // get the position and build the loading bubble
     var position = this.selectionService.getPositionNextToSelection();
     this.createPanel = this.displayLoadingBubble(position.top, position.left);
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
     this.unregisterAddAnnotationShortcut();    
   },
-  
+
   fillCreateForm : function(container, panelContent) {
     // put the content in. Safe update because an escape might have been hit
     if (!this.safeUpdate(this.createPanel, panelContent)) {
@@ -1457,7 +1553,7 @@ XWiki.Annotation = Class.create({
     }
     // and listen to the create shortcut again
     this.registerAddAnnotationShortcut();
-  }, 
+  },
 
   onAnnotationAdd : function(event) {
     // don't submit
@@ -1477,9 +1573,12 @@ XWiki.Annotation = Class.create({
         if (this.checkResponseCodeAndFail(response)) {
           return;
         }
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault);
+        if (this.displayAnnotationsCheckbox) {
+          this.displayAnnotationsCheckbox.checked = true;
+        }
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
         this.fetchedAnnotations = true;
-        form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", "done");
+        form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
         // and hide the create bubble, skipping selection highlight clear
         this.hideAnnotationCreationForm(true);
       }.bind(this),
@@ -1489,28 +1588,37 @@ XWiki.Annotation = Class.create({
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
         }
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.loaderror')" + failureReason, "error", {timeout : 5});
+        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
       }.bind(this),
       on0 : function (response) {
         response.request.options.onFailure(response);
       }
     });
+  },
+
+  /**
+   * Handles the refresh of the document content when an annotations is deleted from the comments tab.
+   * It applies only to the case when annotations are merged with (and stored as) comments. Custom annotations will not use this.
+   */
+  refreshAnnotationsOnCommentDelete : function(event) {
+    // if the annotations are currently visible, re-fetch the annotations and display them
+    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault;
+    if (visible) {
+      // Force the reloading in case this annotation was the last one.
+      this.fetchAnnotations(true, true);
+    } else {
+      // Mark the loaded annotations as dirty and make sure the next time the annotations checkbox is checked, the annotations will be fetched.
+      this.fetchedAnnotations = false;
+    }
   }
 });
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
 
-## Retrieve the annotation settings from the configuration object
-#set($config = 'AnnotationCode.AnnotationConfig')
-#set($configObj = $xwiki.getDocument($config).getObject($config))
-#set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
-#set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
-#set($annotationsActivated = $configObj.getProperty('activated').value)
-#set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
 document.observe('xwiki:dom:loaded', function() {
   // if the action on the current document is not view, don't load annotations
-  if (XWiki.contextaction != "view") {
+  if (XWiki.contextaction != 'view') {
     return;
   }
   
@@ -1542,55 +1650,56 @@ document.observe('xwiki:dom:loaded', function() {
     new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
   }
 });</code>
-</property>
-<property>
-<name>Annotation Javascript -- Annotation application</name>
-</property>
-<property>
-<parse>1</parse>
-</property>
-<property>
-<use>always</use>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.RequiredRightClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<level>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>level</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>level</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values>edit|programming</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</level>
-</class>
-<name>AnnotationCode.Script</name>
-<number>0</number>
-<className>XWiki.RequiredRightClass</className>
-<guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
-<property>
-<level>programming</level>
-</property>
-</object>
-<content>
-</content></xwikidoc>
+    </property>
+    <property>
+      <name>Annotation Javascript -- Annotation application</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
+    <property>
+      <level>programming</level>
+    </property>
+  </object>
+  <content>
+</content>
+</xwikidoc>

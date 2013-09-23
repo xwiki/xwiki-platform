@@ -26,7 +26,7 @@ import java.net.URLStreamHandlerFactory;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Test;
@@ -34,13 +34,12 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link URIClassLoader}.
  * 
  * @version $Id$
- * @since 2.0.1
  */
 public class URIClassLoaderTest extends AbstractComponentTestCase
 {
@@ -54,7 +53,7 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
     {
         super.registerComponents();
 
-        this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
+        this.arf = registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
         this.dab = registerMockComponent(DocumentAccessBridge.class);
     }
 
@@ -64,9 +63,11 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
     @Test
     public void testFindResource() throws Exception
     {
+        URLStreamHandlerFactory urlStreamHandlerFactory =
+            getComponentManager().getInstance(URLStreamHandlerFactory.class);
         URIClassLoader cl =
             new URIClassLoader(new URI[] {new URI("attachmentjar://page%40filename1"), new URI("http://some/url"),
-            new URI("attachmentjar://filename2")}, getComponentManager().lookup(URLStreamHandlerFactory.class));
+            new URI("attachmentjar://filename2")}, urlStreamHandlerFactory);
 
         Assert.assertEquals(3, cl.getURLs().length);
         Assert.assertEquals("attachmentjar://page%40filename1", cl.getURLs()[0].toString());

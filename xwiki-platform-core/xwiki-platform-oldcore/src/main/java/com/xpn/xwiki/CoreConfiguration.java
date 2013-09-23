@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -32,7 +32,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * @version $Id$
  * @since 1.8RC2
  */
-@ComponentRole
+@Role
 public interface CoreConfiguration
 {
     /**

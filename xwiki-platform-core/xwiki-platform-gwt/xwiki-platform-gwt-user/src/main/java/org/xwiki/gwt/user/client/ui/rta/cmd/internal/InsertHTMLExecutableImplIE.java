@@ -43,6 +43,7 @@ public class InsertHTMLExecutableImplIE extends InsertHTMLExecutableImpl
      * 
      * @see InsertHTMLExecutable#deleteSelection(RichTextArea)
      */
+    @Override
     protected Range deleteSelection(RichTextArea rta)
     {
         // If the start container is badly detected then this method might fail to adjust the caret position.

@@ -34,23 +34,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.merge.CollisionException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -58,29 +60,25 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Base class for representing an element having a collection of properties. For example:
  * <ul>
- *   <li>an XClass definition (composed of XClass properties)</li>
- *   <li>an XObject definition (composed of XObject properties)</li>
- *   <li>an XWikiStats object (composed of stats properties)</li>
+ * <li>an XClass definition (composed of XClass properties)</li>
+ * <li>an XObject definition (composed of XObject properties)</li>
+ * <li>an XWikiStats object (composed of stats properties)</li>
  * </ul>
  * 
  * @version $Id$
  */
-public abstract class BaseCollection extends BaseElement implements ObjectInterface, Cloneable
+public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface,
+    Cloneable
 {
-    protected static final Log LOG = LogFactory.getLog(BaseCollection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
     /**
      * The meaning of this reference fields depends on the element represented. Examples:
      * <ul>
-     *   <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's 
-     *       XClass is defined.</li>
-     *   <li>If this BaseCollection instance represents an XClass then it's not used.</li>
+     * <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's XClass
+     * is defined.</li>
+     * <li>If this BaseCollection instance represents an XClass then it's not used.</li>
      * </ul>
-     *
-     * Note that we're saving the XClass reference as a relative reference instead of an absolute one. This is because
-     * We want the ability (for example) to create an XObject relative to the current space or wiki so that a copy of
-     * that XObject would retain that relativity. This is for example useful when copying a Wiki into another Wiki
-     * so that the copied XObject have a XClassReference pointing in the new wiki.
      */
     private EntityReference xClassReference;
 
@@ -100,9 +98,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     /**
      * The meaning of this reference fields depends on the element represented. Examples:
      * <ul>
-     *   <li>When the BaseCollection represents an XObject, this number is the position of this XObject in the document
-     *       where it's located. The first XObject of a given XClass type is at position 0, and other XObject of the
-     *       same XClass type are at position 1, etc.</li>
+     * <li>When the BaseCollection represents an XObject, this number is the position of this XObject in the document
+     * where it's located. The first XObject of a given XClass type is at position 0, and other XObject of the same
+     * XClass type are at position 1, etc.</li>
      * </ul>
      */
     protected int number;
@@ -111,40 +109,14 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * Used to resolve XClass references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver =
-        Utils.getComponent(EntityReferenceResolver.class, "relative");
-
-    /**
-     * Used to convert a proper Class Reference to a string but without the wiki name.
-     */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "local");
+    protected EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.TYPE_STRING, "relative");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "current/reference");
-
-    public int getId()
-    {
-        return hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        return (getName() + getClassName()).hashCode();
-    }
-
-    public void setId(int id)
-    {
-    }
+    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
     public int getNumber()
     {
@@ -162,24 +134,27 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     /**
+     * Get the absolute reference of the XClass.
+     * 
      * @since 2.2M2
      */
     public DocumentReference getXClassReference()
     {
-        // Ensure we always return an absolute references since we always want well-constructed to be used from outside
-        // this class.
         if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
-            this.xClassReferenceCache = this.currentReferenceDocumentReferenceResolver
-                .resolve(getRelativeXClassReference(), getDocumentReference());
+            this.xClassReferenceCache =
+                this.currentReferenceDocumentReferenceResolver.resolve(getRelativeXClassReference(),
+                    getDocumentReference());
         }
 
         return this.xClassReferenceCache;
     }
 
     /**
-     * @since 2.2.3
+     * Get the actual reference to the XClass as stored in this instance.
+     * 
+     * @since 4.0M2
      */
-    private EntityReference getRelativeXClassReference()
+    public EntityReference getRelativeXClassReference()
     {
         return this.xClassReference;
     }
@@ -202,11 +177,27 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     /**
+     * Set the reference to the XClass (used for an XObject).
+     * <p>
+     * Note that absolute reference are not supported for xclasses which mean that the wiki part (whatever the wiki is)
+     * of the reference will be systematically removed.
+     * 
+     * @param xClassReference the reference to the XClass of this XObject.
      * @since 2.2.3
      */
     public void setXClassReference(EntityReference xClassReference)
     {
-        this.xClassReference = xClassReference;
+        // Ensure that the reference to the XClass is always relative to the document wiki.
+        EntityReference ref = xClassReference;
+
+        if (ref != null) {
+            EntityReference wiki = xClassReference.extractReference(EntityType.WIKI);
+            if (wiki != null) {
+                ref = xClassReference.removeParent(wiki);
+            }
+        }
+
+        this.xClassReference = ref;
         this.xClassReferenceCache = null;
     }
 
@@ -230,31 +221,19 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         setXClassReference(xClassReference);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#safeget(java.lang.String)
-     */
+    @Override
     public PropertyInterface safeget(String name)
     {
         return (PropertyInterface) getFields().get(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#get(java.lang.String)
-     */
+    @Override
     public PropertyInterface get(String name) throws XWikiException
     {
         return safeget(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#safeput(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     */
+    @Override
     public void safeput(String name, PropertyInterface property)
     {
         addField(name, property);
@@ -264,11 +243,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     */
+    @Override
     public void put(String name, PropertyInterface property) throws XWikiException
     {
         safeput(name, property);
@@ -277,6 +252,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     /**
      * @since 2.2M1
      */
+    @Override
     public BaseClass getXClass(XWikiContext context)
     {
         BaseClass baseClass = null;
@@ -291,23 +267,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             try {
                 baseClass = context.getWiki().getXClass(classReference, context);
             } catch (Exception e) {
-                LOG.error("Failed to get class [" + classReference + "]", e);
+                LOGGER.error("Failed to get class [" + classReference + "]", e);
             }
         }
 
         return baseClass;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
-     * @deprecated since 2.2M1 use {@link #getXClass(com.xpn.xwiki.XWikiContext)}
-     */
-    @Deprecated
-    public BaseClass getxWikiClass(XWikiContext context)
-    {
-        return getXClass(context);
     }
 
     public String getStringValue(String name)
@@ -585,11 +549,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return it;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object coll)
     {
@@ -625,13 +584,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseElement#clone()
-     */
     @Override
-    public Object clone()
+    public BaseCollection clone()
     {
         BaseCollection collection = (BaseCollection) super.clone();
         collection.setXClassReference(getRelativeXClassReference());
@@ -671,7 +625,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
@@ -680,8 +634,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         String newPropertyValue =
                             (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
                                 propertyName, this, context);
-                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName,
-                            propertyType, "", newPropertyValue));
+                        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                            ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                     }
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
@@ -690,16 +644,18 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
                         (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
-                        propertyName, this, context);
+                            propertyName, this, context);
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                        propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType,
-                        oldPropertyValue, newPropertyValue));
+                            propertyName, oldCollection, context);
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldPropertyValue,
+                        newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType,
-                        oldProperty.toText(), newProperty.toText()));
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldProperty.toText(),
+                        newProperty.toText()));
                 }
             }
         }
@@ -711,7 +667,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
@@ -720,13 +676,13 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                            propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
-                            "removed", propertyName, propertyType, oldPropertyValue, ""));
+                                propertyName, oldCollection, context);
+                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
-                            "removed", propertyName, propertyType, oldProperty.toText(), ""));
+                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), ""));
                     }
                 }
             }
@@ -745,11 +701,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         this.fieldsToRemove = fieldsToRemove;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#toXML(com.xpn.xwiki.objects.classes.BaseClass)
-     */
+    @Override
     public abstract Element toXML(BaseClass bclass);
 
     public String toXMLString()
@@ -769,11 +721,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
@@ -795,12 +742,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return map;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BaseElement#setDocumentReference(org.xwiki.model.reference.DocumentReference)
-     * @since 2.2.3
-     */
     @Override
     public void setDocumentReference(DocumentReference reference)
     {
@@ -811,12 +752,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         this.xClassReferenceCache = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BaseElement#setName(String)
-     * @since 2.2.3
-     */
     @Override
     public void setName(String name)
     {
@@ -825,5 +760,109 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
         // the new document reference.
         this.xClassReferenceCache = null;
+    }
+
+    @Override
+    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
+    {
+        BaseCollection<R> previousCollection = (BaseCollection<R>) previousElement;
+        BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
+
+        List<ObjectDiff> classDiff = newCollection.getDiff(previousCollection, context);
+        for (ObjectDiff diff : classDiff) {
+            PropertyInterface propertyResult = getField(diff.getPropName());
+            PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());
+            PropertyInterface newProperty = newCollection.getField(diff.getPropName());
+
+            if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+                if (propertyResult == null) {
+                    // Add if none has been added by user already
+                    addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                        : newProperty.clone());
+                    mergeResult.setModified(true);
+                } else if (!propertyResult.equals(newProperty)) {
+                    // XXX: collision between DB and new: property to add but already exists in the DB
+                    mergeResult.error(new CollisionException("Collision found on property ["
+                        + newProperty.getReference() + "]"));
+                }
+            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
+                if (propertyResult != null) {
+                    if (propertyResult.equals(previousProperty)) {
+                        // Delete if it's the same as previous one
+                        removeField(diff.getPropName());
+                        mergeResult.setModified(true);
+                    } else {
+                        // XXX: collision between DB and new: property to remove but not the same as previous
+                        // version
+                        mergeResult.error(new CollisionException("Collision found on property ["
+                            + previousProperty.getReference() + "]"));
+                    }
+                } else {
+                    // Already removed from DB, lets assume the user is prescient
+                    mergeResult.warn(new CollisionException("Property [" + previousProperty.getReference()
+                        + "] already removed"));
+                }
+            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
+                if (propertyResult != null) {
+                    if (propertyResult.equals(previousProperty)) {
+                        // Let some automatic migration take care of that modification between DB and new
+                        addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                            : newProperty.clone());
+                        mergeResult.setModified(true);
+                    } else if (!propertyResult.equals(newProperty)) {
+                        // Try to apply 3 ways merge on the property
+                        propertyResult.merge(previousProperty, newProperty, configuration, context, mergeResult);
+                    }
+                } else {
+                    // XXX: collision between DB and new: property to modify but does not exists in DB
+                    // Lets assume it's a mistake to fix
+                    mergeResult.warn(new CollisionException("Collision found on property ["
+                        + newProperty.getReference() + "]"));
+
+                    addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                        : newProperty.clone());
+                    mergeResult.setModified(true);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean apply(ElementInterface newElement, boolean clean)
+    {
+        boolean modified = false;
+
+        BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
+
+        if (clean) {
+            // Delete fields that don't exist anymore
+            List<String> fieldsToDelete = new ArrayList<String>(this.fields.size());
+            for (String key : this.fields.keySet()) {
+                if (newCollection.safeget(key) == null) {
+                    fieldsToDelete.add(key);
+                }
+            }
+
+            for (String key : fieldsToDelete) {
+                removeField(key);
+                modified = true;
+            }
+        }
+
+        // Add new fields and update existing fields
+        for (Map.Entry<String, Object> entry : newCollection.fields.entrySet()) {
+            PropertyInterface field = (PropertyInterface) this.fields.get(entry.getKey());
+            PropertyInterface newField = (PropertyInterface) entry.getValue();
+
+            if (field == null) {
+                addField(entry.getKey(), newField);
+                modified = true;
+            } else {
+                modified |= field.apply(newField, clean);
+            }
+        }
+
+        return modified;
     }
 }

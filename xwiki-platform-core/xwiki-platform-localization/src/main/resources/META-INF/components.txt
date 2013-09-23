@@ -1,2 +1,0 @@
-org.xwiki.localization.internal.DefaultLocalizationManager
-org.xwiki.localization.internal.PulledDocumentsBundle

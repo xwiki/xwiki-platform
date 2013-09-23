@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.Node;
 /**
  * Iterator for the depth-first pre-order strategy, starting in a specified node.
  * 
- * @see http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-Document
+ * @see "http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-Document"
  * @version $Id$
  */
 public class DepthFirstPreOrderIterator implements Iterator<Node>
@@ -53,17 +53,13 @@ public class DepthFirstPreOrderIterator implements Iterator<Node>
         this.currentNode = startNode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean hasNext()
     {
         return this.currentNode != null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Node next()
     {
         // return the currentNode
@@ -93,9 +89,7 @@ public class DepthFirstPreOrderIterator implements Iterator<Node>
         return nodeToReturn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void remove()
     {
         throw new UnsupportedOperationException();

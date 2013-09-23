@@ -13,7 +13,8 @@
 beginDocument
 beginMacroMarkerStandalone [code] [] [<b>bold</b>
 <i>italic</i>]
-beginGroup [[class]=[box code]]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
 beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onSpecialSymbol [<]
 onWord [b]
@@ -39,7 +40,8 @@ onSpecialSymbol [/]
 onWord [i]
 onSpecialSymbol [>]
 endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
-endGroup [[class]=[box code]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [code] [] [<b>bold</b>
 <i>italic</i>]
 endDocument

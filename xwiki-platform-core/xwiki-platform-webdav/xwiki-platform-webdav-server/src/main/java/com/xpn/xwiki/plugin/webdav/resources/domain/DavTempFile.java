@@ -83,9 +83,7 @@ public class DavTempFile extends AbstractDavResource
         timeOfLastModification = (Date) timeOfCreation.clone();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
@@ -101,25 +99,19 @@ public class DavTempFile extends AbstractDavResource
         getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, contentLength));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         return super.decode(tokens, next);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean exists()
     {
         return parentResource.getVirtualMembers().contains(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void spool(OutputContext outputContext) throws IOException
     {
         outputContext.setContentLanguage("en");
@@ -136,9 +128,7 @@ public class DavTempFile extends AbstractDavResource
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();
@@ -146,9 +136,7 @@ public class DavTempFile extends AbstractDavResource
         return new DavResourceIteratorImpl(children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavTempFile) {
@@ -158,9 +146,7 @@ public class DavTempFile extends AbstractDavResource
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource resource) throws DavException
     {
         if (resource instanceof DavTempFile) {
@@ -170,9 +156,7 @@ public class DavTempFile extends AbstractDavResource
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void move(DavResource destination) throws DavException
     {
         if (destination instanceof DavTempFile && destination.getCollection().equals(getCollection())
@@ -226,17 +210,13 @@ public class DavTempFile extends AbstractDavResource
         this.isCollection = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean isCollection()
     {
         return isCollection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public long getModificationTime()
     {
         return timeOfLastModification.getTime();

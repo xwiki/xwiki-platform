@@ -16,36 +16,40 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.div;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class BooleanClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "boolean";
+
+    /** Other string values that might be used to represent "true" values. */
+    private static final Pattern TRUE_PATTERN = Pattern.compile("yes|true", Pattern.CASE_INSENSITIVE);
+
+    /** Other string values that might be used to represent "false" values. */
+    private static final Pattern FALSE_PATTERN = Pattern.compile("no|false", Pattern.CASE_INSENSITIVE);
+
     public BooleanClass(PropertyMetaClass wclass)
     {
-        super("boolean", "Boolean", wclass);
+        super(XCLASSNAME, "Boolean", wclass);
     }
 
     public BooleanClass()
@@ -98,8 +102,15 @@ public class BooleanClass extends PropertyClass
         BaseProperty property = newProperty();
         Number nvalue = null;
         if (StringUtils.isNotEmpty(value)) {
-            nvalue = new Integer(value);
+            if (StringUtils.isNumeric(value)) {
+                nvalue = new Integer(value);
+            } else if (TRUE_PATTERN.matcher(value).matches()) {
+                nvalue = Integer.valueOf(1);
+            } else if (FALSE_PATTERN.matcher(value).matches()) {
+                nvalue = Integer.valueOf(0);
+            }
         }
+        // We don't return null if there's no value, since the BooleanProperty really works that way
         property.setValue(nvalue);
         return property;
     }
@@ -149,6 +160,7 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setAttributeFilter(new XMLAttributeValueFilter());
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
@@ -163,14 +175,18 @@ public class BooleanClass extends PropertyClass
         if (getDefaultValue() == -1) {
             options = new option[] {new option("---", ""), new option(String1, "1"), new option(String0, "0")};
             options[0].addElement("---");
-            options[1].addElement(String1);
-            options[2].addElement(String0);
+            options[1].addElement(XMLUtils.escape(String1));
+            options[2].addElement(XMLUtils.escape(String0));
         } else {
             options = new option[] {new option(String1, "1"), new option(String0, "0")};
-            options[0].addElement(String1);
-            options[1].addElement(String0);
+            options[0].addElement(XMLUtils.escape(String1));
+            options[1].addElement(XMLUtils.escape(String0));
             nb1 = 0;
             nb2 = 1;
+        }
+
+        for (option option : options) {
+            option.setAttributeFilter(new XMLAttributeValueFilter());
         }
 
         try {
@@ -210,8 +226,11 @@ public class BooleanClass extends PropertyClass
         div[] inputs;
 
         input radioNone = new input(input.radio, prefix + name, "");
+        radioNone.setAttributeFilter(new XMLAttributeValueFilter());
         input radioTrue = new input(input.radio, prefix + name, "1");
+        radioTrue.setAttributeFilter(new XMLAttributeValueFilter());
         input radioFalse = new input(input.radio, prefix + name, "0");
+        radioFalse.setAttributeFilter(new XMLAttributeValueFilter());
         radioNone.setDisabled(isDisabled());
         radioTrue.setDisabled(isDisabled());
         radioFalse.setDisabled(isDisabled());
@@ -233,10 +252,10 @@ public class BooleanClass extends PropertyClass
 
         radioNone.setID(prefix + name + "_none");
         labelNone.setFor(prefix + name + "_none");
-        
+
         radioTrue.setID(prefix + name);
         labelTrue.setFor(prefix + name);
-        
+
         radioFalse.setID(prefix + name + "_false");
         labelFalse.setFor(prefix + name + "_false");
 
@@ -280,11 +299,13 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
+        check.setAttributeFilter(new XMLAttributeValueFilter());
         check.setID(prefix + name);
         check.setDisabled(isDisabled());
         // If the (visible) checkbox is unchecked, it will not post anything back so the hidden input by the same
         // name will post back 0 and the save function will save the first entry it finds.
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
+        checkNo.setAttributeFilter(new XMLAttributeValueFilter());
 
         try {
             IntegerProperty prop = (IntegerProperty) object.safeget(name);
@@ -353,99 +374,6 @@ public class BooleanClass extends PropertyClass
         } catch (Exception e) {
             e.printStackTrace();
             return "" + value;
-        }
-    }
-
-    @Override
-    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        if (getDisplayType().equals("input")) {
-            return super.displaySearch(name, prefix, criteria, context);
-        } else if (getDisplayType().equals("radio")) {
-            return displayCheckboxSearch(name, prefix, criteria, context);
-        } else {
-            return displaySelectSearch(name, prefix, criteria, context);
-        }
-    }
-
-    public String displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        select select = new select(prefix + name, 1);
-        select.setMultiple(true);
-        select.setSize(3);
-        String String0 = getDisplayValue(context, 0);
-        String String1 = getDisplayValue(context, 1);
-        String fieldFullName = getFieldFullName();
-        Number[] selectArray = ((Number[]) criteria.getParameter(fieldFullName));
-        List<Number> selectlist = (selectArray != null) ? Arrays.asList(selectArray) : new ArrayList<Number>();
-
-        option[] options = {new option(String1, "1"), new option(String0, "0")};
-        options[0].addElement(String1);
-        options[1].addElement(String0);
-        if (selectlist.contains(new Integer(1)))
-         options[0].setSelected(true); 
-        if (selectlist.contains(new Integer(0)))
-         options[1].setSelected(true); 
-
-        /*
-         * try { IntegerProperty prop = (IntegerProperty) object.safeget(name); if (prop!=null) { Integer ivalue =
-         * (Integer)prop.getValue(); if (ivalue!=null) { int value = ivalue.intValue(); if (value==1)
-         * options[1].setSelected(true); else if (value==0) options[2].setSelected(true); } else { int value =
-         * getDefaultValue(); if (value==1) options[1].setSelected(true); else if (value==0)
-         * options[2].setSelected(true); } } } catch (Exception e) { // This should not happen e.printStackTrace(); }
-         */
-        select.addElement(options);
-        return select.toString();
-    }
-
-    public String displayCheckboxSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        StringBuffer buffer = new StringBuffer();
-        org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
-        org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
-
-        /*
-         * try { IntegerProperty prop = (IntegerProperty) object.safeget(name); if (prop!=null) { Integer ivalue =
-         * (Integer)prop.getValue(); if (ivalue!=null) { int value = ivalue.intValue(); if (value==1)
-         * check.setChecked(true); else if (value==0) check.setChecked(false); } else { int value = getDefaultValue();
-         * if (value==1) check.setChecked(true); else check.setChecked(false); } }} catch (Exception e) { // This should
-         * not happen e.printStackTrace(); }
-         */
-        buffer.append(check.toString());
-        buffer.append(checkNo.toString());
-        return buffer.toString();
-    }
-
-    @Override
-    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
-    {
-        Object values = map.get(prefix);
-        if ((values == null) || (values.equals(""))) {
-            return;
-        }
-
-        // :value = doc.object(XWiki.ArticleClass).category
-
-        Number[] valuesarray = (Number[]) values;
-        String[] criteriaarray = new String[valuesarray.length];
-        for (int i = 0; i < valuesarray.length; i++) {
-            criteriaarray[i] =  "" + valuesarray[i] + " = " + getFullQueryPropertyName();
-        }
-        criteriaList.add("(" + StringUtils.join(criteriaarray, " or ") + ")");
-        return;
-    }
-
-
-    @Override
-    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
-    {
-        String[] data = map.get("");
-        if (data != null) {
-            Number[] data2 = new Number[data.length];
-            for (int i = 0; i < data.length; i++) {
-                data2[i] = (Number) fromString(data[i]).getValue();
-            }
-            query.setParam(getObject().getName() + "_" + getName(), data2);
         }
     }
 }

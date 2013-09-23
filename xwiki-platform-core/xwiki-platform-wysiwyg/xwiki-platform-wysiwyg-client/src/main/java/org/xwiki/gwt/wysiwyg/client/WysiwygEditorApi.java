@@ -176,7 +176,8 @@ public class WysiwygEditorApi
      */
     public Element getPlainTextArea()
     {
-        return editor == null ? null : editor.getPlainTextEditor().getTextArea().getElement();
+        return editor == null || !editor.getConfig().isTabbed() ? null : editor.getPlainTextEditor().getTextArea()
+            .getElement();
     }
 
     /**

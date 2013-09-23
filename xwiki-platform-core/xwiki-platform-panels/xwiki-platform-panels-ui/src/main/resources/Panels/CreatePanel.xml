@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Panels</web>
+  <name>CreatePanel</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.panels.create')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (displayCreatePanelForm)
+{{html}}
+  &lt;form method="post" action="$doc.getURL('view', 'xpage=plain')" onsubmit="cancelCancelEdit()"&gt;
+    &lt;div&gt;
+      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input type="hidden" name="create" value="1"/&gt;
+      &lt;label for="panelTitle" class="hidden"&gt;$services.localization.render('xe.panels.create.title')&lt;/label&gt;
+      &lt;input type="text" id="panelTitle" name="panelTitle" value="$services.localization.render('xe.panels.create.title')" class="panelinput withTip" /&gt;
+      &lt;input type="submit" class="button" value="$services.localization.render('create')"/&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+{{/html}}##
+#end
+
+#macro (createPanel $title)
+  #set ($newPanelDoc = $xwiki.getDocument($services.model.createDocumentReference('', '', $title)))
+  #if (!$newPanelDoc.isNew())
+    #set ($redirecturl = $newPanelDoc.getURL('view', 'xpage=docalreadyexists'))
+  #else
+    #set ($template = "$!{request.getParameter('template')}")
+    #if ($template == '')
+      #set ($template = 'Panels.PanelTemplate')
+    #end
+    #set ($pcontent = "{{velocity}}${util.newline}${escapetool.h}panelheader('${title.replace('''', '''''')}')${util.newline}${util.newline}${escapetool.h}panelfooter()${util.newline}{{/velocity}}")
+    #set ($redirectparams = "template=${escapetool.url($template)}&amp;Panels.PanelClass_0_name=${escapetool.url($title)}&amp;Panels.PanelClass_0_content=${escapetool.url($pcontent)}")
+    #set ($redirecturl = $newPanelDoc.getURL('inline', $redirectparams))
+  #end
+  $response.sendRedirect($redirecturl)
+#end
+{{/velocity}}
+
+{{velocity}}
+#if("$!{request.create}" == '')
+  #displayCreatePanelForm()
+#else
+  #createPanel("$!{request.panelTitle.trim()}")
+#end
+{{/velocity}}</content>
+</xwikidoc>

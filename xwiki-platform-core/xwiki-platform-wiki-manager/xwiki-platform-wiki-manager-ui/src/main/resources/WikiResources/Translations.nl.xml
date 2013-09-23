@@ -1,27 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>WikiResources</web>
-<name>Translations</name>
-<language>nl</language>
-<defaultLanguage>en</defaultLanguage>
-<translation>1</translation>
-<parent>WikiResources.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1186679007000</creationDate>
-<date>1300991417000</date>
-<contentUpdateDate>1300991417000</contentUpdateDate>
-<version>1.1</version>
-<title>Translations</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-</content></xwikidoc>
+  <web>WikiResources</web>
+  <name>Translations</name>
+  <language>nl</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>WikiResources.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1186679007000</creationDate>
+  <date>1300991417000</date>
+  <contentUpdateDate>1300991417000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
+XWiki.XWikiServerClass_visibility_private=Niet Openbaar
+XWiki.XWikiServerClass_visibility_public=Openbaar
+error.ERROR_XWIKI_ACCESS_DENIED=U heeft onvoldoende rechten voor het uitvoeren van deze handeling.
+wikimanager.action.createwiki.hidedoc=Verberg documentatie
+wikimanager.action.createwiki.nonstepbystep=Schakel naar normale weergavemodus
+wikimanager.action.createwiki.showdoc=Toon documentatie
+wikimanager.action.createwiki.stepbystep=Schakel naar Wizard weergavemodus
+wikimanager.action.next=Volgende
+wikimanager.action.previous=Vorige
+wikimanager.action.settemplate.false=Zet uit
+wikimanager.action.settemplate.true=Zet aan
+wikimanager.action.settings=Instellingen
+wikimanager.admins=Beheerders
+wikimanager.answer.deletewiki.msg=Weet u zeker dat u wiki "{0}" wilt verwijderen?
+wikimanager.answer.deletewiki.title=Verwijder wiki
+wikimanager.createwiki=Maak een nieuwe wiki
+wikimanager.defaultdatetimeformat=jjjj MMMM dd 'om' UU\:mm
+wikimanager.doc.createwiki.datafrom=Als u een nieuwe wiki maakt, krijgt u standaard een lege wiki. U kunt wiki-sjablonen en/of XAR-pakketten gebruiken als bronnen voor de inhoud van de nieuwe wiki.
+wikimanager.doc.createwiki.datafrom.package=Vervolgens wordt het gekoppelde XAR-bestand geïmporteerd in de nieuwe wiki. Om meer pakketten aan de lijst toe te voegen, koppelt u XAR-bestanden aan deze pagina.
+wikimanager.doc.createwiki.datafrom.template=Eerst wordt het wiki-sjabloon gekopieerd in de nieuwe wiki. U kunt elke wiki tot sjabloon maken door de ~~Template~~ eigenschap te selecteren in [Wiki Manager main page&gt;WikiManager.WebHome] of in de wiki-beschrijvingspagina.
+wikimanager.doc.createwiki.desc=Stel alle eigenschappen van uw wiki hier in. Alle deze eigenschappen kunnen op elk gewenst moment worden gewijzigd op de wiki-beschrijvingspagina.
+wikimanager.doc.createwiki.desc.description=Een korte beschrijving van de wiki.
+wikimanager.doc.createwiki.desc.homepage=De homepage van de wiki.
+wikimanager.doc.createwiki.desc.iswikitemplate=Geeft aan of deze wiki kan worden gebruikt als sjabloon bij het maken van een nieuwe wiki.
+wikimanager.doc.createwiki.desc.owner=Een globale gebruiker die alle rechten krijgt op deze wiki.
+wikimanager.doc.createwiki.desc.secure=Indien ingeschakeld, zullen alle voor deze wiki gegenereerde URLs starten met ~~https~~.
+wikimanager.doc.createwiki.desc.server=De alias die wordt gebruikt voor het benaderen van deze wiki.
+wikimanager.doc.createwiki.desc.server.creation=De alias die wordt gebruikt voor het benaderen van deze wiki. Het huidige alias-achtervoegsel is ~~{0}~~. Om dit te aan te passen wijzigt u deze wikipagina en zoekt u "$ALIASSUFFIX" in de TOOLS-sectie.&lt;br/&gt;U kunt later meer aliassen toevoegen in de wiki-beschrijvingspagina.
+wikimanager.doc.createwiki.desc.wikiprettyname=De naam die wordt weergegeven voor deze wiki.
+wikimanager.doc.createwiki.intro=Maak een nieuwe wiki. Hiermee wordt een wiki-beschrijvingspagina gemaakt in de hoofdwiki en zijn bijbehorende database of schema, afhankelijk van de database engine die wordt gebruikt.
+wikimanager.doc.createwiki.members=Standaard is een nieuwe wiki zelfstandig, hetgeen inhoudt dat - behalve beheerders - geen globale gebruikers toegang hebben tot de wiki. Hier kunt u bepalen welke globale gebruikers en groepen toegang zullen hebben tot de nieuwe wiki.
+wikimanager.doc.createwiki.members.administrators=Geef "admin"-rechten (alle rechten) aan de opgegeven gebruikers en groepen.
+wikimanager.doc.createwiki.members.readers=Geef "lees"- en "commentaar"-rechten aan de opgegeven gebruikers en groepen.
+wikimanager.doc.createwiki.members.writers=Geef "lees"- en "schrijf"-rechten aan de opgegeven gebruikers en groepen.
+wikimanager.doc.createwiki.summary=U staat op het punt een nieuwe wiki te maken met de onderstaande instellingen. Controleer deze instellingen. U kunt op Vorige klikken om terug te gaan naar eerdere pagina's en daar de instellingen aanpassen.
+wikimanager.doc.createwiki.wikiname=Kies een identificerende naam voor uw wiki. Deze wordt gebruikt\:\n* als naam voor de database in de database engine die voor XWiki wordt gebruikt;\n* voor het adresseren van wikipagina's vanuit een andere wiki met de "wikiidentifier\:Space.Name" syntax.\n* voor het genereren van de wiki-beschrijvingspagina in de hoofwiki (~~XWiki.XWikiServer*Wikiidentifier*~~).\nDe identificerende naam mag alleen kleine alfanumerieke karakters bevatten (a-z, 0-9).
+wikimanager.erroraliasalreadynotexists=Wiki alias "{0}" bestaat al.
+wikimanager.erroraliasdoesnotexists=Wiki alias "{0}" bestaat niet.
+wikimanager.errorcreatewiki=Creatie van wiki "{0}" mislukt\: {1}. 
+wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=Deze wiki "{0}" bestaat al. Kies alstublieft een andere naam.
+wikimanager.errordeletewiki=Verwijderen van wiki "{0}" mislukt\: {1}.
+wikimanager.errorsettemplate=Wijziging van sjablooneigenschap van wiki "{0}" mislukt\: {1}.
+wikimanager.legend.members=Leden
+wikimanager.legend.sources=Maak nieuwe wiki van
+wikimanager.legend.validate=Bevestig
+wikimanager.legend.wiki=Wiki
+wikimanager.listwikiactions=Acties
+wikimanager.listwikiactionsgroups=Groepen
+wikimanager.listwikiactionsmembers=Leden
+wikimanager.listwikiactionspref=Voorkeur
+wikimanager.listwikiactionsrights=Rechten
+wikimanager.listwikiactionsstat=Stat
+wikimanager.listwikiadmin=Beheerder
+wikimanager.listwikicreation=Gecreëerd
+wikimanager.listwikidomains=Domeinnamen
+wikimanager.listwikiempty=Er zijn geen open wiki's
+wikimanager.listwikiname=Naam
+wikimanager.listwikirank=Rangorde
+wikimanager.listwikistate=Toestand
+wikimanager.listwikitemplate=Wiki-sjabloon
+wikimanager.notinvirtualmode=Deze wiki is niet in virtuele modus. Hierdoor kunt u alleen de hoofdwiki benaderen. Zorg dat &lt;tt&gt;xwiki.virtual\=1&lt;tt&gt; is ingesteld in het bestand &lt;tt&gt;xwiki.cfg&lt;tt&gt;.
+wikimanager.panels.applicationsPanelEntryLabel=Wiki Manager
+wikimanager.pluginnotenabled=De Wiki Manager plugin is niet ingeschakeld. Deze pagina zal niet correct functioneren. Zorg dat &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; is opgenomen in de &lt;tt&gt;xwiki.plugins&lt;/tt&gt; parameter in het bestand &lt;tt&gt;xwiki.cfg&lt;/tt&gt;. 
+wikimanager.prop.alias.description=Beschrijving
+wikimanager.prop.alias.homepage=Homepage
+wikimanager.prop.alias.server=Alias
+wikimanager.prop.wiki.description=Beschrijving
+wikimanager.prop.wiki.homepage=Homepage
+wikimanager.prop.wiki.iswikitemplate=Wiki-sjabloon
+wikimanager.prop.wiki.language=Taal
+wikimanager.prop.wiki.owner=Eigenaar
+wikimanager.prop.wiki.secure=Beveiligd (SSL)
+wikimanager.prop.wiki.server=Alias
+wikimanager.prop.wiki.visibility=Zichtbaarheid
+wikimanager.prop.wiki.wikiname=Wiki-identifier
+wikimanager.prop.wiki.wikiprettyname=Volledige naam wiki
+wikimanager.readers=Lezers
+wikimanager.successcreatewiki=Uw wiki "{0}" is gecreëerd. U kunt de wiki benaderen via het volgende adres\: [{1}].
+wikimanager.successdeletewiki=Wiki "{0}" is verwijderd.
+wikimanager.successsettemplate=Zichtbaarheid wiki "{0}" gewijzigd in "{1}".
+wikimanager.title.createnewalias=Maak nieuwe alias
+wikimanager.title.createwiki.datafrom=Maak wiki van
+wikimanager.title.createwiki.desc=Wiki beschrijving
+wikimanager.title.createwiki.intro=Intro
+wikimanager.title.createwiki.members=Initiële globale leden
+wikimanager.title.createwiki.summary=Samenvatting
+wikimanager.title.createwiki.wikiname=Wiki identifier
+wikimanager.title.viewaliases=Bekijk aliassen
+wikimanager.title.wikisettings=Wiki eigenschappen
+wikimanager.totalnumberofwiki=Totaal aantal wiki's
+wikimanager.widget.lastcreatedwikis.title=Laatst gemaakte wiki's
+wikimanager.widget.lastmodifications.title=Recente wijzigingen
+wikimanager.widget.mylastmodifications.title=Mijn recente wijzigingen
+wikimanager.widget.userwikisadmin.title=Wiki's die u beheert
+wikimanager.widget.userwikisowner.title=Wiki's waarvan u eigenaar bent
+wikimanager.widget.userwikisuser.title=Wiki's die u bekijkt
+wikimanager.wikimanager=Wiki Manager
+wikimanager.wikiname.error.alreadyused=Deze identifier is al gebruikt
+wikimanager.wikiname.error.databasealreadyexists=Er bestaat al een database met de identifier
+wikimanager.wikiname.error.empty=Identifier mag niet leeg zijn
+wikimanager.wikiname.error.wikialreadyexists=Er bestaat al een wiki met deze identifier
+wikimanager.wikiname.force=Forceer
+wikimanager.wikiname.info.valid=U kunt deze naam gebruiken als identifier voor een nieuwe wiki
+wikimanager.wikinameneeded=De wiki moet een naam hebben
+wikimanager.wikipackage=Van pakket (bijgevoegd bestand)
+wikimanager.wikitemplate=Van wiki-sjabloon
+wikimanager.writers=Schrijvers
+</content>
+</xwikidoc>

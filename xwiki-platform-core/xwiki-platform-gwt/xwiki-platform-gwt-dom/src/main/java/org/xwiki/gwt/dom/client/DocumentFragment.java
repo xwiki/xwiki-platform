@@ -26,7 +26,7 @@ import com.google.gwt.dom.client.Node;
  * We've added this class because at the time of writing GWT doesn't offer a similar implementation.
  * 
  * @version $Id$
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2955
+ * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=2955"
  */
 public final class DocumentFragment extends Node
 {

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.plugin.image;
 
@@ -37,6 +36,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
@@ -49,23 +49,16 @@ import com.xpn.xwiki.plugin.image.ImageProcessor;
  * @since 2.5M2
  */
 @Component
+@Singleton
 public class DefaultImageProcessor implements ImageProcessor
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImageProcessor#readImage(InputStream)
-     */
+    @Override
     public Image readImage(InputStream inputStream) throws IOException
     {
         return ImageIO.read(inputStream);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImageProcessor#writeImage(RenderedImage, String, float, OutputStream)
-     */
+    @Override
     public void writeImage(RenderedImage image, String mimeType, float quality, OutputStream out) throws IOException
     {
         if ("image/jpeg".equals(mimeType)) {
@@ -95,11 +88,7 @@ public class DefaultImageProcessor implements ImageProcessor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImageProcessor#scaleImage(Image, int, int)
-     */
+    @Override
     public RenderedImage scaleImage(Image image, int width, int height)
     {
         // Draw the given image to a buffered image object and scale it to the new size on-the-fly.
@@ -124,11 +113,7 @@ public class DefaultImageProcessor implements ImageProcessor
         return bufferedImage;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImageProcessor#isMimeTypeSupported(String)
-     */
+    @Override
     public boolean isMimeTypeSupported(String mimeType)
     {
         try {

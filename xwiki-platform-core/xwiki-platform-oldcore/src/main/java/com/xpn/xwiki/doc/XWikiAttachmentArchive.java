@@ -16,16 +16,14 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
@@ -46,7 +44,7 @@ public class XWikiAttachmentArchive implements Cloneable
         "Exception while manipulating the archive for attachment {0}";
 
     /** The log, used to log if there is an error while cloning the archive. */
-    private static final Log LOG = LogFactory.getLog(XWikiAttachmentArchive.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachmentArchive.class);
 
     /** The attachment which this is an archive of. */
     private XWikiAttachment attachment;
@@ -72,11 +70,6 @@ public class XWikiAttachmentArchive implements Cloneable
         // Do nothing as this is here only to please hibernate.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone()
     {
@@ -85,7 +78,7 @@ public class XWikiAttachmentArchive implements Cloneable
             attachmentarchive = getClass().newInstance();
         } catch (Exception e) {
             // This should not happen
-            LOG.error("Error while attachmentArchive.clone()", e);
+            LOGGER.error("Error while attachmentArchive.clone()", e);
         }
 
         attachmentarchive.setAttachment(getAttachment());
@@ -166,8 +159,7 @@ public class XWikiAttachmentArchive implements Cloneable
             } catch (Exception e) {
                 Object[] args = {getAttachment().getFilename()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                    GENERIC_EXCEPTION_MESSAGE, e, args);
+                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
             }
         }
     }
@@ -198,8 +190,7 @@ public class XWikiAttachmentArchive implements Cloneable
         } catch (Exception e) {
             Object[] args = {getAttachment().getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                GENERIC_EXCEPTION_MESSAGE, e, args);
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
         }
     }
 
@@ -223,14 +214,22 @@ public class XWikiAttachmentArchive implements Cloneable
     }
 
     /**
-     * @return an array of versions which are available for this attachment, ordered by version number decending.
+     * @return an array of versions which are available for this attachment, ordered by version number descending.
      */
     public Version[] getVersions()
     {
-        final Node[] nodes = getRCSArchive().changeLog();
-        final Version[] versions = new Version[nodes.length];
-        for (int i = 0; i < nodes.length; i++) {
-            versions[i] = nodes[i].getVersion();
+        final Archive rcsArchive = getRCSArchive();
+
+        Version[] versions;
+        if (rcsArchive != null) {
+            final Node[] nodes = rcsArchive.changeLog();
+            versions = new Version[nodes.length];
+            for (int i = 0; i < nodes.length; i++) {
+                versions[i] = nodes[i].getVersion();
+            }
+        } else {
+            // No archive means there is no history and only the current version
+            versions = new Version[] {this.attachment.getRCSVersion()};
         }
 
         return versions;
@@ -245,9 +244,7 @@ public class XWikiAttachmentArchive implements Cloneable
      * @return an XWikiAttachment for the given revision.
      * @throws XWikiException if any Exception is thrown while getting the revision.
      */
-    public XWikiAttachment getRevision(final XWikiAttachment attachment,
-        final String rev,
-        final XWikiContext context)
+    public XWikiAttachment getRevision(final XWikiAttachment attachment, final String rev, final XWikiContext context)
         throws XWikiException
     {
         try {
@@ -280,8 +277,7 @@ public class XWikiAttachmentArchive implements Cloneable
         } catch (Exception e) {
             final Object[] args = {attachment.getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                GENERIC_EXCEPTION_MESSAGE, e, args);
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
         }
     }
 }

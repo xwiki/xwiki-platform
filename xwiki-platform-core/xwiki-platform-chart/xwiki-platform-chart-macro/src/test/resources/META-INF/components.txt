@@ -1,1 +1,0 @@
-org.xwiki.rendering.macro.chart.TestChartMacro

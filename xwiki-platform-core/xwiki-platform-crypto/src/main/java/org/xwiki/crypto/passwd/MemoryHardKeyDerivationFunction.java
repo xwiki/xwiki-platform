@@ -19,7 +19,7 @@
  */
 package org.xwiki.crypto.passwd;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * A key memory hard derivation function.
@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @since 2.5M1
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface MemoryHardKeyDerivationFunction extends KeyDerivationFunction
 {
     /**

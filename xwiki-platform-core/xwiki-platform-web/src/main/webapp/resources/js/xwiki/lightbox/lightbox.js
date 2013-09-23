@@ -48,7 +48,7 @@ Lightbox = Class.create({
     if(this.loadedForms[url]) {
       $('lb-content').innerHTML = '';
       this.lbPlaceContentInDocument(this.loadedForms[url], $('lb-content'));
-      this.form = c.getElementsByTagName('form')[0];
+      this.form = $('lb-content').down('form');
     } else {
       new Ajax.Request(url, {onSuccess: this.lbFormDataLoaded.bind(this)});
     }
@@ -58,7 +58,7 @@ Lightbox = Class.create({
     var responseContent = document.createElement('div');
     responseContent.innerHTML = transport.responseText;
     $('lb-content').innerHTML = '';
-    this.lbPlaceContentInDocument(responseContent, $('lb-content'), 
+    this.lbPlaceContentInDocument(responseContent, $('lb-content'),
       function() {
         this.resizeBackground();
       }.bind(this)
@@ -79,7 +79,7 @@ Lightbox = Class.create({
    *                   is complete, it will be restarted later by a callback.
    */
   lbPlaceContentInDocument: function(content, whereToPlace, onComplete) {
-    // First clear already existing listeners because we will be firing a dom:loaded event for the 
+    // First clear already existing listeners because we will be firing a dom:loaded event for the
     // benefit of listeners we may be adding.
     document.stopObserving('dom:loaded');
 
@@ -102,7 +102,13 @@ Lightbox = Class.create({
         }
       }
       try {
-        clones[i].innerHTML = treatSpecially[i].innerHTML;
+        var cloneContent = treatSpecially[i].innerHTML;
+        if (cloneContent.startsWith('//<![CDATA[') && cloneContent.endsWith('//]]>')) {
+          // IE drops the entire CDATA section when we set the inner HTML of the clone. In order to preserve the code we
+          // have to unwrap it.
+          cloneContent = cloneContent.substring(11, cloneContent.length - 5);
+        }
+        clones[i].innerHTML = cloneContent;
         // Remove element from content.
         treatSpecially[i].parentNode.removeChild(treatSpecially[i]);
       } catch (ie) {
@@ -124,7 +130,7 @@ Lightbox = Class.create({
      * @param onComplete - Function - Do this when the function is completely finished (it will return at the first script
      *                                which needs to be loaded.)
      * @param startAt - Skips over this number of elements at the beginning of the list.
-     */ 
+     */
     var appendSpecialElements = function(elements, whereToPlace, onComplete, startAt) {
       var i = 0;
       if (startAt) {
@@ -133,7 +139,7 @@ Lightbox = Class.create({
       while (i < elements.length) {
         whereToPlace.appendChild(elements[i]);
         if (elements[i].tagName.toLowerCase() == 'script' && elements[i].src != '') {
-          // In order to make sure the element is loaded before loading the next one, This function ends and then is 
+          // In order to make sure the element is loaded before loading the next one, This function ends and then is
           // restarted by the callback.
           // IE7 does not allow Event.observe(script, 'load'
           // Testing for IE < 8
@@ -163,14 +169,17 @@ Lightbox = Class.create({
         onComplete();
       }
 
-      // Finally, we place a script which fires a dom:loaded event. We are not just manually firing the event 
+      // Finally, we place a script which fires a dom:loaded event. We are not just manually firing the event
       // because we want to make sure all other scripts have been loaded and parsed first.
       var fireScript = document.createElement('script');
+      var scriptContent =
+            'document.fire("dom:loaded");'
+          + 'document.fire("xwiki:dom:loaded");';
       try {
-        fireScript.innerHTML = 'document.fire("dom:loaded");';
+        fireScript.innerHTML = scriptContent;
       } catch (ie) {
         // IE7
-        fireScript.text = 'document.fire("dom:loaded");';
+        fireScript.text = scriptContent;
       }
       whereToPlace.appendChild(fireScript);
     }.bind(this));
@@ -241,8 +250,8 @@ Lightbox = Class.create({
   },
 
   insertlbcontent: function(lbbgcolor, lbbordercolor, lbfontcolor, lbtype) {
-    var str = '<div id="lb-bg" class="hidden"></div>' + 
-      '<div id="lb-align" class="hidden">' + 
+    var str = '<div id="lb-bg" class="hidden"></div>' +
+      '<div id="lb-align" class="hidden">' +
       '<div id="lb">' +
       '<div id="lb-top">' +
       '<div id="close-wrap">' +
@@ -282,7 +291,7 @@ Lightbox = Class.create({
     $('lb-bg').style.height = newHeight + "px";
   },
   roundedlightbottom:  function(bgcolor, bordercolor) {
-    var str = '<div class="roundedlight"><b class="top">' + 
+    var str = '<div class="roundedlight"><b class="top">' +
       '<b class="b4b" style="background:' + bordercolor + ';"></b>' +
       '<b class="b3b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
       '<b class="b3b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
@@ -310,7 +319,7 @@ Lightbox = Class.create({
   },
 
   roundedlighttop: function(bgcolor, bordercolor) {
-    var str = '<div class="roundedlight"><b class="top">' + 
+    var str = '<div class="roundedlight"><b class="top">' +
       '<b class="b1" style="background:' + bordercolor + ';"></b>' +
       '<b class="b2" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
       '<b class="b3" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
@@ -337,7 +346,7 @@ Lightbox = Class.create({
     return str;
   },
 
-  lightboxlink: function(linktext, lbcontent)	{
+  lightboxlink: function(linktext, lbcontent) {
     var str = '<a href="#" onclick="javascript:$(\'lb-content\').innerHTML =' + lbcontent +'; toggleClass($(\'lb-bg\'), \'hidden\'); toggleClass($(\'lb-align\'), \'hidden\');">' + linktext + '</a>';
     return str;
   }

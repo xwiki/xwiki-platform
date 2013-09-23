@@ -93,7 +93,7 @@ public class XWikiApplication extends DefaultXObjectDocument
      *             <li>getting XWikiApplicationClass instance.</li>
      *             <li>or when calling {@link #reload(XWikiContext)}</li>
      *             </ul>
-     * @see DefaultXObjectDocument#DefaultXObjectDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
+     * @see DefaultXObjectDocument#DefaultXObjectDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager,
      *      XWikiDocument, int, XWikiContext)
      */
     public XWikiApplication(XWikiDocument xdoc, int objectId, XWikiContext context) throws XWikiException
@@ -355,33 +355,18 @@ public class XWikiApplication extends DefaultXObjectDocument
 
     // ///
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {
         return getAppName() + "-" + getAppVersion();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return getAppName() != null ? getAppName().hashCode() : "".hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.api.Document#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object object)
     {
@@ -591,8 +576,8 @@ public class XWikiApplication extends DefaultXObjectDocument
      * @return all documents names of type <code>type</code> application contains.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>resolving SQL matching.</li>
-     *             <li>or getting applications dependencies descriptors documents from the database.</li>
+     *             <li>resolving SQL matching.</li> <li>or getting applications dependencies descriptors documents from
+     *             the database.</li>
      *             </ul>
      */
     private Set<String> getDocsNamesByType(String type, boolean recurse, boolean includeAppDesc) throws XWikiException
@@ -634,8 +619,8 @@ public class XWikiApplication extends DefaultXObjectDocument
                 set = Collections.emptySet();
             } else {
                 set =
-                    new HashSet<String>(app.context.getWiki().getStore().searchDocumentsNames(HQL_WHERE + " " + where,
-                        values, app.context));
+                    new HashSet<String>(app.context.getWiki().getStore()
+                        .searchDocumentsNames(HQL_WHERE + " " + where, values, app.context));
             }
         }
 
@@ -654,8 +639,8 @@ public class XWikiApplication extends DefaultXObjectDocument
      * @return all documents names application contains.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>resolving SQL matching.</li>
-     *             <li>or getting applications dependencies descriptors documents from the database.</li>
+     *             <li>resolving SQL matching.</li> <li>or getting applications dependencies descriptors documents from
+     *             the database.</li>
      *             </ul>
      * @see #getDocuments()
      * @see XWikiApplicationClass#FIELD_DOCUMENTS
@@ -676,8 +661,8 @@ public class XWikiApplication extends DefaultXObjectDocument
      * @return all documents names to include application contains.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>resolving SQL matching.</li>
-     *             <li>or getting applications dependencies descriptors documents from the database.</li>
+     *             <li>resolving SQL matching.</li> <li>or getting applications dependencies descriptors documents from
+     *             the database.</li>
      *             </ul>
      * @see #getDocsToInclude()
      * @see XWikiApplicationClass#FIELD_DOCSTOINCLUDE
@@ -697,8 +682,8 @@ public class XWikiApplication extends DefaultXObjectDocument
      * @return all documents names to include <code>applications</code> contains.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>resolving SQL matching.</li>
-     *             <li>or getting applications dependencies descriptors documents from the database.</li>
+     *             <li>resolving SQL matching.</li> <li>or getting applications dependencies descriptors documents from
+     *             the database.</li>
      *             </ul>
      * @see #getDocsToInclude()
      * @see XWikiApplicationClass#FIELD_DOCSTOINCLUDE
@@ -719,8 +704,8 @@ public class XWikiApplication extends DefaultXObjectDocument
      * @return all documents names to link application contains.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>resolving SQL matching.</li>
-     *             <li>or getting applications dependencies descriptors documents from the database.</li>
+     *             <li>resolving SQL matching.</li> <li>or getting applications dependencies descriptors documents from
+     *             the database.</li>
      *             </ul>
      * @see #getDocsToLink()
      * @see XWikiApplicationClass#FIELD_DOCSTOLINK
@@ -740,8 +725,8 @@ public class XWikiApplication extends DefaultXObjectDocument
      * @return all documents names to link <code>applications</code> contains.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>resolving SQL matching.</li>
-     *             <li>or getting applications dependencies descriptors documents from the database.</li>
+     *             <li>resolving SQL matching.</li> <li>or getting applications dependencies descriptors documents from
+     *             the database.</li>
      *             </ul>
      * @see #getDocsToLink()
      * @see XWikiApplicationClass#FIELD_DOCSTOLINK

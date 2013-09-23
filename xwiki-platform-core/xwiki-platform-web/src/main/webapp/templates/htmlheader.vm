@@ -31,6 +31,22 @@
     #end
     <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------
+    ## Force Compatibility mode for IE browsers to use the latest rendering mode. In order to work, the declaration 
+    ## needs to be placed in the <head>, before all other elements except for the <title> and other <meta> elements
+    ## See http://msdn.microsoft.com/en-us/library/jj676915(v=vs.85).aspx#SETMODE
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Favicons
+    ## Legacy, for IE
+    <link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" />
+    ## Present, HTML5
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" />
+    ## The future, scalable icons
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" />
+    ## For smart phones and tablets
+    <link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" />
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Define the default scripting language that is used for intrinsic events (e.g. onmouseover attributes).
     ## ---------------------------------------------------------------------------------------------------------------
     <meta http-equiv="Content-Script-Type" content="text/javascript" />
@@ -62,6 +78,7 @@
     <meta name="page" content="$escapetool.xml($doc.name)"/>
     <meta name="version" content="$doc.version"/>
     <meta name="restURL" content="${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})"/>
+    <meta name="form_token" content="$!{services.csrf.token}"/>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Localize GWT applications.
     ## ---------------------------------------------------------------------------------------------------------------
@@ -75,7 +92,6 @@
     ## ---------------------------------------------------------------------------------------------------------------
     <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
     #template("stylesheets.vm")
-    #template("analytics.vm")
     #template("javascript.vm")
   </head>
   #set($bodyTagName = 'body')

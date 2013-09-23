@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.include;
 
+import org.xwiki.model.EntityType;
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
@@ -47,9 +47,14 @@ public class IncludeMacroParameters
     }
 
     /**
-     * The name of the document to include.
+     * @see #getReference()
      */
-    private String document;
+    private String reference;
+
+    /**
+     * @see #getType()
+     */
+    private EntityType type = EntityType.DOCUMENT;
 
     /**
      * Defines whether the included page is executed in its separated execution context or whether it's executed in the
@@ -63,21 +68,64 @@ public class IncludeMacroParameters
     private String section;
 
     /**
-     * @param document the name of the document to include.
+     * Note: should be mandatory but would break retro compatibility for older macro using {@link #setDocument(String)}.
+     * 
+     * @param reference the reference to display
+     * @since 3.4M1
      */
-    @PropertyMandatory
+    @PropertyDescription("the reference of the resource to display")
+    public void setReference(String reference)
+    {
+        this.reference = reference;
+    }
+
+    /**
+     * @return the reference of the resource to display
+     * @since 3.4M1
+     */
+    public String getReference()
+    {
+        return this.reference;
+    }
+
+    /**
+     * @return the type of the reference
+     * @since 3.4M1
+     */
+    @PropertyDescription("the type of the reference")
+    public EntityType getType()
+    {
+        return this.type;
+    }
+
+    /**
+     * @param type the type of the reference
+     * @since 3.4M1
+     */
+    public void setType(EntityType type)
+    {
+        this.type = type;
+    }
+
+    /**
+     * @param document the name of the document to include.
+     * @deprecated since 3.4M1 use {@link #setReference(String)} instead
+     */
     @PropertyDescription("the name of the document to include")
+    @Deprecated
     public void setDocument(String document)
     {
-        this.document = document;
+        this.reference = document;
     }
 
     /**
      * @return the name of the document to include.
+     * @deprecated since 3.4M1 use {@link #getReference()} instead
      */
+    @Deprecated
     public String getDocument()
     {
-        return this.document;
+        return this.reference;
     }
 
     /**

@@ -19,8 +19,10 @@
  */
 package org.xwiki.annotation.reference.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -31,19 +33,15 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 2.3M1
  */
 @Component
+@Singleton
 public class DefaultTypedStringEntityReferenceSerializer extends AbstractTypedStringEntityReferenceSerializer
 {
     /**
      * Serializer used to serialize the reference without the type specification.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> referenceSerializer;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.reference.internal.AbstractTypedStringEntityReferenceSerializer #getSerializer()
-     */
     @Override
     protected EntityReferenceSerializer<String> getSerializer()
     {

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.render.filter;
 
@@ -25,6 +24,7 @@ import org.radeox.filter.regex.LocaleRegexReplaceFilter;
 
 public class UnderlineFilter extends LocaleRegexReplaceFilter implements CacheFilter
 {
+    @Override
     protected String getLocaleKey()
     {
         return "filter.underline";

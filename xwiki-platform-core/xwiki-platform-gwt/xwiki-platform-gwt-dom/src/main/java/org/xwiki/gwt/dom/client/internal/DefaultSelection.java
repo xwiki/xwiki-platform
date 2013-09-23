@@ -57,37 +57,32 @@ public class DefaultSelection extends AbstractSelection
         return nativeSelection;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#addRange(Range)
-     */
+    @Override
     public void addRange(Range range)
     {
-        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
-        if (wrapper.getNativeRange() == null) {
-            Document doc = (Document) range.getStartContainer().getOwnerDocument();
-            wrapper.setNativeRange(NativeRange.newInstance(doc));
+        NativeSelection selection = getNativeSelection();
+        if (selection != null) {
+            NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
+            if (wrapper.getNativeRange() == null) {
+                Document doc = (Document) range.getStartContainer().getOwnerDocument();
+                wrapper.setNativeRange(NativeRange.newInstance(doc));
+            }
+            NativeRange nativeRange = wrapper.getNativeRange().cast();
+            nativeRange.setStart(range.getStartContainer(), range.getStartOffset());
+            nativeRange.setEnd(range.getEndContainer(), range.getEndOffset());
+            selection.addRange(nativeRange);
+            DOMUtils.getInstance().scrollIntoView(range);
         }
-        NativeRange nativeRange = wrapper.getNativeRange().cast();
-        nativeRange.setStart(range.getStartContainer(), range.getStartOffset());
-        nativeRange.setEnd(range.getEndContainer(), range.getEndOffset());
-        nativeSelection.addRange(nativeRange);
-        DOMUtils.getInstance().scrollIntoView(range);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getRangeAt(int)
-     */
+    @Override
     public Range getRangeAt(int index)
     {
         if (index < 0 || index >= getRangeCount()) {
             throw new IndexOutOfBoundsException();
         }
 
-        NativeRange nativeRange = nativeSelection.getRangeAt(index);
+        NativeRange nativeRange = getNativeSelection().getRangeAt(index);
         Range range = ((Document) nativeRange.getStartContainer().getOwnerDocument()).createRange();
         range.setStart(nativeRange.getStartContainer(), nativeRange.getStartOffset());
         range.setEnd(nativeRange.getEndContainer(), nativeRange.getEndOffset());
@@ -96,34 +91,29 @@ public class DefaultSelection extends AbstractSelection
         return range;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#getRangeCount()
-     */
+    @Override
     public int getRangeCount()
     {
-        return nativeSelection.getRangeCount();
+        NativeSelection selection = getNativeSelection();
+        return selection == null ? 0 : selection.getRangeCount();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#removeAllRanges()
-     */
+    @Override
     public void removeAllRanges()
     {
-        nativeSelection.removeAllRanges();
+        NativeSelection selection = getNativeSelection();
+        if (selection != null) {
+            selection.removeAllRanges();
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelection#removeRange(Range)
-     */
+    @Override
     public void removeRange(Range range)
     {
-        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
-        nativeSelection.removeRange((NativeRange) wrapper.getNativeRange());
+        NativeSelection selection = getNativeSelection();
+        if (selection != null) {
+            NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
+            selection.removeRange((NativeRange) wrapper.getNativeRange());
+        }
     }
 }

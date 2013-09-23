@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.cache.rendering;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 2.4M1
  */
-@ComponentRole
+@Role
 public interface RenderingCache
 {
     /**

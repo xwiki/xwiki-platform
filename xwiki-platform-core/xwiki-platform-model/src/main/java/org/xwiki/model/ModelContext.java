@@ -19,7 +19,7 @@
  */
 package org.xwiki.model;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -29,7 +29,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentRole
+@Role
 public interface ModelContext
 {
     /**

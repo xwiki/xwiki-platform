@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import java.text.SimpleDateFormat;
@@ -27,18 +25,36 @@ import java.util.Date;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
+/**
+ * Represents a date property.
+ * 
+ * @version $Id$
+ */
 public class DateProperty extends BaseProperty implements Cloneable
 {
+    /**
+     * The property value.
+     */
     private Date value;
-
-    public DateProperty()
-    {
-    }
 
     @Override
     public Object getValue()
     {
         return this.value;
+    }
+
+    @Override
+    public void setValue(Object value)
+    {
+        // Make sure to store a Date and not some extended Date or it's going to be a nightmare to compare between
+        // them
+        Date date = (Date) value;
+        if (date != null && date.getClass() != Date.class) {
+            date = new Date(((Date) value).getTime());
+        }
+
+        setValueDirty(date);
+        this.value = date;
     }
 
     @Override
@@ -56,25 +72,26 @@ public class DateProperty extends BaseProperty implements Cloneable
     }
 
     @Override
-    public void setValue(Object value)
+    public String toText()
     {
-        this.value = (Date) value;
+        // FIXME: The value of a date property should be serialized using the date timestamp or the date format
+        // specified in the XClass the date property belongs to.
+        return getValue() == null ? "" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(getValue());
     }
 
     @Override
-    public String toText()
+    public int hashCode()
     {
-        if (getValue() == null) {
-            return "";
-        }
-        
-        return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")).format(getValue());        
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj)
     {
-        // Same Java object, they sure are equal
+        // Same Java object, they sure are equal.
         if (this == obj) {
             return true;
         }
@@ -83,7 +100,7 @@ public class DateProperty extends BaseProperty implements Cloneable
             return false;
         }
 
-        if ((getValue() == null) && (((DateProperty) obj).getValue() == null)) {
+        if (getValue() == null && ((DateProperty) obj).getValue() == null) {
             return true;
         }
 
@@ -91,12 +108,15 @@ public class DateProperty extends BaseProperty implements Cloneable
     }
 
     @Override
-    public Object clone()
+    public DateProperty clone()
     {
-        DateProperty property = (DateProperty) super.clone();
-        property.setValue(getValue());
-
-        return property;
+        return (DateProperty) super.clone();
     }
 
+    @Override
+    protected void cloneInternal(BaseProperty clone)
+    {
+        DateProperty property = (DateProperty) clone;
+        property.setValue(getValue());
+    }
 }

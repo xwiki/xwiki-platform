@@ -57,21 +57,13 @@ public abstract class AbstractSelectionExecutable extends AbstractRichTextAreaEx
         cache = new Cache(rta.getElement());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return cache.get(AbstractSelectionExecutable.class.getName() + "#enabled", new CacheCallback<Boolean>()
@@ -104,11 +96,7 @@ public abstract class AbstractSelectionExecutable extends AbstractRichTextAreaEx
         return selection.getRangeCount() > 0;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         return getParameter() != null;

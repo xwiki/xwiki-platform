@@ -16,15 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 
 import org.dom4j.dom.DOMElement;
@@ -77,7 +73,9 @@ public class XMLWriterTest
 
     private XMLWriter writer;
 
-    /** Make sure writeClose closes internediet nodes. */
+    /**
+     * Make sure writeClose closes internediet nodes.
+     */
     @Test
     public void testWriteClose() throws Exception
     {
@@ -96,8 +94,8 @@ public class XMLWriterTest
         this.writer.endDocument();
 
         Assert.assertEquals("WriteClose didn't write the correct response.",
-                            TEST_CONTENT,
-                            new String(baos.toByteArray(), "UTF-8"));
+            TEST_CONTENT,
+            new String(baos.toByteArray(), "UTF-8"));
     }
 
     @Test
@@ -113,14 +111,14 @@ public class XMLWriterTest
         this.writer.writeOpen(new DOMElement("doc"));
         this.writer.writeOpen(new DOMElement("obj"));
         this.writer.writeBase64(new DOMElement("prop"),
-                                new ByteArrayInputStream(BASE64_INPUT.getBytes("UTF-8")));
+            new ByteArrayInputStream(BASE64_INPUT.getBytes("UTF-8")));
         this.writer.writeClose(new DOMElement("root"));
 
         this.writer.endDocument();
 
         Assert.assertEquals("Incorrect response from testBase64.",
-                            BASE64_TEST,
-                            new String(baos.toByteArray(), "UTF-8"));
+            BASE64_TEST,
+            new String(baos.toByteArray(), "UTF-8"));
     }
 
     @Test
@@ -139,7 +137,7 @@ public class XMLWriterTest
         this.writer.endDocument();
 
         Assert.assertEquals("Incorrect response from testWriteStream.",
-                            WRITE_STREAM_TEST,
-                            new String(baos.toByteArray(), "UTF-8"));
+            WRITE_STREAM_TEST,
+            new String(baos.toByteArray(), "UTF-8"));
     }
 }

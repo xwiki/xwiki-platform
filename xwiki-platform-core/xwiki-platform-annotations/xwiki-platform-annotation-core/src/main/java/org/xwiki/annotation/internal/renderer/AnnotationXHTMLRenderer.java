@@ -67,22 +67,12 @@ public class AnnotationXHTMLRenderer extends AbstractAnnotationRenderer
     @Inject
     private LinkLabelGenerator linkLabelGenerator;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.renderer.AbstractAnnotationRenderer#getAnnotationPrintRenderer(ListenerChain)
-     */
     @Override
     public ChainingPrintRenderer getAnnotationPrintRenderer(ListenerChain chain)
     {
         return new AnnotationXHTMLChainingRenderer(linkRenderer, imageRenderer, chain);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.renderer.AbstractAnnotationRenderer#getLinkLabelGenerator()
-     */
     @Override
     public LinkLabelGenerator getLinkLabelGenerator()
     {

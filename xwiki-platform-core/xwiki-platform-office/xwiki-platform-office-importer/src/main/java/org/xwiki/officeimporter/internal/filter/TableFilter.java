@@ -37,9 +37,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
 @Component("officeimporter/table")
 public class TableFilter extends AbstractHTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         // Remove isolated paragraphs inside cell items / table header items.
@@ -54,6 +52,7 @@ public class TableFilter extends AbstractHTMLFilter
         List<Element> emptyRows =
             filterDescendants(document.getDocumentElement(), new String[] {TAG_TR}, new ElementSelector()
             {
+                @Override
                 public boolean isSelected(Element element)
                 {
                     return element.getChildNodes().getLength() == 0;

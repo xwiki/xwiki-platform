@@ -54,51 +54,31 @@ public class MockUIExtension implements UIExtension
         this.feature = feature;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         return new String[] {feature};
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getRole()
-     */
+    @Override
     public String getRole()
     {
         return role;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getUIObject(String)
-     */
+    @Override
     public UIObject getUIObject(String feature)
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#isEnabled(String)
-     */
+    @Override
     public boolean isEnabled(String feature)
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#setEnabled(String, boolean)
-     */
+    @Override
     public void setEnabled(String feature, boolean enabled)
     {
         // ignore

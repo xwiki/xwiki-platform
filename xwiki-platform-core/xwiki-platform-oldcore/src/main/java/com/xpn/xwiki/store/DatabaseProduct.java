@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.store;
 
@@ -66,6 +65,16 @@ public final class DatabaseProduct
     public static final DatabaseProduct MYSQL = new DatabaseProduct("MySQL");
 
     /**
+     * The product name for PostgreSQL databases.
+     */
+    public static final DatabaseProduct POSTGRESQL = new DatabaseProduct("PostgreSQL");
+
+    /**
+     * The product name for Microsoft SQL Server databases.
+     */
+    public static final DatabaseProduct MSSQL = new DatabaseProduct("Microsoft SQL Server");
+
+    /**
      * Represents an unknown database for which we were not able to find the product name.
      */
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
@@ -95,11 +104,6 @@ public final class DatabaseProduct
         return this.productName;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object object)
     {
@@ -134,6 +138,10 @@ public final class DatabaseProduct
             product = DB2;
         } else if (productNameAsString.equalsIgnoreCase(MYSQL.getProductName())) {
             product = MYSQL;
+        } else if (productNameAsString.equalsIgnoreCase(POSTGRESQL.getProductName())) {
+            product = POSTGRESQL;
+        } else if (productNameAsString.equalsIgnoreCase(MSSQL.getProductName())) {
+            product = MSSQL;
         } else {
             product = UNKNOWN;
         }
@@ -141,14 +149,15 @@ public final class DatabaseProduct
         return product;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
         return getProductName().hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return getProductName();
     }
 }

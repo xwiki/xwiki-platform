@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>ColorThemes</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1375383699000</creationDate>
+  <date>1375450443000</date>
+  <contentUpdateDate>1375450443000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.themes.colors.title')</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>ColorThemes.WebHome</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e38b1cd9-283d-4468-b502-b501c984aa24</guid>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+.x-theme {
+  border: 1px dotted $theme.borderColor;
+  float: left;
+  margin: 0 1em 1em 0;
+  padding: 2px 4px;
+  width: 300px;
+  /* IE6 bugfix */
+  display: inline;
+}
+
+.x-theme-create {
+  background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat .2em center $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  display: inline-block;
+  padding: .5em .5em .5em 22px;
+  margin-bottom: 1em;
+}
+.x-theme-create .buttonwrapper {
+  margin: 0;
+}
+
+.current-theme {
+  background-color: $theme.highlightColor;
+}
+
+.x-theme .x-theme-title, .x-theme .x-theme-title span {
+  border: none;
+  font-size: 1.2em;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.x-theme-info {
+  margin-left: 60px;
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+}
+
+.x-theme-set {
+  font-size: 1.1em;
+  margin-top: .3em;
+}
+
+.x-demo-page {
+  float: left;
+  height: 60px;
+  margin: 0 4px;
+  position: relative;
+  width: 50px;
+}
+
+* html .x-demo-page {
+  border: 1px inset #000;
+  width: 52px;
+}
+
+.x-demo-page * {
+  line-height: 1px;
+  overflow: hidden;
+  position: absolute;
+}
+
+.x-demo-top-menu, .x-demo-panel-header {
+  left: 0;
+  height: 3px;
+  top: 0;
+  width: 50px;
+}
+
+.x-demo-header {
+  left: 0;
+  height: 8px;
+  top: 3px;
+  width: 50px;
+}
+
+.x-demo-right-panel {
+  height: 24px;
+  top: 12px;
+  width: 12px;
+  right: 2px;
+}
+
+.x-demo-panel-header {
+  border-bottom: 1px dotted;
+  width: 12px;
+}
+
+.x-demo-panel-header-text, .x-demo-panel-text1, .x-demo-panel-text2, .x-demo-panel-text3 {
+  height: 1px;
+  left: 2px;
+  top: 1px;
+  width: 8px;
+}
+
+.x-demo-panel-text1 {
+  top: 4px;
+}
+
+.x-demo-panel-text2 {
+  top: 7px;
+}
+
+.x-demo-panel-text3 {
+  top: 10px;
+}
+
+.x-demo-panel-contents {
+  height: 20px;
+  top: 4px;
+  width: 12px;
+}
+
+.x-demo-page-content {
+  height: 40px;
+  left: 2px;
+  overflow: hidden;
+  top: 12px;
+  width: 32px;
+}
+
+.x-demo-title {
+  height: 2px;
+  left: 3px;
+  top: 3px;
+  width: 22px;
+}
+
+.x-demo-text1, .x-demo-text2, .x-demo-text3, .x-demo-text4, .x-demo-text5 {
+  height: 1px;
+  left: 3px;
+  top: 7px;
+  width: 26px;
+}
+
+.x-demo-text2 {
+  top: 10px;
+}
+
+.x-demo-text3 {
+  top: 13px;
+}
+
+.x-demo-text4 {
+  top: 16px;
+}
+
+.x-demo-text5 {
+  top: 19px;
+}</code>
+    </property>
+    <property>
+      <name>Theme list styling</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity output="false"}}
+#if("$!request.xaction" == 'setTheme' &amp;&amp; "$!request.theme" != '' &amp;&amp; $hasAdmin &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+  #set($preferencesDoc = $xwiki.getDocument('XWiki.XWikiPreferences'))
+  #set($preferencesObj = $preferencesDoc.getObject('XWiki.XWikiPreferences'))
+  $preferencesObj.set('colorTheme', $request.theme)
+  $preferencesDoc.save()
+  ## Redirect without xaction, so that refreshing doesn't set the same theme again.
+  $response.sendRedirect($doc.getURL('view', "theme=$escapetool.url($request.theme)"))
+  #stop
+#elseif("$!request.xaction" == 'create' &amp;&amp; "$!request.newThemeName" != '' &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+  $response.sendRedirect($xwiki.getDocument($services.model.createDocumentReference($doc.wiki, 'ColorThemes', $request.newThemeName)).getURL('inline', "template=ColorThemes.ColorThemeTemplate&amp;title=$escapetool.url($request.newThemeName)"))
+  #stop
+#end
+
+$xwiki.ssx.use($doc.fullName)
+
+
+##
+## Page mockup, for displaying the theme colors
+##
+#macro(themeMiniDemo $theme)
+  &lt;div class="x-demo-page"  style="background-color: $theme.pageBackgroundColor"&gt;
+    &lt;div class="x-demo-top-menu" style="background-color: $theme.menuBackgroundColor"&gt; &lt;/div&gt;
+    &lt;div class="x-demo-header" style="background-color: $theme.pageHeaderBackgroundColor"&gt; &lt;/div&gt;
+    &lt;div class="x-demo-page-content" style="background-color: $theme.pageContentBackgroundColor"&gt;
+      &lt;div class="x-demo-title" style="background-color: $theme.titleColor; border-color: $theme.borderColor"&gt; &lt;/div&gt;
+      &lt;div class="x-demo-text1" style="background-color: $theme.textColor"&gt;&lt;/div&gt;
+      &lt;div class="x-demo-text2" style="background-color: $theme.textColor"&gt;&lt;/div&gt;
+      &lt;div class="x-demo-text3" style="background-color: $theme.textColor"&gt;&lt;/div&gt;
+      &lt;div class="x-demo-text4" style="background-color: $theme.linkColor"&gt;&lt;/div&gt;
+      &lt;div class="x-demo-text5" style="background-color: $theme.textColor"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="x-demo-right-panel"&gt;
+      &lt;div class="x-demo-panel-header" style="background-color: $theme.panelHeaderBackgroundColor; border-color: $theme.borderColor"&gt;
+        &lt;div class="x-demo-panel-header-text" style="background-color: $theme.panelHeaderTextColor"&gt; &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="x-demo-panel-contents" style="background-color: $theme.panelBackgroundColor"&gt;
+        &lt;div class="x-demo-panel-text1" style="background-color: $theme.panelTextColor"&gt; &lt;/div&gt;
+        &lt;div class="x-demo-panel-text2" style="background-color: $theme.panelTextColor"&gt; &lt;/div&gt;
+        &lt;div class="x-demo-panel-text3" style="background-color: $theme.panelTextColor"&gt; &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+##
+##
+## Theme information: title, creator, mockup
+##
+#macro(displayTheme $themeDocName)
+  #if($xwiki.getXWikiPreference('colorTheme') == $themeDocName)
+    #set($isCurrentTheme = true)
+  #else
+    #set($isCurrentTheme = false)
+  #end
+  #set($themeDoc = $xwiki.getDocument($themeDocName))
+  #set($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass', true))
+  #template('colorThemeInit.vm')
+  &lt;div class="x-theme#if($isCurrentTheme) current-theme#end"&gt;
+  #themeMiniDemo($theme)
+  &lt;div class="x-theme-info"&gt;
+    &lt;div class="x-theme-title"&gt;[[$themeDoc.displayTitle&gt;&gt;$themeDocName]]&lt;/div&gt;   
+    {{html wiki="false"}}
+      &lt;span class="theme-info"&gt;$services.localization.render('core.footer.creation', [$xwiki.getUserName($themeDoc.creator), $xwiki.formatDate($themeDoc.creationDate)])&lt;/span&gt;
+      #if($hasAdmin &amp;&amp; !$isCurrentTheme)
+        &lt;div class="x-theme-set" id="$themeDoc.fullName"&gt;
+          &lt;a href="$doc.getURL('view', "xaction=setTheme&amp;theme=${themeDoc.fullName}&amp;form_token=$!{services.csrf.getToken()}")" class="use-theme"&gt;$services.localization.render('xe.themes.useTheme')&lt;/a&gt;
+        &lt;/div&gt;
+      #end
+    {{/html}}
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+##
+## End macros
+##
+##
+{{/velocity}}
+
+{{velocity}}
+#if("$!request.theme" != '')
+  {{info}}$services.localization.render('xe.themes.themeSet', [$xwiki.getDocument($request.theme).displayTitle]){{/info}}
+
+#end
+{{html wiki="true"}}
+  #set($currentTheme = $xwiki.getDocument('XWiki.XWikiPreferences').getObject('XWiki.XWikiPreferences').getProperty('colorTheme').value)
+  #if("$!currentTheme" == '')
+    #set($currentTheme = 'ColorThemes.DefaultColorTheme')
+  #end
+  == $services.localization.render('xe.themes.current') ==
+  #displayTheme($currentTheme)
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  #set($query = ", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;? and doc.fullName&lt;&gt;'ColorThemes.ColorThemeSheet' order by doc.title")
+  #set($params = ["$!currentTheme"])
+  #set($themeList = $services.query.hql($query).bindValues($params).execute())
+  #if($themeList.size() &gt; 0)
+    == $services.localization.render('xe.themes.others') ==
+  #end
+  #if(!$isGuest &amp;&amp; $xcontext.action != 'inline')
+  &lt;form action="$doc.getURL()" method="post" class="xformInline"&gt;
+  &lt;div class="x-theme-create"&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="hidden" name="xaction" value="create"/&gt;
+    &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('xe.themes.create.nameLabel')&lt;/label&gt;
+    &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('xe.themes.create.nameTip')" class="withTip" size="30"/&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.themes.create')" class="button"/&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;/form&gt;
+  #end
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  #foreach($themeDocName in $themeList)
+    #displayTheme($themeDocName)
+  #end
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

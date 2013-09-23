@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.globalsearch;
 
 import java.util.ArrayList;
@@ -7,8 +26,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -27,7 +46,7 @@ final class GlobalSearch
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(GlobalSearch.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearch.class);
 
     /**
      * Hql "select" keyword.
@@ -92,18 +111,21 @@ final class GlobalSearch
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The plugin internationalization service.
-     */
-    private XWikiPluginMessageTool messageTool;
-
-    /**
      * Hidden constructor of GlobalSearch only access via getInstance().
      * 
      * @param messageTool the plugin internationalization service.
      */
+    @Deprecated
     public GlobalSearch(XWikiPluginMessageTool messageTool)
     {
-        this.messageTool = messageTool;
+        this();
+    }
+
+    /**
+     * Default constructor.
+     */
+    public GlobalSearch()
+    {
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -116,11 +138,6 @@ final class GlobalSearch
     private Collection<String> getAllWikiNameList(XWikiContext context) throws XWikiException
     {
         Collection<String> wikiNames = context.getWiki().getVirtualWikisDatabaseNames(context);
-
-        if (!wikiNames.contains(context.getMainXWiki())) {
-            wikiNames.add(context.getMainXWiki());
-        }
-
         return wikiNames;
     }
 
@@ -141,14 +158,9 @@ final class GlobalSearch
         List<String> selectColumns = parseSelectColumns(query.getHql());
         List<Object[]> orderColumns = parseOrderColumns(query.getHql());
 
-        Collection<String> wikiNameList;
-        if (context.getWiki().isVirtualMode()) {
-            wikiNameList = query.getWikiNameList();
-            if (wikiNameList.isEmpty()) {
-                wikiNameList = getAllWikiNameList(context);
-            }
-        } else {
-            wikiNameList = Collections.singletonList(context.getMainXWiki());
+        Collection<String> wikiNameList = query.getWikiNameList();
+        if (wikiNameList.isEmpty()) {
+            wikiNameList = getAllWikiNameList(context);
         }
 
         int max = query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0) : 0;
@@ -406,9 +418,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -433,9 +445,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -481,9 +493,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a

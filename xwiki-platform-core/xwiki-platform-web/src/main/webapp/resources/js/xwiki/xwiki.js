@@ -1,4 +1,5 @@
 var XWiki = (function(XWiki) {
+XWiki.widgets = XWiki.widgets || {};
 /**
  * XWiki namespace.
  * TODO: move everything in it.
@@ -9,20 +10,8 @@ var XWiki = (function(XWiki) {
 Object.extend(XWiki, {
 
   constants: {
-    /** Character that separates wiki from space in a page fullName (example: the colon in xwiki:Main.WebHome). */
-    wikiSpaceSeparator: ":",
-
-    /** Character that separates space from page in a page fullName (example: the dot in xwiki:Main.WebHome). */
-    spacePageSeparator: ".",
-
-    /** Character that separates page from attachment in an attachment fullName (example: the @ in xwiki:Main.WebHome@Archive.tgz). */
-    pageAttachmentSeparator: "@",
-
     /** URL Anchor separator. */
     anchorSeparator: "#",
-
-    /** URL Anchor for page annotations. */
-    docextraAnnotationsAnchor: "Annotations",
 
     /** URL Anchor for page comments. */
     docextraCommentsAnchor: "Comments",
@@ -39,96 +28,6 @@ Object.extend(XWiki, {
 
   resource: {
     /**
-     * Extract the name of the wiki from a resource name. Examples: returns "xwiki" with "xwiki:Main.WebHome",
-     * returns null with "Main.WebHome".
-     */
-    getWikiFromResourceName: function(name) {
-      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
-        return name.substring(0, name.indexOf(XWiki.constants.wikiSpaceSeparator));
-      }
-      return null;
-    },
-
-    /**
-     * Extract the name of the space from a resource name. Examples: returns "Main" with "xwiki:Main.WebHome",
-     * returns "Main" with "Main.WebHome", returns null with "WebHome".
-     */
-    getSpaceFromResourceName: function(name) {
-      var originalName = name;
-      // Remove wiki if any.
-      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
-        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
-      }
-      // If the resource contains an attachment, make sure the dot is not part of the attachment name.
-      if (name.include(XWiki.constants.spacePageSeparator)) {
-        if (name.include(XWiki.constants.pageAttachmentSeparator) && name.indexOf(XWiki.constants.spacePageSeparator)
-              > name.indexOf(XWiki.constants.pageAttachmentSeparator)) {
-          return null;
-        }
-        return name.substring(0, name.indexOf(XWiki.constants.spacePageSeparator));
-      }
-      // If the resource name looks like "xwiki:Main" we return "Main".
-      if (originalName.include(XWiki.constants.wikiSpaceSeparator)
-            && !originalName.include(XWiki.constants.pageAttachmentSeparator)
-            && !originalName.include(XWiki.constants.anchorSeparator)) {
-        return name;
-      }
-      return null;
-    },
-
-    /**
-     * Extract the name of the page from a resource name. Examples: returns "WebHome" with "xwiki:Main.WebHome",
-     * returns "WebHome" with "Main.WebHome", returns null with "xwiki:Main".
-     */
-    getNameFromResourceName: function(name) {
-      var originalName = name;
-      // Remove wiki if any.
-      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
-        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
-      }
-      // remove attachment if any.
-      if (name.include(XWiki.constants.pageAttachmentSeparator)) {
-        name = name.substring(0, name.indexOf(XWiki.constants.pageAttachmentSeparator));
-      }
-      // remove anchor if any.
-      if (name.include(XWiki.constants.anchorSeparator)) {
-        name = name.substring(0, name.indexOf(XWiki.constants.anchorSeparator));
-      }
-      if (name.include(XWiki.constants.spacePageSeparator)) {
-        return name.substring(name.indexOf(XWiki.constants.spacePageSeparator) + 1, name.length);
-      } else {
-        if (originalName.include(XWiki.constants.wikiSpaceSeparator)) {
-          // If the resource name looks like "xwiki:Main" it does not contain page info.
-          return null;
-        } else {
-          return name;
-        }
-      }
-    },
-
-    /**
-     * Extract the name of the attachment from a resource name. Examples: returns "test.zip" with
-     * "Main.WebHome@test.zip", returns null with "Main.WebHome".
-     */
-    getAttachmentFromResourceName: function(name) {
-      if (name.include(XWiki.constants.pageAttachmentSeparator)) {
-        return name.substring(name.indexOf(XWiki.constants.pageAttachmentSeparator) + 1, name.length);
-      }
-      return null;
-    },
-
-    /**
-     * Extract the name of the anchor from a resource name. Examples: returns "Comments" with
-     * "Main.WebHome#Comments", returns null with "Main.WebHome".
-     */
-    getAnchorFromResourceName: function(name) {
-      if (name.include(XWiki.constants.anchorSeparator)) {
-        return name.substring(name.indexOf(XWiki.constants.anchorSeparator) + 1, name.length);
-      }
-      return null;
-    },
-
-    /**
      * Build a resource object from a wiki resource name (aka fullName). Example with "Main.WebHome":
      * {
      *   wiki: "xwiki",
@@ -141,35 +40,94 @@ Object.extend(XWiki, {
      *  }
      *
      * @param name name of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
+     * @param entityType the type of entity specified by the given name; this parameter is optional but very useful when
+     *                   the passed string is a relative entity reference; e.g. XWiki.EntityType.SPACE for 'xwiki:Main'
+     *                   and XWiki.EntityType.ATTACHMENT for 'Page@file.txt'
      * @return the newly created resource object.
      */
-    get: function(name) {
-      var wiki = this.getWikiFromResourceName(name);
-      var space = this.getSpaceFromResourceName(name);
-      var pageName = this.getNameFromResourceName(name);
-      var attachment = this.getAttachmentFromResourceName(name);
-      var anchor = this.getAnchorFromResourceName(name);
+    get: function(name, entityType) {
+        // First, extract the anchor if it is specified, because entity references don't support anchors. We use a list
+        // of known anchors to reduce the possibility of a conflict with an entity whose name contains the anchor
+        // separator. Of couse this meas we don't support entity names that end with known anchors.
+        var anchor = '', knownAnchors = ['Attachments'];
+        // In case the entity type is not specified determine it from the known anchor.
+        var entityTypeForAnchor = [XWiki.EntityType.DOCUMENT];
+        for (var i = 0; i < knownAnchors.length; i++) {
+            if (name.endsWith(XWiki.constants.anchorSeparator + knownAnchors[i])) {
+                anchor = knownAnchors[i];
+                name = name.substr(0, name.length - (anchor.length + 1));
+                entityType = entityType || entityTypeForAnchor[i];
+                break;
+            }
+        }
 
-      if (!wiki) { wiki = XWiki.currentWiki; }
-      if (!space) { space = XWiki.currentSpace; }
-      if (!pageName) { pageName = XWiki.currentPage; }
-      if (!attachment) { attachment = ""; }
-      if (!anchor) { anchor = ""; }
+        var reference;
+        if (entityType) {
+            reference = XWiki.Model.resolve(name, entityType);
+        } else {
+            // NOTE: The given name can be an attachment reference, a document reference, a space reference or a wiki
+            // reference. Since we don't know the entity type we try to deduce it. This can fail if the given name is a
+            // relative reference.
+            reference = XWiki.Model.resolve(name, XWiki.EntityType.ATTACHMENT);
+            if (!reference.parent) {
+                // Attachment references must be prefixed with at least the document name.
+                reference = XWiki.Model.resolve(name, XWiki.EntityType.DOCUMENT);
+                if (!reference.parent) {
+                    // Check if it's not a space reference.
+                    var spaceReference = XWiki.Model.resolve(name, XWiki.EntityType.SPACE);
+                    if (spaceReference.parent) {
+                        // The wiki is specified so we assume it is a space reference.
+                        reference = spaceReference;
+                    } else {
+                        // The given name is either a wiki name, a space name or a document name. We can't really
+                        // distinguish between them so we assume it's the name of a document from the current space.
+                    }
+                }
+            }
+        }
 
-      var fullName = space + XWiki.constants.spacePageSeparator + pageName;
-      var prefixedSpace = wiki + XWiki.constants.wikiSpaceSeparator + space;
-      var prefixedFullName = wiki + XWiki.constants.wikiSpaceSeparator + fullName;
+        return this.fromEntityReference(reference, anchor);
+    },
 
-      return {
-          wiki: wiki,
-          space: space,
-          prefixedSpace: prefixedSpace,
-          fullName: fullName,
-          prefixedFullName: prefixedFullName,
-          name: pageName,
-          attachment: attachment,
-          anchor: anchor
-       };
+    fromEntityReference : function(reference, anchor) {
+        var wiki = reference.extractReference(XWiki.EntityType.WIKI);
+        wiki = (wiki && wiki.name) || XWiki.currentWiki;
+
+        var space = reference.extractReference(XWiki.EntityType.SPACE);
+        space = (space && space.name) || XWiki.currentSpace;
+
+        var page = reference.extractReference(XWiki.EntityType.DOCUMENT);
+        page = (page && page.name) || XWiki.currentPage;
+
+        var attachment = reference.extractReference(XWiki.EntityType.ATTACHMENT);
+        attachment = (attachment && attachment.name) || '';
+
+        var documentReference = new XWiki.DocumentReference(wiki, space, page);
+        var fullName = XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(wiki)));
+        var prefixedSpace = XWiki.Model.serialize(documentReference.parent);
+        var prefixedFullName = XWiki.Model.serialize(documentReference);
+
+        return {
+            wiki: wiki,
+            space: space,
+            prefixedSpace: prefixedSpace,
+            fullName: fullName,
+            prefixedFullName: prefixedFullName,
+            name: page,
+            attachment: attachment,
+            anchor: anchor
+        };
+    },
+
+    asEntityReference : function(resource) {
+        var reference;
+        var components = [resource.wiki, resource.space, resource.name, resource.attachment];
+        for (var i = 0; i < components.length; i++) {
+            if (components[i]) {
+                reference = new XWiki.EntityReference(components[i], i, reference);
+            }
+        }
+        return reference;
     },
 
     /**
@@ -179,28 +137,7 @@ Object.extend(XWiki, {
      * @return a string that can be passed to the #get(String) method to reconstruct the resource
      */
     serialize: function(resource) {
-        var name = '';
-        if (resource.wiki) {
-            name = resource.wiki;
-        }
-        if (resource.space) {
-            if (name.length > 0) {
-                name += XWiki.constants.wikiSpaceSeparator;
-            }
-            name += resource.space;
-        }
-        if (resource.name) {
-            if (name.length > 0) {
-                name += XWiki.constants.spacePageSeparator;
-            }
-            name += resource.name;
-        }
-        if (resource.attachment) {
-            if (name.length > 0) {
-                name += XWiki.constants.pageAttachmentSeparator;
-            }
-            name += resource.attachment;
-        }
+        var name = XWiki.Model.serialize(this.asEntityReference(resource));
         if (resource.anchor) {
             if (name.length > 0) {
                 name += XWiki.constants.anchorSeparator;
@@ -300,13 +237,10 @@ Object.extend(XWiki, {
    * Otherwise make all the document's body errors expandable.
    */
   makeRenderingErrorsExpandable: function(content) {
-    if (typeof content == "undefined") {
-      content = document.body;
-    }
-    $(content).select(".xwikirenderingerror").each(function(error) {
+    $(content || 'body').select(".xwikirenderingerror").each(function(error) {
         if(error.next().innerHTML !== "" && error.next().hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
-            error.title = "$msg.get('platform.core.rendering.error.readTechnicalInformation')";
+            error.title = "$services.localization.render('platform.core.rendering.error.readTechnicalInformation')";
             Event.observe(error, "click", function(event){
                    event.element().next().toggleClassName("hidden");
             });
@@ -325,10 +259,7 @@ Object.extend(XWiki, {
     // avoid having it saved by the wysiwyg afterwards. Actually it should be anything different from edit or inline,
     // but like this is consistent with the next function, for section editing.
     if (XWiki.contextaction == "view" || XWiki.contextaction == "preview") {
-      if (typeof content == "undefined") {
-        content = document.body;
-      }
-      var anchors = content.select("a[rel]");
+      var anchors = $(content || 'body').select("a[rel]");
       for (var i = 0; i < anchors.length; i++) {
           var anchor = anchors[i];
           if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
@@ -352,19 +283,20 @@ Object.extend(XWiki, {
   /**
    * Insert a link for editing sections.
    */
-  insertSectionEditLinks: function() {
-      // Insert links only in view mode and for xwiki/2.0 documents.
-      if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+  insertSectionEditLinks: function(container) {
+      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
+      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
 
           // Section count starts at one, not zero.
           var sectioncount = 1;
 
-          // We can't use element.select() since it does not keep the order of the elements in the flow.
-          var nodes = $("xwikicontent");
-          if (!nodes) {
+          container = $(container || 'body');
+          container = container.id == 'xwikicontent' ? container : container.down('#xwikicontent');
+          if (!container) {
             return;
           }
-          nodes = nodes.childNodes;
+          // We can't use element.select() since it does not keep the order of the elements in the flow.
+          var nodes = container.childNodes;
 
           // Only allow section editing for the specified depth level (2 by default)
           var headerPattern = new RegExp("H[1-" + $xwiki.getSectionEditingDepth() + "]");
@@ -376,12 +308,23 @@ Object.extend(XWiki, {
 
               if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
                   var editspan = document.createElement("SPAN");
-                  var editlink = document.createElement("A");
-
-                  editlink.href = window.docediturl + "?section=" + sectioncount;
-                  editlink.style.textDecoration = "none";
-                  editlink.innerHTML = "$msg.get('edit')";
                   editspan.className = "edit_section";
+                  // Hide the section editing link if the section heading is hidden.
+                  (!node.visible() || node.hasClassName('hidden')) && editspan.hide();
+
+                  // If there's no Syntax Renderer for the current document's syntax then make sure the section edit
+                  // button will be displayed inactive since editing a section requires a Syntax Renderer.
+                  var editlink;
+                  if (!XWiki.hasRenderer) {
+                      editlink = document.createElement("SPAN");
+                      editspan.className = editspan.className + " disabled";
+                      editlink.title = "$services.localization.render('platform.core.rendering.noRendererForSectionEdit')";
+                  } else {
+                      editlink = document.createElement("A");
+                      editlink.href = window.docediturl + "?section=" + sectioncount;
+                      editlink.style.textDecoration = "none";
+                      editlink.innerHTML = "$services.localization.render('edit')";
+                  }
 
                   editspan.appendChild(editlink);
                   node.insert( { 'after': editspan } );
@@ -393,10 +336,12 @@ Object.extend(XWiki, {
 
   /**
    * Display a modal box allowing to create the new document from a template when clicking on broken links.
+   *
+   * @param container where to look for broken links
    */
-  insertCreatePageFromTemplateModalBoxes: function() {
-      // Insert links only in view mode and for xwiki/2.0 documents.
-      if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+  insertCreatePageFromTemplateModalBoxes: function(container) {
+      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
+      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
           XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
               initialize : function($super, interactionParameters) {
                   var content =  new Element('div', {'class': 'modal-popup'});
@@ -418,11 +363,16 @@ Object.extend(XWiki, {
               }
           });
 
-          var spans = document.body.select("span.wikicreatelink");
+          var spans = $(container || 'body').select("span.wikicreatelink");
           for (var i = 0; i < spans.length; i++) {
               spans[i].down('a').observe('click', function(event) {
-                  new Ajax.Request(event.findElement('a').href + '&xpage=createinline&ajax=1', {
+                  // Remove the fragment identifier from the link URL.
+                  new Ajax.Request(event.findElement('a').href.replace(/#.*$/, ''), {
                       method:'get',
+                      parameters: {
+                        xpage: 'createinline',
+                        ajax: 1
+                      },
                       onSuccess: function(transport) {
                           var redirect = transport.getHeader('redirect');
                           if (redirect) {
@@ -432,7 +382,7 @@ Object.extend(XWiki, {
                           }
                       },
                       onFailure: function() {
-                        new XWiki.widgets.Notification("$msg.get('core.create.ajax.error')", 'error', {inactive: true}).show();
+                        new XWiki.widgets.Notification("$services.localization.render('core.create.ajax.error')", 'error', {inactive: true}).show();
                       }
                   });
                   event.stop();
@@ -496,10 +446,11 @@ Object.extend(XWiki, {
     /**
      * Initialize watchlist UI.
      */
-    initialize: function() {
+    initialize: function(container) {
+        container = $(container || 'body');
         for (button in XWiki.watchlist.actionsMap) {
-          if ($(button) != null) {
-            var element = $(button);
+          var element = container.down('#' + button);
+          if (element) {
             var self = this;
 
             if (element.nodeName != 'A') {
@@ -578,12 +529,41 @@ Object.extend(XWiki, {
    *
    * @param form  {element} The panel element.
    */
-  togglePanelVisibility: function(element, cookieName){
+  togglePanelVisibility: function(element){
     element = $(element);
     element.toggleClassName("collapsed");
-    if (cookieName) {
-      var cookieValue = element.hasClassName('collapsed') ? 'collapsed' : 'expanded';
-      XWiki.cookies.create(cookieName, cookieValue, '');
+  },
+
+  registerPanelToggle: function(container) {
+    $(container || 'body').select('.panel .xwikipaneltitle').each(function(item) {
+      item.observe('click', this.togglePanelVisibility.bind(this, item.up('.panel')));
+    }.bind(this));
+  },
+
+  /**
+   * Extracts the file name from the value of the specified file input.
+   */
+  extractFileName: function(fileInput) {
+    fileInput = $(fileInput);
+    if (fileInput.files && fileInput.files.length > 0) {
+      // Modern browsers provide additional information about the selected file(s).
+      return fileInput.files[0].name;
+    } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
+      // Most browsers hide the real path for security reasons.
+      return fileInput.value.substr(12);
+    } else {
+      var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
+      if (lastPathSeparatorIndex >= 0) {
+        // Unix-based path.
+        return fileInput.value.substr(lastPathSeparatorIndex + 1);
+      }
+      lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
+      if (lastPathSeparatorIndex >= 0) {
+        // Windows-based path.
+        return fileInput.value.substr(lastPathSeparatorIndex + 1);
+      }
+      // The file input value is just the file name.
+      return fileInput.value;
     }
   },
 
@@ -592,21 +572,46 @@ Object.extend(XWiki, {
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
-  initialize: function(){
+  initialize: function() {
     // Extra security to make sure we do not get initalized twice.
-    // It would fire the custom dom:loaded event twice, which could make their observers misbehave.
+    // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
+      // This variable is set when the marker script is executed, which should always be the last script to execute.
+      // In case the dom:loaded event was fired prematurely, delay the execution and ask instead the marker script to
+      // re-invoke the initialization process.
+      if (typeof XWiki.lastScriptLoaded == "undefined") {
+        XWiki.failedInit = true;
+        return;
+      }
+
+      // All ready, continue with the initialization.
       this.isInitialized = true;
       document.fire("xwiki:dom:loading");
 
-      this.makeRenderingErrorsExpandable();
-      this.fixLinksTargetAttribute();
-      this.insertSectionEditLinks();
-      this.insertCreatePageFromTemplateModalBoxes();
-      this.watchlist.initialize();
+      // Make sure we re-add the behaviour whenever a part of the DOM is updated.
+      document.observe('xwiki:dom:updated', function(event) {
+        event.memo.elements.each(this._addBehaviour.bind(this));
+      }.bindAsEventListener(this));
+      // Add behaviour to the entire DOM.
+      this._addBehaviour();
 
+      this.domIsLoaded = true;
       document.fire("xwiki:dom:loaded");
     }
+  },
+
+  /**
+   * Enhances some of the common page elements with JavaScript behaviour.
+   */
+  _addBehaviour: function(container) {
+    container = container || $('body');
+
+    this.makeRenderingErrorsExpandable(container);
+    this.fixLinksTargetAttribute(container);
+    this.insertSectionEditLinks(container);
+    this.insertCreatePageFromTemplateModalBoxes(container);
+    this.watchlist.initialize(container);
+    this.registerPanelToggle(container);
   }
 });
 
@@ -1269,9 +1274,9 @@ XWiki.Document = Class.create({
 
 /* Initialize the document URL factory, and create XWiki.currentDocument. */
 document.observe('xwiki:dom:loading', function() {
-  XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : "xwiki";
-  XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : "Main";
-  XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : "WebHome";
+  XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : (XWiki.currentWiki || "xwiki");
+  XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : (XWiki.currentSpace || "Main");
+  XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : (XWiki.currentPage || "WebHome");
   XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
   XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
   XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
@@ -1295,27 +1300,79 @@ document.observe('xwiki:dom:loading', function() {
 /**
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
  *
- * To activate this behavior on an input element, add the "withTip" classname to it.
+ * To activate this behavior on an input element, set a "placeholder" attribute, or add the "withTip" classname to it,
+ * or pass it as the 'element' value of the memo of a 'xwiki:addBehavior:withTip' event.
  */
-document.observe('xwiki:dom:loaded', function() {
-  var onFocus = function() {
-    if (this.value==this.defaultValue) {
-      this.value="";
-    } else {
-      this.select();
+(function(){
+  var placeholderPolyfill;
+  if ('placeholder' in document.createElement('input')) {
+    // For browsers that do support the 'placeholder' attribute, we just add support for the older way of supporting this through the 'withTip' classname and the default input value.
+    placeholderPolyfill = function(event) {
+      var item = event.memo.element;
+      if (item.placeholder === '') {
+        if (item.hasClassName('useTitleAsTip')) {
+          // The place-holder text is different than the initial (default) input value.
+          item.placeholder = item.title;
+        } else {
+          // Use the initial (default) input value as place-holder.
+          item.placeholder = item.defaultValue;
+          item.value = '';
+        }
+      }
+    }
+  } else {
+    // For browsers that don't support the 'placeholder' attribute, we simulate it with 'focus' and 'blur' event handlers.
+    var onFocus = function() {
+      var empty = this.hasClassName('empty');
+      this.removeClassName('empty');
+      if (empty) {
+        this.value = '';
+      } else {
+        this.select();
+      }
+    }
+    var onBlur = function() {
+      if (this.value == '') {
+        this.value = this.defaultValue;
+        this.addClassName('empty');
+      }
+    }
+    placeholderPolyfill = function(event) {
+      var item = event.memo.element;
+      // Backup the initial input value because IE resets it when the default value is set.
+      var initialValue = item.value;
+      if (item.readAttribute('placeholder')) {
+        item.defaultValue = item.readAttribute('placeholder');
+      } else if (item.hasClassName('useTitleAsTip')) {
+        item.defaultValue = item.title;
+      }
+      // Restore the initial input value;
+      item.value = initialValue;
+      if (item.value == item.defaultValue) {
+        // The 'empty' CSS class has two functions:
+        // * display the placeholder value with a different color
+        // * distinguish between the case when the user has left the input empty and the case when he typed exactly the
+        //   default value (which should be valid).
+        item.addClassName('empty');
+      }
+      item.observe('focus', onFocus.bindAsEventListener(item));
+      item.observe('blur', onBlur.bindAsEventListener(item));
     }
   }
-  var onBlur = function() {
-    if (this.value=="") {
-      this.value=this.defaultValue;
-    }
-  }
-  $$("input.withTip", "textarea.withTip").each(function(item) {
-    item.observe('focus', onFocus.bindAsEventListener(item));
-    item.observe('blur', onBlur.bindAsEventListener(item));
+  document.observe('xwiki:addBehavior:withTip', placeholderPolyfill);
+  document.observe('xwiki:dom:loaded', function() {
+    $$("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
+      document.fire("xwiki:addBehavior:withTip", {'element' : item});
+    });
   });
-});
-
+  document.observe('xwiki:dom:updated', function(event) {
+    event.memo.elements.each(function(element) {
+      element.select("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
+        document.fire("xwiki:addBehavior:withTip", {'element' : item});
+      });
+    });
+  });
+})();
 /**
  * Small JS improvement, which suggests document names (doc.fullName) when typing in an input.
  *
@@ -1323,8 +1380,6 @@ document.observe('xwiki:dom:loaded', function() {
  * <ul>
  * <li><tt>suggestDocuments</tt> to suggest from any available document</li>
  * <li><tt>suggestSpaces</tt> to suggest space names</li>
- * <li><tt>suggestUsers</tt> to suggest from documents that contains user objects</li>
- * <li><tt>suggestGroups</tt> to suggest from documents that contains group objects</li>
  * </ul>
  */
 document.observe('xwiki:dom:loaded', function() {
@@ -1332,7 +1387,7 @@ document.observe('xwiki:dom:loaded', function() {
         "documents" : {
             script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
             varname: "q",
-            icon: "$xwiki.getSkinFile('icons/silk/page_white_text.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/page_white_text.png')",
             noresults: "Document not found",
             json: true,
             resultsParameter : "searchResults",
@@ -1343,45 +1398,39 @@ document.observe('xwiki:dom:loaded', function() {
         "spaces" : {
             script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&media=json&"),
             varname: "q",
-            icon: "$xwiki.getSkinFile('icons/silk/folder.gif')",
+            icon: "$xwiki.getSkinFile('icons/silk/folder.png')",
             noresults: "Space not found",
             json: true,
             resultsParameter : "searchResults",
             resultId : "id",
             resultValue : "space",
             resultInfo : "space"
-        },
-        "users" : {
-            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),
-            varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/user.gif')",
-            noresults: "User not found"
-        },
-        "groups" : {
-            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiGroups&wiki=local&uorg=group&'),
-            varname: "input",
-            icon: "$xwiki.getSkinFile('icons/silk/group.gif')",
-            noresults: "Group not found"
         }
     };
-    if (typeof(XWiki.widgets.Suggest) != "undefined") {
-      var keys = Object.keys(suggestionsMapping);
-      for (var i=0;i<keys.length;i++) {
-        var selector = 'input.suggest' + keys[i].capitalize();
-        $$(selector).each(function(item) {
-          if (!item.hasClassName('initialized')) {
-            var options = {
-              timeout : 30000,
-              parentContainer : item.up()
-            };
-            Object.extend(options, suggestionsMapping[keys[i]]);
-            // Create the Suggest.
-            var suggest = new XWiki.widgets.Suggest(item, options);
-            item.addClassName('initialized');
-          }
-        });
+    var addSuggests = function(elements) {
+      if (typeof(XWiki.widgets.Suggest) != "undefined") {
+        var keys = Object.keys(suggestionsMapping);
+        for (var i=0;i<keys.length;i++) {
+          var selector = 'input.suggest' + keys[i].capitalize();
+          elements.each(function(element) {$(element).select(selector).each(function(item) {
+            if (!item.hasClassName('initialized')) {
+              var options = {
+                timeout : 30000,
+                parentContainer : item.up()
+              };
+              Object.extend(options, suggestionsMapping[keys[i]]);
+              // Create the Suggest.
+              var suggest = new XWiki.widgets.Suggest(item, options);
+              item.addClassName('initialized');
+            }
+          })});
+        }
       }
-    }
+    };
+    addSuggests([$(document.documentElement)]);
+    document.observe('xwiki:dom:updated', function(event) {
+      addSuggests(event.memo.elements);
+    });
 });
 
 /**
@@ -1390,16 +1439,21 @@ document.observe('xwiki:dom:loaded', function() {
  *
  * To activate this behavior on an input elements, add the "suggested" classname to it.
  */
-document.observe('xwiki:dom:loaded', function() {
-  if (typeof(XWiki.widgets.Suggest) != "undefined") {
-    $$(".suggested").each(function(item) {
-      item.setAttribute("autocomplete", "off");
-      if (typeof item.onfocus === "function") {
-        item.onfocus();
-        item.removeAttribute("onfocus");
-      }
-    });
-  }
+['xwiki:dom:loaded', 'xwiki:dom:updated'].each(function(eventName) {
+  document.observe(eventName, function(event) {
+    if (typeof(XWiki.widgets.Suggest) != "undefined") {
+      var elements = event.memo && event.memo.elements || [document.documentElement];
+      elements.each(function(element) {
+        element.select(".suggested").each(function(item) {
+          item.setAttribute("autocomplete", "off");
+          if (typeof item.onfocus === "function") {
+            item.onfocus();
+            item.removeAttribute("onfocus");
+          }
+        });
+      });
+    }
+  });
 });
 
 /*
@@ -1479,7 +1533,7 @@ document.observe('xwiki:dom:loaded', function() {
       });
     }
     $('body').observe('click', function (event) {
-      if (!event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
+      if (event.element().descendantOf && !event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
         hideParentSection();
       }
     })
@@ -1530,16 +1584,18 @@ document.observe("xwiki:dom:loaded", function() {
       extraHeight = menu.__fm_extra.getHeight();
     }
     var menuHeight = menu.getHeight();
-    var menuMaxTop = content.cumulativeOffset().top + content.getHeight() - menuHeight - extraHeight;
-    var menuMinTop = content.cumulativeOffset().top - menuHeight - extraHeight;
-    if (document.viewport.getScrollOffsets().top >= menuMinTop && document.viewport.getScrollOffsets().top < menuMaxTop) {
+    var menuMinTop = content.cumulativeOffset().top - extraHeight;
+    if (document.viewport.getScrollOffsets().top >= menuMinTop) {
       var menuWidth = content.getWidth();
       var menuLeft = content.cumulativeOffset().left;
       makeFixed(menu, 0, menuLeft, menuWidth);
-      makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth - 50)); // magic number 50 = left+right padding
-    } else if (document.viewport.getScrollOffsets().top >= menuMaxTop) {
-      makeAbsolute(menu, menuMaxTop);
-      makeAbsolute(menu.__fm_extra, menuMaxTop + menuHeight);
+      if (menu.__fm_extra) {
+        makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth -
+          menu.__fm_extra.getStyle('border-left-width').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('border-right-width').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('padding-right').replace(/[^0-9]/g,'') -
+          menu.__fm_extra.getStyle('padding-left').replace(/[^0-9]/g,'')));
+      }
     } else {
       makeScrollable(menu);
       makeScrollable(menu.__fm_extra);
@@ -1570,6 +1626,7 @@ document.observe("xwiki:dom:loaded", function() {
    */
   function makeFixed(element, top, left, width) {
     if (element) {
+      element.addClassName('floating-menu');
       element.style.position = 'fixed';
       element.style.top = top + 'px';
       element.style.left = left + 'px';
@@ -1578,20 +1635,11 @@ document.observe("xwiki:dom:loaded", function() {
     }
   }
   /**
-   * Keeps the provided element at a certain position inside the document.
-   */
-  function makeAbsolute(element, top) {
-    if (element) {
-      element.style.position = 'absolute';
-      element.style.top = top + 'px';
-      element.__fm_ghost.show();
-    }
-  }
-  /**
    * Restores the provided element to its original position in the document.
    */
   function makeScrollable(element) {
     if (element) {
+      element.removeClassName('floating-menu');
       element.style.position = '';
       element.style.top = '';
       element.style.left = '';

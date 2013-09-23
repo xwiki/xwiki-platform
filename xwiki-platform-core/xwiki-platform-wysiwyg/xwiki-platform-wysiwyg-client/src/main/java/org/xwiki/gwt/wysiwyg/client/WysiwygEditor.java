@@ -23,6 +23,7 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.plugin.PluginFactoryManager;
+import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidatorManager;
 
 import com.google.gwt.dom.client.Style.Display;
@@ -87,7 +88,7 @@ public class WysiwygEditor extends RichTextEditorController
      */
     public WysiwygEditor(WysiwygEditorConfig config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
-        super(new RichTextEditor(), config.getConfigurationSource(), pfm, svm.getSyntaxValidator(config.getSyntax()));
+        super(new RichTextEditor(), config.getConfigurationSource(), pfm, getSyntaxValidator(svm, config));
 
         this.config = config;
 
@@ -107,6 +108,20 @@ public class WysiwygEditor extends RichTextEditorController
         Element hook = config.getHook();
         getRichTextEditor().getTextArea().setHeight(Math.max(hook.getOffsetHeight(), 100) + "px");
         hook.getStyle().setDisplay(Display.NONE);
+    }
+
+    /**
+     * @param svm the object used to retrieve the syntax validator
+     * @param config the configuration object
+     * @return a validator for the configured syntax, if it exists, otherwise a validator for the default syntax
+     */
+    private static SyntaxValidator getSyntaxValidator(SyntaxValidatorManager svm, WysiwygEditorConfig config)
+    {
+        SyntaxValidator sv = svm.getSyntaxValidator(config.getSyntax());
+        if (sv == null) {
+            sv = svm.getSyntaxValidator(WysiwygEditorConfig.DEFAULT_SYNTAX);
+        }
+        return sv;
     }
 
     /**

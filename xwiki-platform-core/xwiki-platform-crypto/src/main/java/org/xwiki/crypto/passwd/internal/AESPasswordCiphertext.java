@@ -39,11 +39,6 @@ public class AESPasswordCiphertext extends AbstractPasswordCiphertext
      */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.passwd.internal.CAST5PasswordCiphertext#newCipherInstance()
-     */
     @Override
     protected PaddedBufferedBlockCipher newCipherInstance()
     {

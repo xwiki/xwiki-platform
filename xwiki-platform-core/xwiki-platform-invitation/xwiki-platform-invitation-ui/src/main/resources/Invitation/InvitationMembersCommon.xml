@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Invitation</web>
+  <name>InvitationMembersCommon</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Invitation.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1273964702000</creationDate>
+  <date>1274340674000</date>
+  <contentUpdateDate>1274340674000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiRights</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <allow>
+        <defaultValue>1</defaultValue>
+        <displayFormType>select</displayFormType>
+        <displayType>allow</displayType>
+        <name>allow</name>
+        <number>4</number>
+        <prettyName>Allow/Deny</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </allow>
+      <groups>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>groups</name>
+        <number>1</number>
+        <prettyName>Groups</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <usesList>1</usesList>
+        <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+      </groups>
+      <levels>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>levels</name>
+        <number>2</number>
+        <prettyName>Levels</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
+      </levels>
+      <users>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>users</name>
+        <number>3</number>
+        <prettyName>Users</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <usesList>1</usesList>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </users>
+    </class>
+    <name>Invitation.InvitationMembersCommon</name>
+    <number>0</number>
+    <className>XWiki.XWikiRights</className>
+    <guid>f4fbe6c4-36dc-46c6-9264-5fda011275e8</guid>
+    <property>
+      <allow>1</allow>
+    </property>
+    <property>
+      <groups>XWiki.XWikiAllGroup,</groups>
+    </property>
+    <property>
+      <levels>view</levels>
+    </property>
+    <property>
+      <users/>
+    </property>
+  </object>
+  <content>{{velocity}}
+#*
+ * Invitation Application
+ * This document contains common macros used by all documents in the Invitation Application which are 
+ * only available to wiki members.
+ *
+ * Macros in this script don't rely on any variables except those which are passed to them and the following:
+ *
+ * $doc the com.xpn.xwiki.api.Document object representing the document containing this code.
+ * $msg the internationalization message provider containing a get(String) and a get(String, List) function
+ * $xcontext the com.xpn.xwiki.Context object for this request
+ * $xwiki an object of the com.xpn.xwiki.api.XWiki class.
+ * $escapetool an object of class org.apache.velocity.tools.generic.EscapeTool
+ *
+ * Macros also depend on other macros but only other macros which are contained in this script.
+ *###
+#if($doc.getName() == 'InvitationMembersCommon')
+  {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
+#end
+##
+#*
+ * Display a table of messages.
+ *
+ * $messages (Collection&lt;XObject&gt;) the messages to view.
+ *
+ * $fieldsToDisplay (List&lt;String&gt;) fields which should be displayed.
+ *   Options include: sendingUser, subjectLine, status, memo, recipient and _checkbox
+ *   using the _checkbox option will create a checkbox which is named the message id number.
+ *   the _history option will provide a link to view the memo log for the message.
+ *
+ * $asAdmin (Boolean) should the links point to displaying for admin or user (NOT FOR SECURITY)
+ *
+ * $numberOfRecipientsByMessage (Map&lt;Integer, XObject&gt;) the number of recipients for a given message (Optional)
+ *                                                      if specified and recipient field is set in $fieldsToDisplay
+ *                                                      then messages with multiple recipients will say "X recipients".
+ *
+ *###
+#macro(displayMessageTable, $messages, $fieldsToDisplay, $asAdmin, $numberOfRecipientsByMessage)
+  #if(!$messages || $messages.size() &lt; 1)
+    {{info}}$services.localization.render('xe.invitation.displayMessageTable.noMessages'){{/info}}
+  #else
+
+    (%class="message-table"%)(((
+     #foreach($field in $fieldsToDisplay)
+       #if($field == '_history')
+         |=(%class="history"%)$services.localization.render('xe.invitation.displayMessageTable.history')##
+       #elseif($field == '_checkbox')
+         |=(%class="checkbox"%)##
+       #elseif($field == 'recipient' || $field == 'sentDate')
+       ## We need to prevent tables from overflowing
+       ## unfortunately it makes displayMessageTable aware of the properties of a message.
+         |=(%class="$field"%)$services.localization.render("xe.invitation.displayMessageTable.${field}")##
+       #else
+         |=$services.localization.render("xe.invitation.displayMessageTable.${field}")##
+       #end
+     #end
+
+     #foreach($message in $messages)
+       #foreach($field in $fieldsToDisplay)
+         #if($field == 'sendingUser')
+           |[[$escapetool.xml($message.getProperty("$field").getValue())]]##
+         #elseif($field == 'subjectLine')
+           |[[$escapetool.xml($message.getProperty('subjectLine').getValue())&gt;&gt;$doc.getFullName()?inspect=group##
+           ## If the user is an admin they will be linked to a different page.
+           #if($asAdmin)
+             AsAdmin##
+           #end
+           &amp;messageID=$message.getProperty('messageID').getValue()]]##
+         #elseif($field == 'status'
+                 &amp;&amp; $numberOfRecipientsByMessage
+                 &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient'))
+                 &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient')) &gt; 1)
+           |$services.localization.render('xe.invitation.displayMessageTable.various')
+         #elseif($field == 'status')
+           |#messageStatusForCode($message.getProperty('status').getValue())##
+         #elseif($field == 'recipient'
+                 &amp;&amp; $numberOfRecipientsByMessage
+                 &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient'))
+                 &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient')) &gt; 1)
+           |$services.localization.render('xe.invitation.displayMessageTable.multipleRecipients',
+                     [$numberOfRecipientsByMessage.get($message.get('recipient'))])
+         #elseif($field == '_checkbox')
+           |&lt;input type="checkbox" name="messageID" value="$message.getProperty('messageID').getValue()" ##
+           ## If there is only one message in the group, add the convienence of checking the box by default.
+           #if($messages.size() == 1)
+             checked="checked" ##
+           #end
+           /&gt;##
+         #elseif($field == '_history')
+           |[[$services.localization.render('xe.invitation.displayMessageTable.history')&gt;&gt;##
+              $doc.getFullName()?inspect=history##
+              ## If we are looking as an admin then go to historyAsAdmin
+              #if($asAdmin)
+                AsAdmin##
+              #end
+              &amp;messageID=$message.getProperty('messageID').getValue()]]##
+         #else
+           |$escapetool.xml($message.display($field, 'view'))##
+         #end
+       #end
+
+     #end##foreach message in mail
+    )))## end of class message-table
+  #end##if there is mail
+#end##macro
+##
+#*
+ * Display some tools for users and admins (if applicable).
+ *
+ * $mail (Map&lt;String, XObject&gt;) map of messages by their ID.
+ *
+ * $parameterMap (Map&lt;String, String&gt;) map obtained by calling getParameterMap on the servlet request object.
+ *
+ * $isAdmin (Boolean) should administrative tools be displayed?
+ *
+ * $config (Map&lt;String, String&gt;) configuration for invitation application.
+ *###
+#macro(invitationFooter, $mail, $parameterMap, $isAdmin, $config)
+  ## Clear the float:left which puts elements side by side.
+  #if($parameterMap &amp;&amp; $parameterMap.get('inspect') &amp;&amp; $parameterMap.get('inspect').size() &gt; 0)
+    #set($inspect = $parameterMap.get('inspect').get(0))
+  #end
+  (%class="clearboth" id=invitation-footer%)(((
+
+
+   ## User Tools
+   = $services.localization.render('xe.invitation.tools.heading') =
+   ## Invite friends.
+   #if($doc.getFullName() != $config.get('mainPage') || $parameterMap.size() &gt; 0)
+     * [[$services.localization.render('xe.invitation.tools.senderLink')&gt;&gt;$config.get('mainPage')]]
+   #else
+     * **$services.localization.render('xe.invitation.tools.senderLink')**
+   #end
+   ## My invitations
+   #if($inspect != 'all')
+     * [[$services.localization.render('xe.invitation.tools.myInvitationsLink')&gt;&gt;$config.get('membersActionsPage')?inspect=all]] ##
+     #if($inspect == 'group')
+
+       ** **$services.localization.render('xe.invitation.tools.invitationsInGroup')**
+     #else
+       #set($messagesByMe = [])
+       #getMessagesBySender($mail.values(), $xcontext.getUser(), $messagesByMe)
+       #set($myPendingInvitations = [])
+       #getMessagesByStatus($messagesByMe, 'pending', $myPendingInvitations)
+       #if($myPendingInvitations.size() &gt; 0)
+         (%id="my-pending-invitations"%){{info}}$myPendingInvitations.size() pending{{/info}}(%%)##
+       #end
+       ## If viewing message history then show history brelow group.
+       #if($inspect == 'history')
+
+         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
+               inspect=group&amp;messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]
+         *** **$services.localization.render('xe.invitation.tools.invitationHistory')**##
+       #end
+
+     #end
+   #else
+     * **$services.localization.render('xe.invitation.tools.myInvitationsLink')**
+   #end
+   #if($isAdmin)
+     ## Administrative Tools
+
+
+     = $services.localization.render('xe.invitation.adminTools.heading') =
+     ##
+     ## Warn the user if guests are unable to be invited.
+     #if("#canGuestAcceptInvitation($xwiki.getDocument($config.get('guestsActionsPage')))" != 'true')
+       {{error}}$services.localization.render('xe.invitation.guestsCanNotJoin', [$config.get('guestsActionsPage')]){{/error}}
+
+     #end
+     ## Click here to configure the friend inviter
+     * {{html}}&lt;a href="$xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'admin=globaladmin&amp;section=Invitation')"&gt;##
+         $services.localization.render('xe.invitation.adminTools.configureLink')##
+       &lt;/a&gt;{{/html}}
+     ## View all invitations
+     #if($inspect != 'allAsAdmin')
+       * [[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;##
+         $config.get('membersActionsPage')?inspect=allAsAdmin]] ##
+       #set($spamReports = [])
+       #getMessagesByStatus($mail.values(), 'reported', $spamReports)
+       #if($spamReports.size() &gt; 0)
+         (%id="spam-reports"%){{warning}}$spamReports.size() reported as spam{{/warning}}(%%)##
+       #end
+
+       #if($inspect == 'groupAsAdmin')
+         ** **$services.localization.render('xe.invitation.tools.invitationsInGroup')**
+       #elseif($inspect == 'historyAsAdmin')
+         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
+               inspect=groupAsAdmin&amp;messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]
+         *** **$services.localization.render('xe.invitation.tools.invitationHistory')**
+       #end
+     #else
+       ## Inspect all as admin is selected.
+       * **$services.localization.render('xe.invitation.adminTools.allInvitationsLink')**
+     #end
+   #end
+  )))
+#end
+##
+#*
+ * Get only messages by a given sender
+ *
+ * $messages (Collection&lt;XObject&gt;) the messages to search though.
+ *
+ * $sender (String) the name of the user (document name) who sent the message.
+ *
+ * $messagesOut (List&lt;XObject&gt;) will be populated with messages which are sent by $user
+ *###
+#macro(getMessagesBySender, $messages, $sender, $messagesOut)
+  #foreach($message in $messages)
+    #if($sender == $message.getProperty('sendingUser').getValue())
+      #set($discard = $messagesOut.add($message))
+    #end
+  #end
+#end
+##
+#*
+ * Get only messages with a given status code.
+ *
+ * $messages (Collection&lt;XObject&gt;) the messages to search though.
+ *
+ * $status (String) the status code for the messages to get.
+ *
+ * $messagesOut (List&lt;XObject&gt;) will be populated with messages which are sent by $user
+ *###
+#macro(getMessagesByStatus, $messages, $status, $messagesOut)
+  #foreach($message in $messages)
+    #if($status == $message.getProperty('status').getValue())
+      #set($discard = $messagesOut.add($message))
+    #end
+  #end
+#end
+##
+#*
+ * Get a "breadcrumb trail" based on the way users are expected to navigate through the members' actions.
+ * Each entry in the list is a link except for the last (which is the page the user is currently on)
+ * output might look like ['[[Invitation]]', '[[My invitations]]', 'Invitations in this message group']
+ * * [[output]] denotes that the output is a link.
+ *
+ * $parameterMap (Map&lt;String, String&gt;) map obtained by calling getParameterMap on the servlet request object.
+ *
+ * $config (Map&lt;String, String&gt;) configuration for invitation application.
+ *
+ * $trail (List&lt;String&gt;) this list will be populated with entries into the breadcrumb trail.
+ *###
+#macro(getInvitationBreadcrumbTrail, $parameterMap, $config, $trail)
+  #if($parameterMap &amp;&amp; $parameterMap.get('inspect') &amp;&amp; $parameterMap.get('inspect').size() &gt; 0)
+    #set($inspect = $parameterMap.get('inspect').get(0))
+  #end
+  ##
+  #if($doc.getFullName() == $config.get('mainPage'))
+    ## Invitation
+    #set($discard = $trail.add($services.localization.render('xe.invitation.heading')))
+  #else
+    #set($discard = $trail.add("[[$services.localization.render('xe.invitation.heading')&gt;&gt;$config.get('mainPage')]]"))
+    #if($doc.getFullName() == $config.get('membersActionsPage'))
+      ##
+      ## Administration
+      #if($inspect.contains('AsAdmin'))
+        #if($inspect == 'allAsAdmin')
+          ## [[Invitation]]  --&gt;  All invitations
+          #set($discard = $trail.add($services.localization.render('xe.invitation.adminTools.allInvitationsLink')))
+        #else
+          #set($allAsAdminLink = "[[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;"
+                                 + "$config.get('membersActionsPage')?inspect=allAsAdmin]]")
+          #set($discard = $trail.add($allAsAdminLink))
+          #if($inspect == 'groupAsAdmin')
+            ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  Invitations in group
+            #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationsInGroup')))
+          #elseif($inspect == 'historyAsAdmin')
+            ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  [[Invitations in group]]  --&gt;  History of this invitation
+            #set($allInGroupAsAdminLink = "[[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
+                                          + "$config.get('membersActionsPage')?inspect=groupAsAdmin&amp;"
+                                          + "messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]")
+            #set($discard = $trail.add($allInGroupAsAdminLink))
+            #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationHistory')))
+          #end
+        #end
+      ##
+      ## For user.
+      #else
+        #if($inspect == 'all')
+          ## [[Invitation]] --&gt; My Invitations
+          #set($discard = $trail.add($services.localization.render('xe.invitation.tools.myInvitationsLink')))
+        #else
+          #set($myInvitationsLink = "[[$services.localization.render('xe.invitation.tools.myInvitationsLink')&gt;&gt;"
+                                    + "$config.get('membersActionsPage')?inspect=all]]")
+          #set($discard = $trail.add($myInvitationsLink))
+          #if($inspect == 'group')
+            #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationsInGroup')))
+          #else
+            #set($myInvitationsinGroupLink = "[[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
+                                             + "$config.get('membersActionsPage')?inspect=group&amp;amp;messageID="
+                                             + "$escapetool.xml($parameterMap.get('messageID').get(0))]]")
+            #set($discard = $trail.add($myInvitationsinGroupLink))
+            #if($inspect == 'history')
+              #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationHistory')))
+            #end
+          #end
+        #end## If not inspect 'all'
+      #end## If not inspecting as admin
+    #end## If we're on InvitationMemberActions
+  #end## If we're not on the main page
+#end## Macro
+##
+#*
+ * Display the header for at the top of the page.
+ *
+ * $parameterMap (Map&lt;String, String&gt;) map obtained by calling getParameterMap on the servlet request object.
+ *
+ * $config (Map&lt;String, String&gt;) configuration for invitation application.
+ *###
+#macro(displayInvitationHeader, $parameterMap, $config)
+  #set($breadcrumbTrail = [])
+  #getInvitationBreadcrumbTrail($parameterMap, $config, $breadcrumbTrail)
+  #if($breadcrumbTrail.size() &gt; 0)
+    #if($breadcrumbTrail.size() &gt; 1)
+      #foreach($entry in $breadcrumbTrail)
+        #if($velocityCount &gt; 1)
+          #**#  »  ##
+        #end
+        $entry##
+      #end
+    #end
+
+    = $breadcrumbTrail.get($mathtool.add($breadcrumbTrail.size(), -1)) =
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

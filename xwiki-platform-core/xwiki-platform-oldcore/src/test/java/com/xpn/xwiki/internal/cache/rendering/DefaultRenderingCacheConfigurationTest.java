@@ -23,21 +23,19 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.MockConfigurationSource;
+import org.xwiki.test.internal.MockConfigurationSource;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit test for {@link DefaultRenderingCacheConfiguration}.
  * 
  * @version $Id$
- * @since 2.4M1
  */
-public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedXWikiComponentTestCase
+public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedComponentTestCase
 {
     private RenderingCacheConfiguration configuration;
 
@@ -53,20 +51,21 @@ public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedXWiki
 
     private MockConfigurationSource getWikiConfigurationSource() throws Exception
     {
-        return (MockConfigurationSource) getComponentManager().lookup(ConfigurationSource.class, "wiki");
+        return (MockConfigurationSource) getComponentManager().getInstance(ConfigurationSource.class, "wiki");
     }
 
     private MockConfigurationSource getXWikiPropertiesConfigurationSource() throws Exception
     {
-        return (MockConfigurationSource) getComponentManager().lookup(ConfigurationSource.class, "xwikiproperties");
+        return (MockConfigurationSource) getComponentManager().getInstance(
+            ConfigurationSource.class, "xwikiproperties");
     }
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.configuration = getComponentManager().lookup(RenderingCacheConfiguration.class);
+        this.configuration = getComponentManager().getInstance(RenderingCacheConfiguration.class);
         this.documentReference = new DocumentReference("wiki", "space", "page");
 
         getContext().setDatabase("wiki");

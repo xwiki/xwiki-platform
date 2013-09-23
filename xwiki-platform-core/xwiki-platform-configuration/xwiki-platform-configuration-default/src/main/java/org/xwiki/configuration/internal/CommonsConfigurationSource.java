@@ -19,11 +19,14 @@
  */
 package org.xwiki.configuration.internal;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+
+import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.properties.ConverterManager;
 
@@ -35,48 +38,52 @@ import org.xwiki.properties.ConverterManager;
  * @version $Id$
  * @since 1.6M1
  */
-public class CommonsConfigurationSource extends AbstractLogEnabled implements ConfigurationSource
+public class CommonsConfigurationSource implements ConfigurationSource
 {
     private Configuration configuration;
 
     /**
      * Component used for performing type conversions.
      */
-    @Requirement
+    @Inject
     private ConverterManager converterManager;
+
+    protected Configuration getConfiguration()
+    {
+        return this.configuration;
+    }
 
     protected void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getProperty(String, Object)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, T defaultValue)
     {
-        return getProperty(key, defaultValue, (Class<T>) defaultValue.getClass());
+        T result;
+        if (containsKey(key)) {
+            if (defaultValue != null) {
+                return getProperty(key, (Class<T>) defaultValue.getClass());
+            } else {
+                return getProperty(key);
+            }
+        } else {
+            result = defaultValue;
+        }
+
+        return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getProperty(String)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
-        return (T) this.configuration.getProperty(key);
+        return (T) getConfiguration().getProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getProperty(String, Class)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, Class<T> valueClass)
     {
@@ -84,11 +91,11 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
 
         try {
             if (String.class.getName().equals(valueClass.getName())) {
-                result = (T) this.configuration.getString(key);
+                result = (T) getConfiguration().getString(key);
             } else if (List.class.isAssignableFrom(valueClass)) {
-                result = (T) this.configuration.getList(key);
+                result = (T) getConfiguration().getList(key);
             } else if (Properties.class.isAssignableFrom(valueClass)) {
-                result = (T) this.configuration.getProperties(key);
+                result = (T) getConfiguration().getProperties(key);
             } else if (null != getProperty(key)) {
                 result = (T) this.converterManager.convert(valueClass, getProperty(key));
             }
@@ -103,49 +110,27 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#getKeys()
-     */
-    @SuppressWarnings("unchecked")
+    @Override
     public List<String> getKeys()
     {
         List<String> keysList = new ArrayList<String>();
-        Iterator keys = this.configuration.getKeys();
+        Iterator<String> keys = getConfiguration().getKeys();
         while (keys.hasNext()) {
-            keysList.add((String) keys.next());
+            keysList.add(keys.next());
         }
+
         return keysList;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#containsKey(String)
-     */
+    @Override
     public boolean containsKey(String key)
     {
-        return this.configuration.containsKey(key);
+        return getConfiguration().containsKey(key);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigurationSource#isEmpty()
-     */
+    @Override
     public boolean isEmpty()
     {
-        return this.configuration.isEmpty();
+        return getConfiguration().isEmpty();
     }
-
-    private <T> T getProperty(String key, T defaultValue, Class<T> valueClass)
-    {
-        T result = getProperty(key, valueClass);
-        if (result == null) {
-            result = defaultValue;
-        }
-        return result;
-    }
-
 }

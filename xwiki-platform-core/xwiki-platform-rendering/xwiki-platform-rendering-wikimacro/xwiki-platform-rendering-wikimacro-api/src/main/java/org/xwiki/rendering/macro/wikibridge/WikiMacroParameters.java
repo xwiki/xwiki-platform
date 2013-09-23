@@ -47,9 +47,7 @@ public class WikiMacroParameters implements RawProperties
         this.parametersMap = new HashMap<String, Object>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void set(String propertyName, Object value)
     {
         this.parametersMap.put(propertyName, value);

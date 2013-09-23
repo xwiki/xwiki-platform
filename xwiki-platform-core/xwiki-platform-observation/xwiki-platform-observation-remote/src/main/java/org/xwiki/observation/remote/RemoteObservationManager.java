@@ -19,7 +19,7 @@
  */
 package org.xwiki.observation.remote;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Provide apis to manage the event network interface.
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M3
  */
-@ComponentRole
+@Role
 public interface RemoteObservationManager
 {
     /**

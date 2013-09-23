@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-query</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-query-jpql-parser</artifactId>
   <name>XWiki Platform - Query - JPQL Parser</name>
   <description>Simple Java Persistence Query Language parser based on SableCC</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
+  </properties>
   <build>
     <plugins>
       <plugin>

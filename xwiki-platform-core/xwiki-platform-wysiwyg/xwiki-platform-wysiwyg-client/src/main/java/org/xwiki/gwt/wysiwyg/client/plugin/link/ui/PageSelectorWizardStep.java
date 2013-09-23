@@ -26,7 +26,8 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
-import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntitySelectorAggregatorWizardStep;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorAggregatorWizardStep;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
@@ -35,8 +36,13 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
  * 
  * @version $Id$
  */
-public class PageSelectorWizardStep extends AbstractEntitySelectorAggregatorWizardStep<LinkConfig>
+public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<EntityLink<LinkConfig>>
 {
+    /**
+     * The service to be used for creating links to wiki pages.
+     */
+    private final WikiServiceAsync wikiService;
+
     /**
      * Creates a new page selector, that aggregates different views for selecting a page: recently modified pages, all
      * pages or page search.
@@ -45,7 +51,8 @@ public class PageSelectorWizardStep extends AbstractEntitySelectorAggregatorWiza
      */
     public PageSelectorWizardStep(WikiServiceAsync wikiService)
     {
-        super(wikiService);
+        this.wikiService = wikiService;
+        setStepTitle(Strings.INSTANCE.linkSelectWikipageTitle());
     }
 
     /**
@@ -68,11 +75,11 @@ public class PageSelectorWizardStep extends AbstractEntitySelectorAggregatorWiza
     protected WizardStep getStepInstance(String name)
     {
         if (name.equals(Strings.INSTANCE.selectorSelectFromRecentPages())) {
-            return new RecentChangesSelectorWizardStep(getWikiService());
+            return new RecentChangesSelectorWizardStep(wikiService);
         } else if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
-            return new WikiPageExplorerWizardStep(getWikiService());
+            return new WikiPageExplorerWizardStep();
         } else if (name.equals(Strings.INSTANCE.selectorSelectFromSearchPages())) {
-            return new SearchSelectorWizardStep(getWikiService());
+            return new SearchSelectorWizardStep(wikiService);
         }
         return null;
     }
@@ -83,15 +90,7 @@ public class PageSelectorWizardStep extends AbstractEntitySelectorAggregatorWiza
     @Override
     protected List<String> getStepNames()
     {
-        return Arrays.asList(Strings.INSTANCE.selectorSelectFromRecentPages(), Strings.INSTANCE
-            .selectorSelectFromAllPages(), Strings.INSTANCE.selectorSelectFromSearchPages());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.linkSelectWikipageTitle();
+        return Arrays.asList(Strings.INSTANCE.selectorSelectFromRecentPages(),
+            Strings.INSTANCE.selectorSelectFromAllPages(), Strings.INSTANCE.selectorSelectFromSearchPages());
     }
 }

@@ -65,6 +65,6 @@
   width: 83px;
 }
  
-.xSearchForm input {
+.xSearchForm input.gwt-TextBox {
   width: 365px;
 }

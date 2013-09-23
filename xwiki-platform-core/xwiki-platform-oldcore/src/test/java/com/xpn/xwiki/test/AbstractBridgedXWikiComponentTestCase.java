@@ -19,16 +19,23 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.File;
+import javax.servlet.ServletContext;
+
 import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiResponse;
 
 /**
  * Extension of {@link AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution
@@ -58,17 +65,39 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         this.context.setDatabase("xwiki");
         this.context.setMainXWiki("xwiki");
 
+        // Make sure response.encodeURL() calls don't fail
+        Mock xwikiResponse = mock(XWikiResponse.class);
+        xwikiResponse.stubs().method("setLocale");
+        xwikiResponse.stubs().method("encodeURL").will(
+            new CustomStub("Implements XWikiResponse.encodeURL")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return invocation.parameterValues.get(0);
+                }
+            });
+        this.context.setResponse((XWikiResponse) xwikiResponse.proxy());
+
         // We need to initialize the Component Manager so that the components can be looked up
         getContext().put(ComponentManager.class.getName(), getComponentManager());
 
         // Bridge with old XWiki Context, required for old code.
-        Execution execution = getComponentManager().lookup(Execution.class);
-        execution.getContext().setProperty("xwikicontext", this.context);
-        getComponentManager().lookup(XWikiStubContextProvider.class).initialize(this.context);
+        Execution execution = getComponentManager().getInstance(Execution.class);
+        this.context.declareInExecutionContext(execution.getContext());
+        XWikiStubContextProvider stubContextProvider =
+            getComponentManager().getInstance(XWikiStubContextProvider.class);
+        stubContextProvider.initialize(this.context);
 
-        // Set a simple application context, as some components fail to start without one.
-        Container c = getComponentManager().lookup(Container.class);
-        c.setApplicationContext(new TestApplicationContext());
+        // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
+        // correctly with a Servlet Context.
+        ServletEnvironment environment = getComponentManager().getInstance(Environment.class);
+        Mock mockServletContext = mock(ServletContext.class); 
+        environment.setServletContext((ServletContext) mockServletContext.proxy());
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/cache/infinispan/config.xml"))
+            .will(returnValue(null));
+        mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
+            .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));

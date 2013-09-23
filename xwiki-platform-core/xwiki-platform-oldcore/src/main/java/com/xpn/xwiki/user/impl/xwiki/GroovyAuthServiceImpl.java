@@ -16,15 +16,14 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.Principal;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -34,8 +33,9 @@ import com.xpn.xwiki.user.api.XWikiUser;
 
 public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
 {
-    private static final Log log = LogFactory.getLog(GroovyAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroovyAuthServiceImpl.class);
 
+    @Override
     protected String getParam(String name, XWikiContext context)
     {
         String param = "";
@@ -59,8 +59,8 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
     {
         String authservicepage = getParam("groovy_pagename", context);
         if ((authservicepage == null) || authservicepage.trim().equals("")) {
-            if (log.isErrorEnabled())
-                log.error("No page specified for auth service implementation");
+            if (LOGGER.isErrorEnabled())
+                LOGGER.error("No page specified for auth service implementation");
             return null;
         }
 
@@ -69,18 +69,19 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
             if (context.getWiki().getRightService().hasProgrammingRights(doc, context))
                 return (XWikiAuthService) context.getWiki().parseGroovyFromString(doc.getContent(), context);
             else {
-                if (log.isErrorEnabled())
-                    log.error("Auth service implementation page " + authservicepage
+                if (LOGGER.isErrorEnabled())
+                    LOGGER.error("Auth service implementation page " + authservicepage
                         + " missing programming rights, requires ownership by authorized user.");
                 return null;
             }
         } catch (XWikiException e) {
-            if (log.isErrorEnabled())
-                log.error("Exception while parsing groovy authentication service code", e);
+            if (LOGGER.isErrorEnabled())
+                LOGGER.error("Exception while parsing groovy authentication service code", e);
             return null;
         }
     }
 
+    @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         XWikiAuthService authservice = getAuthService(context);
@@ -95,6 +96,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         }
     }
 
+    @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
@@ -110,6 +112,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         }
     }
 
+    @Override
     public void showLogin(XWikiContext context) throws XWikiException
     {
         XWikiAuthService authservice = getAuthService(context);
@@ -124,6 +127,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         }
     }
 
+    @Override
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException
     {
         XWikiAuthService authservice = getAuthService(context);
@@ -137,5 +141,4 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
             }
         }
     }
-
 }

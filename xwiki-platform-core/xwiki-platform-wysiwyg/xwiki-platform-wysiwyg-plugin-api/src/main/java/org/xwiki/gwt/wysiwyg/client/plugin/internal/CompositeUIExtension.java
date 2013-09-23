@@ -54,11 +54,7 @@ public class CompositeUIExtension implements UIExtension
         extensions = new ArrayList<UIExtension>();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         final List<String> allFeatures = new ArrayList<String>();
@@ -74,21 +70,13 @@ public class CompositeUIExtension implements UIExtension
         return allFeatures.toArray(new String[allFeatures.size()]);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getRole()
-     */
+    @Override
     public String getRole()
     {
         return role;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getUIObject(String)
-     */
+    @Override
     public UIObject getUIObject(String feature)
     {
         for (UIExtension uie : extensions) {
@@ -100,11 +88,7 @@ public class CompositeUIExtension implements UIExtension
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#isEnabled(String)
-     */
+    @Override
     public boolean isEnabled(String feature)
     {
         boolean enabled = false;
@@ -114,11 +98,7 @@ public class CompositeUIExtension implements UIExtension
         return enabled;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#setEnabled(String, boolean)
-     */
+    @Override
     public void setEnabled(String feature, boolean enabled)
     {
         for (UIExtension uie : extensions) {

@@ -20,14 +20,14 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.observation.ObservationManager;
+
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.XWikiContext;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Entry point of the Rights Manager plugin.
@@ -47,7 +47,7 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(RightsManagerPlugin.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(RightsManagerPlugin.class);
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -63,11 +63,6 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
         super(PLUGIN_NAME, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
@@ -82,12 +77,6 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
-     *      com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {

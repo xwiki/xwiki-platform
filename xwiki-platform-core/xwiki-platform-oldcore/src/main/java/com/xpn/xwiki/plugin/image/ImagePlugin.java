@@ -16,21 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.image;
 
 import java.awt.Image;
 import java.awt.image.RenderedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -46,13 +44,15 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
+@Deprecated
 public class ImagePlugin extends XWikiDefaultPlugin
 {
     /**
      * Logging helper object.
      */
-    private static final Log LOG = LogFactory.getLog(ImagePlugin.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImagePlugin.class);
 
     /**
      * The name used for retrieving this plugin from the context.
@@ -64,7 +64,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * Cache for already served images.
      */
-    private Cache<byte[]> imageCache;
+    private Cache<XWikiAttachment> imageCache;
 
     /**
      * The size of the cache. This parameter can be configured using the key {@code xwiki.plugin.image.cache.capacity}.
@@ -92,25 +92,16 @@ public class ImagePlugin extends XWikiDefaultPlugin
     public ImagePlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
+
         init(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ImagePluginAPI((ImagePlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#getName()
-     */
     @Override
     public String getName()
     {
@@ -121,15 +112,16 @@ public class ImagePlugin extends XWikiDefaultPlugin
     public void init(XWikiContext context)
     {
         super.init(context);
+
         initCache(context);
 
         String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
-        if (!StringUtils.isBlank(defaultQualityParam) && StringUtils.isNumeric(defaultQualityParam.trim())) {
+        if (!StringUtils.isBlank(defaultQualityParam)) {
             try {
                 this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {
-                LOG.warn(String.format("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
-                    + "Using %s as the default image quality.", this.defaultQuality), e);
+                LOG.warn("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
+                    + "Using {} as the default image quality.", this.defaultQuality);
             }
         }
     }
@@ -141,46 +133,35 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     private void initCache(XWikiContext context)
     {
-        CacheConfiguration configuration = new CacheConfiguration();
+        if (this.imageCache == null) {
+            CacheConfiguration configuration = new CacheConfiguration();
 
-        configuration.setConfigurationId("xwiki.plugin.image");
+            configuration.setConfigurationId("xwiki.plugin.image");
 
-        // Set folder to store cache.
-        File tempDir = context.getWiki().getTempDirectory(context);
-        File imgTempDir = new File(tempDir, configuration.getConfigurationId());
-        try {
-            imgTempDir.mkdirs();
-        } catch (Exception ex) {
-            LOG.warn("Cannot create temporary files.", ex);
-        }
-        configuration.put("cache.path", imgTempDir.getAbsolutePath());
-        // Set cache constraints.
-        LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-        configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            // Set cache constraints.
+            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-        String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
-        if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
-            try {
-                this.capacity = Integer.parseInt(capacityParam.trim());
-            } catch (NumberFormatException e) {
-                LOG.warn(String.format("Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
-                    + "Using %s as the cache capacity.", this.capacity), e);
+            String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
+            if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
+                try {
+                    this.capacity = Integer.parseInt(capacityParam.trim());
+                } catch (NumberFormatException e) {
+                    LOG.warn(String.format(
+                        "Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
+                            + "Using %s as the cache capacity.", this.capacity), e);
+                }
             }
-        }
-        lru.setMaxEntries(this.capacity);
+            lru.setMaxEntries(this.capacity);
 
-        try {
-            this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
-        } catch (CacheException e) {
-            LOG.error("Error initializing the image cache.", e);
+            try {
+                this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            } catch (CacheException e) {
+                LOG.error("Error initializing the image cache.", e);
+            }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiPluginInterface#flushCache()
-     */
     @Override
     public void flushCache()
     {
@@ -259,13 +240,14 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment downloadImage(XWikiAttachment image, int width, int height, float quality,
         XWikiContext context) throws Exception
     {
-        if (this.imageCache == null) {
-            initCache(context);
-        }
+        initCache(context);
+
         boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
-        XWikiAttachment thumbnail =
-            this.imageCache == null ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
+
+        XWikiAttachment thumbnail = (this.imageCache == null)
+                ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
                 : downloadImageFromCache(image, width, height, keepAspectRatio, quality, context);
+
         // If the image has been transformed, update the file name extension to match the image format.
         String fileName = thumbnail.getFilename();
         String extension = StringUtils.lowerCase(StringUtils.substringAfterLast(fileName, String.valueOf('.')));
@@ -296,14 +278,11 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String key =
             String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
                 quality);
-        byte[] data = this.imageCache.get(key);
-        XWikiAttachment thumbnail;
-        if (data != null) {
-            thumbnail = (XWikiAttachment) image.clone();
-            thumbnail.setContent(new ByteArrayInputStream(data), data.length);
-        } else {
+
+        XWikiAttachment thumbnail = this.imageCache.get(key);
+        if (thumbnail == null) {
             thumbnail = shrinkImage(image, width, height, keepAspectRatio, quality, context);
-            this.imageCache.set(key, thumbnail.getContent(context));
+            this.imageCache.set(key, thumbnail);
         }
         return thumbnail;
     }
@@ -348,13 +327,17 @@ public class ImagePlugin extends XWikiDefaultPlugin
         // Scale the image to the new dimensions.
         RenderedImage shrunkImage = this.imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
 
-        // Write the shrunk image to a byte array output stream.
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        this.imageProcessor.writeImage(shrunkImage, attachment.getMimeType(context), quality, bout);
-
         // Create an image attachment for the shrunk image.
         XWikiAttachment thumbnail = (XWikiAttachment) attachment.clone();
-        thumbnail.setContent(new ByteArrayInputStream(bout.toByteArray()), bout.size());
+        thumbnail.loadContent(context);
+
+        OutputStream acos = thumbnail.getAttachment_content().getContentOutputStream();
+        this.imageProcessor.writeImage(shrunkImage,
+                                       attachment.getMimeType(context),
+                                       quality,
+                                       acos);
+
+        IOUtils.closeQuietly(acos);
 
         return thumbnail;
     }

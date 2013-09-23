@@ -43,14 +43,21 @@ public class CurrentPageAttachmentSelectorWizardStep extends
     AbstractEntityListSelectorWizardStep<LinkConfig, Attachment>
 {
     /**
+     * The service used to fetch the list of files attached to the current page.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
      * Builds a selector from the attachments of the link origin page.
      * 
      * @param wikiService the service used to retrieve the attachments of the current page
      */
     public CurrentPageAttachmentSelectorWizardStep(WikiServiceAsync wikiService)
     {
-        super(wikiService);
-        getMainPanel().addStyleName("xAttachmentsSelector");
+        this.wikiService = wikiService;
+
+        setStepTitle(Strings.INSTANCE.linkSelectAttachmentTitle());
+        display().addStyleName("xAttachmentsSelector");
     }
 
     /**
@@ -77,7 +84,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
-        getWikiService().getAttachments(new WikiPageReference(getData().getOrigin()), callback);
+        wikiService.getAttachments(new WikiPageReference(getData().getOrigin()), callback);
     }
 
     /**
@@ -118,14 +125,6 @@ public class CurrentPageAttachmentSelectorWizardStep extends
         if (getSelectedItem() != null && getSelectedItem().getData() == null) {
             return LinkWizardStep.ATTACHMENT_UPLOAD.toString();
         }
-        return LinkWizardStep.WIKI_PAGE_CONFIG.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.linkSelectAttachmentTitle();
+        return LinkWizardStep.LINK_CONFIG.toString();
     }
 }

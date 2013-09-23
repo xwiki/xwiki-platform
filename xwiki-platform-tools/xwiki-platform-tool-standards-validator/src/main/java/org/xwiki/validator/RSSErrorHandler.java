@@ -29,11 +29,6 @@ import org.xwiki.validator.framework.XMLErrorHandler;
  */
 public class RSSErrorHandler extends XMLErrorHandler
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.framework.XMLErrorHandler#error(org.xml.sax.SAXParseException)
-     */
     @Override
     public void error(SAXParseException e)
     {

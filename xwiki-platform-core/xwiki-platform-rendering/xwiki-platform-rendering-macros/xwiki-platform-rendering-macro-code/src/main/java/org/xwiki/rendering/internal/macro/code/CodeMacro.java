@@ -20,15 +20,25 @@
 package org.xwiki.rendering.internal.macro.code;
 
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
@@ -44,7 +54,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.7RC1
  */
-@Component("code")
+@Component
+@Named("code")
+@Singleton
 public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 {
     /**
@@ -65,14 +77,21 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     /**
      * Used to parse content when language="none".
      */
-    @Requirement("plain/1.0")
+    @Inject
+    @Named("plain/1.0")
     private Parser plainTextParser;
 
     /**
      * Used to lookup highlight parsers.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -83,12 +102,6 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.macro.box.DefaultBoxMacro#parseContent(org.xwiki.rendering.macro.box.BoxMacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
     @Override
     protected List<Block> parseContent(CodeMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
@@ -106,6 +119,15 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to highlight content", e);
+        }
+
+        Map<String, String> formatParameters = new LinkedHashMap<String, String>();
+        formatParameters.put("class", "code");
+
+        if (context.isInline()) {
+            result = Arrays.<Block> asList(new FormatBlock(result, Format.NONE, formatParameters));
+        } else {
+            result = Arrays.<Block> asList(new GroupBlock(result, formatParameters));
         }
 
         return result;
@@ -126,22 +148,22 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         HighlightParser parser;
 
         if (parameters.getLanguage() != null) {
-            try {
-                parser = this.componentManager.lookup(HighlightParser.class, parameters.getLanguage());
-                return parser.highlight(parameters.getLanguage(), new StringReader(content));
-            } catch (ComponentLookupException e) {
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(
-                        "Can't find specific highlighting parser for language [" + parameters.getLanguage() + "]", e);
+            if (this.componentManager.hasComponent(HighlightParser.class, parameters.getLanguage())) {
+                try {
+                    parser = this.componentManager.getInstance(HighlightParser.class, parameters.getLanguage());
+                    return parser.highlight(parameters.getLanguage(), new StringReader(content));
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Faild to load highlighting parser for language [{}]", parameters.getLanguage(),
+                        e);
                 }
             }
         }
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Trying the default highlighting parser");
-        }
+        this.logger.debug(
+            "Can't find any specific highlighting parser for language [{}]. Trying the default highlighting parser.",
+            parameters.getLanguage());
 
-        parser = this.componentManager.lookup(HighlightParser.class, "default");
+        parser = this.componentManager.getInstance(HighlightParser.class, "default");
 
         return parser.highlight(parameters.getLanguage(), new StringReader(content));
     }

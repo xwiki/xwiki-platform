@@ -41,7 +41,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
  * represent empty lines, Open Office uses following element: <br/>
  * {@code<P STYLE="margin-bottom: 0in"><BR></P>} <br/>
  * These constructs when rendered on browsers doesn't resemble the original document at all, and when parsed
- * into xwiki/2.0 syntax the generated xwiki syntax is also invalid (obviously). The purpose of this filter is to clean
+ * into xwiki syntax the generated xwiki syntax is also invalid (obviously). The purpose of this filter is to clean
  * up such html content by merging consecutive paragraph sequences and appropriately inserting {@code<br/>} elements.
  * 
  * @version $Id$
@@ -49,9 +49,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
 @Component("officeimporter/paragraph")
 public class ParagraphFilter extends AbstractHTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         for (Node p : findEmptyLineParagraphSequences(document)) {
@@ -78,6 +76,7 @@ public class ParagraphFilter extends AbstractHTMLFilter
         List<Element> emptyLineParagraphs =
             filterDescendants(document.getDocumentElement(), new String[] {TAG_P}, new ElementSelector()
             {
+                @Override
                 public boolean isSelected(Element element)
                 {
                     return isEmptyLineParagraph(element);

@@ -19,8 +19,11 @@
  */
 package org.xwiki.gwt.user.client.ui.rta;
 
+import org.xwiki.gwt.dom.client.CopyEvent;
+import org.xwiki.gwt.dom.client.CopyHandler;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.dom.client.HasCopyHandlers;
 import org.xwiki.gwt.dom.client.HasPasteHandlers;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.dom.client.PasteEvent;
@@ -53,7 +56,7 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
  * @version $Id$
  */
 public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers,
-    HasLoadHandlers, LoadHandler, HasPasteHandlers, HasActionHandlers, ClosingHandler
+    HasLoadHandlers, LoadHandler, HasPasteHandlers, HasCopyHandlers, HasActionHandlers, ClosingHandler
 {
     /**
      * @see #setHTML(String)
@@ -90,7 +93,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * The JavaScript function used to retrieve the edited document.
      */
-    @SuppressWarnings("unused")
     private final JavaScriptObject documentGetter;
 
     /**
@@ -171,6 +173,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
+    @Override
     public void setHTML(String html)
     {
         // We use a dirty flag to overcome the Issue 3156. Precisely, we test this flag in the setHTMLImpl to avoid
@@ -179,11 +182,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         super.setHTML(html);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#onBrowserEvent(com.google.gwt.user.client.Event)
-     */
+    @Override
     public void onBrowserEvent(com.google.gwt.user.client.Event event)
     {
         // We need to preview the event due to a GWT bug.
@@ -214,42 +213,34 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         return @com.google.gwt.user.client.DOM::previewEvent(Lcom/google/gwt/user/client/Event;)(event);
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasDoubleClickHandlers#addDoubleClickHandler(DoubleClickHandler)
-     */
+    @Override
     public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler)
     {
         return addDomHandler(handler, DoubleClickEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasPasteHandlers#addPasteHandler(PasteHandler)
-     */
+    @Override
     public HandlerRegistration addPasteHandler(PasteHandler handler)
     {
         return addDomHandler(handler, PasteEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasLoadHandlers#addLoadHandler(LoadHandler)
-     */
+    @Override
+    public HandlerRegistration addCopyHandler(CopyHandler handler)
+    {
+        // FIXME: We should use addDomHandler(handler, CopyEvent.getType()) but GWT currently doesn't support the copy
+        // event type and throws "Trying to sink unknown event type copy".
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=4030 .
+        return addHandler(handler, CopyEvent.getType());
+    }
+
+    @Override
     public HandlerRegistration addLoadHandler(LoadHandler handler)
     {
         return addDomHandler(handler, LoadEvent.getType());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadHandler#onLoad(LoadEvent)
-     * @see #onAttach()
-     */
+    @Override
     public void onLoad(LoadEvent event)
     {
         // The load event could be fired multiple times.
@@ -279,21 +270,12 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         return this.@com.google.gwt.user.client.ui.RichTextArea::impl;
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasActionHandlers#addActionHandler(String, ActionHandler)
-     */
+    @Override
     public HandlerRegistration addActionHandler(String actionName, ActionHandler handler)
     {
         return addHandler(handler, ActionEvent.getType(actionName));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#sinkEvents(int)
-     */
     @Override
     public void sinkEvents(int eventBitsToAdd)
     {
@@ -313,12 +295,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#onDetach()
-     * @see #sinkEvents(int)
-     */
     @Override
     protected void onDetach()
     {
@@ -331,12 +307,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         DOM.setEventListener(getElement(), this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClosingHandler#onWindowClosing(ClosingEvent)
-     * @see #onDetach()
-     */
+    @Override
     public void onWindowClosing(ClosingEvent event)
     {
         // We can't remove the listener on detach so we remove it here.

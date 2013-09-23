@@ -19,12 +19,6 @@ address.vcard {
   margin-right: 8px;
 }
 
-dt.label label {
-  color: #999;
-  padding: 0px 2px;
-  font-variant: small-caps;
-}
-
 .vevent h4 {
   color: #000;
   line-height: 1.1em;

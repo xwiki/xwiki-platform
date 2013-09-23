@@ -26,11 +26,10 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -43,22 +42,18 @@ import org.xwiki.script.ScriptContextManager;
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    public void initialize(MockingComponentManager componentManager) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();
 
         new ScriptMockSetup(mockery, componentManager);
 
         // Script Context Mock
-        final ScriptContextManager mockScriptContextManager = mockery.mock(ScriptContextManager.class);
+        final ScriptContextManager scm = componentManager.registerMockComponent(mockery, ScriptContextManager.class);
         final SimpleScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
         mockery.checking(new Expectations() {{
-            allowing(mockScriptContextManager).getScriptContext(); will(returnValue(scriptContext));
+            allowing(scm).getScriptContext(); will(returnValue(scriptContext));
         }});
-        DefaultComponentDescriptor<ScriptContextManager> descriptorSCM =
-            new DefaultComponentDescriptor<ScriptContextManager>();
-        descriptorSCM.setRole(ScriptContextManager.class);
-        componentManager.registerComponent(descriptorSCM, mockScriptContextManager);
     }
 }

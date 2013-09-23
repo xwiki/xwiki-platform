@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Menu</web>
+  <name>UIExtensionSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Menu.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1372193154000</creationDate>
+  <date>1372239465000</date>
+  <contentUpdateDate>1372239465000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Menu.UIExtensionSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>5660a695-5640-4eb9-a5bb-38509ac5faf6</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jQueryNoConflict'], function($) {
+  // Hide the UIX content field.
+  $('#XWiki\\.UIExtensionClass_0_content').parent('dd').hide().prev('dt').hide();
+  // Synchronize the UIX content with the selected extension point id.
+  $('#XWiki\\.UIExtensionClass_0_extensionPointId').on('change', function(event) {
+    $('#XWiki\\.UIExtensionClass_0_content').get(0).selectedIndex = this.selectedIndex;
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>{{velocity}}
+#macro (displayExtensionPointTitle $id)
+  #set ($shortId = $stringtool.removeStart($id, 'org.xwiki.platform.'))
+  #set ($shortId = $stringtool.removeStart($shortId, 'platform.'))
+  #if ("$!shortId" != '')
+    $services.localization.render("menu.uix.extensionPoint.value.$shortId")
+  #else
+    $services.localization.render('menu.uix.extensionPoint.value.nowhere')
+  #end
+#end
+##
+##
+#set ($discard = $services.localization.use('document', 'Menu.MenuTranslations'))
+#set ($discard = $doc.use('XWiki.UIExtensionClass'))
+#set ($uixObject = $doc.getObject('XWiki.UIExtensionClass'))
+#set ($selectedExtensionPointId = $uixObject.getProperty('extensionPointId').value)
+#if ($xcontext.action == 'edit')
+  #set ($discard = $xwiki.jsx.use('Menu.UIExtensionSheet'))
+  ## Prepare the extension point map.
+  #set ($menuPanel = "{{velocity}}
+    ${escapetool.h}panelheader(""$doc.plainTitle"")
+    {{menu type=""vertical collapsible open""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}
+    ${escapetool.h}panelfooter()
+    {{/velocity}}")
+  #set ($menuBar = "{{menu type=""horizontal fixedWidth""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}")
+  #set ($extensionPoints = {
+    'org.xwiki.platform.template.header.after': $menuBar,
+    'platform.panels.rightPanels': $menuPanel,
+    'platform.panels.leftPanels': $menuPanel
+  })
+  #set ($selectedContent = $uixObject.getProperty('content').value)
+  #if (("$!selectedExtensionPointId" != '' &amp;&amp; !$extensionPoints.containsKey($selectedExtensionPointId))
+    || ("$!selectedContent" != '' &amp;&amp; !$extensionPoints.containsValue($selectedContent)))
+    ## Either custom extension point or custom content for a known extension point.
+    #set ($discard = $extensionPoints.put($selectedExtensionPointId, $selectedContent))
+  #end
+#end
+(% class="xform" %)
+(((
+  ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_extensionPointId"&gt;{{translation key="menu.uix.extensionPoint.label"/}}&lt;/label&gt;{{/html}}##
+    (% class="xHint" %){{translation key="menu.uix.extensionPoint.hint"/}}
+  #if ($xcontext.action == 'edit')
+    : {{html}}&lt;select id="XWiki.UIExtensionClass_0_extensionPointId" name="XWiki.UIExtensionClass_0_extensionPointId"&gt;
+        &lt;option value=""&gt;$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option&gt;
+        #foreach ($extensionPointId in $extensionPoints.keySet())
+          #set ($selected = $extensionPointId == $selectedExtensionPointId)
+          &lt;option value="$extensionPointId"#if ($selected) selected="selected"#end&gt;
+            #displayExtensionPointTitle($extensionPointId)
+          &lt;/option&gt;
+        #end
+      &lt;/select&gt;{{/html}}
+  #else
+    : #displayExtensionPointTitle($selectedExtensionPointId)
+  #end
+  ##
+  ##
+  #if ($xcontext.action == 'edit')
+    ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_content"&gt;{{translation key="menu.uix.content.label"/}}&lt;/label&gt;{{/html}}##
+      (% class="xHint" %){{translation key="menu.uix.content.hint"/}}
+    : {{html}}&lt;select id="XWiki.UIExtensionClass_0_content" name="XWiki.UIExtensionClass_0_content"&gt;
+        &lt;option value=""&gt;$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option&gt;
+        #foreach ($entry in $extensionPoints.entrySet())
+          #set ($value = $escapetool.xml($entry.value).replaceAll("\r", '&amp;#13;').replaceAll("\n", '&amp;#10;'))
+          #set ($selected = $entry.value == $selectedContent)
+          &lt;option value="$value"#if ($selected) selected="selected"#end&gt;
+            #displayExtensionPointTitle($entry.key)
+          &lt;/option&gt;
+        #end
+      &lt;/select&gt;{{/html}}
+  #end
+  ##
+  ##
+  ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_scope"&gt;{{translation key="menu.uix.scope.label"/}}&lt;/label&gt;{{/html}}##
+    (% class="xHint" %){{translation key="menu.uix.scope.hint"/}}
+  : $doc.display('scope')
+)))
+
+#set ($discard = $doc.set('name', $doc.prefixedFullName))
+#if ($xcontext.action == 'edit')
+  (% class="hidden" %)(((
+    $doc.display('name', 'hidden')
+  )))
+#end
+{{/velocity}}</content>
+</xwikidoc>

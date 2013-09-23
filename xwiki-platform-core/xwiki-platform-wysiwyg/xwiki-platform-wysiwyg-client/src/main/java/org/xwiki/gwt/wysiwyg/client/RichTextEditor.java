@@ -20,12 +20,12 @@
 package org.xwiki.gwt.wysiwyg.client;
 
 import org.xwiki.gwt.user.client.ui.LoadingPanel;
-import org.xwiki.gwt.user.client.ui.MenuBar;
 import org.xwiki.gwt.user.client.ui.ToolBar;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.MenuBar;
 
 /**
  * The user interface of the WYSIWYG editor.
@@ -89,6 +89,7 @@ public class RichTextEditor extends Composite
     {
         if (menu == null) {
             menu = new MenuBar();
+            menu.setFocusOnHoverEnabled(false);
             ((FlowPanel) textArea.getParent()).insert(menu, 0);
         }
         return menu;

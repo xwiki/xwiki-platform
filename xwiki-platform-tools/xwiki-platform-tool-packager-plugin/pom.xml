@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -37,23 +37,196 @@
     as a Maven2 plugin or directly from the command line.
    </description>
   <properties>
-    <platform.core.version>2.6.1</platform.core.version>
+    <mavenVersion>3.0.5</mavenVersion>
   </properties>
   <dependencies>
+    <!-- Maven -->
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <version>2.0</version>
+      <artifactId>maven-core</artifactId>
+      <version>${mavenVersion}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.7</version>
+    </dependency>
+    <!-- Plexus -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-archiver</artifactId>
+      <version>2.3</version>
+    </dependency>
+    <!-- XWiki -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- Exclude LOG4J so that we use SLF4J's LOG4J JAR instead to have LOG4J logs go through SLF4J -->
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+        <!-- Exclude Servlet Environment since we want to run our code in a Standard Environment -->
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-environment-servlet</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <!-- By default we import/export using HSQLDB. We could have let users of this plugin define which version to use
+         but it makes it simpler to use the plugin to define it here as a default which can be overridden by users
+         of the plugin if they wishes. -->
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>${hsqldb.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <!-- Route LOG4J calls to SLF4J -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+    </dependency>
+    <!-- Make sure we provide a default implementation of SLF4J when executing this plugin -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We need the Servlet API dep since it's used by the Packager and since it has
+         a provided scope in XWiki core it's not inherited as part of transitive deps -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- These dependencies are needed at runtime when this plugin executes. We list them here to be sure that any
+         pom.xml that uses this packager plugin is built after those deps are built -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-colibri</artifactId>
       <version>${project.version}</version>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-configuration-resources</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-server</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <classifier>shared</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webdav-server</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-gwt-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-source-legacy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-bridge</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.smartgwt</groupId>
+      <artifactId>smartgwt</artifactId>
+      <version>${smartgwt.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We need to pick a URL implementation @ runtime -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-standard</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>
@@ -68,19 +241,17 @@
         <configuration>
           <excludes>
               **/ImportMojo.java,
-              **/ExportMojo.java
+              **/ExportMojo.java,
+              **/PackageMojo.java
           </excludes>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
         <configuration>
-          <!--
-            Note: This is to allow typing "mvn
-            xwiki-packager-plugin:[goalname]" without having to type the
-            fully qualified name on the command line
-          -->
-          <goalPrefix>xwiki-packager-plugin</goalPrefix>
+          <!-- This to allow calling mvn packager:<mojo> from the command line. For example mvn packager:package
+               Without this users would need to call mvn xwiki-platform-tool-packager-plugin:package -->
+          <goalPrefix>packager</goalPrefix>
         </configuration>
       </plugin>
     </plugins>
@@ -88,24 +259,26 @@
   <profiles>
     <profile>
       <id>integration-tests</id>
-      <activation>
-        <property>
-          <name>integration-tests</name>
-          <value>true</value>
-        </property>
-      </activation>
+      <!-- The integration tests use only the local maven repository (as specified by the dedicated settings.xml) and so
+        we have to make sure the required dependencies are present in the local maven repository by listing them here. -->
+      <dependencies>
+        <!-- Used by package-simple integration test -->
+        <dependency>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
+          <version>${commons.version}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.5</version>
             <configuration>
-              <projectsDirectory>src/it</projectsDirectory>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <pomIncludes>
-                <pomInclude>*/pom.xml</pomInclude>
-              </pomIncludes>
+              <settingsFile>src/it/settings.xml</settingsFile>
+              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <goals>
                 <goal>clean</goal>
                 <goal>package</goal>
@@ -121,6 +294,25 @@
                 </goals>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- The Packager plugin uses XWiki oldcore which gets Clovered and thus we need to have the Clover JAR in the
+         execution classpath of the plugin. Since that plugin is used in the integration tests we need to tell the
+         Maven Invoker plugin to execute the Maven projects using the Clover profile. -->
+    <profile>
+      <id>clover</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <configuration>
+              <profiles>
+                <profile>clover</profile>
+              </profiles>
+            </configuration>
           </plugin>
         </plugins>
       </build>

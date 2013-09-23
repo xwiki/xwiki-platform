@@ -32,31 +32,19 @@ public class Timer extends com.google.gwt.user.client.Timer implements SourcesTi
      */
     private final TimerListenerCollection timerListeners = new TimerListenerCollection();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesTimerEvents#addTimerListener(TimerListener)
-     */
+    @Override
     public void addTimerListener(TimerListener listener)
     {
         timerListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesTimerEvents#removeTimerListener(TimerListener)
-     */
+    @Override
     public void removeTimerListener(TimerListener listener)
     {
         timerListeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.Timer#run()
-     */
+    @Override
     public void run()
     {
         // notify all registered listeners

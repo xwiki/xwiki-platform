@@ -1,0 +1,49 @@
+##
+## Error message template for when an user accesses a wiki that does not exist.
+##
+## Note: If a behavior similar to the now deprecated "xwiki.virtual.redirect" configuration property is desired, it can
+## be achieved by commenting out the code below and using $response.sendRedirect("http://location.where/to/redirect")
+## instead. Some more detailed examples can be found at http://extensions.xwiki.org/xwiki/bin/view/Extension/Redirect
+##
+## Note2: While evaluating this template, the context database is the main wiki. This is important specially when
+## passing relative references.
+##
+## @since 5.0M2
+##
+$response.setStatus(404)
+##
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+## Remove unneeded UI elements
+#set ($displayQuickSearch = false)
+#set ($displayLanguageChoice = false)
+#set ($showLeftPanels = "0")
+#set ($showRightPanels = "0")
+## Show some basic UI
+#template("htmlheader.vm")
+#template("header.vm")
+<div class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end" id="contentcontainer">
+  <div id="contentcontainerinner">
+    <div class="leftsidecolumns">
+    #if($hidecolumns && ($!hidecolumns == 1))
+      <div id="contentcolumn" class="contenthidelefthideright">
+    #else
+      <div id="contentcolumn"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
+    #end
+      ##
+      ## Display the standard error message or the custom XWiki.WikiDoesNotExist page from the main wiki
+      ##
+      <div class='main layoutsubsection'>
+        <div id='mainContentArea'>
+          ## Allow the wiki admin to specify a custom wiki error page in the main wiki
+          #if ($xwiki.exists('XWiki.WikiDoesNotExist'))
+            $xwiki.includeForm('XWiki.WikiDoesNotExist', false)
+          #else
+            ## If no such page exists, display the standard message instead
+            #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thiswikidoesnotexist'))
+            #xwikimessageboxend()
+          #end
+          <div class="clearfloats"></div>
+        </div>## mainContentArea
+      </div>## main
+#template('endpage.vm')

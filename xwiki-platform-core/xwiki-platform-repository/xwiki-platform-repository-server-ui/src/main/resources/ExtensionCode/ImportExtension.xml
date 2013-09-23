@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>ExtensionCode</web>
+  <name>ImportExtension</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Extension.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1326441833000</creationDate>
+  <date>1329914769000</date>
+  <contentUpdateDate>1329914769000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Import Extension</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="ExtensionCode.RepositoryCode"/}}
+
+Imports an Extension coming from another Extension Repository into the current wiki.
+
+This feature is useful for the following use cases:
+* Adding full documentation for an Extension.
+* Allowing to search for an Extension for Extensions located in an Extension Repository not supporting searching.
+* Creating an Extension Repository containing a hand-picked selection of Extensions.
+
+{{info}}
+If an Extension already exists with the provided id in the current wiki then the Extension will be updated instead of being created.
+{{/info}}
+
+{{velocity}}
+#if ($request.importExtension == 'true')
+  #set($extensionDocumentReference = $repositoryManager.importExtension($request.extensionId, $request.repositoryId))
+  #if (!$extensionDocumentReference)
+    {{error}}Failed to import extension: #printThrowable($repositoryManager.lastError){{/error}}
+  #else
+    {{success}}Redirect to $response.sendRedirect($xwiki.getURL($extensionDocumentReference)){{/success}}
+  #end
+#else
+  {{html}}
+    #if ($isGuest)
+      You need first to &lt;a href="${escapetool.xml($xwiki.getURL("Main.WebHome", "login", "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+    #else
+    &lt;form action="" id="importextension"&gt;
+      &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
+      &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
+      &lt;input type="hidden" name="importExtension" value="true" /&gt;
+      &lt;input class="withTip" type="text" name="extensionId" value="extension id..."  size="25" id="importExtensionIdInput"/&gt;
+      &lt;select name="repositoryId" id="importRepositoryIdInput"&gt;
+        #foreach($repository in $extensionManager.repositories)
+          #if ($repository.id.type != 'xwiki')
+            &lt;option value="$escapetool.xml($repository.id.id)"&gt;$escapetool.html($repository.id.id)&lt;/option&gt;
+          #end
+        #end
+      &lt;/select&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input class="button" type="submit" value="Import" id="importSubmit"/&gt;
+      &lt;/span&gt;
+    &lt;/form&gt;
+    #end
+  {{/html}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

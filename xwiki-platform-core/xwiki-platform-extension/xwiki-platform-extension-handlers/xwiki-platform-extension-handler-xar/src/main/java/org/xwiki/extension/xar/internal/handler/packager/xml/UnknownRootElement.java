@@ -21,6 +21,11 @@ package org.xwiki.extension.xar.internal.handler.packager.xml;
 
 import org.xml.sax.SAXException;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class UnknownRootElement extends SAXException
 {
     public UnknownRootElement(String elementName)

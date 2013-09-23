@@ -8,7 +8,7 @@
   #set ($sql = "where doc.name like ? order by doc.date desc")
   #set ($params = ["%${page}%"])
 #end
-<p><strong>$msg.get('listofresultspages'): </strong></p>
+<p><strong>$services.localization.render('listofresultspages'):</strong></p>
 <div class="panel_result">
 #set ($documents = $xwiki.searchDocuments($sql, 50, 0, ${params}))
 #if ($documents.size() > 0)
@@ -22,13 +22,13 @@
       #set ($itemSpace = $escapetool.xml($escapetool.javascript($bentrydoc.space)))
       #set ($itemName = $escapetool.xml($escapetool.javascript($bentrydoc.name)))
       <a href="#" onclick="document.forms[0].wiki_page.value='$itemName';if ('$currentSpaceEscaped' != '$itemSpace') document.forms[0].wiki_space.value='$itemSpace'; else document.forms[0].wiki_space.value=''; return false;">
-      $escapetool.xml($bentrydoc.name)</a>  $msg.get('lastmodifiedby')  $xwiki.getUserName($bentrydoc.author) $msg.get('lastmodifiedon') $xwiki.formatDate($bentrydoc.date, 'MMMM dd, yyyy HH:mm')
+      $escapetool.xml($bentrydoc.name)</a>  $services.localization.render('lastmodifiedby')  $xwiki.getUserName($bentrydoc.author) $services.localization.render('lastmodifiedon') $xwiki.formatDate($bentrydoc.date, 'MMMM dd, yyyy HH:mm')
       </li>
     #end
   #end
   </ul>
 #else
-  $msg.get('nopagesatthemoment')
+  $services.localization.render('nopagesatthemoment')
 #end
 </div>## panel_result
 </div>## xwikidatacontent

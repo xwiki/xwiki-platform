@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.observation.remote.test;
 
@@ -36,21 +35,12 @@ public class TestEvent implements Event, Serializable
      */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
-     */
+    @Override
     public boolean matches(Object otherEvent)
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {

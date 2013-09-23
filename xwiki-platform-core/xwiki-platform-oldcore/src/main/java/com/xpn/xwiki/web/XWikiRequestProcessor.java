@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -25,31 +24,26 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xpn.xwiki.internal.web.XWikiConfigurationService;
 
 /**
- * 
  * @version $Id$
  */
 public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor
 {
-    protected static final Log LOG = LogFactory.getLog(XWikiRequestProcessor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiRequestProcessor.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.struts.action.RequestProcessor#processPath(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
-     */
     @Override
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws IOException
     {
         String result = super.processPath(httpServletRequest, httpServletResponse);
 
-        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "0", getServletContext()))) {
+        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "1", getServletContext()))) {
             // Remove /wikiname part if the struts action is /wiki
             if (httpServletRequest.getServletPath().equals(
                 "/"

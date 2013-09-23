@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
@@ -26,21 +24,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class StaticListClass extends ListClass
 {
+    private static final String XCLASSNAME = "staticlist";
 
     public StaticListClass(PropertyMetaClass wclass)
     {
-        super("staticlist", "Static List", wclass);
+        super(XCLASSNAME, "Static List", wclass);
         setSeparators(" ,|");
     }
 
@@ -96,9 +96,10 @@ public class StaticListClass extends ListClass
     {
         if (getDisplayType().equals("input")) {
             input input = new input();
+            input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
-                input.setValue(prop.toFormString());
+                input.setValue(prop.toText());
             }
             input.setType("text");
             input.setSize(getSize());
@@ -117,8 +118,8 @@ public class StaticListClass extends ListClass
                 String secondCol = "-", firstCol = "-";
 
                 String script =
-                    "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
-                    + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
+                    "\"" + path + "?xpage=suggest&classname=" + classname + "&fieldname=" + fieldname + "&firCol="
+                        + firstCol + "&secCol=" + secondCol + "&\"";
                 String varname = "\"input\"";
                 String seps = "\"" + this.getSeparators() + "\"";
                 if (isMultiSelect()) {
@@ -135,10 +136,11 @@ public class StaticListClass extends ListClass
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);
-        }
 
-        if (!getDisplayType().equals("input")) {
+            // We need a hidden input with an empty value to be able to clear the selected values from the above select
+            // when it has multiple selection enabled and no value selected.
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            hidden.setAttributeFilter(new XMLAttributeValueFilter());
             hidden.setDisabled(isDisabled());
             buffer.append(hidden);
         }

@@ -19,14 +19,14 @@
  */
 package org.xwiki.wysiwyg.server;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * WYSIWYG editor configuration properties.
  * 
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface WysiwygEditorConfiguration
 {
     /**
@@ -94,4 +94,15 @@ public interface WysiwygEditorConfiguration
      * @return the list of style names available in the style picker
      */
     String getStyleNames();
+
+    /**
+     * @return the maximum number of history entries that will be stored
+     */
+    Integer getHistorySize();
+
+    /**
+     * @return {@code true} if the content pasted into the rich text area should be cleaned automatically, {@code false}
+     *         otherwise (the user can trigger the clean manually using the tool bar icon)
+     */
+    Boolean isPasteContentCleanedAutomatically();
 }

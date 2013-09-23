@@ -28,11 +28,6 @@ import org.xwiki.gwt.dom.client.IFrameElement;
  */
 public class ReloaderImplOpera extends ReloaderImpl
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ReloaderImpl#unloadIFrameElement(IFrameElement)
-     */
     @Override
     public void unloadIFrameElement(IFrameElement iFrame)
     {

@@ -27,11 +27,7 @@ import org.xwiki.annotation.maintainer.XDelta;
  */
 public abstract class AbstractXDelta implements XDelta
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.XDelta#getSignedDelta()
-     */
+    @Override
     public int getSignedDelta()
     {
         return getChanged().length() - getOriginal().length();

@@ -16,17 +16,14 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author jeremi
  */
 package com.xpn.xwiki.gwt.api.client;
 
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Window;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 
 
 public class DOMUtils {

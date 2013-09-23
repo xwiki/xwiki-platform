@@ -19,11 +19,9 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
-import java.text.MessageFormat;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -61,19 +59,14 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
     /**
      * The logger for this class.
      */
-    private static final Log LOG = LogFactory.getLog(AppServerTrustedKerberosAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppServerTrustedKerberosAuthServiceImpl.class);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#checkAuth(com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         String user = context.getRequest().getRemoteUser();
 
-        LOG.debug(MessageFormat.format("Checking auth for remote user {0}", user));
+        LOGGER.debug("Checking auth for remote user [{}]", user);
 
         if (StringUtils.isBlank(user)) {
             return super.checkAuth(context);
@@ -87,12 +80,6 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
         return new XWikiUser(user);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#checkAuth(java.lang.String, java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
@@ -109,7 +96,7 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
     private String extractUsernameFromPrincipal(final String principal)
     {
         String username = principal;
-        
+
         // Clears the Kerberos principal, by removing the domain part, to retain only the user name of the
         // authenticated remote user.
         if (username.contains(ANTI_SLASH)) {

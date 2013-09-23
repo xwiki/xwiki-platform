@@ -22,19 +22,16 @@ package com.xpn.xwiki.plugin.watchlist;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.ServletException;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -59,7 +56,7 @@ public class WatchListJob extends AbstractJob implements Job
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(WatchListPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListPlugin.class);
 
     /**
      * Scheduler Job XObject.
@@ -91,39 +88,35 @@ public class WatchListJob extends AbstractJob implements Job
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
         // clone the context to make sure we have a new one per run
-        this.context = (XWikiContext) ((XWikiContext) data.get("context")).clone();
+        this.context =  ((XWikiContext) data.get("context")).clone();
         // clean up the database connections
         this.context.getWiki().getStore().cleanUp(this.context);
         this.plugin = (WatchListPlugin) this.context.getWiki().getPlugin(WatchListPlugin.ID, this.context);
         this.schedulerJobObject = (BaseObject) data.get("xjob");
         this.watchListJobObject =
-            this.context.getWiki().getDocument(this.schedulerJobObject.getName(), this.context).getObject(
-                WatchListJobManager.WATCHLIST_JOB_CLASS);
+            this.context.getWiki().getDocument(this.schedulerJobObject.getName(), this.context)
+                .getObject(WatchListJobManager.WATCHLIST_JOB_CLASS);
         initializeComponents(this.context);
     }
 
     /**
      * Initialize container context.
      * 
-     * @param context The XWiki context.
-     * @throws ServletException If the container initialization fails.
+     * @param xcontext the XWiki context
+     * @throws Exception if the execution context initialization fails
      */
-    protected void initializeComponents(XWikiContext context) throws ServletException
+    protected void initializeComponents(XWikiContext xcontext) throws Exception
     {
-        // Initialize the Container fields (request, response, session).
-        // Note that this is a bridge between the old core and the component architecture.
-        // In the new component architecture we use ThreadLocal to transport the request,
-        // response and session to components which require them.
-        // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
-        ServletContainerInitializer containerInitializer =
-            Utils.getComponent(ServletContainerInitializer.class);
-
         try {
-            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
-            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
-        } catch (ServletContainerException e) {
-            throw new ServletException("Failed to initialize Request/Response or Session", e);
+            ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+            ExecutionContext econtext = new ExecutionContext();
+
+            // Bridge with old XWiki Context, required for old code.
+            xcontext.declareInExecutionContext(econtext);
+
+            ecim.initialize(econtext);
+        } catch (Exception e) {
+            throw new Exception("Failed to initialize Execution Context", e);
         }
     }
 
@@ -132,14 +125,10 @@ public class WatchListJob extends AbstractJob implements Job
      */
     protected void cleanupComponents()
     {
-        Container container = Utils.getComponent(Container.class);
         Execution execution = Utils.getComponent(Execution.class);
 
-        // We must ensure we clean the ThreadLocal variables located in the Container and Execution
-        // components as otherwise we will have a potential memory leak.
-        container.removeRequest();
-        container.removeResponse();
-        container.removeSession();
+        // We must ensure we clean the ThreadLocal variables located in the Execution component as otherwise we will
+        // have a potential memory leak.
         execution.removeContext();
     }
 
@@ -253,28 +242,31 @@ public class WatchListJob extends AbstractJob implements Job
             }
 
             for (String subscriber : subscribers) {
-                List<String> wikis =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.WIKI, this.context);
-                List<String> spaces =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
-                List<String> documents =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
-                List<String> users =
-                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
-                List<WatchListEvent> matchingEvents =
-                    eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
-                String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
+                try {
+                    List<String> wikis =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.WIKI, this.context);
+                    List<String> spaces =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
+                    List<String> documents =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
+                    List<String> users =
+                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
+                    List<WatchListEvent> matchingEvents =
+                        eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
+                    String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
 
-                // If events have occurred on at least one element watched by the user, send the email
-                if (matchingEvents.size() > 0) {
-                    this.plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents,
-                        getEmailTemplate(userWiki), previousFireTime, this.context);
+                    // If events have occurred on at least one element watched by the user, send the email
+                    if (matchingEvents.size() > 0) {
+                        this.plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents,
+                            getEmailTemplate(userWiki), previousFireTime, this.context);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Failed to send watchlist notification to user [{}]", subscriber, e);
                 }
             }
         } catch (Exception e) {
             // We're in a job, we don't throw exceptions
-            LOG.error("Exception while running job", e);
-            e.printStackTrace();
+            LOGGER.error("Exception while running job", e);
         } finally {
             this.context.getWiki().getStore().cleanUp(this.context);
             cleanupComponents();

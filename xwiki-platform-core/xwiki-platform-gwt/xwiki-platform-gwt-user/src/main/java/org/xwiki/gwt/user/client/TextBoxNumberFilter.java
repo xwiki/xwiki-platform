@@ -37,11 +37,7 @@ public class TextBoxNumberFilter implements KeyPressHandler
      */
     private static final List<Integer> SPECIAL_KEY_CODES = Arrays.asList(KeyCodes.KEY_BACKSPACE, KeyCodes.KEY_TAB);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         int keyCode = event.getNativeEvent().getKeyCode();

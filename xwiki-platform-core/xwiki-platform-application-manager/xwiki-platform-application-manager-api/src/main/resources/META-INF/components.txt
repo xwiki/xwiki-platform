@@ -1,0 +1,2 @@
+com.xpn.xwiki.plugin.applicationmanager.internal.ApplicationManagerScriptService
+com.xpn.xwiki.plugin.applicationmanager.internal.ApplicationManagerListener

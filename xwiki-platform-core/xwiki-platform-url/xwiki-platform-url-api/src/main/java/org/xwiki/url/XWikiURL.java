@@ -16,18 +16,20 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.url;
 
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Represents a XWiki URL.
  *
  * @version $Id$
  */
+@Unstable
 public interface XWikiURL
 {
     /**

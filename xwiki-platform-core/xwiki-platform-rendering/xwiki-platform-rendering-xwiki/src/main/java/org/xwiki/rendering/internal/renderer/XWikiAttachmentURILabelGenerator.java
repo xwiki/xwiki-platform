@@ -19,8 +19,11 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -32,21 +35,23 @@ import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
  * @version $Id$
  * @since 2.5RC1
  */
-@Component("attach")
+@Component
+@Named("attach")
+@Singleton
 public class XWikiAttachmentURILabelGenerator implements URILabelGenerator
 {
     /**
      * Used to extract the attachment name part in an Attachment reference.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.reference.link.URILabelGenerator#generateLabel(
-     *org.xwiki.rendering.listener.reference.ResourceReference)
      * @since 2.5RC1
      */
+    @Override
     public String generateLabel(ResourceReference reference)
     {
         AttachmentReference attachmentReference =

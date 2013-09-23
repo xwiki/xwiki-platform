@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.classes;
 
@@ -39,6 +38,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
 {
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -56,6 +56,7 @@ public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
         mockXWikiRenderingEngine.stubs().method("interpretText").will(
             new CustomStub("Implements XWikiRenderingEngine.interpretText")
             {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     return invocation.parameterValues.get(0);

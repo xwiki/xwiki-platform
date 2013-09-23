@@ -25,24 +25,6 @@ package org.xwiki.rest;
 public class Constants
 {
     /**
-     * The key used to store the XWiki component manager in the current Restlet context.
-     */
-    public static final String XWIKI_COMPONENT_MANAGER = "xwikiComponentManager";
-
-    /**
-     * The key used to store the list of components that have to be released in the current Restlet context.
-     */
-    public static final String RELEASABLE_COMPONENT_REFERENCES = "currentComponentReference";
-
-    /**
-     * The key used to store allowed values for an object property in an XWiki object representation.
-     * 
-     * @see DomainObjectFactory#createObject(org.xwiki.rest.model.jaxb.ObjectFactory, java.net.URI,
-     *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.api.Document, com.xpn.xwiki.objects.BaseObject, boolean)
-     */
-    public static final String ALLOWED_VALUES_ATTRIBUTE_NAME = "allowedValues";
-
-    /**
      * The key used to store the current HTTP request object in the current Restlet context.
      */
     public static final String HTTP_REQUEST = "httpRequest";

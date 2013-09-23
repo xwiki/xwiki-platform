@@ -16,20 +16,23 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -41,7 +44,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 2.0M4
  */
-@Component("action")
+@Component
+@Singleton
+@Named("action")
 public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
 {
     /**
@@ -54,16 +59,11 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
         }
     };
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.LocalEventConverter#toRemote(org.xwiki.observation.remote.LocalEventData,
-     *      org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (localEvent.getEvent() instanceof ActionExecutionEvent) {
-            ActionExecutionEvent event = (ActionExecutionEvent) localEvent.getEvent();
+        if (localEvent.getEvent() instanceof ActionExecutedEvent) {
+            ActionExecutedEvent event = (ActionExecutedEvent) localEvent.getEvent();
 
             if (this.actions.contains(event.getActionName())) {
                 // fill the remote event
@@ -78,22 +78,21 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.RemoteEventConverter#fromRemote(org.xwiki.observation.remote.RemoteEventData,
-     *      org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (remoteEvent.getEvent() instanceof ActionExecutionEvent) {
+        if (remoteEvent.getEvent() instanceof ActionExecutedEvent) {
             // fill the local event
-            XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
+            XWikiContext xcontext = unserializeXWikiContext(remoteEvent.getData());
 
-            if (context != null) {
-                localEvent.setEvent((Event) remoteEvent.getEvent());
-                localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
-                localEvent.setData(unserializeXWikiContext(remoteEvent.getData()));
+            try {
+                if (xcontext != null) {
+                    localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
+                    localEvent.setData(xcontext);
+                    localEvent.setEvent((Event) remoteEvent.getEvent());
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to convert remote event [{}]", remoteEvent, e);
             }
 
             return true;

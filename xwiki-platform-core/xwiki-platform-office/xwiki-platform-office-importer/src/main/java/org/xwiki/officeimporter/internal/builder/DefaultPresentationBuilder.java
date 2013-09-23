@@ -27,22 +27,26 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -56,51 +60,52 @@ import org.xwiki.xml.html.HTMLUtils;
  * @since 2.1M1
  */
 @Component
+@Singleton
 public class DefaultPresentationBuilder implements PresentationBuilder
 {
     /**
      * Component manager used by {@link XDOMOfficeDocument}.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * Used to obtain document converter.
      */
-    @Requirement
-    private OpenOfficeManager officeManager;
+    @Inject
+    private OfficeServer officeServer;
 
     /**
      * Used to access current context document.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to serialize the reference document name.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * OpenOffice HTML cleaner.
+     * Office HTML cleaner.
      */
-    @Requirement("openoffice")
-    private HTMLCleaner ooHTMLCleaner;
+    @Inject
+    @Named("openoffice")
+    private HTMLCleaner officeHTMLCleaner;
 
     /**
      * The component used to parse the XHTML obtained after cleaning.
      */
-    @Requirement("xhtml/1.0")
+    @Inject
+    @Named("xhtml/1.0")
     private Parser xhtmlParser;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName,
         DocumentReference documentReference) throws OfficeImporterException
     {
-        // Invoke OpenOffice document converter.
+        // Invoke the office document converter.
         Map<String, byte[]> artifacts = importPresentation(officeFileStream, officeFileName);
 
         // Create presentation HTML.
@@ -112,7 +117,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         // Create the XDOM.
         XDOM xdom = buildPresentationXDOM(html, documentReference);
 
-        return new XDOMOfficeDocument(xdom, artifacts, componentManager);
+        return new XDOMOfficeDocument(xdom, artifacts, this.componentManager);
     }
 
     /**
@@ -130,13 +135,13 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(officeFileName, officeFileStream);
         try {
-            // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
+            // The office converter uses the output file name extension to determine the output format/syntax.
             // The returned artifacts are of three types: imgX.jpg (slide screen shot), imgX.html (HTML page that
             // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
             // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
             // artifact displays a screen shot of the first presentation slide.
-            return officeManager.getConverter().convert(inputStreams, officeFileName, "img0.html");
-        } catch (OpenOfficeConverterException e) {
+            return this.officeServer.getConverter().convert(inputStreams, officeFileName, "img0.html");
+        } catch (OfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), e);
         }
@@ -199,10 +204,10 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     protected String cleanPresentationHTML(String dirtyHTML, DocumentReference targetDocumentReference)
     {
-        HTMLCleanerConfiguration configuration = ooHTMLCleaner.getDefaultConfiguration();
-        configuration.setParameters(Collections.singletonMap("targetDocument", entityReferenceSerializer
-            .serialize(targetDocumentReference)));
-        Document xhtmlDocument = ooHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument",
+            this.entityReferenceSerializer.serialize(targetDocumentReference)));
+        Document xhtmlDocument = this.officeHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
         HTMLUtils.stripHTMLEnvelope(xhtmlDocument);
         return HTMLUtils.toString(xhtmlDocument);
     }
@@ -212,7 +217,8 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * 
      * @param html the HTML text to parse
      * @param targetDocumentReference specifies the document where the presentation will be imported; we use the target
-     *            document reference to get the syntax of the target document;
+     *            document reference to get the syntax of the target document and to set the {@code BASE} meta data on
+     *            the created XDOM
      * @return a XDOM tree
      * @throws OfficeImporterException if parsing the given HTML fails
      */
@@ -220,14 +226,17 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         throws OfficeImporterException
     {
         try {
-            String syntaxId = documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
-            BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, syntaxId);
+            String syntaxId = this.documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, syntaxId);
 
             Map<String, String> galleryParameters = Collections.emptyMap();
             ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", galleryParameters, renderer, false);
-            gallery.addChildren(xhtmlParser.parse(new StringReader(html)).getChildren());
+            gallery.addChild(this.xhtmlParser.parse(new StringReader(html)));
 
-            return new XDOM(Collections.singletonList((Block) gallery));
+            XDOM xdom = new XDOM(Collections.singletonList((Block) gallery));
+            // Make sure (image) references are resolved relative to the target document reference.
+            xdom.getMetaData().addMetaData(MetaData.BASE, entityReferenceSerializer.serialize(targetDocumentReference));
+            return xdom;
         } catch (Exception e) {
             throw new OfficeImporterException("Failed to build presentation XDOM.", e);
         }

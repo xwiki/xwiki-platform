@@ -1,24 +1,24 @@
 #if(!$xwiki.hasAccessLevel('view', 'XWiki.Registration') || $xwiki.getDocument('XWiki.Registration').isNew())
   ## Display the static content included in this template, as there's no override in the wiki
-  <h1>$msg.get('core.register.title')</h1>
+  <h1>$services.localization.render('core.register.title')</h1>
   #if(!$reg || $reg < 0)
-    <p>$msg.get('core.register.welcome')</p>
+    <p>$services.localization.render('core.register.welcome')</p>
   #end
   #if($reg && $reg <= 0)
     #if($reg == -2)
-      #error($msg.get('core.register.passwordMismatch'))
+      #error($services.localization.render('core.register.passwordMismatch'))
     #elseif($reg == -3)
-      #error($msg.get('core.register.userAlreadyExists'))
+      #error($services.localization.render('core.register.userAlreadyExists'))
     #elseif($reg == -4)
-      #error($msg.get('core.register.invalidUsername'))
+      #error($services.localization.render('core.register.invalidUsername'))
     #elseif($reg == -8)
-      #error($msg.get('core.register.userAlreadyExists'))
+      #error($services.localization.render('core.register.userAlreadyExists'))
     #else
-      #error($msg.get('core.register.registerFailed', [$reg]))
+      #error($services.localization.render('core.register.registerFailed', [$reg]))
     #end
   #elseif($reg)
     #set($xwname = "XWiki.${request.xwikiname}")
-    #info($msg.get('core.register.successful', [$xwiki.getUserName($xwname), ${escapetool.xml($request.xwikiname)}]))
+    #info($services.localization.render('core.register.successful', [$xwiki.getUserName($xwname), ${escapetool.xml($request.xwikiname)}]))
   #end
   #if(!$reg || $reg < 0)
     <form id="register" action="" method="post" class="xform third">
@@ -40,29 +40,29 @@
         #end
         <dl>
           #set($prop = $class.first_name)
-          <dt><label for="register_${prop.name}">$msg.get('core.register.firstName')</label></dt>
+          <dt><label for="register_${prop.name}">$services.localization.render('core.register.firstName')</label></dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
 
           #set($prop = $class.last_name)
-          <dt><label for="register_${prop.name}">$msg.get('core.register.lastName')</label></dt>
+          <dt><label for="register_${prop.name}">$services.localization.render('core.register.lastName')</label></dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
 
-          <dt><label for="register_username">$msg.get('core.register.username') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>
+          <dt><label for="register_username">$services.localization.render('core.register.username') <span class="xRequired">$services.localization.render('core.validation.required')</span></label></dt>
           <dd><input name="xwikiname" id="register_username" type="text" size="20" onfocus="prepareName(document.forms.register);" /></dd>
 
           #set($prop = $class.password)
-          <dt><label for="register_${prop.name}">$msg.get('core.register.password') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
+          <dt><label for="register_${prop.name}">$services.localization.render('core.register.password') <span class="xRequired">$services.localization.render('core.validation.required')</span></label></dt>
+          <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
 
-          <dt><label for="register2_${prop.name}">$msg.get('core.register.passwordRepeat') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>
-          <dd>$doc.displayEdit($prop, 'register2_',  $obj)</dd>
+          <dt><label for="register2_${prop.name}">$services.localization.render('core.register.passwordRepeat') <span class="xRequired">$services.localization.render('core.validation.required')</span></label></dt>
+          <dd>$doc.displayEdit($prop, 'register2_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
 
           #set($prop = $class.email)
-          <dt><label for="register_${prop.name}">$msg.get('core.register.email')</label></dt>
+          <dt><label for="register_${prop.name}">$services.localization.render('core.register.email')</label></dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
         </dl>
       </div>
-      <div class="buttons"><span class="buttonwrapper"><input type="submit" value="$msg.get('core.register.submit')" class="button"/></span></div>
+      <div class="buttons"><span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.register.submit')" class="button"/></span></div>
     </form>
   #end
 #else

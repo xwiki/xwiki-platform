@@ -31,7 +31,6 @@ public class NativeActionHandler implements ActionHandler
     /**
      * The JavaScript function that is called whenever this action handler is executed.
      */
-    @SuppressWarnings("unused")
     private final JavaScriptObject jsHandler;
 
     /**
@@ -44,11 +43,7 @@ public class NativeActionHandler implements ActionHandler
         this.jsHandler = jsHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ActionHandler#onAction(ActionEvent)
-     */
+    @Override
     public native void onAction(ActionEvent event)
     /*-{
         var jsHandler = this.@org.xwiki.gwt.user.client.NativeActionHandler::jsHandler;

@@ -16,23 +16,16 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.observation.remote.test;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.junit.Before;
+import org.junit.Rule;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkAdapter;
-import org.xwiki.test.MockConfigurationSource;
-import org.xwiki.test.XWikiComponentInitializer;
+import org.xwiki.test.internal.MockConfigurationSource;
+import org.xwiki.test.jmock.JMockRule;
+import org.xwiki.test.jmock.XWikiComponentInitializer;
 
 /**
  * Base class to easily emulate two instances of observation manager communicate with each other by network.
@@ -41,6 +34,9 @@ import org.xwiki.test.XWikiComponentInitializer;
  */
 public abstract class AbstractROMTestCase
 {
+    @Rule
+    public final JMockRule mockery = new JMockRule();
+
     private XWikiComponentInitializer initializer1 = new XWikiComponentInitializer();
 
     private XWikiComponentInitializer initializer2 = new XWikiComponentInitializer();
@@ -58,33 +54,11 @@ public abstract class AbstractROMTestCase
         this.initializer2.initializeConfigurationSource();
         this.initializer2.initializeExecution();
 
-        ApplicationContext applicationContext = new ApplicationContext()
-        {
-            public File getTemporaryDirectory()
-            {
-                throw new RuntimeException("Not implemented");
-            }
-
-            public InputStream getResourceAsStream(String resourceName)
-            {
-                return this.getClass().getClassLoader().getResourceAsStream(
-                    resourceName.substring(("/WEB-INF/" + JGroupsNetworkAdapter.CONFIGURATION_PATH).length()));
-            }
-
-            public URL getResource(String resourceName) throws MalformedURLException
-            {
-                throw new RuntimeException("Not implemented");
-            }
-        };
-
-        getComponentManager1().lookup(Container.class).setApplicationContext(applicationContext);
-        getComponentManager2().lookup(Container.class).setApplicationContext(applicationContext);
-
         getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
         getConfigurationSource2().setProperty("observation.remote.enabled", Boolean.TRUE);
 
-        this.observationManager1 = getComponentManager1().lookup(ObservationManager.class);
-        this.observationManager2 = getComponentManager2().lookup(ObservationManager.class);
+        this.observationManager1 = getComponentManager1().getInstance(ObservationManager.class);
+        this.observationManager2 = getComponentManager2().getInstance(ObservationManager.class);
     }
 
     public EmbeddableComponentManager getComponentManager1() throws Exception

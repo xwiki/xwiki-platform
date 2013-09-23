@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -30,23 +33,23 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
  * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
  * defined in {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
- *
+ * 
  * @version $Id$
  * @since 2.2M1
  */
-@Component("current")
+@Component
+@Named("current")
+@Singleton
 public class CurrentStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private EntityReferenceResolver<String> entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
-     */
+    @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
-        return new DocumentReference(this.entityReferenceResolver.resolve(
-            documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
+        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
+            EntityType.DOCUMENT, parameters));
     }
 }

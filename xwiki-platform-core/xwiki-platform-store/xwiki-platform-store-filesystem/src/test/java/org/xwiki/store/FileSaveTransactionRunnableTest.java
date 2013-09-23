@@ -21,18 +21,17 @@ package org.xwiki.store;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * Tests for FileDeleteTransactionRunnable
@@ -42,7 +41,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class FileSaveTransactionRunnableTest
 {
-    private static final String[] FILE_PATH = {"path", "to", "file"};
+    private static final String[] FILE_PATH = { "path", "to", "file" };
 
     private File storageLocation;
 
@@ -78,7 +77,8 @@ public class FileSaveTransactionRunnableTest
 
         this.lock = new ReentrantReadWriteLock();
 
-        this.provider = new StreamProvider() {
+        this.provider = new StreamProvider()
+        {
             public InputStream getStream()
             {
                 return new ByteArrayInputStream("Version2".getBytes());
@@ -86,10 +86,10 @@ public class FileSaveTransactionRunnableTest
         };
 
         this.runnable = new FileSaveTransactionRunnable(this.toSave,
-                                                        this.temp,
-                                                        this.backup,
-                                                        this.lock,
-                                                        this.provider);
+            this.temp,
+            this.backup,
+            this.lock,
+            this.provider);
     }
 
     @After
@@ -116,7 +116,8 @@ public class FileSaveTransactionRunnableTest
         Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
 
         // After preRun(), before run.
-        final TransactionRunnable failRunnable = new TransactionRunnable() {
+        final TransactionRunnable failRunnable = new TransactionRunnable()
+        {
             public void onRun() throws Exception
             {
                 Assert.assertFalse("Temp file was not cleared in preRun.", temp.exists());
@@ -138,7 +139,8 @@ public class FileSaveTransactionRunnableTest
         Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
 
         // After run() before onCommit()
-        final TransactionRunnable failRunnable = new TransactionRunnable() {
+        final TransactionRunnable failRunnable = new TransactionRunnable()
+        {
             public void onRun() throws Exception
             {
                 Assert.assertTrue("Content was not saved to temp file.", temp.exists());
@@ -166,13 +168,14 @@ public class FileSaveTransactionRunnableTest
         Assert.assertFalse(this.backup.exists());
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void rollbackWithNonexistantOriginalTest() throws Exception
     {
         this.toSave.delete();
         Assert.assertFalse(this.toSave.exists());
 
-        final TransactionRunnable failRunnable = new TransactionRunnable() {
+        final TransactionRunnable failRunnable = new TransactionRunnable()
+        {
             public void onRun() throws Exception
             {
                 Assert.assertFalse(backup.exists());
@@ -199,7 +202,8 @@ public class FileSaveTransactionRunnableTest
         try {
             tr.start();
             Assert.fail("TransactionRunnable#start() did not throw the exception thrown by run.");
-        } catch (Exception e) { }
+        } catch (Exception expected) {
+        }
         Assert.assertTrue(this.toSave.exists());
         Assert.assertEquals(IOUtils.toString(new FileInputStream(this.toSave)), "Version1");
         Assert.assertFalse(this.temp.exists());

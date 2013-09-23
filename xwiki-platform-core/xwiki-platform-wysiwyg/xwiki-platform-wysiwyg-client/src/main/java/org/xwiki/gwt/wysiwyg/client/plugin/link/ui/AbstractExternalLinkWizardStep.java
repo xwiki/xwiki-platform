@@ -21,8 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
@@ -34,7 +33,6 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Wizard step to collect the data about an external link (e.g. http: or mailto:). Extends the default link
@@ -53,11 +51,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
      * The label to display the url label for the created link.
      */
     private final Label urlErrorLabel = new Label();
-
-    /**
-     * The main panel of this wizard step.
-     */
-    private FlowPanel mainPanel;
 
     /**
      * Creates a new wizard step for configuring links to external entities.
@@ -85,9 +78,8 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
 
         getLabelTextBox().setTitle(getLabelTextBoxTooltip());
 
-        mainPanel = new FlowPanel();
-        mainPanel.removeStyleName(DEFAULT_STYLE_NAME);
-        mainPanel.addStyleName("xLinkToUrl");
+        display().removeStyleName(DEFAULT_STYLE_NAME);
+        display().addStyleName("xLinkToUrl");
 
         FlowPanel urlPanel = new FlowPanel();
         urlPanel.addStyleName("url");
@@ -96,20 +88,17 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         urlPanel.add(urlErrorLabel);
         urlPanel.add(urlTextBox);
 
-        mainPanel.add(urlPanel);
-        mainPanel.add(getMainPanel());
+        display().insert(urlPanel, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(Object data, final AsyncCallback< ? > cb)
     {
         super.init(data, new AsyncCallback<Boolean>()
         {
             public void onSuccess(Boolean result)
             {
-                urlTextBox.setText(getData().getData().getUrl());
+                setURL(getData().getData().getUrl());
                 cb.onSuccess(null);
             }
 
@@ -120,9 +109,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setFocus()
     {
@@ -132,17 +118,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         Scheduler.get().scheduleDeferred(new FocusCommand(focusable));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return mainPanel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean validateForm()
     {
@@ -156,31 +131,17 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LinkConfigWizardStep#saveForm(AsyncCallback)
-     */
     @Override
     protected void saveForm(final AsyncCallback<Boolean> callback)
     {
-        final ResourceReference destination = getData().getDestination().clone();
-        destination.setEntityReference(new URIReference(buildURL()).getEntityReference());
-        getWikiService().getEntityConfig(getData().getOrigin(), destination, new AsyncCallback<EntityConfig>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                callback.onFailure(caught);
-            }
-
-            public void onSuccess(EntityConfig result)
-            {
-                getData().setDestination(destination);
-                getData().getData().setReference(result.getReference());
-                getData().getData().setUrl(result.getUrl());
-                AbstractExternalLinkWizardStep.super.saveForm(callback);
-            }
-        });
+        EntityReference destinationEntityReference = new URIReference(getURL()).getEntityReference();
+        if (!destinationEntityReference.equals(getData().getDestination().getEntityReference())) {
+            getData().getDestination().setEntityReference(destinationEntityReference);
+            // Reset the link configuration.
+            getData().getData().setReference(null);
+            getData().getData().setUrl(null);
+        }
+        super.saveForm(callback);
     }
 
     /**
@@ -207,14 +168,23 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     protected abstract String getURLErrorMessage();
 
     /**
-     * Builds an URL to the external resource to be linked from the user input, adding protocols, parsing user input,
-     * etc.
+     * Subclasses can overwrite this method to adjust the URL the user has set.
      * 
-     * @return the URL to the external resource from the user input.
+     * @return the value of the URL text box
      */
-    protected String buildURL()
+    protected String getURL()
     {
         return urlTextBox.getText().trim();
+    }
+
+    /**
+     * Fills the URL text box with the given URL. Subclasses can overwrite this method to adjust the URL.
+     * 
+     * @param url the URL to fill the text box with
+     */
+    protected void setURL(String url)
+    {
+        urlTextBox.setText(url);
     }
 
     /**
@@ -225,9 +195,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         return "";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void hideErrors()
     {

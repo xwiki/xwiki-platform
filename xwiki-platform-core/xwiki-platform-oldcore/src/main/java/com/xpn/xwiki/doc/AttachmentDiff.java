@@ -36,7 +36,7 @@ public class AttachmentDiff
 
     public String getFileName()
     {
-        return fileName;
+        return this.fileName;
     }
 
     public void setFileName(String fileName)
@@ -46,7 +46,7 @@ public class AttachmentDiff
 
     public String getOrigVersion()
     {
-        return origVersion;
+        return this.origVersion;
     }
 
     public void setOrigVersion(String origVersion)
@@ -56,7 +56,7 @@ public class AttachmentDiff
 
     public String getNewVersion()
     {
-        return newVersion;
+        return this.newVersion;
     }
 
     public void setNewVersion(String newVersion)
@@ -64,16 +64,22 @@ public class AttachmentDiff
         this.newVersion = newVersion;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer(fileName);
+        StringBuilder buf = new StringBuilder(this.fileName);
         buf.append(": ");
-        buf.append(origVersion);
-        buf.append(" &gt; ");
-        buf.append(newVersion);
+        if (this.origVersion != null) {
+            buf.append(this.origVersion);
+        } else {
+            buf.append("()");
+        }
+        buf.append(" \u21E8 ");
+        if (this.newVersion != null) {
+            buf.append(this.newVersion);
+        } else {
+            buf.append("()");
+        }
         return buf.toString();
     }
 }

@@ -23,8 +23,8 @@ package com.xpn.xwiki.plugin.skinx;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -63,33 +63,18 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
     @Override
     public String getName()
     {
         return PLUGIN_NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new SkinFileExtensionPluginApi((AbstractSkinExtensionPlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
-     */
     @Override
     public String getLink(String filename, XWikiContext context)
     {

@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.configuration.ConversionException;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link CommonsConfigurationSource}.
@@ -45,12 +45,14 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
     private CommonsConfigurationSource source;
 
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
+
         this.source = new CommonsConfigurationSource();
-        ConverterManager converterManager = getComponentManager().lookup(ConverterManager.class);
+        ConverterManager converterManager = getComponentManager().getInstance(ConverterManager.class);
         ReflectionUtils.setFieldValue(source, "converterManager", converterManager);
         this.configuration = new BaseConfiguration();
         this.source.setConfiguration(this.configuration);
@@ -63,6 +65,7 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
         Assert.assertEquals("default", source.getProperty("unknown", "default"));
         Assert.assertEquals("value", source.getProperty("string", "default"));
+        Assert.assertEquals(null, source.getProperty("unknown", (String) null));
     }
 
     @Test
@@ -103,6 +106,8 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 
         Assert.assertEquals(true, source.getProperty("boolean"));
         Assert.assertEquals(true, source.getProperty("boolean", Boolean.class));
+        Assert.assertEquals(true, source.getProperty("unknown", true));
+        Assert.assertEquals(false, source.getProperty("unknown", false));
     }
 
     @Test
@@ -122,6 +127,7 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
         Assert.assertEquals(expected, source.getProperty("list", List.class));
 
         Assert.assertTrue(source.getProperty("unknown", List.class).isEmpty());
+        Assert.assertEquals(Arrays.asList("toto"), source.getProperty("unknown", Arrays.asList("toto")));
     }
 
     @Test
@@ -147,5 +153,15 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
         Assert.assertEquals(expectedProperties, source.getProperty("properties", Properties.class));
 
         Assert.assertTrue(source.getProperty("unknown", Properties.class).isEmpty());
+    }
+
+    @Test
+    public void testIsEmpty()
+    {
+        Assert.assertTrue(configuration.isEmpty());
+
+        configuration.addProperty("properties", "key2=value2");
+
+        Assert.assertFalse(configuration.isEmpty());
     }
 }

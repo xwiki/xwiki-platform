@@ -1,8 +1,28 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.export.html;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,18 +30,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.model.EntityType;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -39,7 +59,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class HtmlPackager
 {
-    private static final Log LOG = LogFactory.getLog(HtmlPackager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlPackager.class);
 
     /**
      * A point.
@@ -85,6 +105,11 @@ public class HtmlPackager
      * The pages to export. A {@link Set} of page name.
      */
     private Set<String> pages = new HashSet<String>();
+
+    /**
+     * Used to get the temporary directory.
+     */
+    private Environment environment = Utils.getComponent((Type) Environment.class);
 
     /**
      * Modify the name of the package for which packager append ".zip".
@@ -156,10 +181,14 @@ public class HtmlPackager
     private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
         throws XWikiException, IOException
     {
-        @SuppressWarnings("unchecked")
-        EntityReferenceResolver<String> resolver = Utils.getComponent(EntityReferenceResolver.class);
-        DocumentReference docReference = new DocumentReference(resolver.resolve(pageName, EntityType.DOCUMENT));
+        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        DocumentReference docReference = resolver.resolve(pageName);
         XWikiDocument doc = context.getWiki().getDocument(docReference, context);
+
+        if (doc.isNew()) {
+            // Skip non-existing documents.
+            return;
+        }
 
         String zipname = doc.getDocumentReference().getWikiReference().getName();
         for (EntityReference space : doc.getDocumentReference().getSpaceReferences()) {
@@ -215,32 +244,35 @@ public class HtmlPackager
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
         try {
-            XWikiContext renderContext = (XWikiContext) context.clone();
+            XWikiContext renderContext = context.clone();
             renderContext.put("action", "view");
 
-            ExecutionContext ec = new ExecutionContext();
+            ExecutionContext executionContext = ecim.clone(execution.getContext());
 
-            // Bridge with old XWiki Context, required for old code.
-            ec.setProperty("xwikicontext", renderContext);
-
-            ecim.initialize(ec);
+            // Bridge with old XWiki Context, required for legacy code.
+            executionContext.setProperty("xwikicontext", renderContext);
 
             // Push a clean new Execution Context since we don't want the main Execution Context to be used for
             // rendering the HTML pages to export. It's cleaner to isolate it as we do. Note that the new
             // Execution Context automatically gets initialized with a new Velocity Context by
             // the VelocityRequestInitializer class.
-            execution.pushContext(ec);
+            execution.pushContext(executionContext);
 
-            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            try {
 
-            // At this stage we have a clean Velocity Context
-            VelocityContext vcontext = velocityManager.getVelocityContext();
+                VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
-            urlf.init(this.pages, tempdir, renderContext);
-            renderContext.setURLFactory(urlf);
+                // At this stage we have a clean Velocity Context
+                VelocityContext vcontext = velocityManager.getVelocityContext();
 
-            for (String pageName : this.pages) {
-                renderDocument(pageName, zos, renderContext, vcontext);
+                urlf.init(this.pages, tempdir, renderContext);
+                renderContext.setURLFactory(urlf);
+
+                for (String pageName : this.pages) {
+                    renderDocument(pageName, zos, renderContext, vcontext);
+                } 
+            } finally {
+                execution.popContext();
             }
         } catch (ExecutionContextException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, XWikiException.ERROR_XWIKI_INIT_FAILED,
@@ -248,8 +280,6 @@ public class HtmlPackager
         } finally {
             // We must ensure that the new request we've used is removed so that the current
             // thread can continue to use its original Execution Context.
-            execution.popContext();
-
             context.put("vcontext", oldVelocityContext);
         }
     }
@@ -270,7 +300,7 @@ public class HtmlPackager
 
         ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = this.environment.getTemporaryDirectory();
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         tempdir.mkdirs();
         File attachmentDir = new File(tempdir, "attachment");
@@ -361,8 +391,8 @@ public class HtmlPackager
     private static void addDirToZip(File directory, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
         }
 
         if (!directory.isDirectory()) {

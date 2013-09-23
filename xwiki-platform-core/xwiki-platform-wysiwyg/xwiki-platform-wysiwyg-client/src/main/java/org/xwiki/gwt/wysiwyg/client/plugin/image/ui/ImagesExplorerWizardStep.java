@@ -34,9 +34,9 @@ import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardSte
 import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -47,7 +47,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Wizard step to explore and select images from all the pages in the wiki. <br />
@@ -83,11 +82,6 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
     private boolean displayWikiSelector;
 
     /**
-     * The main panel of this widget.
-     */
-    private final VerticalResizePanel mainPanel = new VerticalResizePanel();
-
-    /**
      * The image selector for the currently selected page in this wizard step. This will be instantiated every time the
      * list of pages for a selected page needs to be displayed, and the functionality of this aggregator will be
      * delegated to it.
@@ -108,18 +102,21 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      */
     public ImagesExplorerWizardStep(boolean displayWikiSelector, WikiServiceAsync wikiService)
     {
+        super(new VerticalResizePanel());
+
         this.wikiService = wikiService;
+        setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
 
         Label helpLabel = new Label(Strings.INSTANCE.imageSelectImageLocationHelpLabel());
         helpLabel.addStyleName("xHelpLabel");
-        mainPanel.add(helpLabel);
+        display().add(helpLabel);
         // initialize selectors, mainPanel
-        mainPanel.addStyleName("xImagesExplorer");
+        display().addStyleName("xImagesExplorer");
         this.displayWikiSelector = displayWikiSelector;
-        mainPanel.add(getSelectorsPanel());
+        display().add(getSelectorsPanel());
         pageWizardStep = new CurrentPageImageSelectorWizardStep(wikiService, true);
-        mainPanel.add(pageWizardStep.display());
-        mainPanel.setExpandingWidget(pageWizardStep.display(), true);
+        display().add(pageWizardStep.display());
+        display().setExpandingWidget(pageWizardStep.display(), true);
     }
 
     /**
@@ -227,25 +224,30 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      * @param imageReference the image to be selected
      * @param cb the object to be notified after the specified image is selected
      */
-    private void setSpaceSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
+    private void setSpaceSelection(AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        String originWiki = new WikiPageReference(getData().getOrigin()).getWikiName();
-        spaceSelector.setWiki(displayWikiSelector ? imageReference.getWikiPageReference().getWikiName() : originWiki);
-        spaceSelector.refreshList(imageReference.getWikiPageReference().getSpaceName(),
-            new AsyncCallback<List<String>>()
+        // Clone the image reference because we might modify it. See the next comment.
+        final AttachmentReference actualImageReference = imageReference.clone();
+        WikiPageReference wikiPageReference = actualImageReference.getWikiPageReference();
+        spaceSelector.setWiki(displayWikiSelector ? wikiSelector.getSelectedWiki() : wikiPageReference.getWikiName());
+        // Replace the image reference components that point to missing entities with the entities selected by default.
+        // In this case, if the image reference points to a wiki that doesn't exist then we update the image reference
+        // to use the wiki selected by default.
+        wikiPageReference.setWikiName(spaceSelector.getWiki());
+        spaceSelector.refreshList(wikiPageReference.getSpaceName(), new AsyncCallback<List<String>>()
+        {
+            public void onSuccess(List<String> result)
             {
-                public void onSuccess(List<String> result)
-                {
-                    setPageSelection(imageReference, cb);
-                }
+                setPageSelection(actualImageReference, cb);
+            }
 
-                public void onFailure(Throwable caught)
-                {
-                    if (cb != null) {
-                        cb.onFailure(caught);
-                    }
+            public void onFailure(Throwable caught)
+            {
+                if (cb != null) {
+                    cb.onFailure(caught);
                 }
-            });
+            }
+        });
     }
 
     /**
@@ -256,13 +258,20 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      */
     private void setPageSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        String originWiki = new WikiPageReference(getData().getOrigin()).getWikiName();
-        pageSelector.setWiki(displayWikiSelector ? imageReference.getWikiPageReference().getWikiName() : originWiki);
-        pageSelector.setSpace(imageReference.getWikiPageReference().getSpaceName());
+        pageSelector.setWiki(spaceSelector.getWiki());
+        pageSelector.setSpace(spaceSelector.getSelectedSpace());
+        // Replace the image reference components that point to missing entities with the entities selected by default.
+        // In this case, if the image reference points to a space that doesn't exist then we update the image reference
+        // to use the space selected by default.
+        imageReference.getWikiPageReference().setSpaceName(pageSelector.getSpace());
         pageSelector.refreshList(imageReference.getWikiPageReference().getPageName(), new AsyncCallback<List<String>>()
         {
             public void onSuccess(List<String> result)
             {
+                // Replace the image reference components that point to missing entities with the entities selected by
+                // default. In this case, if the image reference points to a page that doesn't exist then we update the
+                // image reference to use the page selected by default.
+                imageReference.getWikiPageReference().setPageName(pageSelector.getSelectedPage());
                 initCurrentPage(imageReference, cb);
             }
 
@@ -298,8 +307,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
                 }
             });
         } else if (event.getSource() == spaceSelector) {
-            WikiPageReference originPage = new WikiPageReference(getData().getOrigin());
-            pageSelector.setWiki(displayWikiSelector ? wikiSelector.getSelectedWiki() : originPage.getWikiName());
+            pageSelector.setWiki(spaceSelector.getWiki());
             pageSelector.setSpace(spaceSelector.getSelectedSpace());
             pageSelector.refreshList(pageSelector.getSelectedPage());
         }
@@ -314,7 +322,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      */
     protected void initCurrentPage(AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        mainPanel.addStyleName(STYLE_LOADING);
+        display().addStyleName(STYLE_LOADING);
         getData().getDestination().setEntityReference(imageReference.getEntityReference());
         pageWizardStep.init(getData(), new AsyncCallback<Object>()
         {
@@ -344,11 +352,11 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      */
     private void showCurrentPageInitializationError()
     {
-        mainPanel.removeStyleName(STYLE_LOADING);
+        display().removeStyleName(STYLE_LOADING);
         Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
         error.addStyleName("errormessage");
-        mainPanel.remove(pageWizardStep.display());
-        mainPanel.add(error);
+        display().remove(pageWizardStep.display());
+        display().add(error);
     }
 
     /**
@@ -357,20 +365,20 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
     private void onCurrenPageInitialization()
     {
         // if the current page's display is not there (maybe an error before removed it), remove the error and add
-        if (mainPanel.getWidgetIndex(pageWizardStep.display()) < 0) {
+        if (display().getWidgetIndex(pageWizardStep.display()) < 0) {
             // FIXME: the error panel shouldn't be identified by its position!
-            mainPanel.remove(mainPanel.getWidgetCount() - 1);
-            mainPanel.add(pageWizardStep.display());
+            display().remove(display().getWidgetCount() - 1);
+            display().add(pageWizardStep.display());
         }
-        mainPanel.removeStyleName(STYLE_LOADING);
+        display().removeStyleName(STYLE_LOADING);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Widget display()
+    public VerticalResizePanel display()
     {
-        return mainPanel;
+        return (VerticalResizePanel) super.display();
     }
 
     /**
@@ -379,14 +387,6 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
     public String getNextStep()
     {
         return pageWizardStep.getNextStep();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.imageSelectImageTitle();
     }
 
     /**

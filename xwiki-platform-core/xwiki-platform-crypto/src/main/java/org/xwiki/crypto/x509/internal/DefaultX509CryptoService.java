@@ -21,17 +21,16 @@ package org.xwiki.crypto.x509.internal;
 
 import java.security.GeneralSecurityException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 import org.xwiki.crypto.internal.UserDocumentUtils;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
 import org.xwiki.crypto.x509.X509CryptoService;
 import org.xwiki.crypto.x509.XWikiX509Certificate;
 import org.xwiki.crypto.x509.XWikiX509KeyPair;
-
 
 /**
  * Service allowing a user to sign text, determine the validity and signer of already signed text, and create keys.
@@ -40,15 +39,15 @@ import org.xwiki.crypto.x509.XWikiX509KeyPair;
  * @since 2.5M1
  */
 @Component
-@InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
+@Singleton
 public class DefaultX509CryptoService implements X509CryptoService
 {
     /** Used for dealing with non cryptographic stuff like getting user document names and URLs. */
-    @Requirement
+    @Inject
     private UserDocumentUtils userDocUtils;
 
     /** For encrypting the private key when a key pair is generated on the server side. */
-    @Requirement
+    @Inject
     private PasswordCryptoService passwordCryptoService;
 
     /** Handles the generation of keys. */
@@ -57,11 +56,7 @@ public class DefaultX509CryptoService implements X509CryptoService
     /** For signing and verifying signatures on text. */
     private final X509SignatureService signatureService = new X509SignatureService();
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.x509.X509CryptoService#certsFromSpkac(java.lang.String, int)
-     */
+    @Override
     public XWikiX509Certificate[] certsFromSpkac(final String spkacSerialization, final int daysOfValidity)
         throws GeneralSecurityException
     {
@@ -70,11 +65,7 @@ public class DefaultX509CryptoService implements X509CryptoService
         return this.keyService.certsFromSpkac(spkacSerialization, daysOfValidity, webID, userName);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.x509.X509CryptoService#newCertAndPrivateKey(int)
-     */
+    @Override
     public XWikiX509KeyPair newCertAndPrivateKey(final int daysOfValidity, final String password)
         throws GeneralSecurityException
     {
@@ -83,44 +74,28 @@ public class DefaultX509CryptoService implements X509CryptoService
         return this.keyService.newCertAndPrivateKey(daysOfValidity, webID, userName, password, passwordCryptoService);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.x509.X509CryptoService#signText(java.lang.String, org.xwiki.crypto.data.XWikiX509KeyPair)
-     */
+    @Override
     public String signText(final String textToSign, final XWikiX509KeyPair toSignWith, final String password)
         throws GeneralSecurityException
     {
         return this.signatureService.signText(textToSign, toSignWith, password);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.x509.X509CryptoService#verifyText(java.lang.String, java.lang.String)
-     */
+    @Override
     public XWikiX509Certificate verifyText(final String signedText, final String base64Signature)
         throws GeneralSecurityException
     {
         return this.signatureService.verifyText(signedText, base64Signature);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.x509.X509CryptoService#certFromPEM(java.lang.String)
-     */
+    @Override
     public XWikiX509Certificate certFromPEM(final String pemFormatCert)
         throws GeneralSecurityException
     {
         return XWikiX509Certificate.fromPEMString(pemFormatCert);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.x509.X509CryptoService#keyPairFromBase64(java.lang.String)
-     */
+    @Override
     public XWikiX509KeyPair keyPairFromBase64(final String keyPairAsBase64)
         throws GeneralSecurityException
     {

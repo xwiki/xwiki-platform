@@ -25,17 +25,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -48,7 +49,7 @@ import org.xwiki.rendering.block.XDOM;
  * @since 2.5M2
  * @version $Id$
  */
-public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements OfficeViewer, Initializable
+public abstract class AbstractOfficeViewer implements OfficeViewer, Initializable
 {
     /**
      * Default encoding used for encoding wiki, space, page and attachment names.
@@ -64,37 +65,39 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
     /**
      * Used to access attachment content.
      */
-    @Requirement
+    @Inject
     protected DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to access the temporary directory.
      */
-    @Requirement
-    private Container container;
+    @Inject
+    private Environment environment;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
      * Used to initialize the view cache.
      */
-    @Requirement
+    @Inject
     private CacheManager cacheManager;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Office document view cache.
      */
     private Cache<OfficeDocumentView> cache;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         CacheConfiguration config = new CacheConfiguration();
@@ -106,11 +109,7 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewer#createView(AttachmentReference, Map)
-     */
+    @Override
     public XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
     {
         // Search the cache.
@@ -168,24 +167,19 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
         Map<String, String> parameters) throws Exception;
 
     /**
-     * Saves a temporary file associated with the given attachment.
+     * Creates a temporary file that stores the given data.
      * 
-     * @param attachmentReference reference to the attachment to which this temporary file belongs
-     * @param fileName name of the temporary file
-     * @param fileData file data
-     * @return file that was just written
-     * @throws Exception if an error occurs while writing the temporary file
+     * @param file the temporary file to be created
+     * @param fileData file data to be written
+     * @throws Exception if an error occurs while creating the temporary file
      */
-    protected File saveTemporaryFile(AttachmentReference attachmentReference, String fileName, byte[] fileData)
-        throws Exception
+    protected void createTemporaryFile(File file, byte[] fileData) throws Exception
     {
-        File tempFile = new File(getTemporaryDirectory(attachmentReference), fileName);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(tempFile);
+            fos = new FileOutputStream(file);
             IOUtils.write(fileData, fos);
-            tempFile.deleteOnExit();
-            return tempFile;
+            file.deleteOnExit();
         } finally {
             IOUtils.closeQuietly(fos);
         }
@@ -214,14 +208,29 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
 
         // Create temporary directory.
         String path = String.format("temp/%s/%s/%s/%s/%s/", MODULE_NAME, wiki, space, page, attachmentName);
-        File rootDir = container.getApplicationContext().getTemporaryDirectory();
+        File rootDir = this.environment.getTemporaryDirectory();
         File tempDir = new File(rootDir, path);
         boolean success = (tempDir.exists() || tempDir.mkdirs()) && tempDir.isDirectory() && tempDir.canWrite();
         if (!success) {
-            String message = "Error while creating temporary directory for attachment [%s].";
-            throw new Exception(String.format(message, attachmentName));
+            String message = "Error while creating temporary directory [%s] for attachment [%s].";
+            throw new Exception(String.format(message, tempDir, attachmentName));
         }
         return tempDir;
+    }
+
+    /**
+     * Utility method for obtaining a temporary file to store an artifact produced by the office viewer.
+     * 
+     * @param attachmentReference a reference to the attachment that produced the artifact
+     * @param artifactName the name of the artifact to be saved in the temporary file
+     * @return a temporary file to store the specified artifact
+     * @throws Exception if {@link #getTemporaryDirectory(AttachmentReference)} throws an exception
+     */
+    protected File getTemporaryFile(AttachmentReference attachmentReference, String artifactName) throws Exception
+    {
+        // Encode to avoid illegal characters in the artifact name.
+        String encodedArtifactName = URLEncoder.encode(artifactName, DEFAULT_ENCODING);
+        return new File(getTemporaryDirectory(attachmentReference), encodedArtifactName);
     }
 
     /**
@@ -244,7 +253,7 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
             return String.format("%s/%s/%s/%s", prefix, MODULE_NAME, encodedAttachmentName, encodedFileName);
         } catch (UnsupportedEncodingException e) {
             // This should never happen.
-            getLogger().error("Failed to encode URL using " + DEFAULT_ENCODING, e);
+            this.logger.error("Failed to encode URL using " + DEFAULT_ENCODING, e);
             return null;
         }
     }

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -24,7 +23,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
@@ -58,11 +57,6 @@ public class ObjectRemoveAction extends XWikiAction
         return obj;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -95,11 +89,6 @@ public class ObjectRemoveAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

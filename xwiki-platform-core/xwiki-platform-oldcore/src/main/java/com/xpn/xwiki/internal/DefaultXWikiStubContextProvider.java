@@ -19,14 +19,20 @@
  */
 package com.xpn.xwiki.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
+import com.xpn.xwiki.web.XWikiServletResponse;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Default implementation of XWikiStubContextProvider.
@@ -38,54 +44,95 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * @since 2.0M3
  */
 @Component
-public class DefaultXWikiStubContextProvider extends AbstractLogEnabled implements XWikiStubContextProvider
+@Singleton
+public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 {
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
+
     /**
      * The initial stub XWikiContext.
      */
-    private XWikiContext stubContext;
+    private XWikiContext initialContext;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.XWikiStubContextProvider#initialize(com.xpn.xwiki.XWikiContext)
-     */
+    @Override
     public void initialize(XWikiContext context)
     {
-        this.stubContext = (XWikiContext) context.clone();
+        XWikiContext newContext = context.clone();
+
+        newContext.setCacheDuration(0);
+
+        newContext.setUserReference(null);
+        newContext.setLanguage(null);
+        newContext.setDatabase(context.getMainXWiki());
+
+        // Cleanup
+        newContext.flushClassCache();
 
         // We are sure the context request is a real servlet request
         // So we force the dummy request with the current host
-        XWikiServletRequestStub dummy = new XWikiServletRequestStub();
-        if (context.getRequest() != null) {
-            dummy.setHost(context.getRequest().getHeader("x-forwarded-host"));
-            dummy.setScheme(context.getRequest().getScheme());
+        if (newContext.getRequest() != null) {
+            XWikiServletRequestStub initialRequest = new XWikiServletRequestStub();
+            initialRequest.setHost(newContext.getRequest().getHeader("x-forwarded-host"));
+            initialRequest.setScheme(newContext.getRequest().getScheme());
+            XWikiServletRequest request = new XWikiServletRequest(initialRequest);
+            newContext.setRequest(request);
         }
-        XWikiServletRequest request = new XWikiServletRequest(dummy);
-        this.stubContext.setRequest(request);
 
-        this.stubContext.setCacheDuration(0);
+        // Get rid of the real response
+        if (newContext.getResponse() != null) {
+            XWikiServletResponseStub initialResponse = new XWikiServletResponseStub();
+            // anything to keep ?
+            XWikiServletResponse response = new XWikiServletResponse(initialResponse);
+            newContext.setResponse(response);
+        }
 
-        this.stubContext.setUserReference(null);
-        this.stubContext.setLanguage(null);
-        this.stubContext.setDatabase(context.getMainXWiki());
-        this.stubContext.setDoc(new XWikiDocument());
+        // Set the URL Factory so that the URL Factory doesn't depend of the mode of the first action that entered
+        // the system (Servlet, PDF, GWT, Portlet, etc).
+        // We decide arbitrarily to use the Servlet URL Factory since it's the "standard" factory.
+        if (newContext.getURLFactory() != null) {
+            XWikiURLFactory urlf =
+                newContext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, context);
+            newContext.setURLFactory(urlf);
+        }
 
-        this.stubContext.flushClassCache();
-        this.stubContext.flushArchiveCache();
-
-        getLogger().debug("Stub context initialized.");
+        this.initialContext = newContext;
+        this.logger.debug("Stub context initialized.");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.XWikiStubContextProvider#createStubContext()
-     */
+    @Override
     public XWikiContext createStubContext()
     {
-        // TODO: we need to find a way to create a usable XWikiContext from scratch even if it will not contains
-        // information related to the URL
-        return this.stubContext == null ? null : (XWikiContext) this.stubContext.clone();
+        XWikiContext stubContext;
+
+        if (this.initialContext != null) {
+            stubContext = this.initialContext.clone();
+
+            // We make sure to not share the same Request instance with several threads
+            if (this.initialContext.getRequest() != null) {
+                XWikiServletRequestStub stubRequest = new XWikiServletRequestStub();
+                stubRequest.setHost(this.initialContext.getRequest().getHeader("x-forwarded-host"));
+                stubRequest.setScheme(this.initialContext.getRequest().getScheme());
+                XWikiServletRequest request = new XWikiServletRequest(stubRequest);
+                stubContext.setRequest(request);
+            }
+
+            // We make sure to not share the same Response instance with several threads
+            if (this.initialContext.getResponse() != null) {
+                XWikiServletResponseStub stubResponse = new XWikiServletResponseStub();
+                XWikiServletResponse response = new XWikiServletResponse(stubResponse);
+                stubContext.setResponse(response);
+            }
+
+            // We make sure to not share the same document instance with several threads
+            stubContext.setDoc(new XWikiDocument());
+        } else {
+            stubContext = null;
+        }
+
+        return stubContext;
     }
 }

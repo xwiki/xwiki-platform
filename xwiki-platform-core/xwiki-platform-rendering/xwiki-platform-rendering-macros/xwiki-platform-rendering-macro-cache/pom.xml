@@ -27,20 +27,26 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-cache</artifactId>
   <name>XWiki Platform - Rendering - Macro - Cache</name>
-  <description>XWiki Platform - Rendering - Macro - Cache</description>
+  <description>Cache the content of the macro for some time</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Cache Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-cache-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-cache-jbosscache</artifactId>
+      <artifactId>xwiki-platform-cache-infinispan</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -71,9 +77,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
+     <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

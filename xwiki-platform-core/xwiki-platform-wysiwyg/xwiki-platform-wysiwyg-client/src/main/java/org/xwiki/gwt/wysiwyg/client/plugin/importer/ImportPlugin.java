@@ -35,6 +35,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
@@ -98,13 +99,18 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
+
+        if (Boolean.valueOf(config.getParameter("cleanPaste", "true"))) {
+            PasteManager pasteManager = GWT.create(PasteManager.class);
+            saveRegistrations(pasteManager.initialize(textArea, importService));
+        }
+
         this.importMenuExtension = new ImportMenuExtension(this);
         getUIExtensionList().add(importMenuExtension);
 
         addFeature("import:officefile", ImportWizardStep.OFFICE_FILE, Images.INSTANCE.importOfficeFileMenuEntryIcon(),
             Strings.INSTANCE.importOfficeFileMenuItemCaption());
-        addFeature("paste", ImportWizardStep.OFFICE_PASTE, Images.INSTANCE.paste(),
-            Strings.INSTANCE.paste());
+        addFeature("paste", ImportWizardStep.OFFICE_PASTE, Images.INSTANCE.paste(), Strings.INSTANCE.paste());
         if (toolBarExtension.getFeatures().length > 0) {
             getUIExtensionList().add(toolBarExtension);
         }
@@ -165,7 +171,7 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
         wizardSteps.clear();
 
         toolBarExtension.clearFeatures();
-        importMenuExtension.destroy();
+        importMenuExtension.clearFeatures();
 
         super.destroy();
     }

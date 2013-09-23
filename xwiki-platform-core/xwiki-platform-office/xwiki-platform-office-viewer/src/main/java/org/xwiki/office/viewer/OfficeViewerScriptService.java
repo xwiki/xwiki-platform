@@ -21,7 +21,7 @@ package org.xwiki.office.viewer;
 
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.script.service.ScriptService;
 
@@ -31,7 +31,7 @@ import org.xwiki.script.service.ScriptService;
  * @since 2.5M2
  * @version $Id$
  */
-@ComponentRole
+@Role
 public interface OfficeViewerScriptService extends ScriptService
 {
     /**

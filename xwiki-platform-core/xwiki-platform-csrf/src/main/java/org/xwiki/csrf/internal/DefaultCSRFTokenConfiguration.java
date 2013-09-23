@@ -19,37 +19,40 @@
  */
 package org.xwiki.csrf.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.csrf.CSRFTokenConfiguration;
 
 /**
  * Get configuration data from the XWiki properties file. Supported options:
  * <ul>
- *   <li>"csrf.enabled", default = false</li>
+ *   <li>"csrf.enabled", default = true</li>
  * </ul>
  * 
  * @version $Id$
  * @since 2.5M2
  */
 @Component
-public class DefaultCSRFTokenConfiguration extends AbstractLogEnabled implements CSRFTokenConfiguration
+public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
 {
     /** Prefix for the configuration keys for the {@link org.xwiki.csrf.CSRFToken} component. */
     private static final String PREFIX = "csrf.";
 
     /** Main XWiki properties configuration source. */
-    @Requirement("xwikiproperties")
+    @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEnabled()
     {
         String key = PREFIX + "enabled";
-        return this.configuration.getProperty(key, Boolean.FALSE).booleanValue();
+        return this.configuration.getProperty(key, Boolean.TRUE).booleanValue();
     }
 }

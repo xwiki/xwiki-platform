@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Responsible for registering wiki macros against the ComponentManager at XE startup.
@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.0M2
  */
-@ComponentRole
+@Role
 public interface WikiMacroInitializer
 {
     /**

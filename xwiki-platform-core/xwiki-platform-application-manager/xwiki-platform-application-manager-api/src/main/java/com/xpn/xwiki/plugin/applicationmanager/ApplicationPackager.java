@@ -1,7 +1,28 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
 import java.util.Set;
+
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -13,6 +34,7 @@ import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Provide method to install export applications.
@@ -28,14 +50,14 @@ public class ApplicationPackager
     private static final String PACKAGEPLUGIN_NAME = "package";
 
     /**
-     * The message tool to use to generate error or comments.
-     */
-    private XWikiPluginMessageTool messageTool;
-
-    /**
      * Protected API for managing applications.
      */
     private ApplicationManager applicationManager;
+
+    /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -44,9 +66,17 @@ public class ApplicationPackager
      */
     public ApplicationPackager(XWikiPluginMessageTool messageTool)
     {
-        this.messageTool = messageTool;
+        this();
+    }
 
-        this.applicationManager = new ApplicationManager(this.messageTool);
+    /**
+     * Default constructor.
+     */
+    public ApplicationPackager()
+    {
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
+
+        this.applicationManager = new ApplicationManager();
     }
 
     /**
@@ -55,9 +85,10 @@ public class ApplicationPackager
      * @param context the XWiki context.
      * @return a translated strings manager.
      */
+    @Deprecated
     public XWikiPluginMessageTool getMessageTool(XWikiContext context)
     {
-        return this.messageTool != null ? this.messageTool : ApplicationManagerMessageTool.getDefault(context);
+        return ApplicationManagerMessageTool.getDefault(context);
     }
 
     /**
@@ -116,8 +147,9 @@ public class ApplicationPackager
         XWikiAttachment packFile = packageDoc.getAttachment(packageName);
 
         if (packFile == null) {
-            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, getMessageTool(context).get(
-                ApplicationManagerMessageTool.ERROR_IMORT_PKGDOESNOTEXISTS, packageName));
+            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                this.localizationManager.getTranslationPlain(
+                    ApplicationManagerMessageTool.ERROR_IMORT_PKGDOESNOTEXISTS, packageName));
         }
 
         // Import
@@ -126,13 +158,15 @@ public class ApplicationPackager
         try {
             importer.Import(packFile.getContent(context));
         } catch (IOException e) {
-            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, getMessageTool(context).get(
-                ApplicationManagerMessageTool.ERROR_IMORT_IMPORT, packageName), e);
+            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.ERROR_IMORT_IMPORT,
+                    packageName), e);
         }
 
         if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
-            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, getMessageTool(context).get(
-                ApplicationManagerMessageTool.ERROR_IMORT_INSTALL, packageName));
+            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.ERROR_IMORT_INSTALL,
+                    packageName));
         }
 
         // Apply applications installation
@@ -140,8 +174,8 @@ public class ApplicationPackager
             XWikiDocument doc = docinfo.getDocInfo().getDoc();
 
             if (XWikiApplicationClass.getInstance(context).isInstance(doc)) {
-                this.applicationManager.reloadApplication(
-                    XWikiApplicationClass.getInstance(context).newXObjectDocument(doc, 0, context), comment, context);
+                this.applicationManager.reloadApplication(XWikiApplicationClass.getInstance(context)
+                    .newXObjectDocument(doc, 0, context), comment, context);
             }
         }
     }

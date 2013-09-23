@@ -1,10 +1,19 @@
 .runTransformations
-.#-----------------------------------------------------
+.#--------------------------------------------------------------------
 .input|xwiki/2.0
-.#-----------------------------------------------------
+.# Verify that the macro generates an error if the user doesn't exist.
+.#--------------------------------------------------------------------
 {{useravatar username="XWiki.UserNotExisting" /}}
-.#-----------------------------------------------------
-.expect|event/1.0|skip
-.# This test is skipped until we add the notion of user-friendly message in the MacroExecutionException to have a alternative to display a full stack trace.
-.# When this mecanism is available the user avatar should use it to throw an exception with the proper message when passed user does not exist.
-.#-----------------------------------------------------
+.#--------------------------------------------------------------------
+.expect|event/1.0
+.#--------------------------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [useravatar] [username=XWiki.UserNotExisting]
+beginGroup [[class]=[xwikirenderingerror]]
+onWord [Failed to execute the [useravatar] macro]
+endGroup [[class]=[xwikirenderingerror]]
+beginGroup [[class]=[xwikirenderingerrordescription hidden]]
+onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: User [XWiki.UserNotExisting] is not registered in this wiki${{{regex:.*}}}] [false]
+endGroup [[class]=[xwikirenderingerrordescription hidden]]
+endMacroMarkerStandalone [useravatar] [username=XWiki.UserNotExisting]
+endDocument

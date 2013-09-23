@@ -1,22 +1,41 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-       xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-       version="2.4">
+<?xml version="1.0" encoding="UTF-8"?>
 
-  <display-name>xwiki</display-name>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+  <display-name>XWiki</display-name>
   <description>XWiki Application</description>
   
-  <!-- Restlet Application class name -->
+  <!-- Main Restlet Application using Restlet's JAX-RS extension. -->
   <context-param>
     <param-name>org.restlet.application</param-name>
-    <param-value>
-      org.xwiki.rest.XWikiRestletJaxRsApplication  
-    </param-value>
+    <param-value>org.xwiki.rest.internal.XWikiRestletJaxRsApplication</param-value>
   </context-param> 
   
-  <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
+  <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
        without affecting the whole container (and the other applications hosted). -->
@@ -39,10 +58,10 @@
     </init-param>
   </filter>
 
-  <!-- A filter that allows requests to be saved and reused later. For example when the current request contains an expired
-       authentication token, and the authorization module redirects to the login page, all the information sent by the
-       client would be lost; this filter allows to save all that information, and after a successful login, injects the
-       saved data in the new request. -->
+  <!-- A filter that allows requests to be saved and reused later. For example when the current request contains an
+       expired authentication token, and the authorization module redirects to the login page, all the information sent
+       by the client would be lost; this filter allows to save all that information, and after a successful login,
+       injects the saved data in the new request. -->
   <filter>
     <filter-name>RequestRestorer</filter-name>
     <filter-class>org.xwiki.container.servlet.filters.internal.SavedRequestRestorerFilter</filter-class>
@@ -85,7 +104,8 @@
     </init-param>
   </filter>
 
-  <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
+  <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
+       request data. -->
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
     <url-pattern>/*</url-pattern>
@@ -140,6 +160,9 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>    
 
+  <!-- TODO: This should be fixed. It's not normal that the REST module depends on the WYSIWYG module.
+       "XWikiXmlRpcContextInitializationFilter" points to
+       org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter -->
   <filter-mapping>
     <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
     <servlet-name>RestletServlet</servlet-name>
@@ -234,7 +257,7 @@
   <servlet>
     <servlet-name>RestletServlet</servlet-name>
     <servlet-class>
-      org.xwiki.rest.XWikiRestletServlet  
+      org.xwiki.rest.internal.XWikiRestletServlet
     </servlet-class>
   </servlet>
 
@@ -357,30 +380,12 @@
     <location>/bin/view/Main/DocumentDoesNotExist</location>
   </error-page>
 
-  <!-- Struts Tag Library Descriptors -->
-  <jsp-config>
-    <taglib>
-      <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
-      <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
-    </taglib>
-
-    <taglib>
-      <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
-      <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
-    </taglib>
-
-    <taglib>
-      <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
-      <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
-    </taglib>
-  </jsp-config>
-
   <!-- Uncomment if you wish to use a DataSource to define the Database connection
   <resource-ref>
-      <description>DB Connection</description>
-      <res-ref-name>jdbc/XWikiDS</res-ref-name>
-      <res-type>javax.sql.DataSource</res-type>
-      <res-auth>Container</res-auth>
+    <description>DB Connection</description>
+    <res-ref-name>jdbc/XWikiDS</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
   </resource-ref>
   -->
 

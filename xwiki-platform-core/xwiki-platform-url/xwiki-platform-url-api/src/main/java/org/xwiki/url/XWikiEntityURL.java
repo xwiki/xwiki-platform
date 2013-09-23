@@ -16,13 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.url;
 
 import java.util.Locale;
 
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a XWiki URL pointing to an Entity (Document, Attachment, etc).
@@ -30,6 +30,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 2.3M1
  */
+@Unstable
 public class XWikiEntityURL extends AbstractXWikiURL
 {
     // Note: We're not using a typed object since the action name can be anything and corresponds to an Action
@@ -39,8 +40,8 @@ public class XWikiEntityURL extends AbstractXWikiURL
     private EntityReference entityReference;
 
     private Locale locale;
-    
-    private String revision;
+
+    private static final String REVISION_PARAMETER_NAME = "rev";
 
     public XWikiEntityURL(EntityReference entityReference)
     {
@@ -80,11 +81,11 @@ public class XWikiEntityURL extends AbstractXWikiURL
     
     public void setRevision(String revision)
     {
-        this.revision = revision;
+        addParameter(REVISION_PARAMETER_NAME, revision);
     }
     
     public String getRevision()
     {
-        return this.revision;
+        return getParameterValue(REVISION_PARAMETER_NAME);
     }
 }

@@ -1,1 +1,11 @@
 org.xwiki.chart.internal.DefaultChartGenerator
+org.xwiki.chart.internal.plot.AreaPlotGenerator
+org.xwiki.chart.internal.plot.Bar3DPlotGenerator
+org.xwiki.chart.internal.plot.BarPlotGenerator
+org.xwiki.chart.internal.plot.Line3DPlotGenerator
+org.xwiki.chart.internal.plot.LinePlotGenerator
+org.xwiki.chart.internal.plot.PiePlotGenerator
+org.xwiki.chart.internal.plot.XYAreaPlotGenerator
+org.xwiki.chart.internal.plot.XYLine3DPlotGenerator
+org.xwiki.chart.internal.plot.XYLineAndShapePlotGenerator
+org.xwiki.chart.internal.plot.XYStepPlotGenerator

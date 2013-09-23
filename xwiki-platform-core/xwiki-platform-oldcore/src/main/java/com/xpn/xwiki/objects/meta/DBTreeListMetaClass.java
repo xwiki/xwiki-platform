@@ -16,31 +16,45 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.DBTreeListClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+/**
+ * Defines the meta properties of a database tree list XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("DBTreeList")
+@Singleton
 public class DBTreeListMetaClass extends DBListMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Database Tree XClass property.
+     */
     public DBTreeListMetaClass()
     {
-        super();
         setPrettyName("Database Tree");
-        setName(DBTreeListClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        StringClass parentfield_class = new StringClass(this);
-        parentfield_class.setName("parentField");
-        parentfield_class.setPrettyName("Parent Field Name");
-        parentfield_class.setSize(20);
-        safeput("parentField", parentfield_class);
+        StringClass parentFieldClass = new StringClass(this);
+        parentFieldClass.setName("parentField");
+        parentFieldClass.setPrettyName("Parent Field Name");
+        parentFieldClass.setSize(20);
+        safeput(parentFieldClass.getName(), parentFieldClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new DBTreeListClass();
     }

@@ -33,11 +33,7 @@ import com.google.gwt.dom.client.Style.Display;
  */
 public class HiddenElements implements NodeFilter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see NodeFilter#acceptNode(Node)
-     */
+    @Override
     public Action acceptNode(Node node)
     {
         return node.getNodeType() == Node.ELEMENT_NODE

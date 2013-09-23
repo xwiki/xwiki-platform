@@ -29,16 +29,62 @@ import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 public class LinkConfig extends EntityConfig
 {
     /**
-     * Enumeration type to store the type of link: wiki external link, link to an existing page, link to a new page,
-     * etc.
+     * Link types.
      */
-    public enum LinkType
+    public static enum LinkType
     {
+        /** External link (default for any unrecognized link). */
+        EXTERNAL("wikiexternallink"),
+
+        /** Internal link targeting a new page. */
+        NEW_WIKIPAGE("wikicreatelink"),
+
+        /** Internal link targeting an existent page. */
+        WIKIPAGE("wikilink"),
+
+        /** Link targeting an attached file. */
+        ATTACHMENT("wikiattachmentlink"),
+
+        /** External link to an email address. Currently it doesn't have a dedicated CSS class name. */
+        EMAIL(EXTERNAL.className);
+
         /**
-         * Link types: external link (default for any unrecognized link), internal link targeting an existent page,
-         * internal link targeting a new page, link targeting an attached file, external link to an email address.
+         * The CSS class name associated with a link type.
          */
-        EXTERNAL, NEW_WIKIPAGE, WIKIPAGE, ATTACHMENT, EMAIL
+        private final String className;
+
+        /**
+         * Creates a new link type that has the given CSS class name associated.
+         * 
+         * @param className the CSS class name associated with the new link type
+         */
+        LinkType(String className)
+        {
+            this.className = className;
+        }
+
+        /**
+         * @return the CSS class name associated with this link type
+         */
+        public String getClassName()
+        {
+            return className;
+        }
+
+        /**
+         * @param className a CSS class name used to mark a specific type of link
+         * @return the {@link LinkType} corresponding to the given class name, {@code null} if none of the link types
+         *         match the given class name
+         */
+        public static LinkType getByClassName(String className)
+        {
+            for (LinkType linkType : values()) {
+                if (linkType.className.equals(className)) {
+                    return linkType;
+                }
+            }
+            return null;
+        }
     };
 
     /**

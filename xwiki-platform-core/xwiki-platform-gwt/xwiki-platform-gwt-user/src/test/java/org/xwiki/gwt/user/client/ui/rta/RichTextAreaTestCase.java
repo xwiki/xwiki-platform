@@ -28,11 +28,7 @@ import org.xwiki.gwt.user.client.UserTestCase;
  */
 public class RichTextAreaTestCase extends AbstractRichTextAreaTestCase
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaTestCase#getModuleName()
-     */
+    @Override
     public String getModuleName()
     {
         return UserTestCase.MODULE_NAME;

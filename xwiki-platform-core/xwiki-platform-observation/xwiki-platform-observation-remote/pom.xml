@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-remote</artifactId>
   <name>XWiki Platform - Observation - Remote</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Observation - Remote</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -45,9 +48,9 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -59,24 +62,16 @@
       <artifactId>xwiki-commons-context</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Note that jgroups depends on Java 6 since 2.9 branch. -->
     <dependency>
-      <groupId>jgroups</groupId>
+      <groupId>org.jgroups</groupId>
       <artifactId>jgroups</artifactId>
-      <version>2.8.0.GA</version>
     </dependency>
 
     <!-- Tests dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
       <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -104,25 +99,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- 
-           * Some JDK implementations have problems with jgroups IPv6 Since the tests only ever use IPv4
-           * Prefer IPv4 stack while running the tests. See: http://www.jgroups.org/tutorial/html/ch01.html
-          -->
-          <argLine>-Djava.net.preferIPv4Stack=true</argLine>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>jboss-public-repository-group</id>
-      <name>JBoss Public Maven Repository Group</name>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-    </repository>
-  </repositories>
 </project>
-       

@@ -47,9 +47,7 @@ public class FocusCommand implements Command
         this.widget = widget;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void execute()
     {
         widget.setFocus(true);

@@ -134,8 +134,7 @@ public class DefaultReferenceEntityReferenceResolverTest
                 EntityType.ATTACHMENT)), EntityType.DOCUMENT);
             Assert.fail("Should have thrown an exception here");
         } catch (InvalidEntityReferenceException expected) {
-            Assert.assertEquals("Invalid reference [name = [page], type = [DOCUMENT], parent = [name = [filename], "
-                + "type = [ATTACHMENT], parent = [null]]]", expected.getMessage());
+            Assert.assertEquals("Invalid reference [Document filename.page]", expected.getMessage());
         }
     }
 

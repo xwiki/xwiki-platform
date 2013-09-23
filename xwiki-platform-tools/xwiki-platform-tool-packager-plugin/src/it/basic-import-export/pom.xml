@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>@project.version@</version>
   </parent>
   <artifactId>xwiki-backup-sample-basic-import-export</artifactId>
   <packaging>pom</packaging>
@@ -69,19 +69,6 @@
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.8.0.7</version>
-          </dependency>
-          <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>runtime</scope>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
             <id>import</id>
@@ -101,4 +88,26 @@
       </plugin>
     </plugins>
   </build>
+  <!-- The Packager plugin uses XWiki oldcore which gets Clovered and thus we need to have the Clover JAR in the
+       execution classpath of the plugin. -->
+  <profiles>
+    <profile>
+      <id>clover</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>com.cenqua.clover</groupId>
+                <artifactId>clover</artifactId>
+                <version>3.1.6</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

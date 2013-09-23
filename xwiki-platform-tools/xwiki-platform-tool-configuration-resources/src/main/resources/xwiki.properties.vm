@@ -1,3 +1,23 @@
+# ---------------------------------------------------------------------------
+# See the NOTICE file distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation; either version 2.1 of
+# the License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this software; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+# ---------------------------------------------------------------------------
+
 # This is the new XWiki configuration file. In the future it'll replace the old
 # xwiki.cfg file. However right now it's only used by some XWiki components.
 # As time progresses more and more component will get their configurations from
@@ -9,8 +29,8 @@
 
 #-# [Since 1.8RC2]
 #-# Specifies the default syntax to use when creating new documents.
-#-# Default value is xwiki/2.0.
-# core.defaultDocumentSyntax = xwiki/1.0
+#-# Default value is xwiki/2.1.
+# core.defaultDocumentSyntax = xwiki/2.1
 
 #-# [Since 2.4M1]
 #-# Indicate if the rendering cache is enabled.
@@ -21,6 +41,7 @@
 #-# A list of Java regex patterns matching full documents reference.
 # core.renderingcache.documents=wiki:Space\.Page
 # core.renderingcache.documents=wiki:Space\..*
+# core.renderingcache.documents=Space\.PageOnWhateverWiki
 
 #-# [Since 2.4M1]
 #-# The time (in seconds) after which data should be removed from the cache when not used.
@@ -35,16 +56,42 @@
 # core.renderingcache.size=100
 
 #-------------------------------------------------------------------------------------
+# Environment
+#-------------------------------------------------------------------------------------
+
+#-# [Since 3.5M1, replaces the container.persistentDirectory property]
+#-# The directory used to store persistent data (data that should persist across server restarts). This is an
+#-# important directory containing important data and thus it should never be deleted (it should be backed-up along
+#-# with the database).
+#-# For example this is where the Extension Manager stores downloaded extensions if the extension.localRepository
+#-# property isn't configured.
+#-#
+#-# You can set:
+#-# * an absolute path (recommended)
+#-# * a relative path (not recommended at all)but in this case the directory will be relative to where the XWiki server
+#-#   is started and thus the user under which XWiki is started will need write permissions for the current directory
+#-#
+#-# Note if the system property xwiki.data.dir is set then this property is not used.
+#-# If neither the system property nor this configuration value here are set then the Servlet container's temporary
+#-# directory is used; This is absolutely not recommended since that directory could be wiped out at any time and you
+#-# should specify a value.
+#if ($xwikiPropertiesEnvironmentPermanentDirectory)
+environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
+#else
+# environment.permanentDirectory=/var/local/xwiki/
+#end
+
+#-------------------------------------------------------------------------------------
 # Rendering
 #-------------------------------------------------------------------------------------
 
 #-# [Since 1.8RC2]
-#-# Specifies how links labels are displayed when the user doesn't specify the label explicitely.
+#-# Specifies how links labels are displayed when the user doesn't specify the label explicitly.
 #-# Valid values:
 #-#   %w: wiki name
 #-#   %s: space name
 #-#   %p: page name
-#-#   %P: page name with spaces between camel case words, i.e. "My Page" iff the page name is "MyPage"
+#-#   %P: page name with spaces between camel case words, i.e. "My Page" if the page name is "MyPage"
 #-#   %t: page title
 #-#
 #-# Note that if the page title is empty or not defined then it defaults to %p. This is also the case
@@ -63,7 +110,7 @@
 # rendering.macroCategories = script:My Other Category
 
 #-# [Since 2.5M2]
-#-# Sepecifies whether the image dimensions should be extracted from the image parameters and included in the image URL
+#-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL
 #-# or not. When image dimensions are included in the image URL the image can be resized on the server side before being
 #-# downloaded, improving thus the page loading speed.
 #-#
@@ -94,13 +141,22 @@
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
+#-------------------------------------------------------------------------------------
+# Rendering Transformations
+#-------------------------------------------------------------------------------------
+
 #-# [Since 2.6RC1]
 #-# Controls what transformations will be executed when rendering content.
 #-# A transformation modifies the parsed content. For example the Icon transformation replaces some characters with
 #-# icons, a WikiWord transformation will automatically create links when it finds wiki words, etc.
 #-# Note that the Macro transformation is a special transformation that replaces macro markers by the result of the
 #-# macro execution. If you don't list it, macros won't get executed.
-#-# The default value is: rendering.transformations = macro, icon
+#-# The default value is: macro, icon
+#if ($xwikiRenderingTransformations)
+rendering.transformations = $xwikiRenderingTransformations
+#else
+# rendering.transformations = macro, icon
+#end
 
 #-# [Since 2.6RC1]
 #-# Icon Transformation Configuration
@@ -125,26 +181,49 @@
 #-# rendering.transformation.icon.mappings = (off) = lightbulb_off
 #-# rendering.transformation.icon.mappings = (*) = star
 
+#-# [Since 3.3M2]
+#-# LinkChecker Transformation Configuration
+#-# Defines the time (in ms) after which an external link should be checked again for validity.
+#-# the default configuration is:
+# rendering.transformation.linkchecker.timeout = 3600000
+
+#-------------------------------------------------------------------------------------
+# Rendering Macros
+#-------------------------------------------------------------------------------------
+
+#-# Velocity Macro
+
+#-# [Since 2.0M1]
+#-# Defines which Velocity Filter to use by default. This offers the possibility to filter the Velocity macro content
+#-# before and after the Velocity Engine execution.
+#-# The following filters are available:
+#-# - indent (the default): Remove all first whites spaces of lines to support source code indentation without
+#-#          generating whitespaces in the resulting XDOM.
+#-# - none: Doesn't change the content
+#-# - html: Removes all leading and trailing white spaces and new lines. If you need a space you'll need to use
+#-#         \$sp and if you need a new line you'll need to use \$nl
+#-# rendering.macro.velocity.filter = indent
+
 #-------------------------------------------------------------------------------------
 # Cache
 #-------------------------------------------------------------------------------------
 
 #-# [Since 1.7M1]
 #-# The standard cache component implementation to use (can be local or distributed depending on the implementation).
-#-# The default standard cache implementation is JBoss Cache.
-# cache.defaultCache=jbosscache
+#-# The default standard cache implementation is Infinispan.
+# cache.defaultCache=infinispan
 
 #-# [Since 1.7M1]
 #-# The local cache implementation to use.
-#-# The default local cache implementation is JBoss Cache.
-# cache.defaultLocalCache=jbosscache/local
+#-# The default local cache implementation is Infinispan.
+# cache.defaultLocalCache=infinispan/local
 
-#----------------------------------------------------------------------------------
-# Settings for the OpenOffice server instance consumed by the OfficeImporter plugin
-#----------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+# Settings for the OpenOffice server instance consumed by the OfficeImporter component
+#-------------------------------------------------------------------------------------
  
 #-# [Since 1.9M2]
-#-# Type of the openoffice server instance used by officeimporter plugin.
+#-# Type of the openoffice server instance used by officeimporter component.
 #-# 0 - Internally managed server instance. (Default)
 #-# 1 - Externally managed (local) server instance.
 # openoffice.serverType=0
@@ -175,7 +254,7 @@
 # openoffice.maxTasksPerProcess=50
 
 #-# [Since 1.8RC3]
-#-# Timeout for conversion tasks (in miliseconds) (serverType:0 only).
+#-# Timeout for conversion tasks (in milliseconds) (serverType:0 only).
 #-# Default value is 30 seconds
 # openoffice.taskExecutionTimeout=30000
 
@@ -206,7 +285,24 @@
 #-#   velocity.properties = resource.manager.logwhenfound = false
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
 #-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.ChainingUberspector
-#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector
+#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector\,org.xwiki.velocity.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+
+#-------------------------------------------------------------------------------------
+# Groovy
+#-------------------------------------------------------------------------------------
+
+#-# [Since 4.1M1]
+#-# Allows to specify Compiler customization for the Groovy execution engine.
+#-# There's no customizers defined by default. Available customizer ids:
+#-# - timedinterrupt: interrupt script execution if it takes longer than a given time (default to 1 minute)
+#-# - secure: runs Groovy in a security sandbox
+#-# groovy.compilationCustomizers=<list of customizer ids here>
+
+#-# Timed Interrupt Customizer
+
+#-# [Since 4.1M1]
+#-# Default execution time for a script before a timeout occurs, in seconds.
+#-# groovy.customizer.timedInterrupt.timeout=60
 
 #-------------------------------------------------------------------------------------
 # Events distribution
@@ -221,16 +317,16 @@
 #-# The list of events communication channels to start when the application starts.
 #-# By default no channel is configured.
 #-#
-#-# The default remote event distribution implementation is using JGroups and you'll need to drop your JGroups channel
-#-# xml files in the WEB-INF/observation/remote/jgroups/ directory. There's a README file in that directory with more
-#-# information.
+#-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded JGroups configuration
+#-# files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
+#-# There's a README file in that directory with more information.
 #-# Example: observation.remote.channels = public, cluster
 
 #-# [Since 2.0M4]
 #-# The implementation of network adapter to use.
 #-# The default is jgroups.
 #-#
-#-# By default obnly jgroups is provided. To add one implements NetworkAdaptor componenet interface. The identifier provided in the configuration is matched with the component role hint.
+#-# By default only jgroups is provided. To add one implements NetworkAdaptor component interface. The identifier provided in the configuration is matched with the component role hint.
 #-# Example: observation.remote.networkadapter = jgroups
 
 #-------------------------------------------------------------------------------------
@@ -321,6 +417,181 @@
 #-#   true : Enabled
 #-#   false: Disabled
 #-#
-#-# Default value is false
-# csrf.enabled = false
+#-# Default value is true
+# csrf.enabled = true
 
+#-------------------------------------------------------------------------------------
+# Extension Manager
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.5]
+#-# Repositories to use when searching and downloading extensions.
+#-# 
+#-# The format is <id>:<type>:<url> where
+#-# * id can be anything as long as there is only one
+#-# * type is the type of the repository (maven, xwiki, etc.)
+#-# * url is the URL or the root of the repository
+#-# 
+#-# [Since 4.3] It's also possible to associate various properties to each repository.
+#-# Here are the standard properties:
+#-# * user: the user to use to authenticate to the repository
+#-# * password: the password to use to authenticate to the repository
+#-# 
+#-# Here is an example:
+# extension.repositories=privatemavenid:maven:http://host.com/private/maven/
+# extension.repositories.privatemavenid.auth.user=someuser
+# extension.repositories.privatemavenid.auth.password=thepassword
+#-# 
+#-# Here's an example to add your local Maven Repository
+## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
+## Apache Commons Configuration syntax for specifying the user.home system property!
+#set ($userHome = '${sys:user.home}')
+# extension.repositories=local:maven:file://${userHome}/.m2/repository
+#-#
+#-# And an example to add the XWiki Maven Snapshot Repository
+# extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
+#-#
+#-# The default is:
+# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+# extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
+
+#-# [Since 2.5]
+#-# The directory where extensions are stored after being downloaded.
+#-# 
+#-# The default is extension/repository in whatever is the general persistent directory.
+#-# See container.persistentDirectory.
+# extension.localRepository=extension/repository
+
+#-# [Since 3.4]
+#-# The user agent to use when communication with external services (generally repositories).
+#-# 
+#-# The default is:
+# extension.userAgent=XWikiExtensionManager
+
+#-------------------------------------------------------------------------------------
+# Solr Search
+#-------------------------------------------------------------------------------------
+
+#-# [Since 4.5M1]
+#-# The Solr server type. Currently accepted values are "embedded" (default) and "remote".
+# solr.type=embedded
+
+#-# [Since 4.5M1]
+#-# The location where the embedded Solr instance stores its configuration and the indexed data.
+#-# The default is the subfolder "solr" inside the folder defined by the property "environment.permanentDirectory".
+# solr.embedded.home=/var/local/xwiki/solr
+
+#-# [Since 4.5M1]
+#-# The URL to use to connect to the remote solr server.
+#-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
+# solr.remote.url=http://localhost:8983/solr
+
+#-# [Since 5.1M1]
+#-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
+#-# It's possible to configure this behavior with the following properties:
+#-# 
+#-# The maximum number of elements sent at the same time to the Solr server
+#-# The default is 50.
+# solr.indexer.batch.size=50
+#-# The maximum number of characters in the batch of elements to send to the Solr server.
+#-# The default is 10000.
+# solr.indexer.batch.maxLength=10000
+
+#-# [Since 5.1M1]
+#-# The maximum number of elements in the background queue of elements to index/delete
+#-# The default is 10000.
+# solr.indexer.queue.capacity=100000
+
+#-------------------------------------------------------------------------------------
+# Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.0M2]
+#-# Define the authorization policies by choosing another implementation of the AuthorizationSettler. This component
+#-# is solely responsible for settling access decisions based on user, target entity and available security rules.
+#-# The identifier provided here is matched with the component role hint.
+#-#
+#-# The default is:
+# security.authorization.settler=default
+
+#-------------------------------------------------------------------------------------
+# URL
+#-------------------------------------------------------------------------------------
+
+#-# IMPORTANT: The URL module is a feature still in development and as such should be considered experimental at the
+#-# moment. The configuration parameters below are used only in some part of the code at the moment. The idea is to
+#-# progressively refactor more and more till only the new properties are used. For the moment you should continue to
+#-# use the following old properties located in xwiki.cfg:
+#-#  xwiki.virtual.usepath
+#-#  xwiki.virtual.usepath.servletpath
+
+#-# [Since 5.1M1]
+#-# The id of the URL format to use. This allows to plug in different implementations and thus allows to completely
+#-# control the format of XWiki URLs.
+#-#
+#-# The default is:
+# url.format=standard
+
+#-# [Since 5.1M1]
+#-# Defines where the wiki part is defined in a URL pointing to a subwiki
+#-# If true then the wiki part is located in the URL path (a.k.a path-based), for example:
+#-#   http://server/xwiki/wiki/mywiki/view/Space/Page
+#-# If false then the wiki part is located in the URL host domain (a.k.a domain-based), for example:
+#-#   http://mywiki.domain/xwiki/bin/view/Space/Page
+#-#
+#-# The default is:
+# url.standard.multiwiki.isPathBased=true
+
+#-# [Since 5.1M1]
+#-# For path-based setups, this property defines the path segment before the one identifying the subwiki in the URL.
+#-# For example if set to "thewiki", then the following URL will point to a subwiki named "mywiki":
+#-#   http://server/xwiki/thewiki/mywiki/view/Space/Page
+#-# Note that the mapping in web.xml has to be modified accordingly if you don't use the default value:
+#-#   <servlet-mapping>
+#-#     <servlet-name>action</servlet-name>
+#-#     <url-pattern>/wiki/*</url-pattern>
+#-#   </servlet-mapping>
+#-#
+#-# The default is:
+# url.standard.multiwiki.wikiPathPrefix=wiki
+
+#-# [Since 5.2M1]
+#-# Defines the URL path prefix used for Entity URLs, i.e. URLs pointing to a Document, Space, Object, etc.
+#-# For example this is the "bin" part in the following URL:
+#-#   http://server/xwiki/bin/view/space/page
+#-# Note that this replaces the old xwiki.defaultservletpath property in the old xwiki.cfg file.
+#-#
+#-# The default is:
+# url.standard.getEntityPathPrefix=bin
+
+#-------------------------------------------------------------------------------------
+# Attachment
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.2M2]
+#-# Define the kind of attachment that can be displayed inline. You can either choose to do it through a whitelist (only
+#-# the mimetypes defined in this list would be displayed inline) or a blacklist (every mimetype that is not in this list
+#-# would be displayed inline if possible)
+#-#
+#-# By default we use the following whitelist (coma separated list of values).
+# attachment.download.whitelist=audio/basic,audio/L24,audio/mp4,audio/mpeg,audio/ogg,audio/vorbis,audio/vnd.rn-realaudio,audio/vnd.wave,audio/webm,image/gif,image/jpeg,image/pjpeg,image/png,image/svg+xml,image/tiff,text/csv,text/plain,text/xml,text/rtf,video/mpeg,video/ogg,video/quicktime,video/webm,video/x-matroska,video/x-ms-wmv,video/x-flv 
+#-#
+#-# If you prefer to use a blacklist instead, you can define the forbidden types here, as a coma separated list of values.
+#-# We advise you to forbid at least the following mimetypes : text/html, text/javascript
+# attachment.download.blacklist=text/html,text/javascript 
+
+#-------------------------------------------------------------------------------------
+# Active Installs
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.2M2]
+#-# The URL of where the Active Installs module should connect to in order to send a ping of activity. This feature
+#-# regularly sends the following information to xwiki.org about the current instance:
+#-# - its unique id
+#-# - the id and versions of all installed extensions)
+#-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
+#-#
+#-# The default is:
+# activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
+
+$!xwikiPropertiesAdditionalProperties

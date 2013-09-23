@@ -43,9 +43,7 @@ public class HomeView extends AbstractDavView
      */
     private DavPage mPage;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
@@ -53,9 +51,7 @@ public class HomeView extends AbstractDavView
         mPage.init(this, "Main.WebHome", "");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -68,33 +64,25 @@ public class HomeView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public long getModificationTime()
     {
         return mPage.exists() ? mPage.getModificationTime() : super.getModificationTime();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavPropertySet getProperties()
     {
         return mPage.exists() ? mPage.getProperties() : super.getProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         return mPage.exists() ? mPage.getMembers() : new DavResourceIteratorImpl(getVirtualMembers());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (mPage.exists()) {
@@ -104,9 +92,7 @@ public class HomeView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource member) throws DavException
     {
         if (mPage.exists()) {

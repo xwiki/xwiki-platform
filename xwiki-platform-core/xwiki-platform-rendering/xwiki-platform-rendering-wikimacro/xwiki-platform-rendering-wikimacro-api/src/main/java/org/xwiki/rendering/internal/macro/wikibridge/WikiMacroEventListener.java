@@ -22,14 +22,17 @@ package org.xwiki.rendering.internal.macro.wikibridge;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -46,41 +49,43 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
  * @version $Id$
  * @since 2.0M2
  */
-@Component("wikimacrolistener")
-public class WikiMacroEventListener extends AbstractLogEnabled implements EventListener
+@Component
+@Named("wikimacrolistener")
+@Singleton
+public class WikiMacroEventListener implements EventListener
 {
     /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
-    @Requirement
+    @Inject
     private WikiMacroFactory macroFactory;
 
     /**
      * The {@link WikiMacroManager} component.
      */
-    @Requirement
+    @Inject
     private WikiMacroManager wikiMacroManager;
 
     /**
-     * {@inheritDoc}
+     * The logger to log.
      */
+    @Inject
+    private Logger logger;
+
+    @Override
     public String getName()
     {
         return "wikimacrolistener";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Event> getEvents()
     {
         return Arrays
             .<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof AbstractDocumentEvent) {
@@ -118,7 +123,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
                 try {
                     wikiMacro = this.macroFactory.createWikiMacro(documentReference);
                 } catch (WikiMacroException e) {
-                    getLogger().debug(String.format("Failed to create wiki macro [%s]", documentReference), e);
+                    this.logger.debug(String.format("Failed to create wiki macro [%s]", documentReference), e);
                     return;
                 }
 
@@ -139,11 +144,11 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
         try {
             this.wikiMacroManager.registerWikiMacro(documentReference, wikiMacro);
         } catch (WikiMacroException e) {
-            getLogger().debug(
+            this.logger.debug(
                 String.format("Unable to register macro [%s] in document [%s]", wikiMacro.getDescriptor().getId()
                     .getId(), documentReference), e);
         } catch (InsufficientPrivilegesException e) {
-            getLogger().debug(String.format("Insufficient privileges for registering macro [%s] in document [%s]",
+            this.logger.debug(String.format("Insufficient privileges for registering macro [%s] in document [%s]",
                 wikiMacro.getDescriptor().getId().getId(), documentReference), e);
         }
     }
@@ -161,7 +166,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
             try {
                 this.wikiMacroManager.unregisterWikiMacro(documentReference);
             } catch (WikiMacroException e) {
-                getLogger().debug(String.format("Unable to unregister macro in document [%s]", documentReference), e);
+                this.logger.debug(String.format("Unable to unregister macro in document [%s]", documentReference), e);
                 result = false;
             }
         }

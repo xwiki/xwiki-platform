@@ -51,9 +51,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
      */
     private static final Logger logger = LoggerFactory.getLogger(PagesBySpaceNameSubView.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -79,9 +77,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         return last ? resource : resource.decode(tokens, next + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean exists()
     {
         try {
@@ -95,9 +91,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();
@@ -136,9 +130,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         return new DavResourceIteratorImpl(children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
         if (resource instanceof DavPage) {
@@ -153,9 +145,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeMember(DavResource member) throws DavException
     {
         XWikiDavResource davResource = (XWikiDavResource) member;
@@ -193,9 +183,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
         davResource.clearCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void move(DavResource destination) throws DavException
     {
         // We only support rename operation for the moment.

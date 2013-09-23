@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.filter.HTMLFilter;
@@ -38,98 +40,95 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("wysiwyg")
-public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleaner
+@Component
+@Named("wysiwyg")
+@Singleton
+public class WysiwygHTMLCleaner implements HTMLCleaner
 {
     /**
-     * Default html cleaner component used internally. 
+     * Default html cleaner component used internally.
      */
-    @Requirement
+    @Inject
     private HTMLCleaner defaultHtmlCleaner;
-    
+
     /**
      * {@link HTMLFilter} for stripping various tags.
      */
-    @Requirement("officeimporter/stripper")
+    @Inject
+    @Named("officeimporter/stripper")
     private HTMLFilter stripperFilter;
-    
+
     /**
      * {@link HTMLFilter} filtering styles.
      */
-    @Requirement("officeimporter/style")
+    @Inject
+    @Named("officeimporter/style")
     private HTMLFilter styleFilter;
-    
+
     /**
      * {@link HTMLFilter} for stripping redundant tags.
      */
-    @Requirement("officeimporter/redundancy")
+    @Inject
+    @Named("officeimporter/redundancy")
     private HTMLFilter redundancyFilter;
-    
+
     /**
      * {@link HTMLFilter} for cleaning empty paragraphs.
      */
-    @Requirement("officeimporter/paragraph")
+    @Inject
+    @Named("officeimporter/paragraph")
     private HTMLFilter paragraphFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering image tags.
      */
-    @Requirement("officeimporter/image")
+    @Inject
+    @Named("officeimporter/image")
     private HTMLFilter imageFilter;
 
     /**
      * {@link HTMLFilter} for filtering lists.
      */
-    @Requirement("officeimporter/list")
+    @Inject
+    @Named("officeimporter/list")
     private HTMLFilter listFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering tables.
      */
-    @Requirement("officeimporter/table")
+    @Inject
+    @Named("officeimporter/table")
     private HTMLFilter tableFilter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent)
     {
         return clean(originalHtmlContent, getDefaultConfiguration());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#clean(Reader, HTMLCleanerConfiguration)
-     */
+    @Override
     public Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration)
     {
         return this.defaultHtmlCleaner.clean(originalHtmlContent, configuration);
     }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLCleaner#getDefaultConfiguration()
-     */
+
+    @Override
     public HTMLCleanerConfiguration getDefaultConfiguration()
     {
         HTMLCleanerConfiguration configuration = this.defaultHtmlCleaner.getDefaultConfiguration();
 
-        // Add OO cleaning filters after the default filters
+        // Add office cleaning filters after the default filters.
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>(configuration.getFilters());
         filters.addAll(Arrays.asList(
-            this.stripperFilter, 
-            this.styleFilter, 
+            this.stripperFilter,
+            this.styleFilter,
             this.redundancyFilter,
             this.paragraphFilter,
             this.imageFilter,
             this.listFilter,
             this.tableFilter));
         configuration.setFilters(filters);
-        
+
         return configuration;
-    }    
+    }
 }

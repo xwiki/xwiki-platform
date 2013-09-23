@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>XWikiUserWatchListLiveTableResults</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.XWikiUserWatchListSheet</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1249395964000</creationDate>
-<date>1249395964000</date>
-<contentUpdateDate>1249395964000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity wiki="false"}}
+  <web>XWiki</web>
+  <name>XWikiUserWatchListLiveTableResults</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiUserWatchListSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1249395964000</creationDate>
+  <date>1249395964000</date>
+  <contentUpdateDate>1249395964000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity wiki="false"}}
 #if($xcontext.action == 'get')
 ##
 ## Constants
@@ -36,43 +37,39 @@
 #set($wikis = $xwiki.watchlist.getWatchedWikis())
 #set($spaces = $xwiki.watchlist.getWatchedSpaces())
 #set($pages = $xwiki.watchlist.getWatchedDocuments())
-#set($elements = $util.getArrayList())
+#set($elements = [])
 ## Wikis
 #foreach($wiki in $wikis)
   #if("$!wiki" != '')
-    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
-    #set($wikiDoc = $xwiki.getDocument($wikiRef))
-    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiDoc.getURL(), $msg.get('watchlist.table.allspaces'), '', $msg.get('watchlist.table.alldocuments'), '', $wikiDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
+    #set($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
+    #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
+    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiHomeDoc.getURL(), $services.localization.render('watchlist.table.allspaces'), '', $services.localization.render('watchlist.table.alldocuments'), '', $wikiHomeDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
   #end
 #end
 ## Spaces
 #foreach($space in $spaces)
   #if("$!space" != '')
-    #set($wiki = $space.substring(0, $space.indexOf(':')))
-    #set($dotsindex = $space.indexOf(':') + 1)
-    #set($spaceName = $space.substring($dotsindex))
-    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
-    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
-    #set($wikiDoc = $xwiki.getDocument($wikiRef))
-    #set($spaceDoc = $xwiki.getDocument($spaceRef))
-    #set($discard = $elements.add([$space, $spaceType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $msg.get('watchlist.table.alldocuments'), '', $spaceDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
+    #set($spaceRef = $services.model.resolveSpace($space))
+    #set($wiki = $spaceRef.parent.name)
+    #set($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
+    #set($spaceHomeDocRef = $services.model.createDocumentReference($wiki, $spaceRef.name, '', 'default'))
+    #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
+    #set($spaceHomeDoc = $xwiki.getDocument($spaceHomeDocRef))
+    #set($discard = $elements.add([$spaceRef.name, $spaceType, $wiki, $wikiHomeDoc.getURL(), $spaceRef.name, $spaceHomeDoc.getURL(), $services.localization.render('watchlist.table.alldocuments'), '', $spaceHomeDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
   #end
 #end
 ## Pages
 #foreach($page in $pages)
   #if ("$!page" != '')
-    #set($wiki = $page.substring(0, $page.indexOf(':')))
-    #set($dotsindex = $page.indexOf(':') + 1)
-    #set($spaceName = $page.substring($dotsindex, $page.indexOf('.')))
-    #set($dotindex = $page.indexOf('.') + 1)
-    #set($pageName = $page.substring($dotindex))
-    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
-    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
-    #set($pageRef = $services.model.createDocumentReference($wiki, $spaceName, $pageName))
-    #set($wikiDoc = $xwiki.getDocument($wikiRef))
-    #set($spaceDoc = $xwiki.getDocument($spaceRef))
+    #set($pageRef = $services.model.resolveDocument($page))
+    #set($wiki = $pageRef.wikiReference.name)
+    #set($spaceName = $pageRef.lastSpaceReference.name)
+    #set($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
+    #set($spaceHomeDocRef = $services.model.createDocumentReference($wiki, $spaceName, '', 'default'))
+    #set($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
+    #set($spaceHomeDoc = $xwiki.getDocument($spaceHomeDocRef))
     #set($pageDoc = $xwiki.getDocument($pageRef))
-    #set($discard = $elements.add([$page, $pageType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $pageName, $pageDoc.getURL(), $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')]))
+    #set($discard = $elements.add([$page, $pageType, $wiki, $wikiHomeDoc.getURL(), $spaceName, $spaceHomeDoc.getURL(), $pageRef.name, $pageDoc.getURL(), $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')]))
   #end
 #end
 ##
@@ -90,8 +87,8 @@
         "id"        : "$!listtool.get($element, 0)",
         "type"      : "$!listtool.get($element, 1)",
         #set($wikiName = $!listtool.get($element, 2))
-        #if($xwiki.isVirtualMode() &amp;&amp; $xwiki.wikimanager)
-          #set($wikiPrettyName = $xwiki.wikimanager.getWikiDocument($wikiName).getWikiPrettyName())
+        #if($services.wikimanager)
+          #set($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).getWikiPrettyName())
           #if("$!wikiPrettyName.trim()" != '')
             #set($wikiName = $wikiPrettyName)
           #end
@@ -108,4 +105,5 @@
   ]
 }
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

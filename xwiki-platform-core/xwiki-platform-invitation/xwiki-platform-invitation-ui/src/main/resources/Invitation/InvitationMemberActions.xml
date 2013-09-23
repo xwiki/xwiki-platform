@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Invitation</web>
+  <name>InvitationMemberActions</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Invitation.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1273964773000</creationDate>
+  <date>1274346351000</date>
+  <contentUpdateDate>1274346351000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiRights</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <allow>
+        <defaultValue>1</defaultValue>
+        <displayFormType>select</displayFormType>
+        <displayType>allow</displayType>
+        <name>allow</name>
+        <number>4</number>
+        <prettyName>Allow/Deny</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </allow>
+      <groups>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>groups</name>
+        <number>1</number>
+        <prettyName>Groups</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <usesList>1</usesList>
+        <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+      </groups>
+      <levels>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>levels</name>
+        <number>2</number>
+        <prettyName>Levels</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
+      </levels>
+      <users>
+        <cache>0</cache>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>users</name>
+        <number>3</number>
+        <prettyName>Users</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <usesList>1</usesList>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </users>
+    </class>
+    <name>Invitation.InvitationMemberActions</name>
+    <number>0</number>
+    <className>XWiki.XWikiRights</className>
+    <guid>09cf0119-1b3b-44a6-a38d-50fd539331b7</guid>
+    <property>
+      <allow>1</allow>
+    </property>
+    <property>
+      <groups>XWiki.XWikiAllGroup,</groups>
+    </property>
+    <property>
+      <levels>view</levels>
+    </property>
+    <property>
+      <users/>
+    </property>
+  </object>
+  <content>{{include document="Invitation.InvitationCommon" /}}
+
+{{include document="Invitation.InvitationMembersCommon" /}}
+
+{{velocity}}
+#*
+ * Invitation Application
+ * This script is only for use by registered members to inspect messages and do actions on them (cancel invitations)
+ * This script should not be viewable to guests.
+ *
+ * Macros in this script don't rely on any variables except those which are passed to them and the following:
+ * $doc the com.xpn.xwiki.api.Document object representing the document containing this code.
+ * $msg the internationalization message provider containing a get(String) and a get(String, List) function
+ * $xcontext the com.xpn.xwiki.Context object for this request
+ *
+ * The main section of this script also uses:
+ * $xwiki an object of the com.xpn.xwiki.api.XWiki class.
+ *
+ * Macros also depend on other macros but only other macros which are contained in this script except for:
+ * #getMessagesBySender contained in InvitationMembersCommon
+ * #invitationFooter contained in InvitationMembersCommon
+ * #displayMessageTable contained in InvitationMembersCommon
+ * #loadInvitationConfig contained in InvitationCommon
+ * #loadInvitationMail contained in InvitationCommon
+ * #getUserAction contained in InvitationCommon
+ * #displayActionConfirmationForm contained in InvitationCommon
+ *
+ * This script is affected by the following documents:
+ *
+ * InvitationMessages stores all of the mail message objects. If this does not exist it will be created.
+ *                    May be changed in the configuration.
+ *
+ * InvitationMailClass the class for mail message objects. May be changed in the configuration.
+ *
+ * InvitationConfig configuration for this code. Contains an XObject of the class defined in this document.
+ *                  If it does not exist it will be created with default values.
+ *
+ *###
+#if($xcontext.getUser() == 'XWiki.XWikiGuest')
+  ## Only members should ever have access to this document, enforce this through XWiki permissions system,
+  ## this is a last effort in the event of incorrect settings.
+  #stop
+#end
+##
+## Is the current user a mail admin? TODO Improve this!
+#set($isAdmin = $hasEdit)
+##
+## Load config and mail.
+#set($config = {})
+#loadInvitationConfig($config)
+#set($mail = {})
+#set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+#loadInvitationMail($config, $emailContainer, $mail)
+##
+## Load CSS
+$xwiki.get('ssx').use($config.get('commonPage'))
+##
+## Don't load comments, history, etc.
+#set($docextras = [])
+##
+#set($action = [])
+#getUserAction($request.getParameterMap(), $action)
+#if($action.size() &gt; 0 &amp;&amp; $request.getMethod().toLowerCase() == 'post')
+  #set($action = $action.get(0))
+  #doUserActionOnMultipleMessages($request.getParameterValues('messageID'),
+                                  $action,
+                                  $request.getParameter('memo'),
+                                  $request.getParameter('confirm'),
+                                  $request.getParameter('inspect'),
+                                  $isAdmin,
+                                  $mail,
+                                  $emailContainer)
+  #inspectMessages($mail, $inspect, $isAdmin, $messageID)
+  #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
+#else
+  ## Inspect messages without doing any action.
+  #set($inspect = $request.getParameter('inspect'))
+  #if("$!inspect" != '')
+    #displayInvitationHeader($request.getParameterMap(), $config)
+    #inspectMessages($mail, $inspect, $isAdmin, $request.getParameter('messageID'))
+    #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
+  #else
+    ##
+    ## No orders, Lets just explain what this page is for.
+    {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
+  #end
+#end
+##
+## Prevent $mail and config from leaking if this page is included in another page.
+#set($mail = 0)
+#set($config = 0)
+##
+#*
+ * Either a user wants to inspect their old messages or an admin wants to inspect all old messages.
+ *
+ * Inspection Codes:
+ * 'allAsAdmin' --- View all message groups (only works if admin.)
+ * 'all' ---------- View all of my message groups
+ * 'group' -------- View all messages in group
+ * 'groupAsAdmin' - View all messages in group as admin
+ *
+ * $mail (Map&lt;String, XObject&gt;) map of messages by their ID.
+ *
+ * $inspect the code for what the user wants to do.
+ *
+ * $isAdmin (Boolean) is the current user to be regarded as a mail administrator.
+ *
+ * $messageID (String) ID of a message in the group to show. Only needed if $inspect == 'all' or 'group'
+ *###
+#macro(inspectMessages, $mail, $inspect, $isAdmin, $messageID)
+  #if($inspect == 'allAsAdmin' &amp;&amp; $isAdmin)
+    ## All message groups.
+    #set($uniqueMail = [])
+    #set($numberOfMessagesByGroup = {})
+    #getMessagesOfUniqueGroups($mail.values(), $uniqueMail, $numberOfMessagesByGroup)
+    #displayMessageTable($uniqueMail,
+                         ['sentDate', 'sendingUser', 'subjectLine', 'status'],
+                         true,
+                         $numberOfMessagesByGroup)
+  #elseif($inspect == 'all')
+    ## My message groups.
+    #set($myMail = [])
+    #getMessagesBySender($mail.values(), $xcontext.getUser(), $myMail)
+    #set($myUniqueMail = [])
+    #set($numberOfMessagesByGroup = {})
+    #getMessagesOfUniqueGroups($myMail, $myUniqueMail, true, $numberOfMessagesByGroup)
+    #displayMessageTableInForm($myUniqueMail,
+                               ['_checkbox', 'sentDate', 'subjectLine', 'recipient', 'status'],
+                               false,
+                               $numberOfMessagesByGroup,
+                               ['cancel', 'noClass'])
+  #elseif($inspect == 'group')
+    ## Inspect a single message group
+    #set($myMail = [])
+    #getMessagesBySender($mail.values(), $xcontext.getUser(), $myMail)
+    #set($myMailInGroup = [])
+    #getMessagesInGroup($myMail, $mail.get($messageID).getProperty('messageGroupID').getValue(), $myMailInGroup)
+    ## If any messages are pending then we add the cancel button.
+    #set($showCancelButton = false)
+    #foreach($message in $myMailInGroup)
+      #if($message.getProperty('status').getValue() == 'pending')
+        #set($showCancelButton = true)
+        #break
+      #end
+    #end
+    ## if there is only one message and there is a memo, show the memo.
+    #if($myMailInGroup.size() == 1)
+      #displayStatusAndMemo($myMailInGroup.get(0))
+    #end
+    #if($showCancelButton)
+      #displayMessageTableInForm($myMailInGroup,
+                                 ['_checkbox', 'sentDate', 'recipient', 'status', '_history'],
+                                 false,
+                                 '',
+                                 ['cancel'])
+    #else
+      #displayMessageTableInDiv($myMailInGroup, ['sentDate', 'recipient', 'status', '_history'], false, '')
+    #end
+    #if($myMailInGroup.size() &gt; 0)
+      #displayMessage($myMailInGroup.get(0))
+    #end
+  #elseif($inspect == 'groupAsAdmin' &amp;&amp; $isAdmin)
+    ## Inspect a single message group as admin
+    #set($mailInGroup = [])
+    #getMessagesInGroup($mail.values(), $mail.get($messageID).getProperty('messageGroupID').getValue(), $mailInGroup)
+    #if($mailInGroup.size() == 1)
+      #displayStatusAndMemo($mailInGroup.get(0))
+    #end
+    #displayMessageTableInForm($mailInGroup,
+                               ['_checkbox', 'sentDate', 'sendingUser', 'recipient', 'status', '_history'],
+                               true,
+                               '',
+                               ['notSpam'])
+    #if($mailInGroup.size() &gt; 0)
+      #displayMessage($mailInGroup.get(0))
+    #end
+  ## NOTE: we are not checking for admin status to view history as an admin. If the user knows the messageID then they
+  ## can see it's history.
+  #elseif($inspect == 'history' || $inspect == 'historyAsAdmin')
+    #displayMessageHistory($mail.get($messageID))
+  #end
+#end
+##
+#*
+ * Display an info box with the message status and last memo.
+ *
+ * $message (XObject) the message to display.
+ *###
+#macro(displayStatusAndMemo, $message)
+  #set($lastMemo = "#getLastMemo($message)")
+  #if("$!lastMemo" != '')
+
+
+    {{info}}##
+     (%id="message-status-and-memo"%)##
+      $services.localization.render('xe.invitation.inspectMessages.lastEntryInfoBox',
+               ["#messageStatusForCode($message.getProperty('status').getValue())", $lastMemo])##
+    {{/info}}
+
+  #end
+#end
+##
+#*
+ * Display a table of the history of a message
+ *
+ * $message (XObject) the message to display history for.
+ *###
+#macro(displayMessageHistory, $message)
+
+    (%id="message-history-table" class="invitation"%)(((
+     |=(%class="status-set-to"%)$services.localization.render('xe.invitation.displayMessageHistory.messageStatusSetTo')##
+       |=$services.localization.render('xe.invitation.displayMessageHistory.setByUser')##
+         |=(%class="log-entry"%)$services.localization.render('xe.invitation.displayMessageHistory.logEntry')
+     $message.getProperty('history').getValue()
+    )))
+
+    #displayMessage($mail.get($messageID))  
+#end
+##
+#*
+ * Do an action on multiple messages. Only for actions available to registered users.
+ *
+ * Actions:
+ * cancel - must be message sender or admin, message status must be 'pending'
+ * notSpam - must be admin and message status must be 'reported'
+ * else - unknown
+ *
+ * $messageIDs (List&lt;String&gt;) the unique IDs of the invitations to cancel.
+ *
+ * $action (String) the sction to do to the invitations.
+ *
+ * $memo (String) an action specific message to attach to the mail EG: reason for declining, 
+ *                or results of spam investigation.
+ *
+ * $confirm (Boolean) are you sure you want to do this?
+ *
+ * $inspect (String) what to inspect after finishing an action.
+ *
+ * $isAdmin (Boolean) is the current user a mail administrator?
+ *
+ * $mail (Map&lt;String, XObject&gt;) the map of stored messages by their id.
+ *
+ * $emailContainer (Document) the document to save after changing objects.
+ *###
+#macro(doUserActionOnMultipleMessages, $messageIDs, $action, $memo, $confirm, $inspect, $isAdmin, $mail, $emailContainer)
+  ##
+  ## 1. get messages.
+  #set($messages = [])
+  #foreach($messageID in $messageIDs)
+    #set($discard = $messages.add($mail.get($messageID)))
+  #end
+  ##
+  ## 2. determine how many groups the messages belong to.
+  #set($groups = {})
+  #foreach($message in $messages)
+    #set($discard = $groups.put($message.getProperty('messageGroupID'), ''))
+  #end
+  #set($numGroups = $groups.keySet().size())
+  ##
+  #if($action == 'cancel')
+    ## Cancel Invitations &lt;----------------------------------------------------------------------
+    = $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.heading') =
+    #if($messages.size() == 0)
+      ## No message found by that id.
+      (%id="invitation-action-message"%)((({{error}}##
+      #if(!$messageIDs || $messageIDs.size() &lt; 2)
+        $services.localization.render('xe.invitation.noMessageFound')##
+      #else
+        $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesFound')##
+      #end
+      {{/error}})))
+    #elseif($messages.size() != $messageIDs.size())
+      #if($messages.size() &gt; $messageIDs.size())
+        ## this should not happen.
+        Internal error: Too many messages for the number of ids given. In #doUserActionOnMultipleMessages
+      #else
+        ## x of the y messages to cancel could not be found.
+        (%id="invitation-action-message"%)((({{error}}##
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.someMessagesNotFound',
+                     [$mathtool.sub($messageIDs.size(), $messages.size()), $messageIDs.size()]){{error}})))
+      #end
+    #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+      ## If the user accidently selected messages to which this action cannot be done, just skip over them.
+      #set($changed = false)
+      #foreach($message in $messages)
+        #if($message.getProperty('status').getValue() == 'pending')
+          #setMessageStatus($message, 'canceled', $memo)
+          #set($changed = true)
+        #end
+      #end
+      #if($changed)
+        $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.saveComment'))
+        ## Invitations canceled successfully.
+        (%id="invitation-action-message"%)((({{info}}##
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.success'){{/info}})))
+      #else
+        (%id="invitation-action-message"%)((({{warning}}##
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesAffected'){{/warning}})))
+      #end
+    #else
+      ## Are you sure?...
+      #if($messages.size() &lt; 2)
+        ## If one message: "Are you sure you want to cancel this invitation?"
+        == $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.OneMessage') ==
+      #elseif($messages.size() == $numGroups)
+        ## If number of groups is same as number of messages: "Are you sure you want to cancel X invitations?"
+        == $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.OneMessagePerGroup', [$numGroups]) ==
+      #else
+        ## Otherwise: "Are you sure you want to cancel X invitations to Y recipients?"
+        == $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.areYouSure.multipleMessagesMultipleGroups',
+                    [$numGroups, $messages.size()]) ==
+      #end
+      #displayActionConfirmationForm($messageIDs,
+                                     $action,
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.cancel.memoLabel'),
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.confirmLabel'),
+                                     {'inspect': $inspect})
+      (%class="invitation right-side"%)(((
+        #displayMessageTable($messages, ['sentDate', 'sendingUser', 'subjectLine'], $isAdmin)
+      )))
+    #end
+  #elseif($action == 'notSpam')
+    ## Declare message not spam &lt;-----------------------------------------------------------------
+    = $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.heading') =
+
+    #if($messages.size() == 0)
+      ## No message found by that id.
+      (%id="invitation-action-message"%)((({{error}}##
+      #if(!$messageIDs || $messageIDs.size() &lt; 2)
+        $services.localization.render('xe.invitation.noMessageFound')
+      #else
+        $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesFound')
+      #end
+      {{/error}})))
+    #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+      ## If the user accidently selected messages to which this action cannot be done, just skip over them.
+      #set($changed = false)
+      #foreach($message in $messages)
+        #if($message.getProperty('status').getValue() == 'reported')
+          #setMessageStatus($message, 'notSpam', $memo)
+          #set($changed = true)
+        #end
+      #end
+      #if($changed)
+        $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.reportHandledSaveComment',
+                                              [$xcontext.getUser()]))
+        (%id="invitation-action-message"%)((({{info}}##
+          $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.successMessage', [$memo])
+        {{/info}})))
+      #else
+        (%id="invitation-action-message"%)((({{error}}##
+            $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.noMessagesAffected'){{/error}})))
+      #end
+    #else
+      ## Are you sure?...
+      #displayActionConfirmationForm($messageIDs,
+                                     $action,
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.memoLabel'),
+                                     $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notSpam.confirmLabel'),
+                                     {'inspect': $inspect})
+      #if($messages.size() &gt; 0)
+        ## should always be true.
+        #displayMessage($messages.get(0))
+      #end
+    #end
+  #else
+
+    (%id="invitation-action-message"%)((({{error}}##
+        $services.localization.render('xe.invitation.doUserActionOnMultipleMessages.notPossibleOnMultipleMessages'){{/error}})))
+  #end
+
+  #if($confirm)
+    #inspectMessages($mail, $inspect, $isAdmin, $messageIDs.get(0))
+  #end
+#end
+##
+#*
+ * Display a table of messages, in a div class="invitation" html element.
+ *
+ * $mail (Collection&lt;XObject&gt;) the messages to view.
+ *
+ * $fieldsToDisplay (List&lt;String&gt;) fields which should be displayed.
+ *   Options include: sendingUser, subjectLine, status, memo, recipient
+ *
+ * $isAdmin (Boolean) should the links point to displaying for admin or user (NOT FOR SECURITY)
+ *
+ * $numberOfRecipientsByMessage (Map&lt;Integer, XObject&gt;) the number of recipients for a given message (Optional)
+ *                                                      if specified and recipient field is set in $fieldsToDisplay
+ *                                                      then messages with multiple recipients will say "X recipients".
+ *###
+#macro(displayMessageTableInDiv, $mail, $fieldsToDisplay, $isAdmin, $numberOfRecipientsByMessage)
+
+
+
+  #if(!$mail || $mail.size() &lt; 1)
+    {{info}}$services.localization.render('xe.invitation.displayMessageTable.noMessages'){{/info}}
+  #else
+    (%class="invitation"%)(((
+     #displayMessageTable($mail, $fieldsToDisplay, $isAdmin,  $numberOfRecipientsByMessage)
+    )))
+  #end
+
+#end
+##
+#*
+ * Display a table of messages, in a form class="invitation" html element.
+ *
+ * $mail (Collection&lt;XObject&gt;) the messages to view.
+ *
+ * $fieldsToDisplay (List&lt;String&gt;) fields which should be displayed.
+ *   Options include: sendingUser, subjectLine, status, memo, recipient
+ *
+ * $isAdmin (Boolean) should the links point to displaying for admin or user (NOT FOR SECURITY)
+ *
+ * $numberOfRecipientsByMessage (Map&lt;Integer, XObject&gt;) the number of recipients for a given message (Optional)
+ *                                                      if specified and recipient field is set in $fieldsToDisplay
+ *                                                      then messages with multiple recipients will say "X recipients".
+ * $formOptions (List&lt;String&gt;) the options which should be presented to the user. 
+ *                                   Options include: "cancel", "notSpam", "noClass"
+ *###
+#macro(displayMessageTableInForm, $mail, $fieldsToDisplay, $isAdmin, $numberOfRecipientsByMessage, $formOptions)
+
+
+
+  #if(!$mail || $mail.size() &lt; 1)
+    {{info}}$services.localization.render('xe.invitation.displayMessageTable.noMessages'){{/info}}
+  #else
+    {{html wiki=true}}
+     &lt;form ##
+      #if(!$formOptions.contains('noClass'))
+        class="invitation" ##
+      #end
+      action="$doc.getURL()" method="POST"&gt;
+      #displayMessageTable($mail, $fieldsToDisplay, $isAdmin,  $numberOfRecipientsByMessage)##
+
+      #if($formOptions &amp;&amp; $formOptions.size() &gt; 0)
+        #set($validOptions = ['cancel', 'notSpam'])
+        &lt;div class="bottombuttons"&gt;
+         &lt;div class="buttons"&gt;
+          #foreach($option in $formOptions)
+            &lt;span class="buttonwrapper"&gt;
+             #if($validOptions.contains($option))
+               &lt;input type="submit" class="button" name="doAction_$option" ##
+                   value="$services.localization.render("xe.invitation.displayMessageTableInForm.buttonLabel.${option}")"/&gt;
+             #end
+            &lt;/span&gt;
+          #end
+         &lt;/div&gt;
+        &lt;/div&gt;
+      #end
+     &lt;/form&gt;
+    {{/html}}
+  #end
+
+#end
+##
+#*
+ * Get only messages of unique groups. If one message in a group is marked as spam it will be the one included.
+ *
+ * $mail (Collection&lt;XObject&gt;) the messages to search through.
+ *
+ * $mailOut (Map&lt;Integer, XObject&gt;) Message from each group by how many messages in that group.
+ *
+ * $numberOfMessagesByGroupOut (Map&lt;Integer, Integer&gt;) Populated with numbers of messages in each group by group number.
+ *###
+#macro(getMessagesOfUniqueGroups, $mail, $mailOut, $numberOfMessagesByGroupOut)
+  #set($messageByGroup = {})
+  #foreach($message in $mail)
+    #set($messageGroup = $message.getProperty('messageGroupID').getValue())
+    ##
+    ## Get number of messages by group:
+    #if($numberOfMessagesByGroupOut.containsKey($messageGroup))
+       #set($numMessages = $numberOfMessagesByGroupOut.get($messageGroup))
+       #set($discard = $numberOfMessagesByGroupOut.put($messageGroup, $mathtool.add($numMessages, 1)))
+    #else
+       #set($discard = $numberOfMessagesByGroupOut.put($messageGroup, 1))
+    #end
+    ##
+    ## Get messages of unique groups.
+    #if(!$messageByGroup.containsKey($messageGroup) || $message.getProperty('status').getValue() == 'reported')
+      #set($discard = $messageByGroup.put($messageGroup, $message))
+    #end
+  #end
+  #set($discard = $mailOut.addAll($messageByGroup.values()))
+#end
+##
+#*
+ * Get only messages of given group.
+ *
+ * $mail (Collection&lt;XObject&gt;) the messages to search though.
+ *
+ * $groupID (Double) the ID of the group to get messages from.
+ *
+ * $mailOut (List&lt;XObject&gt;) will be populated with messages which are from that group and found in $mail
+ *###
+#macro(getMessagesInGroup, $mail, $groupID, $mailOut)
+  #foreach($message in $mail)
+    #if($groupID == $message.getProperty('messageGroupID').getValue())
+      #set($discard = $mailOut.add($message))
+    #end
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

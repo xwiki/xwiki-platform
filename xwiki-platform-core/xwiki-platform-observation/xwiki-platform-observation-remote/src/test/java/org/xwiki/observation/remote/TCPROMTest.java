@@ -16,14 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.observation.remote;
 
 import java.util.Arrays;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,21 +33,23 @@ public class TCPROMTest extends AbstractROMTestCase
 {
     static class Unserializable { }
     
-    private Mockery context = new Mockery();
-
+    @Override
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        
-        getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp1"));
-        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp2");
+
+        System.setProperty("jgroups.bind_addr", "localhost");
+
+        getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp"));
+        RemoteObservationManager rom = getComponentManager2().getInstance(RemoteObservationManager.class);
+        rom.startChannel("tcp");
     }
-    
+
     @After
     public void tearDown() throws Exception
     {
-        this.context.assertIsSatisfied();
+        this.mockery.assertIsSatisfied();
     }
 
     /**
@@ -58,18 +58,23 @@ public class TCPROMTest extends AbstractROMTestCase
     @Test
     public void testSerializableEvent() throws InterruptedException
     {
-        final EventListener localListener = this.context.mock(EventListener.class, "listener1");
-        final EventListener remoteListener = this.context.mock(EventListener.class, "listener2");
+        final EventListener localListener = this.mockery.mock(EventListener.class, "local");
+        final EventListener remoteListener = this.mockery.mock(EventListener.class, "remote");
 
         final TestEvent event = new TestEvent();
 
         final Unserializable unserializable = new Unserializable();
 
-        this.context.checking(new Expectations() {{
-                allowing(localListener).getName(); will(returnValue("mylistener"));
-                allowing(remoteListener).getName(); will(returnValue("mylistener"));
-                allowing(localListener).getEvents(); will(returnValue(Arrays.asList(event)));
-                allowing(remoteListener).getEvents(); will(returnValue(Arrays.asList(event)));
+        this.mockery.checking(new Expectations()
+        {{
+                allowing(localListener).getName();
+                will(returnValue("mylistener"));
+                allowing(remoteListener).getName();
+                will(returnValue("mylistener"));
+                allowing(localListener).getEvents();
+                will(returnValue(Arrays.asList(event)));
+                allowing(remoteListener).getEvents();
+                will(returnValue(Arrays.asList(event)));
                 oneOf(localListener).onEvent(with(same(event)), with(equal("some source")), with(equal("some data")));
                 oneOf(localListener).onEvent(with(same(event)), with(same(unserializable)), with(same(unserializable)));
                 oneOf(remoteListener).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));

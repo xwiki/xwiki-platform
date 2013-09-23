@@ -52,13 +52,16 @@
   background: white; 
 }
 
-.gwt-MenuBar-vertical table {
-  border-collapse: collapse;
+.gwt-MenuBar-vertical {
   background-color: #F0F0EE;
   border-style: solid;
   border-width: 1px;
   border-color: #fff #aaa #aaa #fff;
   font-size: 12px;
+}
+
+.gwt-MenuBar-vertical table {
+  border-collapse: collapse;
 }
 
 .gwt-MenuBar-vertical .gwt-MenuItem {
@@ -147,18 +150,10 @@
   overflow: hidden;
 }
 
-* html .gwt-MenuBar-vertical table {
-  border-collapse: collapse;
-  background-color: #F0F0EE;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #fff #aaa #aaa #fff;
-  font-size: 12px;
-}
-
 .gwt-MenuItem .gwt-MenuItemIcon {
   float: left;
   margin-left: -5px;
+  max-width: none;
   vertical-align: middle;
 }
 

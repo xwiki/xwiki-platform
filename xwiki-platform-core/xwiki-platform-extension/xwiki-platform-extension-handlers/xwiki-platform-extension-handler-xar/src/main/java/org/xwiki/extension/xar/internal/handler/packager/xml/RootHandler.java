@@ -27,14 +27,14 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentManager;
 
+/**
+ * 
+ * @version $Id$
+ * @since 4.0M1
+ */
 public class RootHandler extends AbstractHandler
 {
     private Map<String, ContentHandler> handlers = new HashMap<String, ContentHandler>();
-
-    public RootHandler()
-    {
-        super(null, null);
-    }
 
     public RootHandler(ComponentManager componentManager)
     {

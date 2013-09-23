@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import com.xpn.xwiki.XWikiContext;
@@ -26,13 +24,20 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import org.dom4j.Element;
 
-public interface ObjectInterface extends ElementInterface {
-    public BaseClass getxWikiClass(XWikiContext context) throws XWikiException;
-    // public void setxWikiClass(BaseClass xWikiClass);
+public interface ObjectInterface extends ElementInterface
+{
+    /**
+     * @since 4.0M1
+     */
+    public BaseClass getXClass(XWikiContext context) throws XWikiException;
 
     public PropertyInterface get(String name) throws XWikiException;
-    public void put(String name,PropertyInterface property) throws XWikiException;
+
+    public void put(String name, PropertyInterface property) throws XWikiException;
+
     public PropertyInterface safeget(String name);
+
     public void safeput(String name, PropertyInterface property);
+
     public Element toXML(BaseClass bclass);
 }

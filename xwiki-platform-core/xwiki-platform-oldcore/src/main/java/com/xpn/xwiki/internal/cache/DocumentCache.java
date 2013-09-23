@@ -31,6 +31,8 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 2.4M1
  */
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have DocumentCache<C>.
+// Changing it will thus break all code looking up components implementing this role.
 @ComponentRole
 public interface DocumentCache<C>
 {

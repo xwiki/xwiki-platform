@@ -1,0 +1,17 @@
+#if ($type == 'edit' || $type == 'search')
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="email" />
+#elseif ($type == 'view' || $type == 'rendered')
+#if ($xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0) == 1)
+$!value.replaceAll('^(.).*@', '$1...@')##
+#else
+$!value##
+#end
+#elseif ($type == 'hidden')
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  <input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml($value)" />
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end

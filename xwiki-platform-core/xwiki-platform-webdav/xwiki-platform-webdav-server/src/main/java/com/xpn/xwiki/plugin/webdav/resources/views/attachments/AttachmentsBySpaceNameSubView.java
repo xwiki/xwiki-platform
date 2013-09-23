@@ -48,9 +48,7 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
      */
     private static final Logger logger = LoggerFactory.getLogger(AttachmentsBySpaceNameSubView.class);
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String nextToken = tokens[next];
@@ -68,9 +66,7 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResourceIterator getMembers()
     {
         List<DavResource> children = new ArrayList<DavResource>();

@@ -35,7 +35,7 @@ public class DocumentDeletingEvent extends AbstractDocumentEvent
      * changes.
      */
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
@@ -45,18 +45,18 @@ public class DocumentDeletingEvent extends AbstractDocumentEvent
     {
         super();
     }
-    
+
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
      * meaning that this event will match only delete events affecting the same document.
      * 
      * @param documentReference the reference of the document to match
      */
-    public DocumentDeletingEvent(DocumentReference documentReference)    
+    public DocumentDeletingEvent(DocumentReference documentReference)
     {
         super(documentReference);
     }
-    
+
     /**
      * Constructor using a custom {@link EventFilter}.
      * 
@@ -65,5 +65,5 @@ public class DocumentDeletingEvent extends AbstractDocumentEvent
     public DocumentDeletingEvent(EventFilter eventFilter)
     {
         super(eventFilter);
-    }    
+    }
 }

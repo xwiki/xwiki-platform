@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.render.filter;
 
@@ -39,6 +38,7 @@ public class CodeRemoveFilter extends RegexTokenFilter
         super("(\\{(code)(?::([^\\}]*))?\\})(.*?)\\{code}", MULTILINE);
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
     	// Remove the content inside the code macro. It'll be put back in CodeRestoreFilter

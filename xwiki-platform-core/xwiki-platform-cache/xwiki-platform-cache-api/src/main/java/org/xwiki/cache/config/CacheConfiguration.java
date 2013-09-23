@@ -21,10 +21,14 @@ package org.xwiki.cache.config;
 
 import java.util.HashMap;
 
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
+
 /**
  * Contains all informations used to create the cache.
  * <p>
- * A configuration identifier can be defined. It will be used to me the cache unique for clustering process.
+ * A configuration identifier can be defined.
+ * <p>
+ * It can be used to be the cache unique identifier for clustering process.
  * <p>
  * This is also used by implementations to associate the cache with a configuration file which overwrite the
  * configuration it contains. This way any cache can be tuned in a particular installation with option specifics to
@@ -36,14 +40,65 @@ import java.util.HashMap;
 public class CacheConfiguration extends HashMap<String, Object>
 {
     /**
-     * Since this class is a Map it needs to be serializable and thus have a unique id for Serialization. 
+     * Since this class is a Map it needs to be serializable and thus have a unique id for Serialization.
      */
     private static final long serialVersionUID = -7298684313672163845L;
-    
+
     /**
      * The configuration identifier.
      */
     private String configurationId;
+
+    /**
+     * The default constructor.
+     */
+    public CacheConfiguration()
+    {
+
+    }
+
+    /**
+     * @param configurationId the configuration identifier
+     * @since 4.3M1
+     */
+    public CacheConfiguration(String configurationId)
+    {
+        this(configurationId, null);
+    }
+
+    /**
+     * Creates CacheConfiguration instance with given eviction configuration.
+     * 
+     * @param evictionConfiguration describes details of entry eviction method.
+     * @since 4.3M1
+     */
+    public CacheConfiguration(EntryEvictionConfiguration evictionConfiguration)
+    {
+        this(null, evictionConfiguration);
+    }
+
+    /**
+     * Creates CacheConfiguration instance with given eviction configuration and id.
+     * 
+     * @param evictionConfiguration describes details of entry eviction method.
+     * @param configurationId the configuration identifier.
+     * @since 4.3M1
+     */
+    public CacheConfiguration(String configurationId, EntryEvictionConfiguration evictionConfiguration)
+    {
+        setEvictionConfiguration(evictionConfiguration);
+        setConfigurationId(configurationId);
+    }
+
+    /**
+     * Sets details of entry eviction method.
+     * 
+     * @param evictionConfiguration describes details of entry eviction method.
+     */
+    private void setEvictionConfiguration(EntryEvictionConfiguration evictionConfiguration)
+    {
+        put(EntryEvictionConfiguration.CONFIGURATIONID, evictionConfiguration);
+    }
 
     /**
      * @param configurationId the configuration identifier.
@@ -58,6 +113,6 @@ public class CacheConfiguration extends HashMap<String, Object>
      */
     public String getConfigurationId()
     {
-        return configurationId;
+        return this.configurationId;
     }
 }

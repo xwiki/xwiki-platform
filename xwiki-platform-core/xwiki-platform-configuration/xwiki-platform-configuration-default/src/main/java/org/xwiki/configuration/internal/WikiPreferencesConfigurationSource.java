@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 /**
@@ -38,21 +39,27 @@ import org.xwiki.model.reference.SpaceReference;
 @Singleton
 public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
+    /**
+     * The name of the space where wiki preferences are located.
+     */
     private static final String SPACE_NAME = "XWiki";
 
-    private static final String PAGE_NAME = "XWikiPreferences";
+    /**
+     * The local reference of the class containing wiki preferences.
+     */
+    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME,
+        "XWikiPreferences");
 
     @Override
-    protected DocumentReference getClassReference()
+    protected LocalDocumentReference getClassReference()
     {
-        // The Class reference is the same as the document refernece for XWiki.XWikiPreferences since the class is
-        // stored in the document of the same name.
-        return getDocumentReference();
+        return CLASS_REFERENCE;
     }
 
     @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(PAGE_NAME, new SpaceReference(SPACE_NAME, getCurrentWikiReference()));
+        return new DocumentReference(CLASS_REFERENCE.getName(), new SpaceReference(SPACE_NAME,
+            getCurrentWikiReference()));
     }
 }

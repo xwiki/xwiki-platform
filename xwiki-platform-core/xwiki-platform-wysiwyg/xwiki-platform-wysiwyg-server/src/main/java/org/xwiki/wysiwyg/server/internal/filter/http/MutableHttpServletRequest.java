@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.xwiki.wysiwyg.server.filter.MutableServletRequest;
 
-
 /**
  * {@link MutableServletRequest} implementation for the HTTP protocol.
  * 
@@ -59,114 +58,70 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
         params.putAll(request.getParameterMap());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableServletRequest#setParameter(String, String)
-     */
+    @Override
     public String setParameter(String name, String value)
     {
         String[] previousValues = params.put(name, new String[] {value});
         return (previousValues == null || previousValues.length == 0) ? null : previousValues[0];
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableServletRequest#setParameterValues(String, String[])
-     */
+    @Override
     public String[] setParameterValues(String name, String[] values)
     {
         return params.put(name, values);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableServletRequest#removeParameter(String)
-     */
+    @Override
     public String removeParameter(String name)
     {
         String[] previousValues = params.remove(name);
         return (previousValues == null || previousValues.length == 0) ? null : previousValues[0];
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HttpServletRequestWrapper#getParameter(String)
-     */
+    @Override
     public String getParameter(String name)
     {
         String[] values = params.get(name);
         return (values == null || values.length == 0) ? null : values[0];
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HttpServletRequestWrapper#getParameterMap()
-     */
+    @Override
     public Map<String, String[]> getParameterMap()
     {
         return Collections.unmodifiableMap(params);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HttpServletRequestWrapper#getParameterNames()
-     */
+    @Override
     public Enumeration<String> getParameterNames()
     {
         return Collections.enumeration(params.keySet());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HttpServletRequestWrapper#getParameterValues(String)
-     */
+    @Override
     public String[] getParameterValues(String name)
     {
         return params.get(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableHttpServletRequest#sendRedirect(ServletResponse, String)
-     */
+    @Override
     public void sendRedirect(ServletResponse res, String url) throws IOException
     {
         ((HttpServletResponse) res).sendRedirect(url);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableServletRequest#getReferer()
-     */
+    @Override
     public String getReferer()
     {
         return getHeader("Referer");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableServletRequest#setSessionAttribute(String, Object)
-     */
+    @Override
     public Object getSessionAttribute(String attrName)
     {
         return getSession().getAttribute(attrName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MutableServletRequest#setSessionAttribute(String, Object)
-     */
+    @Override
     public Object setSessionAttribute(String attrName, Object attrValue)
     {
         Object oldValue = getSession().getAttribute(attrName);

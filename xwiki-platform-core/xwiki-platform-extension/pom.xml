@@ -27,25 +27,26 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension</artifactId>
   <name>XWiki Platform - Extension - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Parent POM</description>
-  <properties>
-    <maven.version>3.0.3</maven.version>
-  
-    <!-- Extension Manager is still in experimental sate and change very often -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <modules>
-    <module>xwiki-platform-extension-api</module>
+    <module>xwiki-platform-extension-cluster</module>
+    <module>xwiki-platform-extension-distribution</module>
     <module>xwiki-platform-extension-handlers</module>
-    <module>xwiki-platform-extension-repositories</module>
     <module>xwiki-platform-extension-script</module>
     <module>xwiki-platform-extension-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-extension-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
 

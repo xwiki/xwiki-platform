@@ -20,10 +20,11 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
@@ -41,7 +42,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     /**
      * Log object to log messages in this class.
      */
-    private static final Log LOG = LogFactory.getLog(MailSenderPluginApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderPluginApi.class);
 
     /**
      * API constructor.
@@ -55,11 +56,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         super(plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendHtmlMessage(String, String, String, String, String, String, String, java.util.List)
-     */
+    @Override
     public int sendHtmlMessage(String from, String to, String cc, String bcc, String subject, String body,
         String alternative, List<Attachment> attachments)
     {
@@ -75,11 +72,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendTextMessage(String, String, String, String)
-     */
+    @Override
     public int sendTextMessage(String from, String to, String subject, String message)
     {
         Mail email = new Mail();
@@ -90,11 +83,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendTextMessage(String, String, String, String, String, String, java.util.List)
-     */
+    @Override
     public int sendTextMessage(String from, String to, String cc, String bcc, String subject, String message,
         List<Attachment> attachments)
     {
@@ -109,11 +98,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendRawMessage(String, String, String)
-     */
+    @Override
     public int sendRawMessage(String from, String to, String rawMessage)
     {
         Mail email = new Mail();
@@ -124,11 +109,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         return sendMail(email);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendMessageFromTemplate(String, String, String, String, String, String, VelocityContext)
-     */
+    @Override
     public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
         String documentFullName, VelocityContext vcontext)
     {
@@ -140,26 +121,49 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put("error", e.getMessage());
             }
-            LOG.error("sendMessageFromTemplate", e);
+            LOGGER.error("sendMessageFromTemplate", e);
             return -1;
         }
     }
 
     /**
-     * {@inheritDoc}
+     * Uses an XWiki document to build the message subject and context, based on variables stored in a map. Sends the
+     * email.
      * 
-     * @see MailSender#createMail()
+     * @param from Email sender
+     * @param to Email recipient
+     * @param cc Email Carbon Copy
+     * @param bcc Email Hidden Carbon Copy
+     * @param language Language of the email
+     * @param documentFullName Full name of the template to be used (example: XWiki.MyEmailTemplate). The template needs
+     *        to have an XWiki.Email object attached
+     * @param parameters variables to be passed to the velocity context
+     * @return 0 on success, -1 on failure. On failure the error message is stored in the XWiki context under the
+     *         "error" key.
      */
+    public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
+        String documentFullName, Map<String, Object> parameters)
+    {
+        try {
+            return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, parameters,
+                this.context);
+        } catch (Exception e) {
+            // If the exception is a null pointer exception there is no message and e.getMessage() is null.
+            if (e.getMessage() != null) {
+                this.context.put("error", e.getMessage());
+            }
+            LOGGER.error("sendMessageFromTemplate", e);
+            return -1;
+        }
+    }
+
+    @Override
     public Mail createMail()
     {
         return new Mail();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendMail(Mail)
-     */
+    @Override
     public int sendMail(Mail mail)
     {
         int result = 0;
@@ -170,28 +174,20 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put("error", e.getMessage());
             }
-            LOG.error("Failed to send email [" + mail.toString() + "]", e);
+            LOGGER.error("Failed to send email [" + mail.toString() + "]", e);
             result = -1;
         }
 
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#createMailConfiguration(com.xpn.xwiki.api.XWiki)
-     */
+    @Override
     public MailConfiguration createMailConfiguration(XWiki xwiki)
     {
         return new MailConfiguration(xwiki);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MailSender#sendMail(Mail, MailConfiguration)
-     */
+    @Override
     public int sendMail(Mail mail, MailConfiguration mailConfiguration)
     {
         int result = 0;
@@ -202,7 +198,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put("error", e.getMessage());
             }
-            LOG.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
+            LOGGER.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
                 + mailConfiguration.toString() + "]", e);
             result = -1;
         }

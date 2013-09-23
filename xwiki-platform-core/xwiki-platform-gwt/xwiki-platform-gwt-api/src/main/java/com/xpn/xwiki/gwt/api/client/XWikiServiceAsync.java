@@ -16,16 +16,10 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author jeremi
- * @author ldubost
- *
  */
 package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
-
 import java.util.List;
 import java.util.Map;               
 

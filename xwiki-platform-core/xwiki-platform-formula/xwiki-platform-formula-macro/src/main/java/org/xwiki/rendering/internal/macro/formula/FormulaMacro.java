@@ -19,17 +19,17 @@
  */
 package org.xwiki.rendering.internal.macro.formula;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.FormulaRenderer.FontSize;
@@ -53,7 +53,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("formula")
+@Component
+@Named("formula")
+@Singleton
 public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
 {
     /** Predefined error message: empty formula. */
@@ -62,9 +64,6 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     /** Predefined error message: invalid formula. */
     public static final String WRONG_CONTENT_ERROR = "The formula text is not valid, please correct it.";
 
-    /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(FormulaMacro.class);
-
     /** The description of the macro. */
     private static final String DESCRIPTION = "Displays a mathematical formula.";
 
@@ -72,16 +71,22 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     private static final String CONTENT_DESCRIPTION = "The mathematical formula, in LaTeX syntax";
 
     /** Component manager, needed for retrieving the selected formula renderer. */
-    @Requirement
+    @Inject
     private ComponentManager manager;
 
     /** Defines from where to read the rendering configuration data. */
-    @Requirement
+    @Inject
     private FormulaMacroConfiguration configuration;
 
     /** Needed for computing the URL for accessing the rendered image. */
-    @Requirement
+    @Inject
     private DocumentAccessBridge dab;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -92,11 +97,7 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(FormulaMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -107,15 +108,14 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         String rendererHint = this.configuration.getRenderer();
         FontSize size = parameters.getFontSize();
         Type type = parameters.getImageType();
-        Block result = null;
+        Block result;
         try {
             result = render(content, context.isInline(), size, type, rendererHint);
-        } catch (ComponentLookupException ex) {
-            LOG.error("Invalid renderer: [" + rendererHint + "]. Falling back to the safe renderer.", ex);
+        } catch (MacroExecutionException ex) {
+            this.logger.debug("Failed to render content with the [{}] renderer. Falling back to the safe renderer.",
+                rendererHint, ex);
             try {
                 result = render(content, context.isInline(), size, type, this.configuration.getSafeRenderer());
-            } catch (ComponentLookupException ex2) {
-                LOG.error("Safe renderer not found. No image generated. Returning plain text.", ex);
             } catch (IllegalArgumentException ex2) {
                 throw new MacroExecutionException(WRONG_CONTENT_ERROR);
             }
@@ -143,31 +143,29 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
      * @param imageType the specified resulting image type
      * @param rendererHint the hint for the renderer to use
      * @return the resulting block holding the generated image, or {@code null} in case of an error.
-     * @throws ComponentLookupException if no component with the specified hint can be retrieved
+     * @throws MacroExecutionException if no renderer exists for the passed hint or if that rendered failed to render
+     *         the formula
      * @throws IllegalArgumentException if the formula is not valid, according to the LaTeX syntax
      */
     private Block render(String formula, boolean inline, FontSize fontSize, Type imageType, String rendererHint)
-        throws ComponentLookupException, IllegalArgumentException
+        throws MacroExecutionException, IllegalArgumentException
     {
         try {
-            FormulaRenderer renderer = this.manager.lookup(FormulaRenderer.class, rendererHint);
+            FormulaRenderer renderer = this.manager.getInstance(FormulaRenderer.class, rendererHint);
             String imageName = renderer.process(formula, inline, fontSize, imageType);
-            String url = this.dab.getURL(null, "tex", null, null) + "/" + imageName;
+            String url = this.dab.getDocumentURL(null, "tex", null, null) + "/" + imageName;
             ResourceReference imageReference = new ResourceReference(url, ResourceType.URL);
             ImageBlock result = new ImageBlock(imageReference, false);
             // Set the alternative text for the image to be the original formula
             result.setParameter("alt", formula);
             return result;
-        } catch (IOException ex) {
-            throw new ComponentLookupException("Failed to render formula using [" + rendererHint + "] renderer");
+        } catch (Exception e) {
+            throw new MacroExecutionException(
+                String.format("Failed to render formula using the [%s] renderer", rendererHint), e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;

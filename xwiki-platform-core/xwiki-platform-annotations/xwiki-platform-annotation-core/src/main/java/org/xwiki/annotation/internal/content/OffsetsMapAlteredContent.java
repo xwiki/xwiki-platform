@@ -69,21 +69,13 @@ public class OffsetsMapAlteredContent implements AlteredContent
         this.size = size;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getContent()
-     */
+    @Override
     public CharSequence getContent()
     {
         return content;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getInitialOffset(int)
-     */
+    @Override
     public int getInitialOffset(int i)
     {
         Integer result = alteredToInitial.get(i);
@@ -93,11 +85,7 @@ public class OffsetsMapAlteredContent implements AlteredContent
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getAlteredOffset(int)
-     */
+    @Override
     public int getAlteredOffset(int i)
     {
         Integer result = initialToAltered.get(i);
@@ -107,11 +95,7 @@ public class OffsetsMapAlteredContent implements AlteredContent
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.content.AlteredContent#getInitialLength()
-     */
+    @Override
     public int getInitialLength()
     {
         return size;

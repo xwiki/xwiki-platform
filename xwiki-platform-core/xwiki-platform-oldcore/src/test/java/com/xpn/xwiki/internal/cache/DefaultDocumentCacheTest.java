@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.internal.cache;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
-import org.jmock.Mock;
-import org.junit.Before;
+import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -32,7 +31,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit test for {@link DefaultDocumentCache}.
@@ -40,20 +39,20 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * @version $Id$
  * @since 2.4M1
  */
-public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestCase
+public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
 {
-    private Mock mockXWiki;
+    private XWiki mockXWiki;
 
     private XWikiDocument document;
 
     private DefaultDocumentCache<String> cache;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.cache = (DefaultDocumentCache<String>) getComponentManager().lookup(DocumentCache.class);
+        this.cache = (DefaultDocumentCache<String>) getComponentManager().getInstance(DocumentCache.class);
 
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setConfigurationId("documentcachetest");
@@ -62,16 +61,18 @@ public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestC
         this.cache.create(cacheConfiguration);
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.document.setOriginalDocument(this.document.clone());
 
-        this.mockXWiki = mock(XWiki.class);
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
+        this.mockXWiki = getMockery().mock(XWiki.class);
+        getContext().setWiki(this.mockXWiki);
         
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.document.getDocumentReference()), ANYTHING).will(
-            returnValue(this.document));
+        getMockery().checking(new Expectations() {{
+            allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
+        }});
     }
 
     @Override
-    protected void tearDown() throws Exception
+    public void tearDown() throws Exception
     {
         this.cache.dispose();
 
@@ -79,7 +80,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestC
     }
 
     @Test
-    public void testGetSet() throws InterruptedException
+    public void testGetSet()
     {
         this.cache.set("data", this.document.getDocumentReference());
         this.cache.set("data2", this.document.getDocumentReference(), "ext1", "ext2");
@@ -94,7 +95,8 @@ public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestC
         this.cache.set("data", this.document.getDocumentReference());
         this.cache.set("data", this.document.getDocumentReference(), "ext1", "ext2");
 
-        getComponentManager().lookup(ObservationManager.class).notify(
+        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+        observationManager.notify(
             new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
 
         Assert.assertNull(this.cache.get(this.document.getDocumentReference()));

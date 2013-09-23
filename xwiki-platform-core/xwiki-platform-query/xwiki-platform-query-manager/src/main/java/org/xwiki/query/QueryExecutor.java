@@ -21,7 +21,7 @@ package org.xwiki.query;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Execute a query for a given language (one implementation per language).
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @see Query
  * @since 1.6M1
  */
-@ComponentRole
+@Role
 public interface QueryExecutor
 {
     /**

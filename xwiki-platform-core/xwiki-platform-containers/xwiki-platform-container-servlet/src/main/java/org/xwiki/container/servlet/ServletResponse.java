@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.servlet;
 
@@ -41,9 +40,7 @@ public class ServletResponse implements Response
         return this.httpServletResponse;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public OutputStream getOutputStream() throws IOException
     {
         try {
@@ -53,17 +50,13 @@ public class ServletResponse implements Response
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentLength(int length)
     {
         this.httpServletResponse.setContentLength(length);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setContentType(String mimeType)
     {
         this.httpServletResponse.setContentType(mimeType);

@@ -27,22 +27,29 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
   <name>XWiki Platform - Rendering - Macro - Groovy</name>
-  <description>XWiki Platform - Rendering - Macro - Groovy</description>
+  <description>Adds ability to write scripts in Groovy in wiki pages</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Groovy Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
+    <!-- Note: We could only depend on xwiki-commons-groovy but since we want everyone to depend on the Groovy Macro
+         to also have all customizers defined in xwiki-platform-groovy we have added a dependency on it instead -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-groovy</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-    </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -52,9 +59,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

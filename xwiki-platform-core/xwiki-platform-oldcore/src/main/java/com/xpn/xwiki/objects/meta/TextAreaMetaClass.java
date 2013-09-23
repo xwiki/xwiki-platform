@@ -16,55 +16,67 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
+/**
+ * Defines the meta properties of a text area XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("TextArea")
+@Singleton
 public class TextAreaMetaClass extends StringMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Text Area XClass property.
+     */
     public TextAreaMetaClass()
     {
-        super();
-        // setType("textareametaclass");
         setPrettyName("TextArea");
-        setName(TextAreaClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        NumberClass rows_class = new NumberClass(this);
-        rows_class.setName("rows");
-        rows_class.setPrettyName("Rows");
-        rows_class.setSize(5);
-        rows_class.setNumberType("integer");
-        safeput("rows", rows_class);
+        NumberClass rowsClass = new NumberClass(this);
+        rowsClass.setName("rows");
+        rowsClass.setPrettyName("Rows");
+        rowsClass.setSize(5);
+        rowsClass.setNumberType("integer");
+        safeput(rowsClass.getName(), rowsClass);
 
-        StaticListClass editor_class = new StaticListClass(this);
-        editor_class.setName("editor");
-        editor_class.setPrettyName("Editor");
-        editor_class.setValues("---|Text|PureText|Wysiwyg");
-        editor_class.setRelationalStorage(false);
-        editor_class.setDisplayType("select");
-        editor_class.setMultiSelect(false);
-        editor_class.setSize(1);
-        safeput("editor", editor_class);
+        StaticListClass editorClass = new StaticListClass(this);
+        editorClass.setName("editor");
+        editorClass.setPrettyName("Editor");
+        editorClass.setValues("---|Text|PureText|Wysiwyg");
+        editorClass.setRelationalStorage(false);
+        editorClass.setDisplayType("select");
+        editorClass.setMultiSelect(false);
+        editorClass.setSize(1);
+        safeput(editorClass.getName(), editorClass);
 
-        StaticListClass contenttype_class = new StaticListClass(this);
-        contenttype_class.setName("contenttype");
-        contenttype_class.setPrettyName("Content");
-        contenttype_class.setValues("FullyRenderedText|VelocityCode|PureText");
-        contenttype_class.setRelationalStorage(false);
-        contenttype_class.setDisplayType("select");
-        contenttype_class.setMultiSelect(false);
-        contenttype_class.setSize(1);
-        safeput("contenttype", contenttype_class);
+        StaticListClass contentTypeClass = new StaticListClass(this);
+        contentTypeClass.setName("contenttype");
+        contentTypeClass.setPrettyName("Content");
+        contentTypeClass.setValues("FullyRenderedText|VelocityCode|PureText");
+        contentTypeClass.setRelationalStorage(false);
+        contentTypeClass.setDisplayType(editorClass.getDisplayType());
+        contentTypeClass.setMultiSelect(false);
+        contentTypeClass.setSize(1);
+        safeput(contentTypeClass.getName(), contentTypeClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new TextAreaClass();
     }

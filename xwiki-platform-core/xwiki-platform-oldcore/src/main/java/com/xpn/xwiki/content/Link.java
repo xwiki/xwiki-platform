@@ -348,10 +348,7 @@ public class Link implements Cloneable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @see Object#toString()
-     */
+    @Override
     public String toString()
     {
         StringBuffer buffer = new StringBuffer();

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -33,6 +32,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 /**
  * Action used for saving and proceeding to view the saved page.
+ * <p>
  * Used as a generic action for saving documents.
  * 
  * @version $Id$
@@ -58,9 +58,6 @@ public class SaveAction extends PreviewAction
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
 
-        // This is pretty useless, since contexts aren't shared between threads.
-        // It just slows down execution.
-        String title = doc.getTitle();
         // Check save session
         int sectionNumber = 0;
         if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
@@ -70,7 +67,7 @@ public class SaveAction extends PreviewAction
         // We need to clone this document first, since a cached storage would return the same object for the
         // following requests, so concurrent request might get a partially modified object, or worse, if an error
         // occurs during the save, the cached object will not reflect the actual document at all.
-        doc = (XWikiDocument) doc.clone();
+        doc = doc.clone();
 
         String language = ((EditForm) form).getLanguage();
         // FIXME Which one should be used: doc.getDefaultLanguage or
@@ -79,17 +76,19 @@ public class SaveAction extends PreviewAction
         XWikiDocument tdoc;
 
         if (doc.isNew() || (language == null) || (language.equals("")) || (language.equals("default"))
-            || (language.equals(doc.getDefaultLanguage())))
-        {
+            || (language.equals(doc.getDefaultLanguage()))) {
+            // Saving the default document translation.
             // Need to save parent and defaultLanguage if they have changed
             tdoc = doc;
         } else {
             tdoc = doc.getTranslatedDocument(language, context);
             if ((tdoc == doc) && xwiki.isMultiLingual(context)) {
+                // Saving a new document translation.
                 tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(language);
                 tdoc.setStore(doc.getStore());
             } else if (tdoc != doc) {
+                // Saving an existing document translation (but not the default one).
                 // Same as above, clone the object retrieved from the store cache.
                 tdoc = tdoc.clone();
             }
@@ -116,9 +115,8 @@ public class SaveAction extends PreviewAction
             XWikiDocument sectionDoc = tdoc.clone();
             sectionDoc.readFromForm((EditForm) form, context);
             String sectionContent = sectionDoc.getContent() + "\n";
-            String content = doc.updateDocumentSection(sectionNumber, sectionContent);
+            String content = tdoc.updateDocumentSection(sectionNumber, sectionContent);
             tdoc.setContent(content);
-            tdoc.setTitle(title);
             tdoc.setComment(sectionDoc.getComment());
             tdoc.setMinorEdit(sectionDoc.isMinorEdit());
         } else {
@@ -138,21 +136,23 @@ public class SaveAction extends PreviewAction
         // Validate the document if we have xvalidate=1 in the request
         if ("1".equals(request.getParameter("xvalidate"))) {
             boolean validationResult = tdoc.validate(context);
-            // if the validation fails we should show the inline action
+            // If the validation fails we should show the "Inline form" edit mode
             if (validationResult == false) {
                 // Set display context to 'edit'
                 context.put("display", "edit");
-                // Set the action to inline
-                context.setAction("inline");
+                // Set the action used by the "Inline form" edit mode as the context action. See #render(XWikiContext).
+                context.setAction(tdoc.getDefaultEditMode(context));
                 // Set the document in the context
-                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
                 context.put("doc", doc);
                 context.put("cdoc", tdoc);
                 context.put("tdoc", tdoc);
                 Document vdoc = tdoc.newDocument(context);
+                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
                 vcontext.put("doc", doc.newDocument(context));
                 vcontext.put("cdoc", vdoc);
                 vcontext.put("tdoc", vdoc);
+                // Force the "Inline form" edit mode.
+                vcontext.put("editor", "inline");
                 return true;
             }
         }
@@ -168,11 +168,6 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#action(XWikiContext)
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -193,11 +188,6 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiAction#render(XWikiContext)
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -207,8 +197,10 @@ public class SaveAction extends PreviewAction
         }
 
         if ("edit".equals(context.get("display"))) {
-            // When form validation (xvalidate) fails the save action forwards to the inline action.
-            return "inline";
+            // When form validation (xvalidate) fails the save action forwards to the "Inline form" edit mode. In this
+            // case the context action is not "save" anymore because it was changed in #save(XWikiContext). The context
+            // action should be the action used by the "Inline form" edit mode (either "edit" or "inline").
+            return context.getAction();
         }
 
         return "exception";

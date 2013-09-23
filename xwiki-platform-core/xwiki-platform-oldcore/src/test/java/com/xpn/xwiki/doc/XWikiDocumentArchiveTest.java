@@ -43,6 +43,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
 
     private Mock mockXWiki;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -225,7 +226,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         String author = "XWiki.some author";
         
         addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
-        XWikiDocument doc11 = (XWikiDocument) doc.clone();
+        XWikiDocument doc11 = doc.clone();
         
         doc.setContent("content 2.1\nqwe @ ");
         archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);

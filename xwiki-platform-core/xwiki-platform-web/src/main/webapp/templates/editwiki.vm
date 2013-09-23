@@ -21,7 +21,6 @@
 $xwiki.getTextArea($tdoc.content)
 </div></div> ## xwikieditcontent
 </div> ## xwikitext
-## #template("tagedit.vm")
 </div> ## noname
 <div class="bottombuttons">#template("editactions.vm")</div>
 ## Insert JS and CSS needed for the fullscreen edit feature

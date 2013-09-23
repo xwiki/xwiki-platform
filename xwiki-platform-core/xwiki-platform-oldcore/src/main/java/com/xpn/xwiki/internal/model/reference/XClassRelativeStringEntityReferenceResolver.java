@@ -45,11 +45,6 @@ import org.xwiki.model.reference.EntityReference;
 @Singleton
 public class XClassRelativeStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType, Object...)
-     */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {
@@ -63,11 +58,6 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStringEntityReferenceResolver#resolve(String, org.xwiki.model.EntityType, Object...)
-     */
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {

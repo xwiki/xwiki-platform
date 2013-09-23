@@ -45,11 +45,6 @@ public class CurrentStringEntityReferenceResolver extends AbstractStringEntityRe
     @Named("current")
     private EntityReferenceValueProvider provider;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStringEntityReferenceResolver#getDefaultValue
-     */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {

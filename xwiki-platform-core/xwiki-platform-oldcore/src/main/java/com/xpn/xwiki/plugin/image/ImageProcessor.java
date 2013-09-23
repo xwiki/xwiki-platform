@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.image;
 
@@ -26,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Component used to process images.
@@ -34,7 +33,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.5M2
  */
-@ComponentRole
+@Role
 public interface ImageProcessor
 {
     /**

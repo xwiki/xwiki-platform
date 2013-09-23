@@ -19,13 +19,15 @@
  */
 package org.xwiki.annotation.rights.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -41,12 +43,13 @@ import com.xpn.xwiki.XWikiException;
  * @since 2.3M1
  */
 @Component
-public class XWikiAnnotationRightService extends AbstractLogEnabled implements AnnotationRightService
+@Singleton
+public class XWikiAnnotationRightService implements AnnotationRightService
 {
     /**
      * The execution used to get the deprecated XWikiContext.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
@@ -55,26 +58,28 @@ public class XWikiAnnotationRightService extends AbstractLogEnabled implements A
      * since current resolver does not exist in 2.1.1 and a current typed resolver would fail. Plus, all references
      * passed to this service should be absolute.
      */
-    @Requirement
+    @Inject
     private TypedStringEntityReferenceResolver referenceResolver;
 
     /**
      * The annotations storage service, used to retrieve information about annotations to check the rights on it.
      */
-    @Requirement
+    @Inject
     private IOService annotationsStorageService;
 
     /**
      * Entity reference serializer, to create references to the documents to which annotation targets refer.
      */
-    @Requirement
+    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canAddAnnotation(java.lang.String, java.lang.String)
+     * The logger to log.
      */
+    @Inject
+    private Logger logger;
+
+    @Override
     public boolean canAddAnnotation(String target, String userName)
     {
         // if the user has comment right on the document represented by the target
@@ -88,12 +93,7 @@ public class XWikiAnnotationRightService extends AbstractLogEnabled implements A
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canEditAnnotation(java.lang.String, java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public boolean canEditAnnotation(String annotationId, String target, String userName)
     {
         // if the user has edit right on the document represented by the target, or is the author of the annotation
@@ -114,22 +114,13 @@ public class XWikiAnnotationRightService extends AbstractLogEnabled implements A
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canViewAnnotatedTarget(java.lang.String,
-     *      java.lang.String)
-     */
+    @Override
     public boolean canViewAnnotatedTarget(String target, String userName)
     {
         return canViewAnnotations(target, userName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.rights.AnnotationRightService#canViewAnnotations(java.lang.String, java.lang.String)
-     */
+    @Override
     public boolean canViewAnnotations(String target, String userName)
     {
         // if user can view the target, it should be able to view annotations on it
@@ -172,7 +163,8 @@ public class XWikiAnnotationRightService extends AbstractLogEnabled implements A
      */
     private void logException(Exception e, String target, String user)
     {
-        getLogger().warn("Couldn't get access rights for the target " + target + "for user " + user, e);
+        this.logger.warn("Couldn't get access rights for the target [{}] for user [{}]",
+            new Object[] {target, user, e});
     }
 
     /**

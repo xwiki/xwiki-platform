@@ -24,25 +24,20 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 
 /**
- * Resolver that resolves a Reference passed as a String into an absolute reference. For missing reference parts, the
- * resolver takes default values from a parameter which must be of type {@link EntityReference}.
+ * Resolver that resolves a {@link org.xwiki.model.reference.EntityReference} into an absolute reference. For missing
+ * reference parts, the resolver takes default values from a parameter which must be of type
+ * {@link org.xwiki.model.reference.EntityReference}.
  * 
  * @version $Id$
- * @since 2.23
+ * @since 4.0M1
  */
 @Component
-@Named("explicit/reference")
+@Named("explicit")
 @Singleton
 public class ExplicitReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
-    /**
-     * {@inheritDoc} Expects an EntityReference parameter from which to extract the default values.
-     * 
-     * @see AbstractStringEntityReferenceResolver#getDefaultValue
-     */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {

@@ -16,22 +16,27 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.render;
 
-import org.xwiki.velocity.VelocityContextInitializer;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
-import org.apache.velocity.VelocityContext;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component("xwiki")
+import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.velocity.VelocityContextInitializer;
+
+@Component
+@Named("xwiki")
+@Singleton
 public class XWikiVelocityContextInitializer implements VelocityContextInitializer
 {
-    @Requirement
+    @Inject
     private Execution execution;
 
+    @Override
     public void initialize(VelocityContext context)
     {
         // TODO: Move the Velocity Context initialization code currently located in

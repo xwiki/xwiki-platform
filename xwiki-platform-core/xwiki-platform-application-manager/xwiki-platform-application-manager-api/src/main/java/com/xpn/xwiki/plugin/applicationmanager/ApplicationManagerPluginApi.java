@@ -17,24 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
-import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
-import com.xpn.xwiki.plugin.PluginApi;
-import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
-import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
-import com.xpn.xwiki.web.XWikiMessageTool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.xpn.xwiki.plugin.PluginApi;
+import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
+import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
+import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Plugin for managing applications: installation, export, creation. The plugin uses the concept of an Application
@@ -58,7 +58,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(ApplicationManagerPluginApi.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManagerPluginApi.class);
 
     /**
      * The default ApplicationManager managed exception.
@@ -76,9 +76,9 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
     private ApplicationPackager applicationPackager;
 
     /**
-     * The plugin internationalization service.
+     * Used to access translations.
      */
-    private ApplicationManagerMessageTool messageTool;
+    private ContextualLocalizationManager localizationManager;
 
     /**
      * Create an instance of the Application Manager plugin user api.
@@ -93,13 +93,10 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         // Default Exception
         this.defaultException = new XWikiExceptionApi(ApplicationManagerException.getDefaultException(), context);
 
-        // Message Tool
-        Locale locale = (Locale) context.get("locale");
-        this.messageTool = new ApplicationManagerMessageTool(locale, plugin, context);
-        context.put(ApplicationManagerMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
+        this.applicationManager = new ApplicationManager();
+        this.applicationPackager = new ApplicationPackager();
 
-        this.applicationManager = new ApplicationManager(this.messageTool);
-        this.applicationPackager = new ApplicationPackager(this.messageTool);
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -113,9 +110,10 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
     /**
      * @return the plugin internationalization service.
      */
+    @Deprecated
     public XWikiMessageTool getMessageTool()
     {
-        return this.messageTool;
+        return ApplicationManagerMessageTool.getDefault(context);
     }
 
     /**
@@ -126,7 +124,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
      */
     public void logError(String errorMessage, XWikiException e)
     {
-        LOG.error(errorMessage, e);
+        LOGGER.error(errorMessage, e);
 
         context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
         context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -169,11 +167,12 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            this.applicationManager.createApplication(appXObjectDocument, failOnExist, this.messageTool.get(
-                ApplicationManagerMessageTool.COMMENT_CREATEAPPLICATION, appXObjectDocument.toString()), context);
+            this.applicationManager.createApplication(appXObjectDocument, failOnExist, this.localizationManager
+                .getTranslationPlain(ApplicationManagerMessageTool.COMMENT_CREATEAPPLICATION,
+                    appXObjectDocument.toString()), context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_CREATEAPP, appXObjectDocument.toString()),
-                e);
+            logError(this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_CREATEAPP,
+                appXObjectDocument.toString()), e);
 
             returncode = e.getCode();
         }
@@ -204,7 +203,8 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             this.applicationManager.deleteApplication(appName, context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_DELETEAPP, appName), e);
+            logError(
+                this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_DELETEAPP, appName), e);
 
             returncode = e.getCode();
         }
@@ -225,7 +225,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             listDocument = this.applicationManager.getApplicationList(this.context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETALLAPPS), e);
+            logError(this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_GETALLAPPS), e);
         }
 
         return listDocument;
@@ -250,7 +250,8 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             app = this.applicationManager.getApplication(appName, context, true);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETAPP, appName), e);
+            logError(
+                this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_GETAPP, appName), e);
         }
 
         return app;
@@ -301,7 +302,8 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             this.applicationPackager.exportApplicationXAR(appName, recurse, withDocHistory, context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_EXPORTAPP, appName), e);
+            logError(
+                this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_EXPORTAPP, appName), e);
 
             returncode = e.getCode();
         }
@@ -335,10 +337,12 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            this.applicationPackager.importApplication(context.getDoc(), packageName, this.messageTool.get(
-                ApplicationManagerMessageTool.COMMENT_IMPORTAPPLICATION, packageName), context);
+            this.applicationPackager.importApplication(context.getDoc(), packageName, this.localizationManager
+                .getTranslationPlain(ApplicationManagerMessageTool.COMMENT_IMPORTAPPLICATION, packageName), context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_IMPORTAPP, packageName), e);
+            logError(
+                this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_IMPORTAPP, packageName),
+                e);
 
             returncode = e.getCode();
         }
@@ -375,10 +379,11 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
 
         try {
             XWikiApplication app = this.applicationManager.getApplication(appName, context, true);
-            this.applicationManager.reloadApplication(app, this.messageTool.get(
+            this.applicationManager.reloadApplication(app, this.localizationManager.getTranslationPlain(
                 ApplicationManagerMessageTool.COMMENT_RELOADAPPLICATION, app.getAppName()), context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_RELOADAPP, appName), e);
+            logError(
+                this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_RELOADAPP, appName), e);
 
             returncode = e.getCode();
         }
@@ -407,10 +412,10 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            this.applicationManager.reloadAllApplications(
-                this.messageTool.get(ApplicationManagerMessageTool.COMMENT_RELOADALLAPPLICATIONS), context);
+            this.applicationManager.reloadAllApplications(this.localizationManager
+                .getTranslationPlain(ApplicationManagerMessageTool.COMMENT_RELOADALLAPPLICATIONS), context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_REALOADALLAPPS), e);
+            logError(this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_REALOADALLAPPS), e);
 
             returncode = e.getCode();
         }
@@ -431,7 +436,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             app = this.applicationManager.getRootApplication(context);
         } catch (ApplicationManagerException e) {
-            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETROOTAPP), e);
+            logError(this.localizationManager.getTranslationPlain(ApplicationManagerMessageTool.LOG_GETROOTAPP), e);
         }
 
         return app;

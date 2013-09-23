@@ -82,4 +82,10 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
     {
         element.ensureEditable();
     }
+
+    @Override
+    protected void ensureLineBreakIsVisible(Node lineBreak, Node container)
+    {
+        // Do nothing.
+    }
 }

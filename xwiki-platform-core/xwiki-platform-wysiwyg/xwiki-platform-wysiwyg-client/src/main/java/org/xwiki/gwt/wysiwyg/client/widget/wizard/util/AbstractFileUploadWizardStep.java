@@ -19,11 +19,8 @@
  */
 package org.xwiki.gwt.wysiwyg.client.widget.wizard.util;
 
-import java.util.EnumSet;
-
 import org.xwiki.gwt.user.client.StringUtils;
-import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
-import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractInteractiveWizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
@@ -35,19 +32,18 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 
 /**
- * Wizard step to handle the upload of a file to a wiki page: display the file input and upload on finish. <br/>
+ * Wizard step to handle the upload of a file to a wiki page: display the file input and upload on finish.
  * 
  * @version $Id$
  */
-public abstract class AbstractFileUploadWizardStep implements WizardStep
+public abstract class AbstractFileUploadWizardStep extends AbstractInteractiveWizardStep
 {
     /**
      * The style of the fields under error.
@@ -55,9 +51,14 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
-     * Main panel of this wizard step, to be used for the {@link #display()}.
+     * The style used on the field label.
      */
-    private final Panel mainPanel = new FlowPanel();
+    protected static final String FIELD_LABEL_STYLE = "xInfoLabel";
+
+    /**
+     * The style used on the field hint.
+     */
+    protected static final String FIELD_HINT_STYLE = "xHelpLabel";
 
     /**
      * The file upload form.
@@ -93,13 +94,15 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     {
         this.wikiService = wikiService;
 
-        mainPanel.addStyleName("xUploadPanel");
+        setStepTitle(Strings.INSTANCE.fileUploadTitle());
+
+        display().addStyleName("xUploadPanel");
         fileUploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
         fileUploadForm.setMethod(FormPanel.METHOD_POST);
         // set the url on submit time, just before upload
 
         Panel fileLabel = new FlowPanel();
-        fileLabel.setStyleName("xInfoLabel");
+        fileLabel.setStyleName(FIELD_LABEL_STYLE);
         fileLabel.add(new InlineLabel(getFileLabel()));
         InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
         mandatoryLabel.addStyleName("xMandatory");
@@ -108,7 +111,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         FlowPanel formPanel = new FlowPanel();
 
         formPanel.add(fileLabel);
-        fileHelpLabel.setStyleName("xHelpLabel");
+        fileHelpLabel.setStyleName(FIELD_HINT_STYLE);
         fileHelpLabel.setVisible(false);
         formPanel.add(fileHelpLabel);
 
@@ -120,7 +123,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
 
         fileUploadForm.setWidget(formPanel);
 
-        mainPanel.add(fileUploadForm);
+        display().add(fileUploadForm);
     }
 
     /**
@@ -171,6 +174,8 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
 
     /**
      * {@inheritDoc}
+     * 
+     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
      */
     public void init(Object data, AsyncCallback< ? > cb)
     {
@@ -180,43 +185,8 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
 
     /**
      * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return mainPanel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDirectionName(NavigationDirection direction)
-    {
-        if (direction == NavigationDirection.NEXT) {
-            return Strings.INSTANCE.fileUploadSubmitLabel();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.fileUploadTitle();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public EnumSet<NavigationDirection> getValidDirections()
-    {
-        return EnumSet.of(NavigationDirection.CANCEL, NavigationDirection.PREVIOUS, NavigationDirection.NEXT);
-    }
-
-    /**
-     * {@inheritDoc}
      * 
-     * @see WizardStep#onCancel()
+     * @see AbstractInteractiveWizardStep#onCancel()
      */
     public void onCancel()
     {
@@ -226,7 +196,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see WizardStep#onSubmit(AsyncCallback)
+     * @see AbstractInteractiveWizardStep#onSubmit(AsyncCallback)
      */
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
@@ -350,16 +320,6 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     }
 
     /**
-     * Method for retrieving the main UI (panel) by sub-classes so that they can customize it.
-     * 
-     * @return the main ui panel.
-     */
-    protected Panel getMainPanel()
-    {
-        return this.mainPanel;
-    }
-
-    /**
      * @return the fileUploadInput
      */
     protected FileUpload getFileUploadInput()
@@ -386,13 +346,5 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     {
         fileErrorLabel.setVisible(false);
         fileUploadInput.removeStyleName(FIELD_ERROR_STYLE);
-    }
-
-    /**
-     * @return the service used to retrieve information about the uploaded files
-     */
-    public WikiServiceAsync getWikiService()
-    {
-        return wikiService;
     }
 }

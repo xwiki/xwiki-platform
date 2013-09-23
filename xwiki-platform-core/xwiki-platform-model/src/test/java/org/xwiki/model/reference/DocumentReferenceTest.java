@@ -19,13 +19,13 @@
  */
 package org.xwiki.model.reference;
 
-import org.junit.Test;
-
-import junit.framework.Assert;
-import org.xwiki.model.EntityType;
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.model.EntityType;
 
 /**
  * Unit tests for {@link org.xwiki.model.reference.DocumentReference}.
@@ -39,13 +39,11 @@ public class DocumentReferenceTest
     public void testConstructors()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        Assert.assertEquals(reference, new DocumentReference(
-            new EntityReference("page", EntityType.DOCUMENT,
-                new EntityReference("space", EntityType.SPACE,
-                    new EntityReference("wiki", EntityType.WIKI, null)))));
+        Assert.assertEquals(reference, new DocumentReference(new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI, null)))));
         Assert.assertEquals(reference, new DocumentReference("wiki", Arrays.asList("space"), "page"));
-        Assert.assertEquals(reference, new DocumentReference("page",
-            new SpaceReference("space", new WikiReference("wiki"))));
+        Assert.assertEquals(reference, new DocumentReference("page", new SpaceReference("space", new WikiReference(
+            "wiki"))));
     }
 
     @Test
@@ -66,7 +64,7 @@ public class DocumentReferenceTest
             new DocumentReference("page", null);
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [null] for a document reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [null] in a document reference", expected.getMessage());
         }
     }
 
@@ -77,8 +75,7 @@ public class DocumentReferenceTest
             new DocumentReference(new EntityReference("page", EntityType.DOCUMENT, new WikiReference("wiki")));
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid parent reference [name = [wiki], type = [WIKI], parent = [null]] for a "
-                + "document reference", expected.getMessage());
+            Assert.assertEquals("Invalid parent reference [Wiki wiki] in a document reference", expected.getMessage());
         }
     }
 
@@ -89,12 +86,8 @@ public class DocumentReferenceTest
         EntityReference spaceReference = reference.getParent();
 
         // Verify that create a new reference based on an existing one doesn't modify the existing one in any manner.
-        new DocumentReference(
-            reference.getWikiReference().getName(), reference.getLastSpaceReference().getName(), reference.getName());
-
-        // Verify parent/child relationships
-        Assert.assertSame(reference, reference.getParent().getChild());
-        Assert.assertSame(spaceReference, reference.getParent().getParent().getChild());
+        new DocumentReference(reference.getWikiReference().getName(), reference.getLastSpaceReference().getName(),
+            reference.getName());
     }
 
     @Test
@@ -102,14 +95,6 @@ public class DocumentReferenceTest
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         Assert.assertEquals(new WikiReference("wiki"), reference.getWikiReference());
-    }
-
-    @Test
-    public void testSetWikiReference()
-    {
-        DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        reference.setWikiReference(new WikiReference("newwiki"));
-        Assert.assertEquals(new DocumentReference("newwiki", "space", "page"), reference);
     }
 
     @Test
@@ -142,5 +127,25 @@ public class DocumentReferenceTest
         Assert.assertEquals(new SpaceReference("space1", new WikiReference("wiki")), spaceRefs2.get(0));
         Assert.assertEquals(new SpaceReference("space2", new SpaceReference("space1", new WikiReference("wiki"))),
             spaceRefs2.get(1));
+    }
+
+    @Test
+    public void testToString()
+    {
+        DocumentReference reference1 = new DocumentReference("wiki", "space", "page");
+        Assert.assertEquals("wiki:space.page", reference1.toString());
+
+        DocumentReference reference2 = new DocumentReference("wiki", "space", "page", Locale.FRANCE);
+        Assert.assertEquals("wiki:space.page(fr_FR)", reference2.toString());
+
+        DocumentReference reference3 = new DocumentReference("wiki", "space", "page", "en");
+        Assert.assertEquals("wiki:space.page(en)", reference3.toString());
+    }
+
+    @Test
+    public void testCreateDocumentReferenceFromLocalDocumentReference()
+    {
+        Assert.assertEquals("wiki:space.page", new DocumentReference(new LocalDocumentReference("space", "page"),
+            new WikiReference("wiki")).toString());
     }
 }

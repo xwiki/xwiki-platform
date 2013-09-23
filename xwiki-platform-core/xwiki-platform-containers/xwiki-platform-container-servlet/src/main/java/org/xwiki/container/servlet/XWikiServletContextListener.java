@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.servlet;
 
@@ -26,9 +25,10 @@ import javax.servlet.ServletContextListener;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -41,19 +41,29 @@ import org.xwiki.observation.event.ApplicationStoppedEvent;
 public class XWikiServletContextListener implements ServletContextListener
 {
     /** The component manager used to lookup other components. */
-    private ComponentManager componentManager;
+    private EmbeddableComponentManager componentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-     */
+    @Override
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
         // Initializes the Embeddable Component Manager
         EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+
+        // Initialize all the components. Note that this can fail with a Runtime Exception. This is done voluntarily so
+        // that the XWiki webaopp will not be available if one component fails to load. It's better to fail-fast.
         ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
+
+        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
+        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
+        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
+        // Class that need to lookup then just need to get it from the XWikiContext instance.
+        // This is of course not necessary for XWiki components since they just need to implement
+        // the Composable interface to get access to the Component Manager or better they simply
+        // need to declare their components requirements using the @Inject annotation of the xwiki
+        // component manager together with a private class member, for automatic injection by the CM on init.
+        servletContextEvent.getServletContext().setAttribute(
+            org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
 
         // Use a Component Event Manager that stacks Component instance creation events till we tell it to flush them.
         // The reason is that the Observation Manager used to send the events but we need the Application Context to
@@ -62,10 +72,23 @@ public class XWikiServletContextListener implements ServletContextListener
         StackingComponentEventManager eventManager = new StackingComponentEventManager();
         this.componentManager.setComponentEventManager(eventManager);
 
-        // Initializes XWiki's Container with the Servlet Context.
+        // Initialize the Environment
+        try {
+            ServletEnvironment servletEnvironment =
+                (ServletEnvironment) this.componentManager.getInstance(Environment.class);
+            servletEnvironment.setServletContext(servletContextEvent.getServletContext());
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to initialize the Servlet Environment", e);
+        }
+
+        // Initializes the Application Context.
+        // Even though the notion of ApplicationContext has been deprecated in favor of the notion of Environment we
+        // still keep this initialization for backward-compatibility.
+        // TODO: Add an Observation Even that we send when the Environment is initialized so that we can move the code
+        // below in an Event Listener and move it to the legacy module.
         try {
             ServletContainerInitializer containerInitializer =
-                this.componentManager.lookup(ServletContainerInitializer.class);
+                this.componentManager.getInstance(ServletContainerInitializer.class);
             containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Application Context", e);
@@ -75,8 +98,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // something on startup to do it.
         ObservationManager observationManager;
         try {
-            observationManager = this.componentManager.lookup(ObservationManager.class);
-            observationManager.notify(new ApplicationStartedEvent(), this);
+            observationManager = this.componentManager.getInstance(ObservationManager.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to find the Observation Manager component", e);
         }
@@ -86,43 +108,41 @@ public class XWikiServletContextListener implements ServletContextListener
         eventManager.shouldStack(false);
         eventManager.flushEvents();
 
-        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
-        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
-        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
-        // Class that need to lookup then just need to get it from the XWikiContext instance.
-        // This is of course not necessary for XWiki components since they just need to implement
-        // the Composable interface to get access to the Component Manager or better they simply
-        // need to declare their components requirements using the @Requirement annotation of the xwiki
-        // component manager together with a private class member, for automatic injection by the CM on init.
-        servletContextEvent.getServletContext().setAttribute(
-            org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
+        // Indicate to the various components that XWiki is ready
+        observationManager.notify(new ApplicationStartedEvent(), this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-     */
+    @Override
     public void contextDestroyed(ServletContextEvent sce)
     {
-        // Send an Observation event to signal the XWiki application is stopped. This allows components who need to do
-        // something on stop to do it.
-        try {
-            ObservationManager observationManager = this.componentManager.lookup(ObservationManager.class);
-            observationManager.notify(new ApplicationStoppedEvent(), this);
-        } catch (ComponentLookupException e) {
-            // Nothing to do here.
-            // TODO: Log a warning
-        }
+        // It's possible that the Component Manager failed to initialize some of the required components.
+        if (this.componentManager != null) {
+            // Send an Observation event to signal the XWiki application is stopped. This allows components who need
+            // to do something on stop to do it.
+            try {
+                ObservationManager observationManager = this.componentManager.getInstance(ObservationManager.class);
+                observationManager.notify(new ApplicationStoppedEvent(), this);
+            } catch (ComponentLookupException e) {
+                // Nothing to do here.
+                // TODO: Log a warning
+            }
 
-        try {
-            ApplicationContextListenerManager applicationContextListenerManager =
-                this.componentManager.lookup(ApplicationContextListenerManager.class);
-            Container container = this.componentManager.lookup(Container.class);
-            applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
-        } catch (ComponentLookupException ex) {
-            // Nothing to do here.
-            // TODO: Log a warning
+            // Even though the notion of ApplicationContext has been deprecated in favor of the notion of Environment we
+            // still keep this destruction for backward-compatibility.
+            // TODO: Add an Observation Even that we send when the Environment is destroyed so that we can move the code
+            // below in an Event Listener and move it to the legacy module.
+            try {
+                ApplicationContextListenerManager applicationContextListenerManager =
+                    this.componentManager.getInstance(ApplicationContextListenerManager.class);
+                Container container = this.componentManager.getInstance(Container.class);
+                applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
+            } catch (ComponentLookupException ex) {
+                // Nothing to do here.
+                // TODO: Log a warning
+            }
+
+            // Make sure to dispose all components before leaving
+            this.componentManager.dispose();
         }
     }
 }

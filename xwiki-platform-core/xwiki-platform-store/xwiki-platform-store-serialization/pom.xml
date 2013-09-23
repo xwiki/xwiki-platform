@@ -27,11 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-serialization</artifactId>
   <name>XWiki Platform - Store - Serialization</name>
   <description>Serializers and deserializers for storing objects on the disk or exporting them.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -43,7 +46,6 @@
     <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
     </dependency>
 
     <!-- XMLSerializer uses Base64OutputStream -->

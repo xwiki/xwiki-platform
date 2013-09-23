@@ -46,7 +46,7 @@ public class VoidAttachmentVersioningStoreTest extends AbstractBridgedXWikiCompo
         XWiki xwiki = new XWiki();
         getContext().setWiki(xwiki);
         
-        this.store = getComponentManager().lookup(AttachmentVersioningStore.class, "void");
+        this.store = getComponentManager().getInstance(AttachmentVersioningStore.class, "void");
         xwiki.setAttachmentVersioningStore(this.store);
     }
 

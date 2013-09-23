@@ -16,24 +16,28 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.util.Util;
 
-
-
-public class PrepareEditForm extends XWikiForm {
+public class PrepareEditForm extends XWikiForm
+{
     private String template;
+
     private String parent;
+
     private String defaultLanguage;
+
     private String defaultTemplate;
+
     private String creator;
+
     private boolean lockForce;
 
-    public void readRequest() {
+    @Override
+    public void readRequest()
+    {
         XWikiRequest request = getRequest();
         setTemplate(request.getParameter("template"));
         setParent(request.getParameter("parent"));
@@ -43,51 +47,63 @@ public class PrepareEditForm extends XWikiForm {
         setLockForce("1".equals(request.getParameter("force")));
     }
 
-    public String getTemplate() {
+    public String getTemplate()
+    {
         return template;
     }
 
-    public void setTemplate(String template) {
+    public void setTemplate(String template)
+    {
         this.template = template;
     }
 
-    public String getDefaultTemplate() {
+    public String getDefaultTemplate()
+    {
         return defaultTemplate;
     }
 
-    public void setDefaultTemplate(String template) {
+    public void setDefaultTemplate(String template)
+    {
         this.defaultTemplate = template;
-    }   
-    
-    public String getParent() {
+    }
+
+    public String getParent()
+    {
         return parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(String parent)
+    {
         this.parent = parent;
     }
 
-    public String getCreator() {
+    public String getCreator()
+    {
         return creator;
     }
 
-    public void setCreator(String creator) {
+    public void setCreator(String creator)
+    {
         this.creator = creator;
     }
 
-    public String getDefaultLanguage() {
+    public String getDefaultLanguage()
+    {
         return defaultLanguage;
     }
 
-    public void setDefaultLanguage(String defaultLanguage) {
+    public void setDefaultLanguage(String defaultLanguage)
+    {
         this.defaultLanguage = Util.normalizeLanguage(defaultLanguage);
     }
 
-    public boolean isLockForce() {
+    public boolean isLockForce()
+    {
         return lockForce;
     }
 
-    public void setLockForce(boolean lockForce) {
+    public void setLockForce(boolean lockForce)
+    {
         this.lockForce = lockForce;
     }
 }

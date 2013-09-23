@@ -1,7 +1,12 @@
 #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
 <div id="leftPanels" class="panels left"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
-#foreach($panel in $leftPanels)
-#displaypanel($panel.trim())
+#set($panelUixs = $services.uix.getExtensions('platform.panels.leftPanels'))
+#foreach($panelUix in $panelUixs)
+  ## We need to set this because the panelheader macro used in panels needs it
+  #set($paneldoc = $xwiki.getDocument($panelUix.getId()))
+  #if($paneldoc && $!xwiki.hasAccessLevel('view', $paneldoc))
+  $services.rendering.render($panelUix.execute(), "xhtml/1.0")
+  #end
 #end
 </div>
 #end

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.ldap;
 
@@ -29,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -98,7 +97,7 @@ public final class XWikiLDAPConfig
     /**
      * Logging tool.
      */
-    private static final Log LOG = LogFactory.getLog(XWikiLDAPConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiLDAPConfig.class);
 
     /**
      * The default secure provider to use for SSL.
@@ -159,7 +158,7 @@ public final class XWikiLDAPConfig
         try {
             param = context.getWiki().getXWikiPreference(prefName, context);
         } catch (Exception e) {
-            LOG.error("Failed to get preferences", e);
+            LOGGER.error("Failed to get preferences", e);
         }
 
         if (param == null || "".equals(param)) {
@@ -192,6 +191,31 @@ public final class XWikiLDAPConfig
     }
 
     /**
+     * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name* (for XWiki
+     * Preferences) will be changed to ldap.*name* for xwiki.cfg.
+     * 
+     * @param name the name of the property in XWikiPreferences.
+     * @param def default value.
+     * @param context the XWiki context.
+     * @return the value of the property.
+     */
+    public long getLDAPParamAsLong(String name, long def, XWikiContext context)
+    {
+        String paramStr =
+            getLDAPParam(name, name.replace(PREF_LDAP_SUFFIX, CFG_LDAP_SUFFIX), String.valueOf(def), context);
+
+        long value;
+
+        try {
+            value = Long.valueOf(paramStr);
+        } catch (Exception e) {
+            value = def;
+        }
+
+        return value;
+    }
+
+    /**
      * @param context the XWiki context.
      * @return the of the LDAP groups classes.
      * @since 1.5M1
@@ -213,8 +237,8 @@ public final class XWikiLDAPConfig
             set = DEFAULT_GROUP_CLASSES;
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("ldap_group_classes: " + set);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("ldap_group_classes: " + set);
         }
 
         return set;
@@ -242,8 +266,8 @@ public final class XWikiLDAPConfig
             set = DEFAULT_GROUP_MEMBERFIELDS;
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("ldap_group_memberfields: " + set);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("ldap_group_memberfields: " + set);
         }
 
         return set;
@@ -315,36 +339,62 @@ public final class XWikiLDAPConfig
         String param = getLDAPParam("ldap_group_mapping", "", context);
 
         if (param.trim().length() > 0) {
-            String[] mappingTable = param.split("\\|");
+            char[] buffer = param.trim().toCharArray();
+            boolean escaped = false;
+            StringBuilder mapping = new StringBuilder(param.length());
+            for (int i = 0; i < buffer.length; ++i) {
+                char c = buffer[i];
 
-            for (int i = 0; i < mappingTable.length; ++i) {
-                String mapping = mappingTable[i].trim();
-
-                int splitIndex = mapping.indexOf('=');
-
-                if (splitIndex < 1) {
-                    LOG.error("Error parsing ldap_group_mapping attribute: " + mapping);
+                if (escaped) {
+                    mapping.append(c);
+                    escaped = false;
                 } else {
-                    String xwikigroup = mapping.substring(0, splitIndex);
-                    String ldapgroup = mapping.substring(splitIndex + 1);
-
-                    Set<String> ldapGroups = groupMappings.get(xwikigroup);
-
-                    if (ldapGroups == null) {
-                        ldapGroups = new HashSet<String>();
-                        groupMappings.put(xwikigroup, ldapGroups);
-                    }
-
-                    ldapGroups.add(ldapgroup);
-
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Groupmapping found: " + xwikigroup + " " + ldapGroups);
+                    if (c == '\\') {
+                        escaped = true;
+                    } else if (c == '|') {
+                        addGroupMapping(mapping.toString(), groupMappings);
+                        mapping.setLength(0);
+                    } else {
+                        mapping.append(c);
                     }
                 }
+            }
+
+            if (mapping.length() > 0) {
+                addGroupMapping(mapping.toString(), groupMappings);
             }
         }
 
         return groupMappings;
+    }
+
+    /**
+     * @param mapping the mapping to parse
+     * @param groupMappings the map to add parsed group mapping to
+     */
+    private void addGroupMapping(String mapping, Map<String, Set<String>> groupMappings)
+    {
+        int splitIndex = mapping.indexOf('=');
+
+        if (splitIndex < 1) {
+            LOGGER.error("Error parsing ldap_group_mapping attribute [{}]", mapping);
+        } else {
+            String xwikigroup = mapping.substring(0, splitIndex);
+            String ldapgroup = mapping.substring(splitIndex + 1);
+
+            Set<String> ldapGroups = groupMappings.get(xwikigroup);
+
+            if (ldapGroups == null) {
+                ldapGroups = new HashSet<String>();
+                groupMappings.put(xwikigroup, ldapGroups);
+            }
+
+            ldapGroups.add(ldapgroup);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Groupmapping found [{}] [{}]", xwikigroup, ldapGroups);
+            }
+        }
     }
 
     /**
@@ -376,7 +426,7 @@ public final class XWikiLDAPConfig
                         attrListToFill.add(ldapattr);
                     }
                 } else {
-                    LOG.error("Error parsing ldap_fields_mapping attribute in xwiki.cfg: " + fields[j]);
+                    LOGGER.error("Error parsing ldap_fields_mapping attribute in xwiki.cfg: " + fields[j]);
                 }
             }
         }
@@ -393,7 +443,7 @@ public final class XWikiLDAPConfig
         try {
             return context.getWiki().getXWikiPreferenceAsInt("ldap_groupcache_expiration", context);
         } catch (Exception e) {
-            return (int) context.getWiki().ParamAsLong("xwiki.authentication.ldap.groupcache_expiration", 21800);
+            return (int) context.getWiki().ParamAsLong("xwiki.authentication.ldap.groupcache_expiration", 21600);
         }
     }
 
@@ -441,5 +491,15 @@ public final class XWikiLDAPConfig
     public String getLDAPBindPassword(String login, String password, XWikiContext context)
     {
         return MessageFormat.format(getLDAPBindPassword(context), login, password);
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the maximum number of milliseconds the client waits for any operation under these constraints to
+     *         complete.
+     */
+    public int getLDAPTimeout(XWikiContext context)
+    {
+        return (int) getLDAPParamAsLong("ldap_timeout", 1000, context);
     }
 }

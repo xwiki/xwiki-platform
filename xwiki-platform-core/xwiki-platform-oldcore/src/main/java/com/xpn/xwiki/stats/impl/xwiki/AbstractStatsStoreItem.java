@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.util.Date;
@@ -79,14 +77,10 @@ public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem
         this.periodType = periodType;
         this.period = StatsUtil.getPeriodAsInt(this.periodDate, this.periodType);
 
-        this.context = (XWikiContext) context.clone();
+        this.context = context.clone();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
-     */
+    @Override
     public void store(List<XWikiStatsStoreItem> statsList)
     {
         ExecutionContext econtext = Utils.getComponent(Execution.class).getContext();

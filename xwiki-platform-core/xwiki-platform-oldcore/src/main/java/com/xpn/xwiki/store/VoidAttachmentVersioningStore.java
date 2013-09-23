@@ -21,9 +21,11 @@ package com.xpn.xwiki.store;
 
 import java.util.Date;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -39,11 +41,13 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
  * @version $Id$
  * @since 1.4M2
  */
-@Component("void")
+@Component
+@Named("void")
+@Singleton
 public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
 {
     /**
-     * Constructor used by {@link XWiki} during storage initialization.
+     * Constructor used by {@link com.xpn.xwiki.XWiki} during storage initialization.
      * 
      * @param context The current context.
      * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
@@ -60,27 +64,21 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteArchive(XWikiAttachment attachment, XWikiContext context, boolean transaction)
         throws XWikiException
     {
         // Don't do anything since it's a void implementation.
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveArchive(XWikiAttachmentArchive archive, XWikiContext context, boolean transaction)
         throws XWikiException
     {
         // Don't do anything since it's a void implementation.
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public XWikiAttachmentArchive loadArchive(XWikiAttachment attachment, XWikiContext context, boolean transaction)
         throws XWikiException
     {
@@ -140,10 +138,7 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
         @Override
         public byte[] getArchive(XWikiContext context) throws XWikiException
         {
-            String sdata = getAttachment().toStringXML(true, false, context);
-            Object[] lines = ToString.stringToArray(sdata);
-            Archive archive = new Archive(lines, getAttachment().getFilename(), getAttachment().getVersion());
-            return archive.toByteArray();
+            return new byte[0];
         }
 
         /**

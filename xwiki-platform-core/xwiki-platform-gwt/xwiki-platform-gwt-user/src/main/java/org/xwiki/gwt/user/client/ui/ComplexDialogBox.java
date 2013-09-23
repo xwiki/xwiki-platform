@@ -116,11 +116,7 @@ public class ComplexDialogBox extends CompositeDialogBox
         return footer;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CompositeDialogBox#center()
-     */
+    @Override
     public void center()
     {
         // Reset the canceled state before showing the dialog.

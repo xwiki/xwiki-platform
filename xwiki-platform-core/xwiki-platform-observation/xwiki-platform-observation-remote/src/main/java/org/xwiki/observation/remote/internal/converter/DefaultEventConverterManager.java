@@ -23,8 +23,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.observation.remote.LocalEventData;
@@ -40,30 +42,28 @@ import org.xwiki.observation.remote.converter.RemoteEventConverter;
  * @since 2.0M3
  */
 @Component
+@Singleton
 public class DefaultEventConverterManager implements EventConverterManager, Initializable
 {
     /**
      * The local events converters.
      */
-    @Requirement
+    @Inject
     private List<LocalEventConverter> localEventConverters;
 
     /**
      * The remote events converters.
      */
-    @Requirement
+    @Inject
     private List<RemoteEventConverter> remoteEventConverters;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
+    @Override
     public void initialize() throws InitializationException
     {
         // sort local events converters by priority
         Collections.sort(this.localEventConverters, new Comparator<LocalEventConverter>()
         {
+            @Override
             public int compare(LocalEventConverter eventConverter1, LocalEventConverter eventConverter2)
             {
                 return eventConverter1.getPriority() - eventConverter2.getPriority();
@@ -73,6 +73,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
         // sort remote events converters by priority
         Collections.sort(this.remoteEventConverters, new Comparator<RemoteEventConverter>()
         {
+            @Override
             public int compare(RemoteEventConverter eventConverter1, RemoteEventConverter eventConverter2)
             {
                 return eventConverter1.getPriority() - eventConverter2.getPriority();
@@ -80,31 +81,19 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
         });
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.EventConverterManager#getLocalEventConverters()
-     */
+    @Override
     public List<LocalEventConverter> getLocalEventConverters()
     {
         return this.localEventConverters;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.EventConverterManager#getRemoteEventConverters()
-     */
+    @Override
     public List<RemoteEventConverter> getRemoteEventConverters()
     {
         return this.remoteEventConverters;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.EventConverterManager#createRemoteEventData(org.xwiki.observation.remote.LocalEventData)
-     */
+    @Override
     public RemoteEventData createRemoteEventData(LocalEventData localEvent)
     {
         RemoteEventData remoteEvent = new RemoteEventData();
@@ -122,11 +111,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
         return remoteEvent;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.converter.EventConverterManager#createLocalEventData(org.xwiki.observation.remote.RemoteEventData)
-     */
+    @Override
     public LocalEventData createLocalEventData(RemoteEventData remoteEvent)
     {
         LocalEventData localEvent = new LocalEventData();

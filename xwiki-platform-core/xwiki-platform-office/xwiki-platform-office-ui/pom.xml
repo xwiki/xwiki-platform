@@ -27,15 +27,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Office - UI</name>
-  <description>An XWiki application used to transform office documents into wiki pages.</description>
+  <description>Easily turn Office documents (MS Office, Open Office, PDF, etc) into wiki pages</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Office Importer Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

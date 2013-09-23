@@ -91,22 +91,12 @@ public class ActionEvent extends GwtEvent<ActionHandler>
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GwtEvent#dispatch(Object)
-     */
     @Override
     protected void dispatch(ActionHandler handler)
     {
         handler.onAction(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GwtEvent#getAssociatedType()
-     */
     @Override
     public Type<ActionHandler> getAssociatedType()
     {

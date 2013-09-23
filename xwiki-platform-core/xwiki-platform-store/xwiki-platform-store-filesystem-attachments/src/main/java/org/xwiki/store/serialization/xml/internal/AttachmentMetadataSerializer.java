@@ -16,18 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.IOException;
 import java.util.Date;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
+
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * A serializer for saving the metadata from an XWikiAttachment.
@@ -38,38 +37,52 @@ import org.xwiki.component.annotation.Component;
 @Component("attachment-meta/1.0")
 public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAttachment, XWikiAttachment>
 {
-    /** The root element for serialized element. */
+    /**
+     * The root element for serialized element.
+     */
     private static final String ROOT_ELEMENT_NAME = "attachment";
 
-    /** Root node paramter which must be present in order to attempt parsing. */
+    /**
+     * Root node paramter which must be present in order to attempt parsing.
+     */
     private static final String SERIALIZER_PARAM = "serializer";
 
-    /** Value of SERIALIZER_PARAM must be this in order to continue parsing. */
+    /**
+     * Value of SERIALIZER_PARAM must be this in order to continue parsing.
+     */
     private static final String THIS_SERIALIZER = "attachment-meta/1.0";
 
-    /** Interpret a node by this name as the filename of the attachment. */
+    /**
+     * Interpret a node by this name as the filename of the attachment.
+     */
     private static final String FILENAME = "filename";
 
-    /** Interpret a node by this name as the size of the attachment in bytes. */
+    /**
+     * Interpret a node by this name as the size of the attachment in bytes.
+     */
     private static final String FILESIZE = "filesize";
 
-    /** Interpret a node by this name as the name of the attachment author. */
+    /**
+     * Interpret a node by this name as the name of the attachment author.
+     */
     private static final String AUTHOR = "author";
 
-    /** Interpret a node by this name as a string representation of the RCS version of the attachment. */
+    /**
+     * Interpret a node by this name as a string representation of the RCS version of the attachment.
+     */
     private static final String VERSION = "version";
 
-    /** Interpret a node by this name as a comment left by the author on this attachment. */
+    /**
+     * Interpret a node by this name as a comment left by the author on this attachment.
+     */
     private static final String COMMENT = "comment";
 
-    /** Interpret a node by this name as the date the attachment was saved. */
+    /**
+     * Interpret a node by this name as the date the attachment was saved.
+     */
     private static final String DATE = "date";
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractXMLSerializer#parse(Element)
-     */
+    @Override
     public XWikiAttachment parse(final Element docel) throws IOException
     {
         if (!ROOT_ELEMENT_NAME.equals(docel.getName())) {
@@ -79,7 +92,7 @@ public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAtt
             || !THIS_SERIALIZER.equals(docel.attribute(SERIALIZER_PARAM).getValue()))
         {
             throw new IOException("Cannot parse this attachment metadata, it was saved with a different "
-                                  + "serializer.");
+                + "serializer.");
         }
         final XWikiAttachment out = new XWikiAttachment();
 
@@ -96,11 +109,7 @@ public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAtt
         return out;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractXMLSerializer#serialize(T, XMLWriter)
-     */
+    @Override
     public void serialize(final XWikiAttachment attach, final XMLWriter writer) throws IOException
     {
         final Element docel = new DOMElement(ROOT_ELEMENT_NAME);

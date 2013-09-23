@@ -27,14 +27,22 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ircbot</artifactId>
-  <name>XWiki Platform - IRC Bot</name>
-  <packaging>xar</packaging>
+  <name>XWiki Platform - IRC Bot - Parent POM</name>
+  <packaging>pom</packaging>
   <description>IRC Bot Application for XWiki</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-ircbot-api</module>
+    <module>xwiki-platform-ircbot-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-ircbot-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

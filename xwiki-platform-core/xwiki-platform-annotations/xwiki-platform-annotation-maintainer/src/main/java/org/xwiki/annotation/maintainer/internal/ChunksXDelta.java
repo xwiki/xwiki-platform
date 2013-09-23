@@ -58,31 +58,19 @@ public class ChunksXDelta extends AbstractXDelta
         this.edited = edited;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.XDelta#getChanged()
-     */
+    @Override
     public String getChanged()
     {
         return edited;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.XDelta#getOriginal()
-     */
+    @Override
     public String getOriginal()
     {
         return original;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.annotation.maintainer.XDelta#getOffset()
-     */
+    @Override
     public int getOffset()
     {
         return position;

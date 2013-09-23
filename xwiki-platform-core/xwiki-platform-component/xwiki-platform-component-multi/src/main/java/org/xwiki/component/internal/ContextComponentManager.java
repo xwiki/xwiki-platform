@@ -19,36 +19,39 @@
  */
 package org.xwiki.component.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentEventManager;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
 /**
- * Chains Component Managers to perform lookups based on the current execution context
- * (current user, current wiki, etc).
- *  
+ * Chains Component Managers to perform lookups based on the current execution context (current user, current wiki,
+ * etc).
+ * 
  * @version $Id$
  * @since 2.1RC1
  */
-@Component("context")
+@Component
+@Named("context")
+@Singleton
 public class ContextComponentManager extends DelegateComponentManager implements Initializable
 {
     /**
      * The first Component Manager in the chain.
      */
-    @Requirement("user")
+    @Inject
+    @Named("user")
     private ComponentManager userComponentManager;
-    
-    /**
-     * {@inheritDoc}
-     * @see Initializable#initialize()
-     */
+
+    @Override
     public void initialize() throws InitializationException
     {
         // The first Component Manager in the lookup chain is the user Component Manager (i.e. components registered
@@ -58,10 +61,6 @@ public class ContextComponentManager extends DelegateComponentManager implements
 
     // Make the Context Component Manager "read-only". Writes should be done against specific Component Managers.
 
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#registerComponent(ComponentDescriptor, Object)
-     */
     @Override
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor, T componentInstance)
         throws ComponentRepositoryException
@@ -69,40 +68,18 @@ public class ContextComponentManager extends DelegateComponentManager implements
         throwException();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#registerComponent(ComponentDescriptor)
-     */
     @Override
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException
     {
         throwException();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#release(Object)
-     */
-    @Override
-    public <T> void release(T component) throws ComponentLifecycleException
-    {
-        throwException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#setComponentEventManager(ComponentEventManager)
-     */
     @Override
     public void setComponentEventManager(ComponentEventManager eventManager)
     {
         throwException();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#setParent(ComponentManager)
-     */
     @Override
     public void setParent(ComponentManager parentComponentManager)
     {
@@ -110,18 +87,8 @@ public class ContextComponentManager extends DelegateComponentManager implements
     }
 
     /**
-     * {@inheritDoc}
-     * @see DelegateComponentManager#unregisterComponent(Class, String)
-     */
-    @Override
-    public void unregisterComponent(Class< ? > role, String roleHint)
-    {
-        throwException();
-    }
-    
-    /**
-     * Exception to throw when trying to access a write method since this Component Manager is a chaining
-     * Component Manager and should only be used for read-only access.
+     * Exception to throw when trying to access a write method since this Component Manager is a chaining Component
+     * Manager and should only be used for read-only access.
      */
     private void throwException()
     {

@@ -19,8 +19,11 @@
  */
 package org.xwiki.captcha.internal.velocity;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.captcha.XWikiCaptchaService;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -32,21 +35,20 @@ import org.apache.velocity.VelocityContext;
  * @version $Id$
  * @since 2.2M2
  */
-@Component("captchaservice")
+@Component
+@Named("captchaservice")
+@Singleton
 public class CaptchaVelocityContextInitializer implements VelocityContextInitializer
 {
     /** The key to use for the captcha in the velocity context. */
     public static final String VELOCITY_CONTEXT_KEY = "captchaservice";
 
     /** The service which we will be passing to the velocity context. */
-    @Requirement("velocity")
+    @Inject
+    @Named("velocity")
     private XWikiCaptchaService service;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.velocity.VelocityContextInitializer#initialize(VelocityContext)
-     */
+    @Override
     public void initialize(VelocityContext context)
     {
         context.put(VELOCITY_CONTEXT_KEY, service);

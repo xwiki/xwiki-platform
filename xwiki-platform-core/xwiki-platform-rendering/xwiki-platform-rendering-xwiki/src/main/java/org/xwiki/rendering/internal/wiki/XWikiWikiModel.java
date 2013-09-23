@@ -19,20 +19,23 @@
  */
 package org.xwiki.rendering.internal.wiki;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,6 +58,7 @@ import com.steadystate.css.parser.SACParserCSS21;
  * @since 2.0M1
  */
 @Component
+@Singleton
 public class XWikiWikiModel implements WikiModel
 {
     /**
@@ -75,38 +79,47 @@ public class XWikiWikiModel implements WikiModel
     /**
      * The component used to access configuration parameters.
      */
-    @Requirement
+    @Inject
     private XWikiRenderingConfiguration xwikiRenderingConfiguration;
 
     /**
      * The component used to access the underlying XWiki model.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to find the URL for an icon.
      */
-    @Requirement
+    @Inject
     private SkinAccessBridge skinAccessBridge;
 
     /**
      * The component used to serialize entity references to strings.
      */
-    @Requirement("compactwiki")
+    @Inject
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     /**
      * Convert an Attachment Reference from a String into an Attachment object.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
     /**
      * Used to resolve a Resource Reference into a proper Document Reference.
      */
-    @Requirement("current")
+    @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    /**
+     * Provides logging for this class.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * The object used to parse the CSS from the image style parameter.
@@ -122,10 +135,9 @@ public class XWikiWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
-     *
-     * @see WikiModel#getLinkURL(org.xwiki.rendering.listener.reference.ResourceReference)
-     * @since 2.5RC1 
+     * @since 2.5RC1
      */
+    @Override
     public String getLinkURL(ResourceReference linkReference)
     {
         return this.documentAccessBridge.getAttachmentURL(resolveAttachmentReference(linkReference),
@@ -134,9 +146,6 @@ public class XWikiWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.wiki.WikiModel#getImageURL(org.xwiki.rendering.listener.reference.ResourceReference ,
-     *      java.util.Map)
      * @since 2.5RC1
      */
     public String getImageURL(ResourceReference imageReference, Map<String, String> parameters)
@@ -172,22 +181,14 @@ public class XWikiWikiModel implements WikiModel
         return new StringBuilder(url).insert(insertionPoint, queryString).toString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.reference.ResourceReference)
-     */
+    @Override
     public boolean isDocumentAvailable(ResourceReference documentResourceReference)
     {
         DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
         return this.documentAccessBridge.exists(documentReference);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.reference.ResourceReference)
-     */
+    @Override
     public String getDocumentViewURL(ResourceReference documentResourceReference)
     {
         DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
@@ -196,11 +197,7 @@ public class XWikiWikiModel implements WikiModel
             documentResourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.reference.ResourceReference)
-     */
+    @Override
     public String getDocumentEditURL(ResourceReference documentResourceReference)
     {
         // Add the parent=<current document name> parameter to the query string of the edit URL so that
@@ -321,8 +318,9 @@ public class XWikiWikiModel implements WikiModel
             try {
                 CSSStyleDeclaration sd = this.cssParser.parseStyleDeclaration(new InputSource(new StringReader(style)));
                 value = sd.getPropertyValue(dimension);
-            } catch (IOException e) {
-                // Ignore the style parameter.
+            } catch (Exception e) {
+                // Ignore the style parameter but log a warning to let the user know.
+                this.logger.warn("Failed to parse CSS style [{}]", style);
             }
         }
         if (StringUtils.isBlank(value)) {

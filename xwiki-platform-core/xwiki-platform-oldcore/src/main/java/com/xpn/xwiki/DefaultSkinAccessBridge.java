@@ -16,38 +16,37 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 /**
- * {@inheritDoc}
+ * Default implementation of {@link SkinAccessBridge}.
+ * 
  * @see org.xwiki.bridge.SkinAccessBridge
- * @version $Id$ 
+ * @version $Id$
  * @since 1.7
  */
 @Component
+@Singleton
 public class DefaultSkinAccessBridge implements SkinAccessBridge
 {
     /** Execution context handler, needed for accessing the XWikiContext. */
-    @Requirement
+    @Inject
     private Execution execution;
 
     private XWikiContext getContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
-    
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.bridge.SkinAccessBridge#getSkinFile(String fileName)
-     */
+
+    @Override
     public String getSkinFile(String fileName)
     {
         XWikiContext xcontext = getContext();
@@ -55,11 +54,7 @@ public class DefaultSkinAccessBridge implements SkinAccessBridge
         return xwiki.getSkinFile(fileName, xcontext);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.bridge.SkinAccessBridge#getIconURL(String)
-     * @since 2.6M1
-     */
+    @Override
     public String getIconURL(String iconName)
     {
         XWikiContext xcontext = getContext();

@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -40,13 +40,8 @@ public class DeleteVersionsAction extends XWikiAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        // CSRF prevention
-        if (!csrfTokenCheck(context)) {
-            return false;
-        }
-
         DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();
-        if (!form.isConfirmed()) {
+        if (!form.isConfirmed() || !csrfTokenCheck(context)) {
             return true;
         }
 
@@ -63,7 +58,7 @@ public class DeleteVersionsAction extends XWikiAction
         if (v1 != null && v2 != null) {
             XWikiDocument doc = context.getDoc();
             String language = form.getLanguage();
-            XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
+            XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
 
             XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
             archive.removeVersions(v1, v2, context);
@@ -85,7 +80,9 @@ public class DeleteVersionsAction extends XWikiAction
                     // Reset the document reference, since the one taken from the archive might be wrong (old name from
                     // before a rename)
                     newdoc.setDocumentReference(tdoc.getDocumentReference());
+                    // Make sure we don't create a new rev!
                     newdoc.setMetaDataDirty(false);
+                    newdoc.addXObjectsToRemoveFromVersion(tdoc);
                     context.getWiki().getStore().saveXWikiDoc(newdoc, context);
                     context.setDoc(newdoc);
                 }

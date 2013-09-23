@@ -1,21 +1,19 @@
 ##
 ## Document footer: tags, creation date, modification date
 ##
-## There is no need for document extras to have permissions.
-$xcontext.dropPermissions()
 ##
 <div id="xdocFooter">
   #template("documentTags.vm")
   <div id="xdocAuthors">
     <div class="xdocCreation"> ## Creation
-      $msg.get('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
+      $services.localization.render('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
       #if($tdoc.realLanguage != $doc.realLanguage)
-        $msg.get('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
+        $services.localization.render('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
       #end
     </div>
-    <div class="xdocLastModification"> ## Last modification
-      $msg.get('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
-    </div>
+##    <div class="xdocLastModification"> ## Last modification
+##      $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+##    </div>
   </div>
 </div>
 ##
@@ -28,11 +26,11 @@ $xcontext.dropPermissions()
 ## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText', ExtraNumberOfItems, 'extratemplate.vm', 'keyboardShortcut']
 ##
 #if (!$docextras)
-  #set ($docextras = $util.arrayList)
+  #set ($docextras = [])
   #if ($showcomments)
     $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
-    #set ($discard = $docextras.add(['Comments', 'comments', $msg.get('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $msg.get('core.shortcuts.view.comments')]))
+    #set ($discard = $docextras.add(['Comments', 'comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $services.localization.render('core.shortcuts.view.comments')]))
   #end
   #if ($showannotations)
     #if (!$annotationCount)
@@ -41,18 +39,28 @@ $xcontext.dropPermissions()
       ## config document. This however should not happen.
       #set ($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
     #end
-    #set ($discard = $docextras.add(['Annotations', 'annotations', $msg.get('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $msg.get('core.shortcuts.view.annotations')]))
+    #set ($discard = $docextras.add(['Annotations', 'annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $services.localization.render('core.shortcuts.view.annotations')]))
   #end
   #if ($showattachments)
+    $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+    $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
-    #set ($discard = $docextras.add(['Attachments', 'attachments', $msg.get('docextra.attachments'), $doc.getAttachmentList().size(), 'attachmentsinline.vm', $msg.get('core.shortcuts.view.attachments')]))
+    ### Support attachment sorting
+    #set ($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
+    #if ($sortAttachmentsBy != '')
+      ## Prepend request parameter
+      #set ($sortAttachmentsBy = "&sortAttachmentsBy=$escapetool.url(${sortAttachmentsBy})")
+    #end
+    #set ($discard = $docextras.add(['Attachments', 'attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), "attachmentsinline.vm$!{sortAttachmentsBy}", $services.localization.render('core.shortcuts.view.attachments')]))
   #end
   #if ($showhistory)
-    #set ($discard = $docextras.add(['History', 'history', $msg.get('docextra.history'), -1, 'historyinline.vm', $msg.get('core.shortcuts.view.history')]))
+    ## Pagination style
+    $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
+    #set ($discard = $docextras.add(['History', 'history', $services.localization.render('docextra.history'), -1, 'historyinline.vm', $services.localization.render('core.shortcuts.view.history')]))
   #end
   #if ($showinformation)
-    #set ($discard = $docextras.add(['Information', 'information', $msg.get('docextra.information'), -1, 'informationinline.vm', $msg.get('core.shortcuts.view.information')]))
+    #set ($discard = $docextras.add(['Information', 'information', $services.localization.render('docextra.information'), -1, 'informationinline.vm', $services.localization.render('core.shortcuts.view.information')]))
   #end
 #end
 ##
@@ -73,7 +81,7 @@ $xcontext.dropPermissions()
         #foreach($docextra in $docextras)
           <li id="${docextra.get(0)}tab">
             <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")">
-              $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$msg.get('docextra.extranb', [$docextra.get(3)])</span> #end
+              $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
             </a>
           </li>
         #end
@@ -94,6 +102,7 @@ $xcontext.dropPermissions()
       var hashviewer = self.document.location.hash.substring(1);
       #foreach($docextra in $docextras)
         #set ($extraAnchor = $listtool.get($docextra, 0))
+        #set ($extraName = $listtool.get($docextra, 1))
         #set ($extraTemplate = $listtool.get($docextra, 4))
         #set ($extraShortcut = $listtool.get($docextra, 5))
         ##
@@ -118,6 +127,13 @@ $xcontext.dropPermissions()
         if ($("tmShow${extraAnchor}") != null) {
           $("tmShow${extraAnchor}").href="#${extraAnchor}";
           Event.observe($("tmShow${extraAnchor}"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+        }
+        ##
+        ## Replace shortcut link (if any)
+        ##
+        if ($("${extraName}shortcut") != null) {
+          $("${extraName}shortcut").down('a').href="#${extraName}";
+          Event.observe($("${extraName}shortcut"), "click", function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
         }
         ##
         ## Override keyboard shortcut (if any)

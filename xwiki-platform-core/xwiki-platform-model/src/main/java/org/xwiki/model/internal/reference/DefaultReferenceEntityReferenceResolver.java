@@ -25,22 +25,24 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Resolve an {@link EntityReference} into a valid and absolute reference (with all required parents filled in). See
- * {@link DefaultEntityReferenceValueProvider} for the behavior used when Reference values are not defined in the passed
- * reference.
+ * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
+ * parents filled in). See {@link DefaultEntityReferenceValueProvider} for the behavior used when Reference values are
+ * not defined in the passed reference.
  * 
  * @version $Id$
- * @since 2.2M1
+ * @since 4.0M1
  */
 @Component
-@Named("default/reference")
+@Named("default")
 @Singleton
 public class DefaultReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
+    /**
+     * Entity reference value provider used to provide default value.
+     */
     @Inject
     private EntityReferenceValueProvider provider;
 

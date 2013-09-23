@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.plugin.skinx;
 
@@ -43,33 +42,18 @@ public class CssResourceSkinExtensionPlugin extends AbstractResourceSkinExtensio
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
     @Override
     public String getName()
     {
         return "ssrx";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getAction()
-     */
     @Override
     protected String getAction()
     {
         return "ssx";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractResourceSkinExtensionPlugin#generateLink(String, String, XWikiContext)
-     */
     @Override
     protected String generateLink(String url, String resourceName, XWikiContext context)
     {

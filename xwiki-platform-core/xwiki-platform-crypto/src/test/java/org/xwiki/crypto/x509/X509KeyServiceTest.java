@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
 import org.xwiki.crypto.x509.internal.X509KeyService;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * KeyService test, insure that the key service is able to make keys without throwing an exception.
@@ -80,7 +80,7 @@ public class X509KeyServiceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.passwordService = getComponentManager().lookup(PasswordCryptoService.class);
+        this.passwordService = getComponentManager().getInstance(PasswordCryptoService.class);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class X509KeyServiceTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void newPrivateKeyWrongPassword() throws GeneralSecurityException
+    public void newPrivateKeyWrongPassword()
     {
         try {
             Assert.assertNotNull("Private key is null", getKeyPair(passwordService).getPrivateKey("asdf"));

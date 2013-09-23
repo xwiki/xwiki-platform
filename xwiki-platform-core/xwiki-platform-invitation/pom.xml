@@ -27,14 +27,21 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-invitation</artifactId>
   <name>XWiki Platform - Invitation</name>
-  <packaging>xar</packaging>
+  <packaging>pom</packaging>
   <description>Application allowing users to invite friends to join a wiki by email.</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-invitation-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-invitation-test-pageobject</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -24,16 +24,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -41,11 +44,13 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Execute the macro's content in the context of another document's reference.
- *
+ * 
  * @version $Id$
  * @since 3.0M1
  */
-@Component("context")
+@Component
+@Named("context")
+@Singleton
 public class ContextMacro extends AbstractMacro<ContextMacroParameters>
 {
     /**
@@ -61,20 +66,21 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
     /**
      * Used to set the current document in the context (old way) and check rights.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The parser used to parse macro content.
      */
-    @Requirement
+    @Inject
     private MacroContentParser contentParser;
 
     /**
      * Used to transform document links into absolute references.
      */
-    @Requirement("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    @Inject
+    @Named("macro")
+    private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -89,21 +95,13 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
+    @Override
     public List<Block> execute(ContextMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
@@ -112,7 +110,8 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                 + "set in the context as the current document.");
         }
 
-        DocumentReference docReference = this.currentDocumentReferenceResolver.resolve(parameters.getDocument());
+        DocumentReference docReference = this.macroDocumentReferenceResolver.resolve(parameters.getDocument(),
+            context.getCurrentMacroBlock());
 
         boolean currentContextHasProgrammingRights = this.documentAccessBridge.hasProgrammingRights();
 
@@ -130,13 +129,13 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                         + "context document provided [" + parameters.getDocument() + "] has programming rights.");
                 }
 
-                result = this.contentParser.parse(content, context, true, false);
+                result = this.contentParser.parse(content, context, true, false).getChildren();
 
             } finally {
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
             }
         } catch (Exception e) {
-            if (e instanceof  MacroExecutionException) {
+            if (e instanceof MacroExecutionException) {
                 throw (MacroExecutionException) e;
             } else {
                 throw new MacroExecutionException("Failed to render page in the context of [" + docReference + "]", e);

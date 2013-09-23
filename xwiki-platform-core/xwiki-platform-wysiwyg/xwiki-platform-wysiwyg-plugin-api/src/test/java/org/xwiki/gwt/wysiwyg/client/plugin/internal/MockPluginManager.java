@@ -48,58 +48,34 @@ public class MockPluginManager implements PluginManager
         this.uiExtensions = uiExtensions;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#getPluginFactoryManager()
-     */
+    @Override
     public PluginFactoryManager getPluginFactoryManager()
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#getUIExtension(String, String)
-     */
+    @Override
     public UIExtension getUIExtension(String role, String feature)
     {
         return uiExtensions.get(role).get(feature);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#load(String)
-     */
+    @Override
     public void load(String pluginName)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#setPluginFactoryManager(PluginFactoryManager)
-     */
+    @Override
     public void setPluginFactoryManager(PluginFactoryManager pfm)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#unload(String)
-     */
+    @Override
     public void unload(String pluginName)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginManager#unloadAll()
-     */
+    @Override
     public void unloadAll()
     {
     }

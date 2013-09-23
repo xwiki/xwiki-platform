@@ -21,22 +21,27 @@ package org.xwiki.chart.internal.plot;
 
 import java.util.Map;
 
-import org.jfree.chart.renderer.xy.XYAreaRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.jfree.chart.renderer.category.AreaRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating area charts.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
-public class AreaPlotGenerator extends AbstractXYPlotGenerator
-{    
-    /**
-     * {@inheritDoc}
-     */
-    protected XYItemRenderer getXYItemRenderer(Map<String, String> parameters)
+@Component
+@Named("area")
+@Singleton
+public class AreaPlotGenerator extends AbstractCategoryPlotGenerator
+{
+    @Override
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
-        return new XYAreaRenderer();
-    }   
+        return new AreaRenderer();
+    }
 }

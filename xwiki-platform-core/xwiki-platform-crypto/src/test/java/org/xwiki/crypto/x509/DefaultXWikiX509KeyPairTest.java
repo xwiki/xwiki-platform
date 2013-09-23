@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
 import org.xwiki.crypto.x509.internal.DefaultXWikiX509KeyPair;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 
 /**
@@ -86,7 +86,7 @@ public class DefaultXWikiX509KeyPairTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.service = getComponentManager().lookup(PasswordCryptoService.class);
+        this.service = getComponentManager().getInstance(PasswordCryptoService.class);
     }
 
     @Test

@@ -38,11 +38,7 @@ import com.google.gwt.dom.client.Node;
  */
 public abstract class AbstractSelection implements Selection
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#collapse(Node, int)
-     */
+    @Override
     public void collapse(Node parentNode, int offset)
     {
         Range range = ((Document) parentNode.getOwnerDocument()).createRange();
@@ -52,21 +48,13 @@ public abstract class AbstractSelection implements Selection
         addRange(range);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#collapseToEnd()
-     */
+    @Override
     public void collapseToEnd()
     {
         collapse(false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#collapseToStart()
-     */
+    @Override
     public void collapseToStart()
     {
         collapse(true);
@@ -87,22 +75,14 @@ public abstract class AbstractSelection implements Selection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#containsNode(Node, boolean)
-     */
+    @Override
     public boolean containsNode(Node node, boolean partlyContained)
     {
         // TODO
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#deleteFromDocument()
-     */
+    @Override
     public void deleteFromDocument()
     {
         if (getRangeCount() > 0) {
@@ -113,11 +93,7 @@ public abstract class AbstractSelection implements Selection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#extend(Node, int)
-     */
+    @Override
     public void extend(Node parentNode, int offset)
     {
         if (getRangeCount() > 0) {
@@ -128,11 +104,7 @@ public abstract class AbstractSelection implements Selection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#getAnchorNode()
-     */
+    @Override
     public Node getAnchorNode()
     {
         if (getRangeCount() > 0) {
@@ -142,11 +114,7 @@ public abstract class AbstractSelection implements Selection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#getAnchorOffset()
-     */
+    @Override
     public int getAnchorOffset()
     {
         if (getRangeCount() > 0) {
@@ -156,11 +124,7 @@ public abstract class AbstractSelection implements Selection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#getFocusNode()
-     */
+    @Override
     public Node getFocusNode()
     {
         if (getRangeCount() > 0) {
@@ -170,11 +134,7 @@ public abstract class AbstractSelection implements Selection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#getFocusOffset()
-     */
+    @Override
     public int getFocusOffset()
     {
         if (getRangeCount() > 0) {
@@ -184,21 +144,13 @@ public abstract class AbstractSelection implements Selection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#isCollapsed()
-     */
+    @Override
     public boolean isCollapsed()
     {
         return getRangeCount() == 1 && getRangeAt(0).isCollapsed();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#selectAllChildren(Node)
-     */
+    @Override
     public void selectAllChildren(Node parentNode)
     {
         Range range = ((Document) parentNode.getOwnerDocument()).createRange();
@@ -207,22 +159,14 @@ public abstract class AbstractSelection implements Selection
         addRange(range);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#selectionLanguageChange(boolean)
-     */
+    @Override
     public void selectionLanguageChange(boolean langRTL)
     {
         // TODO
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Selection#toString()
-     */
+    @Override
     public String toString()
     {
         if (getRangeCount() > 0) {

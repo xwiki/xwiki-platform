@@ -14,10 +14,10 @@
 #else
   #set($lang = '')
 #end
-$msg.get('currentdifftype'): $type (
-<a href="$doc.getURL("view", "xpage=changesall&amp;type=wiki$lang")">$msg.get("wikidiff")</a>
-<a href="$doc.getURL("view", "xpage=changesall&amp;type=source$lang")">$msg.get("sourcediff")</a>
-<a href="$doc.getURL("view", "xpage=changesall&amp;type=html$lang")">$msg.get("htmldiff")</a>
+$services.localization.render('currentdifftype'): $type (
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=wiki$lang")">$services.localization.render('wikidiff')</a>
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=source$lang")">$services.localization.render('sourcediff')</a>
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=html$lang")">$services.localization.render('htmldiff')</a>
 )
 #set ($firstrev = $tdoc.getVersion())
 #set ($nextversion = $firstrev)

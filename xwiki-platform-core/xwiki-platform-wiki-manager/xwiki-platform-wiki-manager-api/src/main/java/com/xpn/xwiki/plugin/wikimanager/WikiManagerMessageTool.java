@@ -23,8 +23,11 @@ package com.xpn.xwiki.plugin.wikimanager;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Wiki Manager plugin translation messages manager.
@@ -34,6 +37,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  * 
  * @version $Id$
  */
+@Deprecated
 public class WikiManagerMessageTool extends XWikiPluginMessageTool
 {
     /**
@@ -66,6 +70,8 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     /**
      * Used as {@link WikiManagerException} message when trying to make action that require virtual mode in a wiki not
      * in virtual mode.
+     * 
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      */
     public static final String ERROR_XWIKINOTVIRTUAL = "wikimanager.plugin.error.xwikinotvirtual";
 
@@ -157,75 +163,69 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_DELETEMAINWIKI = "wikimanager.plugin.error.deletemainwiki";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new wiki with a wiki
-     * descriptor that already exist.
+     * Used as log message when trying to create a new wiki with a wiki descriptor that already exist.
      */
     public static final String LOG_DESCRIPTORALREADYEXISTS =
         "wikimanager.plugin.log.createwiki.descriptoralreadyexists";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new database/schema that
-     * already exists.
+     * Used as log message when trying to create a new database/schema that already exists.
      */
     public static final String LOG_DATABASEALREADYEXISTS = "wikimanager.plugin.log.createwiki.databasealreadyexist";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when database/schema creation failed.
+     * Used as log message when database/schema creation failed.
      */
     public static final String LOG_DATABASECREATION = "wikimanager.plugin.log.createwiki.databasecreation";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when database/schema creation thrown unknown
-     * exception.
+     * Used as log message when database/schema creation thrown unknown exception.
      */
     public static final String LOG_DATABASECREATIONEXCEPTION =
         "wikimanager.plugin.log.createwiki.databasecreationexception";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when wiki creation failed.
+     * Used as log message when wiki creation failed.
      */
     public static final String LOG_WIKICREATION = "wikimanager.plugin.log.wikicreation";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when wiki deletion failed.
+     * Used as log message when wiki deletion failed.
      */
     public static final String LOG_WIKIDELETION = "wikimanager.plugin.log.wikideletion";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki alias.
+     * Used as log message when failed to find wiki alias.
      */
     public static final String LOG_WIKIGET = "wikimanager.plugin.log.wikiget";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki descriptor document.
+     * Used as log message when failed to find wiki descriptor document.
      */
     public static final String LOG_WIKIALIASGET = "wikimanager.plugin.log.wikialiasget";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis descriptors
-     * documents.
+     * Used as log message when failed to find all the wikis descriptors documents.
      */
     public static final String LOG_WIKIGETALL = "wikimanager.plugin.log.wikigetall";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis aliases.
+     * Used as log message when failed to find all the wikis aliases.
      */
     public static final String LOG_WIKIALIASGETALL = "wikimanager.plugin.log.wikialiasgetall";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when modification of the "visibility" field of a wiki
-     * descriptor failed.
+     * Used as log message when modification of the "visibility" field of a wiki descriptor failed.
      */
     public static final String LOG_WIKISETVISIBILITY = "wikimanager.plugin.log.wikisetvisibility";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki template descriptor document.
+     * Used as log message when failed to find wiki template descriptor document.
      */
     public static final String LOG_WIKITEMPLATEGET = "wikimanager.plugin.log.wikitemplateget";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis templates
-     * descriptors documents.
+     * Used as log message when failed to find all the wikis templates descriptors documents.
      */
     public static final String LOG_WIKITEMPLATEGETALL = "wikimanager.plugin.log.wikitemplategetall";
 
@@ -237,11 +237,18 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     private static final WikiManagerMessageTool DEFAULTMESSAGETOOL = new WikiManagerMessageTool();
 
     /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
+
+    /**
      * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system {@link Locale}.
      */
     private WikiManagerMessageTool()
     {
         super(ResourceBundle.getBundle(WikiManagerPlugin.PLUGIN_NAME + "/ApplicationResources"));
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -256,6 +263,18 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     WikiManagerMessageTool(Locale locale, WikiManagerPlugin plugin, XWikiContext context)
     {
         super(locale, plugin, context);
+    }
+
+    @Override
+    public String get(String key)
+    {
+        return this.localizationManager.getTranslationPlain(key);
+    }
+
+    @Override
+    public String get(String key, Object... params)
+    {
+        return this.localizationManager.getTranslationPlain(key, params);
     }
 
     /**

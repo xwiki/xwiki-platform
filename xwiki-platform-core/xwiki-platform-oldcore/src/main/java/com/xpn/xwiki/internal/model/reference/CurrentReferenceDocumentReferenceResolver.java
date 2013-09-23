@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -32,21 +35,20 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * component to resolve {@link DocumentReference} objects from Entity Reference (when they miss some parent references
  * or have NULL values). The behavior is the one defined in
  * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider}.
- *
+ * 
  * @version $Id$
  * @since 2.2M1
  */
-@Component("current/reference")
+@Component
+@Named("current")
+@Singleton
 public class CurrentReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
-    @Requirement("current/reference")
+    @Inject
+    @Named("current")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
-     */
+    @Override
     public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
         return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,

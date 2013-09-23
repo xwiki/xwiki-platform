@@ -26,8 +26,8 @@ import com.google.gwt.dom.client.Node;
 /**
  * Extends the document implementation provided by GWT to add support for selection and range.
  * 
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3006
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3053
+ * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3006"
+ * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3053"
  * @version $Id$
  */
 public class Document extends com.google.gwt.dom.client.Document
@@ -72,7 +72,7 @@ public class Document extends com.google.gwt.dom.client.Document
      * support for retrieving the current selection.
      * 
      * @return The selection object associated with this document.
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3053
+     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3053"
      */
     public final Selection getSelection()
     {
@@ -84,7 +84,7 @@ public class Document extends com.google.gwt.dom.client.Document
      * support for creating a range.
      * 
      * @return A new range for this document.
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3053
+     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3053"
      */
     public final Range createRange()
     {
@@ -99,7 +99,7 @@ public class Document extends com.google.gwt.dom.client.Document
      * @param externalNode The node from another document to be imported.
      * @param deep Indicates whether the children of the given node need to be imported.
      * @return a copy of the given node that can be inserted into this document.
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3006
+     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3006"
      */
     public final Node xImportNode(Node externalNode, boolean deep)
     {
@@ -112,7 +112,7 @@ public class Document extends com.google.gwt.dom.client.Document
      * @param startNode node to start iteration from
      * @return the depth-first pre-order iterator
      * @see {@link DepthFirstPreOrderIterator}
-     * @see http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-Document
+     * @see "http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-Document"
      */
     public final Iterator<Node> getIterator(Node startNode)
     {

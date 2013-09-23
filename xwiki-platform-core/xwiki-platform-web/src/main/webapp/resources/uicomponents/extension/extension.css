@@ -1,0 +1,411 @@
+#template('colorThemeInit.vm')
+.extension-item {
+  border-color: $theme.borderColor $theme.pageContentBackgroundColor $theme.pageContentBackgroundColor $theme.borderColor;
+  border-style: solid solid solid;
+  border-width: 1px 4px 1px 1px;
+  display: block;
+  box-shadow:  1px 0 0 $theme.borderColor;
+  margin-right: 1px;
+  position: relative;
+}
+.extension-item > * {
+  padding: 0.8em 1em 1em 2.7em;
+}
+.extension-item:last-of-type {
+  border-bottom-color: $theme.borderColor;
+}
+
+.extension-title {
+  color: $theme.titleColor;
+  font-size: 1.2em;
+  font-weight: 700;
+  border: none;
+  background: none no-repeat scroll 0.2em 0.3em transparent;
+  margin: 0 0 0 -1.8em;
+  padding: 2px 0 2px 1.8em;
+}
+
+.extension-version, .extension-namespace {
+  color: $theme.textSecondaryColor;
+  margin-left: 1em;
+  font-weight: normal;
+  font-size: .8em;
+}
+
+.extension-item:hover .extension-header {
+  background-color: $theme.highlightColor;
+}
+.extension-header .buttonwrapper {
+  margin: 0 0 0 5px;
+}
+
+.extension-actions {
+  clear: right;
+  float: right;
+  text-align: right;
+}
+/* Display the drop-down menu of a button group on top of the extension to make sure it is visible. */
+.extension-actions .button-group > .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
+.extension-status {
+  font-size: 0.8em;
+}
+.extension-header .extension-status {
+  float: right;
+  margin: -2em 0 1em;
+}
+
+.extension-authors {
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+}
+
+.extension-item-core .extension-status, .extension-item-installed .extension-status,
+/* We have to duplicate the selectors to force the style to be applied to extension dependencies, which are nested inside extension display. */
+.extension-item .extension-item-core .extension-status, .extension-item .extension-item-installed .extension-status {
+  color: $theme.notificationSuccessColor;
+}
+.extension-item-remote-core .extension-status, .extension-item-remote-installed .extension-status,
+.extension-item .extension-item-remote-core .extension-status, .extension-item .extension-item-remote-installed .extension-status {
+  color: $theme.notificationWarningColor;
+}
+.extension-item-installed-invalid .extension-status, .extension-item-remote-installed-invalid .extension-status,
+.extension-item .extension-item-installed-invalid .extension-status, .extension-item .extension-item-remote-installed-invalid .extension-status,
+/* This applies only to dependencies. */
+.extension-item-remote-core-incompatible .extension-status, .extension-item-remote-installed-incompatible .extension-status {
+  color: $theme.notificationErrorColor;
+}
+
+.extension-summary {
+  font-size: .9em;
+  margin-top: .5em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.extension-body {
+  border: 1px dotted $theme.borderColor;;
+  padding: 0 .8em .8em 1.8em !important;
+  margin: 0 1em 1em;
+}
+.extension-body.loading {
+  padding: 16px !important;
+}
+
+*[id^="extension-body-"]:target {
+  display: none;
+}
+*[class^="extension-body-"] {
+  display: none;
+  font-size: 0.9em;
+  /* Make sure we have space for the loading animation. */
+  min-height: 16px;
+}
+*[id^="extension-body-"]:target + *[class^="extension-body-"] {
+  display: block;
+}
+
+dl.extension-metadata > dd > ul {
+  list-style-position: inside;
+  margin: 0;
+}
+
+.extension-body-dependencies ul, .extension-body-progress > ul {
+  border-top: 1px dotted #E8E8E8;
+  list-style-type: none;
+  margin: 0;
+}
+.extension-body-dependencies li:hover, .extension-body-progress > ul li:hover {
+  background-color: $theme.highlightColor;
+}
+.dependency-item, .extension-log-item {
+  background: transparent none no-repeat left;
+  border-bottom: 1px dotted #E8E8E8;
+  border-right: 7px solid $theme.pageContentBackgroundColor;
+  padding: 0.3em 0 0.3em 20px;
+  position: relative;
+}
+.dependency-item, .extension-log-item > div {
+  line-height: 1.4em;
+}
+.extension-item-core .extension-title, .extension-item-remote-core .extension-title,
+.dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
+}
+.extension-item-installed .extension-title, .extension-item-remote-installed .extension-title,
+.extension-item-installed-invalid .extension-title, .extension-item-remote-installed-invalid .extension-title,
+.dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed,
+.dependency-item.extension-item-installed-invalid, .dependency-item.extension-item-remote-installed-invalid,
+.dependency-item.extension-item-remote-installed-incompatible {
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
+}
+.extension-item-remote .extension-title, .dependency-item.extension-item-remote {
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
+}
+.extension-item-loading .extension-title, .dependency-item.extension-item-loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+}
+.dependency-item.extension-item-unknown {
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
+}
+.dependency-item .extension-status {
+  position: absolute;
+  right: 1.5em;
+}
+
+.extension-item-core, .extension-item-installed {
+  border-right-color: $theme.notificationSuccessColor;
+}
+.extension-item-remote-installed, .extension-item-remote-core {
+  border-right-color: $theme.notificationWarningColor;
+}
+.extension-item-installed-invalid, .extension-item-remote-installed-invalid,
+.extension-item-remote-core-incompatible, .extension-item-remote-installed-incompatible {
+  border-right-color: $theme.notificationErrorColor;
+}
+
+.extension-diff-title {
+  margin: 1.2em 0 .6em;
+}
+.extension-diff-options {
+  margin-bottom: .6em;
+}
+.extension-diff-options .label {
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-right: 0.3em;
+  text-transform: uppercase;
+}
+.extension-diff-options select {
+  margin-right: 0.3em;
+  width: auto;
+}
+
+.extension-body-progress > ul {
+  margin-top: .5em;
+  /* This should accommodate 10 items */
+  max-height: 230px;
+  overflow: auto;
+}
+.extension-log-item {
+  background-position: left .3em;
+}
+.extension-log-item-info {
+  background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
+  color: $theme.notificationInfoColor;
+}
+.extension-log-item-loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  color: $theme.notificationInfoColor;
+}
+.extension-log-item-warn {
+  background-image: url("$xwiki.getSkinFile('icons/silk/error.png')");
+  color: $theme.notificationWarningColor;
+}
+.extension-log-item-error {
+  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
+  color: $theme.notificationErrorColor;
+}
+.extension-log-item .stacktrace {
+  white-space: pre-wrap;
+}
+
+.extension-search-bar {
+  background-color: $theme.panelCollapsedBackgroundColor;
+  border: 1px solid $theme.borderColor;
+  border-bottom: 0;
+  color: $theme.panelCollapsedTextColor;
+  font-size: .8em;
+  padding: .3em 1.2em .3em .3em;
+  position: relative;
+}
+
+#extension-search-simple {
+  float: left;
+}
+#extensionSearchInput {
+  background: url("$xwiki.getSkinFile('icons/xwiki/search.png')") no-repeat scroll left center $theme.pageContentBackgroundColor;
+  padding-left: 18px;
+  width: 340px;
+}
+
+#extensionSearchRepositoryList {
+  padding: 3px;
+}
+
+#extension-search-advanced {
+  float: right;
+  margin: 8px 0 0;
+}
+
+#extension-search-advanced legend {
+  font-size: .875em;
+  margin: 0;
+  border: 0 none;
+  text-align: right;
+}
+
+#extension-search-advanced legend a:after, a.extension-versions-link:after {
+  content: " \bb";
+}
+#extension-search-advanced legend a.expanded:after {
+  color: transparent;
+}
+#extension-search-advanced-body {
+  display: none;
+}
+#extension-search-advanced-body:target ~ div.hidden {
+  /* The 'hidden' class forces display:none using !important so we have to use it too in order to overwrite it.  */
+  display: block !important;
+}
+.extension-search-advanced-popup {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  padding: .3em .5em;
+  position: absolute;
+  right: 1.2em;
+  text-align: left;
+  width: 40%;
+  z-index: 200;
+}
+
+.innerMenu {
+  color: $theme.textSecondaryColor;
+  font-size: 1em;
+  font-size: 0.8em;
+  /*padding: 0 1.55em .1em 3.35em;*/
+  padding: 0 0 .1em;
+  margin: 0 0 0 0 !important;
+  margin-top: -5px !important;
+}
+.innerMenu li {
+  display: inline-block;
+  sborder: 1px solid red;
+  vertical-align: top;
+  margin-left: -1px;
+}
+.innerMenu li a {
+  border-radius: 5px 5px 0 0 / 3px 3px 0 0;
+  border-top: 3px solid $theme.borderColor;
+  display: inline-block;
+  margin: 2px 2em 0 0;
+  padding: 6px .5em .2em;
+  position: relative;
+  top: 0px;
+}
+.innerMenu li a:hover {
+  border-radius: 5px 5px 0 0;
+  border-top: 5px solid $theme.borderColor;
+  margin-top: 0px;
+}
+.innerMenu li a.current {
+  background-color: $theme.panelCollapsedBackgroundColor;
+  border: 0 none;
+  border-top: 5px solid $theme.panelCollapsedBackgroundColor;
+  margin-top: 0;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 3px;
+}
+.innerMenu li a.current:after {
+  border-style: solid;
+  border-color: transparent transparent  $theme.borderColor;
+  border-width: 0 5px 5px 0;
+  width: 0;
+  display: block;
+  position: absolute;
+  height: 0;
+  content: "";
+  top: -5px;
+  right: -5px;
+}
+.innerMenu li a.current {
+  color: $theme.panelCollapsedTextColor;
+  text-decoration: none;
+}
+
+.ui-progress {
+  margin-top: .5em;
+}
+
+.ui-progress-bar {
+  background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
+  background-repeat: repeat;
+  background-color: $theme.notificationSuccessColor !important;
+  background-position: left;
+  -moz-animation-duration: 0.2s;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-name: progress-animation;
+  -moz-animation-timing-function: linear;
+}
+
+@-moz-keyframes progress-animation {
+  0% {background-position: -14.142px 0;}
+  100% {background-position: 0px 0;}
+}
+
+.ui-progress-background {
+  background-color: transparent;
+  border-radius: 8px 8px 8px 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) inset, 0 1px 0 0 $theme.pageContentBackgroundColor;
+  height: 8px;
+}
+
+.ui-progress-bar {
+  background-color: $theme.backgroundSecondaryColor;
+  border-radius: 8px 8px 8px 8px;
+  height: 8px;
+}
+
+.ui-progress-bar.green {
+  box-shadow:
+    inset 0 2px 9px  rgba(255,255,255,0.3),
+    inset 0 -2px 6px rgba(0,0,0,0.4);
+
+  background-image:
+     -webkit-gradient(linear, 0 0, 100% 100%,
+        color-stop(.25, rgba(255, 255, 255, .2)),
+        color-stop(.25, transparent), color-stop(.5, transparent),
+        color-stop(.5, rgba(255, 255, 255, .2)),
+        color-stop(.75, rgba(255, 255, 255, .2)),
+        color-stop(.75, transparent), to(transparent)
+     );
+
+  -webkit-background-size: 50px 50px;
+  -moz-background-size: 50px 50px;
+}
+
+.ui-progress-bar.orange {
+  /*other*/ background: -moz-repeating-linear-gradient(left top -30deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.17) 15px, rgba(255, 255, 255, 0) 15px, rgba(255, 255, 255, 0) 30px) repeat scroll 0 0%, -moz-linear-gradient(center top , #F1A165, #D09000) repeat scroll 0 0 transparent;
+}
+
+.ui-progress-bar.red {
+  /*other*/ background: -moz-repeating-linear-gradient(left top -30deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.17) 15px, rgba(255, 255, 255, 0) 15px, rgba(255, 255, 255, 0) 30px) repeat scroll 0 0%, -moz-linear-gradient(center top , #F0A3A3, #F42323) repeat scroll 0 0 transparent;
+}
+
+.ui-progress-message {
+  color: $theme.textSecondaryColor;
+  font-size: .85em;
+  line-height: inherit;
+  margin: 0;
+  min-width: 100px;
+}
+
+#extensionUpdater > .ui-progress {
+  margin-bottom: .5em;
+}
+#extensionUpdater > .extension-body-progress {
+  display: block;
+}
+
+.xLabel {
+  font-weight: 700;
+  margin: 1.2em 0 0.3em 0;
+  text-transform: uppercase;
+}
+.xHint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  margin: 0.3em 0;
+}

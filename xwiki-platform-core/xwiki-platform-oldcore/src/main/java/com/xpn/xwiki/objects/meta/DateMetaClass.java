@@ -16,55 +16,70 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+/**
+ * Defines the meta properties of a date XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("Date")
+@Singleton
 public class DateMetaClass extends PropertyMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Date XClass property.
+     */
     public DateMetaClass()
     {
-        super();
-        // setType("numbermetaclass");
         setPrettyName("Date");
-        setName(DateClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        NumberClass size_class = new NumberClass(this);
-        size_class.setName("size");
-        size_class.setPrettyName("Size");
-        size_class.setSize(5);
-        size_class.setNumberType("integer");
+        NumberClass sizeClass = new NumberClass(this);
+        sizeClass.setName("size");
+        sizeClass.setPrettyName("Size");
+        sizeClass.setSize(5);
+        sizeClass.setNumberType("integer");
+        safeput(sizeClass.getName(), sizeClass);
 
-        NumberClass emptyistoday_class = new NumberClass(this);
-        emptyistoday_class.setName("emptyIsToday");
-        emptyistoday_class.setPrettyName("Empty Is Today");
-        emptyistoday_class.setSize(5);
-        emptyistoday_class.setNumberType("integer");
+        BooleanClass emptyIsTodayClass = new BooleanClass(this);
+        emptyIsTodayClass.setName("emptyIsToday");
+        emptyIsTodayClass.setPrettyName("Empty Is Today");
+        emptyIsTodayClass.setDisplayType("yesno");
+        emptyIsTodayClass.setDisplayFormType("checkbox");
+        emptyIsTodayClass.setDefaultValue(1);
+        safeput(emptyIsTodayClass.getName(), emptyIsTodayClass);
 
-        BooleanClass picker_class = new BooleanClass(this);
-        picker_class.setName("picker");
-        picker_class.setPrettyName("Picker");
-        picker_class.setDefaultValue(1);
+        BooleanClass pickerClass = new BooleanClass(this);
+        pickerClass.setName("picker");
+        pickerClass.setPrettyName("Use Date Picker");
+        pickerClass.setDisplayType(emptyIsTodayClass.getDisplayType());
+        pickerClass.setDisplayFormType(emptyIsTodayClass.getDisplayFormType());
+        pickerClass.setDefaultValue(1);
+        safeput(pickerClass.getName(), pickerClass);
 
-        StringClass dateformat_class = new StringClass(this);
-        dateformat_class.setName("dateFormat");
-        dateformat_class.setPrettyName("Date Format");
-        dateformat_class.setSize(20);
-
-        safeput("size", size_class);
-        safeput("emptyIsToday", emptyistoday_class);
-        safeput("dateFormat", dateformat_class);
+        StringClass dateFormatClass = new StringClass(this);
+        dateFormatClass.setName("dateFormat");
+        dateFormatClass.setPrettyName("Date Format");
+        dateFormatClass.setSize(20);
+        safeput(dateFormatClass.getName(), dateFormatClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new DateClass();
     }

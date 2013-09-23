@@ -57,9 +57,7 @@ public class DavWikiFile extends AbstractDavFile
      */
     private XWikiDocument parentDoc;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(XWikiDavResource parent, String name, String relativePath)
         throws DavException
     {
@@ -84,17 +82,13 @@ public class DavWikiFile extends AbstractDavFile
             new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, contentLength));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean exists()
     {
         return !parentDoc.isNew() && parentResource.getVirtualMembers().contains(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void spool(OutputContext outputContext) throws IOException
     {
         // Protect against direct url referencing.
@@ -130,17 +124,13 @@ public class DavWikiFile extends AbstractDavFile
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void move(DavResource destination) throws DavException
     {
         throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public long getModificationTime()
     {
         if (exists()) {

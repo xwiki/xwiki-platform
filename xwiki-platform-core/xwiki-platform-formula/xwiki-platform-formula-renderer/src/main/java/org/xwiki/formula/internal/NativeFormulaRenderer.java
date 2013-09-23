@@ -26,17 +26,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.formula.AbstractFormulaRenderer;
 import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.ImageData;
@@ -56,31 +59,28 @@ import org.xwiki.formula.ImageData;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("native")
+@Component
+@Named("native")
+@Singleton
 public class NativeFormulaRenderer extends AbstractFormulaRenderer implements Initializable
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(NativeFormulaRenderer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NativeFormulaRenderer.class);
 
     /** Application container, needed for retrieving the work directory where temporary files can be created. */
-    @Requirement
-    private Container container;
+    @Inject
+    private Environment environment;
 
     /** Temporary parent directory for storing files created during the image rendering process. */
     private File tempDirectory;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void initialize() throws InitializationException
     {
-        this.tempDirectory = new File(this.container.getApplicationContext().getTemporaryDirectory(), "formulae");
+        this.tempDirectory = new File(this.environment.getTemporaryDirectory(), "formulae");
         this.tempDirectory.mkdir();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ImageData renderImage(String formula, boolean inline, FormulaRenderer.FontSize size,
         FormulaRenderer.Type type) throws IllegalArgumentException, IOException
@@ -88,10 +88,11 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
         File tmpDirectory = null;
         try {
             String texContent =
-                "\\documentclass[10pt]{article}\n" + "\\usepackage{amsmath}\n" + "\\usepackage{amsfonts}\n"
-                    + "\\usepackage{amssymb}\n" + "\\usepackage{pst-plot}\n" + "\\usepackage{color}\n"
-                    + "\\pagestyle{empty}\n" + "\\begin{document}\n" + size.getCommand() + "\n"
-                    + wrapFormula(formula, inline) + "\\end{document}\n";
+                "\\documentclass[10pt]{article}\n" + "\\usepackage[paperheight=1000in]{geometry}\n"
+                    + "\\usepackage{amsmath}\n" + "\\usepackage{amsfonts}\n" + "\\usepackage{amssymb}\n"
+                    + "\\usepackage{pst-plot}\n" + "\\usepackage{color}\n" + "\\pagestyle{empty}\n"
+                    + "\\begin{document}\n" + size.getCommand() + "\n" + wrapFormula(formula, inline)
+                    + "\\end{document}\n";
             do {
                 tmpDirectory = new File(this.tempDirectory, RandomStringUtils.randomAlphanumeric(8));
             } while (tmpDirectory.exists());
@@ -148,7 +149,7 @@ public class NativeFormulaRenderer extends AbstractFormulaRenderer implements In
         }
 
         if (process.exitValue() != 0) {
-            LOG.debug("Error generating image: " + IOUtils.toString(process.getErrorStream()));
+            LOGGER.debug("Error generating image: " + IOUtils.toString(process.getErrorStream()));
         }
 
         return process.exitValue() == 0;

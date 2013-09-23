@@ -27,18 +27,26 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-application-manager</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-application-manager-api</artifactId>
   <name>XWiki Platform - Application Manager - API</name>
-  <description>XWiki Platform - Application Manager - API</description>
+  <description>API to manage application descriptors</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>com.xpn.xwiki.platform.plugins:xwiki-plugin-application-manager</xwiki.extension.features>
+
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Application Manager API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.28</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Needed at test time. Some versions of Maven don't inherit provided dependencies. -->
+    <!-- Test dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -51,12 +59,6 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -64,6 +66,12 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              **/ApplicationManagerListener.java,
+              **/ApplicationManagerScriptService.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

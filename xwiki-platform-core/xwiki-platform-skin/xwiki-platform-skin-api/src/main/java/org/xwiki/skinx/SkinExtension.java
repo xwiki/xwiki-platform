@@ -21,7 +21,7 @@ package org.xwiki.skinx;
 
 import java.util.Map;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Allows a component to use a skin file (js or css), in the current page being rendered.
@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.0M1
  */
-@ComponentRole
+@Role
 public interface SkinExtension
 {
     /**

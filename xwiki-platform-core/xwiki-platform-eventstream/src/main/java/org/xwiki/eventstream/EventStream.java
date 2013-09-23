@@ -16,13 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.eventstream;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
@@ -32,7 +31,7 @@ import org.xwiki.query.QueryException;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole
+@Role
 public interface EventStream
 {
     /**

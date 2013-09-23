@@ -82,32 +82,20 @@ public class HiddenConfig extends Composite implements Config
         initWidget(container);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Config#getParameter(String)
-     */
+    @Override
     public String getParameter(String paramName)
     {
         return getParameter(paramName, null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Config#getParameter(String, String)
-     */
+    @Override
     public String getParameter(String paramName, String defaultValue)
     {
         Hidden hidden = params.get(paramName);
         return hidden == null ? defaultValue : hidden.getValue();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Config#getParameterNames()
-     */
+    @Override
     public Set<String> getParameterNames()
     {
         return params.keySet();

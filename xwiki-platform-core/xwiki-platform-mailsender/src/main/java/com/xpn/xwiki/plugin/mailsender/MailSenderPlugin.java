@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -52,12 +53,12 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -84,7 +85,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 public class MailSenderPlugin extends XWikiDefaultPlugin
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(MailSenderPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderPlugin.class);
 
     /**
      * Since Java uses full Unicode Strings and email clients manage it we force email encoding to UTF-8. XWiki encoding
@@ -130,11 +131,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         super(name, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(XWikiContext)
-     */
     @Override
     public void init(XWikiContext context)
     {
@@ -145,11 +141,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#virtualInit(XWikiContext)
-     */
     @Override
     public void virtualInit(XWikiContext context)
     {
@@ -160,22 +151,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#getName()
-     */
     @Override
     public String getName()
     {
         return ID;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface, XWikiContext)
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
@@ -243,7 +224,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             needsUpdate = true;
         }
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(EMAIL_XWIKI_CLASS_NAME);
         needsUpdate |= bclass.addTextField("subject", "Subject", 40);
         needsUpdate |= bclass.addTextField("language", "Language", 5);
@@ -270,6 +251,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
+        }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
         }
 
         if (needsUpdate) {
@@ -313,7 +298,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         InternetAddress[] bcc = toInternetAddresses(recipients);
 
         if ((to == null) && (cc == null) && (bcc == null)) {
-            LOG.info("No recipient -> skipping this email");
+            LOGGER.info("No recipient -> skipping this email");
             return null;
         }
 
@@ -354,8 +339,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     /**
      * Add attachments to a multipart message
      * 
-     * @param multipart Multipart message
-     * @param attachments List of attachments
+     * @param attachment the attachment to create the body part for.
+     * @param context the XWiki context.
+     * @return the body part for the given attachment.
      */
     public MimeBodyPart createAttachmentBodyPart(Attachment attachment, XWikiContext context) throws XWikiException,
         IOException, MessagingException
@@ -527,7 +513,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 line = input.readLine();
             } else {
                 if (headersFound) {
-                    LOG.warn("Mail body does not contain an empty line between the headers and the body.");
+                    LOGGER.warn("Mail body does not contain an empty line between the headers and the body.");
                 }
             }
 
@@ -545,7 +531,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             toMail.setTextPart(result.toString());
         } catch (IOException ioe) {
             // Can't really happen here
-            LOG.error("Unexpected IO exception while preparing a mail", ioe);
+            LOGGER.error("Unexpected IO exception while preparing a mail", ioe);
         }
     }
 
@@ -637,6 +623,30 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Prepares a Mail Velocity context based on a map of parameters
+     *
+     * @param fromAddr Mail from
+     * @param toAddr Mail to
+     * @param ccAddr Mail cc
+     * @param bccAddr Mail bcc
+     * @param parameters variables to be passed to the velocity context
+     * @return The prepared context
+     */
+    public VelocityContext prepareVelocityContext(String fromAddr, String toAddr, String ccAddr, String bccAddr,
+        Map<String, Object> parameters, XWikiContext context)
+    {
+        VelocityContext vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
+
+        if (parameters != null) {
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                vcontext.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return vcontext;
+    }
+
+    /**
      * Send a single Mail
      * 
      * @param mailItem The Mail to send
@@ -652,7 +662,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Send a single Mail
-     * 
+     *
      * @param mailItem The Mail to send
      * @return True if the the email has been sent
      */
@@ -697,7 +707,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 count++;
 
                 Mail mail = emailIt.next();
-                LOG.info("Sending email: " + mail.toString());
+                LOGGER.info("Sending email: " + mail.toString());
 
                 if ((transport == null) || (session == null)) {
                     // initialize JavaMail Session and Transport
@@ -728,15 +738,15 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                                 transport.close();
                             }
                         } catch (MessagingException ex) {
-                            LOG.error("MessagingException has occured.", ex);
+                            LOGGER.error("MessagingException has occured.", ex);
                         }
                         transport = null;
                         session = null;
                     }
                 } catch (SendFailedException ex) {
                     sendFailedCount++;
-                    LOG.error("SendFailedException has occured.", ex);
-                    LOG.error("Detailed email information" + mail.toString());
+                    LOGGER.error("SendFailedException has occured.", ex);
+                    LOGGER.error("Detailed email information" + mail.toString());
                     if (emailCount == 1) {
                         throw ex;
                     }
@@ -744,15 +754,15 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                         throw ex;
                     }
                 } catch (MessagingException mex) {
-                    LOG.error("MessagingException has occured.", mex);
-                    LOG.error("Detailed email information" + mail.toString());
+                    LOGGER.error("MessagingException has occured.", mex);
+                    LOGGER.error("Detailed email information" + mail.toString());
                     if (emailCount == 1) {
                         throw mex;
                     }
                 } catch (XWikiException e) {
-                    LOG.error("XWikiException has occured.", e);
+                    LOGGER.error("XWikiException has occured.", e);
                 } catch (IOException e) {
-                    LOG.error("IOException has occured.", e);
+                    LOGGER.error("IOException has occured.", e);
                 }
             }
         } finally {
@@ -761,10 +771,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     transport.close();
                 }
             } catch (MessagingException ex) {
-                LOG.error("MessagingException has occured.", ex);
+                LOGGER.error("MessagingException has occured.", ex);
             }
 
-            LOG.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
+            LOGGER.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
         }
         return true;
     }
@@ -787,6 +797,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         String language, VelocityContext vcontext, XWikiContext context) throws XWikiException
     {
         XWikiURLFactory originalURLFactory = context.getURLFactory();
+        // Backup the Locale and restore it in the finally block
+        // because setting the language below to the given language changes the locale.
+        Locale originalLocale = context.getLocale();
         try {
             context.setURLFactory(new ExternalServletURLFactory(context));
             VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
@@ -799,7 +812,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
             }
             if (obj == null) {
-                LOG.error("No mail object found in the document " + templateDocFullName);
+                LOGGER.error("No mail object found in the document " + templateDocFullName);
                 return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
             }
             String subjectContent = obj.getStringValue("subject");
@@ -827,11 +840,33 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 sendMail(mail, context);
                 return 0;
             } catch (Exception e) {
-                LOG.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
+                LOGGER.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
                 return ERROR;
             }
         } finally {
             context.setURLFactory(originalURLFactory);
+            context.setLocale(originalLocale);
         }
+    }
+
+    /**
+     * Uses an XWiki document to build the message subject and context, based on variables stored in a map.
+     * Sends the email.
+     *
+     * @param templateDocFullName Full name of the template to be used (example: XWiki.MyEmailTemplate). The template
+     *            needs to have an XWiki.Email object attached
+     * @param from Email sender
+     * @param to Email recipient
+     * @param cc Email Carbon Copy
+     * @param bcc Email Hidden Carbon Copy
+     * @param language Language of the email
+     * @param parameters variables to be passed to the velocity context
+     * @return True if the email has been sent
+     */
+    public int sendMailFromTemplate(String templateDocFullName, String from, String to, String cc, String bcc,
+        String language, Map<String, Object> parameters, XWikiContext context) throws XWikiException
+    {
+        VelocityContext vcontext = prepareVelocityContext(from, to, cc, bcc, parameters, context);
+        return sendMailFromTemplate(templateDocFullName, from, to, cc, bcc, language, vcontext, context);
     }
 }

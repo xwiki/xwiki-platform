@@ -25,13 +25,12 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.script.event.ScriptEvaluatingEvent;
+import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -44,14 +43,14 @@ import org.xwiki.script.event.ScriptEvaluatingEvent;
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    public void initialize(MockingComponentManager cm) throws Exception
     {
         Mockery mockery = new JUnit4Mockery();
-        new ScriptMockSetup(mockery, componentManager);
+        new ScriptMockSetup(mockery, cm);
 
         // fake nested script validator never fails
-        final EventListener nestedValidator
-            = mockery.mock(EventListener.class, "nestedscriptmacrovalidator");
+        final EventListener nestedValidator =
+            cm.registerMockComponent(mockery, EventListener.class, "nestedscriptmacrovalidator");
         mockery.checking(new Expectations() {{
             atLeast(1).of(nestedValidator).onEvent(with(any(Event.class)), with(any(MacroTransformationContext.class)),
                 with(any(ScriptMacroParameters.class)));
@@ -60,10 +59,5 @@ public class IntegrationTests
             allowing(nestedValidator).getEvents();
                 will(returnValue(Collections.singletonList((Event) new ScriptEvaluatingEvent())));
         }});
-        DefaultComponentDescriptor<EventListener> validatorDescriptor
-            = new DefaultComponentDescriptor<EventListener>();
-        validatorDescriptor.setRole(EventListener.class);
-        validatorDescriptor.setRoleHint("nestedscriptmacrovalidator");
-        componentManager.registerComponent(validatorDescriptor, nestedValidator);
     }
 }

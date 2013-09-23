@@ -16,17 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.RenderRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-public interface XWikiRequest extends HttpServletRequest, RenderRequest, ActionRequest
+public interface XWikiRequest extends HttpServletRequest
 {
     public String get(String name);
 

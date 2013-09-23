@@ -16,19 +16,20 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Component responsible for managing all {@link ApplicationContextListener} components.
  * 
  * @version $Id$
  * @since 1.9M2
+ * @deprecated starting with 3.5M1, use the notion of Environment instead
  */
-@ComponentRole
+@Role
+@Deprecated
 public interface ApplicationContextListenerManager
 {
     /**
@@ -36,6 +37,7 @@ public interface ApplicationContextListenerManager
      * 
      * @param applicationContext the {@link ApplicationContext}.
      */
+    @Deprecated
     void initializeApplicationContext(ApplicationContext applicationContext);
     
     /**
@@ -43,5 +45,6 @@ public interface ApplicationContextListenerManager
      * 
      * @param applicationContext the {@link ApplicationContext}.
      */
+    @Deprecated
     void destroyApplicationContext(ApplicationContext applicationContext);
 }

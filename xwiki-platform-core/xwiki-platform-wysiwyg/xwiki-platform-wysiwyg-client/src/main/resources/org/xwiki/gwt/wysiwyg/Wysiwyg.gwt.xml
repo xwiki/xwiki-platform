@@ -27,7 +27,7 @@
   <stylesheet src="stylesheets/Wysiwyg.css" />
   <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />
 
-  <extend-property name="locale" values="ca,de,es,fr,it,lv,ru,sk,sv,zh,zh_TW" />
+  <extend-property name="locale" values="ca,cs,da,de,es,fr,it,lv,nl,pt_BR,ru,sk,sv,zh,zh_TW" />
 
   <!-- Custom linker that adds the document type declaration to the generated permutations. -->
   <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
@@ -43,14 +43,14 @@
     <when-property-is name="user.agent" value="safari" />
   </replace-with>
 
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.OperaReadOnlyKeyboardHandler">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler" />
+    <when-property-is name="user.agent" value="opera" />
+  </replace-with>
+
   <!-- LinePlugin -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
-  </replace-with>
-
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.MozillaLinePlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
-    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.IELinePlugin">
@@ -66,7 +66,7 @@
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.IESubmitPlugin">
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.internal.IEOldSubmitPlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
     <any>
       <when-property-is name="user.agent" value="ie6" />
@@ -81,20 +81,14 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IEImageConfigDOMWriter">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
-    <when-property-is name="user.agent" value="ie6" />
-  </replace-with>
-
-  <!-- List behavior adjuster -->
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
-  </replace-with>
-
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.IEListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
     <any>
-      <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
     </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IE6ImageConfigDOMWriter">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
+    <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 
   <!-- PasteFilter -->
@@ -110,8 +104,22 @@
     </any>
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
-    <when-property-is name="user.agent" value="gecko1_8" />
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.WebKitPasteFilter">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter" />
+    <when-property-is name="user.agent" value="safari" />
+  </replace-with>
+
+  <!-- PasteManager -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteManager">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteManager" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.IEPasteManager">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteManager" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie9" />
+    </any>
   </replace-with>
 </module>

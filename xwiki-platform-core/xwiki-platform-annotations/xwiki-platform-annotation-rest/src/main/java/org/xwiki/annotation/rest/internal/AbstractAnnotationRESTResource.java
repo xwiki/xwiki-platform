@@ -27,6 +27,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+
+import javax.inject.Inject;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.annotation.Annotation;
@@ -39,9 +42,10 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationStub;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
 import org.xwiki.annotation.rights.AnnotationRightService;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.velocity.VelocityManager;
 
@@ -68,19 +72,19 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     /**
      * The annotations service to be used by this REST interface.
      */
-    @Requirement
+    @Inject
     protected AnnotationService annotationService;
 
     /**
      * The annotations rights checking service, to check user rights to perform annotations actions.
      */
-    @Requirement
+    @Inject
     protected AnnotationRightService annotationRightService;
 
     /**
      * The execution needed to get the annotation author from the context user.
      */
-    @Requirement
+    @Inject
     protected Execution execution;
 
     /**
@@ -188,7 +192,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         Collection<Annotation> annotations) throws XWikiException, AnnotationServiceException
     {
         String isInRenderingEngineKey = "isInRenderingEngine";
-        XWikiContext context = org.xwiki.rest.Utils.getXWikiContext(componentManager);
+        XWikiContext context = getXWikiContext(componentManager);
         Object isInRenderingEngine = context.get(isInRenderingEngineKey);
         // set the context url factory to the servlet url factory so that all links get correctly generated as if we
         // were view-ing the page
@@ -230,10 +234,10 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     private void setUpDocuments(String docName, String language) throws XWikiException
     {
         try {
-            VelocityManager velocityManager = componentManager.lookup(VelocityManager.class);
+            VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
 
-            XWikiContext context = org.xwiki.rest.Utils.getXWikiContext(componentManager);
+            XWikiContext context = getXWikiContext(componentManager);
             XWiki xwiki = context.getWiki();
 
             // prepare the messaging tools and set them on context
@@ -313,5 +317,53 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     protected String getXWikiUser()
     {
         return ((XWikiContext) execution.getContext().getProperty("xwikicontext")).getUser();
+    }
+
+    /**
+     * Helper method to make sure that the context is set to the right document and database name.
+     * 
+     * @param wiki the REST wikiName path parameter
+     * @param space the REST spaceName path parameter
+     * @param page the REST pageName path parameter
+     */
+    protected void updateContext(String wiki, String space, String page)
+    {
+        try {
+            // Set the database to the current wiki.
+            XWikiContext deprecatedContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+            deprecatedContext.setDatabase(wiki);
+
+            // Set the document to the current document.
+            XWiki xwiki = deprecatedContext.getWiki();
+            XWikiDocument currentDocument =
+                xwiki.getDocument(new DocumentReference(wiki, space, page), deprecatedContext);
+            deprecatedContext.setDoc(currentDocument);
+        } catch (Exception e) {
+            // Just log it.
+            logger.log(Level.SEVERE,
+                String.format("Failed to update the context for page [%s:%s.%s].", wiki, space, page), e);
+        }
+    }
+    
+    /**
+     * <p>
+     * Retrieve the XWiki context from the current execution context
+     * </p>
+     * 
+     * @param componentManager The component manager to be used to retrieve the execution context.
+     * @return The XWiki context.
+     * @throws RuntimeException If there was an error retrieving the context.
+     */
+    public XWikiContext getXWikiContext(ComponentManager componentManager)
+    {
+        Execution execution;
+        XWikiContext xwikiContext;
+        try {
+            execution = componentManager.getInstance(Execution.class);
+            xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+            return xwikiContext;
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to get XWiki context", e);
+        }
     }
 }

@@ -1,0 +1,13 @@
+ALTER TABLE xwikiattachment_archive ADD COLUMN xwa_archive2 oid;
+UPDATE xwikiattachment_archive SET xwa_archive2 = (SELECT oid FROM (SELECT oid, lowrite(lo_open(oid, 131072), xwikiattachment_archive.xwa_archive) FROM lo_create(0) o(oid)) x);
+ALTER TABLE xwikiattachment_archive DROP COLUMN xwa_archive;
+ALTER TABLE xwikiattachment_archive ADD COLUMN xwa_archive oid;
+UPDATE xwikiattachment_archive SET xwa_archive=xwa_archive2;
+ALTER TABLE xwikiattachment_archive DROP COLUMN xwa_archive2;
+ALTER TABLE xwikiattachment_content ADD COLUMN xwa_content2 oid;
+UPDATE xwikiattachment_content SET xwa_content2 = (SELECT oid FROM (SELECT oid, lowrite(lo_open(oid, 131072), xwikiattachment_content.xwa_content) FROM lo_create(0) o(oid)) x);
+ALTER TABLE xwikiattachment_content DROP COLUMN xwa_content;
+ALTER TABLE xwikiattachment_content ADD COLUMN xwa_content oid;
+UPDATE xwikiattachment_content SET xwa_content=xwa_content2;
+ALTER TABLE xwikiattachment_content DROP COLUMN xwa_content2;
+ALTER TABLE xwikiattachment_content ALTER COLUMN xwa_content SET NOT NULL;

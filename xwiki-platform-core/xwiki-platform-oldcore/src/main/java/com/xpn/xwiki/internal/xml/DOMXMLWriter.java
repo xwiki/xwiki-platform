@@ -261,23 +261,12 @@ public class DOMXMLWriter extends XMLWriter
         this.parent.push(element);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.dom4j.io.XMLWriter#startCDATA()
-     */
     @Override
     public void startCDATA() throws SAXException
     {
         throw new SAXUnsupportedException();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.dom4j.io.XMLWriter#startElement(java.lang.String, java.lang.String, java.lang.String,
-     *      org.xml.sax.Attributes)
-     */
     @Override
     public void startElement(String namespaceURI, String localName, String qName, Attributes attributes)
         throws SAXException
@@ -285,44 +274,24 @@ public class DOMXMLWriter extends XMLWriter
         throw new SAXUnsupportedException();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.dom4j.io.XMLWriter#startEntity(java.lang.String)
-     */
     @Override
     public void startEntity(String name) throws SAXException
     {
         throw new SAXUnsupportedException();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.dom4j.io.XMLWriter#endCDATA()
-     */
     @Override
     public void endCDATA() throws SAXException
     {
         throw new SAXUnsupportedException();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.dom4j.io.XMLWriter#endElement(java.lang.String, java.lang.String, java.lang.String)
-     */
     @Override
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException
     {
         throw new SAXUnsupportedException();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.dom4j.io.XMLWriter#endEntity(java.lang.String)
-     */
     @Override
     public void endEntity(String name) throws SAXException
     {

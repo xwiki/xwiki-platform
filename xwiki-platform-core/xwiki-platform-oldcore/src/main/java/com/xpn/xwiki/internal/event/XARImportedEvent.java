@@ -20,15 +20,17 @@
 package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.AbstractFilterableEvent;
+import org.xwiki.observation.event.EndEvent;
 
 /**
- * Event to notify of the finished import of a XAR package. <br />
+ * Event to notify of the finished import of a XAR package.
+ * <p>
  * TODO: this event should take the name of the imported xar as a parameter, and listeners should be able to match on
  * it. For the moment, I cannot figure out how to get the name of the imported xar from the Package plugin.
  * 
  * @version $Id$
  */
-public class XARImportedEvent extends AbstractFilterableEvent
+public class XARImportedEvent extends AbstractFilterableEvent implements EndEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

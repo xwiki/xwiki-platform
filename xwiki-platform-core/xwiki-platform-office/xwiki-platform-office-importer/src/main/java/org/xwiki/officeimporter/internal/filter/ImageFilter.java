@@ -24,13 +24,16 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -46,30 +49,32 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("officeimporter/image")
+@Component
+@Named("officeimporter/image")
+@Singleton
 public class ImageFilter extends AbstractHTMLFilter
 {
     /**
      * The {@link DocumentAccessBridge} component.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to serialize the image reference as XHTML comment.
      */
-    @Requirement("xhtmlmarker")
+    @Inject
+    @Named("xhtmlmarker")
     private ResourceReferenceSerializer xhtmlMarkerSerializer;
 
     /**
      * The component used to parse string document references.
      */
-    @Requirement("currentmixed")
+    @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> documentStringReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void filter(Document htmlDocument, Map<String, String> cleaningParams)
     {
         String targetDocument = cleaningParams.get("targetDocument");
@@ -78,7 +83,7 @@ public class ImageFilter extends AbstractHTMLFilter
         List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {TAG_IMG});
         for (Element image : images) {
             if (targetDocumentReference == null && !StringUtils.isBlank(targetDocument)) {
-                targetDocumentReference = documentStringReferenceResolver.resolve(targetDocument);
+                targetDocumentReference = this.documentStringReferenceResolver.resolve(targetDocument);
             }
             String src = image.getAttribute(ATTRIBUTE_SRC);
             if (!StringUtils.isBlank(src) && targetDocumentReference != null) {
@@ -96,11 +101,12 @@ public class ImageFilter extends AbstractHTMLFilter
 
                 // Set image source attribute relative to the reference document.
                 AttachmentReference attachmentReference = new AttachmentReference(src, targetDocumentReference);
-                image.setAttribute(ATTRIBUTE_SRC, documentAccessBridge.getAttachmentURL(attachmentReference, false));
+                image.setAttribute(ATTRIBUTE_SRC, this.documentAccessBridge
+                    .getAttachmentURL(attachmentReference, false));
 
-                // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
-                // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for
-                // avoiding content wrapping around images which is not valid xhtml. There for, to be consistent and
+                // The 'align' attribute of images creates a lot of problems. First,the office server has a problem with
+                // center aligning images (it aligns them to left). Next, the office server uses <br clear"xxx"> for
+                // avoiding content wrapping around images which is not valid XHTML. There for, to be consistent and
                 // simple we will remove the 'align' attribute of all the images so that they are all left aligned.
                 image.removeAttribute(ATTRIBUTE_ALIGN);
             } else if (src.startsWith("file://")) {

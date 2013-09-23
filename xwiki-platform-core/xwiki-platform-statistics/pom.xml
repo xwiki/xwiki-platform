@@ -27,14 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-statistics</artifactId>
   <name>XWiki Platform - Statistics</name>
-  <packaging>xar</packaging>
+  <packaging>pom</packaging>
   <description>Panels and pages providing XWiki statistics</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-statistics-ui</module>
+  </modules>
 </project>

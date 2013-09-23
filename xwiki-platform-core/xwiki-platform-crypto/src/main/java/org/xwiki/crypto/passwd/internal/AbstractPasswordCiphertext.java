@@ -65,11 +65,7 @@ public abstract class AbstractPasswordCiphertext implements PasswordCiphertext
      */
     private transient PaddedBufferedBlockCipher cipher;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.passwd.PasswordCiphertext#init(byte[], java.lang.String, org.xwiki.crypto.passwd.KeyDerivationFunction)
-     */
+    @Override
     public synchronized void init(byte[] message, String password, KeyDerivationFunction initializedKeyFunction)
         throws GeneralSecurityException
     {
@@ -90,11 +86,7 @@ public abstract class AbstractPasswordCiphertext implements PasswordCiphertext
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.crypto.passwd.PasswordCiphertext#decrypt(java.lang.String)
-     */
+    @Override
     public synchronized byte[] decrypt(String password) throws GeneralSecurityException
     {
         PaddedBufferedBlockCipher theCipher = this.getCipher();
@@ -143,22 +135,14 @@ public abstract class AbstractPasswordCiphertext implements PasswordCiphertext
         return new ParametersWithIV(new KeyParameter(key), iv);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.passwd.PasswordCiphertext#serialize()
-     */
+    @Override
     public byte[] serialize()
         throws IOException
     {
         return SerializationUtils.serialize(this);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.crypto.passwd.PasswordCiphertext#getRequiredKeySize()
-     */
+    @Override
     public int getRequiredKeySize()
     {
         return this.getKeyLength() + this.getCipher().getBlockSize();

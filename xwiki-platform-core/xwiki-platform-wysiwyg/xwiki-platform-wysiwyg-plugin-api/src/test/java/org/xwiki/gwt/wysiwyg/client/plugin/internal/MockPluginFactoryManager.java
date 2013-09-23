@@ -44,21 +44,13 @@ public class MockPluginFactoryManager implements PluginFactoryManager
         this.factory = factory;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactoryManager#addPluginFactory(PluginFactory)
-     */
+    @Override
     public PluginFactory addPluginFactory(PluginFactory factory)
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactoryManager#getPluginFactory(String)
-     */
+    @Override
     public PluginFactory getPluginFactory(String pluginName)
     {
         if (factory.getPluginName().equals(pluginName)) {
@@ -68,11 +60,7 @@ public class MockPluginFactoryManager implements PluginFactoryManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactoryManager#removePluginFactory(String)
-     */
+    @Override
     public PluginFactory removePluginFactory(String pluginName)
     {
         return null;

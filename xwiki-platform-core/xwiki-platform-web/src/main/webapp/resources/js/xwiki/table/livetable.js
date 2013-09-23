@@ -1,18 +1,6 @@
-(function(){
-
-/**
- * XWiki namespace
- */
-if (typeof XWiki == "undefined") {
-    XWiki = new Object();
-}
-
-/**
- * widgets namespace
- */
-if (typeof XWiki.widgets == "undefined") {
-    XWiki.widgets = new Object();
-}
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
 
 /**
   * The class representing an AJAX-populated live table.
@@ -39,7 +27,7 @@ XWiki.widgets.LiveTable = Class.create({
     if (!options) {
       var options = {};
     }
-     
+
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
 
@@ -48,7 +36,7 @@ XWiki.widgets.LiveTable = Class.create({
     if ($(this.domNodeName).down('tr.xwiki-livetable-initial-message')) {
       $(this.domNodeName).down('tr.xwiki-livetable-initial-message').remove();
     }
-    
+
     // id of the display element (the inner dynamic table) of this livetable
     // defined by convention as the root node id on which is appended "-display".
     // fallback on the unique "display1" id for backward compatibility.
@@ -66,7 +54,7 @@ XWiki.widgets.LiveTable = Class.create({
 
      // Array of nodes under which a page size control will be displayed
     this.pageSizeNodes = options.pageSizeNodes || $(this.domNodeName).select(".xwiki-livetable-pagesize");
-    
+
     if (typeof options == "undefined") {
        options = {};
     }
@@ -108,7 +96,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.filter = new LiveTableFilter(this, this.filtersNodes, this.permalinks.getFilters(), {
         throttlingDelay: this.throttlingDelay
       });
-    } 
+    }
 
     if ($(domNodeName + "-tagcloud"))
     {
@@ -126,13 +114,13 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Initialize sort column and observe sort events
     this.observeSortableColumns(this.permalinks.getSortColumn(), this.permalinks.getSortDirection());
- 
+
     this.currentOffset = (initialPage - 1) * this.limit + 1;
 
     // Show initial rows
     this.showRows(this.currentOffset, this.limit);
   },
-  
+
   /**
    * Set the page size of the table and refresh the display
    * @param pageSize The new maximum number of rows to display per page
@@ -181,8 +169,6 @@ XWiki.widgets.LiveTable = Class.create({
       }
       url += self.getSortURLFragment();
 
-      self.loadingStatus.removeClassName("hidden");
-
       // Let code know the table is about to load new entries.
       // 1. Named event (for code interested by that table only)
       document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
@@ -216,7 +202,6 @@ XWiki.widgets.LiveTable = Class.create({
           }
 
           self.recvReqNo = res.reqNo;
-          self.loadingStatus.addClassName("hidden");
 
           if (self.tagCloud && res.matchingtags) {
             self.tagCloud.updateTagCloud(res.tags, res.matchingtags);
@@ -239,6 +224,10 @@ XWiki.widgets.LiveTable = Class.create({
       });
 
     }
+
+    // Make sure to set show the loading as soon as possible (instead of waiting the delay for the actual ajax request)
+    // so that it really reflect the status of the livetable
+    self.loadingStatus.removeClassName("hidden");
 
     if (typeof delay != 'undefined' && delay > 0) {
       // fire the request after a withdrawal period in which it can be cancelled
@@ -281,19 +270,19 @@ XWiki.widgets.LiveTable = Class.create({
     * @param limit Maximum number of rows to display.
     */
   displayRows: function(offset, limit)
-  { 
+  {
     var f = offset + limit - 1;
     if (f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0) ? offset : 0;
-    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('xe.pagination.results.of') <strong>" + this.totalRows + "</strong>";
+    var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $services.localization.render('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$msg.get('xe.pagination.results') " + msg;
+    this.limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {
       if (this.fetchedRows[i]) {
-        var elem = this.handler(this.fetchedRows[i], i, this);      
+        var elem = this.handler(this.fetchedRows[i], i, this);
         this.displayNode.appendChild(elem);
         var memo = {
           "data": this.fetchedRows[i],
@@ -323,7 +312,7 @@ XWiki.widgets.LiveTable = Class.create({
     * any) rows should be fetched from the server, then forwards the call to {@link #displayRows}.
     * @param offset Starting offset; the index of the first row that should be displayed.
     * @param limit Maximum number of rows to display.
-    * @param in case we need to fetch rows, an optional delay before the rows are actually fetched 
+    * @param in case we need to fetch rows, an optional delay before the rows are actually fetched
     *         against the server (allows submission throttling)
     */
   showRows: function(offset, limit, delay)
@@ -365,7 +354,7 @@ XWiki.widgets.LiveTable = Class.create({
       buff += 'we need to get rows '+min+' to '+ (max+1) +' <br />\n';
       this.getRows(min, max - min + 1, offset, limit);
     }
- 
+
     if(this.paginator) this.paginator.refreshPagination();
 
     return buff;
@@ -417,7 +406,7 @@ XWiki.widgets.LiveTable = Class.create({
     else {
       this.showRows(newoffset, this.limit);
     }
-                                     
+
     if (this.paginator) this.paginator.refreshPagination();
 
     // Let code know displaying is finished
@@ -716,7 +705,7 @@ var LiveTablePagination = Class.create({
             this.pagesNodes.invoke("insert", " ... ");
          }
       }
-      // display pages 
+      // display pages
       for (var i=(startPage<=0) ? 1 : startPage;i<=Math.min(startPage + currentMax + 1, pages);i++) {
          var selected = (currentPage == i);
          this.pagesNodes.each(function(elem){
@@ -732,6 +721,48 @@ var LiveTablePagination = Class.create({
         //this.pagesNodes.invoke("insert", pageSpan.clone());
         this.pagesNodes.each(function(elem){
              elem.insert(self.createPageLink(pages, false));
+        });
+      }
+      if (currentPage <= 1) {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var prevPage = item.up().previous('.controlPagination').down('.prevPagination');
+          if (prevPage) {
+            prevPage.addClassName('noPrevPagination').removeClassName('prevPagination');
+          }
+        });
+      } else {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var prevPage = item.up().previous('.controlPagination').down('.noPrevPagination');
+          if (prevPage) {
+            prevPage.addClassName('prevPagination').removeClassName('noPrevPagination');
+          }
+        });
+      }
+      if (currentPage >= pages) {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var nextPage = item.up().previous('.controlPagination').down('.nextPagination');
+          if (nextPage) {
+            nextPage.addClassName('noNextPagination').removeClassName('nextPagination');
+          }
+        });
+      } else {
+        this.pagesNodes.each(function(item) {
+          if (!item.up().previous('.controlPagination')) {
+            return;
+          }
+          var nextPage = item.up().previous('.controlPagination').down('.noNextPagination');
+          if (nextPage) {
+            nextPage.addClassName('nextPagination').removeClassName('noNextPagination');
+          }
         });
       }
     },
@@ -788,18 +819,18 @@ var LiveTablePagination = Class.create({
     this.startValue = bounds[0] || 10;
     this.step = bounds[2] || 10;
     this.maxValue = bounds[1] || 100;
-    
+
     var self = this;
     this.pageSizeNodes = [];
     domNodes.each(function(elem) {
       self.pageSizeNodes.push(elem.down(".xwiki-livetable-pagesize-content"));
     });
-    
+
     this.pageSizeNodes.each(function(elem) {
       elem.insert(self.createPageSizeSelectControl());
     });
   },
-  
+
   /**
    * Create the page size control using a select node and returns it
    * @return an Element containing the select
@@ -821,7 +852,7 @@ var LiveTablePagination = Class.create({
     select.observe("change", this.changePageSize.bind(this));
     return select;
   },
-  
+
   /**
    * Change the page size of the table
    **/
@@ -957,8 +988,7 @@ var LiveTableFilter = Class.create({
    * Apply style to livetable filters that are applied
    */
   applyActiveFilterStyle: function(element) {
-    if(element && element.tagName && 
-	    ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
+    if(element && element.tagName && ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
       if ($F(element) != '') {
         element.addClassName('xwiki-livetable-filter-active');
       } else {
@@ -995,13 +1025,13 @@ var LiveTableTagCloud = Class.create({
    /**
     * Tags matching the current filters
     */
-   matchingTags: [],
+   matchingTags: {},
 
    /**
     * Tags selected as filters
     */
    selectedTags: {},
-   
+
    /**
     * Default popularity levels. Used as CSS class on the tag list items.
     */
@@ -1013,12 +1043,13 @@ var LiveTableTagCloud = Class.create({
     */
    updateTagCloud: function(tags, matchingTags) {
       if (!this.hasTags && tags.length > 0) {
-        this.tags = tags;    
+        this.tags = tags;
         this.map = this.buildPopularityMap(this.tags);
         this.hasTags = true;
         this.domNode.removeClassName("hidden");
       }
-      this.matchingTags = matchingTags;       
+      // Normalize the list of matching tags (all lower case).
+      this.matchingTags = Object.toJSON(matchingTags || {}).toLowerCase().evalJSON();
       this.displayTagCloud();
    },
 
@@ -1038,7 +1069,9 @@ var LiveTableTagCloud = Class.create({
          var tagLabel = this.tags[i].tag;
          var tagSpan = new Element("span").update(tagLabel.escapeHTML());
          var tag = new Element("li", {'class':liClass}).update(tagSpan);
-         if (typeof this.matchingTags[tagLabel] != "undefined") {
+         // Determine if the tag is selectable (matched) ignoring the case because multiple documents can be tagged with
+         // the same tag but in different cases (e.g. tag, Tag, TAG etc.)
+         if (typeof this.matchingTags[tagLabel.toLowerCase()] != "undefined") {
             tag.addClassName("selectable");
             Event.observe(tagSpan, "click", function(event) {
                 var tag = event.element().up("li").down("span").innerHTML.unescapeHTML();
@@ -1055,7 +1088,7 @@ var LiveTableTagCloud = Class.create({
                 self.table.showRows(1, self.table.limit);
             });
          }
-         if (this.selectedTags[tagLabel] != undefined) {
+         if (typeof this.selectedTags[tagLabel] == "object") {
             tag.addClassName("selected");
          }
          var self = this;
@@ -1138,4 +1171,14 @@ if(browser.isIE6x) {
   });
 }
 
-})();
+// Trigger table loading when document and scripts are ready
+function init() {
+  document.fire("xwiki:livetable:loading");
+}
+
+(XWiki.isInitialized && init())
+|| document.observe("xwiki:dom:loading", init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

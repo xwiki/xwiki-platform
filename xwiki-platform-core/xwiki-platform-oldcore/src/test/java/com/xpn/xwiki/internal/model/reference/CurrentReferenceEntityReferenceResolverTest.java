@@ -19,22 +19,22 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver}.
  * 
  * @version $Id$
- * @since 2.2M1
  */
-public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
+public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridgedComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -44,19 +44,19 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
 
     private EntityReferenceResolver<EntityReference> resolver;
 
-    @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current/reference");
+        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "current");
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndNoContextDocument()
     {
         EntityReference reference =
-                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+            resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
 
         Assert.assertEquals("WebHome", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
@@ -66,14 +66,14 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
         getContext().setDatabase(CURRENT_WIKI);
         getContext().setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =
-                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+            resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
 
         Assert.assertEquals(CURRENT_PAGE, reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());

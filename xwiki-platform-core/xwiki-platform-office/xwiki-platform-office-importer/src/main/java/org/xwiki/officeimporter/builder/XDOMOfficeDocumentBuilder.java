@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.builder;
 
 import java.io.InputStream;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -34,20 +34,20 @@ import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
  * @version $Id$
  * @since 2.1M1
  */
-@ComponentRole
+@Role
 public interface XDOMOfficeDocumentBuilder
 {
     /**
      * Builds a {@link XDOMOfficeDocument} corresponding to the given office document.
      * 
-     * @param officeFileStream {@link InputStream} corresponding to the office document.
-     * @param officeFileName name of the office document (used to determine input document format).
-     * @param reference reference document w.r.t which html cleaning is performed. If the office file contains images or
-     *            other binary artifacts, html cleaning will be performed assuming that those artifacts are present as
-     *            attachments to the reference document.
-     * @param filterStyles whether to filter css styles present in the html content produced by openoffice server.
-     * @return an {@link XDOMOfficeDocument} corresponding to the office document.
-     * @throws OfficeImporterException if an error occurs while performing the import operation.
+     * @param officeFileStream {@link InputStream} corresponding to the office document
+     * @param officeFileName name of the office document (used to determine input document format)
+     * @param reference reference document w.r.t which HTML cleaning is performed. If the office file contains images or
+     *            other binary artifacts, HTML cleaning will be performed assuming that those artifacts are present as
+     *            attachments to the reference document
+     * @param filterStyles whether to filter CSS styles present in the HTML content produced by the office server
+     * @return an {@link XDOMOfficeDocument} corresponding to the office document
+     * @throws OfficeImporterException if an error occurs while performing the import operation
      * @since 2.2M1
      */
     XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
@@ -56,9 +56,9 @@ public interface XDOMOfficeDocumentBuilder
     /**
      * Builds a {@link XDOMOfficeDocument} from the given {@link XHTMLOfficeDocument}.
      * 
-     * @param xhtmlOfficeDocument {@link XHTMLOfficeDocument} already built using {@link XHTMLOfficeDocumentBuilder}.
-     * @return an {@link XDOMOfficeDocument} corresponding to the given {@link XHTMLOfficeDocument}.
-     * @throws OfficeImporterException if an error occurs while parsing xhtml into xdom.
+     * @param xhtmlOfficeDocument {@link XHTMLOfficeDocument} already built using {@link XHTMLOfficeDocumentBuilder}
+     * @return an {@link XDOMOfficeDocument} corresponding to the given {@link XHTMLOfficeDocument}
+     * @throws OfficeImporterException if an error occurs while parsing XHTML into XDOM
      */
     XDOMOfficeDocument build(XHTMLOfficeDocument xhtmlOfficeDocument) throws OfficeImporterException;
 }

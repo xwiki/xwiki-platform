@@ -22,10 +22,14 @@ package org.xwiki.velocity;
 import java.io.StringWriter;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Integration test for {@link XWikiWebappResourceLoader}.
@@ -38,12 +42,16 @@ public class XWikiWebappResourceLoaderTest extends AbstractComponentTestCase
     @Test
     public void testVelocityInitialization() throws Exception
     {
+        // Fake the initialization of the Servlet Environment
+        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
+        environment.setServletContext(getMockery().mock(ServletContext.class));
+        
         Properties properties = new Properties();
         properties.setProperty("resource.loader", "xwiki");
         properties.setProperty("xwiki.resource.loader.class", XWikiWebappResourceLoader.class.getName());
 
-        VelocityEngine engine =
-            getComponentManager().lookup(VelocityFactory.class).createVelocityEngine("key", properties);
+        VelocityFactory factory = getComponentManager().getInstance(VelocityFactory.class);
+        VelocityEngine engine = factory.createVelocityEngine("key", properties);
 
         // Ensure Velocity has been correctly initialized by trying to evaluate some content.
         StringWriter out = new StringWriter();

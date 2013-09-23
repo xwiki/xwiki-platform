@@ -49,17 +49,13 @@ public class HeadingLevelSplittingCriterion implements SplittingCriterion
         Arrays.sort(this.headingLevels);
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean shouldIterate(Block block, int depth)
     {
         return (block instanceof SectionBlock && depth < headingLevels[headingLevels.length - 1]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean shouldSplit(Block block, int depth)
     {
         boolean shouldSplit = false;

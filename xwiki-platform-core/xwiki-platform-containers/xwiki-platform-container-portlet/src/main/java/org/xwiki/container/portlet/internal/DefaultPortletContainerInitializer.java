@@ -16,14 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.container.portlet.internal;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.portlet.PortletContext;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
@@ -41,30 +42,40 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
 @Component
+@Singleton
 public class DefaultPortletContainerInitializer implements PortletContainerInitializer
 {
-    @Requirement
+    @Inject
     private ApplicationContextListenerManager applicationContextListenerManager;
 
-    @Requirement
+    @Inject
     private RequestInitializerManager requestInitializerManager;
 
-    @Requirement
+    @Inject
     private ExecutionContextManager executionContextManager;
 
-    @Requirement
+    @Inject
     private Container container;
 
-    @Requirement
+    @Inject
     private Execution execution;
 
+    @Inject
+    private ComponentManager componentManager;
+
+    /**
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     */
+    @Deprecated
+    @Override
     public void initializeApplicationContext(PortletContext portletContext)
     {
-        ApplicationContext applicationContext = new PortletApplicationContext(portletContext);
+        ApplicationContext applicationContext = new PortletApplicationContext(portletContext, this.componentManager);
         this.container.setApplicationContext(applicationContext);
         this.applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }
 
+    @Override
     public void initializeRequest(javax.portlet.PortletRequest portletRequest, Object xwikiContext)
         throws PortletContainerException
     {
@@ -77,9 +88,15 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         this.execution.setContext(new ExecutionContext());
 
         // 3) Bridge with old code to play well with new components. Old code relies on the
-        // XWikiContext object whereas new code uses the Container component.
+        // XWikiContext object whereas new code uses the ExecutionContext found in the Execution component.
         if (xwikiContext != null) {
-            this.execution.getContext().setProperty("xwikicontext", xwikiContext);
+            ExecutionContext ec = this.execution.getContext();
+            String key = "xwikicontext";
+            if (ec.hasProperty(key)) {
+                ec.setProperty(key, xwikiContext);
+            } else {
+                ec.newProperty(key).inherited().initial(xwikiContext).declare();
+            }
         }
 
         // 4) Call the request initializers to populate the Request.
@@ -100,11 +117,13 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         }
     }
 
+    @Override
     public void initializeResponse(javax.portlet.PortletResponse portletResponse)
     {
         this.container.setResponse(new PortletResponse(portletResponse));
     }
 
+    @Override
     public void initializeSession(javax.portlet.PortletRequest portletRequest)
     {
         this.container.setSession(new PortletSession(portletRequest));

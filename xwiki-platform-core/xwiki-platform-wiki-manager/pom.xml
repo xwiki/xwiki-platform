@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-manager</artifactId>
   <name>XWiki Platform - Wiki Manager - Parent POM</name>
@@ -36,5 +36,14 @@
   <modules>
     <module>xwiki-platform-wiki-manager-api</module>
     <module>xwiki-platform-wiki-manager-ui</module>
+    <module>xwiki-platform-wiki-manager-rest</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-wiki-manager-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -27,24 +27,21 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha</artifactId>
   <name>XWiki Platform - Captcha</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Captcha</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <!-- CaptchaActions are components -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <!-- CaptchaAction extends Action -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-action</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <!-- CaptchaVelocityContextInitializer needs ConfigurationSource to tell whether captchas should be enabled -->
     <dependency>
@@ -85,7 +82,6 @@
     <dependency>
       <groupId>struts</groupId>
       <artifactId>struts</artifactId>
-      <version>1.2.9</version>
     </dependency>
   </dependencies>
   <build>

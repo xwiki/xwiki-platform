@@ -23,24 +23,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Removes the line breaks that were added by the WYSIWYG editor as spacers. Precisely, it removes all {@code <br
- * class="spacer"/>}.
+ * class="spacer"/>}
+ * .
  * 
  * @version $Id$
  */
-public class LineBreakFilter implements HTMLFilter
+@Component(roles = {HTMLFilter.class })
+@Named("lineBreak")
+@Singleton
+public class LineBreakFilter extends AbstractHTMLFilter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HTMLFilter#filter(Document, Map)
-     */
+    @Override
     public void filter(Document document, Map<String, String> parameters)
     {
         NodeList brs = document.getElementsByTagName("br");
@@ -55,5 +58,12 @@ public class LineBreakFilter implements HTMLFilter
             Element br = emptyLineBRs.get(i);
             br.getParentNode().removeChild(br);
         }
+    }
+
+    @Override
+    public int getPriority()
+    {
+        // Make sure this filter is applied before the rest (EmptyLineFilter and StandAloneMacroFilter depend on it).
+        return super.getPriority() - 1;
     }
 }

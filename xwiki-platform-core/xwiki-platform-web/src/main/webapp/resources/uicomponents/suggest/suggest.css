@@ -1,11 +1,12 @@
 #template('colorThemeInit.vm')
-
-.xhover {
-  background:red;
-}
-
 input[type="text"].suggest {
   border-width: 1px;
+}
+input[type="text"].loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  background-position: .3em center;
+  background-repeat: no-repeat;
+  padding-left: 2em;
 }
 
 body {
@@ -16,9 +17,21 @@ div.suggestItems {
   position:absolute;
   border: 1px solid $theme.borderColor;
   border-top: none;
-  background: white; /* theme color ? */
+  background: $theme.pageContentBackgroundColor;
   z-index: 100013;
   text-align:left;
+}
+div.suggestItems .hide-button-wrapper {
+  line-height: 1em;
+  text-align: right;
+}
+div.suggestItems .hide-button {
+  cursor: pointer;
+  font-size: 0.8em;
+  font-style: italic;
+  margin: 0 4px;
+  opacity: .4;
+  padding: 0 0.5em;
 }
 
 div.suggestItems ul {
@@ -30,6 +43,14 @@ div.suggestItems li {
   white-space:nowrap;
 }
 
+div.suggestItems ul.xlist.suggestList > li.xitem {
+  /* Reset the float because we want the suggest items to take only the necessary width. This way, if the width of the
+  suggest list is not specified, the list adapts its width to fit the suggest items. */
+  float: none;
+  /* IE9 fix for XWIKI-9155. Added !important in order to override Colibri's "ul.xlist li" */
+  width: auto !important;
+}
+
 div.suggestItems * {
   line-height:1.6em;
 }
@@ -37,6 +58,11 @@ div.suggestItems * {
 div.suggestItems em {
   font-weight:700;
   margin-right:2px;
+}
+
+div.suggestItems span.info span.hint {
+  color: $theme.textSecondaryColor;
+  margin-left:5px;
 }
 
 div.suggestItems div.info {
@@ -82,10 +108,10 @@ div.suggestItemInfo {
 }
 
 div.resultContainer div.sourceName {
-  background-color:$theme.panelCollapsedBackgroundColor;
+  background-color:$theme.menuContentBackgroundColor;
   font-variant: small-caps;
   font-weight: 700;
-  color:$theme.panelHeaderBackgroundColor;
+  color:$theme.menuContentLinkColor;
   padding-top:3px;
   font-size:0.875em;
   background-position:3px 3px;
@@ -107,11 +133,11 @@ div.resultContainer div.sourceName {
 
 .horizontalLayout div.resultContainer div.results {
   clear:both;
-  background-color:$theme.panelCollapsedBackgroundColor;
+  background-color:$theme.menuContentBackgroundColor;
 }
 
 .horizontalLayout div.resultContainer ul.suggestList {
-  background-color:white;
+  background-color:$theme.pageContentBackgroundColor;
 }
 
 div.resultContainer div.sourceContent.loading {

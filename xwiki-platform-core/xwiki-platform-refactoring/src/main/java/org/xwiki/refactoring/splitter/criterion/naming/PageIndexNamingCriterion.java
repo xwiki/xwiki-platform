@@ -57,9 +57,7 @@ public class PageIndexNamingCriterion implements NamingCriterion
         this.docBridge = docBridge;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDocumentName(XDOM newDoc)
     {
         int newIndex = ++index;

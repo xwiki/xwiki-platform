@@ -27,14 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-classloader</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-classloader-protocols</artifactId>
   <name>XWiki Platform - ClassLoader - Protocols - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - ClassLoader - Protocols - Parent POM</description>
   <modules>
-    <module>xwiki-platform-classloader-protocol-jar</module>
     <module>xwiki-platform-classloader-protocol-attachmentjar</module>
   </modules>
 </project>

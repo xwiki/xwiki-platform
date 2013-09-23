@@ -16,53 +16,82 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+/**
+ * Defines the meta properties of a boolean XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("Password")
+@Singleton
 public class PasswordMetaClass extends StringMetaClass
 {
+    /**
+     * Indicates that the password should be stored in clean.
+     */
     public static final String CLEAR = "Clear";
 
+    /**
+     * Indicates that the password should be stored encrypted.
+     */
     public static final String ENCRYPTED = "Encrypted";
 
+    /**
+     * Indicates that the password hash should be store instead of the pass itself.
+     */
     public static final String HASH = "Hash";
 
+    /**
+     * The string used to separate the possible values of a static list. It is used for instance to separate the various
+     * storage types for {@link #ALGORITHM_KEY}.
+     */
     public static final String SEPARATOR = "|";
 
+    /**
+     * The name of the meta property that specifies how the password is stored.
+     */
     public static final String ALGORITHM_KEY = "algorithm";
 
+    /**
+     * Default constructor. Initializes the default meta properties of a Password XClass property.
+     */
     public PasswordMetaClass()
     {
-        super();
         setPrettyName("Password");
-        setName(PasswordClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        StaticListClass storageType_class = new StaticListClass(this);
-        storageType_class.setName("storageType");
-        storageType_class.setPrettyName("Storage type");
-        storageType_class.setValues(HASH + SEPARATOR + CLEAR);// + SEPARATOR + ENCRYPTED
-        storageType_class.setRelationalStorage(false);
-        storageType_class.setDisplayType("select");
-        storageType_class.setMultiSelect(false);
-        storageType_class.setSize(1);
-        safeput("storageType", storageType_class);
+        StaticListClass storageTypeClass = new StaticListClass(this);
+        storageTypeClass.setName("storageType");
+        storageTypeClass.setPrettyName("Storage type");
+        storageTypeClass.setValues(HASH + SEPARATOR + CLEAR);
+        storageTypeClass.setRelationalStorage(false);
+        storageTypeClass.setDisplayType("select");
+        storageTypeClass.setMultiSelect(false);
+        storageTypeClass.setSize(1);
+        safeput(storageTypeClass.getName(), storageTypeClass);
 
-        StringClass encryptAlgorithm_class = new StringClass(this);
-        encryptAlgorithm_class.setName(ALGORITHM_KEY);
-        encryptAlgorithm_class.setPrettyName("Encryption/hash algorithm");
-        encryptAlgorithm_class.setSize(20);
-        safeput(ALGORITHM_KEY, encryptAlgorithm_class);
+        StringClass encryptAlgorithmClass = new StringClass(this);
+        encryptAlgorithmClass.setName(ALGORITHM_KEY);
+        encryptAlgorithmClass.setPrettyName("Encryption/hash algorithm");
+        encryptAlgorithmClass.setSize(20);
+        safeput(encryptAlgorithmClass.getName(), encryptAlgorithmClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new PasswordClass();
     }

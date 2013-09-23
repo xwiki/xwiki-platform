@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.classes;
 
@@ -25,14 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
@@ -43,14 +43,16 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  */
 public class DBTreeListClass extends DBListClass
 {
-    private static final Log LOG = LogFactory.getLog(DBTreeListClass.class);
+    private static final String XCLASSNAME = "dbtreelist";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBTreeListClass.class);
 
     /** In-memory cache of the ordered tree values, to be used in case it is supposed to be cached. */
     private List<ListItem> cachedDBTreeList;
 
     public DBTreeListClass(PropertyMetaClass wclass)
     {
-        super("dbtreelist", "DB Tree List", wclass);
+        super(XCLASSNAME, "DB Tree List", wclass);
     }
 
     public DBTreeListClass()
@@ -322,7 +324,7 @@ public class DBTreeListClass extends DBListClass
                     option.setSelected(true);
                 }
                 select.addElement(option);
-                addToSelect(select, selectlist, map, treemap, item.getId(), level + "&nbsp;", context);
+                addToSelect(select, selectlist, map, treemap, item.getId(), level + "\u00A0", context);
             }
         }
     }
@@ -331,6 +333,7 @@ public class DBTreeListClass extends DBListClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setAttributeFilter(new XMLAttributeValueFilter());
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
         select.setName(prefix + name);
@@ -411,9 +414,9 @@ public class DBTreeListClass extends DBListClass
                     if (hasClassname) {
                         sql =
                             "select distinct doc.fullName, doc.fullName, "
-                            + (hasParentField ? parentField : "doc.parent")
-                            + " from XWikiDocument as doc, BaseObject as obj"
-                            + " where doc.fullName=obj.name and obj.className='" + classname + "'";
+                                + (hasParentField ? parentField : "doc.parent")
+                                + " from XWikiDocument as doc, BaseObject as obj"
+                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the first 3 properties is specified, return a query that
                         // always returns no rows (only with the parent field no query can be made)
@@ -439,7 +442,7 @@ public class DBTreeListClass extends DBListClass
                 // columns is an object property.
                 boolean usesObj =
                     hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.")
-                    || parentField.startsWith("obj.");
+                        || parentField.startsWith("obj.");
                 // The document is needed if one of the selected columns is a document property, or
                 // if there is no classname specified and at least one of the selected columns is
                 // not an object property.
@@ -531,7 +534,7 @@ public class DBTreeListClass extends DBListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOG.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
+            LOGGER.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
         }
         return sql;
     }

@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWikiContext}.
@@ -40,14 +42,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        getContext().setWiki(new XWiki()
-        {
-            @Override
-            public boolean isVirtualMode()
-            {
-                return true;
-            }
-        });
+        getContext().setWiki(new XWiki());
     }
 
     @Test
@@ -104,5 +99,15 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("XWiki.XWikiGuest", getContext().getUser());
         Assert.assertEquals("XWiki.XWikiGuest", getContext().getLocalUser());
         Assert.assertNull(getContext().getXWikiUser());
+        
+        getContext().setUser(XWikiRightService.GUEST_USER_FULLNAME);
+        
+        Assert.assertEquals(new XWikiUser(XWikiRightService.GUEST_USER_FULLNAME), getContext().getXWikiUser());
+        Assert.assertNull(getContext().getUserReference());
+        
+        getContext().setUser(XWikiRightService.GUEST_USER);
+        
+        Assert.assertEquals(new XWikiUser(XWikiRightService.GUEST_USER), getContext().getXWikiUser());
+        Assert.assertNull(getContext().getUserReference());
     }
 }

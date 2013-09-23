@@ -6,7 +6,7 @@
 ##
 ##
 #macro(displayTag $tag)
-  <span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$!{escapetool.url($tag)}")">$!{escapetool.xml($tag)}</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$!{escapetool.url($tag)}&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$msg.get('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
+  <span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$!{escapetool.url($tag)}")">$!{escapetool.xml($tag)}</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$!{escapetool.url($tag)}&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$services.localization.render('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
 #end
 ##
 #macro(removeTag $tag)
@@ -17,13 +17,13 @@
       #set($responseMessage = 'OK')
     #elseif($result == 'NO_EFFECT')
       $response.setStatus(409)
-      #set($responseMessage = $msg.get('core.tags.remove.error.notFound', [$tag]))
+      #set($responseMessage = $services.localization.render('core.tags.remove.error.notFound', [$tag]))
     #elseif($result == 'NOT_ALLOWED')
       $response.setStatus(403)
-      #set($responseMessage = $msg.get('core.tags.remove.error.notAllowed', [$tag]))
+      #set($responseMessage = $services.localization.render('core.tags.remove.error.notAllowed', [$tag]))
     #elseif($result == 'FAILED')
       $response.setStatus(500)
-      #set($responseMessage = $msg.get('core.tags.remove.error.failed', [$tag]))
+      #set($responseMessage = $services.localization.render('core.tags.remove.error.failed', [$tag]))
     #end
     #if("$!{request.ajax}" != '')
       $!responseMessage
@@ -49,13 +49,13 @@
       #end
     #elseif($result == 'NO_EFFECT')
       $response.setStatus(409)
-      #set($tagErrorMessage = $msg.get('core.tags.add.error.alreadySet', [$tag]))
+      #set($tagErrorMessage = $services.localization.render('core.tags.add.error.alreadySet', [$tag]))
     #elseif($result == 'NOT_ALLOWED')
       $response.setStatus(403)
-      #set($tagErrorMessage = $msg.get('core.tags.add.error.notAllowed', [$tag]))
+      #set($tagErrorMessage = $services.localization.render('core.tags.add.error.notAllowed', [$tag]))
     #elseif($result == 'FAILED')
       $response.setStatus(500)
-      #set($tagErrorMessage = $msg.get('core.tags.add.error.failed', [$tag]))
+      #set($tagErrorMessage = $services.localization.render('core.tags.add.error.failed', [$tag]))
     #end
     #if("$!{request.ajax}" != '')
       $tagErrorMessage
@@ -72,10 +72,10 @@
     <div>
       ## CSRF prevention
       <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-      <label for="tag">$msg.get('core.tags.add.label')<br/>
+      <label for="tag">$services.localization.render('core.tags.add.label')<br/>
       <input class="input-tag" type="text" id="tag" name="tag" autocomplete="off"/></label><br/>
-      <span class="buttonwrapper"><input class="button button-add-tag" type="submit" value="$msg.get('core.tags.add.submit')"/></span>
-      <span class="buttonwrapper"><a class="button button-add-tag-cancel" href="$doc.getURL('view', "#${tagsId}")">$msg.get('core.tags.add.cancel')</a></span>
+      <span class="buttonwrapper"><input class="button button-add-tag" type="submit" value="$services.localization.render('core.tags.add.submit')"/></span>
+      <span class="buttonwrapper"><a class="button button-add-tag-cancel" href="$doc.getURL('view', "#${tagsId}")">$services.localization.render('core.tags.add.cancel')</a></span>
     </div>
   </form>
 #end
@@ -88,8 +88,8 @@
 #elseif($xaction == 'add')
   #addTag($request.tag)
 #else ## display
-  $xwiki.ssfx.use('resources/uicomponents/viewers/tags.css', true)##
-  $xwiki.jsfx.use('resources/uicomponents/viewers/tags.js', true)##
+  $xwiki.ssfx.use('uicomponents/viewers/tags.css', {'forceSkinAction': true, 'colorTheme': "$!{themeDocFullName}"})##
+  $xwiki.jsfx.use('uicomponents/viewers/tags.js', true)##
   <div class="doc-tags" id="${tagsId}">
   #if($xwiki.tag)
     #set($hasTagsPlugin = true)
@@ -101,14 +101,14 @@
 ##   #if($!tags.size() == 0)
 ##     No tags
 ##   #else
-    $msg.get('core.tags.list.label')
+    $services.localization.render('core.tags.list.label')
     #foreach($tag in $tags)
       #displayTag($tag)
     #end
 ##   #end
   #if($hasedit)
     #if($xwiki.tag)
-      <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$msg.get('core.tags.add.tooltip')">[+]</a>#else #displayAddForm()#end</div>
+      <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$services.localization.render('core.tags.add.tooltip')">[+]</a>#else #displayAddForm()#end</div>
     #else
       ## TODO
     #end

@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<wikis>
+  <wiki name="xwiki" mainWiki="true" owner="XWiki.Admin" >
+    <user name="AllanSvensson" />
+    <group name="AllansGroup">
+      <user name="AllanSvensson" />
+    </group>
+    <allowGroup name="AllGroup" type="view" />
+    <denyGroup name="AllGroup" type="edit" />
+    <space name="Main">
+      <allowGroup name="AllGroup" type="edit" />
+      <document name="WebHome">
+        <denyUser name="AllanSvensson" type="edit" />
+        <allowUser name="AllanSvensson" type="view" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

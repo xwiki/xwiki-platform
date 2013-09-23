@@ -1,0 +1,112 @@
+#template('colorThemeInit.vm')
+.wizard-header {
+  background-color: $theme.backgroundSecondaryColor;
+  border-bottom: 1px solid $theme.borderColor;
+  margin: 1em 0;
+}
+
+.wizard-header h1 {
+  border-bottom: 0 none;
+  color: $theme.titleColor;
+  float: left;
+  font-size: 1.5em;
+  margin: 0;
+  padding: 0.5em;
+}
+
+.wizard-header .steps {
+  float: right;
+  line-height: 1.5em;
+  list-style-position: inside;
+  list-style-type: none;
+  margin: 0;
+  padding: .8em 0;
+}
+
+.wizard-header .steps li {
+  display: inline-block;
+  margin-right: 1em;
+}
+
+.steps .number {
+  background-color: $theme.menuBackgroundColor;
+  border-radius: 10px 10px 10px 10px;
+  box-shadow: 0 -4px 5px rgba(0, 0, 0, 0.05) inset, 0 4px 3px rgba(252, 254, 255, 0.4) inset, 0 2px 1px rgba(0, 0, 0, 0.1);
+  color: $theme.menuLinkColor;
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.85em;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  width: 20px;
+}
+
+.steps .number.active {
+  background-color: transparent;
+  border: 3px solid $theme.notificationSuccessColor;
+  color: $theme.notificationSuccessColor;
+  height: 15px;
+  line-height: 15px;
+  width: 15px;
+}
+
+.steps .number.done {
+  background-color: transparent;
+  border: 3px solid $theme.menuBackgroundColor;
+  color: $theme.menuBackgroundColor;
+  height: 15px;
+  line-height: 15px;
+  width: 15px;
+}
+
+.steps .name {
+  color: $theme.titleColor;
+}
+
+.steps .name.active {
+  color: $theme.notificationSuccessColor;
+}
+
+.steps .name.done {
+  color: $theme.menuBackgroundColor;
+  opacity: .5;
+}
+
+.steps.vertical {
+  list-style-position: inside;
+  list-style-type: none;
+  margin: 0;
+}
+
+.steps.vertical li {
+  margin-top: .5em;
+}
+
+.steps.vertical .description {
+  display: block;
+  line-height: normal;
+  margin-left: 23px;
+}
+
+.wizard-footer {
+  background-color: $theme.backgroundSecondaryColor;
+  border-top: 1px solid $theme.borderColor;
+  margin-top: 2em;
+  padding: .5em 1em;
+  position: relative;
+  text-align: right;
+}
+
+.wizard-footer .buttonwrapper.left {
+  left: 1em;
+  position: absolute;
+  top: .1em;
+}
+
+.wizard-body .half{
+  width: 48%;
+  padding: 0 1%;
+  float: left;
+}

@@ -1,18 +1,29 @@
+#if (!$XWIKIVARS_VM)
+#set ($XWIKIVARS_VM = true)
 #template("frequentlyUsedDocs.vm")
 #set ($isGuest = $xcontext.getUser().equals('XWiki.XWikiGuest'))
 #set ($isSuperAdmin = ($xcontext.user == 'XWiki.superadmin'))
 #set ($hasEdit = $xwiki.hasAccessLevel('edit'))
 #set ($hasAdmin = $xwiki.hasAccessLevel('admin'))
 #set ($hasComment = $xwiki.hasAccessLevel('comment'))
-## Note: In order to know if the user has the right to create a space we compute a space name that doesn't exist and check edit rights on that space
-#set ($hasCreateSpace = $xwiki.hasAccessLevel('edit', "${doc.space}${mathtool.random(0, 999)}.DocumentReservedForInternalXWikiUsage"))
-## Note: In order to know if the user has the right to create a page we compute a page name that doesn't exist and check edit rights on that page 
-#set ($hasCreatePage = $xwiki.hasAccessLevel('edit', "${doc.space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
+## To query for a right at wiki level, we use a reserved space name, and for space level, a reserved
+## document name.  These are very unlikely to be used otherwise (i.e., it is expected that there is no
+## existing space or documents using these names).  Note that this hack will be unnecessary when the
+## new authorization service is made the default, as it will provide an API for checking these
+## rights directly.
+#set ($reservedSpaceName = 'SpaceReservedForInternalXWikiUsagejDGER5nj3KOE5ouUFUc7OYru')
+#set ($reservedDocumentName = 'DocumentReservedForInternalXWikiUsageMK9DxecV0XcDGnIeqzNDB4K')
+#set ($hasCreateSpace = $xwiki.hasAccessLevel('edit', "${reservedSpaceName}.DocumentReservedForInternalXWikiUsage"))
+#set ($reservedDocumentReference = $services.model.createDocumentReference($doc.wiki, $doc.space, $reservedDocumentName))
+#set ($hasCreatePage = $xwiki.hasAccessLevel('edit', $services.model.serialize($reservedDocumentReference, 'default')))
 #set ($hasGlobalAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
 ## Note: The document name is not internally used to determine if a user has programming access level. We pass XWiki.XWikiPreferences for consistency with the call for global admin
 #set ($hasProgramming = $xwiki.hasAccessLevel('programming', $xcontext.user, 'XWiki.XWikiPreferences'))
-#set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${doc.space}.WebPreferences"))
+#set ($hasCreateWiki = $xwiki.hasAccessLevel('createwiki', 'XWiki.XWikiPreferences'))
+#set ($spacePreferencesDocumentReference = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+#set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, $services.model.serialize($spacePreferencesDocumentReference, 'default')))
 #set ($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
+#set ($hasDashboard = $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'Dashboard', 'XWikiUserDashboardSheet'), 'local')))
 ##
 ## Are comments, attachments, history etc. enabled?
 ##
@@ -94,9 +105,10 @@
   #set ($headertitle = "<a href='$viewUrl'>$escapetool.xml(${doc.displayTitle})</a>")
 #end
 #set ($skin = $xwiki.getSkin())
-#set ($copyright = $xwiki.getSpaceCopyright())
+## Compute the copyright and evaluate its content with Velocity to allow users to put some scripts inside
+#set ($copyright = $xwiki.parseContent($xwiki.getSpaceCopyright()))
 #set ($xwikimode = $xcontext.getMode())
-#set ($logredir = $escapetool.xml($xwiki.getRequestURL()))
+#set ($logredir = $escapetool.xml($xwiki.relativeRequestURL))
 ##
 #if ($xwiki.exists('XWiki.MaintenanceInfo'))
   #set ($maintenanceinfo = 'XWiki.MaintenanceInfo')
@@ -120,6 +132,7 @@
   #set ($docvariant = "${languageparams}${revparams}")
 #end
 #set ($keyboardShortcutsEnabled = $isAdvancedUser)
-#set ($isInServletMode = $xwikimode == 0)
-#set ($isInPortletMode = $xwikimode == 1)
+#set ($isInPortletMode = $xwikimode == 1 || "$!request.getAttribute('javax.portlet.request')" != '')
+#set ($isInServletMode = $xwikimode == 0 && !$isInPortletMode)
 #template("deprecatedVars.vm")
+#end

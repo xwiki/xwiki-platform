@@ -16,17 +16,18 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
 
-import javax.portlet.ActionResponse;
-import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpServletResponse;
 
-public interface XWikiResponse extends HttpServletResponse, RenderResponse, ActionResponse {
+public interface XWikiResponse extends HttpServletResponse
+{
+    /**
+     * @deprecated starting with 5.0M1, don't call this method and instead pass "this"
+     */
+    @Deprecated
     public HttpServletResponse getHttpServletResponse();
-    public void setCharacterEncoding(String s);
-    public void removeCookie(String cookieName, XWikiRequest request);    
+
+    public void removeCookie(String cookieName, XWikiRequest request);
 }

@@ -19,8 +19,11 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -29,25 +32,29 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
- * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
- * defined in {@link org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver}.
- *
+ * component to resolve {@link DocumentReference} objects from their partial representation passed as
+ * {@link org.xwiki.model.reference.EntityReference}. The behavior is the one defined in
+ * {@link org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver}.
+ * 
  * @version $Id$
- * @since 2.2.3
+ * @since 4.0M1
  */
-@Component("explicit/reference")
+@Component
+@Named("explicit")
+@Singleton
 public class ExplicitReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
-    @Requirement("explicit/reference")
+    /**
+     * Default entity reference resolver used for resolution.
+     */
+    @Inject
+    @Named("explicit")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
-     */
+    @Override
     public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
-        return new DocumentReference(this.entityReferenceResolver.resolve(
-            documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
+        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
+            EntityType.DOCUMENT, parameters));
     }
 }

@@ -23,18 +23,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
+import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.taskdefs.ExecTask;
-import org.apache.tools.ant.types.Commandline;
+import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Start and stop a xwiki instance.
@@ -44,11 +51,19 @@ import org.apache.tools.ant.types.Commandline;
  */
 public class XWikiExecutor
 {
-    protected static final Log LOG = LogFactory.getLog(XWikiExecutor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
+
+    public static final String SKIP_STARTING_XWIKI_INSTANCE = System.getProperty("xwiki.test.skipStart", "false");
+    
+    public static final String BASEDIR = System.getProperty("basedir");
+    
+    public static final String URL = System.getProperty("xwiki.test.baseURL", "http://localhost");
 
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
     public static final String DEFAULT_STOPPORT = System.getProperty("xwikiStopPort", "8079");
+
+    public static final String DEFAULT_RMIPORT = System.getProperty("rmiPort", "9010");
 
     private static final String DEFAULT_EXECUTION_DIRECTORY = System.getProperty("xwikiExecutionDirectory");
 
@@ -64,17 +79,19 @@ public class XWikiExecutor
 
     private static final String XWIKIPROPERTIES_PATH = WEBINF_PATH + "/xwiki.properties";
 
-    private static final String LOG4PROPERTIES_PATH = WEBINF_PATH + "/classes/log4j.properties";
-
     private static final int TIMEOUT_SECONDS = 120;
-
-    private Project project;
 
     private int port;
 
     private int stopPort;
 
+    private int rmiPort;
+
     private String executionDirectory;
+
+    private Map<String, String> environment = new HashMap<String, String>();
+
+    private DefaultExecuteResultHandler startedProcessHandler;
 
     /**
      * Was XWiki server already started. We don't try to stop it if it was already started.
@@ -84,27 +101,31 @@ public class XWikiExecutor
     private class Response
     {
         public boolean timedOut;
+
         public byte[] responseBody;
+
         public int responseCode;
     }
-    
+
     public XWikiExecutor(int index)
     {
-        this.project = new Project();
-        this.project.init();
-        this.project.addBuildListener(new AntBuildListener(DEBUG));
-
         // resolve ports
         String portString = System.getProperty("xwikiPort" + index);
         this.port = portString != null ? Integer.valueOf(portString) : (Integer.valueOf(DEFAULT_PORT) + index);
         String stopPortString = System.getProperty("xwikiStopPort" + index);
         this.stopPort =
             stopPortString != null ? Integer.valueOf(stopPortString) : (Integer.valueOf(DEFAULT_STOPPORT) - index);
+        String rmiPortString = System.getProperty("rmiPort" + index);
+        this.rmiPort =
+            rmiPortString != null ? Integer.valueOf(rmiPortString) : (Integer.valueOf(DEFAULT_RMIPORT) + index);
 
         // resolve execution directory
         this.executionDirectory = System.getProperty("xwikiExecutionDirectory" + index);
         if (this.executionDirectory == null) {
             this.executionDirectory = DEFAULT_EXECUTION_DIRECTORY;
+            if (this.executionDirectory == null) {
+                this.executionDirectory = BASEDIR + "/target/xwiki";
+            }
             if (index > 0) {
                 this.executionDirectory += "-" + index;
             }
@@ -121,6 +142,11 @@ public class XWikiExecutor
         return this.stopPort;
     }
 
+    public int getRMIPort()
+    {
+        return this.rmiPort;
+    }
+
     public String getExecutionDirectory()
     {
         if (this.executionDirectory == null) {
@@ -130,88 +156,97 @@ public class XWikiExecutor
         return this.executionDirectory;
     }
 
+    public void setXWikiOpts(String opts)
+    {
+        addEnvironmentVariable("XWIKI_OPTS", opts);
+    }
+
+    public void addEnvironmentVariable(String key, String value)
+    {
+        this.environment.put(key, value);
+    }
+
     public void start() throws Exception
     {
-        // First, verify if XWiki is started. If it is then don't start it again.
-        this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
-        if (!this.wasStarted) {
-            startXWikiInSeparateThread();
-            waitForXWikiToLoad();
-        } else {
-            System.out.println("XWiki server is already started!");
+        if (SKIP_STARTING_XWIKI_INSTANCE.equals("true")){
+            LOGGER.info("Using running instance at [{}:{}]", URL, getPort());
+        }
+        else {
+            LOGGER.info("Checking if an XWiki server is already started at [{}:{}]", URL, getPort());
+            // First, verify if XWiki is started. If it is then don't start it again.
+            this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
+            if (!this.wasStarted) {
+                LOGGER.info("Starting XWiki server at [{}:{}]", URL, getPort());
+                startXWiki();
+                waitForXWikiToLoad();
+            } else {
+                LOGGER.info("XWiki server is already started!");
+            }
         }
     }
 
-    private void startXWikiInSeparateThread()
+    private DefaultExecuteResultHandler executeCommand(String commandLine) throws Exception
     {
-        Thread startThread = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                try {
-                    startXWiki();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        startThread.start();
+        // The command line to execute
+        CommandLine command = CommandLine.parse(commandLine);
+
+        // Execute the process asynchronously so that we don't block.
+        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+
+        // Send Process output and error streams to our logger.
+        PumpStreamHandler streamHandler = new PumpStreamHandler(
+            new XWikiLogOutputStream(XWikiLogOutputStream.STDOUT),
+            new XWikiLogOutputStream(XWikiLogOutputStream.STDERR));
+
+        // Make sure we end the process when the JVM exits
+        ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();
+
+        // Prevent the process from running indefinitely and kill it after 1 hour...
+        ExecuteWatchdog watchDog = new ExecuteWatchdog(60L*60L*1000L);
+
+        // The executor to execute the command
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setStreamHandler(streamHandler);
+        executor.setWorkingDirectory(new File(getExecutionDirectory()));
+        executor.setProcessDestroyer(processDestroyer);
+        executor.setWatchdog(watchDog);
+
+        // Inherit the current process's environment variables and add the user-defined ones
+        Map newEnvironment = EnvironmentUtils.getProcEnvironment();
+        newEnvironment.putAll(this.environment);
+
+        executor.execute(command, newEnvironment, resultHandler);
+
+        return resultHandler;
     }
 
+    /**
+     * Starts XWiki and returns immediately.
+     */
     private void startXWiki() throws Exception
     {
         File dir = new File(getExecutionDirectory());
         if (dir.exists()) {
-            ExecTask execTask = (ExecTask) this.project.createTask("exec");
-            execTask.setDir(new File(getExecutionDirectory()));
-
-            String startCommand = START_COMMAND;
-            startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(getPort()));
-            startCommand = startCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(getStopPort()));
-
-            Commandline commandLine = new Commandline(startCommand);
-            execTask.setCommand(commandLine);
-
-            execTask.execute();
+            this.startedProcessHandler = executeCommand(getDefaultStartCommand(getPort(), getStopPort(), getRMIPort()));
         } else {
             throw new Exception("Invalid directory from where to start XWiki [" + this.executionDirectory + "]");
         }
     }
 
-    private Task createStopTask() throws Exception
-    {
-        ExecTask execTask;
-        File dir = new File(getExecutionDirectory());
-        if (dir.exists()) {
-            execTask = (ExecTask) this.project.createTask("exec");
-            execTask.setDir(new File(getExecutionDirectory()));
-
-            String stopCommand = STOP_COMMAND;
-            stopCommand = stopCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(getStopPort()));
-
-            Commandline commandLine = new Commandline(stopCommand);
-            execTask.setCommand(commandLine);
-        } else {
-            throw new Exception("Invalid directory from where to stop XWiki [" + this.executionDirectory + "]");
-        }
-
-        return execTask;
-    }
-
     private void waitForXWikiToLoad() throws Exception
     {
         // Wait till the main page becomes available which means the server is started fine
-        System.out.println("Checking that XWiki is up and running...");
+        LOGGER.info("Checking that XWiki is up and running...");
 
         Response response = isXWikiStarted(getURL(), TIMEOUT_SECONDS);
         if (response.timedOut) {
-            String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds, last error code ["
-                + response.responseCode + ", message [" + new String(response.responseBody) + "]";
-            System.out.println(message);
+            String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
+                TIMEOUT_SECONDS, response.responseCode, new String(response.responseBody));
+            LOGGER.info(message);
             stop();
             throw new RuntimeException(message);
         } else {
-            System.out.println("Server is answering to [" + getURL() + "]... cool");
+            LOGGER.info("Server is answering to [{}]... cool", getURL());
         }
     }
 
@@ -229,8 +264,8 @@ public class XWikiExecutor
             GetMethod method = new GetMethod(url);
 
             // Don't retry automatically since we're doing that in the algorithm below
-            method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-                new DefaultHttpMethodRetryHandler(0, false));
+            method.getParams()
+                .setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(0, false));
             // Set a socket timeout to ensure the server has no chance of not answering to our request...
             method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, new Integer(10000));
 
@@ -242,8 +277,8 @@ public class XWikiExecutor
                 response.responseBody = method.getResponseBody();
 
                 if (DEBUG) {
-                    System.out.println("Result of pinging [" + url + "] = [" + response.responseCode + "], Message = ["
-                        + new String(response.responseBody) + "]");
+                    LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url,
+                        response.responseCode, new String(response.responseBody));
                 }
 
                 // check the http response code is either not an error, either "unauthorized"
@@ -258,6 +293,11 @@ public class XWikiExecutor
             Thread.sleep(500L);
             response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
         }
+
+        if (response.timedOut) {
+            LOGGER.info("No server is responding on [{}] after [{}] seconds", url, timeout);
+        }
+
         return response;
     }
 
@@ -265,7 +305,20 @@ public class XWikiExecutor
     {
         // Stop XWiki if it was started by start()
         if (!this.wasStarted) {
-            createStopTask().execute();
+            DefaultExecuteResultHandler stopProcessHandler = executeCommand(getDefaultStopCommand(getStopPort()));
+
+            // First wait for the stop process to have stopped, waiting a max of 5 minutes!
+            // It's going to stop the start process...
+            stopProcessHandler.waitFor(5*60L*1000L);
+
+            // Now wait for the start process to be stopped, waiting a max of 5 minutes!
+            if (this.startedProcessHandler != null) {
+                this.startedProcessHandler.waitFor(5*60L*1000L);
+            }
+
+            LOGGER.info("XWiki server stopped");
+        } else {
+            LOGGER.info("XWiki server not stopped since we didn't start it (it was already started)");
         }
     }
 
@@ -284,11 +337,6 @@ public class XWikiExecutor
         return getExecutionDirectory() + XWIKIPROPERTIES_PATH;
     }
 
-    public String getLog4JPropertiesPath()
-    {
-        return getExecutionDirectory() + LOG4PROPERTIES_PATH;
-    }
-
     public Properties loadXWikiCfg() throws Exception
     {
         return getProperties(getXWikiCfgPath());
@@ -299,11 +347,15 @@ public class XWikiExecutor
         return getProperties(getXWikiPropertiesPath());
     }
 
-    public Properties loadLog4JProperties() throws Exception
+    public PropertiesConfiguration loadXWikiPropertiesConfiguration() throws Exception
     {
-        return getProperties(getLog4JPropertiesPath());
+        return getPropertiesConfiguration(getXWikiPropertiesPath());
     }
 
+    /**
+     * @deprecated since 4.2M1 use {@link #getPropertiesConfiguration(String)} instead
+     */
+    @Deprecated
     private Properties getProperties(String path) throws Exception
     {
         Properties properties = new Properties();
@@ -318,7 +370,30 @@ public class XWikiExecutor
                 fis.close();
             }
         } catch (FileNotFoundException e) {
-            LOG.debug("Failed to load properties [" + path + "]", e);
+            LOGGER.debug("Failed to load properties [{}]", path, e);
+        }
+
+        return properties;
+    }
+
+    /**
+     * @since 4.2M1
+     */
+    private PropertiesConfiguration getPropertiesConfiguration(String path) throws Exception
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        FileInputStream fis;
+        try {
+            fis = new FileInputStream(path);
+
+            try {
+                properties.load(fis);
+            } finally {
+                fis.close();
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.debug("Failed to load properties [" + path + "]", e);
         }
 
         return properties;
@@ -329,14 +404,21 @@ public class XWikiExecutor
         saveProperties(getXWikiCfgPath(), properties);
     }
 
+    /**
+     * @deprecated since 4.2M1 use {@link #saveXWikiProperties(PropertiesConfiguration)} instead
+     */
+    @Deprecated
     public void saveXWikiProperties(Properties properties) throws Exception
     {
         saveProperties(getXWikiPropertiesPath(), properties);
     }
 
-    public void saveLog4JProperties(Properties properties) throws Exception
+    /**
+     * @since 4.2M1
+     */
+    public void saveXWikiProperties(PropertiesConfiguration properties) throws Exception
     {
-        saveProperties(getLog4JPropertiesPath(), properties);
+        savePropertiesConfiguration(getXWikiPropertiesPath(), properties);
     }
 
     private void saveProperties(String path, Properties properties) throws Exception
@@ -349,8 +431,55 @@ public class XWikiExecutor
         }
     }
 
+    private void savePropertiesConfiguration(String path, PropertiesConfiguration properties) throws Exception
+    {
+        FileOutputStream fos = new FileOutputStream(path);
+        try {
+            properties.save(fos);
+        } finally {
+            fos.close();
+        }
+    }
+
     private String getURL()
     {
-        return "http://localhost:" + getPort() + "/xwiki/bin/view/Main/WebHome";
+        // We use "xpage=plain" for 2 reasons:
+        // 1) the page loads faster since it doesn't need to display the skin
+        // 2) if the page doesn't exist it won't return a 404 HTTP Response code
+        return URL + ":" + getPort() + "/xwiki/bin/view/Main?xpage=plain";
+    }
+
+    private String getDefaultStartCommand(int port, int stopPort, int rmiPort)
+    {
+        String startCommand = START_COMMAND;
+        if (startCommand == null) {
+            if (SystemUtils.IS_OS_WINDOWS) {
+                startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
+            } else {
+                startCommand = String.format("sh -f start_xwiki.sh %s %s", port, stopPort);
+            }
+        } else {
+            startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));
+            startCommand = startCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(stopPort));
+            startCommand = startCommand.replaceFirst(DEFAULT_RMIPORT, String.valueOf(rmiPort));
+        }
+
+        return startCommand;
+    }
+
+    private String getDefaultStopCommand(int stopPort)
+    {
+        String stopCommand = STOP_COMMAND;
+        if (stopCommand == null) {
+            if (SystemUtils.IS_OS_WINDOWS) {
+                stopCommand = String.format("cmd /c stop_xwiki.bat %s", stopPort);
+            } else {
+                stopCommand = String.format("sh -f stop_xwiki.sh %s", stopPort);
+            }
+        } else {
+            stopCommand = stopCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(stopPort));
+        }
+
+        return stopCommand;
     }
 }

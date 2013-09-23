@@ -67,33 +67,18 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
         setListenerChain(listenerChain);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onWord(java.lang.String)
-     */
     @Override
     public void onWord(String word)
     {
         printText(word);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onSpecialSymbol(char)
-     */
     @Override
     public void onSpecialSymbol(char symbol)
     {
         printText("" + symbol);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onVerbatim(java.lang.String, boolean, java.util.Map)
-     */
     @Override
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
@@ -112,11 +97,6 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.QueueListener#onRawText(java.lang.String, org.xwiki.rendering.syntax.Syntax)
-     */
     @Override
     public void onRawText(String text, Syntax syntax)
     {
@@ -137,11 +117,6 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onSpace()
-     */
     @Override
     public void onSpace()
     {
@@ -174,11 +149,6 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
         isInWhitespace = false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onEmptyLines(int)
-     */
     @Override
     public void onEmptyLines(int count)
     {
@@ -187,22 +157,12 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onNewLine()
-     */
     @Override
     public void onNewLine()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onHorizontalLine(java.util.Map)
-     */
     @Override
     public void onHorizontalLine(Map<String, String> parameters)
     {
@@ -211,312 +171,168 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
 
     // all next events are block, so spaces need to be printed around
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionDescription()
-     */
     @Override
     public void beginDefinitionDescription()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionDescription()
-     */
     @Override
     public void endDefinitionDescription()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionList(java.util.Map)
-     */
     @Override
     public void beginDefinitionList(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList(java.util.Map)
-     */
     @Override
     public void endDefinitionList(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionTerm()
-     */
     @Override
     public void beginDefinitionTerm()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionTerm()
-     */
     @Override
     public void endDefinitionTerm()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(java.util.Map)
-     */
     @Override
     public void beginGroup(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(java.util.Map)
-     */
     @Override
     public void endGroup(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
-     *      java.lang.String, java.util.Map)
-     */
     @Override
     public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endHeader(org.xwiki.rendering.listener.HeaderLevel,
-     *      java.lang.String, java.util.Map)
-     */
     @Override
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginList(org.xwiki.rendering.listener.ListType,
-     *      java.util.Map)
-     */
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endList(org.xwiki.rendering.listener.ListType,
-     *      java.util.Map)
-     */
     @Override
     public void endList(ListType listType, Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginListItem()
-     */
     @Override
     public void beginListItem()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endListItem()
-     */
     @Override
     public void endListItem()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginParagraph(java.util.Map)
-     */
     @Override
     public void beginParagraph(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endParagraph(java.util.Map)
-     */
     @Override
     public void endParagraph(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginQuotation(java.util.Map)
-     */
     @Override
     public void beginQuotation(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endQuotation(java.util.Map)
-     */
     @Override
     public void endQuotation(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginQuotationLine()
-     */
     @Override
     public void beginQuotationLine()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endQuotationLine()
-     */
     @Override
     public void endQuotationLine()
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginTable(java.util.Map)
-     */
     @Override
     public void beginTable(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endTable(java.util.Map)
-     */
     @Override
     public void endTable(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginTableRow(java.util.Map)
-     */
     @Override
     public void beginTableRow(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endTableRow(java.util.Map)
-     */
     @Override
     public void endTableRow(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginTableHeadCell(java.util.Map)
-     */
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endTableHeadCell(java.util.Map)
-     */
     @Override
     public void endTableHeadCell(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginTableCell(java.util.Map)
-     */
     @Override
     public void beginTableCell(Map<String, String> parameters)
     {
         printSpace();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endTableCell(java.util.Map)
-     */
     @Override
     public void endTableCell(Map<String, String> parameters)
     {

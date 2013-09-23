@@ -186,8 +186,6 @@ public interface Strings extends Constants
 
     String superscript();
 
-    String sync();
-
     String teletype();
 
     String ul();
@@ -276,6 +274,8 @@ public interface Strings extends Constants
 
     String linkNewPageError();
 
+    String linkSettingsLabel();
+
     String selectorSelectFromCurrentPage();
 
     String selectorSelectFromAllPages();
@@ -306,7 +306,9 @@ public interface Strings extends Constants
 
     String imageTooltip();
 
-    String imageInsertImage();
+    String imageInsertAttachedImage();
+
+    String imageInsertURLImage();
 
     String imageEditImage();
 
@@ -364,6 +366,8 @@ public interface Strings extends Constants
 
     String imageNoImageSelectedError();
 
+    String imageChangeImageButton();
+
     String imageExternal();
 
     String imageExternalLocationLabel();
@@ -411,6 +415,12 @@ public interface Strings extends Constants
     String importWizardImportButtonCaption();
 
     String importOfficeContentFilterStylesCheckBoxLabel();
+
+    String importOfficeContentFilterStylesCheckBoxHint();
+
+    String importOfficeFileUseOfficeViewerCheckBoxLabel();
+
+    String importOfficeFileUseOfficeViewerCheckBoxHint();
 
     String importOfficeFileMenuItemCaption();
 

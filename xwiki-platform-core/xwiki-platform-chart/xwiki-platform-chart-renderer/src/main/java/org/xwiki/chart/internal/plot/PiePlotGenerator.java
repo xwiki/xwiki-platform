@@ -21,37 +21,37 @@ package org.xwiki.chart.internal.plot;
 
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
-import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
+import org.xwiki.chart.PlotGeneratorException;
 import org.xwiki.chart.model.ChartModel;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating pie charts.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
+@Component
+@Named("pie")
+@Singleton
 public class PiePlotGenerator implements PlotGenerator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public Plot generate(ChartModel model, Map<String, String> parameters)
+    @Override
+    public Plot generate(ChartModel model, Map<String, String> parameters) throws PlotGeneratorException
     {
-        DefaultPieDataset dataset = new DefaultPieDataset();
-        String dataSeries = parameters.get("series");
-        if (dataSeries.equals("rows")) {
-            for (int column = 0; column < model.getColumnCount(); column++) {
-                String category = model.getColumnHeader(column);
-                dataset.setValue(category, model.getCellValue(0, column));
-            }
-        } else {
-            for (int row = 0; row < model.getRowCount(); row++) {
-                String category = model.getRowHeader(row);
-                dataset.setValue(category, model.getCellValue(row, 0));
-            }
+        PieDataset dataset;
+        try {
+            dataset = (PieDataset) model.getDataset();
+        } catch (ClassCastException e) {
+            throw new PlotGeneratorException("Incompatible dataset for the pie plot.");
         }
+
         return new PiePlot(dataset);
     }
 }

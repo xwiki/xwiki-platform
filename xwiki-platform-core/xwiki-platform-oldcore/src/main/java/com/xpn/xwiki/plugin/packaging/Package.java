@@ -35,14 +35,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -50,6 +52,16 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryException;
@@ -60,6 +72,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
+import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
@@ -72,15 +85,24 @@ public class Package
 
     public static final String DEFAULT_FILEEXT = "xml";
 
+    public static final String XAR_FILENAME_ENCODING = "UTF-8";
+
     public static final String DefaultPackageFileName = "package.xml";
 
     public static final String DefaultPluginName = "package";
 
-    private static final Log LOG = LogFactory.getLog(Package.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Package.class);
 
     private String name = "My package";
 
     private String description = "";
+
+    /**
+     * @see #isInstallExension()
+     */
+    private boolean installExension = true;
+
+    private String extensionId;
 
     private String version = "1.0.0";
 
@@ -120,6 +142,40 @@ public class Package
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public String getId()
+    {
+        return this.extensionId;
+    }
+
+    public void setId(String id)
+    {
+        this.extensionId = id;
+    }
+
+    /**
+     * @return <code>true</code> if the extension packaged in the XAR should be registered as such automatically,
+     *         <code>false</code> otherwise.
+     */
+    public boolean isInstallExension()
+    {
+        return this.installExension;
+    }
+
+    public void setInstallExension(boolean installExension)
+    {
+        this.installExension = installExension;
+    }
+
+    public String getExtensionId()
+    {
+        return this.extensionId;
+    }
+
+    public void setExtensionId(String extensionId)
+    {
+        this.extensionId = extensionId;
     }
 
     public String getVersion()
@@ -267,7 +323,7 @@ public class Package
             }
             return true;
         } catch (ExcludeDocumentException e) {
-            LOG.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document " + doc.getDocumentReference());
 
             return false;
         }
@@ -335,7 +391,13 @@ public class Package
             return "No Selected file";
         }
 
-        ZipOutputStream zos = new ZipOutputStream(os);
+        ZipArchiveOutputStream zos = new ZipArchiveOutputStream(os);
+        zos.setEncoding(XAR_FILENAME_ENCODING);
+        // By including the unicode extra fields, it is possible to extract XAR-files
+        // containing documents with non-ascii characters in the document name using InfoZIP,
+        // and the filenames will be correctly converted to the character set of the local
+        // file system.
+        zos.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
         for (int i = 0; i < this.files.size(); i++) {
             DocumentInfo docinfo = this.files.get(i);
             XWikiDocument doc = docinfo.getDoc();
@@ -371,8 +433,9 @@ public class Package
 
     /**
      * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
-     * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
-     *
+     * Your should prefer {@link #Import(InputStream, XWikiContext)} which may avoid loading the package twice in
+     * memory.
+     * 
      * @param file a byte array containing the content of a zipped package file
      * @param context current XWikiContext
      * @return an empty string, useless.
@@ -396,12 +459,12 @@ public class Package
      */
     public String Import(InputStream file, XWikiContext context) throws IOException, XWikiException
     {
-        ZipInputStream zis = new ZipInputStream(file);
-        ZipEntry entry;
+        ZipArchiveInputStream zis;
+        ArchiveEntry entry;
         Document description = null;
 
         try {
-            zis = new ZipInputStream(file);
+            zis = new ZipArchiveInputStream(file, XAR_FILENAME_ENCODING, false);
 
             List<XWikiDocument> docsToLoad = new LinkedList<XWikiDocument>();
             /*
@@ -421,7 +484,7 @@ public class Package
                     try {
                         doc = readFromXML(new CloseShieldInputStream(zis));
                     } catch (Throwable ex) {
-                        LOG.warn("Failed to parse document [" + entry.getName()
+                        LOGGER.warn("Failed to parse document [" + entry.getName()
                             + "] from XML during import, thus it will not be installed. " + "The error was: "
                             + ex.getMessage());
                         // It will be listed in the "failed documents" section after the import.
@@ -436,14 +499,13 @@ public class Package
                         this.filter(doc, context);
                         docsToLoad.add(doc);
                     } catch (ExcludeDocumentException e) {
-                        LOG.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
                     }
                 }
             }
             // Make sure a manifest was included in the package...
             if (description == null) {
-                throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Could not find the package definition");
+                throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
             }
             /*
              * Loop 2: Cycle through the list of documents and if they are in the manifest then add them, otherwise log
@@ -453,7 +515,7 @@ public class Package
                 if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
                     this.add(doc, context);
                 } else {
-                    LOG.warn("document " + doc.getDocumentReference() + " does not exist in package definition."
+                    LOGGER.warn("document " + doc.getDocumentReference() + " does not exist in package definition."
                         + " It will not be installed.");
                     // It will be listed in the "skipped documents" section after the
                     // import.
@@ -528,8 +590,8 @@ public class Package
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Package test install");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Package test install");
         }
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
@@ -548,15 +610,15 @@ public class Package
 
             return result;
         } finally {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Package test install result " + result);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Package test install result " + result);
             }
         }
     }
 
     public int install(XWikiContext context) throws XWikiException
     {
-        boolean isAdmin = context.getWiki().getRightService().hasAdminRights(context);
+        boolean isAdmin = context.getWiki().getRightService().hasWikiAdminRights(context);
 
         if (testInstall(isAdmin, context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             setStatus(DocumentInfo.INSTALL_IMPOSSIBLE, context);
@@ -581,31 +643,81 @@ public class Package
         // We test it once for the whole import in case one of the document break user during the import process.
         boolean backup = this.backupPack && isFarmAdmin(context);
 
-        // Start by installing all documents having a class definition so that their
-        // definitions are available when installing documents using them.
-        for (DocumentInfo classFile : this.classFiles) {
-            if (installDocument(classFile, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
-                status = DocumentInfo.INSTALL_ERROR;
-            }
-        }
+        // Notify all the listeners about import
+        ObservationManager om = Utils.getComponent(ObservationManager.class);
 
-        // Install the remaining documents (without class definitions).
-        for (DocumentInfo docInfo : this.files) {
-            if (!this.classFiles.contains(docInfo)) {
-                if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
+        // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
+        // imported documents. But for the moment it's fine
+        om.notify(new XARImportingEvent(), null, context);
+
+        try {
+            // Start by installing all documents having a class definition so that their
+            // definitions are available when installing documents using them.
+            for (DocumentInfo classFile : this.classFiles) {
+                if (installDocument(classFile, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
                     status = DocumentInfo.INSTALL_ERROR;
                 }
             }
-        }
-        setStatus(status, context);
 
-        // Notify all the listeners about the just done import
-        ObservationManager om = Utils.getComponent(ObservationManager.class);
-        // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
-        // imported documents. But for the moment it's fine
-        om.notify(new XARImportedEvent(), null, context);
+            // Install the remaining documents (without class definitions).
+            for (DocumentInfo docInfo : this.files) {
+                if (!this.classFiles.contains(docInfo)) {
+                    if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
+                        status = DocumentInfo.INSTALL_ERROR;
+                    }
+                }
+            }
+            setStatus(status, context);
+
+        } finally {
+            // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
+            // imported documents. But for the moment it's fine
+            om.notify(new XARImportedEvent(), null, context);
+
+            registerExtension(context);
+        }
 
         return status;
+    }
+
+    private void registerExtension(XWikiContext context)
+    {
+        // Register the package as extension if it's one
+        if (isInstallExension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
+            ExtensionId extensionId = new ExtensionId(getExtensionId(), getVersion());
+
+            try {
+                LocalExtensionRepository localRepository = Utils.getComponent(LocalExtensionRepository.class);
+
+                LocalExtension localExtension = localRepository.getLocalExtension(extensionId);
+                if (localExtension == null) {
+                    Extension extension;
+                    try {
+                        // Try to find and download the extension from a repository
+                        extension = Utils.getComponent(ExtensionRepositoryManager.class).resolve(extensionId);
+                    } catch (ResolveException e) {
+                        LOGGER.debug("Can't find extension [{}]", extensionId, e);
+
+                        // FIXME: Create a dummy extension. Need support for partial/lazy extension.
+                        return;
+                    }
+
+                    localExtension = localRepository.storeExtension(extension);
+                }
+
+                // Register the extension as installed
+                InstalledExtensionRepository installedRepository =
+                    Utils.getComponent(InstalledExtensionRepository.class);
+                String namespace = "wiki:" + context.getDatabase();
+                InstalledExtension installedExtension =
+                    installedRepository.getInstalledExtension(localExtension.getId());
+                if (installedExtension == null || !installedExtension.isInstalled(namespace)) {
+                    installedRepository.installExtension(localExtension, namespace, false);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
+            }
+        }
     }
 
     /**
@@ -621,7 +733,7 @@ public class Package
         try {
             context.setDatabase(context.getMainXWiki());
 
-            return context.getWiki().getRightService().hasAdminRights(context);
+            return context.getWiki().getRightService().hasWikiAdminRights(context);
         } finally {
             context.setDatabase(wiki);
         }
@@ -640,8 +752,8 @@ public class Package
 
         int result = DocumentInfo.INSTALL_OK;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
         }
 
         if (doc.getAction() == DocumentInfo.ACTION_SKIP) {
@@ -674,19 +786,38 @@ public class Package
                         // let's log the error but not stop
                         result = DocumentInfo.INSTALL_ERROR;
                         addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                        if (LOG.isErrorEnabled()) {
-                            LOG.error("Failed to delete document " + previousdoc.getDocumentReference());
+                        if (LOGGER.isErrorEnabled()) {
+                            LOGGER.error("Failed to delete document " + previousdoc.getDocumentReference());
                         }
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
                         }
                     }
                 }
+                else if(previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS))
+                {
+                    // We conserve the old attachments in the new documents
+                    List<XWikiAttachment> newDocAttachments = doc.getDoc().getAttachmentList();
+                    for (XWikiAttachment att : previousdoc.getAttachmentList())
+                    {
+                        if (doc.getDoc().getAttachment(att.getFilename()) == null)
+                        {
+                            // We add the attachment to new document
+                            newDocAttachments.add(att);
+                            // But then we add it in the "to remove list" of the document
+                            // So the attachment will be removed from the database when XWiki#saveDocument
+                            // will be called
+                            doc.getDoc().removeAttachment(att);
+                        }
+                    }
+                }
+                doc.getDoc().addXObjectsToRemoveFromVersion(previousdoc);
+                doc.getDoc().setOriginalDocument(previousdoc);
             }
             try {
                 if (!backup) {
-                    doc.getDoc().setAuthor(context.getUser());
-                    doc.getDoc().setContentAuthor(context.getUser());
+                    doc.getDoc().setAuthorReference(context.getUserReference());
+                    doc.getDoc().setContentAuthorReference(context.getUserReference());
                     // if the import is not a backup pack we set the date to now
                     Date date = new Date();
                     doc.getDoc().setDate(date);
@@ -726,22 +857,15 @@ public class Package
                     }
                 }
 
-                // Attachment saving should not generate additional saving
-                for (XWikiAttachment xa : doc.getDoc().getAttachmentList()) {
-                    xa.setMetaDataDirty(false);
-                    xa.getAttachment_content().setContentDirty(false);
-                }
-
                 String saveMessage = context.getMessageTool().get("core.importer.saveDocumentComment");
                 context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
-                doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
                 if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {
                     // we need to force the saving the document archive.
                     if (doc.getDoc().getDocumentArchive() != null) {
-                        context.getWiki().getVersioningStore().saveXWikiDocArchive(
-                            doc.getDoc().getDocumentArchive(context), true, context);
+                        context.getWiki().getVersioningStore()
+                            .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
                     }
                 }
 
@@ -754,8 +878,8 @@ public class Package
 
             } catch (XWikiException e) {
                 addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                if (LOG.isErrorEnabled()) {
-                    LOG.error("Failed to save document " + doc.getFullName(), e);
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Failed to save document " + doc.getFullName(), e);
                 }
                 result = DocumentInfo.INSTALL_ERROR;
             }
@@ -897,7 +1021,7 @@ public class Package
 
     /**
      * Write the package.xml file to an {@link XMLWriter}.
-     *
+     * 
      * @param wr the writer to write to
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2
@@ -972,17 +1096,16 @@ public class Package
      * Write the package.xml file to a ZipOutputStream
      * 
      * @param zos the ZipOutputStream to write to
-     * @param context curent XWikiContext
-     * @throws IOException when an error occurs during streaming operation
+     * @param context current XWikiContext
      */
-    private void addInfosToZip(ZipOutputStream zos, XWikiContext context) throws IOException
+    private void addInfosToZip(ZipArchiveOutputStream zos, XWikiContext context)
     {
         try {
             String zipname = DefaultPackageFileName;
-            ZipEntry zipentry = new ZipEntry(zipname);
-            zos.putNextEntry(zipentry);
+            ZipArchiveEntry zipentry = new ZipArchiveEntry(zipname);
+            zos.putArchiveEntry(zipentry);
             toXML(zos, context);
-            zos.closeEntry();
+            zos.closeArchiveEntry();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1046,12 +1169,38 @@ public class Package
      * @param context current XWikiContext
      * @throws XWikiException when an error occurs during documents access
      * @throws IOException when an error occurs during streaming operation
+     * @deprecated since 4.1M2
      */
+    @Deprecated
     public void addToZip(XWikiDocument doc, ZipOutputStream zos, boolean withVersions, XWikiContext context)
         throws XWikiException, IOException
     {
         String zipname = getPathFromDocument(doc, context);
-        doc.addToZip(zos, zipname, withVersions, context);
+        ZipEntry zipentry = new ZipEntry(zipname);
+        zos.putNextEntry(zipentry);
+        doc.toXML(zos, true, false, true, withVersions, context);
+        zos.closeEntry();
+    }
+
+    /**
+     * Write an XML serialized XWikiDocument to a ZipOutputStream
+     * 
+     * @param doc the document to serialize
+     * @param zos the ZipOutputStream to write to
+     * @param withVersions if true, also serialize all document versions
+     * @param context current XWikiContext
+     * @throws XWikiException when an error occurs during documents access
+     * @throws IOException when an error occurs during streaming operation
+     * @since 4.1M2
+     */
+    private void addToZip(XWikiDocument doc, ZipArchiveOutputStream zos, boolean withVersions, XWikiContext context)
+        throws XWikiException, IOException
+    {
+        String zipname = getPathFromDocument(doc, context);
+        ZipArchiveEntry zipentry = new ZipArchiveEntry(zipname);
+        zos.putArchiveEntry(zipentry);
+        doc.toXML(zos, true, false, true, withVersions, context);
+        zos.closeArchiveEntry();
     }
 
     public void addToDir(XWikiDocument doc, File dir, boolean withVersions, XWikiContext context) throws XWikiException
@@ -1074,7 +1223,7 @@ public class Package
             fos.flush();
             fos.close();
         } catch (ExcludeDocumentException e) {
-            LOG.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document " + doc.getDocumentReference());
         } catch (Exception e) {
             Object[] args = new Object[1];
             args[0] = doc.getDocumentReference();
@@ -1100,9 +1249,14 @@ public class Package
 
     protected String getElementText(Element docel, String name)
     {
+        return getElementText(docel, name, "");
+    }
+
+    protected String getElementText(Element docel, String name, String def)
+    {
         Element el = docel.element(name);
         if (el == null) {
-            return "";
+            return def;
         } else {
             return el.getText();
         }
@@ -1114,12 +1268,14 @@ public class Package
         Document domdoc = reader.read(xml);
 
         Element docEl = domdoc.getRootElement();
+
         Element infosEl = docEl.element("infos");
 
         this.name = getElementText(infosEl, "name");
         this.description = getElementText(infosEl, "description");
         this.licence = getElementText(infosEl, "licence");
         this.authorName = getElementText(infosEl, "author");
+        this.extensionId = getElementText(infosEl, "extensionId", null);
         this.version = getElementText(infosEl, "version");
         this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
         this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
@@ -1202,10 +1358,10 @@ public class Package
                                 + doc.getDocumentReference() + " does not exist in package definition");
                         }
                     } catch (ExcludeDocumentException e) {
-                        LOG.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
                     }
                 } else if (!file.getName().equals(DefaultPackageFileName)) {
-                    LOG.info(file.getAbsolutePath() + " is not a valid wiki document");
+                    LOGGER.info(file.getAbsolutePath() + " is not a valid wiki document");
                 }
             }
         }
@@ -1241,7 +1397,7 @@ public class Package
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Error when reading the XML");
         }
 
-        LOG.info("Package read " + count + " documents");
+        LOGGER.info("Package read " + count + " documents");
 
         return "";
     }

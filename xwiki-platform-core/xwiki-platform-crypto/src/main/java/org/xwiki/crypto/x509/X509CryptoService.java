@@ -21,7 +21,7 @@ package org.xwiki.crypto.x509;
 
 import java.security.GeneralSecurityException;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Service allowing components to sign text, determine the validity and signer of already signed text,
@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 2.5M1
  */
-@ComponentRole
+@Role
 public interface X509CryptoService
 {
     /**

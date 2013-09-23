@@ -31,11 +31,6 @@ import com.google.gwt.user.client.ui.PopupPanel;
 public class ColorPicker extends PopupPanel implements SelectionHandler<String>
 {
     /**
-     * The object used to get the hex code for a given color.
-     */
-    private final ColorConverter converter = new ColorConverter();
-
-    /**
      * Creates a new color picker that uses the given color palette.
      * 
      * @param palette the color palette to be used by this color picker
@@ -86,6 +81,6 @@ public class ColorPicker extends PopupPanel implements SelectionHandler<String>
      */
     public void setColor(String color)
     {
-        getColorPalette().setSelectedColor(converter.convertToHex(color));
+        getColorPalette().setSelectedColor(color);
     }
 }

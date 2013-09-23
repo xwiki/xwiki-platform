@@ -27,11 +27,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>  
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-php</artifactId>
   <name>XWiki Platform - Rendering - Macro - PHP</name>
-  <description>XWiki macro for interpreting PHP code.</description>
+  <description>Adds ability to write scripts in PHP in wiki pages</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-core-rendering-macro-php</xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>PHP Macro</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -59,17 +66,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-local</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>maven2-repository.caucho.com</id>
-      <name>Caucho Repository for Maven</name>
-      <url>http://caucho.com/m2/</url>
-    </repository>
-  </repositories>
 </project>

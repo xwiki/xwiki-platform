@@ -1,34 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>SearchCode</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>Main.WebHome</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1272532474000</creationDate>
-<date>1273048678000</date>
-<contentUpdateDate>1273048678000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>{{velocity output="false"}}
-#set($searchConfigDoc = $xwiki.getDocument('XWiki.SearchConfig'))
-#set($searchConfigClass = $xwiki.getDocument('XWiki.SearchConfigClass').xWikiClass)
-#set($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name))
-#set($searchEngine = $!searchConfigObj.getProperty('engine').value)
-#if (!$searchEngine || $searchEngine == '')
-  #set($searchEngine = 'lucene')
+  <web>XWiki</web>
+  <name>SearchCode</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1272532474000</creationDate>
+  <date>1273048678000</date>
+  <contentUpdateDate>1273048678000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set ($searchConfigDoc = $xwiki.getDocument('XWiki.SearchConfig'))
+#set ($searchConfigClass = $xwiki.getDocument('XWiki.SearchConfigClass').xWikiClass)
+
+## Get or create the configuration object
+#set ($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
+#set ($searchEngine = "$!{searchConfigObj.getProperty('engine').value}")
+
+## Default search engine to use in case the configured one is not found:
+## - 'solr' is the preferred default
+## - 'database' is the fall-back default
+#set ($searchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortByCustomOrder' : "${searchEngine}, solr, database"}))
+#if (!$searchExtensions.isEmpty())
+  #set ($searchExtension = $searchExtensions[0])
+
+  ## Update the configuration if it is out of synch with the reality (installed extensions).
+  #set ($needsUpdate = $searchEngine != $searchExtension.id)
+  #set ($searchEngine = $searchExtension.id)
+  #if ($needsUpdate &amp;&amp; $searchConfigDoc.hasAccessLevel('edit'))
+    #if ($searchConfigDoc.parent == '')
+      $searchConfigDoc.setParent('XWiki.SearchAdmin')
+    #end
+    ## Save the updated configuration. Make sure to set it hidden as it's a technical document.
+    $searchConfigObj.set('engine', $searchEngine)
+    $searchConfigDoc.setHidden(true)
+    $searchConfigDoc.save()
+  #end
+
+  #set ($searchPage = $searchExtension.parameters.search)
+  #set ($searchAdminPage = $searchExtension.parameters.admin)
+#else
+  ## No Search UI Extension was found!
+  #set ($searchPage = '')
+  #set ($searchAdminPage = '')
 #end
-#set($searchPage = "Main.${searchEngine.substring(0, 1).toUpperCase()}${searchEngine.substring(1)}Search")
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

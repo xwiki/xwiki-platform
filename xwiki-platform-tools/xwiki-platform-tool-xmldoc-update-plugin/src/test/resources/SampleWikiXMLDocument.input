@@ -54,12 +54,12 @@
 <tags/>
 </property>
 </object>
-<content>#set($WikiManager = $xwiki.wikimanager)
+<content>#set($WikiManager = $services.wikimanager)
 #if(!$WikiManager)
-  #error($msg.get("wikimanager.pluginnotenabled"))
+  #error($services.localization.render('wikimanager.pluginnotenabled'))
 #end
-#if(!$xwiki.applicationmanager)
-  #error($msg.get("xapp.pluginnotenabled"))
+#if(!$services.applicationmanager)
+  #error($services.localization.render('xapp.pluginnotenabled'))
 #end
 
 #set($Exception = $WikiManager.DefaultException)
@@ -74,24 +74,24 @@
   #if($confirm &amp;&amp; $confirm == 1)
     #set($result = $WikiManager.createWikiTemplate("templatexe", "XWiki Entreprise (default xwiki)", "template-xe.xar"))
     #if ($result == $Exception.ERROR_NOERROR)
-      #info($msg.get("xem.install.success"))
+      #info($services.localization.render('xem.install.success'))
     #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
-      #error($msg.get("notallowed"))
+      #error($services.localization.render('notallowed'))
     #else
-      #error($msg.get("xem.install.error", [$context.lastexception]))
+      #error($services.localization.render('xem.install.error', [$context.lastexception]))
     #end
   #else
     #set($urlyes = $doc.getURL("view", "confirm=1"))
     #set($urlno = $doc.getURL("view"))
 
-    #xwikimessageboxstart($msg.get("xem.answer.install.title") $msg.get("xem.answer.install.actions"))
-      $msg.get("xem.answer.install.actions.template")
+    #xwikimessageboxstart($services.localization.render('xem.answer.install.title') $services.localization.render('xem.answer.install.actions'))
+      $services.localization.render('xem.answer.install.actions.template')
       &lt;div class="buttons"&gt;
-        &lt;a href="$urlyes"&gt;&lt;input type="button" class="button" value="$msg.get("yes")" onclick="location='$urlyes'; return false;"/&gt;&lt;/a&gt;&lt;a href="$urlno"&gt;&lt;input type="button" class="button" value="$msg.get("no")" onclick="location='$urlno'; return false;"/&gt;&lt;/a&gt;
+        &lt;a href="$urlyes"&gt;&lt;input type="button" class="button" value="$services.localization.render('yes')" onclick="location='$urlyes'; return false;"/&gt;&lt;/a&gt;&lt;a href="$urlno"&gt;&lt;input type="button" class="button" value="$services.localization.render('no')" onclick="location='$urlno'; return false;"/&gt;&lt;/a&gt;
       &lt;/div&gt;
     #xwikimessageboxend()
   #end
 #else
-  #info($msg.get("xem.install.noneed"))
+  #info($services.localization.render('xem.install.noneed'))
 #end</content>
 </xwikidoc>

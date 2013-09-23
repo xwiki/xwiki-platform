@@ -22,7 +22,9 @@ package org.xwiki.gwt.wysiwyg.client.plugin.macro;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.DeferredUpdater;
 import org.xwiki.gwt.user.client.HandlerRegistrationCollection;
@@ -170,7 +172,11 @@ public class MacroSelector implements Updatable, MouseUpHandler, KeyUpHandler, C
         // Mark currently selected macros.
         Selection selection = displayer.getTextArea().getDocument().getSelection();
         for (int i = 0; i < selection.getRangeCount(); i++) {
-            Element macro = getMacroContaining(selection.getRangeAt(i).getCommonAncestorContainer());
+            // We need to shrink the range because sometimes when you double click on a macro the browser selects the
+            // macro container and although the selection end points are not inside the macro container the selection
+            // includes only the macro.
+            Range shrunkenRange = DOMUtils.getInstance().shrinkRange(selection.getRangeAt(i));
+            Element macro = getMacroContaining(shrunkenRange.getCommonAncestorContainer());
             if (macro != null) {
                 selectedMacros.add(macro);
                 displayer.setSelected(macro, true);

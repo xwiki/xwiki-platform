@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.render.macro;
 
 import org.radeox.macro.code.DefaultRegexCodeFormatter;
@@ -65,9 +63,7 @@ public class XWikiJavaCodeFilter extends DefaultRegexCodeFormatter implements So
         addRegex(OBJECTS, "<span class=\"java-object\">$1</span>");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getName()
     {
         return "java";

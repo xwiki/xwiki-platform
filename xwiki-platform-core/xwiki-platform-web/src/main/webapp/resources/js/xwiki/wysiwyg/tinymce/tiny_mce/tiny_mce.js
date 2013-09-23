@@ -521,6 +521,7 @@ TinyMCE_Engine.prototype = {
 		this.instances[id] = inst;
 
 		inst._onAdd(replace_element, form_element_name, target_document);
+		document.fire('xwiki:tinymce:created', {instance: replace_element});
         return id;
     },
 

@@ -1,26 +1,33 @@
 ##
-## CSS files related to JS libraries.
-##
-<link href="$xwiki.getSkinFile("uicomponents/suggest/suggest.css", true)" rel="stylesheet" type="text/css" />
-<link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
-<!--[if IE]>
-  <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />
-<![endif]-->
-##
 ## JS Libraries.
 ##
+$xwiki.jsfx.use('js/amd/require.js', {'defer': false})
+
+$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})
 $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
-$xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
-$xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)
-$xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
-$xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $context.language})
-$xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)
-$xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)
-$xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)
-$xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
-$xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
-$xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
-$xwiki.jsfx.use('uicomponents/suggest/suggest.js')
+##
+## In order to make it easy to debug Javascript in browsers, allow the request parameter "minify=false" to be passed to
+## avoid using the minified versions of JS/CSS.
+##
+#if ("$!request.minify" == 'false')
+  $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})
+  $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
+  $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})
+  $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
+  $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.language})
+  $xwiki.jsfx.use('uicomponents/model/entityReference.js')
+  $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)
+  $xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)
+  $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)
+  $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
+  $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
+  $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
+  $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})
+  $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)
+#else
+  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})
+  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})
+#end
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
   ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
@@ -29,24 +36,49 @@ $xwiki.jsfx.use('uicomponents/suggest/suggest.js')
   #set($searchSuggestConfigDocument = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
   #set($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestConfig'))
   #if($searchSuggestConfigObject.getProperty('activated').value == 1)
-   #set($searchSuggestConfigHash = '')
-   #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
-     #if($source.getProperty('activated').value == 1)
-       #set($sourceId = "${source.get('name')}:${source.get('url')}:${source.get('highlight')}:${source.get('icon')}}")
-       #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
-     #end
-   #end
-   $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
-    'forceSkinAction' : true,  
-    'h' : $searchSuggestConfigHash.hashCode()  
-   })
-   $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
+    #set($searchSuggestConfigHash = '')
+    #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
+      #if($source.getProperty('activated').value == 1)
+        #set($sourceId = "${source.get('name')}:${source.get('url')}:${source.get('highlight')}:${source.get('icon')}}")
+        #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
+      #end
+    #end
+    $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
+      'forceSkinAction' : true,
+      'h' : $searchSuggestConfigHash.hashCode()
+    })
+    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
   #end
 #end
-<script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
+#set($editActions = ['edit', 'inline', 'admin'])
+#if($editActions.contains($xcontext.action))
+  $xwiki.jsfx.use('uicomponents/lock/lock.js')
+  $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js')
+  $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)
+#end
+##
+## Hooks for inserting JavaScript skin extensions
+##
+#javaScriptExtensionHooks
+##
+## Compatibility "aspect" file for deprecated code.
+## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
+##
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
+## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
 <script type="text/javascript">
 // <![CDATA[
+require.config({
+  baseUrl: '/',
+  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
+  paths: { 'jquery': "$xwiki.getSkinFile('js/amd/')jquery" },
+  map: {
+    '*': { 'jquery': 'jQueryNoConflict' },
+    'jQueryNoConflict': { 'jquery': 'jquery' }
+  }
+});
+define('jQueryNoConflict', ['jquery'], function($) { $.noConflict(); return $; });
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.contextPath = "${request.contextPath}";
@@ -59,81 +91,15 @@ XWiki.viewer = "$!{escapetool.javascript($viewer)}";
 XWiki.contextaction = "${xcontext.getAction()}";
 XWiki.docisnew = $!doc.isNew();
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
+XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
 XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
 XWiki.hasEdit = $hasEdit;
 XWiki.hasProgramming = $hasProgramming;
 XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;
+XWiki.hasRenderer = $services.rendering.availableRendererSyntaxes.contains($!doc.getSyntax());
 window.docviewurl = "${doc.getURL('view')}";
 window.docediturl = "${doc.getURL('edit')}";
 window.docsaveurl = "${doc.getURL('save')}";
 window.docgeturl = "${doc.getURL('get')}";
 // ]]>
 </script>
-#if(($xcontext.action=="inline")||($xcontext.action=="edit") || ($xcontext.action=="admin"))
-$xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
-$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
-<script type="text/javascript">
-// <![CDATA[
-var cancelEditNextOnunload;
-var cancelCancelEditFlag = true;
-var lockEditFlag = false;
-
-function cancelEditResponse() {
-}
-
-function cancelEdit() {
-  if (cancelCancelEditFlag) {
-    var surl = "$doc.getExternalURL('cancel', 'ajax=1')";
-    var myAjax = new Ajax.Request(surl, {
-      method: 'get',
-      parameters: "",
-      asynchronous: true,
-      discardResponse: true
-    });
-    cancelCancelEditFlag = false;
-  }
-  if (cancelEditNextOnunload) {
-    cancelEditNextOnunload();
-  }
-}
-
-function lockEdit() {
-  if (!lockEditFlag) {
-#if ($xcontext.action == 'inline')
-    var surl = "$doc.getExternalURL('lock', "action=inline&ajax=1&${docvariant.replace('&amp;', '&')}")";
-#else
-    var surl = "$doc.getExternalURL('lock', "ajax=1&${docvariant.replace('&amp;', '&')}")";
-#end
-    var myAjax = new Ajax.Request(surl, {
-      method: 'get',
-      parameters: "",
-      asynchronous: true
-    });
-    lockEditFlag = false;
-  }
-}
-
-function prepareCancelEdit() {
-  lockEdit();
-}
-function cancelCancelEdit() {
-  cancelCancelEditFlag = false;
-}
-Event.observe(window, "unload", cancelEdit);
-Event.observe(window, "pagehide", cancelEdit);
-Event.observe(document, "dom:loaded", prepareCancelEdit);
-// ]]>
-</script>
-#end
-##
-## Hooks for inserting JavaScript skin extensions
-##
-## - Skin file extension hook. Placed first since skin extensions might need to have xwiki or external libraries included first to be able to work properly
-<!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
-## - Skin extension hook
-<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
-##
-## Compatibility "aspect" file for deprecated code.
-## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
-##
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>

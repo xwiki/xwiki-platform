@@ -19,47 +19,50 @@
  */
 package org.xwiki.rendering.internal.macro.chart;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.internal.macro.chart.source.DataSource;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.chart.ChartDataSource;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * A macro for rendering charts.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
-@Component("chart")
+@Component
+@Named("chart")
+@Singleton
 public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 {
     /**
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Displays a graphical chart generated from miscellaneous data sources";
-    
+
     /**
      * The description of the macro content.
      */
@@ -68,26 +71,21 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     /**
      * Used for building the actual chart.
      */
-    @Requirement
+    @Inject
     private ChartGenerator chartGenerator;
-
-    /**
-     * Used for getting web URLs from specific filenames.
-     */
-    @Requirement
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component manager needed for instantiating the datasource factory.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
-     * The web container of the current module.
+     * Used to compute the chart image storage location and URL to access it.
      */
-    @Requirement
-    private Container container;
+    @Inject
+    @Named("tmp")
+    private ChartImageWriter imageWriter;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -98,22 +96,20 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Block> execute(ChartMacroParameters macroParams, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        String imageLocation =
-            documentAccessBridge.getURL(null, "charting", null, null) + "/" + generateChart(macroParams, content);
+        // Generate the chart image in a temporary location.
+        generateChart(macroParams, content, context);
+
+        String imageLocation = this.imageWriter.getURL(new ImageId(macroParams));
         String title = macroParams.getTitle();
         ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new ResourceReference(imageLocation, ResourceType.URL), true);
@@ -134,45 +130,90 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 
     /**
      * Builds the chart image according to the specifications passed in.
-     * 
-     * @param parameters macro parameters
-     * @param content macro content
-     * @return the name of the generated image file
+     *
+     * @param parameters the macro parameters
+     * @param content the macro content
+     * @param context the macro transformation context, used for example to find out the current document reference
      * @throws MacroExecutionException if an error occurs while generating / saving the chart image
      */
-    private String generateChart(ChartMacroParameters parameters, String content)
+    private void generateChart(ChartMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        Map<String, String> paramsMap = parameters.getParametersMap();
-        String source = paramsMap.get("source");
-        File chartFile;
+        String source = computeSource(parameters.getSource(), content);
+
+        DataSource dataSource;
         try {
-            ChartDataSource dataSource = componentManager.lookup(ChartDataSource.class, source);
-            byte[] chart =
-                chartGenerator.generate(dataSource.buildModel(content, paramsMap), paramsMap);
-            chartFile = getChartImageFile(parameters);
-            FileOutputStream fos = new FileOutputStream(chartFile);
-            fos.write(chart);
-            fos.close();
-        } catch (ComponentLookupException ex) {
-            throw new MacroExecutionException("Invalid source parameter.", ex);
-        } catch (ChartGeneratorException ex) {
-            throw new MacroExecutionException("Error while rendering chart.", ex);
-        } catch (Exception ex) {
-            throw new MacroExecutionException("Error while saving chart image.", ex);
+            dataSource = this.componentManager.getInstance(DataSource.class, source);
+        } catch (ComponentLookupException e) {
+            throw new MacroExecutionException(String.format("Invalid source parameter [%s]",
+                parameters.getSource()), e);
         }
-        return chartFile.getName();
+
+        Map<String, String> sourceParameters = getSourceParameters(parameters, source);
+
+        dataSource.buildDataset(content, sourceParameters, context);
+
+        try {
+            this.imageWriter.writeImage(new ImageId(parameters),
+                this.chartGenerator.generate(dataSource.getChartModel(), sourceParameters));
+        } catch (ChartGeneratorException e) {
+            throw new MacroExecutionException("Error while rendering chart", e);
+        }
     }
 
     /**
-     * Returns the temporary file into which the chart image will be saved.
-     * 
-     * @param parameters macro parameters
-     * @return the chart image file
+     * Compute what Data Source to use. If the user has specified one then use it. Otherwise if there's content
+     * in the macro default to using the "inline" source and if not default to using the "xdom" source.
+     *
+     * @param userDefinedSource the user specified source value from the Macro parameter (is null if not specified)
+     * @param content the Macro content
+     * @return the hint of the {@link DataSource} component to use
      */
-    protected File getChartImageFile(ChartMacroParameters parameters)
+    private String computeSource(String userDefinedSource, String content)
     {
-        File chartsDir = new File(container.getApplicationContext().getTemporaryDirectory(), "charts");
-        return new File(chartsDir, Math.abs(parameters.hashCode()) + ".png");
+        String source = userDefinedSource;
+        if (source == null) {
+            if (StringUtils.isEmpty(content)) {
+                source = "xdom";
+            } else {
+                source = "inline";
+            }
+        }
+        return source;
+    }
+
+    /**
+     * TODO There is no way to escape the ';' character.
+     *
+     * @param chartMacroParameters The macro parameters.
+     * @param sourceHint the hint of the Data Source component to use
+     * @return A map containing the source parameters.
+     */
+    private Map<String, String> getSourceParameters(ChartMacroParameters chartMacroParameters, String sourceHint)
+    {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put(ChartGenerator.TITLE_PARAM, chartMacroParameters.getTitle());
+        parameters.put(ChartGenerator.WIDTH_PARAM, String.valueOf(chartMacroParameters.getWidth()));
+        parameters.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(chartMacroParameters.getHeight()));
+        parameters.put(ChartGenerator.TYPE_PARAM, chartMacroParameters.getType());
+        parameters.put(DataSource.SOURCE_PARAM, sourceHint);
+        parameters.put(DataSource.PARAMS_PARAM, chartMacroParameters.getParams());
+
+        String sourceParameters = chartMacroParameters.getParams();
+
+        if (null != sourceParameters) {
+            String[] segments = sourceParameters.split(";");
+            for (String segment : segments) {
+                String[] keyValue = segment.split(":", 2);
+                String key = StringUtils.trim(keyValue[0]);
+                if (keyValue.length == 2) {
+                    parameters.put(key, keyValue[1]);
+                } else {
+                    parameters.put(key, null);
+                }
+            }
+        }
+
+        return parameters;
     }
 }

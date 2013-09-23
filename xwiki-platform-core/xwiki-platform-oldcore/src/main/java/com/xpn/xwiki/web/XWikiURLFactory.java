@@ -16,15 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
-
-import com.xpn.xwiki.XWikiContext;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiURLFactory
 {
@@ -36,8 +34,7 @@ public interface XWikiURLFactory
 
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context);
 
-    public URL createURL(String web, String name, String action, String querystring, String anchor,
-        XWikiContext context);
+    public URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context);
 
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         XWikiContext context);
@@ -46,14 +43,14 @@ public interface XWikiURLFactory
         XWikiContext context);
 
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
-        String xwikidb, XWikiContext context);       
+        String xwikidb, XWikiContext context);
 
     public URL createSkinURL(String filename, String skin, XWikiContext context);
 
     public URL createSkinURL(String filename, String web, String name, XWikiContext context);
 
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context);
-    
+
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
@@ -70,6 +67,14 @@ public interface XWikiURLFactory
 
     public URL getRequestURL(XWikiContext context);
 
+    /**
+     * Converts a URL to a string representation. It's up to the implementation to decide whether to perform
+     * transformations or not on the URL. For example some implementations will convert the URL to a relative URL if the
+     * URL is an internal XWiki URL.
+     * 
+     * @param url the URL to convert
+     * @return the converted URL as a string
+     */
     public String getURL(URL url, XWikiContext context);
 
     /**

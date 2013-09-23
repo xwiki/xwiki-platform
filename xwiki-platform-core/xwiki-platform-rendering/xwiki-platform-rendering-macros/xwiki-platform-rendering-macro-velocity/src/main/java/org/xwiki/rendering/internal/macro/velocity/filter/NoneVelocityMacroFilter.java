@@ -32,23 +32,13 @@ import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 @Component("none")
 public class NoneVelocityMacroFilter implements VelocityMacroFilter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#after(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String after(String content, VelocityContext velocityContect)
     {
         return content;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#before(java.lang.String,
-     *      org.apache.velocity.VelocityContext)
-     */
+    @Override
     public String before(String content, VelocityContext velocityContect)
     {
         return content;

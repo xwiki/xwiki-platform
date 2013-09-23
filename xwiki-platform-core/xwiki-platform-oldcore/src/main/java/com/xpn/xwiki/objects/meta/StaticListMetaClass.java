@@ -16,32 +16,45 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
+import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+/**
+ * Defines the meta properties of a static list XClass property.
+ * 
+ * @version $Id$
+ */
+@Component
+@Named("StaticList")
+@Singleton
 public class StaticListMetaClass extends ListMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of a Static List XClass property.
+     */
     public StaticListMetaClass()
     {
-        super();
         setPrettyName("Static List");
-        setName(StaticListClass.class.getName());
+        setName(getClass().getAnnotation(Named.class).value());
 
-        StringClass values_class = new StringClass(this);
-        values_class.setName("values");
-        values_class.setPrettyName("Values");
-        values_class.setSize(40);
-        safeput("values", values_class);
+        StringClass valuesClass = new StringClass(this);
+        valuesClass.setName("values");
+        valuesClass.setPrettyName("Values");
+        valuesClass.setSize(40);
+        safeput(valuesClass.getName(), valuesClass);
     }
 
-    public BaseCollection newObject(XWikiContext context)
+    @Override
+    public PropertyClassInterface getInstance()
     {
         return new StaticListClass();
     }

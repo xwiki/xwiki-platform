@@ -1,27 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-<web>XAppResources</web>
-<name>Translations</name>
-<language>sv</language>
-<defaultLanguage>en</defaultLanguage>
-<translation>1</translation>
-<parent>XAppResources.WebHome</parent>
-<creator></creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1192218584000</creationDate>
-<date>1278346254000</date>
-<contentUpdateDate>1278346254000</contentUpdateDate>
-<version>1.1</version>
-<title></title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden>
-<content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
-</content></xwikidoc>
+  <web>XAppResources</web>
+  <name>Translations</name>
+  <language>sv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>XAppResources.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1192218584000</creationDate>
+  <date>1357298547000</date>
+  <contentUpdateDate>1357298544000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
+xapp.action.exportnonrecurse=Exportera (ej rekursivt)
+xapp.action.exportrecurse=Exportera
+xapp.action.reloadapp=Ladda om
+xapp.answer.deleteapp.msg=Är du säker på att du vill radera applikationen "{0}"?
+xapp.answer.deleteapp.title=Radera applikation "{0}"
+xapp.answer.exportapp.recursive=Rekursivt
+xapp.answer.exportapp.title=Exportera applikation "{0}"
+xapp.answer.exportapp.withdetails=Med historik
+xapp.appmanager=Applikationshanterare
+xapp.appname=Applikationsnamn
+xapp.availablefilestoimport=Filer tillgängliga för import
+xapp.createapplication=Skapa ny applikation
+xapp.description=Beskrivning
+xapp.docname=Dokumentnamn
+xapp.errorcreateapp=Ett fel uppstod då applikationen "{0}" skulle skapas (felkod "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=En applikationen med namnet "{0}" finns redan.  Välj ett annat namn.
+xapp.errordeleteapp=Ett fel uppstod då applikationen "{0}" skulle raderas (felkod "{1}").
+xapp.errorexportapp=Ett fel uppstod då applikationen "{0}" skulle exporteras (felkod "{1}").
+xapp.errorimportapp=Ett fel uppstod vid importeringen av applikationspaketet "{0}" (felkod "{1}").
+xapp.errorreloadapp=Ett fel uppstod då applikationen "{0}" skulle laddas om (felkod "{1}").
+xapp.legend.application=Applikation
+xapp.legend.validate=Validera
+xapp.pluginnotenabled=Pluginen för applikationshanteraren är ej aktiverad.  Den här sidan kommer ej att fungera som den skall. Kontrollera att "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" finns med i listan för parametern xwiki.plugins i filen xwiki.cfg.
+xapp.successcreateapp=Applikationen "{0}" har skapats.  Du kan komma åt den på [{1}].
+xapp.successdeleteapp=Radering av applikationen "{0}" lyckades.
+xapp.successexportapp=Export av applikationen "{0}" lyckades.
+xapp.successimportapp=Importen av applikationspaketet "{0}" lyckades.
+xapp.successreloadapp=Omladdningen av applikationen "{0}" lyckades.
+xapp.totalnumberofapp=Totalt antal applikationer
+</content>
+</xwikidoc>

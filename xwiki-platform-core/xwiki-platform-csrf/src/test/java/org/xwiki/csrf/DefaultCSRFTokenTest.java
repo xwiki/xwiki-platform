@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.csrf;
 
@@ -26,21 +25,25 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.util.Random;
+import java.security.SecureRandom;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Tests for the {@link DefaultCSRFToken} component.
@@ -48,6 +51,7 @@ import org.xwiki.test.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.5M2
  */
+@MockingRequirement(DefaultCSRFTokenTest.InsecureCSRFToken.class)
 public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
 {
     /** URL of the current document. */
@@ -57,24 +61,38 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     private static final String resubmitUrl = mockDocumentUrl;
 
     /** Tested CSRF token component. */
-    @MockingRequirement
-    private DefaultCSRFToken csrf;
+    private CSRFToken csrf;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractMockingComponentTest#setUp()
+     * This class is here because it doesn't require a SecureRandom generator
+     * seed on each startup. Seeding a SecureRandom generator can take a very long time,
+     * especially many time over which depleats the random pool on the server.
      */
-    @Before
-    @Override
-    public void setUp() throws Exception
+    public static class InsecureCSRFToken extends DefaultCSRFToken
     {
-        super.setUp();
+        @Override
+        public void initialize()
+        {
+            final Random random = new Random(System.nanoTime());
+            this.setRandom(new SecureRandom() {
+                private static final long serialVersionUID = 3;
+                @Override
+                public void nextBytes(byte[] out)
+                {
+                    random.nextBytes(out);
+                }
+            });
+        }
+    }
 
+    @Before
+    public void configure() throws Exception
+    {
         // set up mocked dependencies
 
         // document access bridge
-        final DocumentAccessBridge mockDocumentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge =
+            getComponentManager().getInstance(DocumentAccessBridge.class);
         final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
         getMockery().checking(new Expectations()
         {
@@ -92,7 +110,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             }
         });
         // configuration
-        final CSRFTokenConfiguration mockConfiguration = getComponentManager().lookup(CSRFTokenConfiguration.class);
+        final CSRFTokenConfiguration mockConfiguration =
+            getComponentManager().getInstance(CSRFTokenConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -126,7 +145,7 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             }
         });
         // container
-        final Container mockContainer = getComponentManager().lookup(Container.class);
+        final Container mockContainer = getComponentManager().getInstance(Container.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -134,6 +153,13 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
                 will(returnValue(servletRequest));
             }
         });
+        // logging
+        getMockery().checking(new Expectations() {{
+            // Ignore all calls to debug()
+            ignoring(any(Logger.class)).method("debug");
+        }});
+
+        this.csrf = getComponentManager().getInstance(CSRFToken.class);
     }
 
     /**
@@ -175,8 +201,16 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that null is not valid.
      */
     @Test
-    public void testNullNotValid()
+    public void testNullNotValid() throws Exception
     {
+        // Verify that the correct message is logged
+        final Logger logger = getMockLogger();
+
+        getMockery().checking(new Expectations() {{
+            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"null\", stored "
+                + "token:")));
+        }});
+
         Assert.assertFalse("Null passed validity check", this.csrf.isTokenValid(null));
     }
 
@@ -184,8 +218,16 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that empty string is not valid.
      */
     @Test
-    public void testEmptyNotValid()
+    public void testEmptyNotValid() throws Exception
     {
+        // Verify that the correct message is logged
+        final Logger logger = getMockLogger();
+
+        getMockery().checking(new Expectations() {{
+            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token: \"\", stored "
+                + "token:")));
+        }});
+
         Assert.assertFalse("Empty string passed validity check", this.csrf.isTokenValid(""));
     }
 
@@ -193,8 +235,15 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that the prefix of the valid token is not valid.
      */
     @Test
-    public void testPrefixNotValid()
+    public void testPrefixNotValid() throws Exception
     {
+        // Verify that the correct message is logged
+        final Logger logger = getMockLogger();
+
+        getMockery().checking(new Expectations() {{
+            oneOf(logger).warn(with(startsWith("CSRFToken: Secret token verification failed, token:")));
+        }});
+
         String token = this.csrf.getToken();
         if (token != null) {
             token = token.substring(0, token.length() - 2);
@@ -232,8 +281,11 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         // We cannot easily control the value of the token, so we just test if it contains any "bad" characters and hope
         // for the best. Since the probability that the token contains some specific character is about 1/3, this test
         // will start to flicker (instead of always failing) if something like XWIKI-5996 is reintroduced
-        String token = this.csrf.getToken();
-        Assert.assertFalse("The token \"" + token + "\" contains a character that might break the layout",
-            token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"));
+        for (int i = 0; i < 30; ++i) {
+            this.csrf.clearToken();
+            String token = this.csrf.getToken();
+            Assert.assertFalse("The token \"" + token + "\" contains a character that might break the layout",
+                token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"));
+        }
     }
 }

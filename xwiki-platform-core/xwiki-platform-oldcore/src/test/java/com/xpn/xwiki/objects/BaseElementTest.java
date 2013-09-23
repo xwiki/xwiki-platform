@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects;
 
@@ -35,8 +34,8 @@ public class BaseElementTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetReferenceGetName() throws Exception
     {
-        BaseElement baseElement = new BaseElement()
-        {
+        BaseElement baseElement = new BaseElement() {
+
         };
 
         baseElement.setDocumentReference(new DocumentReference("wiki", "space", "page"));

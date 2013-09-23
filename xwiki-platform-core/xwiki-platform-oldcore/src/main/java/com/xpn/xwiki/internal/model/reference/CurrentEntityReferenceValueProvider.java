@@ -36,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * The behavior is the following:
  * <ul>
- * <li>The wiki value used is the default wiki if no wiki was specified in the passed reference (or if it was empty).
+ * <li>The wiki value used is the current wiki if no wiki was specified in the passed reference (or if it was empty).
  * Note that this is different from using the current document's wiki value.</li>
  * <li>The space value used is the space from the current document reference if no space was specified in the passed
  * reference (or if it was empty). If the current document reference is not defined then the default space value is used

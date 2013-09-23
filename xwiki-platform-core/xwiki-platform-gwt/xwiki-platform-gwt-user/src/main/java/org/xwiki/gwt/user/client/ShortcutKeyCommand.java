@@ -61,11 +61,7 @@ public class ShortcutKeyCommand implements Command
         this.repeatable = repeatable;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Command#execute()
-     */
+    @Override
     public void execute()
     {
         command.execute();

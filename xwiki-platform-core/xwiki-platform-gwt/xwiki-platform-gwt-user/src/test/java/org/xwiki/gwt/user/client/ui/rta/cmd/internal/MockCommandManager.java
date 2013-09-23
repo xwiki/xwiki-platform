@@ -44,22 +44,14 @@ public class MockCommandManager extends AbstractCommandManager
         history = new HashMap<Command, String>();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#execute(Command, String)
-     */
+    @Override
     public boolean execute(Command cmd, String param)
     {
         history.put(cmd, param);
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#isEnabled(Command)
-     */
+    @Override
     public boolean isEnabled(Command cmd)
     {
         if (Command.OUTDENT.equals(cmd)) {
@@ -68,31 +60,19 @@ public class MockCommandManager extends AbstractCommandManager
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#isExecuted(Command)
-     */
+    @Override
     public boolean isExecuted(Command cmd)
     {
         return history.containsKey(cmd);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#isSupported(Command)
-     */
+    @Override
     public boolean isSupported(Command cmd)
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#getStringValue(Command)
-     */
+    @Override
     public String getStringValue(Command cmd)
     {
         return history.get(cmd);

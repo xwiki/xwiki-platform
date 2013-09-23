@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Dashboard</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252458000000</creationDate>
+  <date>1303429635000</date>
+  <contentUpdateDate>1303429635000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.dashboard.wiki')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.EditModeClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultEditMode>
+        <disabled>0</disabled>
+        <name>defaultEditMode</name>
+        <number>1</number>
+        <prettyName>Default Edit Mode</prettyName>
+        <size>15</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultEditMode>
+    </class>
+    <name>Dashboard.WebHome</name>
+    <number>0</number>
+    <className>XWiki.EditModeClass</className>
+    <guid>22045e2a-e5ac-4b9e-9ff7-10ee2b62624c</guid>
+    <property>
+      <defaultEditMode>inline</defaultEditMode>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Dashboard.WebHome</name>
+    <number>0</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>6ad7ff1f-6971-4a95-a0e5-94c0d2adf3aa</guid>
+    <property>
+      <content>{{spaces/}}</content>
+    </property>
+    <property>
+      <position>1,3</position>
+    </property>
+    <property>
+      <title>$services.localization.render('platform.dashboard.wiki.spaces')</title>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Dashboard.WebHome</name>
+    <number>1</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>35c8969a-8419-4a70-abda-9b6bb1c0d709</guid>
+    <property>
+      <content>{{tagcloud/}}</content>
+    </property>
+    <property>
+      <position>1,4</position>
+    </property>
+    <property>
+      <title>$services.localization.render('platform.dashboard.wiki.tagcloud')</title>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Dashboard.WebHome</name>
+    <number>2</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>092deb30-707f-43d3-b4e8-8b01b932c0eb</guid>
+    <property>
+      <content>{{activity/}}</content>
+    </property>
+    <property>
+      <position>2,1</position>
+    </property>
+    <property>
+      <title>$services.localization.render('platform.dashboard.wiki.activity')</title>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Dashboard.WebHome</name>
+    <number>3</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>acb59a4e-cbfe-4a33-8a38-1bb6f65efa7b</guid>
+    <property>
+      <content>{{velocity}}
+#set ($currentWiki = $xcontext.database)
+#set ($WorkspaceManager = $services.workspace)
+##
+## TODO: use a dependency check macro.
+##
+#set ($workspace = $WorkspaceManager.getWorkspace($currentWiki))
+#if (!$workspace)
+  {{error}}{{translation key="platform.workspace.wikiNotWorkspace"/}}{{/error}}
+#else
+  #set($wikiDescriptor = $workspace.wikiDescriptor)
+  #set($displayName = $wikiDescriptor.getValue('wikiprettyname'))
+  #if ("$!displayName" == '')
+    #set($displayName = $currentWiki)
+  #end
+  $services.localization.render('platform.workspace.gadgetWelcomeToWorkspace', [$displayName])
+  #set ($workspaceDescription = $wikiDescriptor.description)
+  #if ("$!workspaceDescription" != '')
+
+    $workspaceDescription
+  #end
+  ## User's rights
+  #set ($currentUser = "#if($xcontext.isMainWiki())${xcontext.mainWikiName}:${xcontext.user}#{else}${xcontext.user}#end")
+  #set ($hasOwner = ($wikiDescriptor.owner.equals($currentUser)))
+  #if (!$isGuest)
+    #if ($hasOwner)
+
+      {{translation key="platform.workspace.currentUserIsOwner"/}}
+    #elseif ($hasAdmin)
+
+      {{translation key="platform.workspace.currentUserIsAdministrator"/}}
+    #end
+  #end
+
+  ## Join/Leave
+  #if ($isGuest)
+    {{translation key="platform.workspace.joinNeedToLogIn"/}}
+  #else
+    #set ($workspaceGroupDocument = $workspace.groupDocument)
+    #set ($groupsClass = "$currentWiki:XWiki.XWikiGroups")
+    #set ($currentUserGroupObject = $workspaceGroupDocument.getObject($groupsClass, 'member', $currentUser))
+    #set ($hasJoin = ("$!currentUserGroupObject" == ''))
+    #if ($hasJoin)
+      #set ($joinPageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'JoinWorkspaceCode'))
+      #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${displayName}"))
+      {{translation key="platform.workspace.currentUserNotMember"/}} $services.localization.render('platform.workspace.currentUserCanJoin', $joinUrl)
+    #elseif (!$hasOwner)
+      #set ($leavePageReference = $services.model.createDocumentReference(${xcontext.mainWikiName}, 'WorkspaceManager', 'LeaveWorkspaceCode'))
+      #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "workspaceId=${currentWiki}&amp;workspaceName=${displayName}"))
+      {{translation key="platform.workspace.currentUserIsMember"/}} $services.localization.render('platform.workspace.currentUserCanLeave', $leaveUrl)
+    #end
+  #end
+#end
+{{/velocity}}</content>
+    </property>
+    <property>
+      <position>1,1</position>
+    </property>
+    <property>
+      <title>$services.localization.render('platform.workspace.gadgetWorkspaceInformationLabel')</title>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Dashboard.WebHome</name>
+    <number>4</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>4505776f-6e41-4c59-a0b2-c2082743e60d</guid>
+    <property>
+      <content>{{velocity}}
+## Max number of contributors to display.
+#set ($MAX_CONTRIBUTORS = 5)
+## We fetch a bit more contributors than needed to include some users that might be ignored.
+#set ($FETCHED_CONTRIBUTORS = $MAX_CONTRIBUTORS + 5)
+## Whether to display the main global admin (xwiki:XWiki.Admin) or not. This is useful because a lot of initial actions (wiki creation, import, etc.) are attributed to this used and it should not be counted.
+#set ($DISPLAY_GLOBAL_ADMIN = true)
+##
+#set ($contributors = $xcontext.xWiki.store.search("select ase.user from ActivityEventImpl ase GROUP BY ase.user ORDER BY count(*) DESC", $FETCHED_CONTRIBUTORS, 0, $xcontext.context))
+#set ($validContributors = 0)
+#foreach ($contributor in $contributors)
+  ## It seems that we can have empty users in the table.
+  ## Ignore superadmin since he 'should not exist'.
+  ## Ignore the workspace template admin since it's a side-effect of bug http://jira.xwiki.org/jira/browse/XWIKI-6261
+  ## Ignore a 'ghost' local admin for workspaces since it should no longer exist.
+  ## Ignore guest users.
+  #if ("$!contributor" != '' &amp;&amp; !$contributor.endsWith('superadmin') &amp;&amp; "$!contributor" != 'workspacetemplate:XWiki.Admin' &amp;&amp;
+       ( $DISPLAY_GLOBAL_ADMIN || "$!contributor" != 'xwiki:XWiki.Admin' ) &amp;&amp;
+       ( $xcontext.mainWiki || "$!contributor" != 'XWiki.Admin' ) &amp;&amp;
+       ( "$!contributor" != 'XWiki.XWikiGuest' )
+      )
+    #set ($validContributors = $validContributors + 1)
+    1. [[$xwiki.getUserName($!{contributor}, false)&gt;&gt;$!{contributor}]]
+  #end
+  #if ($validContributors == $MAX_CONTRIBUTORS)
+    #break
+  #end
+#end
+
+$services.localization.render('platform.workspace.gadgetTopActiveUsersAllMembers')
+{{/velocity}}</content>
+    </property>
+    <property>
+      <position>1,2</position>
+    </property>
+    <property>
+      <title>$services.localization.render('platform.workspace.gadgetTopActiveUsersLabel')</title>
+    </property>
+  </object>
+  <content>{{dashboard/}}</content>
+</xwikidoc>

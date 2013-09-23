@@ -16,86 +16,106 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+/**
+ * Defines the default meta properties for all list XClass property types.
+ * 
+ * @version $Id$
+ */
 public class ListMetaClass extends PropertyMetaClass
 {
+    /**
+     * Default constructor. Initializes the default meta properties of all List XClass property.
+     */
     public ListMetaClass()
     {
-        super();
-        setPrettyName("List");
-        setName(ListClass.class.getName());
+        addPresentationMetaProperties();
 
-        StaticListClass type_class = new StaticListClass(this);
-        type_class.setName("displayType");
-        type_class.setPrettyName("Display Type");
-        type_class.setValues("input|select|radio|checkbox");
-        safeput("displayType", type_class);
+        BooleanClass relationalStorageClass = newCheckBox(false);
+        relationalStorageClass.setName("relationalStorage");
+        relationalStorageClass.setPrettyName("Relational Storage");
+        safeput(relationalStorageClass.getName(), relationalStorageClass);
 
-        BooleanClass multi_class = new BooleanClass(this);
-        multi_class.setName("multiSelect");
-        multi_class.setPrettyName("Multiple Select");
-        multi_class.setDisplayType("yesno");
-        multi_class.setDisplayFormType("checkbox");
-        multi_class.setDefaultValue(0);
-        safeput("multiSelect", multi_class);
+        BooleanClass cacheClass = newCheckBox(false);
+        cacheClass.setName("cache");
+        cacheClass.setPrettyName("Cache");
+        safeput(cacheClass.getName(), cacheClass);
+    }
 
-        BooleanClass relational_class = new BooleanClass(this);
-        relational_class.setName("relationalStorage");
-        relational_class.setPrettyName("Relational Storage");
-        relational_class.setDisplayType("yesno");
-        relational_class.setDisplayFormType("checkbox");
-        relational_class.setDefaultValue(0);
-        safeput("relationalStorage", relational_class);
+    /**
+     * Adds the meta properties that control how the XClass property is displayed in edit and view mode.
+     */
+    private void addPresentationMetaProperties()
+    {
+        StaticListClass displayTypeClass = new StaticListClass(this);
+        displayTypeClass.setName("displayType");
+        displayTypeClass.setPrettyName("Display Type");
+        displayTypeClass.setValues("input|select|radio|checkbox");
+        safeput(displayTypeClass.getName(), displayTypeClass);
 
-        BooleanClass picker_class = new BooleanClass(this);
-        picker_class.setName("picker");
-        picker_class.setPrettyName("Use Suggest");
-        picker_class.setDisplayType("yesno");
-        picker_class.setDisplayFormType("checkbox");
-        picker_class.setDefaultValue(1);
-        safeput("picker", picker_class);
+        BooleanClass multiSelectClass = newCheckBox(false);
+        multiSelectClass.setName("multiSelect");
+        multiSelectClass.setPrettyName("Multiple Select");
+        safeput(multiSelectClass.getName(), multiSelectClass);
 
-        NumberClass size_class = new NumberClass(this);
-        size_class.setName("size");
-        size_class.setPrettyName("Size");
-        size_class.setSize(5);
-        size_class.setNumberType("integer");
-        safeput("size", size_class);
+        BooleanClass pickerClass = newCheckBox(true);
+        pickerClass.setName("picker");
+        pickerClass.setPrettyName("Use Suggest");
+        safeput(pickerClass.getName(), pickerClass);
 
-        StringClass separators_class = new StringClass(this);
-        separators_class.setName("separators");
-        separators_class.setPrettyName("Multiselect separators (for editing)");
-        separators_class.setSize(5);
-        safeput("separators", separators_class);
+        NumberClass sizeClass = new NumberClass(this);
+        sizeClass.setName("size");
+        sizeClass.setPrettyName("Size");
+        sizeClass.setSize(5);
+        sizeClass.setNumberType("integer");
+        safeput(sizeClass.getName(), sizeClass);
 
-        StringClass separator_class = new StringClass(this);
-        separator_class.setName("separator");
-        separator_class.setPrettyName("Join separator (for display)");
-        separator_class.setSize(5);
-        safeput("separator", separator_class);
+        addValueSeparatorMetaProperties();
 
-        StaticListClass sort_class = new StaticListClass(this);
-        sort_class.setName("sort");
-        sort_class.setPrettyName("Sort");
-        sort_class.setValues("none|id|value");
-        safeput("sort", sort_class);
+        StaticListClass sortClass = new StaticListClass(this);
+        sortClass.setName("sort");
+        sortClass.setPrettyName("Sort");
+        sortClass.setValues("none|id|value");
+        safeput(sortClass.getName(), sortClass);
+    }
 
-        BooleanClass cache_class = new BooleanClass(this);
-        cache_class.setName("cache");
-        cache_class.setPrettyName("Cache");
-        cache_class.setDisplayType("yesno");
-        cache_class.setDisplayFormType("checkbox");
-        cache_class.setDefaultValue(0);
-        safeput("cache", cache_class);
+    /**
+     * Adds the meta properties that control how list values are separated in edit and view mode.
+     */
+    private void addValueSeparatorMetaProperties()
+    {
+        StringClass separatorsClass = new StringClass(this);
+        separatorsClass.setName("separators");
+        separatorsClass.setPrettyName("Multiselect separators (for editing)");
+        separatorsClass.setSize(5);
+        safeput(separatorsClass.getName(), separatorsClass);
+
+        StringClass separatorClass = new StringClass(this);
+        separatorClass.setName("separator");
+        separatorClass.setPrettyName("Join separator (for display)");
+        separatorClass.setSize(5);
+        safeput(separatorClass.getName(), separatorClass);
+    }
+
+    /**
+     * Creates a new boolean property that is displayed as a check box.
+     * 
+     * @param checked whether the check box is checked or not by default
+     * @return a new {@link BooleanClass} instance that is displayed as a check box
+     */
+    private BooleanClass newCheckBox(boolean checked)
+    {
+        BooleanClass checkBox = new BooleanClass(this);
+        checkBox.setDisplayType("yesno");
+        checkBox.setDisplayFormType("checkbox");
+        checkBox.setDefaultValue(checked ? 1 : 0);
+        return checkBox;
     }
 }

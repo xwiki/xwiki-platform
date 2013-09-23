@@ -38,14 +38,12 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 @Singleton
 public class DefaultStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
+    /**
+     * Entity reference value provider used to provide default value.
+     */
     @Inject
     private EntityReferenceValueProvider provider;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStringEntityReferenceResolver#getDefaultValue
-     */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {

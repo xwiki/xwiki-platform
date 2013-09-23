@@ -21,7 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.stub.CustomStub;
@@ -53,8 +53,8 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         XWikiContext context = new XWikiContext();
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
 
-        doc.getxWikiClass().addNumberField("prop", "prop", 5, "long");
-        BaseObject obj = (BaseObject) doc.getxWikiClass().newObject(context);
+        doc.getXClass().addNumberField("prop", "prop", 5, "long");
+        BaseObject obj = (BaseObject) doc.getXClass().newObject(context);
         obj.setLongValue("prop", 1);
         doc.addObject(doc.getFullName(), obj);
 
@@ -130,9 +130,10 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         final Mock mockXWiki = mock(XWiki.class);
         mockXWiki.stubs().method("getRightService")
-            .will(returnValue((XWikiRightService)mockRightService.proxy()));
+            .will(returnValue(mockRightService.proxy()));
         mockXWiki.expects(once()).method("saveDocument").with(ANYTHING, ANYTHING, ANYTHING, ANYTHING)
             .will(new CustomStub("Make sure the contentAuthor is Alice") {
+                @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     assertEquals("Saving a document before calling dropPermissions() did not save as "

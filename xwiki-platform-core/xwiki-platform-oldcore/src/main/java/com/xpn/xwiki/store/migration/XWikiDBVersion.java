@@ -20,44 +20,59 @@
 package com.xpn.xwiki.store.migration;
 
 /**
- * This entity is store xwiki's data version in database. Used for migrations.
- * Data version is svn revision number from which data need migration.
- * Immutable.
+ * Stores XWiki's data version in the database. Used to find out which migrations to execute based on the current data
+ * version in the Database (each migration says which minimal version it requires to execute).
+ * <p/>
+ * The version scheme in the past was to use the SVN revision number of the commit of the migrator but since we've now
+ * moved to Git we're now using an integer matching the current XWiki version and allowing for a range of 1000
+ * migrations. So if you're writing the first migrator for version 5.2 of XWiki then the version will be 52000. If
+ * you're writing the 2nd migration for XWiki 5.2 then its version would be 52001, etc.
+ *
  * @version $Id$
  */
-public class XWikiDBVersion implements Comparable
+public class XWikiDBVersion implements Comparable<XWikiDBVersion>
 {
     /** svn revision number. */
     private int version;
-    /** Default constructor. It is need for Hibernate. */ 
-    public XWikiDBVersion() { }
+
+    /** Default constructor. It is need for Hibernate. */
+    public XWikiDBVersion()
+    {
+    }
+
     /** @param version - data version */
     public XWikiDBVersion(int version)
     {
         this.version = version;
     }
+
     /** @return data version */
     public int getVersion()
     {
         return version;
     }
+
     /** @param version - data version */
     protected void setVersion(int version)
     {
         this.version = version;
     }
-    /** {@inheritDoc} */
-    public int compareTo(Object arg0)
+
+    @Override
+    public int compareTo(XWikiDBVersion o)
     {
-        XWikiDBVersion o = (XWikiDBVersion) arg0;
-        return Integer.valueOf(getVersion()).compareTo(
-            Integer.valueOf(o.getVersion()));
+        if (o == null) {
+            return -1;
+        }
+        return Integer.valueOf(getVersion()).compareTo(o.getVersion());
     }
-    /** {@inheritDoc} */
+
+    @Override
     public String toString()
     {
-        return String.valueOf(version);
+        return String.valueOf(this.version);
     }
+
     /** @return next version */
     public XWikiDBVersion increment()
     {

@@ -21,10 +21,14 @@ package org.xwiki.rendering.internal.macro.velocity;
 
 import java.io.StringWriter;
 
-import org.apache.commons.lang.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -43,7 +47,9 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @version $Id$
  * @since 1.5M2
  */
-@Component("velocity")
+@Component
+@Named("velocity")
+@Singleton
 public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
 {
     /**
@@ -59,14 +65,20 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     /**
      * Used to get the Velocity Engine and Velocity Context to use to evaluate the passed Velocity script.
      */
-    @Requirement
+    @Inject
     private VelocityManager velocityManager;
 
     /**
      * The velocity macro configuration.
      */
-    @Requirement
+    @Inject
     private VelocityMacroConfiguration configuration;
+
+    /**
+     * The logger to log.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Default constructor.
@@ -77,17 +89,12 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             VelocityMacroParameters.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean supportsInlineMode()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String evaluateString(VelocityMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
@@ -147,9 +154,9 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
         VelocityMacroFilter filter = null;
         if (filterName != null) {
             try {
-                filter = getComponentManager().lookup(VelocityMacroFilter.class, filterName);
+                filter = getComponentManager().getInstance(VelocityMacroFilter.class, filterName);
             } catch (ComponentLookupException e) {
-                getLogger().error("Can't find velocity maco cleaner", e);
+                this.logger.error("Can't find velocity maco cleaner", e);
             }
         }
 

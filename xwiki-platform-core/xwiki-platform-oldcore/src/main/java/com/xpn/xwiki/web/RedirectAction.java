@@ -16,23 +16,24 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class RedirectAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
-        XWikiRequest request = context.getRequest();
+public class RedirectAction extends XWikiAction
+{
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         XWikiResponse response = context.getResponse();
 
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
-        if ((redirect == null)||(redirect.equals("")))
+        if ((redirect == null) || (redirect.equals("")))
             redirect = context.getURLFactory().createURL("Main", "WebHome", "view", context).toString();
         sendRedirect(response, redirect);
         return false;
-	}
+    }
 }

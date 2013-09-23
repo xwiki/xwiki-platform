@@ -16,26 +16,47 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
-import org.xwiki.xml.XMLUtils;
+import org.xwiki.diff.DiffManager;
+
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
+import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
+import com.xpn.xwiki.web.Utils;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
-    protected List<String> list = new ArrayList<String>();
+    /**
+     * Used to do the actual merge.
+     */
+    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
+
+    /**
+     * We make this a notifying list, because we must propagate any value updates to the owner document.
+     */
+    protected transient List<String> list;
 
     private String formStringSeparator = "|";
+
+    /**
+     * This is the actual list. It will be used during serialization/deserialization.
+     */
+    private List<String> actualList = new ArrayList<String>();
+
+    {
+        this.list = new NotifyList(this.actualList, this);
+    }
 
     public String getFormStringSeparator()
     {
@@ -47,31 +68,26 @@ public class ListProperty extends BaseProperty implements Cloneable
         this.formStringSeparator = formStringSeparator;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#getValue()
-     */
     @Override
     public Object getValue()
     {
         return getList();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#setValue(java.lang.Object)
-     */
     @Override
     public void setValue(Object value)
     {
         this.setList((List<String>) value);
     }
 
+    /**
+     * This method is called by Hibernate to get the raw value to store in the database. Check the xwiki.hbm.xml file.
+     * 
+     * @return the string value that is saved in the database
+     */
     public String getTextValue()
     {
-        return toFormString();
+        return toText();
     }
 
     @Override
@@ -81,7 +97,11 @@ public class ListProperty extends BaseProperty implements Cloneable
             return "";
         }
 
-        return StringUtils.join(getList().toArray(), " ");
+        List<String> escapedValues = new ArrayList<String>();
+        for (String value : getList()) {
+            escapedValues.add(value.replace(this.formStringSeparator, "\\" + this.formStringSeparator));
+        }
+        return StringUtils.join(escapedValues, this.formStringSeparator);
     }
 
     public String toSingleFormString()
@@ -89,29 +109,6 @@ public class ListProperty extends BaseProperty implements Cloneable
         return super.toFormString();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#toFormString()
-     */
-    @Override
-    public String toFormString()
-    {
-        List<String> list = getList();
-        StringBuilder result = new StringBuilder();
-        for (String item : list) {
-            result.append(XMLUtils.escape(item).replace(this.formStringSeparator, "\\" + this.formStringSeparator));
-            result.append(this.formStringSeparator);
-        }
-
-        return StringUtils.chomp(result.toString(), this.formStringSeparator);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -153,50 +150,83 @@ public class ListProperty extends BaseProperty implements Cloneable
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#clone()
-     */
     @Override
-    public Object clone()
+    public ListProperty clone()
     {
-        ListProperty property = (ListProperty) super.clone();
-        List<String> list = new ArrayList<String>();
-        for (String entry : getList()) {
-            list.add(entry);
-        }
-        property.setValue(list);
+        return (ListProperty) super.clone();
+    }
 
-        return property;
+    @Override
+    protected void cloneInternal(BaseProperty clone)
+    {
+        ListProperty property = (ListProperty) clone;
+        property.actualList = new ArrayList<String>();
+        for (String entry : getList()) {
+            property.actualList.add(entry);
+        }
+        property.list = new NotifyList(property.actualList, property);
     }
 
     public List<String> getList()
     {
+        // Hibernate will not set the owner of the notify list, so we must make sure this has been done before returning
+        // the list.
+        if (this.list instanceof NotifyList) {
+            ((NotifyList) this.list).setOwner(this);
+        } else if (this.list instanceof ListPropertyPersistentList) {
+            ((ListPropertyPersistentList) this.list).setOwner(this);
+        }
+
         return this.list;
     }
 
+    /**
+     * Starting from 4.3M2, this method will copy the list passed as parameter. Due to XWIKI-8398 we must be able to
+     * detect when the values in the list changes, so we cannot store the values in any type of list.
+     * 
+     * @param list The list to copy.
+     */
     public void setList(List<String> list)
     {
+        if (list == this.list || list == this.actualList) {
+            // Accept a caller that sets the already existing list instance.
+            return;
+        }
+
+        if (this.list instanceof ListPropertyPersistentList) {
+            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) this.list;
+            if (persistentList.isWrapper(list)) {
+                // Accept a caller that sets the already existing list instance.
+                return;
+            }
+        }
+
+        if (list instanceof ListPropertyPersistentList) {
+            // This is the list wrapper we are using for hibernate.
+            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) list;
+            this.list = persistentList;
+            persistentList.setOwner(this);
+            return;
+        }
+
         if (list == null) {
-            this.list = new ArrayList<String>();
+            setValueDirty(true);
+            this.actualList = new ArrayList();
+            this.list = new NotifyList(this.actualList, this);
         } else {
-            this.list = list;
-            // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
-            // safe to assume that a retrieved NULL value should actually be an empty string.
-            for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
-                if (it.next() == null) {
-                    it.remove();
-                }
+            this.list.clear();
+            this.list.addAll(list);
+        }
+
+        // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
+        // safe to assume that a retrieved NULL value should actually be an empty string.
+        for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
+            if (it.next() == null) {
+                it.remove();
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.BaseProperty#toXML()
-     */
     @Override
     public Element toXML()
     {
@@ -228,5 +258,81 @@ public class ListProperty extends BaseProperty implements Cloneable
         }
 
         return toXMLString();
+    }
+
+    @Override
+    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
+    {
+        MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+    }
+
+    /**
+     * List implementation for updating dirty flag when updated.
+     *
+     * This will be accessed from ListPropertyUserType.
+     */
+    public static class NotifyList extends AbstractNotifyOnUpdateList<String>
+    {
+
+        /** The owner list property. */
+        private ListProperty owner;
+
+        /** The dirty flag. */
+        private boolean dirty;
+
+        private List<String> actualList;
+
+        /**
+         * @param list {@link AbstractNotifyOnUpdateList}.
+         */
+        public NotifyList(List<String> list)
+        {
+            super(list);
+            this.actualList = list;
+        }
+
+        private NotifyList(List<String> list, ListProperty owner)
+        {
+            this(list);
+
+            this.owner = owner;
+        }
+
+        @Override
+        public void onUpdate()
+        {
+            setDirty();
+        }
+
+        /**
+         * @param owner The owner list property.
+         */
+        public void setOwner(ListProperty owner)
+        {
+            if (this.dirty) {
+                owner.setValueDirty(true);
+            }
+            this.owner = owner;
+            owner.actualList = this.actualList;
+        }
+
+        /**
+         * @return {@literal true} if the given argument is the instance that this list wraps.
+         */
+        public boolean isWrapper(Object collection)
+        {
+            return this.actualList == collection;
+        }
+
+        /**
+         * Set the dirty flag.
+         */
+        private void setDirty()
+        {
+            if (this.owner != null) {
+                this.owner.setValueDirty(true);
+            }
+            this.dirty = true;
+        }
     }
 }

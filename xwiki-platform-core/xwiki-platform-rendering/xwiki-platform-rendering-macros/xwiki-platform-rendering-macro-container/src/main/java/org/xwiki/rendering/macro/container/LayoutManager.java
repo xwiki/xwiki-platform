@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.container;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
 
 /**
@@ -33,7 +33,7 @@ import org.xwiki.rendering.block.Block;
  * @version $Id$
  * @since 2.5M2
  */
-@ComponentRole
+@Role
 public interface LayoutManager
 {
     /**

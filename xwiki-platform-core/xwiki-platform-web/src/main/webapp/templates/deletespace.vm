@@ -1,0 +1,25 @@
+###
+### Delete space confirm message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+#if ($message)
+  <div id="xwikimessage">$message</div>
+#end
+#set ($cancelURL = $doc.getURL())
+#if ($request.xredirect)
+  #set ($redirectparam = "&amp;xredirect=$escapetool.url($request.xredirect)")
+  #set ($cancelURL = $request.xredirect)
+#end
+#if ($xwiki.hasRecycleBin())
+  #set ($confirmationMessage = $services.localization.render('core.space.recyclebin.confirm', ["<em>${escapetool.xml($doc.space)}</em>"]))
+#else
+  #set ($confirmationMessage = $services.localization.render('core.space.delete.confirm', ["<em>${escapetool.xml($doc.space)}</em>"]))
+#end
+#xwikimessagebox($services.localization.render('core.delete') $confirmationMessage $doc.getURL('deletespace', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}") $escapetool.xml($cancelURL) $services.localization.render('yes') $services.localization.render('no'))
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- * 
  */
-
 /*
  * This file has been modified from the source code of
  * "SnipSnap Radeox Rendering Engine".
@@ -37,16 +35,17 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.radeox.filter.CacheFilter;
 import org.radeox.filter.ListFilter;
 import org.radeox.filter.context.FilterContext;
 import org.radeox.regex.MatchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Listfilter checks for lists in in its input. These are transformed to output lists, e.g. in HTML.
- * Recognizes different lists like numbered lists, unnumbered lists, greek lists, alpha lists etc.
+ * Listfilter checks for lists in in its input. These are transformed to output lists, e.g. in HTML. Recognizes
+ * different lists like numbered lists, unnumbered lists, greek lists, alpha lists etc.
  * 
  * @version $Id$
  */
@@ -55,7 +54,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
     /**
      * Log4J logger object to log messages in this class.
      */
-    private static Log log = LogFactory.getLog(XWikiListFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiListFilter.class);
 
     /**
      * Maps a wiki character (bullet) to the html markup printed at the start of the list.
@@ -132,13 +131,12 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
     }
 
     /**
-     * Method called whenever the wiki source matches the list syntax. It converts the wiki syntax
-     * to HTML markup.
+     * Method called whenever the wiki source matches the list syntax. It converts the wiki syntax to HTML markup.
      * 
      * @param buffer The output buffer, where the HTML code is printed.
      * @param result The regex match result; input is read from this Reader.
      * @param context The FilterContext object, used to get access to the Rendering context.
-     * @see ListFilter#handleMatch(StringBuffer, org.radeox.regex.MatchResult, org.radeox.filter.context.FilterContext) 
+     * @see ListFilter#handleMatch(StringBuffer, org.radeox.regex.MatchResult, org.radeox.filter.context.FilterContext)
      */
     @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
@@ -150,13 +148,12 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
             // following text begins on a new line, and not right after the closing list tag.
             buffer.append("\n");
         } catch (Exception e) {
-            log.warn("ListFilter: unable to get list content", e);
+            LOGGER.warn("ListFilter: unable to get list content", e);
         }
     }
 
     /**
-     * Converts a list item to the corresponding HTML markup, possibly closing or opening the
-     * neccessary lists.
+     * Converts a list item to the corresponding HTML markup, possibly closing or opening the neccessary lists.
      * 
      * @param buffer The output buffer to write HTML to.
      * @param reader Input is read from this Reader.
@@ -167,9 +164,8 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
         char[] lastBullet = new char[0];
         String line = null;
         while ((line = reader.readLine()) != null) {
-            // No nested list handling, trim lines:
             line = line.trim();
-            int bulletEnd = line.indexOf(' ');
+            int bulletEnd = StringUtils.indexOfAny(line, ' ', '\t');
             if (line.length() == 0 || bulletEnd < 1) {
                 continue;
             }
@@ -178,12 +174,11 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
                 bulletEnd--;
             }
             char[] bullet = line.substring(0, bulletEnd).toCharArray();
-            log.debug("found bullet: ('" + new String(lastBullet) + "') '" + new String(bullet)
-                + "'");
+            LOGGER.debug("found bullet: ('" + new String(lastBullet) + "') '" + new String(bullet) + "'");
 
             interpolateLists(buffer, lastBullet, bullet);
             openItem(buffer, bullet[bullet.length - 1]);
-            buffer.append(line.substring(line.indexOf(' ') + 1));
+            buffer.append(line.substring(StringUtils.indexOfAny(line, ' ', '\t') + 1).trim());
             lastBullet = bullet;
         }
 
@@ -223,7 +218,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
      */
     private void openList(StringBuffer buffer, char type)
     {
-        log.debug("opening " + type);
+        LOGGER.debug("opening " + type);
         buffer.append(OPEN_LIST.get(type));
     }
 
@@ -235,13 +230,13 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
      */
     private void closeList(StringBuffer buffer, char type)
     {
-        log.debug("closing " + type);
+        LOGGER.debug("closing " + type);
         buffer.append(CLOSE_LIST.get(type));
     }
 
     /**
-     * Makes the transition from the previous configuration of list types to the current one,
-     * closing and opening any needed lists/items.
+     * Makes the transition from the previous configuration of list types to the current one, closing and opening any
+     * needed lists/items.
      * 
      * @param buffer The output buffer to write HTML to.
      * @param previousBullets The previous list type configuration.
@@ -251,8 +246,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
     {
         int sharedPrefixEnd;
         for (sharedPrefixEnd = 0;; sharedPrefixEnd++) {
-            if ((crtBullets.length <= sharedPrefixEnd)
-                || (previousBullets.length <= sharedPrefixEnd)
+            if ((crtBullets.length <= sharedPrefixEnd) || (previousBullets.length <= sharedPrefixEnd)
                 || (crtBullets[sharedPrefixEnd] != previousBullets[sharedPrefixEnd])) {
                 break;
             }

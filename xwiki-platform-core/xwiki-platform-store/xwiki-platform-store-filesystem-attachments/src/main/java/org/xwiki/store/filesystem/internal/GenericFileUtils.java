@@ -20,8 +20,8 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * Internal class for providing static utilities used by multiple classes in this package.
@@ -39,14 +39,20 @@ final class GenericFileUtils
      */
     private static final String FILE_VERSION_PREFIX = "~v";
 
-    /** The character set to use for encoding and decoding. This should always be UTF-8. */
+    /**
+     * The character set to use for encoding and decoding. This should always be UTF-8.
+     */
     private static final String CHARSET = "UTF-8";
 
-    /** Error message to give if CHARSET is unavailable. */
+    /**
+     * Error message to give if CHARSET is unavailable.
+     */
     private static final String NO_CHARSET =
         "UTF-8 not available, this Java VM is not standards compliant!";
 
-    /** Private constructor for utility class. */
+    /**
+     * Private constructor for utility class.
+     */
     private GenericFileUtils()
     {
     }
@@ -96,7 +102,7 @@ final class GenericFileUtils
      * This means a file such as:
      * file.txt version 1.1 will become file~v1.1.txt and will still be recognized by a text editor
      * A file with no extension such as myUnknownFile version 1.1 will become myUnknownFile~v1.1
-     * Because of URL encoding, a file named file~v1.3.txt of version 1.1 will become 
+     * Because of URL encoding, a file named file~v1.3.txt of version 1.1 will become
      * file%7Ev1.3~1.1.txt and thus will not collide with file.txt version 1.1.
      *
      * @param filename the name of the file to save. This will be URL encoded.
@@ -111,8 +117,8 @@ final class GenericFileUtils
         if (attachFilename.contains(".")) {
             // file.txt version 1.1 --> file~v1.1.txt
             return attachFilename.substring(0, attachFilename.lastIndexOf('.'))
-                     + FILE_VERSION_PREFIX + version
-                     + attachFilename.substring(attachFilename.lastIndexOf('.'));
+                + FILE_VERSION_PREFIX + version
+                + attachFilename.substring(attachFilename.lastIndexOf('.'));
         }
         // someFile version 2.2 --> someFile~v2.2
         return attachFilename + FILE_VERSION_PREFIX + version;

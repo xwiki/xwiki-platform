@@ -1,21 +1,12 @@
-// ======================================
-// Full screen editing for page content
-// 
-// Make sure the XWiki 'namespace' exists.
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the editors 'namespace' exists.
-if (typeof(XWiki.widgets) == 'undefined') {
-  XWiki.widgets = new Object();
-}
-
+var XWiki = (function(XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
 /**
  * Full screen editing for textareas or maximizable elements.
  *
  * TODO Revisit once the new WYSIWYG supports inline editing.
  */
-XWiki.widgets.FullScreen = Class.create({
+widgets.FullScreen = Class.create({
   // Some layout settings, to be customized for other skins
   /** Maximized element margins */
   margin : 0,
@@ -52,12 +43,19 @@ XWiki.widgets.FullScreen = Class.create({
     $$('textarea', '.maximizable').each(function(element) {
       this.addBehavior(element);
     }.bind(this));
+    document.observe('xwiki:dom:updated', function(event) {
+      event.memo.elements.each(function(element) {
+        element.select('textarea', '.maximizable').each(function(element) {
+          this.addBehavior(element);
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
     // The GWT editor removes the textarea from the document, thus should be treated separately
     $$('.xRichTextEditor').each(function(item) {
       this.addBehavior(item);
     }.bind(this));
     // WYSIWYGR sends events when a new editor is created.
-    this.addWysiwyg20Listener();
+    this.addWysiwygListeners();
     // When comming back from preview, check if the user was in full screen before hitting preview, and if so restore
     // that full screen
     this.maximizedReference = $(document.body).down("input[name='x-maximized']");
@@ -67,6 +65,9 @@ XWiki.widgets.FullScreen = Class.create({
         this.makeFullScreen(matches[0]);
       }
     }
+    // Cleanup before the window unloads.
+    this.unloadHandler = this.cleanup.bind(this);
+    Event.observe(window, 'unload', this.unloadHandler);
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
@@ -87,21 +88,30 @@ XWiki.widgets.FullScreen = Class.create({
       this.addElementButton(item);
     }
   },
-  addWysiwyg20Listener : function () {
+  addWysiwygListeners : function () {
     document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
+    document.observe('xwiki:tinymce:created', this.wysiwyg10Created.bindAsEventListener(this));
+  },
+  wysiwyg10Created : function(event) {
+    var item = $(event.memo.instance);
+    this.removeTextareaLink(item);
+    this.addBehavior(item);
   },
   wysiwyg20Created : function(event) {
     var item = $(event.memo.instance.getRichTextArea()).up(".xRichTextEditor");
+    this.removeTextareaLink(item);
     this.addBehavior(item);
-    // Remove the old maximize link inserted for the plain textarea before the WYSIWYG was loaded
+  },
+  /* Remove the old maximize link inserted for the plain textarea before the WYSIWYG was loaded. */
+  removeTextareaLink : function(item) {
     while (true) {
-      item = item.up();
       if (!item) {
         return;
       } else if (item.previous(".fullScreenEditLinkContainer")) {
         item.previous(".fullScreenEditLinkContainer").remove();
         return;
       }
+      item = item.up();
     }
   },
   // Some simple functions that help deciding what kind of editor is the target element
@@ -208,9 +218,9 @@ XWiki.widgets.FullScreen = Class.create({
     // Create HTML element
     var fullScreenActivator = new Element('img', {
       'class': 'fullScreenEditButton',
-      title: "$msg.get('core.editors.fullscreen.editFullScreen')",
-      alt: "$msg.get('core.editors.fullscreen.editFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_out.gif')"
+      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
+      alt: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
+      src: "$xwiki.getSkinFile('icons/silk/arrow_out.png')"
     });
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
@@ -227,9 +237,9 @@ XWiki.widgets.FullScreen = Class.create({
     });
     var fullScreenActivator = new Element('a', {
       'class': 'fullScreenEditLink',
-      title: "$msg.get('core.editors.fullscreen.editFullScreen')"
+      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')"
     });
-    fullScreenActivator.update("${msg.get('core.editors.fullscreen.editFullScreen')} &raquo;")
+    fullScreenActivator.update("${services.localization.render('core.editors.fullscreen.editFullScreen')} &raquo;")
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
     // Add it to the container
@@ -247,9 +257,9 @@ XWiki.widgets.FullScreen = Class.create({
     // Create HTML element
     this.closeButton = new Element('img', {
       'class': 'fullScreenCloseButton',
-      title: "$msg.get('core.editors.fullscreen.exitFullScreen')",
-      alt: "$msg.get('core.editors.fullscreen.exitFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_in.gif')"
+      title: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
+      alt: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
+      src: "$xwiki.getSkinFile('icons/silk/arrow_in.png')"
     });
     // Add functionality
     this.closeButton.observe('click', this.closeFullScreen.bind(this));
@@ -262,7 +272,7 @@ XWiki.widgets.FullScreen = Class.create({
     this.actionCloseButton = new Element('input', {
       "type" : "button",
       'class': 'button',
-      value: "$msg.get('core.editors.fullscreen.exitFullScreen')"
+      value: "$services.localization.render('core.editors.fullscreen.exitFullScreen')"
     });
     this.actionCloseButtonWrapper = new Element('span', {
       'class': 'buttonwrapper'
@@ -315,7 +325,12 @@ XWiki.widgets.FullScreen = Class.create({
     };
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
-      iframe._originalStyle = {
+      // We store the original style of the rich text area on the editor element because the in-line frame used to
+      // implement the rich text area is renewed each time the rich text area is reloaded (e.g. when adding or editing a
+      // macro) to prevent the browser from adding a new history entry. The WYSIWYG editor could copy the JavaScript
+      // object properties whenever the in-line frame is cloned but it would have to filter some internal properties
+      // specific to GWT. Let's keep the hack here, for the moment. The code is not generic anyway.
+      targetElement._richTextAreaOriginalStyle = {
         'width' : iframe.style['width'],
         'height' : iframe.style['height']
       };
@@ -423,7 +438,7 @@ XWiki.widgets.FullScreen = Class.create({
     // Restore the WYSIWYGs
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
-      iframe.setStyle(iframe._originalStyle);
+      iframe.setStyle(targetElement._richTextAreaOriginalStyle);
     } else if (targetElement.hasClassName("mceEditorContainer")) {
       var iframe = targetElement.down(".mceEditorIframe");
       iframe.setStyle(iframe._originalStyle);
@@ -445,7 +460,9 @@ XWiki.widgets.FullScreen = Class.create({
       parent = parents[i];
       parent.setStyle(parent._originalStyle);
       parent.siblings().each(function(item) {
-        item.style['display'] = item._originalDisplay;
+        // IE8 does not like null values. Default to "" (specific to each element's type) for elements that were added
+        // while in full screen mode (like the Save & Continue notifications) and which don't have the _originalDisplay set.
+        item.style['display'] = item._originalDisplay || "";
       });
     }
     document.body.setStyle(document.body._originalStyle);
@@ -516,10 +533,23 @@ XWiki.widgets.FullScreen = Class.create({
   /** onMouseDown handler that prevents dragging the button. */
   preventDrag : function(event) {
     event.stop();
+  },
+  /** Cleans up the DOM tree when the user leaves the current page. */
+  cleanup : function() {
+    Event.stopObserving(window, 'unload', this.unloadHandler);
+    // Remove the "Exit full screen" action button because it can interfere with the browser's back-forward cache.
+    this.actionCloseButtonWrapper.remove();
   }
 });
 
-// Create the fullscreen behavior on startup.
-document.observe('xwiki:dom:loaded', function() {
-  new XWiki.widgets.FullScreen();
-});
+function init() {
+  return new widgets.FullScreen();
+}
+
+// When the document is loaded, enable the fullscreen behavior.
+(XWiki.domIsLoaded && init())
+|| document.observe("xwiki:dom:loaded", init);
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
+

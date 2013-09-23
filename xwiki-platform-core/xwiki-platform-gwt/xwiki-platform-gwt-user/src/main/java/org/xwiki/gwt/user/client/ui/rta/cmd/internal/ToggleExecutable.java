@@ -57,52 +57,32 @@ public class ToggleExecutable implements Executable
         this.offParameter = offParameter;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         return executable.execute(isExecuted() ? offParameter : onParameter);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return executable.isEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         String parameter = executable.getParameter();
         return onParameter == parameter || (onParameter != null && onParameter.equals(parameter));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return executable.isSupported();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         return null;

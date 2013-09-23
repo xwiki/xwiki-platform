@@ -16,10 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author jeremi
- * @author ldubost
- *
  */
 package com.xpn.xwiki.gwt.api.client;
 
@@ -334,7 +330,7 @@ public class Document implements IsSerializable {
         XObject obj = currentObj;
         if (obj==null)
          obj = getFirstObject(name);
-        return (String) obj.getViewProperty(name);
+        return obj.getViewProperty(name);
     }
 
     public Object getValue(String name) {
@@ -354,9 +350,9 @@ public class Document implements IsSerializable {
         if (obj==null)
          obj = getFirstObject(name);
         if (type.equals("edit"))
-            return (String) obj.getEditProperty(name);
+            return obj.getEditProperty(name);
         else
-         return (String) obj.getViewProperty(name);
+         return obj.getViewProperty(name);
     }
 
 

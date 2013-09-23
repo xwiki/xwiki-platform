@@ -27,14 +27,21 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration</artifactId>
-  <name>XWiki Platform - Administration</name>
-  <packaging>xar</packaging>
+  <name>XWiki Platform - Administration - Parent POM</name>
+  <packaging>pom</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <modules>
+    <module>xwiki-platform-administration-ui</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-administration-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

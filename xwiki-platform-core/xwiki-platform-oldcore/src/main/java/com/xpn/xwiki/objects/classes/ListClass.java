@@ -16,27 +16,25 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
@@ -44,11 +42,10 @@ import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 
 public abstract class ListClass extends PropertyClass
 {
+    private static final String XCLASSNAME = "list";
 
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -63,7 +60,7 @@ public abstract class ListClass extends PropertyClass
 
     public ListClass(PropertyMetaClass wclass)
     {
-        this("list", "List", wclass);
+        this(XCLASSNAME, "List", wclass);
     }
 
     public ListClass()
@@ -262,7 +259,6 @@ public abstract class ListClass extends PropertyClass
         }
 
         List<String> list = new ArrayList<String>();
-        ((ListProperty) prop).setList(list);
 
         if (strings.length == 0) {
             return prop;
@@ -280,6 +276,10 @@ public abstract class ListClass extends PropertyClass
                 list.add(item);
             }
         }
+
+        // setList will copy the list, so this call must be made last.
+        ((ListProperty) prop).setList(list);
+
         return prop;
     }
 
@@ -348,7 +348,7 @@ public abstract class ListClass extends PropertyClass
                 msgname = "option_" + value;
                 newresult = context.getMessageTool().get(msgname);
                 if (msgname.equals(newresult)) {
-                    return displayValue;
+                    newresult = displayValue;
                 }
             }
         }
@@ -400,9 +400,10 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context)
     {
         input input = new input();
+        input.setAttributeFilter(new XMLAttributeValueFilter());
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            input.setValue(prop.toFormString());
+            input.setValue(prop.toText());
         }
 
         input.setType("hidden");
@@ -428,11 +429,14 @@ public abstract class ListClass extends PropertyClass
             selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<String>();
             for (String value : selectlist) {
-                newlist.add(getDisplayValue(value, name, map, context));
+                // We have to escape the XML special chars because the output of the display methods is assumed to be
+                // HTML and the list values should be handled as plain text not HTML.
+                newlist.add(XMLUtils.escape(getDisplayValue(value, name, map, context)));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
+            // Escape the value because it has to be treated as plain text not HTML.
+            buffer.append(XMLUtils.escape(getDisplayValue(prop.getValue(), name, map, context)));
         }
     }
 
@@ -441,9 +445,10 @@ public abstract class ListClass extends PropertyClass
     {
         if (getDisplayType().equals("input")) {
             input input = new input();
+            input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
-                input.setValue(prop.toFormString());
+                input.setValue(prop.toText());
             }
             input.setType("text");
             input.setSize(getSize());
@@ -459,6 +464,7 @@ public abstract class ListClass extends PropertyClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);
         }
     }
@@ -480,9 +486,12 @@ public abstract class ListClass extends PropertyClass
             selectlist.add(String.valueOf(prop.getValue()));
         }
 
-        // TODO: add elements that are in the values but not in the predefined list..
+        // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
-            if (!list.contains(item)) {
+            // The empty value means no selection when it's not in the predefined list. Both the radio and the checkbox
+            // input support empty selection (unlike the select input which automatically selects the first value when
+            // single selection is on) so we don't have to generate a radio/checkbox for the empty value.
+            if (!StringUtils.isEmpty(item) && !list.contains(item)) {
                 list.add(item);
             }
         }
@@ -491,23 +500,30 @@ public abstract class ListClass extends PropertyClass
         int count = 0;
         for (Object rawvalue : list) {
             String value = getElementValue(rawvalue);
+            String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
             input radio =
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
                 + name, value);
-            radio.setID("xwiki-form-" + name + "-" + count);
+            radio.setAttributeFilter(new XMLAttributeValueFilter());
+            radio.setID("xwiki-form-" + name + "-" + object.getNumber() + "-" + count);
             radio.setDisabled(isDisabled());
 
             if (selectlist.contains(value)) {
                 radio.setChecked(true);
             }
-            radio.addElement(getDisplayValue(rawvalue, name, map, context));
+            radio.addElement(display);
 
-            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + name + "-" + count++ + "\">");
+            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + XMLUtils.escape(name) + "-"
+                + object.getNumber() + "-" + count++ + "\">");
             buffer.append(radio.toString());
             buffer.append("</label>");
         }
 
+        // We need a hidden input with an empty value to be able to clear the selected values when no value is selected
+        // from the above radio/checkbox buttons.
         org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+        hidden.setAttributeFilter(new XMLAttributeValueFilter());
+        hidden.setDisabled(isDisabled());
         buffer.append(hidden);
     }
 
@@ -520,6 +536,7 @@ public abstract class ListClass extends PropertyClass
             this.map = map;
         }
 
+        @Override
         public int compare(String o1, String o2)
         {
             ListItem s1 = this.map.get(o1);
@@ -545,6 +562,7 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setAttributeFilter(new XMLAttributeValueFilter());
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
         select.setName(prefix + name);
@@ -576,7 +594,7 @@ public abstract class ListClass extends PropertyClass
             selectlist.add(String.valueOf(prop.getValue()));
         }
 
-        // TODO: add elements that are in the values but not in the predefined list..
+        // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
             if (!list.contains(item)) {
                 list.add(item);
@@ -588,7 +606,8 @@ public abstract class ListClass extends PropertyClass
             String value = getElementValue(rawvalue);
             String display = getDisplayValue(rawvalue, name, map, context);
             option option = new option(display, value);
-            option.addElement(display);
+            option.setAttributeFilter(new XMLAttributeValueFilter());
+            option.addElement(XMLUtils.escape(display));
             if (selectlist.contains(value)) {
                 option.setSelected(true);
             }
@@ -602,120 +621,4 @@ public abstract class ListClass extends PropertyClass
 
     public abstract Map<String, ListItem> getMap(XWikiContext context);
 
-    @Override
-    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        if (getDisplayType().equals("input")) {
-            return super.displaySearch(name, prefix, criteria, context);
-        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
-            return displayRadioSearch(name, prefix, criteria, context);
-        } else {
-            return displaySelectSearch(name, prefix, criteria, context);
-        }
-    }
-
-    protected String displayRadioSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        StringBuffer buffer = new StringBuffer();
-        List<String> list = getList(context);
-        List<String> selectlist = new ArrayList<String>();
-
-        /*
-         * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist = new ArrayList(); }
-         * else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) { selectlist = (List)
-         * prop.getValue(); } else { selectlist = new ArrayList(); selectlist.add(prop.getValue()); }
-         */
-
-        // Add options from Set
-        for (Iterator<String> it = list.iterator(); it.hasNext();) {
-            String rawvalue = it.next();
-            String value = getElementValue(rawvalue);
-            String display = getDisplayValue(rawvalue, name, getMap(context), context);
-            input radio =
-                new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix + name, value);
-
-            if (selectlist.contains(value)) {
-                radio.setChecked(true);
-            }
-            radio.addElement(display);
-            buffer.append(radio.toString());
-            if (it.hasNext()) {
-                buffer.append("<br/>");
-            }
-        }
-        return buffer.toString();
-    }
-
-    protected String displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
-    {
-        select select = new select(prefix + name, 1);
-        select.setMultiple(true);
-        select.setSize(5);
-        select.setName(prefix + name);
-        select.setID(prefix + name);
-
-        List<String> list = getList(context);
-        String fieldFullName = getFieldFullName();
-        String[] selectArray = ((String[]) criteria.getParameter(fieldFullName));
-        List<String> selectlist = (selectArray != null) ? Arrays.asList(selectArray) : new ArrayList<String>();
-
-        /*
-         * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist = new ArrayList(); }
-         * else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) { selectlist = (List)
-         * prop.getValue(); } else { selectlist = new ArrayList(); selectlist.add(prop.getValue()); }
-         */
-
-        // Add options from Set
-        for (String rawvalue : list) {
-            String value = getElementValue(rawvalue);
-            String display = getDisplayValue(rawvalue, name, getMap(context), context);
-            option option = new option(display, value);
-            option.addElement(display);
-            if (selectlist.contains(value)) {
-                option.setSelected(true);
-            }
-            select.addElement(option);
-        }
-
-        return select.toString();
-    }
-
-    @Override
-    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
-    {
-        Object values = map.get(prefix);
-        if ((values == null) || (values.equals(""))) {
-            return;
-        }
-
-        // if multiselect
-        // :category member of obj.category
-        // otherwise 
-        // :category = obj.category
-        String separator = isMultiSelect() ? " member of " : " = ";
-
-
- 
-        if (values instanceof String) {
-            // general comparison '=' - tests at least one value =
-            criteriaList.add("'" + values.toString() + "'" + separator  + getFullQueryPropertyName());
-        } else {
-            String[] valuesarray = (String[]) values;
-            String[] criteriaarray = new String[valuesarray.length];
-            for (int i = 0; i < valuesarray.length; i++) {
-                criteriaarray[i] = "'" + valuesarray[i] + "'" + separator + getFullQueryPropertyName();
-            }
-            criteriaList.add("(" + StringUtils.join(criteriaarray, " or ") + ")");
-        }
-        return;
-    }
-
-    @Override
-    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
-    {
-        String[] data = map.get("");
-        if (data != null) {
-            query.setParam(getObject().getName() + "_" + getName(), data);
-        }
-    }
 }

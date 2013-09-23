@@ -26,7 +26,7 @@ import com.google.gwt.dom.client.Node;
  * nodes.
  * 
  * @version $Id$
- * @see http://www.w3.org/TR/DOM-Level-2-Traversal-Range/ranges.html
+ * @see "http://www.w3.org/TR/DOM-Level-2-Traversal-Range/ranges.html"
  */
 public interface Range
 {

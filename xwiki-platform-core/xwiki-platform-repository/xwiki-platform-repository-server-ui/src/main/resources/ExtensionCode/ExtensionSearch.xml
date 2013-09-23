@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>ExtensionCode</web>
+  <name>ExtensionSearch</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1291580123000</creationDate>
+  <date>1322142794000</date>
+  <contentUpdateDate>1322142794000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Search Extensions</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="XWiki.SearchCode"/}}
+
+{{velocity}}
+#set($allwikinamelist = ["extensions"])
+{{include document="$searchPage"/}}
+{{/velocity}}
+</content>
+</xwikidoc>

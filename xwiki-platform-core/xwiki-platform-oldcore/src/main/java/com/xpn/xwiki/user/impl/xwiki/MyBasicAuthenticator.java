@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.io.IOException;
@@ -28,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -45,6 +43,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         return processLogin(request, response, null);
     }
 
+    @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
         throws Exception
     {
@@ -60,6 +59,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         return false;
     }
 
+    @Override
     public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
         HttpServletResponse response, XWikiContext context) throws Exception
     {
@@ -205,6 +205,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         }
     }
 
+    @Override
     public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
         throws IOException
     {

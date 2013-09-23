@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -42,11 +41,6 @@ public class ExternalServletURLFactory extends XWikiServletURLFactory
         super(context);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.web.XWikiServletURLFactory#getURL(java.net.URL, com.xpn.xwiki.XWikiContext)
-     */
     @Override
     public String getURL(URL url, XWikiContext context)
     {

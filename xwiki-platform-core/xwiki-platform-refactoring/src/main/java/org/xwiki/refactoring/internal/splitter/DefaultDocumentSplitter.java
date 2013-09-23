@@ -20,17 +20,22 @@
 package org.xwiki.refactoring.internal.splitter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.IdBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.SectionBlock;
@@ -38,7 +43,10 @@ import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Default implementation of {@link DocumentSplitter}.
@@ -50,8 +58,11 @@ import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
     /**
-     * {@inheritDoc}
+     * The name of the anchor link parameter.
      */
+    private static final String ANCHOR_PARAMETER = "anchor";
+
+    @Override
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
     {
@@ -60,6 +71,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
         result.add(rootDoc);
         // Recursively split the root document.
         split(rootDoc, rootDoc.getXdom().getChildren(), 1, result, splittingCriterion, namingCriterion);
+        updateAnchors(result);
         return result;
     }
 
@@ -133,5 +145,60 @@ public class DefaultDocumentSplitter implements DocumentSplitter
             throw new IllegalArgumentException(
                 "A SectionBlock should either begin with a HeaderBlock or another SectionBlock.");
         }
+    }
+
+    /**
+     * Update the links to internal document fragments after those fragments have been moved as a result of the split.
+     * For instance the "#Chapter1" anchor will be updated to "ChildDocument#Chapter1" if the document fragment
+     * identified by "Chapter1" has been moved to "ChildDocument" as a result of the split.
+     * 
+     * @param documents the list of documents whose anchors to update
+     */
+    private void updateAnchors(List<WikiDocument> documents)
+    {
+        // First we need to collect all the document fragments and map them to their new location.
+        Map<String, String> fragments = collectDocumentFragments(documents);
+
+        // Update the anchors.
+        for (WikiDocument document : documents) {
+            for (LinkBlock linkBlock : document.getXdom().<LinkBlock> getBlocks(new ClassBlockMatcher(LinkBlock.class),
+                Axes.DESCENDANT)) {
+                ResourceReference reference = linkBlock.getReference();
+                String fragment = null;
+                if (reference.getType() == ResourceType.DOCUMENT && StringUtils.isEmpty(reference.getReference())) {
+                    fragment = reference.getParameter(ANCHOR_PARAMETER);
+                } else if (StringUtils.startsWith(reference.getReference(), "#")
+                    && (reference.getType() == ResourceType.PATH || reference.getType() == ResourceType.URL)) {
+                    fragment = reference.getReference().substring(1);
+                }
+
+                String targetDocument = fragments.get(fragment);
+                if (targetDocument != null && !targetDocument.equals(document.getFullName())) {
+                    // The fragment has been moved so we need to update the link.
+                    reference.setType(ResourceType.DOCUMENT);
+                    reference.setReference(targetDocument);
+                    reference.setParameter(ANCHOR_PARAMETER, fragment);
+                }
+            }
+        }
+    }
+
+    /**
+     * Looks for document fragments in the given documents. A document fragment is identified by an {@link IdBlock} for
+     * instance.
+     * 
+     * @param documents the list of documents whose fragments to collect
+     * @return the collection of document fragments mapped to the document that contains them
+     */
+    private Map<String, String> collectDocumentFragments(List<WikiDocument> documents)
+    {
+        Map<String, String> fragments = new HashMap<String, String>();
+        for (WikiDocument document : documents) {
+            for (IdBlock idBlock : document.getXdom().<IdBlock> getBlocks(new ClassBlockMatcher(IdBlock.class),
+                Axes.DESCENDANT)) {
+                fragments.put(idBlock.getName(), document.getFullName());
+            }
+        }
+        return fragments;
     }
 }

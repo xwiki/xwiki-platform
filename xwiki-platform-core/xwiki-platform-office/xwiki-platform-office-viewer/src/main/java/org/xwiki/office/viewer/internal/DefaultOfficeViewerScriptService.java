@@ -22,18 +22,22 @@ package org.xwiki.office.viewer.internal;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.artofsolving.jodconverter.document.DocumentFormat;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.office.viewer.OfficeViewerScriptService;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -48,8 +52,10 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @since 2.5M2
  * @version $Id$
  */
-@Component("officeviewer")
-public class DefaultOfficeViewerScriptService extends AbstractLogEnabled implements OfficeViewerScriptService
+@Component
+@Named("officeviewer")
+@Singleton
+public class DefaultOfficeViewerScriptService implements OfficeViewerScriptService
 {
     /**
      * The key used to save on the execution context the exception caught during office document view.
@@ -59,7 +65,7 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
     /**
      * The component used to view office documents.
      */
-    @Requirement
+    @Inject
     private OfficeViewer officeViewer;
 
     /**
@@ -67,91 +73,102 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
      * 
      * @see #isMimeTypeSupported(String)
      */
-    @Requirement
-    private OpenOfficeManager officeManager;
+    @Inject
+    private OfficeServer officeServer;
 
     /**
      * Used to lookup various {@link BlockRenderer} implementations based on the output syntax.
      */
-    @Requirement
+    @Inject
     private ComponentManager componentManager;
 
     /**
      * Reference to the current execution context, used to save the exception caught during office document view.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * The component used to check access rights on the document holding the office attachment to be viewed.
      */
-    @Requirement
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component used to perform the XDOM transformations.
      */
-    @Requirement
+    @Inject
     private TransformationManager transformationManager;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#getCaughtException()
+     * The logger to log.
      */
+    @Inject
+    private Logger logger;
+
+    @Override
     public Exception getCaughtException()
     {
-        return (Exception) execution.getContext().getProperty(OFFICE_VIEW_EXCEPTION);
+        return (Exception) this.execution.getContext().getProperty(OFFICE_VIEW_EXCEPTION);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#view(AttachmentReference)
-     */
+    @Override
     public String view(AttachmentReference attachmentReference)
     {
         Map<String, String> parameters = Collections.emptyMap();
         return view(attachmentReference, parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#view(AttachmentReference, Map)
-     */
+    @Override
     public String view(AttachmentReference attachmentReference, Map<String, String> parameters)
     {
         // Clear previous caught exception.
-        execution.getContext().removeProperty(OFFICE_VIEW_EXCEPTION);
+        this.execution.getContext().removeProperty(OFFICE_VIEW_EXCEPTION);
         try {
             DocumentReference documentReference = attachmentReference.getDocumentReference();
             // Check whether current user has view rights on the document containing the attachment.
-            if (!documentAccessBridge.isDocumentViewable(documentReference)) {
+            if (!this.documentAccessBridge.isDocumentViewable(documentReference)) {
                 throw new RuntimeException("Inadequate privileges.");
             }
 
             // Create the view and render the result.
-            Syntax fromSyntax = documentAccessBridge.getDocument(documentReference).getSyntax();
+            Syntax fromSyntax = this.documentAccessBridge.getDocument(documentReference).getSyntax();
             Syntax toSyntax = Syntax.XHTML_1_0;
-            return render(officeViewer.createView(attachmentReference, parameters), fromSyntax, toSyntax);
+            return render(this.officeViewer.createView(attachmentReference, parameters), fromSyntax, toSyntax);
         } catch (Exception e) {
             // Save caught exception.
-            execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
-            getLogger().error("Failed to view office document: " + attachmentReference, e);
+            this.execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
+            this.logger.error("Failed to view office document: " + attachmentReference, e);
             return null;
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficeViewerScriptService#isMimeTypeSupported(String)
-     */
+    @Override
     public boolean isMimeTypeSupported(String mimeType)
     {
-        OpenOfficeConverter converter = officeManager.getConverter();
-        return converter != null && converter.isMediaTypeSupported(mimeType);
+        return isConversionSupported(mimeType, "text/html");
+    }
+
+    /**
+     * Use this method to check if the unidirectional conversion from a document format (input media type) to another
+     * document format (output media type) is supported by this converter.
+     * 
+     * @param inputMediaType the media type of the input document
+     * @param outputMediaType the media type of the output document
+     * @return {@code true} if a document can be converted from the input media type to the output media type,
+     *         {@code false} otherwise
+     */
+    private boolean isConversionSupported(String inputMediaType, String outputMediaType)
+    {
+        OfficeConverter converter = this.officeServer.getConverter();
+        if (converter != null) {
+            DocumentFormat inputFormat = converter.getFormatRegistry().getFormatByMediaType(inputMediaType);
+            DocumentFormat outputFormat = converter.getFormatRegistry().getFormatByMediaType(outputMediaType);
+            return inputFormat != null && outputFormat != null
+                && outputFormat.getStoreProperties(inputFormat.getInputFamily()) != null;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -168,10 +185,10 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
         // Perform the transformations. This is required for office presentations which use the gallery macro to display
         // the slide images.
         TransformationContext context = new TransformationContext(xdom, fromSyntax);
-        transformationManager.performTransformations(xdom, context);
+        this.transformationManager.performTransformations(xdom, context);
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, toSyntax.toIdString());
+        BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, toSyntax.toIdString());
         renderer.render(xdom, printer);
         return printer.toString();
     }

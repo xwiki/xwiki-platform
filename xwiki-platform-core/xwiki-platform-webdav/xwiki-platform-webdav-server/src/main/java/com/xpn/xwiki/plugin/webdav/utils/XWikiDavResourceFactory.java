@@ -61,26 +61,19 @@ public class XWikiDavResourceFactory implements DavResourceFactory
         this.servletContext = servletContext;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResource createResource(DavResourceLocator locator, DavServletRequest request, DavServletResponse response)
         throws DavException
     {
         return createResource(locator, request.getDavSession(), request, response);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public DavResource createResource(DavResourceLocator locator, DavSession session) throws DavException
     {
         return createResource(locator, session, null, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public XWikiDavResource createResource(DavResourceLocator locator, DavSession session, DavServletRequest request,
         DavServletResponse response) throws DavException
     {

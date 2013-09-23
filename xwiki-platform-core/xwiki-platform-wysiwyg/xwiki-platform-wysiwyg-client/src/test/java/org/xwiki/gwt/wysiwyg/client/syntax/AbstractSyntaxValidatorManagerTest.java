@@ -20,8 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.syntax;
 
 import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
-import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
-
+import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidator;
 
 /**
  * Unit test for any concrete implementation of {@link SyntaxValidatorManager}.
@@ -41,7 +40,7 @@ public abstract class AbstractSyntaxValidatorManagerTest extends WysiwygTestCase
     public void testAddGetRemove()
     {
         SyntaxValidatorManager svm = newSyntaxValidatorManager();
-        XWikiSyntaxValidator xsv = new XWikiSyntaxValidator();
+        DefaultSyntaxValidator xsv = new DefaultSyntaxValidator("mock");
 
         assertNull(svm.getSyntaxValidator(xsv.getSyntax()));
         assertNull(svm.addSyntaxValidator(xsv));

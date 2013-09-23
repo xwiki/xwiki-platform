@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.store;
 
@@ -29,12 +28,12 @@ import java.util.Properties;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.connection.ConnectionProviderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -87,7 +86,7 @@ import org.hibernate.connection.ConnectionProviderFactory;
 public class DBCPConnectionProvider implements ConnectionProvider
 {
 
-    private static final Log log = LogFactory.getLog(DBCPConnectionProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBCPConnectionProvider.class);
 
     private static final String PREFIX = "hibernate.dbcp.";
 
@@ -99,18 +98,23 @@ public class DBCPConnectionProvider implements ConnectionProvider
     // Property doesn't exists in Hibernate2
     private static final String AUTOCOMMIT = "hibernate.connection.autocommit";
 
+    @Override
     public void configure(Properties props) throws HibernateException
     {
         try {
-            log.debug("Configure DBCPConnectionProvider");
+            LOGGER.debug("Configure DBCPConnectionProvider");
 
             // DBCP properties used to create the BasicDataSource
             Properties dbcpProperties = new Properties();
 
             // DriverClass & url
             String jdbcDriverClass = props.getProperty(Environment.DRIVER);
-            String jdbcUrl = props.getProperty(Environment.URL);
             dbcpProperties.put("driverClassName", jdbcDriverClass);
+
+            String jdbcUrl = System.getProperty(Environment.URL);
+            if (jdbcUrl == null) {
+                jdbcUrl = props.getProperty(Environment.URL);
+            }
             dbcpProperties.put("url", jdbcUrl);
 
             // Username / password. Only put username and password if they're not null. This allows
@@ -177,11 +181,11 @@ public class DBCPConnectionProvider implements ConnectionProvider
             }
 
             // Some debug info
-            if (log.isDebugEnabled()) {
-                log.debug("Creating a DBCP BasicDataSource with the following DBCP factory properties:");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Creating a DBCP BasicDataSource with the following DBCP factory properties:");
                 StringWriter sw = new StringWriter();
                 dbcpProperties.list(new PrintWriter(sw, true));
-                log.debug(sw.toString());
+                LOGGER.debug(sw.toString());
             }
 
             // Let the factory create the pool
@@ -199,7 +203,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
             String message =
                 "Could not create a DBCP pool. "
                     + "There is an error in the hibernate configuration file, please review it.";
-            log.fatal(message, e);
+            LOGGER.error(message, e);
             if (ds != null) {
                 try {
                     ds.close();
@@ -210,9 +214,10 @@ public class DBCPConnectionProvider implements ConnectionProvider
             }
             throw new HibernateException(message, e);
         }
-        log.debug("Configure DBCPConnectionProvider complete");
+        LOGGER.debug("Configure DBCPConnectionProvider complete");
     }
 
+    @Override
     public Connection getConnection() throws SQLException
     {
         Connection conn = null;
@@ -224,6 +229,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
         return conn;
     }
 
+    @Override
     public void closeConnection(Connection conn) throws SQLException
     {
         try {
@@ -233,31 +239,36 @@ public class DBCPConnectionProvider implements ConnectionProvider
         }
     }
 
+    @Override
     public void close() throws HibernateException
     {
-        log.debug("Close DBCPConnectionProvider");
+        LOGGER.debug("Close DBCPConnectionProvider");
         logStatistics();
         try {
             if (ds != null) {
                 ds.close();
                 ds = null;
             } else {
-                log.warn("Cannot close DBCP pool (not initialized)");
+                LOGGER.warn("Cannot close DBCP pool (not initialized)");
             }
         } catch (Exception e) {
             throw new HibernateException("Could not close DBCP pool", e);
         }
-        log.debug("Close DBCPConnectionProvider complete");
+        LOGGER.debug("Close DBCPConnectionProvider complete");
     }
 
     /**
      * Does this connection provider support aggressive release of JDBC connections and re-acquistion of those
-     * connections (if need be) later? <p/> This is used in conjunction with
-     * {@link org.hibernate.cfg.Environment.RELEASE_CONNECTIONS} to aggressively release JDBC connections. However, the
-     * configured ConnectionProvider must support re-acquisition of the same underlying connection for that semantic to
-     * work. <p/> Typically, this is only true in managed environments where a container tracks connections by
-     * transaction or thread.
+     * connections (if need be) later?
+     * <p/>
+     * This is used in conjunction with {@link org.hibernate.cfg.Environment#RELEASE_CONNECTIONS} to aggressively
+     * release JDBC connections. However, the configured ConnectionProvider must support re-acquisition of the same
+     * underlying connection for that semantic to work.
+     * <p/>
+     * Typically, this is only true in managed environments where a container tracks connections by transaction or
+     * thread.
      */
+    @Override
     public boolean supportsAggressiveRelease()
     {
         return false;
@@ -265,8 +276,8 @@ public class DBCPConnectionProvider implements ConnectionProvider
 
     protected void logStatistics()
     {
-        if (log.isInfoEnabled()) {
-            log.info("active: " + ds.getNumActive() + " (max: " + ds.getMaxActive() + ")   " + "idle: "
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("active: " + ds.getNumActive() + " (max: " + ds.getMaxActive() + ")   " + "idle: "
                 + ds.getNumIdle() + "(max: " + ds.getMaxIdle() + ")");
         }
     }

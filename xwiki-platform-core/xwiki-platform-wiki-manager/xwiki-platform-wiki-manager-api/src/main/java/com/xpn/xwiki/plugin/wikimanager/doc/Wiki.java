@@ -1,12 +1,32 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.wikimanager.doc;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,7 +50,12 @@ public class Wiki extends Document
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(Wiki.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Wiki.class);
+
+    /**
+     * Used to access translations.
+     */
+    private ContextualLocalizationManager localizationManager;
 
     /**
      * Create instance of wiki descriptor.
@@ -42,6 +67,8 @@ public class Wiki extends Document
     public Wiki(XWikiDocument xdoc, XWikiContext context) throws XWikiException
     {
         super(xdoc, context);
+
+        this.localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
     }
 
     /**
@@ -65,25 +92,27 @@ public class Wiki extends Document
         String wikiName = getWikiName();
 
         if (wikiName.equals(this.context.getMainXWiki())) {
-            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool.getDefault(
-                this.context).get(WikiManagerMessageTool.ERROR_DELETEMAINWIKI, wikiName));
+            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_DELETEMAINWIKI, wikiName));
         }
 
-        if (hasAdminRights()) {
-            try {
-                this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
-                Utils.getComponent(ObservationManager.class).notify(new WikiDeletedEvent(wikiName), wikiName,
-                    this.context);
-            } catch (XWikiException e) {
-                LOG.error("Failed to delete wiki from database", e);
+        if (deleteDatabase) {
+            if (hasAdminRights()) {
+                try {
+                    this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
+                } catch (XWikiException e) {
+                    LOGGER.error("Failed to delete wiki from database", e);
+                }
+            } else {
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI,
+                        wikiName));
             }
-            this.context.getWiki().getVirtualWikiList().remove(wikiName);
-        } else {
-            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool.getDefault(
-                this.context).get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
         }
 
         super.delete();
+
+        Utils.getComponent(ObservationManager.class).notify(new WikiDeletedEvent(wikiName), wikiName, this.context);
     }
 
     /**
@@ -126,8 +155,8 @@ public class Wiki extends Document
             }
         }
 
-        throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALIASDOESNOTEXISTS, WikiManagerMessageTool
-            .getDefault(this.context).get(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS,
+        throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALIASDOESNOTEXISTS,
+            this.localizationManager.getTranslationPlain(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS,
                 getWikiName() + " - " + domain));
     }
 
@@ -203,11 +232,6 @@ public class Wiki extends Document
         return contains;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

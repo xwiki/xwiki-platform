@@ -28,21 +28,40 @@ package org.xwiki.model.reference;
  */
 public class InvalidEntityReferenceException extends RuntimeException
 {
+    /**
+     * Create a new invalid entity reference exception.
+     */
     public InvalidEntityReferenceException()
     {
         super();
     }
 
+    /**
+     * Create a new invalid entity reference exception with a message.
+     *
+     * @param message the message
+     */
     public InvalidEntityReferenceException(String message)
     {
         super(message);
     }
 
+    /**
+     * Create a new invalid entity reference exception with a message and a cause.
+     *
+     * @param message the message
+     * @param throwable the cause
+     */
     public InvalidEntityReferenceException(String message, Throwable throwable)
     {
         super(message, throwable);
     }
 
+    /**
+     * Create a new invalid entity reference exception with a cause.
+     *
+     * @param throwable the cause
+     */
     public InvalidEntityReferenceException(Throwable throwable)
     {
         super(throwable);

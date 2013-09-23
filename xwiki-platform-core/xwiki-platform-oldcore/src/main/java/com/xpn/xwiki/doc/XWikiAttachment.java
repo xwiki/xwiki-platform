@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayOutputStream;
@@ -30,9 +28,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -40,8 +37,11 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.AttachmentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,7 +50,7 @@ import com.xpn.xwiki.internal.xml.XMLWriter;
 
 public class XWikiAttachment implements Cloneable
 {
-    private static final Log LOG = LogFactory.getLog(XWikiAttachment.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachment.class);
 
     private XWikiDocument doc;
 
@@ -72,9 +72,10 @@ public class XWikiAttachment implements Cloneable
 
     private boolean isMetaDataDirty = false;
 
+    private AttachmentReference reference;
+
     public XWikiAttachment(XWikiDocument doc, String filename)
     {
-        this();
         setDoc(doc);
         setFilename(filename);
     }
@@ -86,6 +87,15 @@ public class XWikiAttachment implements Cloneable
         this.author = "";
         this.comment = "";
         this.date = new Date();
+    }
+
+    public AttachmentReference getReference()
+    {
+        if (this.reference == null) {
+            this.reference = new AttachmentReference(this.filename, this.doc.getDocumentReference());
+        }
+
+        return this.reference;
     }
 
     public long getId()
@@ -110,11 +120,6 @@ public class XWikiAttachment implements Cloneable
     {
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone()
     {
@@ -123,16 +128,16 @@ public class XWikiAttachment implements Cloneable
             attachment = getClass().newInstance();
         } catch (Exception e) {
             // This should not happen
-            LOG.error("exception while attach.clone", e);
+            LOGGER.error("exception while attach.clone", e);
         }
 
         attachment.setAuthor(getAuthor());
         attachment.setComment(getComment());
         attachment.setDate(getDate());
-        attachment.setDoc(getDoc());
         attachment.setFilename(getFilename());
         attachment.setFilesize(getFilesize());
         attachment.setRCSVersion(getRCSVersion());
+        attachment.setMetaDataDirty(isMetaDataDirty());
         if (getAttachment_content() != null) {
             attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
             attachment.getAttachment_content().setAttachment(attachment);
@@ -141,6 +146,8 @@ public class XWikiAttachment implements Cloneable
             attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
             attachment.getAttachment_archive().setAttachment(attachment);
         }
+
+        attachment.setDoc(getDoc());
 
         return attachment;
     }
@@ -169,8 +176,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @param context current XWikiContext
-     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be
-     *         publicly changed.
+     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -190,11 +196,11 @@ public class XWikiAttachment implements Cloneable
 
     public void setFilename(String filename)
     {
-        filename = filename.replaceAll("\\+", " ");
         if (!filename.equals(this.filename)) {
             setMetaDataDirty(true);
             this.filename = filename;
         }
+        this.reference = null;
     }
 
     public String getAuthor()
@@ -266,6 +272,14 @@ public class XWikiAttachment implements Cloneable
     public void setDoc(XWikiDocument doc)
     {
         this.doc = doc;
+        this.reference = null;
+        if (isMetaDataDirty() && doc != null) {
+            doc.setMetaDataDirty(true);
+        }
+        if (getAttachment_content() != null)
+        {
+            getAttachment_content().setOwnerDocument(doc);
+        }
     }
 
     public Date getDate()
@@ -309,11 +323,15 @@ public class XWikiAttachment implements Cloneable
     public void setMetaDataDirty(boolean metaDataDirty)
     {
         this.isMetaDataDirty = metaDataDirty;
+        if (metaDataDirty && doc != null)
+        {
+            doc.setMetaDataDirty(true);
+        }
     }
 
     /**
      * Retrieve an attachment as an XML string. You should prefer
-     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)}
      * to avoid memory loads when appropriate.
      *
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
@@ -431,7 +449,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * Retrieve XML representation of attachment's metadata into an {@link Element}. You should prefer
-     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)}
      * to avoid memory loads when appropriate.
      *
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
@@ -458,7 +476,7 @@ public class XWikiAttachment implements Cloneable
     public void fromXML(String data) throws XWikiException
     {
         SAXReader reader = new SAXReader();
-        Document domdoc = null;
+        Document domdoc;
         try {
             StringReader in = new StringReader(data);
             domdoc = reader.read(in);
@@ -493,6 +511,11 @@ public class XWikiAttachment implements Cloneable
             String archive = archiveel.getText();
             setArchive(archive);
         }
+
+        // The setters we're calling above will set the metadata dirty flag to true since they're changing the
+        // attachment's identity. However since this method is about loading the attachment from XML it shouldn't be
+        // considered as dirty.
+        setMetaDataDirty(false);
     }
 
     public XWikiAttachmentContent getAttachment_content()
@@ -503,6 +526,9 @@ public class XWikiAttachment implements Cloneable
     public void setAttachment_content(XWikiAttachmentContent attachment_content)
     {
         this.attachment_content = attachment_content;
+        if (attachment_content != null) {
+            attachment_content.setOwnerDocument(doc);
+        }
     }
 
     public XWikiAttachmentArchive getAttachment_archive()
@@ -592,25 +618,31 @@ public class XWikiAttachment implements Cloneable
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOG.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s", getFilename(), getDoc()
-                .getFullName(), ex.getMessage()));
-
+            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}",
+                new Object[] {getFilename(), getDoc().getDocumentReference(), ex.getMessage()});
             return new Version[] {new Version(this.getVersion())};
         }
     }
 
-    // We assume versions go from 1.1 to the current one
-    // This allows not to read the full archive file
-    public synchronized List<Version> getVersionList() throws XWikiException
+    /**
+     * Get the list of all versions up to the current.
+     * We assume versions go from 1.1 to the current one
+     * This allows not to read the full archive file.
+     *
+     * @return a list of Version from 1.1 to the current version.
+     * @throws XWikiException never happens.
+     */
+    public List<Version> getVersionList() throws XWikiException
     {
-        List<Version> list = new ArrayList<Version>();
+        final List<Version> list = new ArrayList<Version>();
+        final String currentVersion = this.version.toString();
         Version v = new Version("1.1");
-        while (true) {
+        for (;;) {
             list.add(v);
-            if (v.toString().equals(this.version.toString())) {
+            if (v.toString().equals(currentVersion)) {
                 break;
             }
-            v.next();
+            v = v.next();
         }
 
         return list;
@@ -673,9 +705,10 @@ public class XWikiAttachment implements Cloneable
             try {
                 context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
             } catch (Exception ex) {
-                LOG.warn(String.format("Failed to load content for attachment [%s@%s]. "
-                    + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
-                    getFilename(), (this.doc != null) ? this.doc.getFullName() : "<unknown>", ex.getMessage()));
+                LOGGER.warn("Failed to load content for attachment [{}@{}]. "
+                    + "This attachment is broken, please consider re-uploading it. Internal error: {}", new Object[] {
+                    getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>",
+                    ex.getMessage()});
             }
         }
     }
@@ -687,9 +720,10 @@ public class XWikiAttachment implements Cloneable
                 this.attachment_archive =
                     context.getWiki().getAttachmentVersioningStore().loadArchive(this, context, true);
             } catch (Exception ex) {
-                LOG.warn(String.format("Failed to load archive for attachment [%s@%s]. "
-                    + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
-                    getFilename(), (this.doc != null) ? this.doc.getFullName() : "<unknown>", ex.getMessage()));
+                LOGGER.warn("Failed to load archive for attachment [{}@{}]. "
+                    + "This attachment is broken, please consider re-uploading it. Internal error: {}", new Object[] {
+                    getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>",
+                    ex.getMessage()});
             }
         }
 
@@ -708,13 +742,8 @@ public class XWikiAttachment implements Cloneable
 
     public String getMimeType(XWikiContext context)
     {
-        // Choose the right content type
-        String mimetype = context.getEngineContext().getMimeType(getFilename().toLowerCase());
-        if (mimetype != null) {
-            return mimetype;
-        } else {
-            return "application/octet-stream";
-        }
+        // TODO: Try the stream too in case the extension in unknown (might be expensive to load it just for this) ?
+        return new Tika().detect(getFilename());
     }
 
     public boolean isImage(XWikiContext context)

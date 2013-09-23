@@ -42,7 +42,6 @@ import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -52,11 +51,6 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class RichTextEditorController implements Updatable, MouseUpHandler, KeyUpHandler, CommandListener, LoadHandler
 {
-    /**
-     * The string used to identify the menu bar extension point.
-     */
-    public static final String MENU_ROLE = "menu";
-
     /**
      * The list of plugins this controller will attempt to load by default if the configuration doesn't specify which
      * plugins to load.
@@ -83,6 +77,11 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      * A reference to the rich text editor.
      */
     private final RichTextEditor richTextEditor;
+
+    /**
+     * The object used to manage the menu bar.
+     */
+    private final MenuBarController menuBarController;
 
     /**
      * The object used to manage the tool bar.
@@ -137,6 +136,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         // Put the rich text editor in loading state until we finish loading it. See #onLoad(LoadEvent event)
         richTextEditor.setLoading(true);
 
+        menuBarController = new MenuBarController(richTextEditor.getMenu());
         toolBarController = new ToolBarController(richTextEditor.getToolbar());
 
         this.syntaxValidator = syntaxValidator;
@@ -231,7 +231,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
 
             loadPlugins();
             extendRootUI();
-            fillMenu();
+            menuBarController.fill(config, pluginManager);
             toolBarController.fill(config, pluginManager);
 
             richTextEditor.setLoading(false);
@@ -261,21 +261,6 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
             UIExtension rootExtension = pluginManager.getUIExtension("root", rootExtensionNames[i]);
             if (rootExtension != null) {
                 richTextEditor.getContainer().add((Widget) rootExtension.getUIObject(rootExtensionNames[i]));
-            }
-        }
-    }
-
-    /**
-     * Fills the menu of the editor.
-     */
-    protected void fillMenu()
-    {
-        // By default we don't show the menu (the list of menu entries is empty if not specified in the configuration).
-        String[] entries = config.getParameter(MENU_ROLE, "").split(WHITE_SPACE_SEPARATOR);
-        for (int i = 0; i < entries.length; i++) {
-            UIExtension uie = pluginManager.getUIExtension(MENU_ROLE, entries[i]);
-            if (uie != null) {
-                richTextEditor.getMenu().addItem((MenuItem) uie.getUIObject(entries[i]));
             }
         }
     }
@@ -333,6 +318,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      */
     public void destroy()
     {
+        menuBarController.destroy();
         toolBarController.destroy();
         // Unload all the plug-ins.
         pluginManager.unloadAll();

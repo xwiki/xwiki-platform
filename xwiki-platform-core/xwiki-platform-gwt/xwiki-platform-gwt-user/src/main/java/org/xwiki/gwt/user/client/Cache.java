@@ -35,7 +35,7 @@ public class Cache
      * 
      * @param <T> the type of the cached object
      */
-    public static interface CacheCallback<T>
+    public interface CacheCallback<T>
     {
         /**
          * @return the object to be cached

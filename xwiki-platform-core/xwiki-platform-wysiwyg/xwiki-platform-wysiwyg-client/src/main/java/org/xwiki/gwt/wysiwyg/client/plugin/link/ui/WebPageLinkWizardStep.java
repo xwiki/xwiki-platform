@@ -37,68 +37,42 @@ public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
     public WebPageLinkWizardStep(WikiServiceAsync wikiService)
     {
         super(wikiService);
+        setStepTitle(Strings.INSTANCE.linkToWebPage());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#getURLTextBoxTooltip()
-     */
+    @Override
     protected String getURLTextBoxTooltip()
     {
         return Strings.INSTANCE.linkURLToWebPageTextBoxTooltip();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#getURLErrorMessage()
-     */
+    @Override
     protected String getURLErrorMessage()
     {
         return Strings.INSTANCE.linkWebPageAddressError();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#getURLLabel()
-     */
+    @Override
     protected String getURLLabel()
     {
         return Strings.INSTANCE.linkWebPageLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getURLHelpLabel()
     {
         return Strings.INSTANCE.linkWebPageHelpLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkTab#buildURL()
-     */
-    protected String buildURL()
+    @Override
+    protected String getURL()
     {
-        String webPageAddress = getUrlTextBox().getText().trim();
+        String webPageAddress = super.getURL();
         // If no protocol is specified add HTTP by default.
         if (!webPageAddress.contains("://")) {
             webPageAddress = "http://" + webPageAddress;
         }
 
         return webPageAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getStepTitle()
-    {
-        return Strings.INSTANCE.linkToWebPage();
     }
 }

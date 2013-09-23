@@ -133,7 +133,7 @@ public class ElementTest extends DOMTestCase
         String html = "<h1>header</h1><p>paragraph</p><ul><li>list</li></ul>";
         Element element = getDocument().createDivElement().cast();
         element.xSetInnerHTML(html);
-        assertEquals("<div>" + html + "</div>", element.xGetString().toLowerCase());
+        assertEquals("<div>" + html + "</div>", element.xGetString().toLowerCase().replace("\r\n", ""));
     }
 
     /**

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.internal.observation.remote.converter;
 
@@ -24,14 +23,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.LazyXWikiDocument;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
@@ -58,15 +59,21 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     private static final String ORIGDOC_LANGUAGE = "origdoclanguage";
 
     /**
+     * The logger to log.
+     */
+    @Inject
+    protected Logger logger;
+
+    /**
      * Used to set some proper context informations.
      */
-    @Requirement
+    @Inject
     private Execution execution;
 
     /**
      * Generate stub XWikiContext.
      */
-    @Requirement
+    @Inject
     private XWikiStubContextProvider stubContextProvider;
 
     /**
@@ -95,7 +102,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
             xcontext = this.stubContextProvider.createStubContext();
 
             if (xcontext != null) {
-                context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+                xcontext.declareInExecutionContext(context);
             }
         }
 
@@ -116,10 +123,9 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
             xcontext.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
             xcontext.setUser((String) remoteDataMap.get(CONTEXT_USER));
         } else {
-            getLogger().warn(
-                "Can't get a proper XWikiContext."
-                    + " It generally mean that the wiki has never been fully initialized,"
-                    + " i.e. has never been accesses at least once");
+            this.logger.warn("Can't get a proper XWikiContext."
+                + " It generally mean that the wiki has never been fully initialized,"
+                + " i.e. has never been accesses at least once");
         }
 
         return xcontext;
@@ -150,11 +156,31 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         return remoteDataMap;
     }
 
+    protected XWikiDocument getDocument(DocumentReference documentReference, String language, String version)
+        throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiStubContext();
+
+        XWikiDocument document = new XWikiDocument(documentReference);
+        document.setLanguage(language);
+
+        // Force bypassing the cache to make extra sure we get the last version of the document.
+        XWikiDocument targetDocument = xcontext.getWiki().getNotCacheStore().loadXWikiDoc(document, xcontext);
+
+        if (!targetDocument.getVersion().equals(version)) {
+            // It's not the last version of the document, ask versioning store.
+            targetDocument = xcontext.getWiki().getVersioningStore().loadXWikiDoc(document, version, xcontext);
+        }
+
+        return targetDocument;
+    }
+
     /**
      * @param remoteData the serialized version of the document
      * @return the document
+     * @throws XWikiException when failing to unserialize document
      */
-    protected XWikiDocument unserializeDocument(Serializable remoteData)
+    protected XWikiDocument unserializeDocument(Serializable remoteData) throws XWikiException
     {
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
@@ -164,18 +190,18 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         if (remoteDataMap.get(DOC_VERSION) == null) {
             doc = new XWikiDocument(docReference);
         } else {
-            doc = new LazyXWikiDocument(docReference);
-            doc.setLanguage((String) remoteDataMap.get(DOC_LANGUAGE));
-            doc.setVersion((String) remoteDataMap.get(DOC_VERSION));
+            doc =
+                getDocument(docReference, (String) remoteDataMap.get(DOC_LANGUAGE),
+                    (String) remoteDataMap.get(DOC_VERSION));
         }
 
         XWikiDocument origDoc;
         if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
             origDoc = new XWikiDocument(docReference);
         } else {
-            origDoc = new LazyXWikiDocument(docReference);
-            origDoc.setLanguage((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
-            origDoc.setVersion((String) remoteDataMap.get(ORIGDOC_VERSION));
+            origDoc =
+                getDocument(docReference, (String) remoteDataMap.get(ORIGDOC_LANGUAGE),
+                    (String) remoteDataMap.get(ORIGDOC_VERSION));
         }
 
         doc.setOriginalDocument(origDoc);

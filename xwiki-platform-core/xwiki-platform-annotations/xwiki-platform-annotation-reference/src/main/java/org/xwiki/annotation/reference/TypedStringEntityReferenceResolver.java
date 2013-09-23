@@ -19,7 +19,7 @@
  */
 package org.xwiki.annotation.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
@@ -37,7 +37,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 2.3M1
  */
-@ComponentRole
+@Role
 public interface TypedStringEntityReferenceResolver
 {
     /**

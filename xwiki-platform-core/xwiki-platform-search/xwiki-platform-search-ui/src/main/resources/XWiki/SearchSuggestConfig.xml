@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
-<web>XWiki</web>
-<name>SearchSuggestConfig</name>
-<language></language>
-<defaultLanguage>en</defaultLanguage>
-<translation>0</translation>
-<parent>XWiki.SearchCode</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
-<customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1280310893000</creationDate>
-<date>1299414309000</date>
-<contentUpdateDate>1299414309000</contentUpdateDate>
-<version>1.1</version>
-<title>Search Suggest Configuration</title>
-<template></template>
-<defaultTemplate></defaultTemplate>
-<validationScript></validationScript>
-<comment></comment>
-<minorEdit>false</minorEdit>
-<syntaxId>xwiki/2.0</syntaxId>
-<hidden>false</hidden><attachment>
-<filename>search-suggest.png</filename>
-<filesize>13122</filesize>
-<author>xwiki:XWiki.Admin</author>
-<date>1299806111000</date>
-<version>1.1</version>
-<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAzCUlEQVR4XuyYy28bVRTGz52X7ZmJ
+  <web>XWiki</web>
+  <name>SearchSuggestConfig</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.SearchCode</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1280310893000</creationDate>
+  <date>1299414309000</date>
+  <contentUpdateDate>1299414309000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Search Suggest Configuration</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>search-suggest.png</filename>
+    <filesize>13122</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1299806111000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAzCUlEQVR4XuyYy28bVRTGz52X7ZmJ
 5+HYrm1oqsSERVFV8VrxN6AiyrpsYINYsUBsSooogr+gy66pVJaNgrLLohJqkAqJRFxVVOoDlYY2
 aUNsz3jGfMe5jEbVWKPIQaCQm3z6zswdR6P7u+ec62h0NP53SqAPh8MjAIdcQogUdKkrV74dC8A0
 Tbp2bZEuXbp0aAEsLHxOp06doiAIkkWaZHAipWPp6bgIs0iQJUiYgOIriuLBPVVVHcS1MAxXbNte
@@ -257,940 +260,2045 @@ Znb7sTCr7KOA/VhSQOTtlANpxVFiMquJtnOpGfwW449oH+CR9XNmOl4hrqQo0ZbM/tVs3r02Go2O
 VJc6Uobsy6M/iJJAJ4G/LktE9SjnIv9MArK7B+gRfLAy3ZNrATvWlcvLC3nffIh+wqn827jisPYC
 fEEyAvgPQDcf8T50jL2UxrwU+CqUsUkQHSw8y0u2j6BDXCtmOhoMW62n1MUAPdRNlgJ4Aa/KPnQf
 vDHYXecbFegLFc5cvff06pssIewCH+JCPz4+MQMPDg7H47W8jYosvyh0ov8lWcvPX5eV7+34Mm1x
-AAAAAElFTkSuQmCC</content></attachment>
-<class>
-<name>XWiki.SearchSuggestConfig</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<name>activated</name>
-<number>1</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-</class>
-<object>
-<class>
-<name>XWiki.ConfigurableClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<codeToExecute>
-<disabled>0</disabled>
-<editor>---</editor>
-<name>codeToExecute</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>codeToExecute</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</codeToExecute>
-<configurationClass>
-<disabled>0</disabled>
-<name>configurationClass</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>configurationClass</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</configurationClass>
-<configureGlobally>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>configureGlobally</name>
-<number>4</number>
-<prettyName>configureGlobally</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</configureGlobally>
-<displayInSection>
-<disabled>0</disabled>
-<name>displayInSection</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>displayInSection</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</displayInSection>
-<heading>
-<disabled>0</disabled>
-<name>heading</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<iconAttachment>
-<disabled>0</disabled>
-<name>iconAttachment</name>
-<number>8</number>
-<picker>0</picker>
-<prettyName>iconAttachment</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</iconAttachment>
-<linkPrefix>
-<disabled>0</disabled>
-<name>linkPrefix</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>linkPrefix</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</linkPrefix>
-<propertiesToShow>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>propertiesToShow</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>propertiesToShow</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>20</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</propertiesToShow>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>0</number>
-<className>XWiki.ConfigurableClass</className>
-<guid>322238f5-c742-43ed-81e0-ba169fc05653</guid>
-<property>
-<codeToExecute>[[Configure the suggest sources&gt;&gt;XWiki.SearchSuggestConfig]]</codeToExecute>
-</property>
-<property>
-<configurationClass>XWiki.SearchSuggestConfig</configurationClass>
-</property>
-<property>
-<configureGlobally>1</configureGlobally>
-</property>
-<property>
-<displayInSection>searchSuggest</displayInSection>
-</property>
-<property>
-<heading>Search Suggest</heading>
-</property>
-<property>
-<iconAttachment>search-suggest.png</iconAttachment>
-</property>
-<property>
-<linkPrefix></linkPrefix>
-</property>
-<property>
-<propertiesToShow>
-<value>activated</value>
-</propertiesToShow>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SearchSuggestConfig</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<disabled>0</disabled>
-<displayFormType>select</displayFormType>
-<name>activated</name>
-<number>1</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>0</number>
-<className>XWiki.SearchSuggestConfig</className>
-<guid>5faef1df-77ac-4bb3-9dda-8d38447b94e1</guid>
-<property>
-<activated>1</activated>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SearchSuggestSourceClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>7</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<highlight>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>highlight</name>
-<number>6</number>
-<prettyName>highlight</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</highlight>
-<icon>
-<disabled>0</disabled>
-<name>icon</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<query>
-<disabled>0</disabled>
-<name>query</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>query</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</query>
-<resultsNumber>
-<disabled>0</disabled>
-<name>resultsNumber</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>resultsNumber</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</resultsNumber>
-<url>
-<disabled>0</disabled>
-<name>url</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>url</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</url>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>0</number>
-<className>XWiki.SearchSuggestSourceClass</className>
-<guid>291d9c6d-b9b1-41b2-8aab-5f1cedba5ded</guid>
-<property>
-<activated>1</activated>
-</property>
-<property>
-<highlight>1</highlight>
-</property>
-<property>
-<icon>$xwiki.getSkinFile('icons/silk/page_white_text.gif')</icon>
-</property>
-<property>
-<name>Document name</name>
-</property>
-<property>
-<query>name:__INPUT__* OR web:__INPUT__*</query>
-</property>
-<property>
-<resultsNumber>3</resultsNumber>
-</property>
-<property>
-<url>$xwiki.getURL('XWiki.SuggestLuceneService', 'get', 'outputSyntax=plain')</url>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SearchSuggestSourceClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>7</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<highlight>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>highlight</name>
-<number>6</number>
-<prettyName>highlight</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</highlight>
-<icon>
-<disabled>0</disabled>
-<name>icon</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<query>
-<disabled>0</disabled>
-<name>query</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>query</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</query>
-<resultsNumber>
-<disabled>0</disabled>
-<name>resultsNumber</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>resultsNumber</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</resultsNumber>
-<url>
-<disabled>0</disabled>
-<name>url</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>url</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</url>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>1</number>
-<className>XWiki.SearchSuggestSourceClass</className>
-<guid>9c2ba119-f8b2-4652-b5ff-9d446cbdb9aa</guid>
-<property>
-<activated>1</activated>
-</property>
-<property>
-<highlight>0</highlight>
-</property>
-<property>
-<icon>$xwiki.getSkinFile('icons/silk/page_white_text.gif')</icon>
-</property>
-<property>
-<name>Document content</name>
-</property>
-<property>
-<query>__INPUT__*</query>
-</property>
-<property>
-<resultsNumber>3</resultsNumber>
-</property>
-<property>
-<url>$xwiki.getURL('XWiki.SuggestLuceneService', 'get', 'outputSyntax=plain')</url>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SearchSuggestSourceClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>7</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<highlight>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>highlight</name>
-<number>6</number>
-<prettyName>highlight</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</highlight>
-<icon>
-<disabled>0</disabled>
-<name>icon</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<query>
-<disabled>0</disabled>
-<name>query</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>query</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</query>
-<resultsNumber>
-<disabled>0</disabled>
-<name>resultsNumber</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>resultsNumber</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</resultsNumber>
-<url>
-<disabled>0</disabled>
-<name>url</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>url</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</url>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>2</number>
-<className>XWiki.SearchSuggestSourceClass</className>
-<guid>40387571-e03f-4ffd-abda-61cf2a2b2b55</guid>
-<property>
-<activated>1</activated>
-</property>
-<property>
-<highlight>1</highlight>
-</property>
-<property>
-<icon>$xwiki.getSkinFile('icons/silk/attach.gif')</icon>
-</property>
-<property>
-<name>Attachment name</name>
-</property>
-<property>
-<query>name:__INPUT__* AND type:attachment</query>
-</property>
-<property>
-<resultsNumber>3</resultsNumber>
-</property>
-<property>
-<url>$xwiki.getURL('XWiki.SuggestLuceneService', 'get', 'outputSyntax=plain')</url>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SearchSuggestSourceClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>7</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<highlight>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>highlight</name>
-<number>6</number>
-<prettyName>highlight</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</highlight>
-<icon>
-<disabled>0</disabled>
-<name>icon</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<query>
-<disabled>0</disabled>
-<name>query</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>query</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</query>
-<resultsNumber>
-<disabled>0</disabled>
-<name>resultsNumber</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>resultsNumber</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</resultsNumber>
-<url>
-<disabled>0</disabled>
-<name>url</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>url</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</url>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>3</number>
-<className>XWiki.SearchSuggestSourceClass</className>
-<guid>dbc05205-6333-4889-8613-83686f9288f6</guid>
-<property>
-<activated>1</activated>
-</property>
-<property>
-<highlight>0</highlight>
-</property>
-<property>
-<icon>$xwiki.getSkinFile('icons/silk/attach.gif')</icon>
-</property>
-<property>
-<name>Attachment content</name>
-</property>
-<property>
-<query>__INPUT__* AND type:attachment</query>
-</property>
-<property>
-<resultsNumber>3</resultsNumber>
-</property>
-<property>
-<url>$xwiki.getURL('XWiki.SuggestLuceneService', 'get', 'outputSyntax=plain')</url>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SearchSuggestSourceClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>7</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<highlight>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>highlight</name>
-<number>6</number>
-<prettyName>highlight</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</highlight>
-<icon>
-<disabled>0</disabled>
-<name>icon</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<query>
-<disabled>0</disabled>
-<name>query</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>query</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</query>
-<resultsNumber>
-<disabled>0</disabled>
-<name>resultsNumber</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>resultsNumber</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</resultsNumber>
-<url>
-<disabled>0</disabled>
-<name>url</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>url</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</url>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>4</number>
-<className>XWiki.SearchSuggestSourceClass</className>
-<guid>1e881b2d-031c-42ba-bd2d-867fa72c7dab</guid>
-<property>
-<activated>0</activated>
-</property>
-<property>
-<highlight>0</highlight>
-</property>
-<property>
-<icon>$xwiki.getSkinFile('icons/silk/page_white_picture.gif')</icon>
-</property>
-<property>
-<name>Blog Posts</name>
-</property>
-<property>
-<query>__INPUT__* AND object:Blog.BlogPostClass</query>
-</property>
-<property>
-<resultsNumber>3</resultsNumber>
-</property>
-<property>
-<url>$xwiki.getURL('XWiki.SuggestLuceneService', 'get', 'outputSyntax=plain')</url>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.SearchSuggestSourceClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<activated>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>activated</name>
-<number>7</number>
-<prettyName>activated</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</activated>
-<highlight>
-<defaultValue></defaultValue>
-<disabled>0</disabled>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>highlight</name>
-<number>6</number>
-<prettyName>highlight</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</highlight>
-<icon>
-<disabled>0</disabled>
-<name>icon</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>icon</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</icon>
-<name>
-<disabled>0</disabled>
-<name>name</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<query>
-<disabled>0</disabled>
-<name>query</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>query</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</query>
-<resultsNumber>
-<disabled>0</disabled>
-<name>resultsNumber</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>resultsNumber</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</resultsNumber>
-<url>
-<disabled>0</disabled>
-<name>url</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>url</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</url>
-</class>
-<name>XWiki.SearchSuggestConfig</name>
-<number>5</number>
-<className>XWiki.SearchSuggestSourceClass</className>
-<guid>8cc7466d-c6be-4118-bb06-8f287a3bad92</guid>
-<property>
-<activated>1</activated>
-</property>
-<property>
-<highlight>0</highlight>
-</property>
-<property>
-<icon>$xwiki.getSkinFile('icons/silk/user.gif')</icon>
-</property>
-<property>
-<name>Users</name>
-</property>
-<property>
-<query>__INPUT__* AND object:XWiki.XWikiUsers</query>
-</property>
-<property>
-<resultsNumber>3</resultsNumber>
-</property>
-<property>
-<url>$xwiki.getURL('XWiki.SuggestLuceneService', 'get', 'outputSyntax=plain')</url>
-</property>
-</object>
-<content>{{include document="XWiki.SearchSuggestConfigSheet" /}}
-</content></xwikidoc>
+AAAAAElFTkSuQmCC
+</content>
+  </attachment>
+  <class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <activated>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <name>activated</name>
+      <number>1</number>
+      <prettyName>Activated</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </activated>
+  </class>
+  <object>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>79c764f1-0a8d-4b15-bb2c-40896812c3f1</guid>
+    <property>
+      <sheet>XWiki.SearchSuggestConfigSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <codeToExecute>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <disabled>0</disabled>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayInSection>
+        <disabled>0</disabled>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <disabled>0</disabled>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <disabled>0</disabled>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <disabled>0</disabled>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>322238f5-c742-43ed-81e0-ba169fc05653</guid>
+    <property>
+      <codeToExecute>{{html clean="false"}}
+&lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
+{{/html}}
+
+{{include document="XWiki.SearchSuggestConfig" context="new" /}}
+
+{{html clean=false}}
+  ## We add in a redirect field to prevent the user from being carried away when they save if they don't have JavaScript.
+  #set ($thisURL = $request.getRequestURL())
+  #if ($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
+    #set ($thisURL = "${thisURL}?$request.getQueryString()")
+  #end
+  &lt;fieldset&gt;
+    &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.xml($thisURL)" /&gt;
+    &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
+    &lt;input type="hidden" name="comment" value="$escapetool.xml($services.localization.render('platform.search.suggestConfigSaveComment'))" /&gt;
+  &lt;/fieldset&gt;
+  &lt;div class="bottombuttons"&gt;
+    &lt;p class="admin-buttons"&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input class="button" type="submit" name="action_saveandcontinue" value="$services.localization.render('admin.save')" /&gt;
+      &lt;/span&gt;
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayInSection>searchSuggest</displayInSection>
+    </property>
+    <property>
+      <heading/>
+    </property>
+    <property>
+      <iconAttachment>search-suggest.png</iconAttachment>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestConfig</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>1</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>0</number>
+    <className>XWiki.SearchSuggestConfig</className>
+    <guid>5faef1df-77ac-4bb3-9dda-8d38447b94e1</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>0</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>291d9c6d-b9b1-41b2-8aab-5f1cedba5ded</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>lucene</engine>
+    </property>
+    <property>
+      <highlight>1</highlight>
+    </property>
+    <property>
+      <icon>icon:page_white_text</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceDocumentName</name>
+    </property>
+    <property>
+      <query>name:__INPUT__* OR web:__INPUT__*</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestLuceneService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>1</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>9c2ba119-f8b2-4652-b5ff-9d446cbdb9aa</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine/>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>$xwiki.getSkinFile('icons/silk/page_white_text.png')</icon>
+    </property>
+    <property>
+      <name>$services.localization.render('platform.search.suggestSourceDocumentContent')</name>
+    </property>
+    <property>
+      <query>__INPUT__*</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>$xwiki.getURL('XWiki.SuggestLuceneService', 'get', 'outputSyntax=plain')</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>2</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>40387571-e03f-4ffd-abda-61cf2a2b2b55</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>lucene</engine>
+    </property>
+    <property>
+      <highlight>1</highlight>
+    </property>
+    <property>
+      <icon>icon:attach</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceAttachmentName</name>
+    </property>
+    <property>
+      <query>filename:__INPUT__* AND type:attachment</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestLuceneService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>3</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>dbc05205-6333-4889-8613-83686f9288f6</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>lucene</engine>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>icon:attach</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceAttachmentContent</name>
+    </property>
+    <property>
+      <query>ft:__INPUT__* AND type:attachment</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestLuceneService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>4</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>1e881b2d-031c-42ba-bd2d-867fa72c7dab</guid>
+    <property>
+      <activated>0</activated>
+    </property>
+    <property>
+      <engine>lucene</engine>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>icon:page_white_picture</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceBlogPost</name>
+    </property>
+    <property>
+      <query>__INPUT__* AND object:Blog.BlogPostClass</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestLuceneService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>5</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>8cc7466d-c6be-4118-bb06-8f287a3bad92</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>lucene</engine>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>icon:user</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceUsers</name>
+    </property>
+    <property>
+      <query>__INPUT__* AND object:XWiki.XWikiUsers</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestLuceneService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>7</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>0f3e0a67-fda8-48ff-9a68-3d784f3fbfd3</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>solr</engine>
+    </property>
+    <property>
+      <highlight>1</highlight>
+    </property>
+    <property>
+      <icon>icon:page_white_text</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceDocumentName</name>
+    </property>
+    <property>
+      <query>(title:__INPUT__* OR name:__INPUT__*) AND type:DOCUMENT</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestSolrService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>8</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>e098e101-850d-46df-807a-fc6aad5196a7</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>solr</engine>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>icon:page_white_text</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceDocumentContent</name>
+    </property>
+    <property>
+      <query>(doccontent:__INPUT__* OR doccontentraw:__INPUT__*) AND type:DOCUMENT</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestSolrService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>9</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>ace97109-4a95-4bfb-bf9b-373d0bc3af6e</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>solr</engine>
+    </property>
+    <property>
+      <highlight>1</highlight>
+    </property>
+    <property>
+      <icon>icon:attach</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceAttachmentName</name>
+    </property>
+    <property>
+      <query>filename:__INPUT__* AND type:ATTACHMENT</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestSolrService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>10</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>7232302f-4978-4e6b-a625-7744d9ef1222</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>solr</engine>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>icon:attach</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceAttachmentContent</name>
+    </property>
+    <property>
+      <query>attcontent:__INPUT__* AND type:ATTACHMENT</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestSolrService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>11</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>ab882efa-79a2-428c-ad01-0831a39918e0</guid>
+    <property>
+      <activated>0</activated>
+    </property>
+    <property>
+      <engine>solr</engine>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>icon:page_white_picture</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceBlogPost</name>
+    </property>
+    <property>
+      <query>objcontent:__INPUT__* AND type:OBJECT AND class:Blog.BlogPostClass</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestSolrService</url>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.SearchSuggestSourceClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <activated>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>activated</name>
+        <number>8</number>
+        <prettyName>Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </activated>
+      <engine>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>engine</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Engine</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </engine>
+      <highlight>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>highlight</name>
+        <number>7</number>
+        <prettyName>Highlight</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </highlight>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <query>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>query</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Query</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </query>
+      <resultsNumber>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>resultsNumber</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Limit</prettyName>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </resultsNumber>
+      <url>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>url</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Service</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </url>
+    </class>
+    <name>XWiki.SearchSuggestConfig</name>
+    <number>12</number>
+    <className>XWiki.SearchSuggestSourceClass</className>
+    <guid>643a6e08-2776-4985-80f0-cbcfad8a0c45</guid>
+    <property>
+      <activated>1</activated>
+    </property>
+    <property>
+      <engine>solr</engine>
+    </property>
+    <property>
+      <highlight>0</highlight>
+    </property>
+    <property>
+      <icon>icon:user</icon>
+    </property>
+    <property>
+      <name>platform.search.suggestSourceUsers</name>
+    </property>
+    <property>
+      <query>objcontent:__INPUT__* AND type:OBJECT AND class:XWiki.XWikiUsers</query>
+    </property>
+    <property>
+      <resultsNumber>3</resultsNumber>
+    </property>
+    <property>
+      <url>XWiki.SuggestSolrService</url>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

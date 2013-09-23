@@ -1,3 +1,4 @@
 org.xwiki.rendering.internal.macro.chart.ChartMacro
-org.xwiki.chart.internal.source.DocumentTableBlockDataSource
-org.xwiki.chart.internal.source.MacroContentTableBlockDataSource
+org.xwiki.rendering.internal.macro.chart.source.table.DocumentTableBlockDataSource
+org.xwiki.rendering.internal.macro.chart.source.table.MacroContentTableBlockDataSource
+org.xwiki.rendering.internal.macro.chart.TemporaryChartImageWriter

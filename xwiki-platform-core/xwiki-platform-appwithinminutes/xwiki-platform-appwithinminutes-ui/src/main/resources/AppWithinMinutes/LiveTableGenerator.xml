@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>LiveTableGenerator</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1321021950000</creationDate>
+  <date>1321284110000</date>
+  <contentUpdateDate>1321284110000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false" filter="none"}}
+#macro(prepareColumnProperties)
+  #set ($columnProperties = {})
+  #set ($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
+  #set ($specialColumns = ['_avatar', '_images', '_attachments', '_actions'])
+  ## Field types that aren't sortable nor filterable.
+  #set ($unsortableFieldTypes = ['TextArea', 'ComputedField'])
+  ## Field types that have HTML display.
+  #set ($htmlFieldTypes = ['TextArea', 'Users', 'Groups'])
+  #foreach ($column in $columns)
+    #set ($field = $xclass.get($column))
+    #if ($field.getProperty('customDisplay').value == '{{include reference="AppWithinMinutes.Title"/}}')
+      ## This field is a place-holder for the document title.
+      #set ($titleDisplayNamePlaceHolder = $field.translatedPrettyName)
+      #set ($field = $NULL)
+      #set ($column = 'doc.title')
+      #set ($discard = $columns.set($mathtool.sub($velocityCount, 1), $column))
+    #end
+    #if ($field)
+      ## Column type.
+      #set ($properties = {'type': 'text'})
+      #if ($field.classType.endsWith('List'))
+        #set ($discard = $properties.put('type', 'list'))
+      #elseif ($field.classType == 'Number')
+        #set ($discard = $properties.put('type', 'number'))
+      #end
+      ## Sortable/Filterable columns.
+      #if ($unsortableFieldTypes.contains($field.classType))
+        #set ($discard = $properties.put('filterable', false))
+        #set ($discard = $properties.put('sortable', false))
+      #else
+        ## The size of the filter input.
+        #set ($discard = $properties.put('size', 10))
+      #end
+      ## Columns with HTML display.
+      ## Note that the check for custom display is too generic because you can have a custom displayer that generates
+      ## HTML in edit mode and plain text in view mode.
+      #if ($htmlFieldTypes.contains($field.classType) || $field.getProperty('customDisplay').value != '')
+        #set ($discard = $properties.put('html', true))
+      #end
+    #elseif ($genericColumns.contains($column))
+      #set ($properties = {'type': 'text', 'size': 10})
+      #if ($column == 'doc.title')
+        #set ($discard = $properties.put('size', 20))
+        #if ("$!titleDisplayNamePlaceHolder" != '')
+          #set ($discard = $properties.put('displayName', $titleDisplayNamePlaceHolder))
+          #set ($titleDisplayNamePlaceHolder = $NULL)
+        #end
+      #end
+      #if ($column == 'doc.creator' || $column == 'doc.author')
+        #set ($discard = $properties.put('link', 'author'))
+      #elseif ($column != 'doc.date' &amp;&amp; $column != 'doc.creationDate')
+        #set ($discard = $properties.put('link', 'view'))
+      #end
+    #elseif ($specialColumns.contains($column))
+      #set ($properties = {'sortable': false, 'filterable': false, 'html': true})
+      #if ($column == '_actions')
+        #set ($discard = $properties.put('actions', ['edit', 'delete']))
+      #end
+    #end
+    #set ($discard = $columnProperties.put($column, $properties))
+  #end
+#end
+
+#macro(generateColumnProperties)
+#set ($discard = "#prepareColumnProperties()")
+${escapetool.h}set (${escapetool.d}columnsProperties = {
+#foreach($entry in $columnProperties.entrySet())
+  '$entry.key': $jsontool.serialize($entry.value)#if ($foreach.hasNext),#end
+
+#end
+})
+#end
+
+#macro(maybeGenerateLiveTable)
+#set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass'))
+#if($liveTableObj)
+#set($columns = $liveTableObj.getProperty('columns').value.trim())
+#if("$!columns" != '')
+#set($columns = $columns.split('\s+'))
+#generateLiveTable()
+#end
+#end
+#end
+
+#macro(generateColumnExtraSSX)
+#set($userPicker = false)
+#foreach($column in $columns)
+#set($field = $xclass.get($column))
+#if($field &amp;&amp; ($field.classType == 'Users' || $field.classType == 'Groups') &amp;&amp; !$userPicker)
+#set($userPicker = true)
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
+#end
+#end
+#end
+
+#macro(generateLiveTable)
+{{{##
+{{velocity}}
+#set($className = $liveTableObj.getProperty('class').value)
+#set($translationBundleId = "$stringtool.removeEnd($className, 'Class')Translations")
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '$translationBundleId'))
+#set($classDoc = $xwiki.getDocument($className))
+#set($xclass = $classDoc.getxWikiClass())
+#set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
+#generateColumnExtraSSX()
+#generateColumnProperties()
+${escapetool.h}set (${escapetool.d}options = {
+  'className': '$className',
+  'resultPage': '$stringtool.removeEnd($className, 'Class')LiveTableResults',
+  'translationPrefix': '${shortName}.livetable.',
+  'tagCloud': true,
+  'rowCount': 15,
+  'maxPages': 10,
+  'selectedColumn': '$columns.get(0)',
+  'defaultOrder': 'asc'
+})
+${escapetool.h}set (${escapetool.d}columns = [#foreach($column in $columns)#if($velocityCount &gt; 1), #end'$column'#end])
+${escapetool.h}livetable('$shortName' ${escapetool.d}columns ${escapetool.d}columnsProperties ${escapetool.d}options)
+{{/velocity}}##
+}}}
+#end
+
+#**
+ * We keep this macro only to preserve backwards compatibility with applications created on versions older than 4.5M1.
+ * New applications don't use this document as a custom live table results page any more. A dedicated live table results
+ * page is now generated for each application.
+ *
+ * @deprecated since 4.5M1
+ *#
+#macro (outputLiveTableResults)
+  #set ($output = "#gridresult($!request.classname $request.collist.split(','))")
+  ## We have to escape the translation key because it appears as JSON value in the output.
+  #set ($escapedEmptyValueTranslationKey = $escapetool.javascript("${request.transprefix}emptyvalue"))
+  $output.replace($escapedEmptyValueTranslationKey, '-')
+#end
+{{/velocity}}{{velocity}}
+## We keep the following code only to preserve backwards compatibility with old applications (&lt;4.5M1) that use this
+## document as a live table results page. For these applications we need to distinguish between a request for generating
+## a live table and a request for live table data.
+#set ($isLiveTableResultsRequest = $xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
+## We do the include separately because the wiki syntax is evaluated after the Velocity code.
+#if ($isLiveTableResultsRequest)
+  {{include document="XWiki.LiveTableResultsMacros" /}}
+#end
+{{/velocity}}{{velocity wiki="false"}}
+## Old applications need custom live table results just because they don't have a document translation bundle generated.
+#if ($isLiveTableResultsRequest)
+  #outputLiveTableResults()
+#end
+{{/velocity}}{{velocity}}
+#if (!$isLiveTableResultsRequest)
+  #maybeGenerateLiveTable()
+#end
+{{/velocity}}</content>
+</xwikidoc>

@@ -2,16 +2,15 @@
 
 /* Overriding skins */
 
-div.legend {
-	margin-bottom:10px;
-	font-size:1.33em;
-	border-bottom:1px dotted #D6E1E7;
-	color:#005A83;
-	display:block;
-	font-weight:400;
-	line-height:1.2em;
-	margin:20px 0;
-	overflow:hidden;
+.legend {
+  border-bottom: 1px dotted $theme.borderColor;
+  color: $theme.titleColor;
+  display: block;
+  font-size: 1.33em;
+  font-weight: 400;
+  line-height: 1.2em;
+  margin: 20px 0 10px;
+  overflow: hidden;
 }
 
 .clearfloats {
@@ -41,13 +40,13 @@ div.loading {
   width: 51%;
 }
 
-#packagelist  fieldset {
+#packagelist fieldset {
   background-color: $theme.backgroundSecondaryColor;
   padding: 5px;
 }
 
 .package-upload {
-  background: transparent url($xwiki.getSkinFile('icons/silk/package_add.gif')) no-repeat scroll 0 5px;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/package_add.png')") no-repeat scroll 0 center;
   padding-left: 20px;
 }
 
@@ -56,15 +55,15 @@ div.loading {
 }
 
 #packagelist .xitemcontainer {
-  background: transparent url($xwiki.getSkinFile('icons/silk/package.gif')) no-repeat scroll 5px 0.5em;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/package.png')") no-repeat scroll 5px 0.5em;
   font-size: .85em;
   margin-bottom: .2em;
   padding: .3em 0 .3em 1em;
 }
 
 #packagelist .active {
-  border: 1px dotted $theme.borderColor;
   background-color: #FCFCFC;
+  border: 1px dotted $theme.borderColor;
 }
 
 #packagelistcontainer .name a {
@@ -75,14 +74,13 @@ div.loading {
   color: $theme.textSecondaryColor;
 }
 
-#packagelistcontainer .xwikibuttonlinks{
+#packagelistcontainer .xwikibuttonlinks {
   float: right;
   padding-right: .2em;
-  *margin-top: -2em; /* IE7 */
 }
 
 #packagelistcontainer .deletelink {
-  background: url($xwiki.getSkinFile('icons/silk/cross.gif')) no-repeat left 0.2em;
+  background: url("$xwiki.getSkinFile('icons/silk/cross.png')") no-repeat left 0.2em;
   display: block;
   height: 1.4em;
   width: 16px;
@@ -97,7 +95,7 @@ div.loading {
 
 #packageDescription {
   background-color: #FCFCFC;
-  border: 1px dotted $theme.borderColor;        
+  border: 1px dotted $theme.borderColor;
   overflow: hidden;
   padding: 10px;
   margin-bottom: 1px;
@@ -113,11 +111,11 @@ div.loading {
   display: table-row;
 }
 
-#packagecontainer .packageinfos .filename { 
+#packagecontainer .packageinfos .filename {
   font-weight: 700;
 }
 
-#packagecontainer .packageinfos span{
+#packagecontainer .packageinfos span {
   color: $theme.textSecondaryColor;
   margin: 0 5px 0;
 }
@@ -158,14 +156,31 @@ ul.package li.xitem div.xitemcontainer input.space {
   float: right;
 }
 
-ul.package li.xitem div.xitemcontainer div.spacename,
-ul.package li.xitem div.xitemcontainer img {
-  float: left;	
+ul.package li.xitem div.xitemcontainer {
+  text-indent: 0;
+}
+ul.package li.xitem div.xitemcontainer .spacename:before {
+  content: '\229F';
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 400;
+  height: 16px;
+  margin-right: 20px;
+  text-align: center;
+  width: 16px;
+}
+ul.package li.xitem.collapsed div.xitemcontainer .spacename:before {
+  content: '\229E'
+}
+
+ul.package li.collapsed div.xitemcontainer .pages {
+  display: none;
 }
 
 ul.package li.xitem div.xitemcontainer div.spacename {
-  background: transparent url($xwiki.getSkinFile('icons/silk/folder.gif')) no-repeat scroll 0 .1em ;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat scroll 18px .1em;
   cursor: pointer;
+  float: left;
   font-weight: bold;
 }
 
@@ -178,7 +193,7 @@ ul.package li.xitem div.xitemcontainer div.selection {
 }
 
 ul.pages {
-  margin: 0 !important;
+  margin: 0 0 0 18px !important;
 }
 
 ul.pages li.xitem {
@@ -186,12 +201,8 @@ ul.pages li.xitem {
 }
 
 .documentName{
-  background: transparent url($xwiki.getSkinFile('icons/silk/page_white_text.gif')) no-repeat scroll 0 0;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat scroll 0 0;
   padding-left: 20px;
-}
-
-ul.package ul.pages li.xitem div.xpagecontainer input {
-  *margin-right: 20px;
 }
 
 .historyStrategyOption {

@@ -50,8 +50,6 @@
   #end
   #if($leftPanels == "")
       #set($showLeftPanels = "0")
-  #else
-      #set($leftPanels = $leftPanels.split(","))
   #end
 #end
 
@@ -68,8 +66,6 @@
   #end
   #if($rightPanels == "")
       #set($showRightPanels = "0")
-  #else
-      #set($rightPanels = $rightPanels.split(","))
   #end
 #end
 
@@ -91,6 +87,9 @@
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)
+
+#set ($displayQuickSearch = true)
+#set ($displayLanguageChoice = true)
 
 ## To let custom skins easily override layout variables, we evaluate a template that is empty by default.
 #template("layoutExtraVars.vm")

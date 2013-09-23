@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>ExternalLinksJSON</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.ExternalLinks</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1320049413000</creationDate>
+  <date>1320310931000</date>
+  <contentUpdateDate>1320310931000</contentUpdateDate>
+  <version>1.1</version>
+  <title>JSON Generation for the External Link States LiveTable</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if("$!{request.xpage}" == 'plain')
+  $response.setContentType('application/json')
+#end
+##==============================
+## Offset = item # at which to start displaying data
+##==============================
+#set($offset = $mathtool.toInteger($request.get('offset')))
+## offset starts from 0 in velocity and 1 in javascript
+#set($offset = $offset - 1)
+#if (!$offset || $offset &lt; 0)
+  #set($offset = 0)
+#end
+##==================
+## Limit = # of items to display
+##==================
+#set($limit = $mathtool.toInteger($request.get('limit')))
+#if (!$limit)
+  #set ($limit = 15)
+#end
+##====================================
+## Step1: Transform Map into list, one list item per link/page
+##====================================
+#set ($states = $services.linkchecker.getLinkStates())
+#set ($stateList = [])
+#foreach ($link in $states.keySet())
+  #set ($pages = $states.get($link))
+  #foreach ($page in $pages.keySet())
+    #set ($tmpMap = {})
+    #set ($dummy = $tmpMap.put("link", $link))
+    #set ($dummy = $tmpMap.put("page", $page))
+    #set ($dummy = $tmpMap.put("code", $pages.get($page).getResponseCode()))
+    #set ($dummy = $tmpMap.put("date", $datetool.format($pages.get($page).getLastCheckedTime())))
+    #set ($dummy = $stateList.add($tmpMap))
+  #end
+#end
+##============
+## Step2: Filter the list
+##============
+#set ($filteredList = [])
+#set ($linkFilter = "$!{request.get('link')}")
+#set ($pageFilter = "$!{request.get('page')}")
+#set ($codeFilter = "$!{request.get('code')}")
+#set ($dateFilter = "$!{request.get('date')}")
+#foreach ($entry in $stateList)
+  #set ($codeString = "$entry.get('code')")
+  #if ($codeFilter.startsWith("!") &amp;&amp; $codeFilter.length() &gt; 1)
+    #set ($codeMatch = !$codeString.contains($codeFilter.substring(1)))
+  #else
+    #set ($codeMatch = $codeString.contains($codeFilter))
+  #end
+  #if ($entry.get("link").contains($linkFilter) &amp;&amp; $entry.get("page").contains($pageFilter) &amp;&amp; $codeMatch &amp;&amp; $entry.get("date").contains($dateFilter))
+    #set ($dummy = $filteredList.add($entry))
+  #end
+#end
+##===================
+## Step3: Handle offset and limit
+##===================
+#set ($added = 0)
+#set ($resultList = [])
+#if ($offset &lt; $filteredList.size())
+  #set ($toIndex = $mathtool.min($mathtool.add($offset, $limit), $filteredList.size()))
+  #set ($resultList = $filteredList.subList($offset, $toIndex))
+#end
+## ==========
+## JSON Generation
+## ==========
+#set ($json = {
+  'totalrows': $filteredList.size(),
+  'matchingtags': {},
+  'tags': [],
+  'returnedrows':  $resultList.size(),
+  'offset': $mathtool.add($offset, 1),
+  'reqNo': $mathtool.toInteger($request.reqNo),
+  'rows': []
+})
+#foreach ($entry in $resultList)
+  #set ($discard = $json.rows.add({
+    'doc_viewable': true,
+    'link': $entry.get('link'),
+    'link_url': $entry.get('link'),
+    'page': $entry.get('page'),
+    'page_url': $xwiki.getURL($entry.get('page')),
+    'code': $entry.get("code"),
+    'date': $entry.get("date")
+  }))
+#end
+$jsontool.serialize($json)
+{{/velocity}}</content>
+</xwikidoc>

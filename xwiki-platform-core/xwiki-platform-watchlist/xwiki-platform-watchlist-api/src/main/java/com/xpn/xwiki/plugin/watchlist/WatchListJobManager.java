@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -77,12 +79,17 @@ public class WatchListJobManager
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(WatchListJobManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListJobManager.class);
 
     /**
      * XWiki Rights class name.
      */
     private static final String XWIKI_RIGHTS_CLASS = "XWiki.XWikiRights";
+
+    /**
+     * Name of the space where default Scheduler jobs are located.
+     */
+    private static final String SCHEDULER_SPACE = "Scheduler";
 
     /**
      * Set watchlist common documents fields.
@@ -94,14 +101,15 @@ public class WatchListJobManager
     {
         boolean needsUpdate = false;
 
-        if (StringUtils.isBlank(doc.getCreator())) {
+        if (doc.getCreatorReference() == null) {
             needsUpdate = true;
             doc.setCreator(WatchListPlugin.DEFAULT_DOC_AUTHOR);
         }
-        if (StringUtils.isBlank(doc.getAuthor())) {
+        if (doc.getAuthorReference() == null) {
             needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
+            doc.setAuthorReference(doc.getCreatorReference());
         }
+
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.WatchListClass");
@@ -120,7 +128,7 @@ public class WatchListJobManager
     private boolean initWatchListJobClassProperties(XWikiDocument watchListJobClass, XWikiContext context)
     {
         boolean needsUpdate = false;
-        BaseClass bclass = watchListJobClass.getxWikiClass();
+        BaseClass bclass = watchListJobClass.getXClass();
 
         bclass.setName(WATCHLIST_JOB_CLASS);
         needsUpdate |= bclass.addTextField(WATCHLIST_JOB_EMAIL_PROP, "Email template to use", 30);
@@ -145,7 +153,7 @@ public class WatchListJobManager
             doc = context.getWiki().getDocument(WATCHLIST_JOB_CLASS, context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            String[] spaceAndName = WATCHLIST_JOB_CLASS.split(".");
+            String[] spaceAndName = StringUtils.split(WATCHLIST_JOB_CLASS, '.');
             doc.setSpace(spaceAndName[0]);
             doc.setName(spaceAndName[1]);
             needsUpdate = true;
@@ -162,6 +170,10 @@ public class WatchListJobManager
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
+        }
+        if (!doc.isHidden()) {
+            needsUpdate = true;
+            doc.setHidden(true);
         }
 
         if (needsUpdate) {
@@ -237,13 +249,19 @@ public class WatchListJobManager
             needsUpdate = true;
         }
 
+        if (needsUpdate) {
+            // Make sure the XWikiRights class actually exists.
+            context.getWiki().getRightsClass(context);
+        }
+
         return needsUpdate;
     }
 
     /**
      * Creates a WatchList job in the XWiki Scheduler application (XWiki Object).
      * 
-     * @param docName Name of the document storing the job (example: Scheduler.WatchListDailyNotifier)
+     * @param jobDocReference the reference to the document storing the job. For example
+     *        {@code Scheduler.WatchListDailyNotifier}
      * @param name Job name (example: Watchlist daily notifier)
      * @param nameResource (example: platform.plugin.watchlist.job.daily)
      * @param emailTemplate email template to use for this job (example: XWiki.WatchListMessage)
@@ -251,21 +269,20 @@ public class WatchListJobManager
      * @param context Context of the request
      * @throws XWikiException if the jobs creation fails.
      */
-    private void initWatchListJob(String docName, String name, String nameResource, String emailTemplate, String cron,
-        XWikiContext context) throws XWikiException
+    private void initWatchListJob(EntityReference jobDocReference, String name, String nameResource,
+        String emailTemplate, String cron, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
         boolean needsUpdate = false;
-        BaseObject job = null;
+        BaseObject job;
 
         try {
-            doc = context.getWiki().getDocument(docName, context);
+            doc = context.getWiki().getDocument(jobDocReference, context);
 
-            job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
+            job = doc.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             if (job == null) {
                 needsUpdate = true;
-                int index = doc.createNewObject(SchedulerPlugin.XWIKI_JOB_CLASS, context);
-                job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, index);
+                job = doc.newXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, context);
                 job.setStringValue("jobName", name);
                 job.setStringValue("jobClass", WatchListJob.class.getName());
                 job.setStringValue("cron", cron);
@@ -278,15 +295,16 @@ public class WatchListJobManager
             needsUpdate |= createWatchListJobObject(doc, emailTemplate, context);
             needsUpdate |= setWatchListCommonDocumentsFields(doc);
 
-            if (StringUtils.isBlank(doc.getTitle())) {
+            if (StringUtils.isBlank(doc.getTitle()) || StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
-                doc.setTitle("$msg.get(\"" + nameResource + "\")");
-            }
-
-            if (StringUtils.isBlank(doc.getContent())) {
-                needsUpdate = true;
+                doc.setTitle("$services.localization.render('" + nameResource + "')");
                 doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
+            }
+
+            if (!doc.isHidden()) {
+                needsUpdate = true;
+                doc.setHidden(true);
             }
 
             if (needsUpdate) {
@@ -294,7 +312,7 @@ public class WatchListJobManager
                 ((SchedulerPlugin) context.getWiki().getPlugin("scheduler", context)).scheduleJob(job, context);
             }
         } catch (Exception e) {
-            LOG.error("Cannot initialize WatchListJob", e);
+            LOGGER.error("Cannot initialize WatchListJob", e);
         }
     }
     
@@ -320,7 +338,7 @@ public class WatchListJobManager
                 results.add(new Document(doc, context));
             }
         } catch (Exception e) {
-            LOG.error("error getting list of available watchlist jobs", e);
+            LOGGER.error("error getting list of available watchlist jobs", e);
         } finally {
             context.setDatabase(oriDatabase);
         }
@@ -337,11 +355,15 @@ public class WatchListJobManager
     public void init(XWikiContext context) throws XWikiException
     {
         initWatchListJobClass(context);
-        initWatchListJob("Scheduler.WatchListHourlyNotifier", "WatchList hourly notifier", "watchlist.job.hourly",
+
+        initWatchListJob(new LocalDocumentReference(SCHEDULER_SPACE, "WatchListHourlyNotifier"),
+            "WatchList hourly notifier", "watchlist.job.hourly",
             WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 * * * ?", context);
-        initWatchListJob("Scheduler.WatchListDailyNotifier", "WatchList daily notifier", "watchlist.job.daily",
+        initWatchListJob(new LocalDocumentReference(SCHEDULER_SPACE, "WatchListDailyNotifier"),
+            "WatchList daily notifier", "watchlist.job.daily",
             WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 * * ?", context);
-        initWatchListJob("Scheduler.WatchListWeeklyNotifier", "WatchList weekly notifier", "watchlist.job.weekly",
+        initWatchListJob(new LocalDocumentReference(SCHEDULER_SPACE, "WatchListWeeklyNotifier"),
+            "WatchList weekly notifier", "watchlist.job.weekly",
             WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 ? * MON", context);
     }
 }

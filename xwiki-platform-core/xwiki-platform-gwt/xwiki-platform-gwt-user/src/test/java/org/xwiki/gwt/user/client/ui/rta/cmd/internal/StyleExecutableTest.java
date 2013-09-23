@@ -19,7 +19,6 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.ui.rta.RichTextAreaTestCase;
@@ -39,11 +38,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
      */
     private Executable executable;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -97,7 +92,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
     {
         rta.setHTML("ac");
 
-        Range range = ((Document) rta.getDocument()).createRange();
+        Range range = rta.getDocument().createRange();
         range.setStart(getBody().getFirstChild(), 1);
         range.collapse(true);
         select(range);
@@ -134,7 +129,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
     {
         rta.setHTML("d");
 
-        Range range = ((Document) rta.getDocument()).createRange();
+        Range range = rta.getDocument().createRange();
         range.setStart(getBody().getFirstChild(), 0);
         range.collapse(true);
         select(range);
@@ -170,7 +165,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
     {
         rta.setHTML("e");
 
-        Range range = ((Document) rta.getDocument()).createRange();
+        Range range = rta.getDocument().createRange();
         range.setStart(getBody().getFirstChild(), 1);
         range.collapse(true);
         select(range);
@@ -209,7 +204,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         // last child of its parent..
         rta.setHTML("#<img/><em>$</em>");
 
-        Range range = ((Document) rta.getDocument()).createRange();
+        Range range = rta.getDocument().createRange();
         range.setStartAfter(getBody().getChildNodes().getItem(1));
         range.collapse(true);
         select(range);
@@ -245,7 +240,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
     {
         rta.setHTML("<img/>*");
 
-        Range range = ((Document) rta.getDocument()).createRange();
+        Range range = rta.getDocument().createRange();
         range.setStartBefore(getBody().getFirstChild());
         range.collapse(true);
         select(range);
@@ -283,7 +278,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         String text = "123";
         rta.setHTML(text);
 
-        Range range = ((Document) rta.getDocument()).createRange();
+        Range range = rta.getDocument().createRange();
         range.setStart(getBody().getFirstChild(), 1);
         range.setEnd(getBody().getFirstChild(), 2);
         select(range);
@@ -311,7 +306,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
                 String text = "x<em>y</em>z";
                 rta.setHTML(text);
 
-                Range range = ((Document) rta.getDocument()).createRange();
+                Range range = rta.getDocument().createRange();
                 range.setStart(getBody().getFirstChild(), 1);
                 range.setEnd(getBody().getLastChild(), 0);
                 select(range);
@@ -346,7 +341,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         String html = "<p>abc</p><p>xyz</p>";
         rta.setHTML(html);
 
-        Range range = ((Document) rta.getDocument()).createRange();
+        Range range = rta.getDocument().createRange();
         range.setStart(getBody().getFirstChild().getFirstChild(), 2);
         range.setEnd(getBody().getLastChild().getFirstChild(), 2);
         select(range);

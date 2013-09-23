@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1252454400000</date>
+  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Sandbox</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>Der Sandkasten ist ein Teil dieses Wikis, der frei editierbar ist. Er ist dafür gedacht, das Arbeiten mit dem Wiki zu üben. Sie können herausfinden, wie das Bearbeiten von Seiten funktioniert und wie man neue Seiten erstellt. Klicken Sie einfach auf **Bearbeiten** um zu beginnen!
+
+{{info}}Es macht nichts, wenn Sie beim Bearbeiten dieser Seite Inhalte überschreiben oder verlieren. Über den Reiter "Historie" am unteren Rand der Seite können Sie jederzeit die ursprüngliche Version der Seite wieder herstellen, indem Sie "Zurücksetzen" für die Version 1.1 auswählen.{{/info}}
+
+Wenn Sie mehr über die [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] lernen wollen, können Sie im Menü "Weitere Aktionen" auf "Zeige den Quellcode" klicken, oder auf den Reiter "Quelle", wenn Sie die Seite bearbeiten.
+
+Hier finden Sie eine Reihe von Seiten, mit denen Sie herumspielen können:
+
+* [[Sandkasten Testseite 1&gt;&gt;Sandbox.TestPage1]]
+* [[Sandkasten Testseite 2&gt;&gt;Sandbox.TestPage2]]
+* [[Sandkasten Testseite 3&gt;&gt;Sandbox.TestPage3]]
+
+Hier finden Sie Beispiele für die [[XWiki Syntaxelemente&gt;&gt;XWiki.XWikiSyntax]], die Sie in Wiki-Seiten verwenden können (Überschriften, Bilder, Tabellen).
+
+= Überschriften =
+
+XWiki bietet 6 Ebenen für Überschriften. Sie können sie zum Strukturieren Ihrer Seiten verwenden.
+
+== Überschriftsebene 2 ==
+
+=== Überschriftsebene 3 ===
+
+==== Überschriftsebene 4 ====
+
+===== Überschriftsebene 5 =====
+
+====== Überschriftsebene 6 ======
+
+= Textformatierung =
+
+XWiki unterstützt folgende grundlegende Textformatierungen:
+
+* **Fett gesetzter Text**
+* //Kursiv gesetzter Text//
+* __Unterstrichener Text__
+* --Durchgestrichener Text--
+* ,,Tiefer gestellter,, Text
+* ^^Höher gestellter^^ Text
+
+= Listen =
+
+Sie können verschiedene Arten von Listen in Ihren Texten einfügen :
+
+== Aufzählung ==
+
+* Ebene 1
+** Ebene 2
+*** Ebene 3
+** Ebene 2
+* Ebene 1
+
+== Nummerierung ==
+
+1. Erster Eintrag
+11. Untereintag
+111. Unter-unter-eintrag
+11. Noch ein Unterentrag
+11. Zweiter Eintrag
+
+== Gemischte Listen ==
+
+1. Punkt 1
+11. Unterpunkt 2
+11*. Unterpunkt 3
+11*. Unterpunkt 4
+1. Punkt 5
+
+= Tabellen =
+
+Sie können einfache Tabellen in Ihren Wiki-Seiten erzeugen:
+
+== Einfache Tabelle ==
+
+| Zelle 1 | Zelle 2 | Zelle 3
+| Zelle 4 | Zelle 5 | Zelle 6
+| Zelle 7 | Zelle 8 | Zelle 9
+
+== Tabelle mit einer Kopfzeile oben ==
+
+|= Kopf |= Kopf |= Kopf
+| Zelle | Zelle | Zelle
+| Zelle | Zelle | Zelle
+
+== Tabelle mit Kopfzeilen oben und links ==
+
+|= Kopf |= Kopf |= Kopf
+|= Kopf | Zelle | Zelle
+|= Kopf | Zelle | Zelle
+
+= Links =
+
+Xwiki erlaubt Links zu anderen Wiki-Seiten und zum Web:
+
+* [[WebHome]] -&gt; Link zur Startseite des aktuellen Bereichs
+* [[Startseite Sandkasten&gt;&gt;WebHome]] -&gt; Links können Beschriftungen haben
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; Ein Link kann das Format &lt;Bereich&gt;.&lt;Seite&gt; verwenden, um zu Seiten in einem anderen Bereich zu verweisen
+* [[http://www.xwiki.org]] -&gt; Sie können zu Seiten im Web verlinken
+* [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; Beschriftungen sind auch bei externen Links möglich
+
+= Bilder =
+
+Sie können Bilder in Ihre Wiki-Seiten integrieren:
+
+[[image:XWikiLogo.png]]
+
+= Makros =
+
+Makros bieten die Möglichkeit, das Aussehen von Wiki-Seiten zu verbessern und stellen zusätzliche Funktionalitäten in der Seite zur Verfügung. Hier sind zwei Beispiele, wie Makros die Inhalte verbessern können:
+
+== Makro: Warnmeldung ==
+
+Dieses Makro bietet die Möglichkeit, die Aufmerksamkeit der Leser auf einen bestimmten Text zu lenken:
+
+{{warning}}Dies ist ein wichtiger Hinweis!{{/warning}}
+
+== Inhaltsverzeichnis ==
+
+Dieses Makro erzeugt ein Inhaltsverzeichnis basierend auf den Überschriften in der Seite:
+
+{{toc/}}</content>
+</xwikidoc>

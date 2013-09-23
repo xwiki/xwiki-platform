@@ -30,11 +30,7 @@ import org.xwiki.gwt.dom.client.SelectionManager;
  */
 public class MozillaSelectionManager implements SelectionManager
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionManager#getSelection(Document)
-     */
+    @Override
     public Selection getSelection(Document document)
     {
         return new MozillaSelection(NativeSelection.getInstance(document));

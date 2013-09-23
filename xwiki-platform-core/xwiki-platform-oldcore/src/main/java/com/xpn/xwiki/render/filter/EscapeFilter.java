@@ -2,9 +2,6 @@
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
- * This file was initally copied from Radeox. See below for the Radeox license and
- * copyright.
- *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
@@ -19,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 /*
  * This file is part of "SnipSnap Radeox Rendering Engine".
  *
@@ -54,16 +49,18 @@ import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
 import org.radeox.util.Encoder;
 
-/*
+/**
  * Transforms multiple \ into single backspaces and escapes other characters.
  */
 public class EscapeFilter extends LocaleRegexTokenFilter implements CacheFilter
 {
+    @Override
     protected String getLocaleKey()
     {
         return "filter.escape";
     }
 
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
         buffer.append(handleMatch(result, context));                    

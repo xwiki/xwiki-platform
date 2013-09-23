@@ -22,8 +22,8 @@ package com.xpn.xwiki.api;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -40,7 +40,7 @@ import com.xpn.xwiki.util.Programming;
 public class DeletedDocument extends Api
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(DeletedDocument.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeletedDocument.class);
 
     /**
      * The internal object wrapped by this API.
@@ -111,7 +111,7 @@ public class DeletedDocument extends Api
             return hasAdminRights() || hasAccessLevel("undelete", getFullName());
         } catch (XWikiException ex) {
             // Public APIs should not throw exceptions
-            LOG.warn(String.format("Exception while checking if entry [%s] can be restored from the recycle bin",
+            LOGGER.warn(String.format("Exception while checking if entry [%s] can be restored from the recycle bin",
                 getId()), ex);
             return false;
         }
@@ -147,7 +147,7 @@ public class DeletedDocument extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOG.warn(String.format("Exception while checking if entry [%s] can be removed from the recycle bin",
+            LOGGER.warn(String.format("Exception while checking if entry [%s] can be removed from the recycle bin",
                 getId()), ex);
             return false;
         }
@@ -167,15 +167,18 @@ public class DeletedDocument extends Api
     }
 
     /**
-     * @return the document as it is in the recycle bin
+     * @return the document as it is in the recycle bin if the user has admin rights, {@code null} otherwise
      */
     public Document getDocument()
     {
-        try {
-            return new Document(this.deletedDoc.restoreDocument(null, this.context), this.context);
-        } catch (XWikiException e) {
-            LOG.warn("Failed to parse deleted document: " + e.getMessage());
-            return null;
+        if (hasAdminRights()) {
+            try {
+                return new Document(this.deletedDoc.restoreDocument(null, this.context), this.context);
+            } catch (XWikiException e) {
+                LOGGER.warn("Failed to parse deleted document: " + e.getMessage());
+            }
         }
+
+        return null;
     }
 }

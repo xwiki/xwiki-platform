@@ -165,7 +165,7 @@
             <forward name="edit" path="/templates/rollback.vm"/>
             <forward name="rollback" path="/templates/rollback.vm"/>
         </action>
-        
+
         <action path="/deleteversions/"
                 type="com.xpn.xwiki.web.DeleteVersionsAction"
                 name="deleteversions"
@@ -185,6 +185,12 @@
                 scope="request">
             <forward name="delete" path="/templates/delete.vm"/>
             <forward name="deleted" path="/templates/deleted.vm"/>
+        </action>
+
+        <action path="/deletespace/"
+                type="com.xpn.xwiki.web.DeleteSpaceAction"
+                name="deletespace"
+                scope="request">
         </action>
 
         <action path="/undelete/"
@@ -293,7 +299,7 @@
       </action>
       <action path="/downloadrev/"
               type="com.xpn.xwiki.web.DownloadRevAction"
-              name="dowloadrev"
+              name="downloadrev"
               scope="request">
       </action>
       <action path="/dot/"
@@ -401,6 +407,13 @@
                 name="get"
                 scope="request">
             <forward name="get" path="/templates/get.vm"/>
+        </action>
+
+        <action path="/distribution/"
+                type="org.xwiki.extension.distribution.internal.DistributionAction"
+                name="distribution"
+                scope="request">
+            <forward name="distribution" path="/templates/distribution.vm"/>
         </action>
 
         <action path="/imagecaptcha/"

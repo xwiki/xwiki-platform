@@ -22,8 +22,6 @@ package com.xpn.xwiki.api;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.ListItem;
@@ -68,12 +66,15 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     }
 
     /**
-     * Get the full name of the actual class of the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass}. The
-     * returned value is the canonical class name of the runtime object representing this property definition, for
-     * example {@code com.xpn.xwiki.objects.classes.StringClass}.
+     * Each type of XClass property is identified by a string that specifies the data type of the property value (e.g.
+     * 'String', 'Number', 'Date') without disclosing implementation details. The internal implementation of an XClass
+     * property type can change over time but its {@code classType} should not.
+     * <p>
+     * The {@code classType} can be used as a hint to lookup various components related to this specific XClass property
+     * type or it can be used as a property name to retrieve the meta class of this property from
+     * {@link com.xpn.xwiki.api.XWiki#getMetaclass()}.
      * 
-     * @return the canonical class name of the wrapped property definition
-     * @see #getType() {@code getType()} for a more user-friendly type
+     * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
      */
     public String getClassType()
     {
@@ -86,11 +87,11 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * user-friendly data type name, for example {@code StringClass}, {@code NumberClass} or {@code StaticListClass}.
      * 
      * @return the type of this property definition
-     * @see #getClassType() {@code getClassType()} for a more formal type
+     * @see #getClassType() {@code getClassType()} if you need the implementation hint of this property
      */
     public String getType()
     {
-        return StringUtils.substringAfterLast(getClassType(), ".");
+        return getBasePropertyClass().getClass().getSimpleName();
     }
 
     /**
@@ -130,6 +131,17 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     public String getPrettyName()
     {
         return getBasePropertyClass().getPrettyName();
+    }
+
+    /**
+     * Get the translated user-friendly name of this property.
+     * 
+     * @return the configured pretty name of this property definition
+     * @see #getName() {@code getName()} returns the actual property name
+     */
+    public String getTranslatedPrettyName()
+    {
+        return getBasePropertyClass().getTranslatedPrettyName(context);
     }
 
     /**
@@ -227,6 +239,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * @see #getNumber()
      * @since 2.4M2
      */
+    @Override
     public int compareTo(PropertyClass other)
     {
         return this.getBasePropertyClass().compareTo(other.getBasePropertyClass());

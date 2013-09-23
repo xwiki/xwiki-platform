@@ -1,0 +1,2 @@
+org.xwiki.wikistream.xar.internal.output.XAROutputWikiStream
+org.xwiki.wikistream.xar.internal.output.XAROutputWikiStreamFactory

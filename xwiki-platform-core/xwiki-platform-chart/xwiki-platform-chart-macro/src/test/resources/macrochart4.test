@@ -1,14 +1,16 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
+.# Note that we also verify that by when there's content
+.# in the macro the default source used is "inline".
 .#-----------------------------------------------------
-{{testchart type="line" source="inline" params="range:A2-D4;series:columns;" title="Chart Test" width="630" height="480"}}
+{{chart type="line" params="range:A2-D4;series:columns;" title="Chart Test" width="630" height="480"}}
 |CL1|CL2|CL3|CL4
 |2.3|3.4|5.6|1.2
 |3.4|1.2|1.2|6.4
 |6.0|4.5|0.2|3.4
-{{/testchart}}
+{{/chart}}
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding" alt="Chart Test"/></a></span></p>
+<p><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="temppath/chart/${{{regex:.*}}}"><img src="temppath/chart/${{{regex:.*}}}" class="wikimodel-freestanding" alt="Chart Test"/></a></span></p>

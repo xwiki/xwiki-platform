@@ -605,11 +605,16 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiDocument getWikiServer()
     {
+        return getWikiServer(getDatabase());
+    }
+
+    public XWikiDocument getWikiServer(String wiki)
+    {
         String currentWiki = getDatabase();
         try {
             setDatabase(getMainXWiki());
 
-            return getWiki().getDocument(XWiki.getServerWikiPage(currentWiki), this);
+            return getWiki().getDocument(XWiki.getServerWikiPage(wiki), this);
         } catch (XWikiException e) {
             LOGGER.error("Failed to get wiki descriptor for wiki [{}]", currentWiki, e);
         } finally {

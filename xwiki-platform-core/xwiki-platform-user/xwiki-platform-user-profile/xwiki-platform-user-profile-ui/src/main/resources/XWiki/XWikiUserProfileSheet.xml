@@ -242,7 +242,7 @@
             #if ($inEditMode)
               $doc.display($sectionProperty, 'edit')
             #else
-              $escapetool.xml($doc.getValue($sectionProperty))
+              $!escapetool.xml($doc.getValue($sectionProperty))
             #end
           &lt;/dd&gt;
           #end

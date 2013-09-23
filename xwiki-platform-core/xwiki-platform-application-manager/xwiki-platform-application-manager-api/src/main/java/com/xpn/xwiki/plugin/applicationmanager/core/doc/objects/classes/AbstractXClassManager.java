@@ -457,6 +457,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc.setContent(content != null ? content : getClassSheetDefaultContent());
                 doc.setSyntax(Syntax.XWIKI_1_0);
                 doc.setParent(getClassFullName());
+                doc.setHidden(true);
             }
 
             if (doc.isNew() || needsUpdate) {
@@ -513,8 +514,8 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                         + DOCUMENTCONTENT_EXT);
                 doc.setContent(content != null ? content : getClassTemplateDefaultContent());
                 doc.setSyntax(Syntax.XWIKI_1_0);
-
                 doc.setParent(getClassFullName());
+                doc.setHidden(true);
             }
 
             needsUpdate |= updateClassTemplateDocument(doc);

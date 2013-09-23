@@ -246,6 +246,7 @@
         #set ($templateXWikiGlobalRightsDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiGlobalRights'))
         #macro (setRights $documentReference $rightsClassDocumentReference $entity $comment $isGroup)
           #set ($document = $xwiki.getDocument($documentReference))
+          #set ($discard = $document.setHidden(true))
           #set ($serializedRightsClass = $services.model.serialize($rightsClassDocumentReference))
           #set ($entityType = "#if($isGroup)groups#{else}users#end")
           #set ($existingRight = $document.getObject($serializedRightsClass, $entityType, $entity))

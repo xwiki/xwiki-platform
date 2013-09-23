@@ -80,6 +80,7 @@
             **/OutdatedExtensionsDistributionStep.java,
             **/UpgradeModeDistributionStep.java,
             **/WelcomeDistributionStep.java,
+            **/WikisDefaultUIDistributionStep.java,
             **/WikiDistributionJob.java,
             **/WikiDistributionJobStatus.java
           </excludes>

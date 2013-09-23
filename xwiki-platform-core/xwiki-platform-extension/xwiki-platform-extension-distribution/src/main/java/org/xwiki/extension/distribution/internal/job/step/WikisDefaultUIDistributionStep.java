@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 import com.xpn.xwiki.XWikiContext;
@@ -63,31 +64,33 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
         if (getState() == null) {
             setState(State.COMPLETED);
 
-            XWikiContext xcontext = this.xcontextProvider.get();
+            if (this.distributionManager.getUpgradeMode() == UpgradeMode.ALLINONE) {
+                XWikiContext xcontext = this.xcontextProvider.get();
 
-            List<String> wikis;
-            try {
-                wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
-            } catch (XWikiException e) {
-                this.logger.error("Failed to get the list of wikis", e);
-                setState(null);
-                return;
-            }
+                List<String> wikis;
+                try {
+                    wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+                } catch (XWikiException e) {
+                    this.logger.error("Failed to get the list of wikis", e);
+                    setState(null);
+                    return;
+                }
 
-            ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
+                ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
 
-            for (String wiki : wikis) {
-                if (!xcontext.isMainWiki(wiki)) {
-                    String namespace = "wiki:" + wiki;
+                for (String wiki : wikis) {
+                    if (!xcontext.isMainWiki(wiki)) {
+                        String namespace = "wiki:" + wiki;
 
-                    // Only if the UI is not already installed
-                    if (wikiExtensionUI != null) {
-                        InstalledExtension installedExtension =
-                            this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
-                        if (installedExtension == null
-                            || !installedExtension.getId().getVersion().equals(wikiExtensionUI.getVersion())) {
-                            setState(null);
-                            return;
+                        // Only if the UI is not already installed
+                        if (wikiExtensionUI != null) {
+                            InstalledExtension installedExtension =
+                                this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
+                            if (installedExtension == null
+                                || !installedExtension.getId().getVersion().equals(wikiExtensionUI.getVersion())) {
+                                setState(null);
+                                return;
+                            }
                         }
                     }
                 }

@@ -1551,7 +1551,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceDocumentName</name>
     </property>
     <property>
-      <query>name:__INPUT__* OR title:__INPUT__* OR space:__INPUT__*</query>
+      <query>(title:__INPUT__* OR name:__INPUT__*) AND type:DOCUMENT</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1699,7 +1699,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceDocumentContent</name>
     </property>
     <property>
-      <query>doccontent:__INPUT__* OR doccontentraw:__INPUT__*</query>
+      <query>(doccontent:__INPUT__* OR doccontentraw:__INPUT__*) AND type:DOCUMENT</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>

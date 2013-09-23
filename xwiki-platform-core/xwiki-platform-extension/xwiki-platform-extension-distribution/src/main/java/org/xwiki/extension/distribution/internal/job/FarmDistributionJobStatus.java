@@ -58,6 +58,7 @@ public class FarmDistributionJobStatus extends DistributionJobStatus<Distributio
 
     private void init()
     {
+        /* TODO: enabled when the UI will be a bit more usable in all in one mode
         if (getSteps() != null) {
             for (DistributionStep step : getSteps()) {
                 if (step instanceof UpgradeModeDistributionStep) {
@@ -65,6 +66,7 @@ public class FarmDistributionJobStatus extends DistributionJobStatus<Distributio
                 }
             }
         }
+        */
     }
 
     public UpgradeMode getUpgradeMode()

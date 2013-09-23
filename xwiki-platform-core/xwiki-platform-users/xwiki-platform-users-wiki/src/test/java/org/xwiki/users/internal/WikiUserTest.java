@@ -20,10 +20,12 @@
 package org.xwiki.users.internal;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.users.User;
 
 import java.net.URI;
@@ -32,6 +34,8 @@ import java.net.URISyntaxException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
@@ -61,7 +65,7 @@ public class WikiUserTest
     public void setUp() throws Exception
     {
         this.serializer = mock(EntityReferenceSerializer.class);
-        this.resolver = mock(EntityReferenceResolver.class, "explicit");
+        this.resolver = mock(EntityReferenceResolver.class);
         this.bridgeMock = mock(DocumentAccessBridge.class);
         when(this.bridgeMock.getProperty(same(WikiUserTest.DEFAULT_USER_PROFILE),
             any(DocumentReference.class), same("first_name"))).thenReturn("Administrator");
@@ -72,6 +76,19 @@ public class WikiUserTest
         when(this.bridgeMock.getDocumentURL(WikiUserTest.DEFAULT_USER_PROFILE,
             "view", (String) null, (String) null)).thenReturn("/bin/XWiki/Admin");
         when(this.bridgeMock.exists(DEFAULT_USER_PROFILE)).thenReturn(true);
+        when(this.resolver.resolve(any(EntityReference.class), any(EntityType.class), any(DocumentReference.class)))
+            .thenAnswer(
+                new Answer<EntityReference>()
+                {
+                    @Override
+                    public EntityReference answer(InvocationOnMock invocation) throws Throwable
+                    {
+                        EntityReference toResolve = (EntityReference) invocation.getArguments()[0];
+                        DocumentReference reference = (DocumentReference) invocation.getArguments()[2];
+                        return new DocumentReference(toResolve.getName(),
+                            new SpaceReference(toResolve.getParent().getName(), reference.getRoot()));
+                    }
+                });
 
         this.user = new WikiUser(DEFAULT_USER_PROFILE, this.serializer, this.bridgeMock, this.resolver);
     }
@@ -95,6 +112,7 @@ public class WikiUserTest
     @Test
     public void idIsReference()
     {
+        when(this.serializer.serialize(DEFAULT_USER_PROFILE)).thenReturn("xwiki:XWiki.Admin");
         Assert.assertEquals("xwiki:XWiki.Admin", this.user.getId());
     }
 

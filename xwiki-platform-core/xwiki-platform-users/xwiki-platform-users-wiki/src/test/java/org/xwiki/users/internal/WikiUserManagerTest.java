@@ -27,6 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.users.User;
@@ -37,7 +38,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -78,6 +83,19 @@ public class WikiUserManagerTest
 
         when(this.configuration.getProperty("users.defaultUserSpace", "XWiki")).thenReturn("XWiki");
         when(WikiUserManagerTest.this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
+        when(this.referenceResolver.resolve(any(EntityReference.class), any(EntityType.class),
+            any(DocumentReference.class))).thenAnswer(
+            new Answer<EntityReference>()
+            {
+                @Override
+                public EntityReference answer(InvocationOnMock invocation) throws Throwable
+                {
+                    EntityReference toResolve = (EntityReference) invocation.getArguments()[0];
+                    DocumentReference reference = (DocumentReference) invocation.getArguments()[2];
+                    return new DocumentReference(toResolve.getName(),
+                        new SpaceReference(toResolve.getParent().getName(), reference.getRoot()));
+                }
+            });
 
         this.userManager = this.mocker.getComponentUnderTest();
     }
@@ -158,6 +176,8 @@ public class WikiUserManagerTest
     {
         setupMocks("xwiki");
         User u = this.userManager.getUser("Admin", true);
+        when(this.serializer.serialize(Mockito.same(new DocumentReference("xwiki", "XWiki", "Admin")))).
+            thenReturn("xwiki:XWiki.Admin");
         Assert.assertEquals("xwiki:XWiki.Admin", u.getId());
         Assert.assertTrue(u.exists());
     }
@@ -216,10 +236,10 @@ public class WikiUserManagerTest
         when(this.configuration.getProperty("users.defaultWiki", "local")).thenReturn("users");
         when(this.bridge.getCurrentDocumentReference()).thenReturn(new DocumentReference("local", "Main", "WebHome"));
 
-        when(this.bridge.exists(targetUser)).thenReturn(existing);
         when(this.bridge.exists(new DocumentReference("xwiki", targetSpace, "Admin"))).thenReturn(false);
         when(this.bridge.exists(new DocumentReference("users", targetSpace, "Admin"))).thenReturn(false);
         when(this.bridge.exists(new DocumentReference("local", targetSpace, "Admin"))).thenReturn(false);
+        when(this.bridge.exists(targetUser)).thenReturn(existing);
 
         when(this.referenceResolver.resolve(
             new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",

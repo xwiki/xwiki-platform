@@ -363,20 +363,20 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             return null;
         }
 
-        // Trim the username to allow users to enter their names with spaces before or after
-        String cannonicalUsername = username.replaceAll(" ", "");
-
         // Check for empty usernames
-        if (cannonicalUsername.equals("")) {
+        if (StringUtils.isBlank(username)) {
             context.put("message", "nousername");
             return null;
         }
 
         // Check for empty passwords
-        if ((password == null) || (password.trim().equals(""))) {
+        if (StringUtils.isBlank(password)) {
             context.put("message", "nopassword");
             return null;
         }
+
+        // Trim the username to allow users to enter their names with spaces before or after
+        String cannonicalUsername = username.replaceAll(" ", "");
 
         // Check for superadmin
         if (isSuperAdmin(cannonicalUsername)) {
@@ -415,7 +415,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 try {
                     String user = findUser(susername, context);
                     if (user != null && checkPassword(user, password, context)) {
-                        return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user: user);
+                        return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user : user);
                     }
                 } catch (Exception e) {
                     // continue

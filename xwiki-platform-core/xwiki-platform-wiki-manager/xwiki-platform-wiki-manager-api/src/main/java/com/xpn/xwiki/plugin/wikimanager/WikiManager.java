@@ -522,6 +522,12 @@ public final class WikiManager
             // Verify if server page already exist
             XWikiDocument docToSave = getDocument(context.getMainXWiki(), userWikiSuperDoc.getFullName(), context);
 
+            // If the server page is created, then make sure we create it hidden by default since it's a technical
+            // page.
+            if (docToSave.isNew()) {
+                docToSave.setHidden(true);
+            }
+
             if (!docToSave.isNew() && wikiClass.isInstance(docToSave)) {
                 // If we are not allowed to continue in case wiki descriptor page already
                 // exists.

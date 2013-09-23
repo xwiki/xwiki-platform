@@ -61,7 +61,7 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     @Override
     public void prepare()
     {
-        if (getState() == null) {
+        if (getState() != State.CANCELED) {
             setState(State.COMPLETED);
 
             if (this.distributionManager.getUpgradeMode() == UpgradeMode.ALLINONE) {

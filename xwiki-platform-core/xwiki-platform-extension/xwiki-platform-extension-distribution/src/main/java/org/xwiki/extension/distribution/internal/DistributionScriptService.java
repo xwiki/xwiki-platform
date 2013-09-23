@@ -122,13 +122,24 @@ public class DistributionScriptService implements ScriptService
     }
 
     /**
-     * @return the recommended user interface for {@link #getDistributionExtension()}
+     * @return the recommended user interface for current wiki
      */
     public ExtensionId getUIExtensionId()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
+        return getUIExtensionId(xcontext.getDatabase());
+    }
+
+    /**
+     * @param wiki the wiki
+     * @return the recommended user interface for passed wiki
+     */
+    public ExtensionId getUIExtensionId(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
             .getWikiUIExtensionId();
     }
 

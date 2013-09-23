@@ -121,6 +121,7 @@ public class DefaultPingSender implements PingSender
         return "{ \"" + TYPE + "\" : { \"properties\" : { "
             + "\"formatVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
             + "\"date\" : {\"type\" : \"date\"},"
+            + "\"distributionId\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
             + "\"distributionVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
             + "\"extensions\" : { \"properties\" : {"
             + "\"id\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
@@ -138,6 +139,10 @@ public class DefaultPingSender implements PingSender
         // Send distribution version if it exists (in case some distribution doesn't expose any information).
         CoreExtension distributionExtension = this.distributionManager.getDistributionExtension();
         if (distributionExtension != null) {
+            String distributionId = distributionExtension.getId().getId();
+            if (distributionId != null) {
+                jsonMap.put("distributionId", distributionId);
+            }
             Version distributionVersion = distributionExtension.getId().getVersion();
             if (distributionVersion != null) {
                 jsonMap.put("distributionVersion", distributionVersion.toString());

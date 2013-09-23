@@ -27,15 +27,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-users</artifactId>
   <name>XWiki Platform - Core - Users - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Users - Parent POM</description>
-  <properties>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <description>Users and user management APIs.</description>
   <modules>
     <module>xwiki-platform-users-api</module>
     <module>xwiki-platform-users-wiki</module>

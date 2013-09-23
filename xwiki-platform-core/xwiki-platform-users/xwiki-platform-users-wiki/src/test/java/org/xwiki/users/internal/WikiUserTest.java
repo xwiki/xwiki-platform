@@ -19,28 +19,32 @@
  */
 package org.xwiki.users.internal;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.users.User;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the invalid user flavor of {@link User}.
  * 
- * @version $Id:$
- * @since 2.5M2
+ * @version $Id$
+ * @since 5.3M1
  */
-public class WikiUserTest extends AbstractMockingComponentTestCase
+public class WikiUserTest
 {
     private static final DocumentReference DEFAULT_USER_PROFILE = new DocumentReference("xwiki", "XWiki", "Admin");
 
@@ -52,34 +56,23 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
 
     User user;
 
-    @Before
-    @Override
     @SuppressWarnings("unchecked")
+    @Before
     public void setUp() throws Exception
     {
-        super.setUp();
-        this.serializer = super.getComponentManager().lookup(EntityReferenceSerializer.class);
-        this.resolver = super.getComponentManager().lookup(EntityReferenceResolver.class, "explicit/reference");
-        this.bridgeMock = getMockery().mock(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(WikiUserTest.DEFAULT_USER_PROFILE),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue("Administrator"));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(WikiUserTest.DEFAULT_USER_PROFILE),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue(""));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(WikiUserTest.DEFAULT_USER_PROFILE),
-                    with(any(DocumentReference.class)), with("email"));
-                will(returnValue("admin@xwiki.org"));
-                allowing(WikiUserTest.this.bridgeMock).getDocumentURL(with(WikiUserTest.DEFAULT_USER_PROFILE),
-                    with("view"), with((String) null), with((String) null));
-                will(returnValue("/bin/XWiki/Admin"));
-                allowing(WikiUserTest.this.bridgeMock).exists(with(DEFAULT_USER_PROFILE));
-                will(returnValue(true));
-            }
-        });
+        this.serializer = mock(EntityReferenceSerializer.class);
+        this.resolver = mock(EntityReferenceResolver.class, "explicit");
+        this.bridgeMock = mock(DocumentAccessBridge.class);
+        when(this.bridgeMock.getProperty(same(WikiUserTest.DEFAULT_USER_PROFILE),
+            any(DocumentReference.class), same("first_name"))).thenReturn("Administrator");
+        when(this.bridgeMock.getProperty(same(WikiUserTest.DEFAULT_USER_PROFILE),
+            any(DocumentReference.class), same("last_name"))).thenReturn("");
+        when(this.bridgeMock.getProperty(same(WikiUserTest.DEFAULT_USER_PROFILE),
+            any(DocumentReference.class), same("email"))).thenReturn("admin@xwiki.org");
+        when(this.bridgeMock.getDocumentURL(WikiUserTest.DEFAULT_USER_PROFILE,
+            "view", (String) null, (String) null)).thenReturn("/bin/XWiki/Admin");
+        when(this.bridgeMock.exists(DEFAULT_USER_PROFILE)).thenReturn(true);
+
         this.user = new WikiUser(DEFAULT_USER_PROFILE, this.serializer, this.bridgeMock, this.resolver);
     }
 
@@ -94,16 +87,8 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
     {
         final User missingUser =
             new WikiUser(new DocumentReference("xwiki", "XWiki", "XWikiGuest"), this.serializer, this.bridgeMock,
-            this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).exists(
-                    with(missingUser.getProfileDocument()));
-                will(returnValue(false));
-            }
-        });
-
+                this.resolver);
+        when(this.bridgeMock.exists(missingUser.getProfileDocument())).thenReturn(false);
         Assert.assertFalse(missingUser.exists());
     }
 
@@ -124,17 +109,10 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
     {
         final DocumentReference specialUserProfile = new DocumentReference("xwiki", "XWiki", "nobody");
         this.user = new WikiUser(specialUserProfile, this.serializer, this.bridgeMock, this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue(" Mr. \n"));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue(" Nobody "));
-            }
-        });
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("first_name")))
+            .thenReturn(" Mr. \n");
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("last_name")))
+            .thenReturn(" Nobody ");
         Assert.assertEquals("Mr. Nobody", this.user.getName());
     }
 
@@ -143,17 +121,10 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
     {
         final DocumentReference specialUserProfile = new DocumentReference("xwiki", "XWiki", "aaaa");
         this.user = new WikiUser(specialUserProfile, this.serializer, this.bridgeMock, this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue("Anonymous"));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue(" "));
-            }
-        });
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("first_name")))
+            .thenReturn("Anonymous");
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("last_name")))
+            .thenReturn(" ");
         Assert.assertEquals("Anonymous", this.user.getName());
     }
 
@@ -162,17 +133,10 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
     {
         final DocumentReference specialUserProfile = new DocumentReference("xwiki", "XWiki", "nobody");
         this.user = new WikiUser(specialUserProfile, this.serializer, this.bridgeMock, this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue(""));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue(" Nobody "));
-            }
-        });
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("first_name")))
+            .thenReturn("");
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("last_name")))
+            .thenReturn(" Nobody ");
         Assert.assertEquals("Nobody", this.user.getName());
     }
 
@@ -181,17 +145,10 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
     {
         final DocumentReference specialUserProfile = new DocumentReference("xwiki", "XWiki", "ghost");
         this.user = new WikiUser(specialUserProfile, this.serializer, this.bridgeMock, this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue(""));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue(""));
-            }
-        });
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("first_name")))
+            .thenReturn("");
+        when(this.bridgeMock.getProperty(same(specialUserProfile), any(DocumentReference.class), same("last_name")))
+            .thenReturn("");
         Assert.assertEquals("ghost", this.user.getName());
     }
 
@@ -225,14 +182,7 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
         final DocumentReference specialUserProfile = new DocumentReference("playground", "SouthPark", "timmy");
         final DocumentReference specialUserClass = new DocumentReference("playground", "XWiki", "XWikiUsers");
         this.user = new WikiUser(specialUserProfile, this.serializer, this.bridgeMock, this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(WikiUserTest.this.bridgeMock).getProperty(with(specialUserProfile),
-                    with(specialUserClass), with("motto"));
-                will(returnValue("Living a lie!"));
-            }
-        });
+        when(this.bridgeMock.getProperty(specialUserProfile, specialUserClass, "motto")).thenReturn("Living a lie!");
         Assert.assertEquals("Living a lie!", this.user.getAttribute("motto"));
     }
 
@@ -255,56 +205,31 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
     {
         final User userWithNameAfterInSameWiki =
             new WikiUser(new DocumentReference("xwiki", "XWiki", "Jim"), this.serializer, this.bridgeMock,
-            this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(
-                    with(userWithNameAfterInSameWiki.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue("Jim"));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(
-                    with(userWithNameAfterInSameWiki.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue("James"));
-            }
-        });
+                this.resolver);
+        when(this.bridgeMock.getProperty(same(userWithNameAfterInSameWiki.getProfileDocument()),
+            any(DocumentReference.class), same("first_name"))).thenReturn("Jim");
+        when(this.bridgeMock.getProperty(same(userWithNameAfterInSameWiki.getProfileDocument()),
+            any(DocumentReference.class), same("last_name"))).thenReturn("James");
         Assert.assertTrue(this.user.compareTo(userWithNameAfterInSameWiki) < 0);
         Assert.assertTrue(userWithNameAfterInSameWiki.compareTo(this.user) > 0);
+
         final User userWithNameAfterInDifferentWiki =
             new WikiUser(new DocumentReference("playground", "XWiki", "Jim"), this.serializer, this.bridgeMock,
-            this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(
-                    with(userWithNameAfterInDifferentWiki.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue("Jim"));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(
-                    with(userWithNameAfterInDifferentWiki.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue("James"));
-            }
-        });
+                this.resolver);
+        when(this.bridgeMock.getProperty(same(userWithNameAfterInDifferentWiki.getProfileDocument()),
+            any(DocumentReference.class), same("first_name"))).thenReturn("Jim");
+        when(this.bridgeMock.getProperty(same(userWithNameAfterInDifferentWiki.getProfileDocument()),
+            any(DocumentReference.class), same("last_name"))).thenReturn("James");
         Assert.assertTrue(this.user.compareTo(userWithNameAfterInDifferentWiki) < 0);
         Assert.assertTrue(userWithNameAfterInDifferentWiki.compareTo(this.user) > 0);
+
         final User userWithNameBefore =
             new WikiUser(new DocumentReference("zone", "XWiki", "Aaron"), this.serializer, this.bridgeMock,
-            this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(
-                    with(userWithNameBefore.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue("Aaron"));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(
-                    with(userWithNameBefore.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue("Aronofsky"));
-            }
-        });
+                this.resolver);
+        when(this.bridgeMock.getProperty(same(userWithNameBefore.getProfileDocument()),
+            any(DocumentReference.class), same("first_name"))).thenReturn("Aaron");
+        when(this.bridgeMock.getProperty(same(userWithNameBefore.getProfileDocument()),
+            any(DocumentReference.class), same("last_name"))).thenReturn("Aronofsky");
         Assert.assertTrue(this.user.compareTo(userWithNameBefore) > 0);
         Assert.assertTrue(userWithNameBefore.compareTo(this.user) < 0);
     }
@@ -315,18 +240,13 @@ public class WikiUserTest extends AbstractMockingComponentTestCase
         Assert.assertTrue(this.user.compareTo(this.user) == 0);
         final User anotherUser =
             new WikiUser(new DocumentReference("playground", "XWiki", "Admin"), this.serializer, this.bridgeMock,
-            this.resolver);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(anotherUser.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("first_name"));
-                will(returnValue("Administrator"));
-                allowing(WikiUserTest.this.bridgeMock).getProperty(with(anotherUser.getProfileDocument()),
-                    with(any(DocumentReference.class)), with("last_name"));
-                will(returnValue(""));
-            }
-        });
+                this.resolver);
+
+        when(this.bridgeMock.getProperty(same(anotherUser.getProfileDocument()),
+            any(DocumentReference.class), same("first_name"))).thenReturn("Administrator");
+        when(this.bridgeMock.getProperty(same(anotherUser.getProfileDocument()),
+            any(DocumentReference.class), same("last_name"))).thenReturn("");
+
         Assert.assertTrue(this.user.compareTo(anotherUser) == 0);
         Assert.assertTrue(anotherUser.compareTo(this.user) == 0);
     }

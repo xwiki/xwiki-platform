@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -89,7 +89,7 @@ public class MetaUserManager extends AbstractUserManager
         }
         User result = null;
         try {
-            Map<String, UserManager> managers = this.componentManager.lookupMap(UserManager.class);
+            Map<String, UserManager> managers = this.componentManager.getInstanceMap(UserManager.class);
             managers.remove("default");
             for (UserManager manager : managers.values()) {
                 result = manager.getUser(identifier);
@@ -103,7 +103,7 @@ public class MetaUserManager extends AbstractUserManager
 
         if (force) {
             try {
-                UserManager defaultManager = this.componentManager.lookup(UserManager.class,
+                UserManager defaultManager = this.componentManager.getInstance(UserManager.class,
                     this.configuration.getProperty("users.defaultUserManager", "wiki"));
                 return defaultManager.getUser(identifier, true);
             } catch (ComponentLookupException ex) {

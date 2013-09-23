@@ -19,14 +19,6 @@
  */
 package org.xwiki.users.internal;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
@@ -37,21 +29,35 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.users.User;
 import org.xwiki.users.UserManager;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the meta user manager.
  * 
  * @version $Id$
- * @since 3.1M2
+ * @since 5.3M1
  */
-public class MetaUserManagerTest extends AbstractMockingComponentTestCase
+public class MetaUserManagerTest
 {
-    @MockingRequirement
-    private MetaUserManager userManager;
+    @Rule
+    public final MockitoComponentMockingRule<UserManager> mocker =
+        new MockitoComponentMockingRule<UserManager>(MetaUserManager.class);
+
+    private UserManager userManager;
 
     private EntityReferenceResolver<String> resolver;
 
@@ -61,43 +67,30 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
 
     private ModelConfiguration modelConfiguration;
 
+    private ComponentManager cm;
+
     @Before
-    @Override
-    @SuppressWarnings("unchecked")
     public void setUp() throws Exception
     {
-        super.setUp();
-        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "explicit");
-        this.serializer = getComponentManager().lookup(EntityReferenceSerializer.class);
-        this.configuration = getComponentManager().lookup(ConfigurationSource.class, "xwikiproperties");
-        this.modelConfiguration = getComponentManager().lookup(ModelConfiguration.class);
+        this.resolver = this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "explicit");
+        this.serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        this.configuration = this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+        this.modelConfiguration = this.mocker.getInstance(ModelConfiguration.class);
+        this.userManager = this.mocker.getComponentUnderTest();
+        this.cm = this.mocker.getInstance(ComponentManager.class);
     }
 
     @Test
     public void getUserFromUsernameWithNoManagers() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference admin = new DocumentReference("xwiki", "XWiki", "Admin");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(Collections.emptyMap()));
+        when(this.cm.getInstanceMap(UserManager.class)).thenReturn(Collections.<String, Object> emptyMap());
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
+        when(this.configuration.getProperty("users.defaultWiki", "xwiki")).thenReturn("xwiki");
+        when(this.resolver.resolve("Admin", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")))).thenReturn(admin);
+        when(this.serializer.serialize(admin, new Object[0])).thenReturn("xwiki:XWiki.Admin");
 
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("xwiki"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "xwiki");
-                will(returnValue("xwiki"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("Admin", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")));
-                will(returnValue(admin));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(admin), with(new Object[0]));
-                will(returnValue("xwiki:XWiki.Admin"));
-            }
-        });
         User u = this.userManager.getUser("Admin");
         Assert.assertEquals("xwiki:XWiki.Admin", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);
@@ -106,29 +99,14 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void getUserFromFullReferenceWithNoManagers() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference timmy = new DocumentReference("playground", "SouthPark", "Timmy");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(Collections.emptyMap()));
+        when(this.cm.getInstanceMap(UserManager.class)).thenReturn(Collections.<String, Object> emptyMap());
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
+        when(this.configuration.getProperty("users.defaultWiki", "xwiki")).thenReturn("xwiki");
+        when(this.resolver.resolve("playground:SouthPark.Timmy", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")))).thenReturn(timmy);
+        when(this.serializer.serialize(timmy, new Object[0])).thenReturn("playground:SouthPark.Timmy");
 
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("xwiki"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "xwiki");
-                will(returnValue("xwiki"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("playground:SouthPark.Timmy",
-                    EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")));
-                will(returnValue(timmy));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(timmy), with(new Object[0]));
-                will(returnValue("playground:SouthPark.Timmy"));
-            }
-        });
         User u = this.userManager.getUser("playground:SouthPark.Timmy");
         Assert.assertEquals("playground:SouthPark.Timmy", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);
@@ -137,28 +115,14 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void differentUsersWikiWithNoManagers() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference admin = new DocumentReference("sandbox", "XWiki", "Admin");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(Collections.emptyMap()));
+        when(this.cm.getInstanceMap(UserManager.class)).thenReturn(Collections.<String, Object> emptyMap());
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
+        when(this.configuration.getProperty("users.defaultWiki", "xwiki")).thenReturn("sandbox");
+        when(this.resolver.resolve("Admin", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("sandbox")))).thenReturn(admin);
+        when(this.serializer.serialize(admin, new Object[0])).thenReturn("sandbox:XWiki.Admin");
 
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("xwiki"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "xwiki");
-                will(returnValue("sandbox"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("Admin", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("sandbox")));
-                will(returnValue(admin));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(admin), with(new Object[0]));
-                will(returnValue("sandbox:XWiki.Admin"));
-            }
-        });
         User u = this.userManager.getUser("Admin");
         Assert.assertEquals("sandbox:XWiki.Admin", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);
@@ -167,28 +131,14 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void differentGlobalWikiWithNoManagers() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference admin = new DocumentReference("test", "XWiki", "Admin");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(Collections.emptyMap()));
+        when(this.cm.getInstanceMap(UserManager.class)).thenReturn(Collections.<String, Object> emptyMap());
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("test");
+        when(this.configuration.getProperty("users.defaultWiki", "test")).thenReturn("test");
+        when(this.resolver.resolve("Admin", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("test")))).thenReturn(admin);
+        when(this.serializer.serialize(admin, new Object[0])).thenReturn("test:XWiki.Admin");
 
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("test"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "test");
-                will(returnValue("test"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("Admin", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("test")));
-                will(returnValue(admin));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(admin), with(new Object[0]));
-                will(returnValue("test:XWiki.Admin"));
-            }
-        });
         User u = this.userManager.getUser("Admin");
         Assert.assertEquals("test:XWiki.Admin", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);
@@ -197,28 +147,18 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void managerIteration() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
-        final User mockUser = getMockery().mock(User.class);
-        final UserManager mockManager1 = getMockery().mock(UserManager.class, "um1");
-        final UserManager mockManager2 = getMockery().mock(UserManager.class, "um2");
-        final UserManager mockManager3 = getMockery().mock(UserManager.class, "um3");
+        final User mockUser = mock(User.class);
+        final UserManager mockManager1 = mock(UserManager.class, "um1");
+        final UserManager mockManager2 = mock(UserManager.class, "um2");
+        final UserManager mockManager3 = mock(UserManager.class, "um3");
         final Map<String, UserManager> managers = new LinkedHashMap<String, UserManager>();
         managers.put("1", mockManager1);
         managers.put("2", mockManager2);
         managers.put("3", mockManager3);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(managers));
+        when(this.cm.<UserManager> getInstanceMap(UserManager.class)).thenReturn(managers);
+        when(mockManager1.getUser("Admin")).thenReturn(null);
+        when(mockManager2.getUser("Admin")).thenReturn(mockUser);
 
-                exactly(1).of(mockManager1).getUser("Admin");
-                will(returnValue(null));
-
-                exactly(1).of(mockManager2).getUser("Admin");
-                will(returnValue(mockUser));
-            }
-        });
         User u = this.userManager.getUser("Admin");
         Assert.assertSame(mockUser, u);
     }
@@ -226,34 +166,20 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void managerIterationWithNoResults() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
-        final User mockUser = getMockery().mock(User.class);
-        final UserManager mockManager1 = getMockery().mock(UserManager.class, "ldap");
-        final UserManager mockManager2 = getMockery().mock(UserManager.class, "wiki");
+        final User mockUser = mock(User.class);
+        final UserManager mockManager1 = mock(UserManager.class, "ldap");
+        final UserManager mockManager2 = mock(UserManager.class, "wiki");
         final Map<String, UserManager> managers = new LinkedHashMap<String, UserManager>();
         managers.put("ldap", mockManager1);
         managers.put("wiki", mockManager2);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(managers));
-                exactly(1).of(cm).lookup(UserManager.class, "wiki");
-                will(returnValue(mockManager2));
+        when(this.cm.<UserManager> getInstanceMap(UserManager.class)).thenReturn(managers);
+        when(this.cm.getInstance(UserManager.class, "wiki")).thenReturn(mockManager2);
+        when(mockManager1.getUser("Admin")).thenReturn(null);
+        when(mockManager2.getUser("Admin")).thenReturn(null);
 
-                exactly(1).of(mockManager1).getUser("Admin");
-                will(returnValue(null));
+        when(this.configuration.getProperty("users.defaultUserManager", "wiki")).thenReturn("wiki");
 
-                exactly(1).of(mockManager2).getUser("Admin");
-                will(returnValue(null));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultUserManager", "wiki");
-                will(returnValue("wiki"));
-
-                exactly(1).of(mockManager2).getUser("Admin", true);
-                will(returnValue(mockUser));
-            }
-        });
+        when(mockManager2.getUser("Admin", true)).thenReturn(mockUser);
         User u = this.userManager.getUser("Admin", true);
         Assert.assertSame(mockUser, u);
     }
@@ -261,41 +187,23 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void managerIterationWithNoResultsAndNoDefaultValue() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
-        final UserManager mockManager1 = getMockery().mock(UserManager.class, "1");
+        final UserManager mockManager1 = mock(UserManager.class, "1");
         final Map<String, UserManager> managers = new LinkedHashMap<String, UserManager>();
         final DocumentReference admin = new DocumentReference("test", "XWiki", "Admin");
         managers.put("1", mockManager1);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(managers));
-                exactly(1).of(cm).lookup(UserManager.class, "wiki");
-                will(throwException(new ComponentLookupException("Missing Implementation")));
+        when(this.cm.<UserManager> getInstanceMap(UserManager.class)).thenReturn(managers);
+        when(this.cm.getInstance(UserManager.class, "wiki")).thenThrow(
+            new ComponentLookupException("Missing Implementation"));
 
-                exactly(1).of(mockManager1).getUser("Admin");
-                will(returnValue(null));
+        when(mockManager1.getUser("Admin")).thenReturn(null);
+        when(this.configuration.getProperty("users.defaultUserManager", "wiki")).thenReturn("wiki");
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("test");
+        when(this.configuration.getProperty("users.defaultWiki", "test")).thenReturn("test");
+        when(this.configuration.getProperty("users.defaultUserManager", "wiki")).thenReturn("wiki");
+        when(this.serializer.serialize(admin, new Object[0])).thenReturn("test:XWiki.Admin");
+        when(this.resolver.resolve("Admin", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("test")))).thenReturn(admin);
 
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultUserManager", "wiki");
-                will(returnValue("wiki"));
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("test"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "test");
-                will(returnValue("test"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultUserManager", "wiki");
-                will(returnValue("wiki"));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(admin), with(new Object[0]));
-                will(returnValue("test:XWiki.Admin"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("Admin", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("test")));
-                will(returnValue(admin));
-            }
-        });
         User u = this.userManager.getUser("Admin", true);
         Assert.assertEquals("test:XWiki.Admin", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);
@@ -304,32 +212,17 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void lookupExceptions() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference admin = new DocumentReference("test", "XWiki", "Admin");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(throwException(new ComponentLookupException("No Implementations")));
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultUserManager", "wiki");
-                will(returnValue("wiki"));
-                exactly(1).of(cm).lookup(UserManager.class, "wiki");
-                will(throwException(new ComponentLookupException("Missing Implementation")));
+        when(this.cm.getInstanceMap(UserManager.class)).thenThrow(new ComponentLookupException("No Implementations"));
+        when(this.configuration.getProperty("users.defaultUserManager", "wiki")).thenReturn("wiki");
+        when(this.cm.getInstance(UserManager.class, "wiki")).thenThrow(
+            new ComponentLookupException("Missing Implementation"));
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
+        when(this.configuration.getProperty("users.defaultWiki", "xwiki")).thenReturn("xwiki");
+        when(this.resolver.resolve("Admin", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")))).thenReturn(admin);
+        when(this.serializer.serialize(admin, new Object[0])).thenReturn("xwiki:XWiki.Admin");
 
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("xwiki"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "xwiki");
-                will(returnValue("xwiki"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("Admin", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")));
-                will(returnValue(admin));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(admin), with(new Object[0]));
-                will(returnValue("xwiki:XWiki.Admin"));
-            }
-        });
         User u = this.userManager.getUser("Admin", true);
         Assert.assertEquals("xwiki:XWiki.Admin", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);
@@ -338,32 +231,17 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void differentDefaultUserManager() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference admin = new DocumentReference("test", "XWiki", "Admin");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(Collections.emptyMap()));
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultUserManager", "wiki");
-                will(returnValue("ldap"));
-                exactly(1).of(cm).lookup(UserManager.class, "ldap");
-                will(throwException(new ComponentLookupException("Missing Implementation")));
+        when(this.cm.getInstanceMap(UserManager.class)).thenReturn(Collections.<String, Object> emptyMap());
+        when(this.configuration.getProperty("users.defaultUserManager", "wiki")).thenReturn("ldap");
+        when(this.cm.getInstance(UserManager.class, "ldap")).thenThrow(
+            new ComponentLookupException("Missing Implementation"));
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
+        when(this.configuration.getProperty("users.defaultWiki", "xwiki")).thenReturn("xwiki");
+        when(this.resolver.resolve("Admin", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")))).thenReturn(admin);
+        when(this.serializer.serialize(admin, new Object[0])).thenReturn("xwiki:XWiki.Admin");
 
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("xwiki"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "xwiki");
-                will(returnValue("xwiki"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("Admin", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")));
-                will(returnValue(admin));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(admin), with(new Object[0]));
-                will(returnValue("xwiki:XWiki.Admin"));
-            }
-        });
         User u = this.userManager.getUser("Admin", true);
         Assert.assertEquals("xwiki:XWiki.Admin", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);
@@ -404,34 +282,17 @@ public class MetaUserManagerTest extends AbstractMockingComponentTestCase
     @Test
     public void forceWithMissingDefaultManager() throws Exception
     {
-        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference admin = new DocumentReference("test", "XWiki", "Admin");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(cm).lookupMap(UserManager.class);
-                will(returnValue(Collections.emptyMap()));
+        when(this.cm.getInstanceMap(UserManager.class)).thenReturn(Collections.<String, Object> emptyMap());
+        when(this.cm.getInstance(UserManager.class, "wiki")).thenThrow(
+            new ComponentLookupException("Missing implementation"));
+        when(this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("test");
+        when(this.configuration.getProperty("users.defaultWiki", "test")).thenReturn("test");
+        when(this.configuration.getProperty("users.defaultUserManager", "wiki")).thenReturn("wiki");
+        when(this.serializer.serialize(admin, new Object[0])).thenReturn("test:XWiki.Admin");
+        when(this.resolver.resolve("Admin", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE, new WikiReference("test")))).thenReturn(admin);
 
-                allowing(cm).lookup(UserManager.class, "wiki");
-                will(throwException(new ComponentLookupException("Missing implementation")));
-
-                allowing(MetaUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("test"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultWiki", "test");
-                will(returnValue("test"));
-
-                allowing(MetaUserManagerTest.this.configuration).getProperty("users.defaultUserManager", "wiki");
-                will(returnValue("wiki"));
-
-                exactly(1).of(MetaUserManagerTest.this.serializer).serialize(with(admin), with(new Object[0]));
-                will(returnValue("test:XWiki.Admin"));
-
-                exactly(1).of(MetaUserManagerTest.this.resolver).resolve("Admin", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE, new WikiReference("test")));
-                will(returnValue(admin));
-            }
-        });
         User u = this.userManager.getUser("Admin");
         Assert.assertEquals("test:XWiki.Admin", u.getId());
         Assert.assertTrue(u instanceof InvalidUser);

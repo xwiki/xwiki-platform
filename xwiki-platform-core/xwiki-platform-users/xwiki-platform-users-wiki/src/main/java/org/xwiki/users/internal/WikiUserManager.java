@@ -19,11 +19,6 @@
  */
 package org.xwiki.users.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -40,10 +35,16 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.users.AbstractUserManager;
 import org.xwiki.users.User;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * User manager based on wiki documents holding {@code XWiki.XWikiUsers} XObjects.
  * 
- * @version $Id:$
+ * @version $Id$
  * @since 3.1M2
  */
 @Component
@@ -75,7 +76,7 @@ public class WikiUserManager extends AbstractUserManager implements Initializabl
 
     /** Entity reference resolver to pass to {@link WikiUser} instances. */
     @Inject
-    @Named("explicit/reference")
+    @Named("explicit")
     private EntityReferenceResolver<EntityReference> explicitResolver;
 
     /** The configured default wiki/space where user profiles are stored. */
@@ -87,6 +88,7 @@ public class WikiUserManager extends AbstractUserManager implements Initializabl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void initialize() throws InitializationException
     {
         this.defaultSpace = this.configuration.getProperty("users.defaultUserSpace", "XWiki");
@@ -99,6 +101,7 @@ public class WikiUserManager extends AbstractUserManager implements Initializabl
      * 
      * @see org.xwiki.users.UserManager#getUser(String, boolean)
      */
+    @Override
     public User getUser(String identifier, boolean force)
     {
         if (StringUtils.isBlank(identifier)) {

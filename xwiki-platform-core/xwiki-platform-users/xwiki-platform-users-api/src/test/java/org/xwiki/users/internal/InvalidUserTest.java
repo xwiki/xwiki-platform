@@ -19,13 +19,16 @@
  */
 package org.xwiki.users.internal;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.users.User;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.users.User;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the invalid user flavor of {@link User}.
@@ -33,20 +36,20 @@ import org.xwiki.users.User;
  * @version $Id$
  * @since 3.1M2
  */
-public class InvalidUserTest extends AbstractMockingComponentTestCase
+public class InvalidUserTest
 {
     private EntityReferenceSerializer<String> serializer;
 
     private User user;
 
+    private DocumentReference profile = new DocumentReference("xwiki", "XWiki", "Admin");
+
     @Before
-    @Override
     @SuppressWarnings("unchecked")
     public void setUp() throws Exception
     {
-        super.setUp();
-        this.serializer = super.getComponentManager().lookup(EntityReferenceSerializer.class);
-        this.user = new InvalidUser(new DocumentReference("xwiki", "XWiki", "Admin"), this.serializer);
+        this.serializer = mock(EntityReferenceSerializer.class);
+        this.user = new InvalidUser(this.profile, this.serializer);
     }
 
     @Test
@@ -58,6 +61,7 @@ public class InvalidUserTest extends AbstractMockingComponentTestCase
     @Test
     public void idIsReference()
     {
+        when(this.serializer.serialize(this.profile)).thenReturn("xwiki:XWiki.Admin");
         Assert.assertEquals("xwiki:XWiki.Admin", this.user.getId());
     }
 

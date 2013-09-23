@@ -22,7 +22,7 @@ package org.xwiki.users.internal;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,7 +35,7 @@ import org.xwiki.users.AbstractUser;
  * Class representing a XWiki User based on wiki documents holding {@code XWiki.XWikiUsers} XObjects.
  * 
  * @version $Id$
- * @since 3.1M2
+ * @since 5.3M1
  */
 public class WikiUser extends AbstractUser
 {

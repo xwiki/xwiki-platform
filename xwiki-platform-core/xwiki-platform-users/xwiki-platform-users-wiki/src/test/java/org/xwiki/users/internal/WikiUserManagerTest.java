@@ -19,11 +19,6 @@
  */
 package org.xwiki.users.internal;
 
-import org.apache.commons.lang.StringUtils;
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
@@ -33,20 +28,31 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.users.User;
+import org.xwiki.users.UserManager;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the wiki user manager.
  * 
- * @version $Id:$
- * @since 3.1M2
+ * @version $Id$
+ * @since 5.3M1
  */
-public class WikiUserManagerTest extends AbstractMockingComponentTestCase
+public class WikiUserManagerTest
 {
-    @MockingRequirement
-    private WikiUserManager userManager;
+    @Rule
+    public final MockitoComponentMockingRule<UserManager> mocker =
+        new MockitoComponentMockingRule<UserManager>(WikiUserManager.class);
+
+    private UserManager userManager;
 
     private EntityReferenceResolver<String> nameResolver;
 
@@ -61,33 +67,19 @@ public class WikiUserManagerTest extends AbstractMockingComponentTestCase
     private DocumentAccessBridge bridge;
 
     @Before
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public void configure() throws Exception
     {
-        this.nameResolver = getComponentManager().lookup(EntityReferenceResolver.class, "explicit");
-        this.referenceResolver = getComponentManager().lookup(EntityReferenceResolver.class, "explicit/reference");
-        this.serializer = getComponentManager().lookup(EntityReferenceSerializer.class);
-        this.configuration = getComponentManager().lookup(ConfigurationSource.class, "xwikiproperties");
-        this.modelConfiguration = getComponentManager().lookup(ModelConfiguration.class);
-        this.bridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        this.nameResolver = this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "explicit");
+        this.referenceResolver = this.mocker.getInstance(EntityReferenceResolver.TYPE_REFERENCE, "explicit");
+        this.serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        this.configuration = this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+        this.modelConfiguration = this.mocker.getInstance(ModelConfiguration.class);
+        this.bridge = this.mocker.getInstance(DocumentAccessBridge.class);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserManagerTest.this.configuration).getProperty("users.defaultUserSpace", "XWiki");
-                will(returnValue("XWiki"));
+        when(this.configuration.getProperty("users.defaultUserSpace", "XWiki")).thenReturn("XWiki");
+        when(WikiUserManagerTest.this.modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
 
-                allowing(WikiUserManagerTest.this.modelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
-                will(returnValue("xwiki"));
-            }
-        });
+        this.userManager = this.mocker.getComponentUnderTest();
     }
 
     @Test
@@ -221,49 +213,36 @@ public class WikiUserManagerTest extends AbstractMockingComponentTestCase
         final boolean existing)
     {
         final DocumentReference targetUser = new DocumentReference(targetUserWiki, "XWiki", "Admin");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(WikiUserManagerTest.this.configuration).getProperty("users.defaultWiki", "local");
-                will(returnValue("users"));
-                allowing(WikiUserManagerTest.this.bridge).getCurrentDocumentReference();
-                will(returnValue(new DocumentReference("local", "Main", "WebHome")));
+        when(this.configuration.getProperty("users.defaultWiki", "local")).thenReturn("users");
+        when(this.bridge.getCurrentDocumentReference()).thenReturn(new DocumentReference("local", "Main", "WebHome"));
 
-                allowing(WikiUserManagerTest.this.bridge).exists(targetUser);
-                will(returnValue(existing));
-                allowing(WikiUserManagerTest.this.bridge).exists(new DocumentReference("xwiki", targetSpace, "Admin"));
-                will(returnValue(false));
-                allowing(WikiUserManagerTest.this.bridge).exists(new DocumentReference("users", targetSpace, "Admin"));
-                will(returnValue(false));
-                allowing(WikiUserManagerTest.this.bridge).exists(new DocumentReference("local", targetSpace, "Admin"));
-                will(returnValue(false));
+        when(this.bridge.exists(targetUser)).thenReturn(existing);
+        when(this.bridge.exists(new DocumentReference("xwiki", targetSpace, "Admin"))).thenReturn(false);
+        when(this.bridge.exists(new DocumentReference("users", targetSpace, "Admin"))).thenReturn(false);
+        when(this.bridge.exists(new DocumentReference("local", targetSpace, "Admin"))).thenReturn(false);
 
-                allowing(WikiUserManagerTest.this.referenceResolver).resolve(
-                    new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
-                    EntityType.SPACE)), EntityType.DOCUMENT, targetUser);
-                will(returnValue(new DocumentReference(targetUserWiki, "XWiki", "XWikiUsers")));
+        when(this.referenceResolver.resolve(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
+                EntityType.SPACE)), EntityType.DOCUMENT, targetUser))
+            .thenReturn(new DocumentReference(targetUserWiki, "XWiki", "XWikiUsers"));
 
-                allowing(WikiUserManagerTest.this.serializer).serialize(with(targetUser), with(new Object[0]));
-                will(returnValue(targetUserWiki + ":" + targetSpace + "."
-                    + StringUtils.defaultIfEmpty(StringUtils.substringAfterLast(passedIdentifier, "."),
-                    passedIdentifier)));
+        when(this.serializer.serialize(targetUser, new Object[0])).thenReturn(targetUserWiki + ":" + targetSpace + "."
+            + StringUtils.defaultIfEmpty(StringUtils.substringAfterLast(passedIdentifier, "."),
+                passedIdentifier));
 
-                if (passedIdentifier.startsWith(targetUserWiki + ":")) {
-                    exactly(1).of(WikiUserManagerTest.this.nameResolver).resolve(passedIdentifier, EntityType.DOCUMENT,
-                        new EntityReference("XWiki", EntityType.SPACE, new WikiReference("local")));
-                    will(returnValue(targetUser));
-                } else {
-                    allowing(WikiUserManagerTest.this.nameResolver).resolve(passedIdentifier, EntityType.DOCUMENT,
-                        new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki")));
-                    will(returnValue(new DocumentReference("xwiki", targetSpace, "Admin")));
-                    allowing(WikiUserManagerTest.this.nameResolver).resolve(passedIdentifier, EntityType.DOCUMENT,
-                        new EntityReference("XWiki", EntityType.SPACE, new WikiReference("users")));
-                    will(returnValue(new DocumentReference("users", targetSpace, "Admin")));
-                    allowing(WikiUserManagerTest.this.nameResolver).resolve(passedIdentifier, EntityType.DOCUMENT,
-                        new EntityReference("XWiki", EntityType.SPACE, new WikiReference("local")));
-                    will(returnValue(new DocumentReference("local", targetSpace, "Admin")));
-                }
-            }
-        });
+        if (passedIdentifier.startsWith(targetUserWiki + ":")) {
+            when(this.nameResolver.resolve(passedIdentifier, EntityType.DOCUMENT,
+                new EntityReference("XWiki", EntityType.SPACE, new WikiReference("local")))).thenReturn(targetUser);
+        } else {
+            when(this.nameResolver.resolve(passedIdentifier, EntityType.DOCUMENT,
+                new EntityReference("XWiki", EntityType.SPACE, new WikiReference("xwiki"))))
+                .thenReturn(new DocumentReference("xwiki", targetSpace, "Admin"));
+            when(this.nameResolver.resolve(passedIdentifier, EntityType.DOCUMENT,
+                new EntityReference("XWiki", EntityType.SPACE, new WikiReference("users"))))
+                .thenReturn(new DocumentReference("users", targetSpace, "Admin"));
+            when(this.nameResolver.resolve(passedIdentifier, EntityType.DOCUMENT,
+                new EntityReference("XWiki", EntityType.SPACE, new WikiReference("local"))))
+                .thenReturn(new DocumentReference("local", targetSpace, "Admin"));
+        }
     }
 }

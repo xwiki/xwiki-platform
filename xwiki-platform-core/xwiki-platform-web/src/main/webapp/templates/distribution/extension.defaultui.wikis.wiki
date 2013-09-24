@@ -1,0 +1,47 @@
+##syntax=xwiki/2.1
+{{velocity output="false"}}
+## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
+## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to
+## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
+## but unfortunately this doesn't allow the template to be overridden from the skin.
+#evaluate("#include('extension.vm')")
+{{/velocity}}
+
+{{velocity}}
+#if ("$!request.action" == '')
+  ## Display the step.
+  {{translation key="platform.extension.distributionWizard.wikisStepDescription"/}}
+
+  ## We use HTML here because definition lists don't support block content in wiki syntax (XRENDERING-233).
+  {{html}}
+  <dl>
+  #set ($showCompleteStepButton = true)
+  #foreach ($wikiName in $xwiki.wikiNames)
+    ## The main wiki is handled in the first step.
+    #if ($wikiName != $xcontext.mainWikiName)
+      #set ($extensionId = $services.distribution.getUIExtensionId($wikiName))
+      #set ($extension = $services.extension.resolve($extensionId.id, $extensionId.version.value))
+      ## The extension display uses this variable to determine the extension status.
+      #set ($extensionNamespace = "wiki:$wikiName")
+      <dt>#displayExtensionNamespace($extensionNamespace)</dt>
+      <dd>
+        #if ($extension)
+          #displayExtension($extension)
+          #if ($extensionStatus != 'installed')
+            #set ($showCompleteStepButton = false)
+          #end
+        #else
+          <div class="box infomessage">
+            $services.localization.render('extensions.advancedSearch.noResults',
+            ["<strong>$!escapetool.xml($extensionId.id)</strong>",
+            "<strong>$!escapetool.xml($extensionId.version)</strong>"])
+          </div>
+          #set ($showCompleteStepButton = false)
+        #end
+      </dd>
+    #end
+  #end
+  </dl>
+  {{/html}}
+#end
+{{/velocity}}

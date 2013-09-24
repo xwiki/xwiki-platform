@@ -75,11 +75,13 @@
             **/DistributionRequest.java,
             **/DistributionStep.java,
             **/DistributionStepStatus.java,
+            **/DistributionScriptService.java,
             **/DefaultDistributionManager.java,
             **/FarmDistributionJobStatus.java,
             **/OutdatedExtensionsDistributionStep.java,
             **/UpgradeModeDistributionStep.java,
             **/WelcomeDistributionStep.java,
+            **/WikisDefaultUIDistributionStep.java,
             **/WikiDistributionJob.java,
             **/WikiDistributionJobStatus.java
           </excludes>

@@ -32,6 +32,8 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep;
 
 /**
  * @version $Id$
@@ -58,14 +60,21 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
 
         // Step 2: Upgrade mode
 
-        /* TODO: enabled when the UI will be a bit more usable in all in one mode
         try {
             steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
                 UpgradeModeDistributionStep.ID));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get upgrade mode step instance");
         }
-        */
+
+        // Step 3: Upgrade mode
+
+        try {
+            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+                WikisDefaultUIDistributionStep.ID));
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to get all in one default UI step instance");
+        }
 
         // Step 3: Upgrade outdated extensions
 

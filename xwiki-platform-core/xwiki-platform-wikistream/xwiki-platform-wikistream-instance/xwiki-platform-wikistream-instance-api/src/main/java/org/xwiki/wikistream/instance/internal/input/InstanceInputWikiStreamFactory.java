@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -34,7 +35,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @since 5.2M2
  */
 @Component
-@Named(InstanceInputWikiStreamFactory.ROLEHINT)
+@Named(InstanceUtils.ROLEHINT)
 @Singleton
 public class InstanceInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<InstanceInputProperties>
 {

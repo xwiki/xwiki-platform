@@ -19,14 +19,24 @@
  */
 package org.xwiki.wikistream.script;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.input.InputWikiStream;
+import org.xwiki.wikistream.input.InputWikiStreamFactory;
+import org.xwiki.wikistream.output.OutputWikiStream;
+import org.xwiki.wikistream.output.OutputWikiStreamFactory;
+import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
  * Expose various WikiStream related APIs to scripts.
@@ -45,8 +55,35 @@ public class WikiStreamScriptService implements ScriptService
     @Inject
     private ScriptServiceManager scriptServiceManager;
 
+    @Inject
+    private ComponentManager componentManager;
+
     public ScriptService get(String id)
     {
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
+    }
+
+    public void convert(WikiStreamType inputType, Map<String, Object> inputProperties, WikiStreamType outputType,
+        Map<String, Object> outputProperties) throws WikiStreamException, ComponentLookupException
+    {
+        createInputWikiStream(inputType, inputProperties).read(createOutputWikiStream(outputType, outputProperties));
+    }
+
+    public InputWikiStream createInputWikiStream(WikiStreamType inputType, Map<String, Object> inputProperties)
+        throws ComponentLookupException, WikiStreamException
+    {
+        InputWikiStreamFactory factory =
+            this.componentManager.getInstance(InputWikiStreamFactory.class, inputType.serialize());
+
+        return factory.createInputWikiStream(inputProperties);
+    }
+
+    public OutputWikiStream createOutputWikiStream(WikiStreamType outputType, Map<String, Object> outputProperties)
+        throws ComponentLookupException, WikiStreamException
+    {
+        OutputWikiStreamFactory factory =
+            this.componentManager.getInstance(OutputWikiStreamFactory.class, outputType.serialize());
+
+        return factory.creaOutputWikiStream(outputProperties);
     }
 }

@@ -35,6 +35,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
 import org.xwiki.wikistream.instance.internal.InstanceModel;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 
 /**
@@ -42,7 +43,7 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
  * @since 5.2M2
  */
 @Component
-@Named("xwiki+instance")
+@Named(InstanceUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<InstanceInputProperties, InstanceFilter>
 {

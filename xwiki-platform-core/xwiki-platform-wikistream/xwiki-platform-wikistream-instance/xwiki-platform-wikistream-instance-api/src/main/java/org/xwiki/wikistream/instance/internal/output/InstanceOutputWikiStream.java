@@ -19,14 +19,21 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
+import java.util.List;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.filter.FilterEventParameters;
-import org.xwiki.filter.FilterException;
-import org.xwiki.filter.UnknownFilter;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.filter.FilterDescriptorManager;
+import org.xwiki.filter.internal.CompositeFilter;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.instance.output.InstanceOutputEventReader;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 
 /**
@@ -34,31 +41,29 @@ import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
  * @since 5.2M2
  */
 @Component
-@Named("xwiki+instance")
+@Named(InstanceUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<InstanceOutputProperties> implements
-    UnknownFilter
+    Initializable
 {
-    // events
+    @Inject
+    private FilterDescriptorManager filterManager;
+
+    @Inject
+    private List<InstanceOutputEventReader> eventReaders;
+
+    @Inject
+    private CompositeFilter filter;
 
     @Override
-    public void beginUnknwon(String id, FilterEventParameters parameters) throws FilterException
+    public void initialize() throws InitializationException
     {
-        // TODO Auto-generated method stub
-
+        this.filter = new CompositeFilter(this.eventReaders, this.filterManager);
     }
 
     @Override
-    public void endUnknwon(String id, FilterEventParameters parameters) throws FilterException
+    public Object getFilter() throws WikiStreamException
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onUnknwon(String id, FilterEventParameters parameters) throws FilterException
-    {
-        // TODO Auto-generated method stub
-
+        return this.filter;
     }
 }

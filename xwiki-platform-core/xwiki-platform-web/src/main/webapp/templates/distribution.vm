@@ -145,10 +145,11 @@
   #end
   $response.sendRedirect($redirectURL)
 #else
-  ## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
-  ## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template
-  ## when this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
-  #parse('extension.vm')
+  ## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which
+  ## makes them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly"
+  ## fails to register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with
+  ## #include but unfortunately this doesn't allow the template to be overridden from the skin.
+  #evaluate("#include('extension.vm')")
   #if ("$!request.action" != '')
     #handleStepAction($request.action)
   #elseif ($isAjaxRequest)

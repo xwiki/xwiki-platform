@@ -39,3 +39,11 @@
 #previousUi dt label {
   font-size: .75em;
 }
+#extension\.defaultui\.wikis form.extension-item {
+  margin-top: .5em;
+}
+#extension\.defaultui\.wikis > dl > dt {
+  display: list-item;
+  list-style-position: inside;
+  margin-top: 1.5em;
+}

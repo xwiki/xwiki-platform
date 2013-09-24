@@ -249,9 +249,10 @@ XWiki.DefaultUIStep = Class.create({
 });
 
 /**
- * Enhances the distribution step where the outdated extensions are upgraded.
+ * Base class for steps that list extensions and that require those extensions to satisfy some condition before they
+ * can be completed.
  */
-XWiki.OutdatedExtensionsStep = Class.create({
+var AbstractExtensionListStep = Class.create({
   initialize : function () {
     this.container = $('distributionWizard');
     // Listen to extension status change to be able to update the step buttons.
@@ -259,7 +260,8 @@ XWiki.OutdatedExtensionsStep = Class.create({
     // Listen to DOM changes to catch when the list of extensions is reloaded.
     document.observe('xwiki:dom:updated', function(event) {
       event.memo.elements.each(function(element) {
-        element.id == 'extensionUpdater' && this._updateStepButtons();
+        // Update the step buttons only if the updated element contains extensions.
+        element.down('.extension-item') && this._updateStepButtons();
       }.bind(this));
     }.bindAsEventListener(this));
   },
@@ -268,18 +270,17 @@ XWiki.OutdatedExtensionsStep = Class.create({
     var stepButtons = $('stepButtons');
     if (!stepButtons) return;
     stepButtons = stepButtons.select('button');
-    var checkForUpdatesLink = this.container.down('.checkForUpdates');
     // Disable the step buttons if there is any extension loading.
-    if (this.container.down('.extension-item-loading') || this.container.down('.extension-log-item-loading')) {
+    if (this.container.down('.extension-item.extension-item-loading') || this.container.down('.extension-log-item-loading')) {
       // Disable all step buttons.
       stepButtons.invoke('disable');
-      checkForUpdatesLink && checkForUpdatesLink.up().hide();
+      this._disable && this._disable();
     } else {
       // Enable all step buttons.
       stepButtons.invoke('enable');
-      checkForUpdatesLink && checkForUpdatesLink.up().show();
-      // Show the Continue button if all the invalid extensions have been fixed.
-      if (this._noInvalidExtensions()) {
+      this._enable && this._enable();
+      // Show the Continue button if the step is completed.
+      if (this._isCompleted && this._isCompleted()) {
         // Show the Continue button.
         stepButtons[0].up().removeClassName('hidden');
         stepButtons[1].up().addClassName('hidden');
@@ -291,9 +292,24 @@ XWiki.OutdatedExtensionsStep = Class.create({
         stepButtons[2].up().removeClassName('hidden');
       }
     }
+  }
+});
+
+/**
+ * Enhances the distribution step where the outdated extensions are upgraded.
+ */
+XWiki.OutdatedExtensionsStep = Class.create(AbstractExtensionListStep, {
+  _enable : function() {
+    var checkForUpdatesLink = this.container.down('.checkForUpdates');
+    checkForUpdatesLink && checkForUpdatesLink.up('.xHint').show();
   },
 
-  _noInvalidExtensions : function() {
+  _disable: function() {
+    var checkForUpdatesLink = this.container.down('.checkForUpdates');
+    checkForUpdatesLink && checkForUpdatesLink.up('.xHint').hide();
+  },
+
+  _isCompleted : function() {
     var invalidExtensionsCount = 0;
     var invalidExtensionsFixedCount = 0;
     this.container.select('.invalidExtensions').each(function(invalidExtensionsWrapper) {
@@ -307,8 +323,28 @@ XWiki.OutdatedExtensionsStep = Class.create({
   }
 });
 
+var WikisStep = Class.create(AbstractExtensionListStep, {
+  _isCompleted : function() {
+    // This step is completed when all the listed wikis have the recommended user interface version installed.
+    var wikiCount = this.container.down('dl').childElements().length / 2;
+    var extensions = this.container.select('.extension-item');
+    if (wikiCount != extensions.length) {
+      // Some extensions couldn't be resolved.
+      return false;
+    }
+    for (var i = 0; i < extensions.length; i++) {
+      if (!extensions[i].hasClassName('extension-item-installed')) {
+        // The recommended user interface version is not installed.
+        return false;
+      }
+    }
+    return true;
+  }
+});
+
 function init() {
   $('extension.defaultui') && new XWiki.DefaultUIStep();
+  $('extension.defaultui.wikis') && new WikisStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();
   return true;
 }

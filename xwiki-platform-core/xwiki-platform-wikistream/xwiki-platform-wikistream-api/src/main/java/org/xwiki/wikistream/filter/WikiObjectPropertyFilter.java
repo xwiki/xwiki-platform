@@ -34,7 +34,7 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiObjectPropertyFilter
 {
-    void onWikiObjectProperty(@Name("name") String propertyName, @Name("value") String value,
+    void onWikiObjectProperty(@Name("name") String name, @Name("value") String value,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 }

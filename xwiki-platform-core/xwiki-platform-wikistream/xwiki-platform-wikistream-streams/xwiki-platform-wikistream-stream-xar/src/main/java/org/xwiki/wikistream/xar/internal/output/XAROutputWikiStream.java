@@ -171,7 +171,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         }
 
         this.writer.writeStartDocument();
+
         this.writer.writeStartElement(XARDocumentModel.ELEMENT_DOCUMENT);
+        this.writer.writeAttribute(XARDocumentModel.ATTRIBUTE_STREAMVERSION, "1.1");
+
         this.writer.writeElement(XARDocumentModel.ELEMENT_SPACE, this.currentSpace);
         this.writer.writeElement(XARDocumentModel.ELEMENT_NAME, this.currentDocument);
 
@@ -250,7 +253,8 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     }
 
     @Override
-    public void beginWikiAttachment(String name, FilterEventParameters parameters) throws WikiStreamException
+    public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
+        throws WikiStreamException
     {
         this.writer.writeStartElement(XARAttachmentModel.ELEMENT_ATTACHMENT);
 
@@ -262,48 +266,41 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_DATE,
             toString((Date) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)));
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_VERSION,
-            (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_VERSION));
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION,
+            (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_COMMENT,
             (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
-    }
 
-    @Override
-    public void endWikiAttachment(String attachmentName, FilterEventParameters parameters) throws WikiStreamException
-    {
-        this.writer.writeEndElement();
-    }
+        if (content != null) {
+            long contentSize = 0;
 
-    @Override
-    public void onWikiAttachmentContent(InputStream content, Long size, FilterEventParameters parameters)
-        throws WikiStreamException
-    {
-        long contentSize = 0;
-
-        this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
-        byte[] buffer = new byte[4096];
-        int readSize;
-        do {
-            try {
-                readSize = content.read(buffer, 0, 4096);
-            } catch (IOException e) {
-                throw new WikiStreamException("Failed to read content stream", e);
-            }
-
-            if (readSize > 0) {
-                String chunk;
-                if (readSize == 4096) {
-                    chunk = Base64.encodeBase64String(buffer);
-                } else {
-                    chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
+            this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
+            byte[] buffer = new byte[4096];
+            int readSize;
+            do {
+                try {
+                    readSize = content.read(buffer, 0, 4096);
+                } catch (IOException e) {
+                    throw new WikiStreamException("Failed to read content stream", e);
                 }
-                this.writer.writeCharacters(chunk);
-                contentSize += readSize;
-            }
-        } while (readSize == 4096);
-        this.writer.writeEndElement();
 
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
+                if (readSize > 0) {
+                    String chunk;
+                    if (readSize == 4096) {
+                        chunk = Base64.encodeBase64String(buffer);
+                    } else {
+                        chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
+                    }
+                    this.writer.writeCharacters(chunk);
+                    contentSize += readSize;
+                }
+            } while (readSize == 4096);
+            this.writer.writeEndElement();
+
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
+        }
+
+        this.writer.writeEndElement();
     }
 
     @Override

@@ -19,8 +19,14 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
+
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -34,7 +40,7 @@ public class XARAttachmentModel
 
     public static final String ELEMENT_CONTENT = "content";
 
-    public static final String ELEMENT_REVISION_VERSION = "version";
+    public static final String ELEMENT_REVISION = "version";
 
     public static final String ELEMENT_REVISION_AUTHOR = "author";
 
@@ -43,4 +49,17 @@ public class XARAttachmentModel
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 
     public static final String ELEMENT_REVISIONS = "versions";
+
+    // Utils
+
+    public static final Map<String, Parameter> ATTACHMENT_PARAMETERS = new HashMap<String, Parameter>()
+    {
+        {
+            put(ELEMENT_REVISION, new Parameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
+            put(ELEMENT_REVISION_AUTHOR, new Parameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
+            put(ELEMENT_REVISION_DATE, new Parameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class));
+            put(ELEMENT_REVISION_COMMENT, new Parameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
+            put(ELEMENT_REVISIONS, new Parameter(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+        }
+    };
 }

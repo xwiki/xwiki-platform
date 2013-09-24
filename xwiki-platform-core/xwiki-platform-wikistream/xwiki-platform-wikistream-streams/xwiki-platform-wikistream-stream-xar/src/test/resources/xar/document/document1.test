@@ -95,7 +95,7 @@
             </entry>
           </parameters>
         </p>
-        <wikiAttachment name="attachment.txt">
+        <wikiAttachment name="attachment.txt" content="0,1,2,3,4,5,6,7,8,9" size="10">
           <p>
             <parameters>
               <entry>
@@ -120,7 +120,6 @@
               </entry>
             </parameters>
           </p>
-          <WikiAttachmentContent>0,1,2,3,4,5,6,7,8,9</WikiAttachmentContent>
         </wikiAttachment>
         <wikiClass>
           <p>
@@ -297,7 +296,7 @@
 .inputexpect|xwiki+xar/1.0
 .#------------------------------------------------------------------------------
 <?xml version="1.0" ?>
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>space</web>
   <name>page</name>
   <language></language>

@@ -54,22 +54,14 @@ public interface WikiAttachmentFilter
     /**
      * @type String
      */
-    String PARAMETER_REVISION_VERSION = "revision_version";
+    String PARAMETER_REVISION = "revision_version";
 
     /**
      * @type String
      */
     String PARAMETER_REVISION_COMMENT = "revision_comment";
 
-    void beginWikiAttachment(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws WikiStreamException;
-
-    void endWikiAttachment(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws WikiStreamException;
-
-    void onWikiAttachmentContent(@Name("content") InputStream content, @Name("size") Long size,
+    void onWikiAttachment(@Name("name") String name, @Name("content") InputStream content, @Name("size") Long size,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 }

@@ -19,9 +19,13 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
 /**
@@ -31,6 +35,8 @@ import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 public class XARDocumentModel
 {
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
+
+    public static final String ATTRIBUTE_STREAMVERSION = "version";
 
     public static final String ELEMENT_SPACE = "web";
 
@@ -88,41 +94,40 @@ public class XARDocumentModel
 
     // Utils
 
-    public static final Map<String, String> DOCUMENTPARAMETERS = new HashMap<String, String>()
+    public static final Map<String, Parameter> DOCUMENT_PARAMETERS = new HashMap<String, Parameter>()
     {
         {
-            put(ELEMENT_DEFAULTLOCALE, XWikiWikiDocumentFilter.PARAMETER_LOCALE);
+            put(ELEMENT_DEFAULTLOCALE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_LOCALE, Locale.class));
         }
     };
 
-    public static final Map<String, String> DOCUMENTLOCALEPARAMETERS = new HashMap<String, String>()
+    public static final Map<String, Parameter> DOCUMENTLOCALE_PARAMETERS = new HashMap<String, Parameter>()
     {
         {
-            put(ELEMENT_CREATION_AUTHOR, XWikiWikiDocumentFilter.PARAMETER_CREATION_AUTHOR);
-            put(ELEMENT_CREATION_DATE, XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE);
-            put(ELEMENT_LOCALE, XWikiWikiDocumentFilter.PARAMETER_LOCALE);
-            put(ELEMENT_REVISIONS, XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS);
+            put(ELEMENT_CREATION_AUTHOR, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CREATION_AUTHOR));
+            put(ELEMENT_CREATION_DATE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE, Date.class));
+            put(ELEMENT_REVISIONS, new Parameter(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
         }
     };
 
-    public static final Map<String, String> DOCUMENTREVISIONPARAMETERS = new HashMap<String, String>()
+    public static final Map<String, Parameter> DOCUMENTREVISION_PARAMETERS = new HashMap<String, Parameter>()
     {
         {
-            put(ELEMENT_CONTENT, XWikiWikiDocumentFilter.PARAMETER_CONTENT);
-            put(ELEMENT_CONTENT_AUTHOR, XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR);
-            put(ELEMENT_CONTENT_DATE, XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE);
-            put(ELEMENT_CONTENT_HTML, XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML);
-            put(ELEMENT_CUSTOMCLASS, XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS);
-            put(ELEMENT_DEFAULTTEMPLATE, XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE);
-            put(ELEMENT_HIDDEN, XWikiWikiDocumentFilter.PARAMETER_HIDDEN);
-            put(ELEMENT_PARENT, XWikiWikiDocumentFilter.PARAMETER_PARENT);
-            put(ELEMENT_REVISION_AUTHOR, XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR);
-            put(ELEMENT_REVISION_COMMENT, XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT);
-            put(ELEMENT_REVISION_DATE, XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE);
-            put(ELEMENT_REVISION_MINOR, XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR);
-            put(ELEMENT_SYNTAX, XWikiWikiDocumentFilter.PARAMETER_SYNTAX);
-            put(ELEMENT_TITLE, XWikiWikiDocumentFilter.PARAMETER_TITLE);
-            put(ELEMENT_VALIDATIONSCRIPT, XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT);
+            put(ELEMENT_CONTENT, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT));
+            put(ELEMENT_CONTENT_AUTHOR, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR));
+            put(ELEMENT_CONTENT_DATE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE, Date.class));
+            put(ELEMENT_CONTENT_HTML, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML));
+            put(ELEMENT_CUSTOMCLASS, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS));
+            put(ELEMENT_DEFAULTTEMPLATE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
+            put(ELEMENT_HIDDEN, new Parameter(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, Boolean.class));
+            put(ELEMENT_PARENT, new Parameter(XWikiWikiDocumentFilter.PARAMETER_PARENT));
+            put(ELEMENT_REVISION_AUTHOR, new Parameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
+            put(ELEMENT_REVISION_COMMENT, new Parameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
+            put(ELEMENT_REVISION_DATE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE, Date.class));
+            put(ELEMENT_REVISION_MINOR, new Parameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR, Boolean.class));
+            put(ELEMENT_SYNTAX, new Parameter(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.class));
+            put(ELEMENT_TITLE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_TITLE));
+            put(ELEMENT_VALIDATIONSCRIPT, new Parameter(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
         }
     };
 }

@@ -34,8 +34,6 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiObjectFilter
 {
-    public static final String PARAMETER_NAME = "name";
-
     public static final String PARAMETER_NUMBER = "number";
 
     public static final String PARAMETER_CLASS_REFERENCE = "class_reference";

@@ -22,12 +22,14 @@ package org.xwiki.wikistream.xar.internal.input;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
@@ -46,6 +48,9 @@ import org.xwiki.wikistream.xml.input.source.SourceInputSource;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProperties, XARFilter>
 {
+    @Inject
+    private SyntaxFactory syntaxFactory;
+
     @Override
     protected void read(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
@@ -87,12 +92,22 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
 
     private void readXAR(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
+        WikiReader wikiReader = new WikiReader(this.syntaxFactory);
 
+        try {
+            wikiReader.read(filter, proxyFilter, this.properties);
+        } catch (Exception e) {
+            throw new WikiStreamException("Failed to read XAR package", e);
+        }
+
+        if (wikiReader.getExtensionId() != null && wikiReader.getVersion() != null) {
+            // TODO: send extension event
+        }
     }
 
     protected void readDocument(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
-        DocumentLocaleReader documentReader = new DocumentLocaleReader();
+        DocumentLocaleReader documentReader = new DocumentLocaleReader(this.syntaxFactory);
 
         try {
             documentReader.read(filter, proxyFilter, this.properties);

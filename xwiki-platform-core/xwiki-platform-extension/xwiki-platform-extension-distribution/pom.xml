@@ -75,6 +75,7 @@
             **/DistributionRequest.java,
             **/DistributionStep.java,
             **/DistributionStepStatus.java,
+            **/DistributionScriptService.java,
             **/DefaultDistributionManager.java,
             **/FarmDistributionJobStatus.java,
             **/OutdatedExtensionsDistributionStep.java,

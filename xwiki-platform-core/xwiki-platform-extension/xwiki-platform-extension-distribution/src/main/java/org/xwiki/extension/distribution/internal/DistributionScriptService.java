@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.distribution.internal;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -34,10 +36,14 @@ import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributio
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -88,6 +94,18 @@ public class DistributionScriptService implements ScriptService
     @Inject
     @Named("xhtml/1.0")
     private BlockRenderer xhtmlRenderer;
+
+    /**
+     * Used to execute transformations.
+     */
+    @Inject
+    private transient TransformationManager transformationManager;
+
+    /**
+     * The component used to serialize entity references.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     /**
      * @param <T> the type of the object
@@ -188,6 +206,8 @@ public class DistributionScriptService implements ScriptService
                 if (jobState == State.RUNNING || jobState == State.WAITING) {
                     Block block = job.getCurrentStep().render();
 
+                    transform(block);
+
                     WikiPrinter printer = new DefaultWikiPrinter();
 
                     this.xhtmlRenderer.render(block, printer);
@@ -198,6 +218,24 @@ public class DistributionScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    private void transform(Block block)
+    {
+        TransformationContext txContext =
+            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
+                false);
+
+        XWikiContext xcontext = xcontextProvider.get();
+        if (xcontext != null && xcontext.getDoc() != null) {
+            txContext.setId(this.defaultEntityReferenceSerializer.serialize(xcontext.getDoc().getDocumentReference()));
+        }
+
+        try {
+            this.transformationManager.performTransformations(block, txContext);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

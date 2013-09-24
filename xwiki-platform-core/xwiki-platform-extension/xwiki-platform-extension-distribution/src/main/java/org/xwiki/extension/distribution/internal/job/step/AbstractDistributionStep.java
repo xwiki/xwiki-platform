@@ -49,8 +49,6 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationManager;
 
 public abstract class AbstractDistributionStep implements DistributionStep
 {
@@ -71,9 +69,6 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
     @Inject
     protected transient ComponentManager componentManager;
-
-    @Inject
-    protected transient TransformationManager transformationManager;
 
     @Inject
     protected transient Environment environment;
@@ -222,15 +217,6 @@ public abstract class AbstractDistributionStep implements DistributionStep
     @Override
     public Block render()
     {
-        XDOM content = getXDOM();
-
-        TransformationContext txContext = new TransformationContext(content, null, false);
-        try {
-            this.transformationManager.performTransformations(content, txContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return content;
+        return getXDOM();
     }
 }

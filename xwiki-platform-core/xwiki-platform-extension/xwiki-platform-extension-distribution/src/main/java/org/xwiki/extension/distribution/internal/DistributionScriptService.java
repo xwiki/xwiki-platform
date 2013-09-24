@@ -195,6 +195,19 @@ public class DistributionScriptService implements ScriptService
      */
     public String renderCurrentStepToXHTML()
     {
+        String transformationId = null;
+
+        XWikiContext xcontext = xcontextProvider.get();
+        if (xcontext != null && xcontext.getDoc() != null) {
+            transformationId =
+                this.defaultEntityReferenceSerializer.serialize(xcontext.getDoc().getDocumentReference());
+        }
+
+        return renderCurrentStepToXHTML(transformationId);
+    }
+
+    public String renderCurrentStepToXHTML(String transformationId)
+    {
         DistributionJob job = this.distributionManager.getCurrentDistributionJob();
 
         if (job != null) {
@@ -206,7 +219,7 @@ public class DistributionScriptService implements ScriptService
                 if (jobState == State.RUNNING || jobState == State.WAITING) {
                     Block block = job.getCurrentStep().render();
 
-                    transform(block);
+                    transform(block, transformationId);
 
                     WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -220,16 +233,13 @@ public class DistributionScriptService implements ScriptService
         return null;
     }
 
-    private void transform(Block block)
+    private void transform(Block block, String transformationId)
     {
         TransformationContext txContext =
             new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
                 false);
 
-        XWikiContext xcontext = xcontextProvider.get();
-        if (xcontext != null && xcontext.getDoc() != null) {
-            txContext.setId(this.defaultEntityReferenceSerializer.serialize(xcontext.getDoc().getDocumentReference()));
-        }
+        txContext.setId(transformationId);
 
         try {
             this.transformationManager.performTransformations(block, txContext);

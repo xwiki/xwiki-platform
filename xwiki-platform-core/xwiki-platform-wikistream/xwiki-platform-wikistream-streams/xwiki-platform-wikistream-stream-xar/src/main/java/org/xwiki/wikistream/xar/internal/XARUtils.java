@@ -20,11 +20,32 @@
 package org.xwiki.wikistream.xar.internal;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 public final class XARUtils
 {
+    public static class Parameter
+    {
+        public String name;
 
+        public Class< ? > type;
+
+        public Parameter(String name, Class< ? > type)
+        {
+            this.name = name;
+            this.type = type;
+        }
+
+        public Parameter(String name)
+        {
+            this(name, String.class);
+        }
+    }
+
+    
+    /**
+     * @since 5.2RC1
+     */
+    public static final String ROLEHINT = "xwiki+xar/1.0";
 }

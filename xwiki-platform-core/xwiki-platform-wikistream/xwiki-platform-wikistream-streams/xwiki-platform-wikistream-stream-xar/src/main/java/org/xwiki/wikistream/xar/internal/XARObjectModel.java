@@ -19,8 +19,13 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.wikistream.filter.WikiObjectFilter;
+import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -35,4 +40,15 @@ public class XARObjectModel
     public static final String ELEMENT_CLASSNAME = "className";
 
     public static final String ELEMENT_GUID = "guid";
+
+    // Utils
+
+    public static final Map<String, Parameter> OBJECT_PARAMETERS = new HashMap<String, Parameter>()
+    {
+        {
+            put(ELEMENT_CLASSNAME, new Parameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE));
+            put(ELEMENT_GUID, new Parameter(WikiObjectFilter.PARAMETER_GUID));
+            put(ELEMENT_NUMBER, new Parameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class));
+        }
+    };
 }

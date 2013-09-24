@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 
 import javax.inject.Inject;
@@ -66,11 +67,13 @@ public class XWikiAttachmentEventGenerator extends
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        // > WikiAttachment
-
         FilterEventParameters attachmentParameters = new FilterEventParameters();
 
-        // TODO: add support for real revision events (instead of the jrcs archive )
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, attachment.getAuthor());
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, attachment.getComment());
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
+        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION, attachment.getVersion());
+
         if (properties.isWithWikiAttachmentRevisions()) {
             try {
                 // We need to make sure content is loaded
@@ -85,36 +88,23 @@ public class XWikiAttachmentEventGenerator extends
             }
         }
 
-        attachmentFilter.beginWikiAttachment(attachment.getFilename(), FilterEventParameters.EMPTY);
-
-        // > WikiAttachmentRevision
-
-        FilterEventParameters parameters = new FilterEventParameters();
-
-        parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, attachment.getAuthor());
-        parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, attachment.getComment());
-        parameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
-
-        attachmentFilter.beginWikiAttachmentRevision(attachment.getVersion(), parameters);
-
-        // < WikiAttachmentContent
-
+        InputStream content;
+        Long size;
         if (properties.isWithWikiAttachmentContent()) {
             try {
-                attachmentFilter.onWikiAttachmentContent(attachment.getContentInputStream(xcontext),
-                    Long.valueOf(attachment.getFilesize()), FilterEventParameters.EMPTY);
+                content = attachment.getContentInputStream(xcontext);
+                size = Long.valueOf(attachment.getFilesize());
             } catch (XWikiException e) {
                 throw new WikiStreamException(String.format("Failed to get content of attachment [%s]",
                     attachment.getReference()), e);
             }
+        } else {
+            content = null;
+            size = null;
         }
 
-        // < WikiAttachmentRevision
+        // WikiAttachment
 
-        attachmentFilter.endWikiAttachmentRevision(attachment.getVersion(), parameters);
-
-        // < WikiAttachment
-
-        attachmentFilter.endWikiAttachment(attachment.getFilename(), FilterEventParameters.EMPTY);
+        attachmentFilter.onWikiAttachment(attachment.getFilename(), content, size, attachmentParameters);
     }
 }

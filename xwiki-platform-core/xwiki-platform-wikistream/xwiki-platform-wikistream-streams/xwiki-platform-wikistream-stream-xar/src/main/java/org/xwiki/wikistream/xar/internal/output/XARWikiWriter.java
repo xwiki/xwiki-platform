@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;

@@ -95,34 +95,31 @@
             </entry>
           </parameters>
         </p>
-        <wikiAttachment name="attachment.txt">
+        <wikiAttachment name="attachment.txt" content="0,1,2,3,4,5,6,7,8,9" size="10">
           <p>
             <parameters>
               <entry>
                 <string>xwiki_attachment_jrcsrevisions</string>
                 <string>jrcsrevisions</string>
               </entry>
+              <entry>
+                <string>revision_author</string>
+                <string>XWiki.author</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2000-01-05 00:00:00.0 GMT</date>
+              </entry>
+              <entry>
+                <string>revision_comment</string>
+                <string>comment</string>
+              </entry>
+              <entry>
+                <string>revision_version</string>
+                <string>1.1</string>
+              </entry>
             </parameters>
           </p>
-          <wikiAttachmentRevision version="1.1">
-            <p>
-              <parameters>
-                <entry>
-                  <string>revision_author</string>
-                  <string>XWiki.author</string>
-                </entry>
-                <entry>
-                  <string>revision_date</string>
-                  <date>2000-01-05 00:00:00.0 GMT</date>
-                </entry>
-                <entry>
-                  <string>revision_comment</string>
-                  <string>comment</string>
-                </entry>
-              </parameters>
-            </p>
-            <WikiAttachmentContent>0,1,2,3,4,5,6,7,8,9</WikiAttachmentContent>
-          </wikiAttachmentRevision>
         </wikiAttachment>
         <wikiClass>
           <p>
@@ -296,9 +293,10 @@
   </wikiDocument>
 </wikiSpace>
 .#------------------------------------------------------------------------------
-.expect|xwiki+xar/1.0
+.inputexpect|xwiki+xar/1.0
 .#------------------------------------------------------------------------------
-<xwikidoc>
+<?xml version="1.0" ?>
+<xwikidoc version="1.1">
   <web>space</web>
   <name>page</name>
   <language></language>
@@ -306,6 +304,7 @@
   <translation>0</translation>
   <creator>XWiki.creator</creator>
   <creationDate>946684800000</creationDate>
+  <versions>jrcsrevisions</versions>
   <parent>parent</parent>
   <author>XWiki.author</author>
   <customClass>customclass</customClass>
@@ -320,15 +319,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>syntax/1.0</syntaxId>
   <hidden>true</hidden>
+  <content>content</content>
   <attachment>
     <filename>attachment.txt</filename>
+    <versions>jrcsrevisions</versions>
     <author>XWiki.author</author>
     <date>947030400000</date>
     <version>1.1</version>
     <comment>comment</comment>
     <content>AAECAwQFBgcICQ==</content>
     <filesize>10</filesize>
-    <versions>jrcsrevisions</versions>
   </attachment>
   <class>
     <name>space.page</name>
@@ -408,6 +408,5 @@
       <prop2>2</prop2>
     </property>
   </object>
-  <content>content</content>
-  <versions>jrcsrevisions</versions>
 </xwikidoc>
+

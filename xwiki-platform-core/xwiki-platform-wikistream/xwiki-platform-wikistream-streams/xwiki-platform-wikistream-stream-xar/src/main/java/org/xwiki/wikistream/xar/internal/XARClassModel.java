@@ -19,8 +19,13 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.wikistream.filter.WikiClassFilter;
+import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -34,13 +39,28 @@ public class XARClassModel
 
     public static final String ELEMENT_CUSTOMMAPPING = "customMapping";
 
-    public static final String ELEMENT_DEFAULTVIEWSHEET = "defaultViewSheet";
+    public static final String ELEMENT_SHEET_DEFAULTVIEW = "defaultViewSheet";
 
-    public static final String ELEMENT_DEFAULTEDITSHEET = "defaultEditSheet";
+    public static final String ELEMENT_SHEET_DEFAULTEDIT = "defaultEditSheet";
 
-    public static final String ELEMENT_DEFAULTWEB = "defaultWeb";
+    public static final String ELEMENT_DEFAULTSPACE = "defaultWeb";
 
     public static final String ELEMENT_NAMEFIELD = "nameField";
 
     public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
+
+    // Utils
+
+    public static final Map<String, Parameter> CLASS_PARAMETERS = new HashMap<String, Parameter>()
+    {
+        {
+            put(ELEMENT_CUSTOMCLASS, new Parameter(WikiClassFilter.PARAMETER_CUSTOMCLASS));
+            put(ELEMENT_CUSTOMMAPPING, new Parameter(WikiClassFilter.PARAMETER_CUSTOMMAPPING));
+            put(ELEMENT_SHEET_DEFAULTVIEW, new Parameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW));
+            put(ELEMENT_SHEET_DEFAULTEDIT, new Parameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT));
+            put(ELEMENT_DEFAULTSPACE, new Parameter(WikiClassFilter.PARAMETER_DEFAULTSPACE));
+            put(ELEMENT_NAMEFIELD, new Parameter(WikiClassFilter.PARAMETER_NAMEFIELD));
+            put(ELEMENT_VALIDATIONSCRIPT, new Parameter(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT));
+        }
+    };
 }

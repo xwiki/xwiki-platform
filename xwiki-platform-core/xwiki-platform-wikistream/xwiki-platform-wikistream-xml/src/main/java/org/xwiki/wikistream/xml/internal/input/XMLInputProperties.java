@@ -25,13 +25,14 @@ import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.wikistream.input.InputSource;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 public class XMLInputProperties
 {
     private InputSource source;
+
+    private String encoding;
 
     @PropertyName("The source")
     @PropertyDescription("The source to load the wiki from")
@@ -44,5 +45,15 @@ public class XMLInputProperties
     public void setSource(InputSource source)
     {
         this.source = source;
+    }
+
+    public String getEncoding()
+    {
+        return this.encoding;
+    }
+
+    public void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
     }
 }

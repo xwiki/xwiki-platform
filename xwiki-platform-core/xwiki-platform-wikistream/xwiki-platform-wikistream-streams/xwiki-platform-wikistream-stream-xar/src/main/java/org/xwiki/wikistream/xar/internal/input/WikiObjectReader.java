@@ -117,6 +117,8 @@ public class WikiObjectReader extends AbstractReader
         property.name = xmlReader.getLocalName();
         property.value = xmlReader.getElementText();
 
+        xmlReader.nextTag();
+
         return property;
     }
 }

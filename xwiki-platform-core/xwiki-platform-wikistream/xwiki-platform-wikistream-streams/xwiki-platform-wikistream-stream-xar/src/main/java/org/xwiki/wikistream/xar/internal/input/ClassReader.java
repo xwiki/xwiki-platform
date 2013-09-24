@@ -30,7 +30,6 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
-import org.xwiki.wikistream.xar.internal.XARDocumentModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
 import org.xwiki.wikistream.xar.internal.input.ClassPropertyReader.WikiClassProperty;

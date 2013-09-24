@@ -70,8 +70,6 @@ public class DocumentLocaleReader extends AbstractReader
 
     private boolean sentBeginWikiDocumentRevision;
 
-    private boolean sentBeginWikiAttachment;
-
     private WikiClass currentClass = new WikiClass();
 
     private Queue<WikiObject> currentObjects = new LinkedList<WikiObject>();
@@ -96,7 +94,6 @@ public class DocumentLocaleReader extends AbstractReader
         this.sentBeginWikiDocument = false;
         this.sentBeginWikiDocumentLocale = false;
         this.sentBeginWikiDocumentRevision = false;
-        this.sentBeginWikiAttachment = false;
     }
 
     private void sendBeginWikiDocument(XARFilter proxyFilter, boolean force) throws WikiStreamException

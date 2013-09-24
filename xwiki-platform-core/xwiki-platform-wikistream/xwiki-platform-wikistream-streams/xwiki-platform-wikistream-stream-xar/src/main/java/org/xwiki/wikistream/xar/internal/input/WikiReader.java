@@ -126,6 +126,8 @@ public class WikiReader
         this.extensionId = getElementText(doc, "extensionId");
         this.version = getElementText(doc, "version");
 
+        // TODO: introduce and send extension event
+
         // this.name = getElementText(doc, "name");
         // this.description = getElementText(doc, "description");
         // this.licence = getElementText(doc, "licence");

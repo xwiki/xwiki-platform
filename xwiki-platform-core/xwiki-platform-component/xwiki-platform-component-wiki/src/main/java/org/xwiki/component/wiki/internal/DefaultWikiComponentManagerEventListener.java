@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -38,9 +39,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -79,17 +78,10 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
     private List<WikiComponentBuilder> wikiComponentProviders;
 
     /**
-     * Used to serializes wiki pages reference in the log.
+     * Used to access the current {@link XWikiContext}.
      */
     @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiSerializer;
-
-    /**
-     * The execution used to get the xwiki context, to reset the context grouplist cache.
-     */
-    @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     public List<Event> getEvents()
@@ -129,11 +121,9 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
             // groups. In those cases, if the component document is imported _before_ the author or a group he belongs
             // to, the rights evaluation can be wrong and prevent the component instantiation.
             // We also need to clear the group cache since the list of groups might change during the import.
-            XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            xcontext.remove("grouplist");
+            xcontextProvider.get().remove("grouplist");
             registerComponents();
         }
-
     }
 
     /**
@@ -150,13 +140,12 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                         this.wikiComponentManager.registerWikiComponent(component);
                     }
                 } catch (WikiComponentException e) {
-                    this.logger.warn("Failed to register the wiki component located in the document [{}]. "
-                        + "Root cause: {}", this.compactWikiSerializer.serialize(reference), e.getMessage());
+                    this.logger.warn("Failed to register the wiki component located in the document [{}]: {}",
+                        reference, e.getMessage());
                 }
             }
         }
     }
-
 
     /**
      * Helper method to register wiki components from a given document.
@@ -180,12 +169,12 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                             this.wikiComponentManager.registerWikiComponent(component);
                         } catch (WikiComponentException e) {
                             this.logger.warn("Unable to register component(s) from document [{}]: {}",
-                                compactWikiSerializer.serialize(component.getDocumentReference()), e.getMessage());
+                                component.getDocumentReference(), e.getMessage());
                         }
                     }
                 } catch (WikiComponentException e) {
-                    this.logger.warn("Failed to create wiki component(s) for document [{}]: {}",
-                        compactWikiSerializer.serialize(documentReference), e.getMessage());
+                    this.logger.warn("Failed to create wiki component(s) for document [{}]: {}", documentReference,
+                        e.getMessage());
                 }
             }
         }
@@ -201,8 +190,8 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
         try {
             this.wikiComponentManager.unregisterWikiComponents(documentReference);
         } catch (WikiComponentException e) {
-            this.logger.warn("Unable to unregister component(s) from document [{}]: {}",
-                compactWikiSerializer.serialize(documentReference), e.getMessage());
+            this.logger.warn("Unable to unregister component(s) from document [{}]: {}", documentReference,
+                e.getMessage());
         }
     }
 }

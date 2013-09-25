@@ -64,7 +64,7 @@
   #set ($hasPreviousMenuSection = false)
   #if ($hasCreateWorkspace)
     #set ($createWorkspaceDocumentReference = $services.model.createDocumentReference('xwiki', 'WorkspaceManager', 'CreateNewWorkspace'))
-    #submenuitem("$xwiki.getURL($createWorkspaceDocumentReference)" $services.localization.render('workspacemanager.menu.create') 'tmCreateWorkspace', '')
+    #submenuitem("$xwiki.getURL($createWorkspaceDocumentReference)" $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '')
     #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasCreateSpace)

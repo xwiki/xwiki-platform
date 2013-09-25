@@ -1141,6 +1141,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
+.actionmenu .tmCreateWiki{
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.png')");
+}
+
 .actionmenu .tmCreateSpace {
   background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.png')");
 }

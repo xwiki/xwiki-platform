@@ -107,10 +107,6 @@
   background-image: url("$xwiki.getSkinFile('icons/xwiki/logo-xs.png')");
 }
 
-.actionmenu #tmCreateWorkspace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.png')");
-}
-
 .actionmenu #tmMainWiki {
   background-image: url("$xwiki.getSkinFile('icons/silk/house.png')");
 }

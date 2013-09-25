@@ -52,6 +52,13 @@
       <artifactId>xwiki-commons-context</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

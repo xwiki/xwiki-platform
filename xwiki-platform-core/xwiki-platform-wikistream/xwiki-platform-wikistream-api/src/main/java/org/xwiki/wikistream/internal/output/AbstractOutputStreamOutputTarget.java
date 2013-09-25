@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -34,6 +33,12 @@ public abstract class AbstractOutputStreamOutputTarget implements OutputStreamOu
     protected OutputStream outputStream;
 
     protected abstract OutputStream openStream() throws IOException;
+
+    @Override
+    public boolean restartSupported()
+    {
+        return true;
+    }
 
     @Override
     public OutputStream getOutputStream() throws IOException

@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -36,6 +35,12 @@ public class DefaultOutputStreamOutputTarget implements OutputStreamOutputTarget
     public DefaultOutputStreamOutputTarget(OutputStream outputStream)
     {
         this.outputStream = outputStream;
+    }
+
+    @Override
+    public boolean restartSupported()
+    {
+        return false;
     }
 
     public OutputStream getOutputStream()

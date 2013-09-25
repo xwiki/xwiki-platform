@@ -159,7 +159,7 @@ public class XARWikiWriter
         ZipArchiveEntry zipentry = new ZipArchiveEntry(XARModel.PATH_PACKAGE);
         this.zipStream.putArchiveEntry(zipentry);
 
-        WikiStreamXMLStreamWriter writer = new WikiStreamXMLStreamWriter(this.zipStream, this.xarProperties);
+        WikiStreamXMLStreamWriter writer = new WikiStreamXMLStreamWriter(this.zipStream, this.xarProperties, true);
 
         try {
             writer.writeStartDocument();

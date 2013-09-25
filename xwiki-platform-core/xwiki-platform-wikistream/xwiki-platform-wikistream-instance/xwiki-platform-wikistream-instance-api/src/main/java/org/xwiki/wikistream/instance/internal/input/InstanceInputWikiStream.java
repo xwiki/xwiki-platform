@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -80,6 +81,12 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
             || this.properties.getEntities().matches(new DocumentReference(wiki, space, document));
     }
 
+    @Override
+    public void close() throws IOException
+    {
+        // Nothing do close
+    }
+    
     @Override
     protected void read(Object filter, InstanceFilter proxyFilter) throws WikiStreamException
     {

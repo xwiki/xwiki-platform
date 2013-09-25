@@ -111,17 +111,23 @@ public class WikiStreamTest
         OutputWikiStream outputWikiStream =
             outputFactory.creaOutputWikiStream(this.configuration.expectConfiguration.output);
 
-        // Convert
-        inputWikiStream.read(outputWikiStream.getFilter());
+        try {
+            // Convert
+            inputWikiStream.read(outputWikiStream.getFilter());
 
-        // Compare
+            // Compare
 
-        // ////////////////////////
-        // ////////////////::::///::///:::
+            // ////////////////////////
+            // ////////////////::::///::///:::
 
-        // Verify the expected result against the result we got.
-        assertExpectedResult(this.configuration.expectConfiguration.output.typeId,
-            this.configuration.expectConfiguration.expect, this.configuration.expectConfiguration.output.getTarget());
+            // Verify the expected result against the result we got.
+            assertExpectedResult(this.configuration.expectConfiguration.output.typeId,
+                this.configuration.expectConfiguration.expect,
+                this.configuration.expectConfiguration.output.getTarget());
+        } finally {
+            inputWikiStream.close();
+            outputWikiStream.close();
+        }
     }
 
     private void assertExpectedResult(String typeId, InputSource expect, OutputTarget actual) throws IOException

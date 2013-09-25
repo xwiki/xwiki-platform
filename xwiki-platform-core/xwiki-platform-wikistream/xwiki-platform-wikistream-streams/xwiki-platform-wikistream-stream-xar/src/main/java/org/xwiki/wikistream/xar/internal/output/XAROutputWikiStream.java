@@ -82,6 +82,12 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
 
     private WikiStreamXMLStreamWriter writer;
 
+    @Override
+    public void close() throws IOException
+    {
+        this.properties.getTarget().close();
+    }
+
     public String toString(Object obj)
     {
         return ObjectUtils.toString(obj, null);
@@ -164,9 +170,9 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             if (this.wikiWriter != null) {
                 this.writer =
                     new WikiStreamXMLStreamWriter(this.wikiWriter.newEntry(this.currentDocumentReference, locale),
-                        this.properties);
+                        this.properties, true);
             } else {
-                this.writer = new WikiStreamXMLStreamWriter(this.properties);
+                this.writer = new WikiStreamXMLStreamWriter(this.properties, true);
             }
         }
 

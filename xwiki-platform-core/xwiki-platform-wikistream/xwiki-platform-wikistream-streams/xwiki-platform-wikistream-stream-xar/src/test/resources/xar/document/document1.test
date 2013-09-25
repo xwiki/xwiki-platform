@@ -1,5 +1,5 @@
 .#------------------------------------------------------------------------------
-.input|wiki+xml
+.inputexpect|wiki+xml
 .#------------------------------------------------------------------------------
 <wikiSpace name="space">
   <wikiDocument name="page">
@@ -11,20 +11,20 @@
         </entry>
       </parameters>
     </p>
-    <wikiDocumentLocale locale="">
+    <wikiDocumentLocale>
       <p>
         <parameters>
-          <entry>
-            <string>xwiki_document_jrcsrevisions</string>
-            <string>jrcsrevisions</string>
-          </entry>
           <entry>
             <string>creation_author</string>
             <string>XWiki.creator</string>
           </entry>
           <entry>
             <string>creation_date</string>
-            <date>2000-01-01 00:00:00.0 GMT</date>
+            <date>2000-01-01 00:00:00.0 UTC</date>
+          </entry>
+          <entry>
+            <string>xwiki_document_jrcsrevisions</string>
+            <string>jrcsrevisions</string>
           </entry>
         </parameters>
       </p>
@@ -40,20 +40,20 @@
               <string>XWiki.author</string>
             </entry>
             <entry>
+              <string>customclass</string>
+              <string>customclass</string>
+            </entry>
+            <entry>
               <string>content_author</string>
               <string>XWiki.contentAuthor</string>
             </entry>
             <entry>
               <string>revision_date</string>
-              <date>2000-01-02 00:00:00.0 GMT</date>
+              <date>2000-01-02 00:00:00.0 UTC</date>
             </entry>
             <entry>
               <string>content_date</string>
-              <date>2000-01-03 00:00:00.0 GMT</date>
-            </entry>
-            <entry>
-              <string>customclass</string>
-              <string>customclass</string>
+              <date>2000-01-03 00:00:00.0 UTC</date>
             </entry>
             <entry>
               <string>title</string>
@@ -79,7 +79,7 @@
               <string>syntax</string>
               <org.xwiki.rendering.syntax.Syntax>
                 <type>
-                  <name>Test syntax</name>
+                  <name>syntax</name>
                   <id>syntax</id>
                 </type>
                 <version>1.0</version>
@@ -93,10 +93,15 @@
               <string>content</string>
               <string>content</string>
             </entry>
+            <entry>
+              <string>content_html</string>
+              <string></string>
+            </entry>
           </parameters>
         </p>
-        <wikiAttachment name="attachment.txt" content="0,1,2,3,4,5,6,7,8,9" size="10">
+        <wikiAttachment name="attachment.txt" size="10">
           <p>
+            <content>AAECAwQFBgcICQ==</content>
             <parameters>
               <entry>
                 <string>xwiki_attachment_jrcsrevisions</string>
@@ -108,15 +113,15 @@
               </entry>
               <entry>
                 <string>revision_date</string>
-                <date>2000-01-05 00:00:00.0 GMT</date>
-              </entry>
-              <entry>
-                <string>revision_comment</string>
-                <string>comment</string>
+                <date>2000-01-05 00:00:00.0 UTC</date>
               </entry>
               <entry>
                 <string>revision_version</string>
                 <string>1.1</string>
+              </entry>
+              <entry>
+                <string>revision_comment</string>
+                <string>comment</string>
               </entry>
             </parameters>
           </p>
@@ -155,13 +160,13 @@
             </parameters>
           </p>
           <wikiClassProperty name="prop1" type="com.xpn.xwiki.objects.classes.NumberClass">
-            <wikiClassPropertyField name="disabled" value="0"/>
-            <wikiClassPropertyField name="name" value="prop1"/>
-            <wikiClassPropertyField name="number" value="1"/>
-            <wikiClassPropertyField name="numberType" value="long"/>
-            <wikiClassPropertyField name="prettyName" value="Prop1"/>
-            <wikiClassPropertyField name="size" value="30"/>
-            <wikiClassPropertyField name="unmodifiable" value="0"/>
+            <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
+            <wikiClassPropertyField name="name" value="prop1"></wikiClassPropertyField>
+            <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
+            <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
+            <wikiClassPropertyField name="prettyName" value="Prop1"></wikiClassPropertyField>
+            <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
+            <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
           </wikiClassProperty>
         </wikiClass>
         <wikiObject>
@@ -215,16 +220,16 @@
               </parameters>
             </p>
             <wikiClassProperty name="prop1" type="com.xpn.xwiki.objects.classes.NumberClass">
-              <wikiClassPropertyField name="disabled" value="0"/>
-              <wikiClassPropertyField name="name" value="prop1"/>
-              <wikiClassPropertyField name="number" value="1"/>
-              <wikiClassPropertyField name="numberType" value="long"/>
-              <wikiClassPropertyField name="prettyName" value="Prop1"/>
-              <wikiClassPropertyField name="size" value="30"/>
-              <wikiClassPropertyField name="unmodifiable" value="0"/>
+              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="name" value="prop1"></wikiClassPropertyField>
+              <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
+              <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
+              <wikiClassPropertyField name="prettyName" value="Prop1"></wikiClassPropertyField>
+              <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
+              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="prop1" value="1"/>
+          <wikiObjectProperty name="prop1" value="1"></wikiObjectProperty>
         </wikiObject>
         <wikiObject>
           <p>
@@ -277,16 +282,16 @@
               </parameters>
             </p>
             <wikiClassProperty name="prop2" type="com.xpn.xwiki.objects.classes.NumberClass">
-              <wikiClassPropertyField name="disabled" value="0"/>
-              <wikiClassPropertyField name="name" value="prop2"/>
-              <wikiClassPropertyField name="number" value="1"/>
-              <wikiClassPropertyField name="numberType" value="long"/>
-              <wikiClassPropertyField name="prettyName" value="Prop2"/>
-              <wikiClassPropertyField name="size" value="30"/>
-              <wikiClassPropertyField name="unmodifiable" value="0"/>
+              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="name" value="prop2"></wikiClassPropertyField>
+              <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
+              <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
+              <wikiClassPropertyField name="prettyName" value="Prop2"></wikiClassPropertyField>
+              <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
+              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="prop2" value="2"/>
+          <wikiObjectProperty name="prop2" value="2"></wikiObjectProperty>
         </wikiObject>
       </wikiDocumentRevision>
     </wikiDocumentLocale>
@@ -299,7 +304,7 @@
 <xwikidoc version="1.1">
   <web>space</web>
   <name>page</name>
-  <language></language>
+  <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>XWiki.creator</creator>
@@ -320,6 +325,7 @@
   <syntaxId>syntax/1.0</syntaxId>
   <hidden>true</hidden>
   <content>content</content>
+  <renderedcontent/>
   <attachment>
     <filename>attachment.txt</filename>
     <versions>jrcsrevisions</versions>

@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,8 +30,8 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.filter.CompositeFilter;
 import org.xwiki.filter.FilterDescriptorManager;
-import org.xwiki.filter.internal.CompositeFilter;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.instance.output.InstanceOutputEventReader;
@@ -65,5 +66,11 @@ public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<Insta
     public Object getFilter() throws WikiStreamException
     {
         return this.filter;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        // Nothing to close
     }
 }

@@ -51,9 +51,12 @@ public class WikiReader
 
     private String version;
 
+    private DocumentLocaleReader documentReader;
+
     public WikiReader(SyntaxFactory syntaxFactory)
     {
         this.syntaxFactory = syntaxFactory;
+        this.documentReader = new DocumentLocaleReader(this.syntaxFactory);
     }
 
     public String getExtensionId()
@@ -69,20 +72,26 @@ public class WikiReader
     public void read(Object filter, XARFilter proxyFilter, XARInputProperties properties) throws XMLStreamException,
         IOException, WikiStreamException
     {
-        InputSource source = properties.getSource();
-
         InputStream stream;
 
+        InputSource source = properties.getSource();
         if (source instanceof InputStreamInputSource) {
             stream = ((InputStreamInputSource) source).getInputStream();
         } else {
             throw new WikiStreamException("Unsupported source type [" + source.getClass() + "]");
         }
 
-        try {
-            read(stream, filter, proxyFilter, properties);
-        } finally {
-            source.close();
+        read(stream, filter, proxyFilter, properties);
+
+        // Close last space
+        if (this.documentReader.getCurrentSpace() != null) {
+            proxyFilter.endWikiSpace(this.documentReader.getCurrentSpace(),
+                this.documentReader.getCurrentSpaceParameters());
+        }
+
+        // TODO: send extension event
+        if (this.extensionId != null) {
+
         }
     }
 
@@ -104,10 +113,8 @@ public class WikiReader
                     // TODO: LOG warning
                 }
             } else {
-                DocumentLocaleReader documentReader = new DocumentLocaleReader(this.syntaxFactory);
-
                 try {
-                    documentReader.read(zis, filter, proxyFilter, properties);
+                    this.documentReader.read(zis, filter, proxyFilter, properties);
                 } catch (Exception e) {
                     throw new WikiStreamException("Failed to read XAR XML document", e);
                 }
@@ -126,8 +133,7 @@ public class WikiReader
         this.extensionId = getElementText(doc, "extensionId");
         this.version = getElementText(doc, "version");
 
-        // TODO: introduce and send extension event
-
+        // Decided to not take into account those properties, this should not be package decision
         // this.name = getElementText(doc, "name");
         // this.description = getElementText(doc, "description");
         // this.licence = getElementText(doc, "licence");

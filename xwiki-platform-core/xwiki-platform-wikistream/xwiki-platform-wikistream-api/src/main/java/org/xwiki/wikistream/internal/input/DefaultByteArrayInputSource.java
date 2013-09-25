@@ -19,36 +19,26 @@
  */
 package org.xwiki.wikistream.internal.input;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.xwiki.wikistream.input.FileInputSource;
-import org.xwiki.wikistream.input.InputStreamInputSource;
-
 /**
- * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2RC1
  */
-public class DefaultByteArrayInputSource extends AbstractInputStreamInputSource implements FileInputSource, InputStreamInputSource
+public class DefaultByteArrayInputSource extends AbstractInputStreamInputSource
 {
-    private final File file;
+    private final byte[] array;
 
-    public DefaultByteArrayInputSource(File file)
+    public DefaultByteArrayInputSource(byte[] array)
     {
-        this.file = file;
+        this.array = array;
     }
-
-    public File getFile()
-    {
-        return this.file;
-    }
-
+    
     @Override
     protected InputStream openStream() throws IOException
     {
-        return new FileInputStream(this.file);
+        return new ByteArrayInputStream(this.array);
     }
 }

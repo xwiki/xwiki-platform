@@ -52,6 +52,8 @@ public class DocumentLocaleReader extends AbstractReader
 {
     private String currentSpace;
 
+    private FilterEventParameters currentSpaceParameters = FilterEventParameters.EMPTY;
+
     private String currentDocument;
 
     private Locale currentDocumentLocale;
@@ -79,6 +81,16 @@ public class DocumentLocaleReader extends AbstractReader
     public DocumentLocaleReader(SyntaxFactory syntaxFactory)
     {
         super(syntaxFactory);
+    }
+
+    public String getCurrentSpace()
+    {
+        return this.currentSpace;
+    }
+
+    public FilterEventParameters getCurrentSpaceParameters()
+    {
+        return this.currentSpaceParameters;
     }
 
     private void reset()
@@ -205,10 +217,10 @@ public class DocumentLocaleReader extends AbstractReader
                 if (XARDocumentModel.ELEMENT_SPACE.equals(elementName)) {
                     if (!value.equals(this.currentSpace)) {
                         if (this.currentSpace != null) {
-                            proxyFilter.endWikiSpace(this.currentSpace, FilterEventParameters.EMPTY);
+                            proxyFilter.endWikiSpace(this.currentSpace, this.currentSpaceParameters);
                         }
                         this.currentSpace = value;
-                        proxyFilter.beginWikiSpace(this.currentSpace, FilterEventParameters.EMPTY);
+                        proxyFilter.beginWikiSpace(this.currentSpace, this.currentSpaceParameters);
                     }
                 } else if (XARDocumentModel.ELEMENT_NAME.equals(elementName)) {
                     this.currentDocument = value;
@@ -288,12 +300,10 @@ public class DocumentLocaleReader extends AbstractReader
 
         ClassReader reader = new ClassReader();
 
-        WikiClass wikiClass = reader.read(xmlReader, properties);
+        this.currentClass = reader.read(xmlReader, properties);
 
         if (this.sentBeginWikiDocumentRevision) {
-            wikiClass.send(proxyFilter);
-        } else {
-            this.currentClass = wikiClass;
+            sendWikiClass(proxyFilter);
         }
     }
 
@@ -315,7 +325,7 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void sendWikiClass(XARFilter proxyFilter) throws WikiStreamException
     {
-        if (this.sentBeginWikiDocumentRevision) {
+        if (this.currentClass != null) {
             this.currentClass.send(proxyFilter);
             this.currentClass = null;
         }
@@ -323,19 +333,15 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void sendWikiObjects(XARFilter proxyFilter) throws WikiStreamException
     {
-        if (this.sentBeginWikiDocumentRevision) {
-            while (this.currentObjects.size() > 0) {
-                this.currentObjects.poll().send(proxyFilter);
-            }
+        while (this.currentObjects.size() > 0) {
+            this.currentObjects.poll().send(proxyFilter);
         }
     }
 
     private void sendWikiAttachments(XARFilter proxyFilter) throws WikiStreamException
     {
-        if (this.sentBeginWikiDocumentRevision) {
-            while (this.currentAttachments.size() > 0) {
-                this.currentAttachments.poll().send(proxyFilter);
-            }
+        while (this.currentAttachments.size() > 0) {
+            this.currentAttachments.poll().send(proxyFilter);
         }
     }
 }

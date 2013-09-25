@@ -25,7 +25,6 @@ import java.io.InputStream;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -36,6 +35,12 @@ public class DefaultInputStreamInputSource implements InputStreamInputSource
     public DefaultInputStreamInputSource(InputStream inputStream)
     {
         this.inputStream = inputStream;
+    }
+
+    @Override
+    public boolean restartSupported()
+    {
+        return false;
     }
 
     public InputStream getInputStream()

@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
+import java.io.IOException;
+
 import javanet.staxutils.XMLStreamUtils;
 
 import javax.xml.stream.XMLEventReader;
@@ -32,7 +34,6 @@ import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.ReaderInputSource;
 
 /**
- * 
  * @param <P>
  * @version $Id$
  * @since 5.2M2
@@ -50,13 +51,17 @@ public abstract class AbstractXMLInputWikiStream<P extends XMLInputProperties> i
     public void read(Object listener) throws WikiStreamException
     {
         try {
+            InputSource source = this.parameters.getSource();
+
             XMLEventReader xmlEventReader;
 
-            InputSource source = this.parameters.getSource();
             if (source instanceof ReaderInputSource) {
-                xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(((ReaderInputSource) source).getReader());
+                xmlEventReader =
+                    XMLInputFactory.newInstance().createXMLEventReader(((ReaderInputSource) source).getReader());
             } else if (source instanceof InputStreamInputSource) {
-                xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(((InputStreamInputSource) source).getInputStream());
+                xmlEventReader =
+                    XMLInputFactory.newInstance().createXMLEventReader(
+                        ((InputStreamInputSource) source).getInputStream());
             } else {
                 throw new WikiStreamException("Unknown source type [" + source.getClass() + "]");
             }
@@ -68,4 +73,10 @@ public abstract class AbstractXMLInputWikiStream<P extends XMLInputProperties> i
     }
 
     protected abstract Result createParser(Object listener, P parameters);
+
+    @Override
+    public void close() throws IOException
+    {
+        this.parameters.getSource().close();
+    }
 }

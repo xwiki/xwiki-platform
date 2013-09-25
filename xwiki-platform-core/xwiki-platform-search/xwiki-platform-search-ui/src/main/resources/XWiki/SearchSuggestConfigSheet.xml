@@ -176,7 +176,8 @@
   var createSourceUI = function(sourceFormHTML) {
     var container = document.createElement('li');
     $(container).html('&lt;div class="source"&gt;&lt;div class="source-header"&gt;&lt;span class="name"&gt;'
-      + 'New Source&lt;/span&gt;&lt;div class="actions"/&gt;&lt;/div&gt;&lt;div class="source-body"/&gt;&lt;/div&gt;');
+      + "$escapetool.javascript($escapetool.xml($services.localization.render('platform.search.suggestNewSourceName')))"
+      + '&lt;/span&gt;&lt;div class="actions"/&gt;&lt;/div&gt;&lt;div class="source-body"/&gt;&lt;/div&gt;');
     $(container).find('.source-body').html(sourceFormHTML);
     var objectNumber = parseInt($(container).find('input[type="text"]')
       .attr('name').substr('XWiki.SearchSuggestSourceClass_'.length));
@@ -392,7 +393,7 @@ ul.searchSuggestSources {
 #if ($editing)
   #set ($mode = 'edit')
 #end
-= Search Suggest =
+= {{translation key="admin.searchsuggest" /}} =
 
 #set($discard = $doc.use($doc.fullName))
 (% class="xform" %)(((
@@ -404,7 +405,7 @@ ul.searchSuggestSources {
 : $doc.display('activated', $mode)
 )))
 
-== Sources ==
+== {{translation key="platform.search.suggestSources" /}} ==
 #set ($searchSuggestSourceClassName = 'XWiki.SearchSuggestSourceClass')
 ## Group sources by search engine.
 #set ($sources = {})
@@ -483,7 +484,7 @@ ul.searchSuggestSources {
 #end
 
 #if ($editing)
-  [[Add a new source&gt;&gt;path:$doc.getURL('objectadd', $escapetool.url({
+  [[{{translation key="platform.search.suggestAddNewSource" /}}&gt;&gt;path:$doc.getURL('objectadd', $escapetool.url({
     'form_token': $services.csrf.token,
     'classname': $searchSuggestSourceClassName,
     'xredirect': $xwiki.relativeRequestURL

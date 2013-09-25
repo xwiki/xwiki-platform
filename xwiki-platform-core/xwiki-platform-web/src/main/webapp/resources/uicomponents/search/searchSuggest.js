@@ -10,7 +10,7 @@ var XWiki = (function (XWiki) {
       * Constructor. Prepares a light modal container on the same model as the modalPopup
       * and registers event listerners.
       */
-    initialize: function(searchInput, sources){
+    initialize: function(searchInput, sources) {
 
       this.sources = sources;
 
@@ -33,7 +33,7 @@ var XWiki = (function (XWiki) {
     /**
      * Callback triggered when the original suggest clears its suggestions.
      */
-    onClearSuggestions: function(event){
+    onClearSuggestions: function(event) {
       if (event.memo.suggest == this.suggest) {
         // Restore bottom border style
         this.searchInput.setStyle({'borderBottomStyle' : this.searchInputBorderBottomSavedStyle});
@@ -43,7 +43,7 @@ var XWiki = (function (XWiki) {
     /**
      * Callback triggered when the original suggest has created its results container.
      */
-    onSuggestContainerCreated: function(event){
+    onSuggestContainerCreated: function(event) {
       if (event.memo.suggest == this.suggest) {
         // Save the style of the bottom border of the input field so that we can restore it later on
         this.searchInputBorderBottomSavedStyle = this.searchInput.getStyle('borderBottomStyle');
@@ -96,7 +96,7 @@ var XWiki = (function (XWiki) {
      * Creates the underlaying suggest widget.
      */
     createSuggest: function() {
-      // Create dummy suggestion node to hold the "Show all results" option
+      // Create dummy suggestion node to hold the "Go to search page..." option.
       var valueNode = new Element('div')
             .insert(new Element('span', {'class':'suggestId'}))
             .insert(new Element('span', {'class':'suggestValue'}))
@@ -134,25 +134,25 @@ var XWiki = (function (XWiki) {
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
         parentContainer: $('searchSuggest'),
         className: 'searchSuggest horizontalLayout',
-        fadeOnClear:false,
+        fadeOnClear: false,
         align: "right",
         minchars: 3,
         sources : this.sources,
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
-        displayValue:true,
-        displayValueText: "in ",
+        displayValue: true,
+        displayValueText: "$escapetool.javascript($services.localization.render('platform.search.suggestResultLocatedIn'))",
         timeout: 0,
         width: 500,
-        unifiedLoader:true,
+        unifiedLoader: true,
         loaderNode: allResults.down("li"),
-        shownoresults:false
+        shownoresults: false
       });
     },
 
    /**
     * Callback triggered when a key has been typed on the virtual input.
     */
-   onKeyUp: function(event){
+   onKeyUp: function(event) {
      var key = event.keyCode;
      switch(key) {
        case Event.KEY_RETURN:
@@ -165,7 +165,7 @@ var XWiki = (function (XWiki) {
 
   });
 
-  function init(){
+  var init = function() {
     /*
     ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
     ## search suggest contructor.
@@ -222,7 +222,7 @@ var XWiki = (function (XWiki) {
     var sources = $jsontool.serialize($sources);
     new XWiki.SearchSuggest($('headerglobalsearchinput'), sources);
     return true;
-  }
+  };
 
   // When the document is loaded, install search suggestions
   (XWiki.isInitialized && init())

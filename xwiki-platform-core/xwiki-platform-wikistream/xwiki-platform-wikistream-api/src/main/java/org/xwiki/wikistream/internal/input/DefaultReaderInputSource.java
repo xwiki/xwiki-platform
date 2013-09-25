@@ -37,6 +37,12 @@ public class DefaultReaderInputSource implements ReaderInputSource
         this.reader = reader;
     }
 
+    @Override
+    public boolean restartSupported()
+    {
+        return false;
+    }
+
     public Reader getReader()
     {
         return this.reader;

@@ -25,13 +25,18 @@ import java.io.InputStream;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 public abstract class AbstractInputStreamInputSource implements InputStreamInputSource
 {
     protected InputStream inputStream;
+
+    @Override
+    public boolean restartSupported()
+    {
+        return true;
+    }
 
     @Override
     public InputStream getInputStream() throws IOException
@@ -52,5 +57,11 @@ public abstract class AbstractInputStreamInputSource implements InputStreamInput
             this.inputStream.close();
         }
         this.inputStream = null;
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.inputStream != null ? this.inputStream.toString() : null;
     }
 }

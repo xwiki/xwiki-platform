@@ -38,5 +38,9 @@ import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
 @Unstable
 public interface InputSource extends Closeable
 {
-
+    /**
+     * @return true if it's possible to close and reset the source to its beginning
+     * @since 5.2RC1
+     */
+    boolean restartSupported();
 }

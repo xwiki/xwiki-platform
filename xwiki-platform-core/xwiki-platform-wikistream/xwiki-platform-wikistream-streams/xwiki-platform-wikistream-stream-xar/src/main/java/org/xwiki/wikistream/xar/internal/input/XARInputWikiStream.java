@@ -52,6 +52,12 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
     private SyntaxFactory syntaxFactory;
 
     @Override
+    public void close() throws IOException
+    {
+        this.properties.getSource().close();
+    }
+
+    @Override
     protected void read(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
         InputSource inputSource = this.properties.getSource();
@@ -99,10 +105,6 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
         } catch (Exception e) {
             throw new WikiStreamException("Failed to read XAR package", e);
         }
-
-        if (wikiReader.getExtensionId() != null && wikiReader.getVersion() != null) {
-            // TODO: send extension event
-        }
     }
 
     protected void readDocument(Object filter, XARFilter proxyFilter) throws WikiStreamException
@@ -113,6 +115,11 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
             documentReader.read(filter, proxyFilter, this.properties);
         } catch (Exception e) {
             throw new WikiStreamException("Failed to read XAR XML document", e);
+        }
+
+        // Close last space
+        if (documentReader.getCurrentSpace() != null) {
+            proxyFilter.endWikiSpace(documentReader.getCurrentSpace(), documentReader.getCurrentSpaceParameters());
         }
     }
 

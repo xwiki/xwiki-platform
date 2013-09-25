@@ -17,42 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.output;
+package org.xwiki.wikistream.internal.output;
 
 import java.io.IOException;
+import java.io.Writer;
 
-import javax.xml.transform.Result;
-
-import org.xwiki.wikistream.xml.output.ResultOutputTarget;
+import org.xwiki.wikistream.output.WriterOutputTarget;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2RC1
  */
-public class DefaultResultInputSource implements ResultOutputTarget
+public abstract class AbstractWriterOutputTarget implements WriterOutputTarget
 {
-    private Result result;
+    protected Writer writer;
 
-    public DefaultResultInputSource(Result result)
-    {
-        this.result = result;
-    }
+    protected abstract Writer openWriter();
 
     @Override
     public boolean restartSupported()
     {
-        return false;
+        return true;
+    }
+
+    @Override
+    public Writer getWriter()
+    {
+        if (this.writer == null) {
+            this.writer = openWriter();
+        }
+
+        return this.writer;
     }
 
     @Override
     public void close() throws IOException
     {
-        // Result is not closable
+        if (this.writer != null) {
+            this.writer.close();
+        }
+        this.writer = null;
     }
 
     @Override
-    public Result getResult()
+    public String toString()
     {
-        return this.result;
+        return this.writer != null ? this.writer.toString() : "";
     }
 }

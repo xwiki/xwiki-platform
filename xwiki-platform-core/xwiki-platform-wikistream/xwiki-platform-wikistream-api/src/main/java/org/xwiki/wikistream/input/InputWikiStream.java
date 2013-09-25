@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.input;
 
+import java.io.Closeable;
+
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
 
@@ -27,7 +29,7 @@ import org.xwiki.wikistream.WikiStreamException;
  * @since 5.2M2
  */
 @Unstable
-public interface InputWikiStream
+public interface InputWikiStream extends Closeable
 {
     void read(Object filter) throws WikiStreamException;
 }

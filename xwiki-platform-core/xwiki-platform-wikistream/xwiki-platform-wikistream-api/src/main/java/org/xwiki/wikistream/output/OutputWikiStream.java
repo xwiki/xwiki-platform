@@ -19,16 +19,17 @@
  */
 package org.xwiki.wikistream.output;
 
+import java.io.Closeable;
+
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 @Unstable
-public interface OutputWikiStream
+public interface OutputWikiStream extends Closeable
 {
     Object getFilter() throws WikiStreamException;
 }

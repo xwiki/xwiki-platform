@@ -19,22 +19,26 @@
  */
 package org.xwiki.wikistream.internal.input;
 
+import java.io.Reader;
 import java.io.StringReader;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class StringInputSource extends DefaultReaderInputSource
+public class StringInputSource extends AbstractReaderInputSource
 {
     private String source;
 
     public StringInputSource(String source)
     {
-        super(new StringReader(source));
-
         this.source = source;
+    }
+
+    @Override
+    protected Reader openReader()
+    {
+        return new StringReader(source);
     }
 
     @Override

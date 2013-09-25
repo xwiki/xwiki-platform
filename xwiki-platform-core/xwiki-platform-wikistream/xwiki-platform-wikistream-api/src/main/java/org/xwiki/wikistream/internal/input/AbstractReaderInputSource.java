@@ -17,42 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.output;
+package org.xwiki.wikistream.internal.input;
 
 import java.io.IOException;
+import java.io.Reader;
 
-import javax.xml.transform.Result;
-
-import org.xwiki.wikistream.xml.output.ResultOutputTarget;
+import org.xwiki.wikistream.input.ReaderInputSource;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2RC1
  */
-public class DefaultResultInputSource implements ResultOutputTarget
+public abstract class AbstractReaderInputSource implements ReaderInputSource
 {
-    private Result result;
-
-    public DefaultResultInputSource(Result result)
-    {
-        this.result = result;
-    }
+    private Reader reader;
 
     @Override
     public boolean restartSupported()
     {
-        return false;
+        return true;
     }
+
+    public Reader getReader()
+    {
+        if (this.reader == null) {
+            this.reader = openReader();
+        }
+
+        return this.reader;
+    }
+
+    protected abstract Reader openReader();
 
     @Override
     public void close() throws IOException
     {
-        // Result is not closable
-    }
-
-    @Override
-    public Result getResult()
-    {
-        return this.result;
+        if (this.reader != null) {
+            this.reader.close();
+        }
+        this.reader = null;
     }
 }

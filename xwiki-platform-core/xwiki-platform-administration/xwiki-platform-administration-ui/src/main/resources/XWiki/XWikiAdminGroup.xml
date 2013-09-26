@@ -68,7 +68,7 @@
     <className>XWiki.XWikiGroups</className>
     <guid>46d387f2-4d8d-446d-a618-8bfcb655ba18</guid>
     <property>
-      <member />
+      <member>XWiki.Admin</member>
     </property>
   </object>
   <object>
@@ -96,7 +96,7 @@
     <className>XWiki.XWikiGroups</className>
     <guid>46d387f2-4d8d-446d-a618-8bfcb655ba18</guid>
     <property>
-      <member>XWiki.Admin</member>
+      <member />
     </property>
   </object>
   <object>

@@ -1876,15 +1876,20 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($className = $stringtool.removeEnd($doc.name, 'Class'))
     #set($translationsRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Translations"))
     #set($translationsDoc = $xwiki.getDocument($translationsRef))
-    #set($translationsObj = $translationsDoc.getObject('XWiki.TranslationDocumentClass', true))
-    ## We use the translation bundle on demand because none of the available scopes suits our needs. Simple users can't
-    ## register document translation bundles at WIKI level and the SPACE scope doesn't remove the need to create a
-    ## custom live table results page in the same space as the application.
-    #set($discard = $translationsObj.set('scope', 'ON_DEMAND'))
-    #set($discard = $translationsDoc.setParent($doc.name))
+    #if($translationsDoc.isNew())
+      #set($discard = $translationsDoc.setParent($doc.name))
+      #set($discard = $translationsDoc.setHidden(true))
+    #end
+    #set($translationsObj = $translationsDoc.getObject('XWiki.TranslationDocumentClass'))
+    #if("$!translationsObj" == '')
+      #set($translationsObj = $translationsDoc.newObject('XWiki.TranslationDocumentClass'))
+      ## We use the translation bundle on demand because none of the available scopes suits our needs. Simple users can't
+      ## register document translation bundles at WIKI level and the SPACE scope doesn't remove the need to create a
+      ## custom live table results page in the same space as the application.
+      #set($discard = $translationsObj.set('scope', 'ON_DEMAND'))
+    #end
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
     #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content, $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
-    #set($discard = $translationsDoc.setHidden(true))
     #set($discard = $translationsDoc.save($services.localization.render('platform.appwithinminutes.classEditorTranslationsSaveComment'), $minorEdit))
   #end
 #end

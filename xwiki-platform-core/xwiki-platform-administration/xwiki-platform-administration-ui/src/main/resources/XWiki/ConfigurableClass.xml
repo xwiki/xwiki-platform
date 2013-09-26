@@ -458,12 +458,6 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
  *                          If not set then we look for a request parameter called "editor" if that exists and equals
  *                          "globaladmin" then $globaladmin is true, if it doesn't exist then we check to see if
  *                          $currentDoc.getFullName() equals "XWiki.XWikiPreferences".
- *
- * $doNotUnlockConfigurableDocuments - boolean - If true then this code will not make any attempt to unlock configurable
- *                                               documents. By default it does because it locks any document in the
- *                                               section which is being configured which would lead to a lot of stray
- *                                               locks if they weren't all canceled. Only recommended if this page is
- *                                               being included twice in the same page.
  *###
 ##
 ## Form submission depends on this.
@@ -491,16 +485,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
 ## Removing the next line will open a security hole.
 $doc.dropPermissions()##
-##
-## This application locks every document in a section while that section is being edited so we should
-## check for locks held by the current user on any of the applications configured here and remove them.
-#if(!$doNotUnlockConfigurableDocuments)
-  #set($outputList = [])
-  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)##
-  ## We don't want to generate javascript which unlocks the current document just after we got finished locking it.
-  #set($discard = $outputList.remove($currentDoc))
-  #unlockDocuments($outputList)
-#end
 ##
 ##------------------------------------------------------------------------------------------------------------
 ## If $section exists then we are viewing the admin page for a particular section.
@@ -568,7 +552,6 @@ $doc.dropPermissions()##
     #else
       ## If the document is not already locked, attempt to acquire the lock.
       #if(!$app.getLocked())
-        ## Try to use an AJAX call to lock the document.
 
         {{html wiki=true}}
           &lt;noscript&gt;
@@ -578,11 +561,10 @@ $doc.dropPermissions()##
           &lt;/noscript&gt;
           &lt;script type="text/javascript"&gt;
             document.observe("xwiki:dom:loaded", function() {
-              new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
+              new XWiki.DocumentLock('$escapetool.javascript($app.fullName)').lock();
             });
           &lt;/script&gt;
         {{/html}}
-        #set($discard = $lockedDocumentNames.add($app.getFullName()))
       #end
       ##------------------------------------------------------------------------------------------------------------
       ## Done Locking.

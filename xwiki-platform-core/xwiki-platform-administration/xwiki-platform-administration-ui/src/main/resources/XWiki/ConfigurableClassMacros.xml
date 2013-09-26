@@ -29,39 +29,6 @@
 
 
 #*
- * Any documents which are on the provided list ($documentNames) which are locked by the current user will be unlocked.
- * If this macro has programming rights, then they are unlocked programmatically, otherwise a javascript tag is
- * generated with ajax calls to cancel for all of the documents. If there are documents on this list which are not
- * locked by the current user, then they are ignored.
- *
- * @param $documentNames - List&lt;String&gt; - fullNames of documents which should be unlocked if they are locked by the
- *                                        current user.
- *###
-#macro(unlockDocuments $documentNames)
-  #if($documentNames.size() &gt; 0)
-    #set($sql = "doc.fullName=")
-    #foreach($documentName in $documentNames)
-      #set($sql = "${sql}'$documentName' or doc.fullName=")
-    #end
-    ## Trim the dangling ' or doc.fullName=?'
-    #set($sql = $sql.substring(0, $sql.lastIndexOf(' or doc.fullName=')))
-    #set($sql = ", XWikiLock lock where lock.docId=doc.id and lock.userName='$xcontext.getUser()' and (${sql})")
-    #set($namesOfdocumentsToUnlock = $services.query.hql($sql).addFilter('unique').execute())
-    ## Use ajax and hope the user runs javascript.
-    {{html}}
-      &lt;script type="text/javascript"&gt;
-        document.observe("xwiki:dom:loaded", function() {
-          #foreach($nameOflockedDocument in $namesOfdocumentsToUnlock)
-            new Ajax.Request("$xwiki.getURL($nameOflockedDocument, 'cancel', 'ajax=1')");
-          #end
-        });
-      &lt;/script&gt;
-    {{/html}}
-  #end## If output list size &gt; 0
-#end
-
-
-#*
  * Try to determine whether a document was edited by a user who has edit right on this page. This is tricky because
  * documents are imported with the name XWiki.XWikiGuest who has no access to anything after import.
  *

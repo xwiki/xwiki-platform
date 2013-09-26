@@ -17,21 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.output;
+package org.xwiki.wikistream.instance.internal.output;
 
-import java.util.Map;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.WikiStreamException;
-
-/**
- * @version $Id$
- * @since 5.2
- */
-@Unstable
-@Role
-public interface InstanceOutputEventReader
+public class DocumentInstanceOutputEventReader extends AbstractBeanInstanceOutputEventReader
 {
-    void setProperties(Map<String, Object> properties) throws WikiStreamException;
+
 }

@@ -33,10 +33,6 @@
   <artifactId>xwiki-platform-wikistream</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Wiki Stream</name>
-  <properties>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <modules>
     <module>xwiki-platform-wikistream-api</module>
     <module>xwiki-platform-wikistream-script</module>

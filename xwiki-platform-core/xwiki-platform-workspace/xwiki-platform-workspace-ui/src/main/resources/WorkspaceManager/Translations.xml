@@ -202,9 +202,6 @@ workspacemanager.browse._actions.viewInvitation=View Invitation
 workspacemanager.browse._actions.cancelJoinRequest=Cancel Request
 workspacemanager.browse._actions.leave=Leave
 workspacemanager.browse._actions.delete=Delete
-workspacemanager.menu.create=Wiki
-workspacemanager.menu.mainwiki.admin=Administer Main Wiki
-workspacemanager.menu.workspace.mainWiki=Main Wiki
 workspacemanager.menu.workspace.index=Wiki Index
 workspacemanager.menu.workspace.delete=Delete
 workspacemanager.menu.user.workspaces=Wikis
@@ -287,6 +284,9 @@ platform.workspace.wizard.step2.shortname=Members
 ## until 5.2
 #######################################
 platform.workspace.createNewWorkspaceLabel=Create a new Wiki
+workspacemanager.menu.create=Wiki
+workspacemanager.menu.mainwiki.admin=Administer Main Wiki
+workspacemanager.menu.workspace.mainWiki=Main Wiki
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -119,7 +119,7 @@
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <!-- Specify only what we want included in the WAR:
-               - the GWT-generated resources (located in **/xe/**)
+               - the GWT-generated resources (located in resources/js/xwiki/wysiwyg/xwe/**)
                - the 2 jars: xwiki-platform-wysiwyg-client-*-shared.jar and xwiki-platform-wysiwyg-server-*.jar
           -->
           <packagingIncludes>

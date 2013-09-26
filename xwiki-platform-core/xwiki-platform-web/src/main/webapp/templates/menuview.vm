@@ -4,12 +4,13 @@
 <div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$services.localization.render('core.menu.main.title')</strong>
 <div class="rightmenu">
+#set ($isWorkspaceAPI = ("!$services.workspace" != ''))
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
 #set ($workspaceManagerMainDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
 #set ($isWorkspaceManagerAppInstalled = $xwiki.exists($workspaceManagerMainDocumentReference))
-#set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
+#set ($isWorkspace = $isWorkspaceAPI && $services.workspace.isWorkspace($xcontext.database))
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
-#set ($moreThan1Workspace = $services.workspace.getWorkspaces() != $util.null && $services.workspace.getWorkspaces().size()>1)
+#set ($moreThan1Workspace = $isWorkspaceAPI && "$!services.workspace.getWorkspaces()" != '' && $services.workspace.getWorkspaces().size()>1)
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
 ## User
@@ -57,7 +58,7 @@
 ## - and the user has the right to create a wiki
 ## - and the workspaces application has been installed. We check this by checking if there's at least one template since the installation process will create a template
 ## (in the future the last condition will be removed since we will use the Distribution Wizard for wiki creation)
-#set ($hasCreateWorkspace = $isWorkspaceManagerAppInstalled && $hasCreateWiki && $services.workspace.getWorkspaceTemplates().size() > 0)
+#set ($hasCreateWorkspace = $isWorkspaceAPI && $isWorkspaceManagerAppInstalled && $hasCreateWiki && $services.workspace.getWorkspaceTemplates().size() > 0)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $hasCreateWorkspace)
 #if ($displayCreateSubmenu)
   #xwikitopmenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon')
@@ -178,7 +179,7 @@
 ##
 ## Wiki
 ##
-#set ($canDeleteWorkspace = $isWorkspaceManagerAppInstalled && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
+#set ($canDeleteWorkspace = $isWorkspaceAPI && $isWorkspaceManagerAppInstalled && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $canDeleteWorkspace)
 #set ($wikiEntryId = 'tmWiki')
 #set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))

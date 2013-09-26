@@ -1,6 +1,6 @@
-#set($message = $xwiki.parseMessage())
+#set($message = $xcontext.message)
 #if($message)
-  #xwikimessageboxstart($services.localization.render('notice') $message)
+  #xwikimessageboxstart($services.localization.render('notice') $services.localization.render($message))
   #xwikimessageboxend()
 #else
   #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('problemoccured'))

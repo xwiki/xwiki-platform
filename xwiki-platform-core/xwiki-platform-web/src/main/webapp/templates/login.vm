@@ -26,10 +26,10 @@
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}"/>
 </div>
 #xwikimessageboxstart($services.localization.render('login') '')
-#set($message = $services.localization.render($xwiki.parseMessage()))
+#set($message = $xcontext.message)
 #if($message)
   <!-- previous login errors -->
-  #error($message)
+  #error($services.localization.render($message))
 #end
 <table class="xwikilogintable" summary="$services.localization.render('loginform')">
   <tr>

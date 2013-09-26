@@ -56,6 +56,7 @@ import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AllComponents;
@@ -612,14 +613,20 @@ public class XarExtensionHandlerTest
         // Do some local modifications
 
         XWikiDocument deletedpage =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "deletedpage"),
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "deletedpage"),
                 getXWikiContext());
         XWikiDocument modifieddeletedpage =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"),
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "modifieddeletedpage"),
+                getXWikiContext());
+        XWikiDocument pagewithobject =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithobject"),
                 getXWikiContext());
 
         this.oldcore.getMockXWiki().deleteDocument(deletedpage, getXWikiContext());
         this.oldcore.getMockXWiki().deleteDocument(modifieddeletedpage, getXWikiContext());
+
+        pagewithobject.removeXObjects(new LocalDocumentReference("XWiki", "XWikiGroups"));
+        this.oldcore.getMockXWiki().saveDocument(pagewithobject, getXWikiContext());
 
         // upgrade
 
@@ -685,7 +692,7 @@ public class XarExtensionHandlerTest
         // space.deletedpage
 
         deletedpage =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "deletedpage"),
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "deletedpage"),
                 getXWikiContext());
 
         Assert.assertTrue("Document wiki:space.deleted has been restored", deletedpage.isNew());
@@ -693,10 +700,19 @@ public class XarExtensionHandlerTest
         // space.modifieddeletedpage
 
         modifieddeletedpage =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"),
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "modifieddeletedpage"),
                 getXWikiContext());
 
         Assert.assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
+
+        // space.pagewithobject
+
+        pagewithobject =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithobject"),
+                getXWikiContext());
+
+        Assert.assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
+                pagewithobject.getXObject(new LocalDocumentReference("XWiki", "XWikiGroups")));
     }
 
     @Test

@@ -10,7 +10,7 @@
 #set ($isWorkspaceUIAvailable = $xwiki.exists($workspaceManagerMainDocumentReference))
 #set ($isWorkspace = $isWorkspaceAPIAvailable && $services.workspace.isWorkspace($xcontext.database))
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
-#set ($hasSeveralWorkspaces = $isWorkspaceAPIAvailable && "$!services.workspace.getWorkspaces()" != '' && $services.workspace.getWorkspaces().size()>1)
+#set ($hasSeveralWorkspaces = $isWorkspaceAPIAvailable && "$!services.workspace.getWorkspaces()" != '' && $services.workspace.getWorkspaces().size() > 1)
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
 ## User
@@ -53,17 +53,17 @@
 ##
 ## Create
 ##
-## $hasCreateWorkspace is determined by:
+## $displayCreateWiki is determined by:
 ## - the workspaces app is installed
 ## - and the user has the right to create a wiki
 ## - and the workspaces application has been installed. We check this by checking if there's at least one template since the installation process will create a template
 ## (in the future the last condition will be removed since we will use the Distribution Wizard for wiki creation)
-#set ($hasCreateWorkspace = $isWorkspaceAPIAvailable && $isWorkspaceUIAvailable && $hasCreateWiki && "$!services.workspace.getWorkspaceTemplates()" != '' && $services.workspace.getWorkspaceTemplates().size() > 0)
-#set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $hasCreateWorkspace)
+#set ($displayCreateWiki = $isWorkspaceAPIAvailable && $isWorkspaceUIAvailable && $hasCreateWiki && "$!services.workspace.getWorkspaceTemplates()" != '' && $services.workspace.getWorkspaceTemplates().size() > 0)
+#set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $displayCreateWiki)
 #if ($displayCreateSubmenu)
   #xwikitopmenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon')
   #set ($hasPreviousMenuSection = false)
-  #if ($hasCreateWorkspace)
+  #if ($displayCreateWiki)
     #set ($createWorkspaceDocumentReference = $services.model.createDocumentReference('xwiki', 'WorkspaceManager', 'CreateNewWorkspace'))
     #submenuitem("$xwiki.getURL($createWorkspaceDocumentReference)" $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '')
     #set ($hasPreviousMenuSection = true)

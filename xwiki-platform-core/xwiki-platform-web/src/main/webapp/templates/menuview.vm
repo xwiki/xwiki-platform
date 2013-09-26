@@ -9,7 +9,7 @@
 #set ($isWorkspaceManagerAppInstalled = $xwiki.exists($workspaceManagerMainDocumentReference))
 #set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
-#set ($moreThan1Workspace = $listtool.size($services.workspace.getWorkspaces())>1)
+#set ($moreThan1Workspace = $services.workspace.getWorkspaces() != $util.null && $services.workspace.getWorkspaces().size()>1)
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
 ## User

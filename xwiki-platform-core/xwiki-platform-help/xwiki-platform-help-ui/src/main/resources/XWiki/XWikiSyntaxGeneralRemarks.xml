@@ -111,7 +111,6 @@
 
 XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} corrects some errors or ambiguous syntax entered by the user as shown in the examples in the table below.
 
-(% style="width:100%" %)
 |=Description|=Example of invalid or ambiguous syntax|=Fixed XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
 |Unclosed text styles|{{{**bold}}}|{{{**bold**}}}
 |Two standalone elements not separated by 2 new lines|{{{| table cell}}}\\{{{* list item}}}|{{{| table cell}}}\\\\{{{* list item}}}

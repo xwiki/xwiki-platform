@@ -111,7 +111,6 @@
 
 {{info}}Some of the mentioned styles do not work on all browsers. For a comprehensive list follow [[this link&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Bulleted list|((({{{
 * item 1
@@ -287,7 +286,6 @@ j. item 2
 
 {{info}}Some of the mentioned styles do not work on all browsers. For a comprehensive list follow [[this link&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Bulleted list|((({{{
 * item 1

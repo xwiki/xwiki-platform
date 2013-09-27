@@ -115,7 +115,6 @@ There are 2 kinds of macros in XWiki Syntax 1.0:
 
 {{info}}For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0
 |Velocity Macro|((({{{#info("Some text")}}})))
 |Radeox Macro/XWiki Macro|((({{{
@@ -134,7 +133,6 @@ There are also 2 kinds of macros in XWiki Syntax {{velocity}}$crtSyntaxVer{{/vel
 
 {{info}}For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
 |Velocity Macro|((({{{
 {{info}}

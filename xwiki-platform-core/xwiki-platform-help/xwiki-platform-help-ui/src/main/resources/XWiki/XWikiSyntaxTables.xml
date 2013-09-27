@@ -111,7 +111,6 @@
 
 Allows to easily create content in table format.
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Standard table|((({{{
 {table}
@@ -176,7 +175,6 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 
 Allows to easily create content in table format. Parameters for table, row or cell are also supported in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}.
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Standard table|((({{{
 |=Title 1|=Title 2

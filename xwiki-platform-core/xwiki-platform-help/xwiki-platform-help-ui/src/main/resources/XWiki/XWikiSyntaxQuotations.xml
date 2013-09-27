@@ -111,7 +111,6 @@
 
 Allows to quote some text.
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Simple quote|(((
 &lt;blockquote&gt;&lt;p&gt;john said this&lt;/p&gt;&lt;/blockquote&gt;
@@ -135,7 +134,6 @@ I said ok
 
 Allows to quote some text.
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Simple quote|((({{{
 &gt; john said this

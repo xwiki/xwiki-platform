@@ -113,7 +113,6 @@ Paragraphs are text elements separated by 2 or more new lines.
 
 {{info}}New lines are not honored in XWiki Syntax 1.0.{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Simple paragraph|This is a paragraph|This is a paragraph
 |Paragraph on multiple lines|Paragraph on{{{\\}}}\\multiple lines|Paragraph on\\multiple lines
@@ -126,7 +125,6 @@ Paragraphs are text elements separated by 2 or more new lines.
 
 {{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} new lines are honored which is not the case in XWiki Syntax 1.0 and in Creole Syntax.{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Simple paragraph|This is a paragraph|This is a paragraph
 |Paragraph on multiple lines|Paragraph on\\multiple lines|Paragraph on\\multiple lines

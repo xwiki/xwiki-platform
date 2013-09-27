@@ -109,7 +109,6 @@
 
 === 1.0 ===
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Bold|{{{*bold*}}}|**bold**
 |Underline|{{{__underline___}}}|__underline__
@@ -128,7 +127,6 @@ New in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} over XWiki Syntax 1.0
 * Ability to span several lines (wasn't possible in XWiki Syntax 1.0).
 {{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Bold|{{{**bold**}}}|**bold**
 |Underline|{{{__underline__}}}|__underline__

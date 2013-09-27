@@ -113,7 +113,6 @@ Allow to enter content that will not be formatted (in other words the XWiki Synt
 
 {{info}}In XWiki Syntax 1.0 the [[Pre macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] only preserves XWiki Syntax and Radeox macros. However HTML snippets and Groovy/Velocity scripts are still executed.{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Verbatim inline|{{{Some verbatim {pre}*[not rendered]*{/pre} content}}}|Some verbatim {{{*[not rendered]*}}} content
 |Verbatim block|((({{{
@@ -134,7 +133,6 @@ content
 
 Allow to enter content that will not be formatted (in other words the XWiki Syntax will not be taken into account).
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Verbatim inline|{{{Some verbatim {{{**[[not rendered]]**}}} content}}}|Some verbatim {{{**[[not rendered]]**}}} content
 |Verbatim block|((({{{

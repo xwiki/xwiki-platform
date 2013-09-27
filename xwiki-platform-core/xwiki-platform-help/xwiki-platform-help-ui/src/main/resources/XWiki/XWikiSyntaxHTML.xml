@@ -111,7 +111,6 @@
 
 {{info}}It is possible to enter HTML markup directly in the text in XWiki Syntax 1.0.{{/info}}
 
-(% style="width:100%" %)
 |=XWiki Syntax 1.0|=Result
 |&lt;b&gt;bold&lt;/b&gt;|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
 
@@ -119,7 +118,6 @@
 
 {{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} HTML or XHTML must be entered by using the HTML macro.{{/info}}
 
-(% style="width:100%" %)
 |=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |{{{{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}}}}|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
 

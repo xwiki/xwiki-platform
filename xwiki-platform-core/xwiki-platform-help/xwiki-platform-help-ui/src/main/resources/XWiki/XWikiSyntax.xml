@@ -224,6 +224,9 @@ document.observe('xwiki:dom:loaded', function() {
 #syntax-page-content {
   margin-left: 15em;
 }
+#syntax-page-content table {
+  width: 99%;
+}
 
 /*******************************************************/
 
@@ -360,6 +363,9 @@ $syntaxMenu.add($cat)
   ## "Standard" URLs and icons for categories
   ###set ($category.url = $xwiki.getURL($currentDoc, 'view', "syntax=$escapetool.url(${crtSyntaxVer})&amp;amp;category=${mathtool.sub($velocityCount, 1)}"))
   #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($velocityCount, 1)}")
+  #if ($request.language)
+    #set ($category.url = "$category.url&amp;language=$escapetool.url($request.language)")
+  #end
   ## #set ($category.name = $services.localization.render("admin.${category.id}")) ## We have this hardcoded above right now
   #set ($category.cssClass = "${category.id}Icon")
   #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
@@ -376,6 +382,9 @@ $syntaxMenu.add($cat)
       ###set ($query = "syntax=$escapetool.url(${crtSyntaxVer})&amp;amp;section=$escapetool.url(${section.id})")
       ###set ($section.url = $xwiki.getURL($currentDoc, 'view', $query))
       #set ($section.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;section=$escapetool.url(${section.id})")
+      #if ($request.language)
+        #set ($section.url = "$section.url&amp;language=$escapetool.url($request.language)")
+      #end
     #end
   #end
 #end

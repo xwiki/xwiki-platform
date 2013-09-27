@@ -111,7 +111,6 @@
 
 Groups can be used to insert another document inline directly into the current document. This allows for example to insert complex elements inside a list item or inside a table cell. Groups are delimited by the following syntactic elements: ##{{{(((...)))}}}##. One Group can contain another Group and there is no limit of imbrication.
 
-(% style="width:100%" %)
 |=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |((({{{
 |=Header 1|=Header 2|=Header 3

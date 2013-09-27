@@ -109,7 +109,6 @@
 
 === 1.0 ===
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Standard headings|(((
 1 level 1
@@ -131,7 +130,6 @@
 
 === 2.0 ===
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Standard headings|((({{{
 = level 1 = 

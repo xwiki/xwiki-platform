@@ -135,7 +135,6 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 
 === 1.0 ===
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Image from attachment on current page|(((
 {{info}}See [[Image Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] for details{{/info}}
@@ -147,7 +146,6 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 
 === 2.0 ===
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 2.0|=Result
 |Image from attachment on current page|{{{image:img.png}}}|image:img.png
 |Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:img.png
@@ -181,7 +179,6 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[ima
 
 === 2.1 ===
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 2.1|=Result
 |Image from attachment on current page|{{{image:img.png}}}|image:img.png
 |Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:img.png

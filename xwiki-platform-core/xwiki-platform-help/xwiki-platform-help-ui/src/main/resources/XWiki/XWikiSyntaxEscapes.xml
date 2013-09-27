@@ -111,7 +111,6 @@
 
 Allows to escape XWiki Syntax.
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Escape a character|{{{This is not a \[link\]}}}|{{{This is not a [link]}}}
 
@@ -119,7 +118,6 @@ Allows to escape XWiki Syntax.
 
 Allows to escape XWiki Syntax.
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Escape a character|(((
 {{{This is not a ~[~[link~]~]}}}

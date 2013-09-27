@@ -113,7 +113,6 @@
 
 {{info}}Note that this is different from Creole where exactly 4 dashes are required.{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax 1.0|=Result
 |Simple horizontal line|{{{----}}}|(((----)))
 |Parametrized horizontal line|&lt;hr style="color:blue"/&gt;|(((
@@ -127,7 +126,6 @@
 
 {{info}}Note that this is different from Creole where exactly 4 dashes are required.{{/info}}
 
-(% style="width:100%" %)
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Simple horizontal line|{{{----}}}|(((----)))
 |Parametrized horizontal line|((({{{

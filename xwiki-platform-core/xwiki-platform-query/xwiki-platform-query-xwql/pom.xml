@@ -33,14 +33,9 @@
   <name>XWiki Platform - Query - XWQL</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-query-jpql-parser</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-manager</artifactId>
@@ -68,6 +63,21 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Use SableCC to generate the parser code -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sablecc-maven-plugin</artifactId>
+        <configuration>
+          <sourceDirectory>${basedir}/src/main/java/org/xwiki/query/xwql/internal/parser/sablecc</sourceDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>

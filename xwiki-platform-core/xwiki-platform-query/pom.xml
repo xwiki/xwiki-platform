@@ -33,7 +33,6 @@
   <name>XWiki Platform - Query - Parent POM</name>
   <packaging>pom</packaging>
   <modules>
-    <module>xwiki-platform-query-jpql-parser</module>
     <module>xwiki-platform-query-manager</module>
     <module>xwiki-platform-query-xwql</module>
   </modules>

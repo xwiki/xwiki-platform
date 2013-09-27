@@ -3,7 +3,7 @@
  * Select statement.
  * @version $Id$
  */
-Package org.xwiki.query.jpql;
+Package org.xwiki.query.xwql.internal.parser;
 
 Helpers
     white = ' ' | '\t' | '\n' | '\r';

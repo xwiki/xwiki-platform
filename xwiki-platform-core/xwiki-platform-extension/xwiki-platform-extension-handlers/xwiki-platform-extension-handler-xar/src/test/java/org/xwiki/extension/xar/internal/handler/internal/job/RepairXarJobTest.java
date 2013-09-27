@@ -19,9 +19,13 @@
  */
 package org.xwiki.extension.xar.internal.handler.internal.job;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -30,6 +34,8 @@ import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
+
+import com.xpn.xwiki.XWikiContext;
 
 public class RepairXarJobTest extends AbstractExtensionHandlerTest
 {
@@ -40,6 +46,14 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     public void setUp() throws Exception
     {
         super.setUp();
+
+        // Set up the execution context because the job manager will try to use the user component manager and thus it
+        // needs to access the current user reference from the XWiki context. See XCOMMONS-456.
+        XWikiContext xcontext = mock(XWikiContext.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty("xwikicontext", xcontext);
+        Execution execution = this.mocker.getInstance(Execution.class);
+        execution.setContext(executionContext);
 
         this.xarExtensionRepository =
             this.mocker.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
@@ -59,11 +73,11 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 
-        Assert.assertTrue(installedExtension.isValid(null));
+        assertTrue(installedExtension.isValid(null));
 
         installedExtension = this.xarExtensionRepository.resolve(new ExtensionId("dependency", "1.0"));
 
-        Assert.assertTrue(installedExtension.isValid(null));
+        assertTrue(installedExtension.isValid(null));
     }
 
     @Test
@@ -75,6 +89,6 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 
-        Assert.assertFalse(installedExtension.isValid(null));
+        assertFalse(installedExtension.isValid(null));
     }
 }

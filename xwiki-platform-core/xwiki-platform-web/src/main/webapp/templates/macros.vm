@@ -1925,10 +1925,16 @@ function (row, i, table) {
     loading.style.height = field.offsetHeight + 'px';
     field.parentNode.insertBefore(loading, field);
     var removeLoadingAnimation = function() {
-      // Remove the loading animation after the WYSIWYG module has been loaded.
-      Wysiwyg.onModuleLoad(function() {
+      // Remove the loading animation after the editor code has been loaded or if it can't be loaded.
+      var callback = function() {
         loading.parentNode.removeChild(loading);
-      });
+      };
+      if (typeof Wysiwyg == 'object' && Wysiwyg) {
+        Wysiwyg.onModuleLoad(callback);
+      } else {
+        field.style.visibility = 'visible';
+        callback();
+      }
       return true;
     };
     (XWiki.domIsLoaded && removeLoadingAnimation()) || document.observe('xwiki:dom:loaded', removeLoadingAnimation);
@@ -2096,11 +2102,13 @@ var $jsVarName = {
 //<![CDATA[
 (function() {
   var init = function() {
-    Wysiwyg.onModuleLoad(function() {
+    // Fail safe if the editor can't be loaded.
+    var editorCanBeLoaded = typeof Wysiwyg == 'object' && Wysiwyg;
+    editorCanBeLoaded && Wysiwyg.onModuleLoad(function() {
       new WysiwygEditor($jsVarName);
       $jsVarName = undefined;
     });
-    return true;
+    return editorCanBeLoaded;
   };
   (XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
 })(XWiki || {});

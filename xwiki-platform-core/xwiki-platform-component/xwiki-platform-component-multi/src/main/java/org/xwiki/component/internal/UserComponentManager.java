@@ -29,6 +29,7 @@ import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -80,6 +81,7 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     @Override
     protected String getKey()
     {
-        return ID + ':' + this.referenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
+        DocumentReference userReference = this.documentAccessBridge.getCurrentUserReference();
+        return userReference != null ? ID + ':' + this.referenceSerializer.serialize(userReference) : null;
     }
 }

@@ -35,6 +35,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -82,7 +83,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     private XWikiContext getContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        ExecutionContext econtext = this.execution.getContext();
+
+        return econtext != null ? (XWikiContext) econtext.getProperty("xwikicontext") : null;
     }
 
     @Override
@@ -693,7 +696,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public DocumentReference getCurrentUserReference()
     {
-        return getContext().getUserReference();
+        XWikiContext xcontext = getContext();
+        return xcontext != null ? xcontext.getUserReference() : null;
     }
 
     @Override

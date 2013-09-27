@@ -78,12 +78,6 @@
     <!-- Needed to be in the WAR -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
-      <classifier>shared</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-server</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -609,8 +609,6 @@ public class PackageMojo extends AbstractMojo
         // provide. We'll be able to remove them when we start using Servlet 3.0 -->
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-wysiwyg-server", getXWikiPlatformVersion(), null, "jar"));
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifactWithClassifier("org.xwiki.platform",
-            "xwiki-platform-wysiwyg-client", getXWikiPlatformVersion(), "jar", "shared"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-webdav-server", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",

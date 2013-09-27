@@ -163,13 +163,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <classifier>shared</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-webdav-server</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>

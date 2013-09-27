@@ -49,7 +49,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-client</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
+      <classifier>shared</classifier>
     </dependency>
     <!-- XWiki dependencies -->
     <dependency>

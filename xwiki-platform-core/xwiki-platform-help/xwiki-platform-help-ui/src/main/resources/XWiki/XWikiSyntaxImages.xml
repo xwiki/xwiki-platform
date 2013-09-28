@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <attachment>
     <filename>img.png</filename>
     <filesize>959</filesize>
@@ -133,7 +133,7 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 
 == Images ==
 
-=== 1.0 ===
+=== 1.0 Images ===
 
 |=Feature|=XWiki Syntax 1.0|=Result
 |Image from attachment on current page|(((
@@ -144,7 +144,7 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 |Image with parameters|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
 |Images located at URL|{{{http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 
-=== 2.0 ===
+=== 2.0 Images ===
 
 |=Feature|=XWiki Syntax 2.0|=Result
 |Image from attachment on current page|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
@@ -177,7 +177,7 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[ima
 *** **##alt##**: A parameter that defines which text should be displayed if the browser is not able to display the image. Since this is a required HTML attribute XWiki will use the file name instead if the ##alt## parameter is not defined. Example: ##alt="img.png"##
 *** **More**: A more in depth explanation on the HTML ##&lt;img&gt;## tag including more attributes can be reviewed [[on w3.org&gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]].
 
-=== 2.1 ===
+=== 2.1 Images ===
 
 |=Feature|=XWiki Syntax 2.1|=Result
 |Image from attachment on current page|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png

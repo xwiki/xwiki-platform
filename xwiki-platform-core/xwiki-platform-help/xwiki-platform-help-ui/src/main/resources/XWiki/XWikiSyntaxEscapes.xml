@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -107,14 +107,14 @@
 
 == Escapes ==
 
-=== 1.0 ===
+=== 1.0 Escapes ===
 
 Allows to escape XWiki Syntax.
 
 |=Feature|=XWiki Syntax 1.0|=Result
 |Escape a character|{{{This is not a \[link\]}}}|{{{This is not a [link]}}}
 
-=== 2.0 ===
+=== 2.0 Escapes ===
 
 Allows to escape XWiki Syntax.
 

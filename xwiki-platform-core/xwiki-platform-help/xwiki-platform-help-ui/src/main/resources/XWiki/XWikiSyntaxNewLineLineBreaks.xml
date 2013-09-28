@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -107,7 +107,7 @@
 
 == New Line/Line Breaks ==
 
-=== 1.0 ===
+=== 1.0 New Line Line Breaks ===
 
 A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 
@@ -119,7 +119,7 @@ New lines are not honored in XWiki Syntax 1.0. Use line breaks instead.
 |Line break|{{{Line\\New line}}}|Line\\New line
 |New line|Line\\New line|Line New line
 
-=== 2.0 ===
+=== 2.0 New Line Line Breaks ===
 
 A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 

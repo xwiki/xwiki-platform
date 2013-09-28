@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <attachment>
     <filename>img.png</filename>
     <filesize>959</filesize>
@@ -133,7 +133,7 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 
 == Links ==
 
-=== 1.0 ===
+=== 1.0 Links ===
 
 (% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Feature|=XWiki Syntax 1.0|=Result
@@ -185,7 +185,7 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 * **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
 * **##target##**: An optional string corresponding to the HTML ##target## attribute for a HTML ##A## link element. This element is used when rendering the link. It defaults to opening the link in the current window. Examples: ##_self##, ##_blank##
 
-=== 2.0 ===
+=== 2.0 Links ===
 
 (% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Feature|=XWiki Syntax 2.0|=Result
@@ -239,7 +239,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 * **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
 * **##parameters##**: An optional list of parameters passed to the link. Example: ##rel="~_~_blank"## (open in new window)
 
-=== 2.1 ===
+=== 2.1 Links ===
 
 (% style="overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Feature|=XWiki Syntax 2.1|=Result

@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -107,7 +107,7 @@
 
 == Quotations ==
 
-=== 1.0 ===
+=== 1.0 Quotations ===
 
 Allows to quote some text.
 
@@ -130,7 +130,7 @@ I said ok
 I said ok
 )))
 
-=== 2.0 ===
+=== 2.0 Quotations ===
 
 Allows to quote some text.
 

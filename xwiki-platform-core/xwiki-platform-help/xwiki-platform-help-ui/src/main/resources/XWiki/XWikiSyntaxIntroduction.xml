@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -107,13 +107,13 @@
 
 == Introduction ==
 
-=== 1.0 ===
+=== 1.0 Introduction ===
 
 The XWiki Syntax 1.0 was the first attempt to implement a Wiki-style Syntax in XWiki. It has some limitations and some formatting can only be achieved by inserting raw HTML. We recommend using the newer syntaxes; XWiki Syntax 1.0 is only supported for backwards compatibility.
 
 In addition to the XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes&amp;language=default"]].
 
-=== 2.0 ===
+=== 2.0 Introduction ===
 
 Starting with XWiki Enterprise version 1.7 we've introduced a new wiki syntax. We've named the old syntax the //XWiki Syntax 1.0// and the new syntax was logically called the //XWiki Syntax 2.0//. The main reasons for introducing the new syntax were:
 * Fix the limitations and ambiguities of the XWiki 1.0 syntax (which was inspired by both Radeox - the underlying rendering engine - and TWiki).
@@ -123,7 +123,7 @@ Starting with XWiki Enterprise version 1.7 we've introduced a new wiki syntax. W
 
 In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more>>||queryString="syntax=2.0&amp;section=OtherSyntaxes&amp;language=default"]].
 
-=== 2.1 ===
+=== 2.1 Introduction ===
 
 Since the introduction of XWiki Syntax 2.0 a few shortcomings of this syntax have been found. To fix these a new, as of now //experimental//, XWiki Syntax 2.1 was introduced in XWiki Enterprise version 3.0. Some reason for the development of this new syntax are:
 * Homogenize the link and image syntax for better clarity, consistency and extensibility.

@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -107,7 +107,7 @@
 
 == Parameters ==
 
-=== 1.0 ===
+=== 1.0 Parameters ===
 
 In XWiki Syntax 1.0 there is no syntax for passing parameters and the only way to do it was to write XHTML directly in the content as shown in the table below.
 
@@ -118,7 +118,7 @@ In XWiki Syntax 1.0 there is no syntax for passing parameters and the only way t
 &lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
 }}})))
 
-=== 2.0 ===
+=== 2.0 Parameters ===
 
 With XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} it's possible to pass parameters to the different syntax elements and also to blocks of text. This is used for example to style them. You can set any parameter key/value pair you want. The XHTML renderer will pass these parameters as XHTML attributes to the underlying XHTML representation of the different syntax elements.
 

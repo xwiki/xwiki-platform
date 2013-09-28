@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -94,7 +94,7 @@
       <category>0</category>
     </property>
     <property>
-      <maxSyntaxVersion>2.1</maxSyntaxVersion>
+      <maxSyntaxVersion>1.0</maxSyntaxVersion>
     </property>
     <property>
       <minSyntaxVersion>1.0</minSyntaxVersion>
@@ -107,7 +107,7 @@
 
 == Other Syntaxes ==
 
-=== 1.0 ===
+=== 1.0 Other Syntaxes ===
 
 The following other syntaxes are implemented in XWiki Enterprise 1.6 and later:
 * [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
@@ -119,28 +119,5 @@ The following other syntaxes are implemented in XWiki Enterprise 1.6 and later:
 
 {{warning}}The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.{{/warning}}
 
-=== 2.0 ===
-
-The following other syntaxes are implemented in XWiki Enterprise 1.6 and later:
-* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
-* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
-* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
-* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
-* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
-* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
-
-{{warning}}The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.{{/warning}}
-
-=== 2.1 ===
-
-The following other syntaxes are implemented in XWiki Enterprise 1.6 and later:
-* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
-* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
-* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
-* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
-* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
-* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
-
-{{warning}}The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.{{/warning}}
 </content>
 </xwikidoc>

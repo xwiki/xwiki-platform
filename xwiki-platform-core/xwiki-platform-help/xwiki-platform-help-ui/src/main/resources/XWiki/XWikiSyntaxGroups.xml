@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -107,7 +107,7 @@
 
 == Groups ==
 
-=== 2.0 ===
+=== 2.0 Groups ===
 
 Groups can be used to insert another document inline directly into the current document. This allows for example to insert complex elements inside a list item or inside a table cell. Groups are delimited by the following syntactic elements: ##{{{(((...)))}}}##. One Group can contain another Group and there is no limit of imbrication.
 

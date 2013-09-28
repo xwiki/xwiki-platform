@@ -22,7 +22,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -107,7 +107,7 @@
 
 == Headings ==
 
-=== 1.0 ===
+=== 1.0 Headings ===
 
 |=Feature|=XWiki Syntax 1.0|=Result
 |Standard headings|(((
@@ -128,7 +128,7 @@
 {{/html}})))
 |Headings with XWiki Syntax|1.1.1 Heading with *bold*|(((=== Heading with **bold** ===)))
 
-=== 2.0 ===
+=== 2.0 Headings ===
 
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Standard headings|((({{{

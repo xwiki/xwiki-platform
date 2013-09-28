@@ -283,7 +283,7 @@ tbody&gt;tr&gt;td&gt;tt {
   #set ($crtSyntaxVer = $mathtool.toDouble($crtSyntaxVer))
 
 #else
-  #set ($crtSyntaxVer = 2.0) ## Default to Syntax 2.0
+  #set ($crtSyntaxVer = 2.1) ## Default to Syntax 2.1
 #end
 
 ##

@@ -15,7 +15,7 @@
   <date>1301497691000</date>
   <contentUpdateDate>1301497691000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render("xe.syntax.syntaxpage.title")</title>
+  <title>$services.localization.render("platform.help.syntaxpage.title")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -469,9 +469,8 @@ $syntaxMenu.add($cat)
   &lt;form id="change-context" class="xformInline" action=""&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
-      &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("xe.syntax.changesyntax"))"&gt;
-        ##&lt;optgroup label="$services.localization.render('admin.gotospaceadministration')"&gt;
-        &lt;optgroup label="Select Syntax"&gt;
+      &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("platform.help.changesyntax"))"&gt;
+        &lt;optgroup label="$services.localization.render('platform.help.choose_syntax')"&gt;
           #set ($query = "syntax=1.0&amp;amp;${crtSelection}")
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;XWiki Syntax 1.0&lt;/option&gt;
           #set ($query = "syntax=2.0&amp;amp;${crtSelection}")
@@ -503,9 +502,9 @@ $xwiki.get('ssx').use($doc.getFullName())##
 #elseif ($crtCategoryId != '')
   #set ($sectionName = ${crtCategory.name})
 #else
-  #set ($sectionName = $services.localization.render("xe.syntax.syntaxall"))
+  #set ($sectionName = $services.localization.render("platform.help.syntaxall"))
 #end
-#set ($syntaxTitle = $services.localization.render("xe.syntax.syntaxtitle", ["${crtSyntaxVer}"]))
+#set ($syntaxTitle = $services.localization.render("platform.help.syntaxtitle", ["${crtSyntaxVer}"]))
 #syntaxSwitch()
 (((
 #set ($query = "syntax=$escapetool.url(${crtSyntaxVer})")

@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <object>
     <class>
@@ -91,7 +91,7 @@
     <className>XWiki.XWikiSyntaxClass</className>
     <guid>fd915b6b-becd-4791-952a-978e693af8ab</guid>
     <property>
-      <category>1</category>
+      <category>2</category>
     </property>
     <property>
       <maxSyntaxVersion>2.0</maxSyntaxVersion>
@@ -100,10 +100,10 @@
       <minSyntaxVersion>1.0</minSyntaxVersion>
     </property>
     <property>
-      <section>13</section>
+      <section>3</section>
     </property>
   </object>
-  <content>= Editing =
+  <content>= Advanced =
 
 == Escapes ==
 
@@ -123,5 +123,7 @@ Allows to escape XWiki Syntax.
 {{{This is not a ~[~[link~]~]}}}
 {{info}}To enter a ~~ character use a double escape: ~~~~{{/info}}
 )))|{{{This is not a [[link]]}}}
+|Escape longer text
+(also see "Verbatim")|~{~{~{{{{ some **longer** text //without// formatting}}}~}~}~}|{{{ some **longer** text //without// formatting}}}
 </content>
 </xwikidoc>

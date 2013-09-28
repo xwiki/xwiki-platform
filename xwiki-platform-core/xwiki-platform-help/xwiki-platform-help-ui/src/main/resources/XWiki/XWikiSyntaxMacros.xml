@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <object>
     <class>
@@ -91,7 +91,7 @@
     <className>XWiki.XWikiSyntaxClass</className>
     <guid>b92796d3-f2f2-42a5-9368-77be0e51ce91</guid>
     <property>
-      <category>2</category>
+      <category>3</category>
     </property>
     <property>
       <maxSyntaxVersion>2.0</maxSyntaxVersion>
@@ -117,7 +117,7 @@ There are 2 kinds of macros in XWiki Syntax 1.0:
 
 |=Feature|=XWiki Syntax 1.0
 |Velocity Macro|((({{{#info("Some text")}}})))
-|Radeox Macro/XWiki Macro|((({{{
+|Radeox Macro|((({{{
 {code:java}
 java content
 {code}
@@ -139,7 +139,7 @@ There are also 2 kinds of macros in XWiki Syntax {{velocity}}$crtSyntaxVer{{/vel
 Some text
 {{/info}}
 }}})))
-|Radeox Macro/XWiki Macro|((({{{
+|XWiki Macro|((({{{
 {{code language="java"}}
 java content
 {{/code}}

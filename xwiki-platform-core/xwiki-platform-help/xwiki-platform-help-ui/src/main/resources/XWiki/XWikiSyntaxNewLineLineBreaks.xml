@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <object>
     <class>
@@ -112,7 +112,7 @@
 A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 
 {{info}}
-New lines are not honored in XWiki Syntax 1.0.
+New lines are not honored in XWiki Syntax 1.0. Use line breaks instead.
 {{/info}}
 
 |=Feature|=XWiki Syntax 1.0|=Result

@@ -208,8 +208,7 @@ document.observe('xwiki:dom:loaded', function() {
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
+      <code>
 #document-title {
   margin-bottom: 1em;
 }
@@ -238,14 +237,18 @@ document.observe('xwiki:dom:loaded', function() {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
 }
 
+.syntax-menu .advancedIcon {
+  background-image: url("$xwiki.getSkinFile('icons/silk/wand.gif')");
+}
+
 .syntax-menu .programmingIcon {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_gear.gif')");
 }
 
-#syntax-page-content h3 {
+#syntax-page-content&gt;h3 {
   display: none;
 }
-#syntax-page-content h3.sectionheader {
+#syntax-page-content&gt;h3.sectionheader {
   display: block;
 }
 
@@ -255,7 +258,7 @@ tbody&gt;tr&gt;td&gt;tt {
 }</code>
     </property>
     <property>
-      <name>Syntax Guide stylesheet</name>
+      <name>Syntax Guide Stylesheet</name>
     </property>
     <property>
       <parse>1</parse>
@@ -455,6 +458,13 @@ $syntaxMenu.add($cat)
   #elseif ($crtSectionId != '')
     #set ($crtSelection = "section=$escapetool.url($!{crtSectionId})")
   #end
+  #if ($request.language)
+    #if ($crtSelection != "")
+      #set ($crtSelection = "${crtSelection}&amp;amp;language=$escapetool.url($request.language)")
+    #else
+      #set ($crtSelection = "language=$escapetool.url($request.language)")
+    #end
+  #end
 {{html}}
   &lt;form id="change-context" class="xformInline" action=""&gt;
     &lt;div&gt;
@@ -470,6 +480,9 @@ $syntaxMenu.add($cat)
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;XWiki Syntax 2.1&lt;/option&gt;
         &lt;/optgroup&gt;
       &lt;/select&gt;
+      #if ($request.language)
+        &lt;input type="hidden" name="language" value="$escapetool.xml($request.language)" /&gt;
+      #end
       &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;
     &lt;/div&gt;
   &lt;/form&gt;

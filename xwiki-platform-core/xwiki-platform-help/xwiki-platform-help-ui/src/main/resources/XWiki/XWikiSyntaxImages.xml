@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <attachment>
     <filename>img.png</filename>
@@ -139,18 +139,18 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 |Image from attachment on current page|(((
 {{info}}See [[Image Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] for details{{/info}}
 {{{{image:img.png}}}}
-)))|image:img.png
-|Image from attachment on another page|{{{{image:img.png|document=Space.Page}}}}|image:img.png
-|Image with parameters|{{{{image:img.png|width=25|height=25}}}}|[[image:img.png||width="25" height="25"]]
-|Images located at URL|{{{http://some/url/img.png}}}|image:img.png
+)))|image:XWiki.XWikiSyntaxImages@img.png
+|Image from attachment on another page|{{{{image:img.png|document=Space.Page}}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Image with parameters|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Images located at URL|{{{http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 
 === 2.0 ===
 
 |=Feature|=XWiki Syntax 2.0|=Result
-|Image from attachment on current page|{{{image:img.png}}}|image:img.png
-|Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:img.png
-|Image with parameters|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:img.png||width="25" height="25"]]
-|Images located at URL|{{{image:http://some/url/img.png}}}|image:img.png
+|Image from attachment on current page|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Image with parameters|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Images located at URL|{{{image:http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 
 {{velocity}}$subHeading XWiki Syntax 2.0 Image Specification $subHeading{{/velocity}}
 
@@ -180,10 +180,11 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[ima
 === 2.1 ===
 
 |=Feature|=XWiki Syntax 2.1|=Result
-|Image from attachment on current page|{{{image:img.png}}}|image:img.png
-|Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:img.png
-|Image with parameters|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:img.png||width="25" height="25"]]
-|Images located at URL|{{{image:http://some/url/img.png}}}|image:img.png
+|Image from attachment on current page|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Image with parameters|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Images located at URL|{{{image:http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Prepackaged Icons|{{{image:icon:accept}}}|image:icon:accept
 
 {{velocity}}$subHeading XWiki Syntax 2.1 Image Specification $subHeading{{/velocity}}
 

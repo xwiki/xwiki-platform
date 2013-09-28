@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <object>
     <class>
@@ -91,7 +91,7 @@
     <className>XWiki.XWikiSyntaxClass</className>
     <guid>0fdcea8e-6c45-4c09-9af2-a051e1d4e880</guid>
     <property>
-      <category>1</category>
+      <category>2</category>
     </property>
     <property>
       <maxSyntaxVersion>2.0</maxSyntaxVersion>
@@ -100,7 +100,7 @@
       <minSyntaxVersion>1.0</minSyntaxVersion>
     </property>
     <property>
-      <section>11</section>
+      <section>1</section>
     </property>
   </object>
   <content>= Editing =

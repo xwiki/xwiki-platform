@@ -21,7 +21,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <object>
     <class>
@@ -111,7 +111,8 @@
 
 Paragraphs are text elements separated by 2 or more new lines.
 
-{{info}}New lines are not honored in XWiki Syntax 1.0.{{/info}}
+{{info}}New lines are not honored in XWiki Syntax 1.0. 
+You need to insert a double backslash instead, like: {{{\\}}}{{/info}}
 
 |=Feature|=XWiki Syntax 1.0|=Result
 |Simple paragraph|This is a paragraph|This is a paragraph

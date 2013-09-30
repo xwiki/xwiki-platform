@@ -25,7 +25,6 @@ import java.io.Writer;
 import org.xwiki.wikistream.output.WriterOutputTarget;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -36,6 +35,12 @@ public class DefaultWriterOutputTarget implements WriterOutputTarget
     public DefaultWriterOutputTarget(Writer writer)
     {
         this.writer = writer;
+    }
+
+    @Override
+    public boolean restartSupported()
+    {
+        return false;
     }
 
     public Writer getWriter()

@@ -56,4 +56,33 @@
       <artifactId>stax-utils</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              org/xwiki/wikistream/xml/input/source/SourceInputSource.java,
+              org/xwiki/wikistream/xml/internal/DefaultResultOutputTarget.java,
+              org/xwiki/wikistream/xml/internal/input/AbstractXMLBeanInputWikiStreamFactory.java,
+              org/xwiki/wikistream/xml/internal/input/AbstractXMLInputWikiStream.java,
+              org/xwiki/wikistream/xml/internal/input/DefaultSourceInputSource.java,
+              org/xwiki/wikistream/xml/internal/input/DefaultXMLInputWikiStream.java,
+              org/xwiki/wikistream/xml/internal/input/XMLInputProperties.java,
+              org/xwiki/wikistream/xml/internal/input/XMLInputWikiStreamUtils.java,
+              org/xwiki/wikistream/xml/internal/output/AbstractXMLBeanOutputWikiStreamFactory.java,
+              org/xwiki/wikistream/xml/internal/output/AbstractXMLOutputWikiStream.java,
+              org/xwiki/wikistream/xml/internal/output/DefaultResultInputSource.java,
+              org/xwiki/wikistream/xml/internal/output/DefaultXMLOutputWikiStream.java,
+              org/xwiki/wikistream/xml/internal/output/WikiStreamXMLStreamWriter.java,
+              org/xwiki/wikistream/xml/internal/output/XMLOuputProperties.java,
+              org/xwiki/wikistream/xml/internal/output/XMLOutputWikiStreamUtils.java,
+              org/xwiki/wikistream/xml/output/ResultOutputTarget.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

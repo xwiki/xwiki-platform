@@ -20,18 +20,14 @@
 package org.xwiki.wikistream.internal.output;
 
 import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public class StringWriterOutputTarget extends DefaultWriterOutputTarget
+public class StringWriterOutputTarget extends AbstractWriterOutputTarget
 {
-    public StringWriterOutputTarget()
-    {
-        super(new StringWriter());
-    }
-
     /**
      * Return the string buffer itself.
      * 
@@ -40,5 +36,11 @@ public class StringWriterOutputTarget extends DefaultWriterOutputTarget
     public StringBuffer getBuffer()
     {
         return ((StringWriter) getWriter()).getBuffer();
+    }
+
+    @Override
+    protected Writer openWriter()
+    {
+        return new StringWriter();
     }
 }

@@ -41,7 +41,7 @@ public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputPr
     }
 
     @Override
-    protected InputWikiStream createInputWikiStream(P properties) throws WikiStreamException
+    public InputWikiStream createInputWikiStream(P properties) throws WikiStreamException
     {
         return new DefaultXMLInputWikiStream<P>(this, properties);
     }

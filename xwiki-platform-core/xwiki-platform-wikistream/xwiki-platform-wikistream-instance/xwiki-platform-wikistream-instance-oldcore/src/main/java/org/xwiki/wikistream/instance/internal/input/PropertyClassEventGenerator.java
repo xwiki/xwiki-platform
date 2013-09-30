@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.PropertyClassFilter;
-import org.xwiki.wikistream.instance.internal.PropertyClassProperties;
 
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -39,11 +38,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Component
 @Singleton
 public class PropertyClassEventGenerator extends
-    AbstractBeanEntityEventGenerator<PropertyClass, PropertyClassFilter, PropertyClassProperties>
+    AbstractBeanEntityEventGenerator<PropertyClass, PropertyClassFilter, PropertyClassInputProperties>
 {
     @Override
     public void write(PropertyClass xclassProperty, Object filter, PropertyClassFilter propertyFilter,
-        PropertyClassProperties properties) throws WikiStreamException
+        PropertyClassInputProperties properties) throws WikiStreamException
     {
         // > WikiClassProperty
 

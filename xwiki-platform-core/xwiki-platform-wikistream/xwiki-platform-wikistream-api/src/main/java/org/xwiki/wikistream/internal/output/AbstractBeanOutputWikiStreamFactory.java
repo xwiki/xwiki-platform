@@ -29,8 +29,8 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.internal.AbstractBeanWikiStreamFactory;
 import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
+import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
-import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
@@ -39,7 +39,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @since 5.2M2
  */
 public abstract class AbstractBeanOutputWikiStreamFactory<P> extends AbstractBeanWikiStreamFactory<P> implements
-    OutputWikiStreamFactory
+    BeanOutputWikiStreamFactory<P>
 {
     @Inject
     private ComponentManager componentManager;
@@ -55,6 +55,7 @@ public abstract class AbstractBeanOutputWikiStreamFactory<P> extends AbstractBea
         return creaOutputWikiStream(createPropertiesBean(properties));
     }
 
+    @Override
     public OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
     {
         BeanOutputWikiStream<P> inputWikiStream;

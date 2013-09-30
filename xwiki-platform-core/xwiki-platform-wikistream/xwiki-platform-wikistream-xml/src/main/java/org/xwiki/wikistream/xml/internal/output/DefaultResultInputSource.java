@@ -26,7 +26,6 @@ import javax.xml.transform.Result;
 import org.xwiki.wikistream.xml.output.ResultOutputTarget;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -37,6 +36,12 @@ public class DefaultResultInputSource implements ResultOutputTarget
     public DefaultResultInputSource(Result result)
     {
         this.result = result;
+    }
+
+    @Override
+    public boolean restartSupported()
+    {
+        return false;
     }
 
     @Override

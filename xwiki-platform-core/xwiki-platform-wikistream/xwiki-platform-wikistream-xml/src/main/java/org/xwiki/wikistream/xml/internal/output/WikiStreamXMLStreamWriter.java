@@ -37,12 +37,15 @@ public class WikiStreamXMLStreamWriter
 {
     private final XMLStreamWriter writer;
 
-    public WikiStreamXMLStreamWriter(XMLStreamWriter writer)
+    private final boolean printNullValue;
+
+    public WikiStreamXMLStreamWriter(XMLStreamWriter writer, boolean printNullValue)
     {
         this.writer = writer;
+        this.printNullValue = printNullValue;
     }
 
-    public WikiStreamXMLStreamWriter(OutputStream outputStream, XMLOuputProperties properties)
+    public WikiStreamXMLStreamWriter(OutputStream outputStream, XMLOuputProperties properties, boolean printNullValue)
         throws WikiStreamException
     {
         try {
@@ -57,15 +60,19 @@ public class WikiStreamXMLStreamWriter
         } catch (Exception e) {
             throw new WikiStreamException("Failed to create XML writer", e);
         }
+
+        this.printNullValue = printNullValue;
     }
 
-    public WikiStreamXMLStreamWriter(XMLOuputProperties properties) throws WikiStreamException
+    public WikiStreamXMLStreamWriter(XMLOuputProperties properties, boolean printNullValue) throws WikiStreamException
     {
         try {
             this.writer = XMLOutputWikiStreamUtils.createXMLStreamWriter(properties);
         } catch (Exception e) {
             throw new WikiStreamException("Failed to create XML writer", e);
         }
+
+        this.printNullValue = printNullValue;
     }
 
     public XMLStreamWriter getWriter()
@@ -115,9 +122,15 @@ public class WikiStreamXMLStreamWriter
     public void writeElement(String localName, String value) throws WikiStreamException
     {
         if (value != null) {
-            writeStartElement(localName);
-            writeCharacters(value);
-            writeEndElement();
+            if (value.isEmpty()) {
+                writeEmptyElement(localName);
+            } else {
+                writeStartElement(localName);
+                writeCharacters(value);
+                writeEndElement();
+            }
+        } else if (this.printNullValue) {
+            writeEmptyElement(localName);
         }
     }
 

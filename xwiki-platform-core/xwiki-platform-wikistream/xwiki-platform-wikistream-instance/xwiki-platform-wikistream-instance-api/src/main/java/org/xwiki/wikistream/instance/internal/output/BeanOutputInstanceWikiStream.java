@@ -19,31 +19,17 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.instance.internal.InstanceUtils;
-import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
-import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.instance.output.OutputInstanceWikiStream;
 
 /**
- * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
- * XMLInputStream wiki parsers.
- * 
+ * @param <P> the type of the properties bean
  * @version $Id$
  * @since 5.2
  */
-@Component
-@Named(InstanceUtils.ROLEHINT)
-@Singleton
-public class InstanceOutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<InstanceOutputProperties>
+@Role
+public interface BeanOutputInstanceWikiStream<P> extends OutputInstanceWikiStream
 {
-    public InstanceOutputWikiStreamFactory()
-    {
-        super(WikiStreamType.XWIKI_INSTANCE);
-
-        setName("XWiki instance input stream");
-        setDescription("Setup XWiki instance from wiki events.");
-    }
+    void setProperties(P properties) throws WikiStreamException;
 }

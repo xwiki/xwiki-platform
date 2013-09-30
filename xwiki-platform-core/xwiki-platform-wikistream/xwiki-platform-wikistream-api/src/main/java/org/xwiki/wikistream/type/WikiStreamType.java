@@ -115,8 +115,12 @@ public class WikiStreamType
         StringBuilder builder = new StringBuilder();
 
         builder.append(getType().serialize());
-        builder.append('+');
-        builder.append(getDataFormat());
+
+        if (getDataFormat() != null) {
+            builder.append('+');
+            builder.append(getDataFormat());
+        }
+
         if (getVersion() != null) {
             builder.append('/');
             builder.append(getVersion());

@@ -64,9 +64,13 @@
               org/xwiki/wikistream/instance/internal/input/AbstractBeanEntityEventGenerator.java,
               org/xwiki/wikistream/instance/internal/input/InstanceInputProperties.java,
               org/xwiki/wikistream/instance/internal/input/InstanceInputWikiStreamFactory.java,
-              org/xwiki/wikistream/instance/internal/output/AbstractBeanInstanceOutputEventReader.java,
-              org/xwiki/wikistream/instance/internal/output/DocumentInstanceOutputEventReader.java,
-              org/xwiki/wikistream/instance/internal/output/InstanceOutputWikiStreamFactory.java
+              org/xwiki/wikistream/instance/internal/output/AbstractBeanOutputInstanceWikiStream.java,
+              org/xwiki/wikistream/instance/internal/output/AbstractBeanOutputInstanceWikiStreamFactory.java,
+              org/xwiki/wikistream/instance/internal/output/BeanOutputInstanceWikiStream.java,
+              org/xwiki/wikistream/instance/internal/output/InstanceOutputWikiStreamFactory.java,
+              org/xwiki/wikistream/instance/output/BeanOutputInstanceWikiStreamFactory.java,
+              org/xwiki/wikistream/instance/output/OutputInstanceWikiStream.java,
+              org/xwiki/wikistream/instance/output/OutputInstanceWikiStreamFactory.java
           </excludes>
         </configuration>
       </plugin>

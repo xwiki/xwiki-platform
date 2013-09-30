@@ -17,25 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.output;
+package org.xwiki.wikistream.instance.internal.output;
 
-import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 
 /**
  * @version $Id$
  * @since 5.2
  */
-@Unstable
-@Role
-public interface InstanceOutputEventReader
+@Component
+@Named("documents")
+@Singleton
+public class DocumentOutputInstanceWikiStreamFactory extends
+    AbstractBeanOutputInstanceWikiStreamFactory<DocumentOutputProperties, XWikiDocumentFilter>
 {
+    
     /**
-     * @param properties the properties
-     * @throws WikiStreamException when failing to set the properties
+     * The default constructor.
      */
-    void setProperties(Map<String, Object> properties) throws WikiStreamException;
+    public DocumentOutputInstanceWikiStreamFactory()
+    {
+        super("documents");
+    }
+
+    
 }

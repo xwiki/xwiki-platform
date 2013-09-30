@@ -20,7 +20,6 @@
 package org.xwiki.wikistream.instance.internal.output;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -29,14 +28,13 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.instance.output.InstanceOutputEventReader;
 
 /**
  * @param <P>
  * @version $Id$
  * @since 5.2
  */
-public class AbstractBeanInstanceOutputEventReader<P> implements InstanceOutputEventReader, Initializable
+public abstract class AbstractBeanOutputInstanceWikiStream<P> implements BeanOutputInstanceWikiStream<P>, Initializable
 {
     @Inject
     private BeanManager beanManager;
@@ -50,19 +48,19 @@ public class AbstractBeanInstanceOutputEventReader<P> implements InstanceOutputE
     {
         // Get the type of the properties
         ParameterizedType genericType =
-            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanInstanceOutputEventReader.class, getClass());
+            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanOutputInstanceWikiStream.class, getClass());
         this.propertiesType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
     }
 
     @Override
-    public void setProperties(Map<String, Object> properties) throws WikiStreamException
+    public void setProperties(P properties) throws WikiStreamException
     {
-        try {
-            this.properties = this.propertiesType.newInstance();
-
-            this.beanManager.populate(this.properties, properties);
-        } catch (Exception e) {
-            throw new WikiStreamException("Failed to convert properties to Java bean", e);
-        }
+        this.properties = properties;
+    }
+    
+    @Override
+    public Object getFilter() throws WikiStreamException
+    {
+        return this;
     }
 }

@@ -24,51 +24,56 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.filter.CompositeFilter;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
-import org.xwiki.wikistream.instance.output.InstanceOutputEventReader;
+import org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2
  */
 @Component
 @Named(InstanceUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<InstanceOutputProperties> implements
-    Initializable
+public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<InstanceOutputProperties>
 {
     @Inject
     private FilterDescriptorManager filterManager;
 
     @Inject
-    private List<InstanceOutputEventReader> eventReaders;
+    @Named("context")
+    private Provider<ComponentManager> componentManager;
 
-    private CompositeFilter filter;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.filter = new CompositeFilter(this.eventReaders, this.filterManager);
-    }
+    private List<OutputInstanceWikiStreamFactory> factories;
 
     @Override
     public void setProperties(InstanceOutputProperties properties) throws WikiStreamException
     {
         super.setProperties(properties);
 
-        for (InstanceOutputEventReader eventReader : this.eventReaders) {
-            eventReader.setProperties(properties);
+        try {
+            this.factories = this.componentManager.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
+        } catch (ComponentLookupException e) {
+            throw new WikiStreamException(
+                "Failed to get regsitered instance of OutputInstanceWikiStreamFactory components", e);
         }
+
+        Object[] filters = new Object[this.factories.size()];
+        int i = 0;
+        for (OutputInstanceWikiStreamFactory factory : this.factories) {
+            filters[i++] = factory.creaOutputWikiStream(properties).getFilter();
+        }
+
+        this.filter = this.filterManager.createCompositeFilter(filters);
     }
 
     @Override

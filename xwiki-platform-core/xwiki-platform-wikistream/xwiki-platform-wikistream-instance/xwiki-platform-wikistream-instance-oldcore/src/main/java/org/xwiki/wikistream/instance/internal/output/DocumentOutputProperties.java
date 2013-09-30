@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 5.2
  */
-public class XWikiDocumentOutputProperties
+public class DocumentOutputProperties
 {
     private EntityReference defaultReference;
 

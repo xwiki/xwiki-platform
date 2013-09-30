@@ -37,7 +37,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.instance.internal.output.DocumentInstanceOutputEventReader;
+import org.xwiki.wikistream.instance.internal.output.DocumentOutputInstanceWikiStream;
 import org.xwiki.wikistream.instance.internal.output.InstanceOutputProperties;
 import org.xwiki.wikistream.internal.input.DefaultURLInputSource;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
@@ -54,12 +54,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
- * Validate {@link DocumentInstanceOutputEventReader}.
+ * Validate {@link DocumentOutputInstanceWikiStream}.
  * 
  * @version $Id$
  */
 @AllComponents
-public class DocumentInstanceOutputEventReaderTest
+public class DocumentOutputInstanceWikiStreamTest
 {
     private MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
 

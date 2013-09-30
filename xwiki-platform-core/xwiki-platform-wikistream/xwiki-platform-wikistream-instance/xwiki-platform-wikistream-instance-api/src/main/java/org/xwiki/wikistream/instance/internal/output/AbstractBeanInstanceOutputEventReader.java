@@ -29,9 +29,13 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.instance.internal.input.AbstractBeanEntityEventGenerator;
 import org.xwiki.wikistream.instance.output.InstanceOutputEventReader;
 
+/**
+ * @param <P>
+ * @version $Id$
+ * @since 5.2
+ */
 public class AbstractBeanInstanceOutputEventReader<P> implements InstanceOutputEventReader, Initializable
 {
     @Inject
@@ -46,8 +50,8 @@ public class AbstractBeanInstanceOutputEventReader<P> implements InstanceOutputE
     {
         // Get the type of the properties
         ParameterizedType genericType =
-            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanEntityEventGenerator.class, getClass());
-        this.propertiesType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[2]);
+            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanInstanceOutputEventReader.class, getClass());
+        this.propertiesType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
     }
 
     @Override

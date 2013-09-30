@@ -31,10 +31,19 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class WikiType
 {
+    /**
+     * Mediawiki wiki type.
+     */
     public static final WikiType MEDIAWIKI = new WikiType("mediawiki");
 
+    /**
+     * Confluence wiki type.
+     */
     public static final WikiType CONFLUENCE = new WikiType("confluence");
 
+    /**
+     * XWiki wiki type.
+     */
     public static final WikiType XWIKI = new WikiType("xwiki");
 
     /**
@@ -47,18 +56,23 @@ public class WikiType
      */
     private String id;
 
-    public static WikiType unserialize(String str)
-    {
-        return new WikiType(str);
-    }
-
     /**
      * @param id of a wiki
-     * @param name of a wiki
      */
     public WikiType(String id)
     {
         this.id = id.toLowerCase();
+    }
+
+    /**
+     * Create a new {@link WikiType} from a {@link String}.
+     * 
+     * @param str the {@link String} to parse
+     * @return a {@link WikiType}
+     */
+    public static WikiType unserialize(String str)
+    {
+        return new WikiType(str);
     }
 
     /**
@@ -69,6 +83,9 @@ public class WikiType
         return this.id;
     }
 
+    /**
+     * @return a {@link String} representation of the {@link WikiStreamType}
+     */
     public String serialize()
     {
         return getId();

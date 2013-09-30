@@ -33,5 +33,9 @@ import org.xwiki.wikistream.WikiStreamException;
 @Role
 public interface InstanceOutputEventReader
 {
+    /**
+     * @param properties the properties
+     * @throws WikiStreamException when failing to set the properties
+     */
     void setProperties(Map<String, Object> properties) throws WikiStreamException;
 }

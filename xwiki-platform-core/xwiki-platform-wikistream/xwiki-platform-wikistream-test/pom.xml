@@ -65,4 +65,26 @@
       <artifactId>reflections</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              org/xwiki/wikistream/test/integration/ExpectTestConfiguration.java,
+              org/xwiki/wikistream/test/integration/InputTestConfiguration.java,
+              org/xwiki/wikistream/test/integration/OutputTestConfiguration.java,
+              org/xwiki/wikistream/test/integration/TestConfiguration.java,
+              org/xwiki/wikistream/test/integration/TestDataGenerator.java,
+              org/xwiki/wikistream/test/integration/TestDataParser.java,
+              org/xwiki/wikistream/test/integration/TestResourceData.java,
+              org/xwiki/wikistream/test/integration/WikiStreamTest.java,
+              org/xwiki/wikistream/test/integration/WikiStreamTestSuite.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

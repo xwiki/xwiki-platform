@@ -107,6 +107,9 @@ public class WikiStreamType
         return this.version;
     }
 
+    /**
+     * @return a {@link String} representation of the {@link WikiStreamType}
+     */
     public String serialize()
     {
         StringBuilder builder = new StringBuilder();
@@ -122,6 +125,12 @@ public class WikiStreamType
         return builder.toString();
     }
 
+    /**
+     * Create a new {@link WikiStreamType} from a {@link String}.
+     * 
+     * @param str the {@link String} to parse
+     * @return a {@link WikiStreamType}
+     */
     public static WikiStreamType unserialize(String str)
     {
         if (str == null) {
@@ -137,7 +146,7 @@ public class WikiStreamType
         int versionIndex = str.lastIndexOf('/');
 
         if (versionIndex == 0) {
-            throw new IllegalArgumentException("Invalid wiki sream type format: " + str);
+            throw new IllegalArgumentException("'/' is inavlid as first character: " + str);
         }
 
         if (versionIndex != -1) {
@@ -150,7 +159,7 @@ public class WikiStreamType
         int dataIndex = str.indexOf('+');
 
         if (dataIndex == 0) {
-            throw new IllegalArgumentException("Invalid wiki sream type format: " + str);
+            throw new IllegalArgumentException("'+' is invalid as first character: " + str);
         }
 
         if (dataIndex != -1) {

@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal;
+package org.xwiki.wikistream.instance.internal.input;
 
 /**
  * 
  * @version $Id$
  * @since 5.2
  */
-public class InstanceUtils
+public interface BaseClassInputProperties extends PropertyClassInputProperties
 {
-    public static final String ROLEHINT = "xwiki+instance";
+    
 }

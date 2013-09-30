@@ -58,7 +58,7 @@ public abstract class AbstractEntityEventGenerator<E, F> implements EntityEventG
     @Override
     public void write(E entity, Object filter, Map<String, Object> properties) throws WikiStreamException
     {
-        F internalFilter = this.filterDescriptorManager.createFilterProxy(this.filterType, filter);
+        F internalFilter = this.filterDescriptorManager.createFilterProxy(filter, this.filterType);
 
         write(entity, filter, internalFilter, properties);
     }

@@ -72,7 +72,7 @@ public abstract class AbstractBeanInputWikiStream<P, F> implements BeanInputWiki
     @Override
     public void read(Object filter) throws WikiStreamException
     {
-        F proxyFilter = this.filterDescriptorManager.createFilterProxy(this.filterType, filter);
+        F proxyFilter = this.filterDescriptorManager.createFilterProxy(filter, this.filterType);
 
         read(filter, proxyFilter);
     }

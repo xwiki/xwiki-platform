@@ -53,13 +53,22 @@ public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<Insta
     @Inject
     private List<InstanceOutputEventReader> eventReaders;
 
-    @Inject
     private CompositeFilter filter;
 
     @Override
     public void initialize() throws InitializationException
     {
         this.filter = new CompositeFilter(this.eventReaders, this.filterManager);
+    }
+
+    @Override
+    public void setProperties(InstanceOutputProperties properties) throws WikiStreamException
+    {
+        super.setProperties(properties);
+
+        for (InstanceOutputEventReader eventReader : this.eventReaders) {
+            eventReader.setProperties(properties);
+        }
     }
 
     @Override

@@ -21,14 +21,15 @@ package org.xwiki.wikistream.xwiki.filter;
 
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.filter.WikiDocumentFilter;
+import org.xwiki.wikistream.filter.WikiFilter;
+import org.xwiki.wikistream.filter.WikiSpaceFilter;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 @Unstable
-public interface XWikiWikiDocumentFilter extends WikiDocumentFilter
+public interface XWikiWikiDocumentFilter extends WikiFilter, WikiSpaceFilter, WikiDocumentFilter
 {
     /**
      * @type String

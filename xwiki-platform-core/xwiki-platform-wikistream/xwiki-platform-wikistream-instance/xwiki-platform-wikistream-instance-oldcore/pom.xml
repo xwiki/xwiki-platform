@@ -65,5 +65,38 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              org/xwiki/wikistream/instance/internal/input/BaseClassEventGenerator.java,
+              org/xwiki/wikistream/instance/internal/input/BaseObjectEventGenerator.java,
+              org/xwiki/wikistream/instance/internal/input/DocumentInstanceInputEventGenerator.java,
+              org/xwiki/wikistream/instance/internal/input/XWikiAttachmentEventGenerator.java,
+              org/xwiki/wikistream/instance/internal/input/XWikiAttachmentInputProperties.java,
+              org/xwiki/wikistream/instance/internal/input/XWikiDocumentInputProperties.java,
+              org/xwiki/wikistream/instance/internal/input/XWikiDocumentLocaleEventGenerator.java,
+              org/xwiki/wikistream/instance/internal/output/XWikiDocumentOutputProperties.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

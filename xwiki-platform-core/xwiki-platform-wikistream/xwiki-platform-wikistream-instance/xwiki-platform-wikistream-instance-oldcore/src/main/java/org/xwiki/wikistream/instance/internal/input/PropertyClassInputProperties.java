@@ -17,9 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal.output;
+package org.xwiki.wikistream.instance.internal.input;
 
-public class DocumentInstanceOutputEventReader extends AbstractBeanInstanceOutputEventReader
+/**
+ * 
+ * @version $Id$
+ * @since 5.2
+ */
+public interface PropertyClassInputProperties
 {
-
+    
 }

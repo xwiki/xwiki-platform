@@ -37,7 +37,6 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
-import org.xwiki.wikistream.instance.internal.XWikiDocumentProperties;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -55,10 +54,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Singleton
 // TODO: add support for real revision events (instead of the jrcs archive)
 public class XWikiDocumentLocaleEventGenerator extends
-    AbstractBeanEntityEventGenerator<XWikiDocument, XWikiDocumentFilter, XWikiDocumentProperties>
+    AbstractBeanEntityEventGenerator<XWikiDocument, XWikiDocumentFilter, XWikiDocumentInputProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
-        XWikiDocument.class, XWikiDocumentProperties.class);
+        XWikiDocument.class, XWikiDocumentInputProperties.class);
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -77,7 +76,7 @@ public class XWikiDocumentLocaleEventGenerator extends
 
     @Override
     public void write(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,
-        XWikiDocumentProperties properties) throws WikiStreamException
+        XWikiDocumentInputProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 

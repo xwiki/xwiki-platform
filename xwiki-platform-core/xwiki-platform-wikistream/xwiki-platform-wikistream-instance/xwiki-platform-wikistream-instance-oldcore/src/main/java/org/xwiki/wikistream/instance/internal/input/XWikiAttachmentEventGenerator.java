@@ -34,7 +34,6 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.WikiAttachmentFilter;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiAttachmentFilter;
-import org.xwiki.wikistream.instance.internal.XWikiAttachmentProperties;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -50,10 +49,10 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 @Singleton
 // TODO: add support for real revision events (instead of the jrcs archive )
 public class XWikiAttachmentEventGenerator extends
-    AbstractBeanEntityEventGenerator<XWikiAttachment, XWikiAttachmentFilter, XWikiAttachmentProperties>
+    AbstractBeanEntityEventGenerator<XWikiAttachment, XWikiAttachmentFilter, XWikiAttachmentInputProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
-        XWikiAttachment.class, XWikiAttachmentProperties.class);
+        XWikiAttachment.class, XWikiAttachmentInputProperties.class);
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -63,7 +62,7 @@ public class XWikiAttachmentEventGenerator extends
 
     @Override
     public void write(XWikiAttachment attachment, Object filter, XWikiAttachmentFilter attachmentFilter,
-        XWikiAttachmentProperties properties) throws WikiStreamException
+        XWikiAttachmentInputProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 

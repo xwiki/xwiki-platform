@@ -37,13 +37,13 @@ public abstract class AbstractBeanOutputWikiStream<P> implements BeanOutputWikiS
 
     }
 
-    public AbstractBeanOutputWikiStream(P properties)
+    public AbstractBeanOutputWikiStream(P properties) throws WikiStreamException
     {
         setProperties(properties);
     }
 
     @Override
-    public void setProperties(P properties)
+    public void setProperties(P properties) throws WikiStreamException
     {
         this.properties = properties;
     }

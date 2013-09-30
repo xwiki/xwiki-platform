@@ -47,8 +47,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("documents")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentInstanceOutputEventReader extends
-    AbstractBeanInstanceOutputEventReader<XWikiDocumentOutputProperties> implements XWikiDocumentFilter
+public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputInstanceWikiStream<DocumentOutputProperties>
+    implements XWikiDocumentFilter
 {
     @Inject
     private DocumentReferenceResolver<EntityReference> entityResolver;

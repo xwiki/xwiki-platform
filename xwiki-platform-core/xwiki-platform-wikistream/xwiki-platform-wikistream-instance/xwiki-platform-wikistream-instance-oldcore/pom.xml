@@ -93,7 +93,7 @@
               org/xwiki/wikistream/instance/internal/input/XWikiAttachmentInputProperties.java,
               org/xwiki/wikistream/instance/internal/input/XWikiDocumentInputProperties.java,
               org/xwiki/wikistream/instance/internal/input/XWikiDocumentLocaleEventGenerator.java,
-              org/xwiki/wikistream/instance/internal/output/XWikiDocumentOutputProperties.java
+              org/xwiki/wikistream/instance/internal/output/DocumentOutputProperties.java
           </excludes>
         </configuration>
       </plugin>

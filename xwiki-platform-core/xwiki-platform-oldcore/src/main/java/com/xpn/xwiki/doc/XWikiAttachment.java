@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.dom4j.Document;
@@ -196,7 +197,7 @@ public class XWikiAttachment implements Cloneable
 
     public void setFilename(String filename)
     {
-        if (!filename.equals(this.filename)) {
+        if (ObjectUtils.notEqual(getFilename(), filename)) {
             setMetaDataDirty(true);
             this.filename = filename;
         }
@@ -210,11 +211,10 @@ public class XWikiAttachment implements Cloneable
 
     public void setAuthor(String author)
     {
-        if (!author.equals(this.author)) {
+        if (ObjectUtils.notEqual(getAuthor(), author)) {
             setMetaDataDirty(true);
+            this.author = author;
         }
-
-        this.author = author;
     }
 
     public String getVersion()
@@ -257,11 +257,10 @@ public class XWikiAttachment implements Cloneable
 
     public void setComment(String comment)
     {
-        if (!getComment().equals(comment)) {
+        if (ObjectUtils.notEqual(getComment(), comment)) {
             setMetaDataDirty(true);
+            this.comment = comment;
         }
-
-        this.comment = comment;
     }
 
     public XWikiDocument getDoc()

@@ -21,10 +21,6 @@
             <string>creation_date</string>
             <date>2000-01-01 00:00:00.0 UTC</date>
           </entry>
-          <entry>
-            <string>xwiki_document_jrcsrevisions</string>
-            <string>jrcsrevisions</string>
-          </entry>
         </parameters>
       </p>
       <wikiDocumentRevision version="1.1">
@@ -94,7 +90,7 @@
             </entry>
             <entry>
               <string>content_html</string>
-              <string></string>
+              <string>content</string>
             </entry>
           </parameters>
         </p>
@@ -102,10 +98,6 @@
           <p>
             <content>AAECAwQFBgcICQ==</content>
             <parameters>
-              <entry>
-                <string>xwiki_attachment_jrcsrevisions</string>
-                <string>jrcsrevisions</string>
-              </entry>
               <entry>
                 <string>revision_author</string>
                 <string>XWiki.author</string>
@@ -239,7 +231,7 @@
               </entry>
               <entry>
                 <string>class_reference</string>
-                <string>otherclass</string>
+                <string>space.otherclass</string>
               </entry>
               <entry>
                 <string>guid</string>

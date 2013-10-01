@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Configuration options specific to the {@code standard} URL implementation scheme.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 2.3M1
  */
 @Role
 @Unstable
@@ -51,5 +51,8 @@ public interface StandardURLConfiguration
      */
     String getEntityPathPrefix();
 
+    /**
+     * @return the action to take when a subwiki is not found (ie there's no wiki descriptor for it)
+     */
     WikiNotFoundBehavior getWikiNotFoundBehavior();
 }

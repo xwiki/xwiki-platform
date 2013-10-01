@@ -564,6 +564,14 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # url.standard.getEntityPathPrefix=bin
 
+#-# [Since 5.3M1]
+#-# The action to take when a subwiki is not found (ie there's no wiki descriptor for it). Valid values are:
+#-# - redirect_to_main_wiki: default to displaying the main wiki
+#-# - display_error: redirect to a vm to display an error
+#-#
+#-# The default is:
+# url.standard.multiwiki.notFoundBehavior=redirect_to_main_wiki
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------

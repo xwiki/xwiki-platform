@@ -30,7 +30,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * Default implementation reading data from the {@code xwiki.properties} file.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 2.3M1
  */
 @Component
 @Singleton

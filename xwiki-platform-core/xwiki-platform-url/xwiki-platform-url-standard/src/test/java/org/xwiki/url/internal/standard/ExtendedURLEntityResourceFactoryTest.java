@@ -63,7 +63,7 @@ public class ExtendedURLEntityResourceFactoryTest
         when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(
             new ImmutablePair<WikiReference, Boolean>(this.wikiReference, false));
 
-        StandardResourceConfiguration configuration = this.mocker.getInstance(StandardResourceConfiguration.class);
+        StandardURLConfiguration configuration = this.mocker.getInstance(StandardURLConfiguration.class);
         when(configuration.getEntityPathPrefix()).thenReturn("entity");
     }
 

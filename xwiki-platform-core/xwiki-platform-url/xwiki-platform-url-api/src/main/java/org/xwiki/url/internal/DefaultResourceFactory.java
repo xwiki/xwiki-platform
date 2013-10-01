@@ -32,11 +32,11 @@ import org.xwiki.resource.Resource;
 import org.xwiki.resource.ResourceCreationException;
 import org.xwiki.resource.ResourceFactory;
 import org.xwiki.resource.UnsupportedResourceException;
-import org.xwiki.url.ResourceConfiguration;
+import org.xwiki.url.URLConfiguration;
 
 /**
  * Resource Factory that delegates the work to the Resource Factory specified in the XWiki Configuration
- * (see {@link org.xwiki.url.ResourceConfiguration#getURLFormatId()}.
+ * (see {@link org.xwiki.url.URLConfiguration#getURLFormatId()}.
  *
  * @version $Id$
  * @since 5.2M1
@@ -49,7 +49,7 @@ public class DefaultResourceFactory implements ResourceFactory<URL, Resource>
      * Used to get the hint of the {@link ResourceFactory} to use.
      */
     @Inject
-    private ResourceConfiguration configuration;
+    private URLConfiguration configuration;
 
     /**
      * Used to lookup the correct {@link ResourceFactory} component.

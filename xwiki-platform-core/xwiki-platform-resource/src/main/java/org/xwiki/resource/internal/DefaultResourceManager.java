@@ -32,14 +32,14 @@ import org.xwiki.resource.ResourceManager;
  * Allow getting the {@link org.xwiki.resource.Resource} object from the Execution Context.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Component
 @Singleton
 public class DefaultResourceManager implements ResourceManager
 {
     /**
-     * Used to get the XWIKIURL object from the Execution Context.
+     * Used to get the current Resource object from the Execution Context.
      */
     @Inject
     private Execution execution;

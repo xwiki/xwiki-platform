@@ -25,17 +25,17 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.url.ResourceConfiguration;
+import org.xwiki.url.URLConfiguration;
 
 /**
  * Default implementation reading data from the {@code xwiki.properties} file.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Component
 @Singleton
-public class DefaultResourceConfiguration implements ResourceConfiguration
+public class DefaultURLConfiguration implements URLConfiguration
 {
     /**
      * Prefix for configuration keys for the Resource module.

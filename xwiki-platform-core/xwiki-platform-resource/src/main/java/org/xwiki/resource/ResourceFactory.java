@@ -33,14 +33,14 @@ import org.xwiki.stability.Unstable;
  * @param <T> the object to transform into a XWiki Resource
  * @param <U> the return type (e.g. {@link Resource}, {@link EntityResource}, etc)
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Role
 @Unstable
 public interface ResourceFactory<T, U extends Resource>
 {
     /**
-     * Type instance for {@code ResourceFactory<URL, XWikiURL>}.
+     * Type instance for {@code ResourceFactory<URL, Resource>}.
      */
     ParameterizedType TYPE_URL_RESOURCE =
         new DefaultParameterizedType(null, ResourceFactory.class, URL.class, Resource.class);

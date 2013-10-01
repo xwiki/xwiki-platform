@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * Base XWiki Resource implementation common to all extending classes. Manages XWiki Resource parameters.
  * 
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Unstable
 public abstract class AbstractResource implements Resource

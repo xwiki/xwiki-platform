@@ -179,7 +179,7 @@ public class DefautWikiReferenceExtractorTest
 
     private void setUpConfiguration(boolean isPathBased, WikiNotFoundBehavior wikiNotFoundBehavior) throws Exception
     {
-        StandardResourceConfiguration urlConfiguration = mocker.getInstance(StandardResourceConfiguration.class);
+        StandardURLConfiguration urlConfiguration = mocker.getInstance(StandardURLConfiguration.class);
         when(urlConfiguration.isPathBasedMultiWiki()).thenReturn(isPathBased);
         when(urlConfiguration.getWikiPathPrefix()).thenReturn("wiki");
         when(urlConfiguration.getWikiNotFoundBehavior()).thenReturn(wikiNotFoundBehavior);

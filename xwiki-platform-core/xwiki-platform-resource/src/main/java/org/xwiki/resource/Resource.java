@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Represents a XWiki Resource (Entity Resource, Attachment Resource, Template Resource, etc).
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Unstable
 public interface Resource

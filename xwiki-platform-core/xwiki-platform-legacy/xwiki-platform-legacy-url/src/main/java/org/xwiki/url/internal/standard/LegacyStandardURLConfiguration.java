@@ -32,7 +32,7 @@ import com.xpn.xwiki.internal.web.XWikiConfigurationService;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
- * Replaces {@link DefaultStandardResourceConfiguration} with fallbacks to configuration properties defined in the
+ * Replaces {@link DefaultStandardURLConfiguration} with fallbacks to configuration properties defined in the
  * {@code xwiki.cfg} configuration file.
  *
  * @version $Id$
@@ -40,7 +40,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  */
 @Component
 @Singleton
-public class LegacyStandardResourceConfiguration extends DefaultStandardResourceConfiguration
+public class LegacyStandardURLConfiguration extends DefaultStandardURLConfiguration
 {
     @Inject
     private Execution execution;

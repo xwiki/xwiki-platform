@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Represents a type of XWiki Resource (Entity Resource, skin file Resource, etc).
  * 
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Unstable
 public enum ResourceType

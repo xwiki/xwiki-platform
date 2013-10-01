@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Represents an XWiki Resource pointing to an Entity (Document, Space, Wiki, Object, etc).
  * 
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Unstable
 public class EntityResource extends AbstractResource

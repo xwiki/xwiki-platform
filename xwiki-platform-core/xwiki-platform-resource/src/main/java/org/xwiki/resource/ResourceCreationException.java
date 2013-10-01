@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Means that an error occurred while trying to construct an {@link Resource} object.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Unstable
 public class ResourceCreationException extends Exception

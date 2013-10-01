@@ -34,7 +34,7 @@ import org.xwiki.configuration.ConfigurationSource;
  */
 @Component
 @Singleton
-public class DefaultStandardResourceConfiguration implements StandardResourceConfiguration
+public class DefaultStandardURLConfiguration implements StandardURLConfiguration
 {
     /**
      * Prefix for configuration keys for the Resource module.

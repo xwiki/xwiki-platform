@@ -62,7 +62,7 @@ public class StandardResourceFactory implements ResourceFactory<URL, Resource>
      * Used to know if the wiki is in path-based configuration or not.
      */
     @Inject
-    private StandardResourceConfiguration configuration;
+    private StandardURLConfiguration configuration;
 
     /**
      * {@inheritDoc}

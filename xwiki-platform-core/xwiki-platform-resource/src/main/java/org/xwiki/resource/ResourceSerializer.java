@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Transforms a XWiki Resource instance into some other representation.
  * 
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  * @param <T> the output type
  */
 @Role

@@ -73,7 +73,7 @@ public class ExtendedURLEntityResourceFactory implements ResourceFactory<Extende
      * Used to get the configured entity path prefix from the URL to allow for short URLs.
      */
     @Inject
-    private StandardResourceConfiguration configuration;
+    private StandardURLConfiguration configuration;
 
     @Override
     public EntityResource createResource(ExtendedURL url, Map<String, Object> parameters)

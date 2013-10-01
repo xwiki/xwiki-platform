@@ -17,24 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url;
+package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Configuration options for the Resource module.
+ * Configuration options specific to the {@code standard} URL implementation scheme.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Role
 @Unstable
-public interface ResourceConfiguration
+public interface StandardURLConfiguration
 {
     /**
-     * @return the id of the URL format to use when converting a URL to a Resource. This allows to plug in different
-     *         implementations and thus allows to completely control the format of XWiki URLs.
+     * @return true if Entity URLs define the wiki they point to as part of the URL path (aka path-based) or false if
+     *         the wiki is contained in the URL host (aka domain-based, e.g. "mywiki.server.com")
      */
-    String getURLFormatId();
+    boolean isPathBasedMultiWiki();
+
+    /**
+     * @return the path prefix used when using path-based URLs for multiwiki (e.g. for a wiki named {@code mywiki}:
+     *         {@code http://server/xwiki/&lt;prefix&gt;/mywiki/...})
+     */
+    String getWikiPathPrefix();
+
+    /**
+     * @return the path prefix used for signifying that a URL is pointing at a Model Entity (Document, Space, Object,
+     *         etc): {@code http://server/xwiki/&lt;prefix&gt;/...}.
+     *         For example: {@code http://server/xwiki/bin/...}.
+     */
+    String getEntityPathPrefix();
+
+    WikiNotFoundBehavior getWikiNotFoundBehavior();
 }

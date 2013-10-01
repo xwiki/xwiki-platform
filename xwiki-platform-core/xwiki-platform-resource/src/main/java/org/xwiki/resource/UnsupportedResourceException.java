@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Means the Resource is of a type for which we don't have any parser.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Unstable
 public class UnsupportedResourceException extends Exception

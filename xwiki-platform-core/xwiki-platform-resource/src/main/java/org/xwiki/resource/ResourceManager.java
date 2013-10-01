@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Allow getting the {@link Resource} object from the Execution Context.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Role
 @Unstable

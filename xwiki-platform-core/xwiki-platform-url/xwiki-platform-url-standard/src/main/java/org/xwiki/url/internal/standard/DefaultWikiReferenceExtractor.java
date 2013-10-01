@@ -51,7 +51,7 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
      * To find out how what type of multiwiki is configured (path-based or domain-based).
      */
     @Inject
-    private StandardResourceConfiguration configuration;
+    private StandardURLConfiguration configuration;
 
     /**
      * Used to get the main wiki name.
@@ -71,7 +71,7 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
      * <p/>
      * For domain-based multiwiki setups we ask a resolver to resolve the URL's host name.
      * For path-based multiwiki setup we get the path segment after the first segment, if this first segment has the
-     * predefined {@link StandardResourceConfiguration#getWikiPathPrefix()} value. If not then we
+     * predefined {@link StandardURLConfiguration#getWikiPathPrefix()} value. If not then we
      * fall-back to domain-based multiwiki setups and resolve with the URL's host name.
      *
      * @return the wiki the URL is pointing to, returned as a {@link WikiReference}.

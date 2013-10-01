@@ -22,31 +22,9 @@ package org.xwiki.wikistream.instance.internal;
 /**
  * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2
  */
-public class XWikiAttachmentProperties
+public class InstanceUtils
 {
-    private boolean withWikiAttachmentContent = true;
-
-    private boolean withWikiAttachmentRevisions = true;
-
-    public boolean isWithWikiAttachmentContent()
-    {
-        return this.withWikiAttachmentContent;
-    }
-
-    public void setWithWikiAttachmentContent(boolean withWikiAttachmentContent)
-    {
-        this.withWikiAttachmentContent = withWikiAttachmentContent;
-    }
-
-    public boolean isWithWikiAttachmentRevisions()
-    {
-        return this.withWikiAttachmentRevisions;
-    }
-
-    public void setWithWikiAttachmentRevisions(boolean withWikiAttachmentsRevisions)
-    {
-        this.withWikiAttachmentRevisions = withWikiAttachmentsRevisions;
-    }
+    public static final String ROLEHINT = "xwiki+instance";
 }

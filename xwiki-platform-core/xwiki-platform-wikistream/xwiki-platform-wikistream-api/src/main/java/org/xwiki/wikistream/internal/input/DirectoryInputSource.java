@@ -37,6 +37,12 @@ public class DirectoryInputSource implements FileInputSource
         this.file = file;
     }
 
+    @Override
+    public boolean restartSupported()
+    {
+        return true;
+    }
+
     public File getFile()
     {
         return this.file;

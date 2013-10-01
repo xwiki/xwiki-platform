@@ -80,7 +80,7 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     public void setFilter(Object filter)
     {
         this.filter = filter;
-        this.proxyFilter = this.filterDescriptorManager.createFilterProxy(this.filterType, filter);
+        this.proxyFilter = this.filterDescriptorManager.createFilterProxy(filter, this.filterType);
     }
 
     @Override

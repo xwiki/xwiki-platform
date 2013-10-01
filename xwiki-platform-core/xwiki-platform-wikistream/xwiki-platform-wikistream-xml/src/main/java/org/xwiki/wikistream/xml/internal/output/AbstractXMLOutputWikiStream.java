@@ -38,7 +38,6 @@ import org.xwiki.wikistream.output.WriterOutputTarget;
 import org.xwiki.wikistream.xml.output.ResultOutputTarget;
 
 /**
- * 
  * @param <P>
  * @version $Id$
  * @since 5.2M2
@@ -95,7 +94,7 @@ public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputProperties> 
     {
         if (this.filter == null) {
             try {
-                this.filter = createFilter(properties);
+                this.filter = createFilter(this.properties);
             } catch (Exception e) {
                 throw new WikiStreamException("Failed to create filter", e);
             }
@@ -105,4 +104,10 @@ public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputProperties> 
     }
 
     protected abstract Object createFilter(P parameters) throws XMLStreamException, FactoryConfigurationError;
+
+    @Override
+    public void close() throws IOException
+    {
+        this.properties.getTarget().close();
+    }
 }

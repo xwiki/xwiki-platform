@@ -19,46 +19,72 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.filter.FilterEventParameters;
-import org.xwiki.filter.FilterException;
-import org.xwiki.filter.UnknownFilter;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.filter.FilterDescriptorManager;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2
  */
 @Component
-@Named("xwiki+instance")
+@Named(InstanceUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<InstanceOutputProperties> implements
-    UnknownFilter
+public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<InstanceOutputProperties>
 {
-    // events
+    @Inject
+    private FilterDescriptorManager filterManager;
+
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManager;
+
+    private List<OutputInstanceWikiStreamFactory> factories;
 
     @Override
-    public void beginUnknwon(String id, FilterEventParameters parameters) throws FilterException
+    public void setProperties(InstanceOutputProperties properties) throws WikiStreamException
     {
-        // TODO Auto-generated method stub
+        super.setProperties(properties);
 
+        try {
+            this.factories = this.componentManager.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
+        } catch (ComponentLookupException e) {
+            throw new WikiStreamException(
+                "Failed to get regsitered instance of OutputInstanceWikiStreamFactory components", e);
+        }
+
+        Object[] filters = new Object[this.factories.size()];
+        int i = 0;
+        for (OutputInstanceWikiStreamFactory factory : this.factories) {
+            filters[i++] = factory.creaOutputWikiStream(properties).getFilter();
+        }
+
+        this.filter = this.filterManager.createCompositeFilter(filters);
     }
 
     @Override
-    public void endUnknwon(String id, FilterEventParameters parameters) throws FilterException
+    public Object getFilter() throws WikiStreamException
     {
-        // TODO Auto-generated method stub
-
+        return this.filter;
     }
 
     @Override
-    public void onUnknwon(String id, FilterEventParameters parameters) throws FilterException
+    public void close() throws IOException
     {
-        // TODO Auto-generated method stub
-
+        // Nothing to close
     }
 }

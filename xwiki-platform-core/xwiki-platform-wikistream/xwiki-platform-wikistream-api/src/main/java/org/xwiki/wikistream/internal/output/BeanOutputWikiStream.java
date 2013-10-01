@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.internal.output;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.OutputWikiStream;
 
 /**
@@ -30,5 +31,5 @@ import org.xwiki.wikistream.output.OutputWikiStream;
 @Role
 public interface BeanOutputWikiStream<P> extends OutputWikiStream
 {
-    void setProperties(P properties);
+    void setProperties(P properties) throws WikiStreamException;
 }

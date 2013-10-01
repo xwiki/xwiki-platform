@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -35,6 +36,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
 import org.xwiki.wikistream.instance.internal.InstanceModel;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 
 /**
@@ -42,7 +44,7 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
  * @since 5.2M2
  */
 @Component
-@Named("xwiki+instance")
+@Named(InstanceUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<InstanceInputProperties, InstanceFilter>
 {
@@ -79,6 +81,12 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
             || this.properties.getEntities().matches(new DocumentReference(wiki, space, document));
     }
 
+    @Override
+    public void close() throws IOException
+    {
+        // Nothing do close
+    }
+    
     @Override
     protected void read(Object filter, InstanceFilter proxyFilter) throws WikiStreamException
     {

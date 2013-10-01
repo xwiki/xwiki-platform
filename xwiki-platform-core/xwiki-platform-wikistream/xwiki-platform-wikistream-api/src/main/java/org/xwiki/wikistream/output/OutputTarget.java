@@ -38,5 +38,9 @@ import org.xwiki.wikistream.internal.output.DefaultOutputStreamOutputTarget;
 @Unstable
 public interface OutputTarget extends Closeable
 {
-
+    /**
+     * @return true if it's possible to close and reset the target to its beginning
+     * @since 5.2RC1
+     */
+    boolean restartSupported();
 }

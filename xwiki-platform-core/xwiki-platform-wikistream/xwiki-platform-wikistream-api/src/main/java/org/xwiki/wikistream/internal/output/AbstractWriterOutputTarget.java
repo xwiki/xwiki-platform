@@ -17,14 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal;
+package org.xwiki.wikistream.internal.output;
+
+import java.io.IOException;
+import java.io.Writer;
+
+import org.xwiki.wikistream.output.WriterOutputTarget;
 
 /**
- * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2RC1
  */
-public interface BaseObjectProperties extends BaseClassProperties, BasePropertyProperties
+public abstract class AbstractWriterOutputTarget implements WriterOutputTarget
 {
+    protected Writer writer;
 
+    protected abstract Writer openWriter();
+
+    @Override
+    public boolean restartSupported()
+    {
+        return true;
+    }
+
+    @Override
+    public Writer getWriter()
+    {
+        if (this.writer == null) {
+            this.writer = openWriter();
+        }
+
+        return this.writer;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        if (this.writer != null) {
+            this.writer.close();
+        }
+        this.writer = null;
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.writer != null ? this.writer.toString() : "";
+    }
 }

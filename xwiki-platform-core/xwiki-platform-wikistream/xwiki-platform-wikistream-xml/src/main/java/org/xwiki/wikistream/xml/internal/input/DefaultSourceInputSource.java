@@ -26,7 +26,6 @@ import javax.xml.transform.Source;
 import org.xwiki.wikistream.xml.input.source.SourceInputSource;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -37,6 +36,12 @@ public class DefaultSourceInputSource implements SourceInputSource
     public DefaultSourceInputSource(Source source)
     {
         this.source = source;
+    }
+
+    @Override
+    public boolean restartSupported()
+    {
+        return false;
     }
 
     @Override

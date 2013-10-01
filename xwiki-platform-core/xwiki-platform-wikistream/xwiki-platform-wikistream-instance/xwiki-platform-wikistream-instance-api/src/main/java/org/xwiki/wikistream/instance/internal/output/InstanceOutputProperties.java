@@ -19,6 +19,9 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
+import java.util.HashMap;
+
+import org.xwiki.properties.RawProperties;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -26,7 +29,11 @@ import org.xwiki.stability.Unstable;
  * @since 5.2M2
  */
 @Unstable
-public class InstanceOutputProperties
+public class InstanceOutputProperties extends HashMap<String, Object> implements RawProperties
 {
-
+    @Override
+    public void set(String propertyName, Object value)
+    {
+        put(propertyName, value);
+    }
 }

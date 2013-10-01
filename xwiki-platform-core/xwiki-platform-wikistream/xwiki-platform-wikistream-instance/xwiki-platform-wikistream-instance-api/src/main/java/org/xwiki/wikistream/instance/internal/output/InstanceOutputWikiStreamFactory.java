@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -31,10 +32,10 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * XMLInputStream wiki parsers.
  * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.2
  */
 @Component
-@Named("xwiki+instance")
+@Named(InstanceUtils.ROLEHINT)
 @Singleton
 public class InstanceOutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<InstanceOutputProperties>
 {

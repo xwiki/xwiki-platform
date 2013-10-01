@@ -219,7 +219,10 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
             if (documentNames != null && !documentNames.isEmpty()) {
                 for (String documentName : documentNames) {
                     // Resolve the document names into references and for each one extract the WikiDescriptor
-                    result.add(set(getDocument(this.documentReferenceResolver.resolve(documentName))));
+                    WikiDescriptor descriptor = set(getDocument(this.documentReferenceResolver.resolve(documentName)));
+                    if (descriptor != null) {
+                        result.add(descriptor);
+                    }
                 }
             }
         } catch (Exception e) {

@@ -28,15 +28,15 @@ import org.xwiki.model.reference.EntityReference;
  */
 public class DocumentOutputProperties
 {
-    private EntityReference defaultReference;
+    private EntityReference defaultReference = null;
 
     private String saveComment = "Import";
 
-    private DocumentReference author;
+    private DocumentReference author = null;
 
-    private boolean authorSet;
+    private boolean authorSet = false;
 
-    private boolean preserveVersion;
+    private boolean preserveVersion = false;
 
     public EntityReference getDefaultReference()
     {

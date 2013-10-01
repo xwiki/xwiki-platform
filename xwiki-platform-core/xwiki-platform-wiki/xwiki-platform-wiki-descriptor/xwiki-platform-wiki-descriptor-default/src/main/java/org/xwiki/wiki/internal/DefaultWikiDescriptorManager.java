@@ -211,7 +211,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
 
         try {
             Query query = this.queryManager.createQuery(
-                "from doc.object(XWiki.XWikiServerClass) as descriptor and doc.name like 'XWikiServer%'",
+                "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%'",
                 Query.XWQL);
             query.setWiki(getXWikiContext().getMainXWiki());
             List<String> documentNames = query.execute();

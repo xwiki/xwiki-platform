@@ -251,7 +251,7 @@ public class DefaultWikiDescriptorManagerTest
 
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
-        when(queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor and "
+        when(queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor where "
             + "doc.name like 'XWikiServer%'", Query.XWQL)).thenReturn(
             new DefaultQuery("statement", "language", queryExecutor));
         when(queryExecutor.<String>execute(any(Query.class))).thenReturn(Arrays.asList("space1.page1", "space2.page2"));

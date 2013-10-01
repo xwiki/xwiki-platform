@@ -74,8 +74,7 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
     @Override
     public WikiNotFoundBehavior getWikiNotFoundBehavior()
     {
-        return this.configuration.getProperty(PREFIX + "multiwiki.notFoundBehavior",
-            WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
+        return getWikiNotFoundBehavior(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
     }
 
     @Override
@@ -104,5 +103,16 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
     protected String getEntityPathPrefix(String defaultValue)
     {
         return this.configuration.getProperty(PREFIX + "entityPathPrefix", defaultValue);
+    }
+
+    /**
+     * Makes it easy for this class to be extended.
+     *
+     * @param defaultValue the default value to use if the key is not found in the configuration
+     * @return see {@link #getWikiNotFoundBehavior()}
+     */
+    protected WikiNotFoundBehavior getWikiNotFoundBehavior(WikiNotFoundBehavior defaultValue)
+    {
+        return this.configuration.getProperty(PREFIX + "multiwiki.notFoundBehavior", defaultValue);
     }
 }

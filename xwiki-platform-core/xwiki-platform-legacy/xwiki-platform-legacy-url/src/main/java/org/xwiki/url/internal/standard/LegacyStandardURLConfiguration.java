@@ -69,6 +69,20 @@ public class LegacyStandardURLConfiguration extends DefaultStandardURLConfigurat
         return prefix;
     }
 
+    @Override
+    public WikiNotFoundBehavior getWikiNotFoundBehavior()
+    {
+        WikiNotFoundBehavior legacyBehavior = WikiNotFoundBehavior.DISPLAY_ERROR;
+
+        String legacyValue = getLegacyValue("xwiki.virtual.failOnWikiDoesNotExist", "0");
+
+        if (!"1".equals(legacyValue)) {
+            legacyBehavior = WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI;
+        }
+
+        return super.getWikiNotFoundBehavior(legacyBehavior);
+    }
+
     private String getLegacyValue(String oldKey, String oldDefault)
     {
         String result = null;

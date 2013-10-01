@@ -22,7 +22,6 @@ package org.xwiki.search.solr.internal.metadata;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -94,40 +93,39 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.setField(FieldUtils.FULLNAME, localSerializer.serialize(documentReference));
 
         // Same for document title
-        String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
+        try {
+            String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
 
-        // Rendered title.
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+            // Rendered title.
+            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+        } catch (Throwable e) {
+            this.logger.error("Failed to render title for document [{}]", entityReference);
+        }
 
         // Raw Content
         solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, locale),
             translatedDocument.getContent());
 
         // Rendered content
-        WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
-        this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
-            plainContentPrinter.toString());
+        try {
+            WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
+            this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
+            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
+                plainContentPrinter.toString());
+        } catch (Throwable e) {
+            this.logger.error("Failed to render content for document [{}]", entityReference);
+        }
 
         solrDocument.setField(FieldUtils.VERSION, translatedDocument.getVersion());
         solrDocument.setField(FieldUtils.COMMENT, translatedDocument.getComment());
 
+        solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, translatedDocument.getLocale().toString());
+
         // Add locale inheritance
-        Set<Locale> locales = getLocales(translatedDocument, locale);
-        for (Locale childLocale : locales) {
-            solrDocument.addField(FieldUtils.LOCALES, childLocale.toString());
-        }
+        addLocales(translatedDocument, translatedDocument.getLocale(), solrDocument);
 
-        // Get both serialized user reference string and pretty user name (first_name last_name).
-        String authorString = serializer.serialize(translatedDocument.getAuthorReference());
-        String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
-        String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
-        String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
-
-        solrDocument.setField(FieldUtils.AUTHOR, authorString);
-        solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
-        solrDocument.setField(FieldUtils.CREATOR, creatorString);
-        solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
+        // Get both serialized user reference string and pretty user name
+        setAuthors(solrDocument, translatedDocument, entityReference);
 
         // Document dates.
         solrDocument.setField(FieldUtils.CREATIONDATE, translatedDocument.getCreationDate());
@@ -143,6 +141,35 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     /**
+     * @param solrDocument the Solr document
+     * @param translatedDocument the XWiki document
+     * @param entityReference the document reference
+     */
+    private void setAuthors(LengthSolrInputDocument solrDocument, XWikiDocument translatedDocument,
+        EntityReference entityReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        String authorString = serializer.serialize(translatedDocument.getAuthorReference());
+        solrDocument.setField(FieldUtils.AUTHOR, serializer.serialize(translatedDocument.getAuthorReference()));
+        try {
+            String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
+            solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
+        } catch (Throwable e) {
+            this.logger.error("Failed to get author display name for document [{}]", entityReference);
+        }
+
+        String creatorString = serializer.serialize(translatedDocument.getCreatorReference());
+        solrDocument.setField(FieldUtils.CREATOR, creatorString);
+        try {
+            String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
+            solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
+        } catch (Throwable e) {
+            this.logger.error("Failed to get creator display name for document [{}]", entityReference);
+        }
+    }
+
+    /**
      * @param documentReference the document's reference.
      * @param solrDocument the Solr document where to add the data.
      * @param locale the locale of which to index the extra data.
@@ -151,7 +178,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected void setExtras(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale)
         throws XWikiException
     {
-        // Index the Comments and Objects in general. Use the original document to get the comment objects since the
+        // Index the Objects. Use the original document to get the objects since the
         // translated document is just a lightweight object containing the translated content and title.
 
         // Note: To be able to still find translated documents, we need to redundantly index the same objects (and

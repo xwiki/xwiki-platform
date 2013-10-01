@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
@@ -60,9 +60,15 @@
       <artifactId>org.restlet.ext.jaxrs</artifactId>
       <version>${restlet.version}</version>
       <exclusions>
+        <!-- Already part of Java SE 6 -->
         <exclusion>
           <artifactId>jaxb-api</artifactId>
           <groupId>javax.xml.bind</groupId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
         </exclusion>
       </exclusions>
     </dependency>

@@ -146,8 +146,7 @@ public class LinkParserTest extends TestCase
             parser.parseURI(sb);
             fail("Exception shoud have been thrown here");
         } catch (ContentParserException expected) {
-            assertEquals("Error number 22001 in 17: Invalid URL format "
-                + "[mywiki:http://xwiki.org]\nWrapped Exception: unknown protocol: mywiki",
+            assertEquals("Error number 22001 in 17: Invalid URL format [mywiki:http://xwiki.org]",
                 expected.getMessage());
         }
     }

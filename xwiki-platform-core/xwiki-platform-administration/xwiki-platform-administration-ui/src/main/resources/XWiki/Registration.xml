@@ -1068,7 +1068,7 @@ $heading
     #set($registrationSuccessMessage = '{{info}}$services.localization.render("core.register.successful", ["[[${userFullName}&gt;&gt;${userSpace}${userName}]]", ${userName}]){{/info}}')
   #else
     #set($configObject = $configDocument.getObject($documentName))
-    #if ($context.action == 'register')
+    #if ($xcontext.action == 'register')
       #set ($heading = "(% id='document-title'%)((( = #evaluate($configObject.getProperty('heading').getValue()) = )))(%%)")
     #else
       #set ($heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")

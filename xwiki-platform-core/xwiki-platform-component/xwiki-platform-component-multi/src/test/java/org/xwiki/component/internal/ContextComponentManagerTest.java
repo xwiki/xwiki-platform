@@ -19,18 +19,20 @@
  */
 package org.xwiki.component.internal;
 
-import org.junit.Assert;
-
 import org.jmock.Expectations;
 import org.jmock.States;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
@@ -176,7 +178,44 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
             // No need to assert the message, we just want to ensure an exception is raised.
         }
     }
-    
+
+    @Test
+    public void testDeleteDocument() throws Exception
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                will(returnValue("wiki"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document"));
+                allowing(mockDocumentAccessBridge).getCurrentUserReference();
+                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
+            }
+        });
+
+        ComponentManager documentCM = getComponentManager().getInstance(ComponentManager.class, "document");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        cd.setRoleType(Role.class);
+        cd.setImplementation(RoleImpl.class);
+
+        // Register component for the current user
+        documentCM.registerComponent(cd);
+
+        // Verify we can lookup the component from the Context CM
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+        Assert.assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
+
+        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+
+        observationManager.notify(new DocumentDeletedEvent(new DocumentReference("wiki", "space", "document")), null,
+            null);
+
+        Assert.assertNull(contextCM.getComponentDescriptor(Role.class, "default"));
+    }
+
     @Test
     public void testRegisterComponentInSpaceComponentManager() throws Exception
     {
@@ -235,7 +274,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
             // No need to assert the message, we just want to ensure an exception is raised.
         }
     }
-    
+
     @Test
     public void testRegisterComponentInWikiComponentManager() throws Exception
     {
@@ -268,7 +307,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Verify we can lookup the component from the context CM.
         ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.getInstance(Role.class));
+        Assert.assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
 
         // Now verify that we cannot look it up anymore if there's another wiki in the context
         state.become("otherwiki");
@@ -293,6 +332,40 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         } catch (ComponentLookupException expected) {
             // No need to assert the message, we just want to ensure an exception is raised.
         }
+    }
+
+    @Test
+    public void testDeleteWiki() throws ComponentLookupException, Exception
+    {
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                will(returnValue("wiki"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document"));
+                allowing(mockDocumentAccessBridge).getCurrentUserReference();
+                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
+            }
+        });
+
+        // Register in the current wiki.
+        ComponentManager wikiCM = getComponentManager().getInstance(ComponentManager.class, "wiki");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        cd.setRoleType(Role.class);
+        cd.setImplementation(RoleImpl.class);
+        wikiCM.registerComponent(cd);
+
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+        Assert.assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
+
+        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+
+        observationManager.notify(new WikiDeletedEvent("wiki"), null, null);
+
+        Assert.assertNull(contextCM.getComponentDescriptor(Role.class, "default"));
     }
 
     @Test

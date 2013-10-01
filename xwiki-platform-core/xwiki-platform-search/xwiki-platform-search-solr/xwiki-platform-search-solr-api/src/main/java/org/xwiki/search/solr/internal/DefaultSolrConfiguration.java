@@ -20,9 +20,7 @@
 package org.xwiki.search.solr.internal;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,12 +53,6 @@ public class DefaultSolrConfiguration implements SolrConfiguration
      * Default component type.
      */
     public static final String DEFAULT_SOLR_TYPE = "embedded";
-
-    /**
-     * Default list of multilingual fields.
-     */
-    public static final List<String> DEFAULT_MULTILINGUAL_FIELDS = Arrays.asList("title", "doccontent", "comment",
-        "objcontent", "propertyvalue", "attcontent");
 
     /**
      * The classpath location prefix to use when looking for the default solr configuration files.
@@ -120,7 +112,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * The default size of the batch.
      */
-    public static final int SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT = 10000;
+    public static final int SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT = 100000;
 
     /**
      * The Solr configuration source.
@@ -179,7 +171,8 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public int getIndexerBatchMaxLengh()
     {
-        return this.configuration.getProperty(SOLR_INDEXER_BATCH_SIZE_PROPERTY, SOLR_INDEXER_BATCH_SIZE_DEFAULT);
+        return this.configuration
+            .getProperty(SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY, SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT);
     }
 
     @Override

@@ -103,12 +103,12 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>.actionmenu #tmCreateWorkspace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.png')");
+      <code>.actionmenu #tmXWiki {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/logo-xs.png')");
 }
 
 .actionmenu #tmMainWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/building.png')");
+  background-image: url("$xwiki.getSkinFile('icons/silk/house.png')");
 }
 
 .actionmenu #tmAdminMainWiki {
@@ -121,6 +121,9 @@
 
 .actionmenu #tmMainWikiDocumentIndex {
   background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
+}
+.actionmenu #tmMainUserIndex {
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 
 .actionmenu #tmWorkspace {

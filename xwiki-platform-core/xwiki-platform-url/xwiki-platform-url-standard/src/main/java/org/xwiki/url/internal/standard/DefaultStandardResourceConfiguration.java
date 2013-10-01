@@ -30,7 +30,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * Default implementation reading data from the {@code xwiki.properties} file.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Component
 @Singleton
@@ -78,6 +78,12 @@ public class DefaultStandardResourceConfiguration implements StandardResourceCon
             WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
     }
 
+    @Override
+    public String getEntityPathPrefix()
+    {
+        return getEntityPathPrefix("bin");
+    }
+
     /**
      * Makes it easy for this class to be extended.
      *
@@ -87,5 +93,16 @@ public class DefaultStandardResourceConfiguration implements StandardResourceCon
     protected String getWikiPathPrefix(String defaultValue)
     {
         return this.configuration.getProperty(PREFIX + "multiwiki.wikiPathPrefix", defaultValue);
+    }
+
+    /**
+     * Makes it easy for this class to be extended.
+     *
+     * @param defaultValue the default value to use if the key is not found in the configuration
+     * @return see {@link #getEntityPathPrefix()} ()}
+     */
+    protected String getEntityPathPrefix(String defaultValue)
+    {
+        return this.configuration.getProperty(PREFIX + "entityPathPrefix", defaultValue);
     }
 }

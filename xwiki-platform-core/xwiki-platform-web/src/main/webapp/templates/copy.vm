@@ -27,7 +27,7 @@
     #set($sourcespace = "$!{request.sourceSpaceName}")
     #set($sourcepage = "$!{request.sourcePageName}")
     ##------------------------------------------------
-    ## Get source reference
+    ## Get target reference
     ##------------------------------------------------
     #set($targetwiki = "$!{request.targetWikiName}")
     #if("$!targetwiki" == "")
@@ -73,7 +73,8 @@
       ##------------------
       ## Wiki Source field
       ##------------------
-      #if($xwiki.hasProgrammingRights())
+      #set ($displayWikiFields = ($xcontext.userReference.wikiReference.name == $xcontext.mainWikiName) && $xwiki.hasSubWikis())
+      #if ($displayWikiFields)
       <dt>
         <label for="sourceWikiName">$services.localization.render('core.copy.sourcewiki')</label>
         <span class="xHint">$services.localization.render('core.copy.sourcewiki.hint')</span>
@@ -119,7 +120,7 @@
       ##------------------
       ## Wiki Target field
       ##------------------
-      #if($xwiki.hasProgrammingRights())
+      #if ($displayWikiFields)
       <dt>
         <label for="targetWikiName">$services.localization.render('core.copy.targetwiki')</label>
         <span class="xHint">$services.localization.render('core.copy.targetwiki.hint')</span>

@@ -26,14 +26,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-infinispan</artifactId>
   <name>XWiki Platform - Cache - Infinispan</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - Infinispan</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>68.79</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -54,7 +54,7 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
-      <version>5.1.8.Final</version>
+      <version>5.3.0.Final</version>
       <exclusions>
         <!-- Use javax.transaction:jta instead to not have duplicate JARs in generated WARs -->
         <exclusion>

@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1364889339000</creationDate>
-  <date>1364920930000</date>
-  <contentUpdateDate>1364920930000</contentUpdateDate>
+  <creationDate>1377854961000</creationDate>
+  <date>1377855795000</date>
+  <contentUpdateDate>1377855795000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.officeimporter.import.title')</title>
   <defaultTemplate/>
@@ -442,8 +442,10 @@ select#childPagesNamingMethod {
     &lt;p class="office_importer_target"&gt;
       &lt;label for="targetSpaceInputId"  class="inputtext"&gt;
         &lt;span&gt;$services.localization.render('xe.officeimporter.import.targetspace'): &lt;/span&gt;
+        ## Compute the target space where the document will be imported
         #set ($defaultTargetSpace = $targetdoc.space)
         #if (!$defaultTargetSpace)
+          ## Get the parent document's space and consider it the space of the document we import
           #set ($parentReference = $services.model.resolveDocument("$!request.parent", 'default'))
           #set ($defaultTargetSpace = $parentReference.lastSpaceReference.name)
         #end
@@ -497,7 +499,9 @@ select#childPagesNamingMethod {
 
       &lt;input type="hidden" name="groovyFilter" value="" /&gt;
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-      &lt;input type="hidden" name="parent" value="$!request.parent" /&gt;
+      ## Normalize the parent reference of the new document so that even in a subwiki it points to the current wiki
+      #set ($normalizedParentReference = $services.model.resolveDocument("$!request.parent", 'current'))
+      &lt;input type="hidden" name="parent" value="$normalizedParentReference" /&gt;
     &lt;/div&gt;
     &lt;div class="office_importer_buttons"&gt;
       &lt;span class="buttonwrapper"&gt;

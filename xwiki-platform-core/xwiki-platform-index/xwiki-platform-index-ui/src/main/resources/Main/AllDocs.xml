@@ -38,7 +38,7 @@
 ##========
 #set($tabs = [])
 #macro(addAllDocsTab $tab)
-  #if($xwiki.hasAccessLevel('view', "$!context.user", $tab.get('document')))
+  #if($xwiki.hasAccessLevel('view', "$!xcontext.user", $tab.get('document')))
     #set($discard = $tabs.add($tab))
   #end
 #end

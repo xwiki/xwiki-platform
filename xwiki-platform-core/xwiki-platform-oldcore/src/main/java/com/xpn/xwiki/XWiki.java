@@ -142,6 +142,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
@@ -1292,6 +1293,17 @@ public class XWiki implements EventListener
                 }
             }
 
+            // Put attachments to remove in recycle bin
+            if (hasAttachmentRecycleBin(context)) {
+                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
+                    if (attachment.isToRecycleBin()) {
+                        getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(), context.getUser(),
+                            new Date(), context, true);
+                    }
+                }
+            }
+
+            // Actually save the document.
             getStore().saveXWikiDoc(doc, context);
 
             // Since the store#saveXWikiDoc resets originalDocument, we need to temporarily put it
@@ -3992,9 +4004,14 @@ public class XWiki implements EventListener
 
                 if (wikilanguage == null) {
                     tdoc = sdoc.copyDocument(targetDocumentReference, context);
+
+                    // We know the target document doesn't exist and we want to save the attachments without
+                    // incrementing their versions.
+                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    tdoc.setNew(true);
+
                     // forget past versions
                     if (reset) {
-                        tdoc.setNew(true);
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {
@@ -4010,23 +4027,6 @@ public class XWiki implements EventListener
                     tdoc.setMetaDataDirty(false);
                     tdoc.setContentDirty(false);
 
-                    // XWikiDocument#copyAttachments() marks the copied attachments as dirty which leads to their
-                    // versions being incremented in the target document. We want to prevent this so that the
-                    // attachments have the same version in the target document as in the source. We cannot change
-                    // XWikiDocument#copyAttachments() because it's a public API and we would break its behavior so we
-                    // reset the dirty flags here. Note that the packager plugin does the same thing in order to prevent
-                    // attachment versions from being incremented when importing a document with history.
-                    // We force the attachment content save with the XWikiDocument#saveAllAttachments() call below.
-                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
-                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
-                        attachment.setMetaDataDirty(false);
-                        // In case the attachment is broken (no content) the XWikiDocument#copyDocument() call above has
-                        // already logged a warning. We just need to play safe.
-                        if (attachment.getAttachment_content() != null) {
-                            attachment.getAttachment_content().setContentDirty(false);
-                        }
-                    }
-
                     saveDocument(tdoc, "Copied from " + sourceStringReference, context);
 
                     if (!reset) {
@@ -4036,10 +4036,9 @@ public class XWiki implements EventListener
                         txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
+                        context.setDatabase(targetWiki);
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
-
-                    tdoc.saveAllAttachments(false, true, context);
 
                     // Now we need to copy the translations
                     context.setDatabase(sourceWiki);
@@ -4101,12 +4100,16 @@ public class XWiki implements EventListener
 
                     tdoc = stdoc.copyDocument(targetDocumentReference, context);
 
+                    // We know the target document doesn't exist and we want to save the attachments without
+                    // incrementing their versions.
+                    // See XWIKI-8157: The "Copy Page" action adds an extra version to the attached file
+                    tdoc.setNew(true);
+
                     // forget language
                     tdoc.setDefaultLanguage(wikilanguage);
                     tdoc.setLanguage("");
                     // forget past versions
                     if (reset) {
-                        tdoc.setNew(true);
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {
@@ -4133,11 +4136,6 @@ public class XWiki implements EventListener
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
-                    }
-
-                    context.setDatabase(targetWiki);
-                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
-                        getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
                     }
                 }
             }
@@ -6203,8 +6201,12 @@ public class XWiki implements EventListener
                 }
                 XWikiAttachment equivalentAttachmentRevision =
                     equivalentAttachment.getAttachmentRevision(oldAttachment.getVersion(), context);
+                // We compare the number of milliseconds instead of the date objects directly because Hibernate can
+                // return java.sql.Timestamp for date fields and the JavaDoc says that Timestamp.equals(Object) doesn't
+                // return true if the passed value is a java.util.Date object with the same number of milliseconds
+                // because the nanoseconds component of the passed date is unknown.
                 if (equivalentAttachmentRevision == null
-                    || !equivalentAttachmentRevision.getDate().equals(oldAttachment.getDate())) {
+                    || equivalentAttachmentRevision.getDate().getTime() != oldAttachment.getDate().getTime()) {
                     // Recreated attachment
                     LOGGER.debug("Recreated attachment: " + filename);
                     // If the attachment trash is not available, don't lose the existing attachment
@@ -6456,9 +6458,7 @@ public class XWiki implements EventListener
         if (event instanceof XObjectPropertyEvent) {
             EntityReference reference = ((XObjectPropertyEvent) event).getReference();
             String modifiedProperty = reference.getName();
-            if ("plugins".equals(modifiedProperty)) {
-                onPluginPreferenceEvent(event, doc, context);
-            } else if ("backlinks".equals(modifiedProperty)) {
+            if ("backlinks".equals(modifiedProperty)) {
                 this.hasBacklinks =
                     doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
                         (int) ParamAsLong("xwiki.backlinks", 0)) == 1;
@@ -6474,14 +6474,6 @@ public class XWiki implements EventListener
         flushVirtualWikis(doc);
     }
 
-    private void onPluginPreferenceEvent(Event event, XWikiDocument doc, XWikiContext context)
-    {
-        /*
-         * FIXME: This does not make sense anymore. Discard it? if (!isVirtualMode()) { // If the XWikiPreferences
-         * plugin propery is modified, reload all plugins. preparePlugins(context); }
-         */
-    }
-
     /**
      * The reference to match class XWiki.XWikiServerClass on whatever wiki.
      */
@@ -6492,7 +6484,7 @@ public class XWiki implements EventListener
      * The reference to match properties "plugins" and "backlinks" of class XWiki.XWikiPreference on whatever wiki.
      */
     private static final RegexEntityReference XWIKIPREFERENCE_PROPERTY_REFERENCE = new RegexEntityReference(
-        Pattern.compile("plugins|backlinks"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
+        Pattern.compile("backlinks"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
             Pattern.compile(".*:XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT));
 
     private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()

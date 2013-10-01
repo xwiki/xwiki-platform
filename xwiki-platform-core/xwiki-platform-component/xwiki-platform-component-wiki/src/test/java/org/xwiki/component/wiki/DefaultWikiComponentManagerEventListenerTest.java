@@ -19,11 +19,13 @@
  */
 package org.xwiki.component.wiki;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
-import org.jmock.Expectations;
+import java.util.Arrays;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
@@ -36,12 +38,9 @@ import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-@MockingRequirement(DefaultWikiComponentManagerEventListener.class)
-public class DefaultWikiComponentManagerEventListenerTest extends AbstractMockingComponentTestCase implements
-    WikiComponentConstants
+public class DefaultWikiComponentManagerEventListenerTest implements WikiComponentConstants
 {
     private static final String ROLE_HINT = "roleHint";
 
@@ -49,160 +48,96 @@ public class DefaultWikiComponentManagerEventListenerTest extends AbstractMockin
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
-    private DefaultWikiComponentManagerEventListener listener;
+    @Rule
+    public MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
+        DefaultWikiComponentManagerEventListener.class);
 
-    private WikiComponentBuilder provider;
+    private WikiComponentBuilder wikiComponentBuilder;
+
+    private WikiComponentManager wikiComponentManager;
 
     @Before
-    public void configure() throws Exception
+    public void setUp() throws Exception
     {
-        this.provider =
-            getComponentManager().registerMockComponent(getMockery(), WikiComponentBuilder.class, "default");
-        this.listener =
-            getComponentManager().getInstance(EventListener.class, "defaultWikiComponentManagerEventListener");
+        wikiComponentBuilder = mocker.registerMockComponent(WikiComponentBuilder.class);
+        wikiComponentManager = mocker.getInstance(WikiComponentManager.class);
     }
 
     @Test
     public void onEventWhenSourceIsNotAXWikiDocument() throws Exception
     {
-        final WikiComponentManager wikiComponentManager = getComponentManager().getInstance(WikiComponentManager.class);
+        mocker.getComponentUnderTest().onEvent(null, null, null);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                never(wikiComponentManager).registerWikiComponent(with(any(WikiComponent.class)));
-                never(wikiComponentManager).unregisterWikiComponents(with(any(DocumentReference.class)));
-            }
-        });
-
-        listener.onEvent(null, null, null);
+        verify(wikiComponentManager, never()).registerWikiComponent(any(WikiComponent.class));
+        verify(wikiComponentManager, never()).unregisterWikiComponents(any(DocumentReference.class));
     }
 
     @Test
     public void onEventWhenDocumentDoesNotContainAComponent() throws Exception
     {
-        final WikiComponentManager wikiComponentManager = getComponentManager().getInstance(WikiComponentManager.class);
-        final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
+        DocumentModelBridge componentDocument = mock(DocumentModelBridge.class);
+        when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(componentDoc).getDocumentReference();
-                will(returnValue(DOC_REFERENCE));
-                never(wikiComponentManager).registerWikiComponent(with(any(WikiComponent.class)));
-                never(wikiComponentManager).unregisterWikiComponents(with(any(DocumentReference.class)));
-            }
-        });
+        mocker.getComponentUnderTest().onEvent(null, componentDocument, null);
 
-        listener.onEvent(null, componentDoc, null);
+        verify(wikiComponentManager, never()).registerWikiComponent(any(WikiComponent.class));
+        verify(wikiComponentManager, never()).unregisterWikiComponents(any(DocumentReference.class));
     }
 
     @Test
     public void onDocumentCreated() throws Exception
     {
-        final WikiComponentManager manager = getComponentManager().getInstance(WikiComponentManager.class);
-        final List<DocumentReference> providerReferences = new ArrayList<DocumentReference>();
-        providerReferences.add(DOC_REFERENCE);
-        final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
-        final WikiComponent component =
-            new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
-                WikiComponentScope.WIKI);
-        final List<WikiComponent> components = new ArrayList<WikiComponent>();
-        components.add(component);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(componentDoc).getDocumentReference();
-                will(returnValue(DOC_REFERENCE));
-                oneOf(manager).unregisterWikiComponents(DOC_REFERENCE);
-                oneOf(provider).getDocumentReferences();
-                will(returnValue(providerReferences));
-                oneOf(provider).buildComponents(DOC_REFERENCE);
-                will(returnValue(components));
-                oneOf(manager).registerWikiComponent(component);
-            }
-        });
-
-        listener.onEvent(new DocumentCreatedEvent(DOC_REFERENCE), componentDoc, null);
+        onDocumentCreatedOrUpdated(new DocumentCreatedEvent(DOC_REFERENCE));
     }
 
     @Test
     public void onDocumentUpdated() throws Exception
     {
-        final WikiComponentManager manager = getComponentManager().getInstance(WikiComponentManager.class);
-        final List<DocumentReference> providerReferences = new ArrayList<DocumentReference>();
-        providerReferences.add(DOC_REFERENCE);
-        final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
-        final WikiComponent component =
+        onDocumentCreatedOrUpdated(new DocumentUpdatedEvent(DOC_REFERENCE));
+    }
+
+    public void onDocumentCreatedOrUpdated(Event event) throws Exception
+    {
+        DocumentModelBridge componentDocument = mock(DocumentModelBridge.class);
+        when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
+        when(wikiComponentBuilder.getDocumentReferences()).thenReturn(Arrays.asList(DOC_REFERENCE));
+
+        WikiComponent component =
             new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
                 WikiComponentScope.WIKI);
-        final List<WikiComponent> components = new ArrayList<WikiComponent>();
-        components.add(component);
+        when(wikiComponentBuilder.buildComponents(DOC_REFERENCE)).thenReturn(Arrays.asList(component));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(componentDoc).getDocumentReference();
-                will(returnValue(DOC_REFERENCE));
-                oneOf(manager).unregisterWikiComponents(DOC_REFERENCE);
-                oneOf(provider).getDocumentReferences();
-                will(returnValue(providerReferences));
-                oneOf(provider).buildComponents(DOC_REFERENCE);
-                will(returnValue(components));
-                oneOf(manager).registerWikiComponent(component);
-            }
-        });
+        mocker.getComponentUnderTest().onEvent(event, componentDocument, null);
 
-        Event event = new DocumentUpdatedEvent(DOC_REFERENCE);
-        listener.onEvent(event, componentDoc, null);
+        verify(wikiComponentManager).unregisterWikiComponents(DOC_REFERENCE);
+        verify(wikiComponentManager).registerWikiComponent(component);
     }
 
     @Test
     public void onDocumentDeleted() throws Exception
     {
-        final WikiComponentManager manager = getComponentManager().getInstance(WikiComponentManager.class);
-        final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
+        DocumentModelBridge componentDocument = mock(DocumentModelBridge.class);
+        when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(componentDoc).getDocumentReference();
-                will(returnValue(DOC_REFERENCE));
-                oneOf(manager).unregisterWikiComponents(DOC_REFERENCE);
-            }
-        });
+        mocker.getComponentUnderTest().onEvent(new DocumentDeletedEvent(DOC_REFERENCE), componentDocument, null);
 
-        listener.onEvent(new DocumentDeletedEvent(DOC_REFERENCE), componentDoc, null);
+        verify(wikiComponentManager).unregisterWikiComponents(DOC_REFERENCE);
     }
 
     @Test
     public void onApplicationReady() throws Exception
     {
-        final WikiComponentManager manager = getComponentManager().getInstance(WikiComponentManager.class);
-        final DocumentModelBridge componentDoc = getMockery().mock(DocumentModelBridge.class);
-        final WikiComponent component
-            = new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
-            WikiComponentScope.WIKI);
-        final List<WikiComponent> components = new ArrayList<WikiComponent>();
-        components.add(component);
-        final List<DocumentReference> providerReferences = new ArrayList<DocumentReference>();
-        providerReferences.add(DOC_REFERENCE);
+        DocumentModelBridge componentDocument = mock(DocumentModelBridge.class);
+        when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
+        when(wikiComponentBuilder.getDocumentReferences()).thenReturn(Arrays.asList(DOC_REFERENCE));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(componentDoc).getDocumentReference();
-                will(returnValue(DOC_REFERENCE));
-                oneOf(provider).getDocumentReferences();
-                will(returnValue(providerReferences));
-                oneOf(provider).buildComponents(DOC_REFERENCE);
-                will(returnValue(components));
-                oneOf(manager).registerWikiComponent(component);
-            }
-        });
+        WikiComponent component =
+            new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
+                WikiComponentScope.WIKI);
+        when(wikiComponentBuilder.buildComponents(DOC_REFERENCE)).thenReturn(Arrays.asList(component));
 
-        listener.onEvent(new ApplicationReadyEvent(), null, null);
+        mocker.getComponentUnderTest().onEvent(new ApplicationReadyEvent(), null, null);
+
+        verify(wikiComponentManager).registerWikiComponent(component);
     }
-
 }

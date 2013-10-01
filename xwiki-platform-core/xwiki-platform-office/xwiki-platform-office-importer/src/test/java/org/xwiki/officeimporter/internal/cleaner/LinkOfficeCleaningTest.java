@@ -25,7 +25,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -78,24 +77,5 @@ public class LinkOfficeCleaningTest extends AbstractHTMLCleaningTest
         Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
         Assert.assertEquals(1, nodes.getLength());
-    }
-
-    /**
-     * Test wrapping of HTML anchors with XWiki specific XHTML elements so that XHTML parser can recognize them.
-     */
-    @Test
-    public void testAnchorWrapping()
-    {
-        String html = header + "<a name=\"name\"/>" + footer;
-        Document doc = officeHTMLCleaner.clean(new StringReader(html));
-        NodeList nodes = doc.getElementsByTagName("a");
-        Assert.assertEquals(1, nodes.getLength());
-        Node anchor = nodes.item(0);
-        Node beforeComment = anchor.getPreviousSibling();
-        Assert.assertEquals(Node.COMMENT_NODE, beforeComment.getNodeType());
-        Assert.assertEquals("startmacro:id|-|name=\"name\"|-|", beforeComment.getNodeValue());
-        Node afterComment = anchor.getNextSibling();
-        Assert.assertEquals(Node.COMMENT_NODE, afterComment.getNodeType());
-        Assert.assertEquals("stopmacro", afterComment.getNodeValue());
     }
 }

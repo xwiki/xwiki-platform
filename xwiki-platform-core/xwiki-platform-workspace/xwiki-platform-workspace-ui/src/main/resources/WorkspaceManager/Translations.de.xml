@@ -24,6 +24,31 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+platform.workspace.activityHint=Erzeugt einen Aktivitätsverlauf fuer die angegebenen Workspaces
+platform.workspace.activityMultipleTitle=Aktivitäten in den Arbeitsgebieten {0}
+platform.workspace.activityTitle=Aktivitäten im Arbeitsgebiet {0}
+platform.workspace.createInitialMembersSaveComment=füge dem Arbeitsgebiet Beteiligte zu
+platform.workspace.createNewWorkspaceLabel=Erzeuge ein neues Arbeitsgebiet
+platform.workspace.deleteWorkspaceNo=Nein
+platform.workspace.deleteWorkspaceYes=Ja
+platform.workspace.exceptionWithMessage=Fehler\: {0}
+platform.workspace.invitationAcceptLabel=Akzeptieren
+platform.workspace.invitationRejectLabel=Abweisen
+platform.workspace.invitationReplyLabel=Antworten
+platform.workspace.joinNo=Nein
+platform.workspace.joinRequestCancelLabel=zurück
+platform.workspace.joinRequestCancelNo=nein
+platform.workspace.joinRequestCancelYes=Ja
+platform.workspace.joinRequestMessageLabel=Mitteilung
+platform.workspace.joinRequestSaveComment=Der Anwender {0} möchte sich an diesem Arbeitsgebiet beteiligen.. 
+platform.workspace.joinRequestSendLabel=Anforderung senden
+platform.workspace.joinYes=Ja
+platform.workspace.leaveNo=Nein
+platform.workspace.leaveSaveComment=Anwender {0} hat den Arbeitsbereich verlassen. 
+platform.workspace.leaveYes=Ja
+platform.workspace.templateFeaturesInstallErrorNeedTemplateFirst=Die durch die Workspace-vorlage bereitgestellten Features können erst verwendet werden, wenn die Workspace-vorlage installiert ist.
+platform.workspace.templateFeaturesInstallSuccess=Die Workspace-vorlage wurde erfolgreich installiert.
+platform.workspace.templateNotInstalledInstallNow=Die Workspace-vorlage ist noch nicht installiert. Möchten Sie die Workspace-vorlage jetzt installieren?
 workspacemanager.browse=Durchsuche Workspaces
 workspacemanager.browse._actions=Aktionen
 workspacemanager.browse._actions.cancelJoinRequest=Anfrage abbrechen
@@ -43,11 +68,16 @@ workspacemanager.menu.mainwiki.admin=Main Wiki administrieren
 workspacemanager.menu.workspace.delete=Löschen
 workspacemanager.menu.workspace.index=Workspace Verzeichnis
 workspacemanager.prop.wiki.description=Beschreibung
+workspacemanager.prop.wiki.owner=Eigentümer
+workspacemanager.prop.wiki.server=Alias
 workspacemanager.prop.wiki.wikiname=Workspace Identifizierer
 workspacemanager.prop.wiki.wikiprettyname=Ausführlicher Name
 workspacemanager.prop.workspace.membershipType.hint=So können Benutzer dem Workspace beitreten.
 workspacemanager.prop.workspace.membershipType.label=Mitgliedschaftstyp
 workspacemanager.searchSuggestions.install.success=Die Workspace Suchvorschläge, wurden erfolgreich installiert.
-workspacemanager.successcreatewiki=Dein Workspace "{0}" wurde erstellt. Dieser ist über die folgende Adresse erreichbar\: {1}
+workspacemanager.successcreatewiki=Ihr Workspace "{0}" wurde erstellt. Dieser ist über die folgende Adresse erreichbar\: {1}
+workspacemanager.title.createwiki.desc=Arbeitsgebietsbeschreibung
+workspacemanager.title.createwiki.members=Startmitglieder des Arbeitsgebietes
+workspacemanager.title.createwiki.wikiname=Arbeitsgebietskennung
 </content>
 </xwikidoc>

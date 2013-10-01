@@ -26,6 +26,12 @@
   <content>{{include document="XWiki.SearchCode"/}}
 
 {{velocity}}
-{{include document="$searchPage"/}}
+## If no Search UI Extension exist then don't display the Search page.
+#if ("$!searchPage" != '')
+  {{include document="$searchPage"/}}
+#else
+  ## Display a message explaining that there's no Search UI Extension.
+  $services.localization.render('search.page.noimplementation')
+#end
 {{/velocity}}</content>
 </xwikidoc>

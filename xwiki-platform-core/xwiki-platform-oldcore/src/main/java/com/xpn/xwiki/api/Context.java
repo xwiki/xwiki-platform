@@ -589,4 +589,15 @@ public class Context extends Api
     {
         getXWikiContext().dropPermissions();
     }
+
+    /**
+     * Get the registered (generally error) message for the previous action.
+     * 
+     * @return the registered message
+     * @since 5.2RC1
+     */
+    public String getMessage()
+    {
+        return (String) this.context.get("message");
+    }
 }

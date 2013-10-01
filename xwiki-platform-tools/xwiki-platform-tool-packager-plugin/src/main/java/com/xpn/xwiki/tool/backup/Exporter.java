@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.tool.backup;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.PackageException;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Export a set of XWiki documents from an existing database into the file system.
@@ -46,19 +46,21 @@ public class Exporter extends AbstractPackager
      */
     public void exportDocuments(File exportDirectory, String databaseName, File hibernateConfig) throws Exception
     {
-        XWikiContext context = createXWikiContext(databaseName, hibernateConfig);
+        XWikiContext xcontext = createXWikiContext(databaseName, hibernateConfig);
 
         Package pack = new Package();
         pack.setWithVersions(false);
-        pack.addAllWikiDocuments(context);
+        pack.addAllWikiDocuments(xcontext);
 
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
         // See http://jira.xwiki.org/jira/browse/XWIKI-458
         try {
-            pack.exportToDir(exportDirectory, context);
+            pack.exportToDir(exportDirectory, xcontext);
         } catch (IOException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to export documents to ["
                 + exportDirectory + "]", e);
         }
+
+        disposeXWikiContext(xcontext);
     }
 }

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -160,13 +160,6 @@
       <artifactId>xwiki-platform-wysiwyg-server</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <classifier>shared</classifier>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

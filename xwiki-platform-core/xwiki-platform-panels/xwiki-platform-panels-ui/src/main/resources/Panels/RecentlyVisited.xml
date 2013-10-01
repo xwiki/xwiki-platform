@@ -113,13 +113,11 @@
 #set ($recentlyViewed = $xwiki.statsService.getRecentActions('view', $rv_maxItems))
 #if ($recentlyViewed.size() &gt; 0 || $showEmptyPanels)
   #panelheader($services.localization.render('panels.recentlyVisited.title'))
-  #foreach ($docname in $recentlyViewed)
-    #if ($xwiki.hasAccessLevel('view', $xcontext.getUser(), $docname))
-      #set ($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-      #if ($foreach.index &gt; 0)
-        (% class="pitemseparator" %) ~| (%%)##
-      #end
-      (% class="panelitem" %)[[$rdoc.plainTitle&gt;&gt;$rdoc]](%%)##
+  #foreach ($docName in $recentlyViewed)
+    #if ($xwiki.hasAccessLevel('view', $docName))
+      #set ($recentDoc = $xwiki.getDocument($docName).getTranslatedDocument())
+      ## We use HTML here because we don't have a tool to escape wiki syntax in document title.
+      * {{html}}&lt;a href="$recentDoc.getURL()"&gt;$escapetool.xml($recentDoc.plainTitle)&lt;/a&gt;{{/html}}
     #end
   #end
 #panelfooter()

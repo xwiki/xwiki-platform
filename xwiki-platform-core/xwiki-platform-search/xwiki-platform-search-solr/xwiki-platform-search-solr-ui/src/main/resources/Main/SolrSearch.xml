@@ -183,8 +183,7 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
       <cache>long</cache>
     </property>
     <property>
-      <code>/* #set ($discard = $services.localization.use('document', 'Main.SolrTranslations')) */
-(function () {
+      <code>(function () {
   var SearchFilterBehavior = Class.create({
     initialize: function(container) {
       this.container = container.hide().addClassName('popup');
@@ -270,12 +269,39 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     }
   });
 
+  var SearchResultBehavior = Class.create({
+    initialize: function(container) {
+      this.container = container;
+      var highlights = container.down('.search-result-highlights');
+      if (highlights &amp;&amp; highlights.select('.search-result-highlight').size() &gt; 1) {
+        highlights.addClassName('preview');
+        // Workaround for IE8 which doesn't support :first-of-type CSS selector.
+        highlights.down('.search-result-highlight').addClassName('first').up('dd')
+          .addClassName('first').previous('dt').addClassName('first');
+        var highlightAllLink = new Element('a', {
+          'href': '#',
+          'class': 'search-result-highlightAll'
+        }).update("$escapetool.javascript($services.localization.render('solr.result.highlightAll'))".escapeHTML());
+        highlights.insert({after: highlightAllLink});
+        highlightAllLink.observe('click', function(event) {
+          event.stop();
+          highlightAllLink.remove();
+          highlights.removeClassName('preview');
+        });
+      }
+    }
+  });
+
   var init = function() {
     var searchFilter = $('body').down('.search-filter');
     searchFilter &amp;&amp; new SearchFilterBehavior(searchFilter);
 
     var searchFacets = $('body').down('.search-facets');
     searchFacets &amp;&amp; new SearchFacetsBehavior(searchFacets);
+
+    $('body').select('.search-result').each(function(searchResult) {
+      new SearchResultBehavior(searchResult);
+    });
 
     return true;
   };
@@ -551,11 +577,14 @@ a.sort-item.active, a.sort-item.active:hover {
 }
 
 .search-result-language {
-  font-size: 0.8em;
+  font-size: 0.7em;
+  font-style: italic;
+  font-weight: lighter;
 }
 
 .search-result-location,
 .search-result-author,
+.search-result-language,
 .search-result-mediaType,
 .search-result-object,
 .search-result-property {
@@ -584,6 +613,28 @@ blockquote.search-result-highlight {
 .search-text-highlight {
   background-color: $theme.highlightColor;
   font-weight: bold;
+}
+
+dl.search-result-highlights &gt; dt {
+  color: $theme.textSecondaryColor;
+  font-weight: normal;
+}
+
+dl.search-result-highlights.preview dt,
+dl.search-result-highlights.preview dd &gt; * {
+  display: none;
+}
+
+dl.search-result-highlights.preview dt:first-of-type,
+dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type,
+/* Workaround for IE8 which doesn't support :first-of-type CSS selector. */
+dl.search-result-highlights.preview dt.first,
+dl.search-result-highlights.preview dd.first blockquote.first {
+  display: block;
+}
+
+a.search-result-highlightAll:after {
+  content: ' \bb';
 }
 
 /**
@@ -712,6 +763,10 @@ blockquote.search-result-highlight {
   position: relative;
   text-overflow: ellipsis;
   width: 75%;
+}
+
+.search-facet-body .itemName.empty {
+  color: $theme.textSecondaryColor;
 }
 
 .search-facet-body .itemName {
@@ -888,7 +943,7 @@ blockquote.search-result-highlight {
     #set ($discard = $wikis.add({'value': $wikiName, 'label': $wikiPrettyName}))
   #end
   &lt;select id="searchFilterWiki" name="wiki"&gt;
-    #if ($xcontext.isMainWiki())
+    #if ($xcontext.isMainWiki() &amp;&amp; $wikis.size() &gt; 1)
       ## The main wiki can search in all wikis.
       &lt;option value=""&gt;$services.localization.render('solr.filterBy.wiki.all')&lt;/option&gt;
     #end
@@ -900,9 +955,10 @@ blockquote.search-result-highlight {
 
 #macro(spaceSelector)
   #set ($spaces = [])
-  #if ($wiki == $xcontext.database)
+  #set ($wikiNames = $xwiki.wikiNames)
+  #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
     #set ($spaces = $xwiki.spaces)
-  #elseif ($xwiki.wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
+  #elseif ($wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
     #set ($spaces = $services.query.xwql('select distinct doc.space from Document as doc order by doc.space').setWiki($wiki).execute())
   #end
   &lt;select id="searchFilterSpace" name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
@@ -953,43 +1009,64 @@ blockquote.search-result-highlight {
       [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
     )))
     #foreach ($facetField in $searchResponse.facetFields)
-      #set ($facetValues = $facetField.values)
-      ## Keep only the values that have at least one match.
-      #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
-      ## Display the facets that have values specified on the request or that have at least 2 different values matched.
-      #set ($facetRequestParameter = "f_$facetField.name")
-      #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
-      #if ($facetRequestValues || $facetValues.size() &gt; 1)
-        (% class="search-facet expanded" %)(((
-          {{html}}
-          &lt;div class="search-facet-header"&gt;$escapetool.xml($facetField.name)&lt;/div&gt; 
-          &lt;div class="search-facet-body"&gt;
-            &lt;ul&gt;
-              #foreach ($facetValue in $facetValues)
-                &lt;li&gt;
-                  #set ($selectedValues = [])
-                  #if ($facetRequestValues)
-                    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
-                  #end
-                  #set ($selected = $selectedValues.remove($facetValue.name))
-                  #if (!$selected)
-                    #set ($discard = $selectedValues.add($facetValue.name))
-                  #end
-                  ## Reset the pagination because the number of results can change when a facet is applied.
-                  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
-                  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
-                    &lt;span class="itemName"&gt;$escapetool.xml($facetValue.name)&lt;/span&gt;
-                    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
-                  &lt;/a&gt;
-                &lt;/li&gt;
-              #end
-            &lt;/ul&gt;
-          &lt;/div&gt;
-          {{/html}}
-        )))
-      #end
+      #displaySearchFacet($facetField)
     #end
   )))
+#end
+
+#macro (displaySearchFacet $facetField)
+  #set ($facetValues = $facetField.values)
+  ## Keep only the values that have at least one match.
+  #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
+  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
+  #set ($facetRequestParameter = "f_$facetField.name")
+  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+  #if ($facetRequestValues || $facetValues.size() &gt; 1)
+    (% class="search-facet expanded" %)(((
+      {{html}}
+      #set ($facetPrettyNameKey = "solr.field.$facetField.name")
+      #if ($services.localization.get($facetPrettyNameKey))
+        #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
+      #else
+        #set ($facetPrettyName = $facetField.name)
+      #end
+      &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
+      &lt;div class="search-facet-body"&gt;
+        &lt;ul&gt;
+          #foreach ($facetValue in $facetValues)
+            &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      {{/html}}
+    )))
+  #end
+#end
+
+#macro(displaySearchFacetValue $facetValue)
+  #set ($selectedValues = [])
+  #if ($facetRequestValues)
+    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+  #end
+  #set ($selected = $selectedValues.remove($facetValue.name))
+  #if (!$selected)
+    #set ($discard = $selectedValues.add($facetValue.name))
+  #end
+  ## Reset the pagination because the number of results can change when a facet is applied.
+  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
+    #if ($facetValue.name == '')
+      #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
+      #if (!$services.localization.get($facetPrettyValueKey))
+        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
+      #end
+      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
+    #else
+      #set ($facetPrettyValue = $facetValue.name)
+    #end
+    &lt;span class="itemName#if ($facetValue.name == '') empty#end"&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
+    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
+  &lt;/a&gt;
 #end
 
 #macro (displaySearchResultsSort)
@@ -1055,24 +1132,16 @@ blockquote.search-result-highlight {
 #macro (displaySearchResult $searchResult)
   #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki, $searchResult.space, $searchResult.name))
   #set ($searchResultDocument = $xwiki.getDocument($searchResultDocumentReference))
-  ## The lang field is multivalued to support attachments, objects and properties. For documents however, we only have 1 value.
-  #set ($resultLanguage = $searchResult.lang)
-  #if ($resultLanguage.size() &gt; 0)
-    #set ($resultLanguage = $resultLanguage[0])
-  #end
-  ## Make sure we get the right document translation based on what the resultLanguage says.
-  #if ($searchResultDocument.realLanguage != $resultLanguage)
-    #set ($searchResultDocument = $searchResultDocument.getTranslatedDocument($resultLanguage))
-  #end
+  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
   (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
     ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
     {{html}}
     #displaySearchResultTitle()
     #displaySearchResultLocation()
     ##
-    #set ($date = $datetool.format('d MMM yyyy', $searchResultDocument.date))
+    #set ($date = $datetool.format('d MMM yyyy', $searchResultTranslatedDocument.date))
     ## FIXME: handle multiwiki setup for authors. Better: index absolute authors instead.
-    #set ($author = $xwiki.getUserName($searchResultDocument.author))
+    #set ($author = $xwiki.getUserName($searchResultTranslatedDocument.author))
     &lt;div class="search-result-author"&gt;$services.localization.render('solr.result.author', [$author, $date])&lt;/div&gt;
     ##
     #if ("$!searchResult.mimetype" != '')
@@ -1091,16 +1160,7 @@ blockquote.search-result-highlight {
           [$classLink, $escapetool.xml($propertyName)])&lt;/div&gt;
       #end
     #end
-    #getMatches($searchResult $highlightTexts)
-    #if ($highlightTexts &amp;&amp; $highlightTexts.size() &gt; 0)
-      #set ($highlightUpperIndex = $mathtool.min(2, $mathtool.sub($highlightTexts.size(), 1)))
-      #foreach ($highlighIndex in [0..$highlightUpperIndex])
-        #if ($highlighIndex != 0)
-          &lt;span class="separator"&gt;&amp;hellip;&lt;/span&gt;
-        #end
-        &lt;blockquote class="search-result-highlight"&gt;$highlightTexts[$highlighIndex]&lt;/blockquote&gt;
-      #end
-    #end
+    #displaySearchResultHighlighting($searchResult)
     ## Scoring debug data.
     &lt;div id="debug_$searchResult.id" class="hidden"&gt;
       $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
@@ -1110,22 +1170,21 @@ blockquote.search-result-highlight {
 #end
 
 #macro (displaySearchResultTitle)
-  #set ($title = $searchResultDocument.plainTitle)
+  #set ($title = $searchResultTranslatedDocument.plainTitle)
   #set ($titleURL = $searchResultDocument.getURL())
   #if ($searchResult.type == 'ATTACHMENT')
     #set ($title = $searchResult.filename)
     #set ($titleURL = $searchResultDocument.getAttachmentURL($searchResult.filename))
-  #elseif ($searchResult.type == 'DOCUMENT')
-    ## This always sets the language parameter to the URL. It can be improved on a per-result basis and not be set when
-    ## the result's original document is the same as the requested language. However, this complicates things and will
-    ## cause problems when facets will be added and multiple languages will be queried at once.
-    #set ($titleURL = $searchResultDocument.getURL('view', "language=${resultLanguage}"))
+  #elseif ($searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != ''
+    &amp;&amp; $xcontext.language != $searchResult.locale)
+    #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
     &lt;a href="$titleURL"&gt;$escapetool.xml($title)&lt;/a&gt;
     ## Display document language for document results when multiple language results are requested.
-    #if ($request.lang == '' &amp;&amp; $searchResult.type == 'DOCUMENT')
-      &lt;span class="search-result-language"&gt;$escapetool.xml($resultLanguage)&lt;/span&gt;
+    #if ($request.lang == '' &amp;&amp; $searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != '')
+      &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
+        class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
     #end
   &lt;/h2&gt;
 #end
@@ -1148,53 +1207,85 @@ blockquote.search-result-highlight {
     [$wikiLink, $spaceLink, $documentLink])&lt;/div&gt;
 #end
 
-#macro (getMatches $searchResult $return)
-  #set ($resultHighlightingMap = $searchResponse.highlighting.get($searchResult.id))
-  ##
-  ## (1) Filter the result highlighting map to have simple field names (without the language suffix).
-  ##
-  #set ($filteredResultHighlightingMap = {})
-  #foreach ($highlighting in $resultHighlightingMap.entrySet())
-    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
-    #set ($highlightedField = $stringtool.substringBefore($highlighting.key, '_'))
-    #set ($highlightedValues = $highlighting.value)
-    ## Prefer the field variant that has the most matches.
-    #if (!$filteredResultHighlightingMap.containsKey($highlightedField)
-      || $filteredResultHighlightingMap.get($highlightedField).size() &lt; $highlightedValues.size())
-      #set ($discard = $filteredResultHighlightingMap.put($highlightedField, $highlightedValues))
-    #end
+#macro (displaySearchResultHighlighting $searchResult)
+  #getSearchResultHighlighting($searchResult $highlighting)
+  #if ($highlighting.size() &gt; 0)
+    &lt;dl class="search-result-highlights"&gt;
+      #foreach ($entry in $highlighting)
+        &lt;dt&gt;
+          #if ($services.localization.get("solr.field.$entry.field"))
+            $services.localization.render("solr.field.$entry.field")
+          #else
+            $entry.field
+          #end
+        &lt;/dt&gt;
+        &lt;dd&gt;#displaySearchResultMatches($entry.matches)&lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
   #end
-  #set ($resultHighlightingMap = $filteredResultHighlightingMap)
-  ##
-  ## (2) Keep only the matches corresponding to the search result type.
-  ##
-  #set ($indexedFields = {
-    'DOCUMENT': ['doccontent', 'comment', 'objcontent', 'attcontent'],
-    'OBJECT': ['objcontent'],
-    'OBJECT_PROPERTY': ['propertyvalue'],
-    'ATTACHMENT': ['attcontent']
-  })
-  #set ($matches = [])
-  #foreach ($field in $indexedFields.get($searchResult.type))
-    #set ($matches = $resultHighlightingMap.get($field))
-    ## Consider only the first field that has matches.
-    #if ($matches &amp;&amp; $matches.size() &gt; 0)
-      #break
-    #end
-  #end
-  ##
-  ## (3) Sanitize the matches.
-  ##
+#end
+
+#macro (displaySearchResultMatches $matches)
   #foreach ($match in $matches)
-    #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
-    #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
-    #set ($match = $escapetool.xml($match))
-    #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
-    #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
-    #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
+    #if ($foreach.count &gt; 1)
+      &lt;span class="separator"&gt;&amp;hellip;&lt;/span&gt;
+    #end
+    &lt;blockquote class="search-result-highlight"&gt;$match&lt;/blockquote&gt;
   #end
+#end
+
+#macro (getSearchResultHighlighting $searchResult $return)
+  #set ($highlighting = $searchResponse.highlighting.get($searchResult.id))
+  #set ($highlightingByLanguage = {})
+  #foreach ($entry in $highlighting.entrySet())
+    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
+    #set ($field = $stringtool.substringBefore($entry.key, '_'))
+    ## Extract the language.
+    #set ($lang = $stringtool.substringAfter($entry.key, '_'))
+    #if ($lang == $field)
+      ## No language.
+      #set ($lang = '_')
+    #end
+    #set ($matchesByLanguage = $highlightingByLanguage.get($field))
+    #if (!$matchesByLanguage)
+      #set ($matchesByLanguage = {})
+      #set ($discard = $highlightingByLanguage.put($field, $matchesByLanguage))
+    #end
+    #set ($discard = $matchesByLanguage.put($lang, $entry.value))
+  #end
+  ## Keep only the matches correspoding to the search result locale.
+  #set ($highlighting = [])
+  ## Fields with a higher index will be displayed first. Fields that are not included will be displayed at the end.
+  #set ($fieldPriority = ['filename', 'attcontent', 'objcontent', 'comment', 'propertyname', 'propertyvalue', 'title', 'doccontent'])
+  #foreach ($entry in $highlightingByLanguage.entrySet())
+    #if ($searchResult.locale != '')
+      #set ($matches = $entry.value.get($searchResult.locale))
+    #else
+      ## No language.
+      #set ($matches = $entry.value.get('_'))
+    #end
+    #if (!$matches)
+      ## This should not happen but let's play safe.
+      #set ($matches = $entry.value.entrySet().iterator().next().value)
+    #end
+    ## Sanitize the matches.
+    #foreach ($match in $matches)
+      #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
+      #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
+      #set ($match = $escapetool.xml($match))
+      #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
+      #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
+      #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
+    #end
+    #set ($discard = $highlighting.add({
+      'field': $entry.key,
+      'priority': $fieldPriority.indexOf($entry.key),
+      'matches': $matches
+    }))
+  #end
+  #set ($highlighting = $sorttool.sort($highlighting, 'priority:desc'))
   #set ($return = $NULL)
-  #setVariable("$return" $matches)
+  #setVariable("$return" $highlighting)
 #end
 
 #macro (getSearchResults)
@@ -1217,7 +1308,7 @@ blockquote.search-result-highlight {
   ## Collect the query filters.
   #set ($filters = {})
   #if ($language != '')
-    #set ($discard = $filters.put('lang', [$language]))
+    #set ($discard = $filters.put('locales', [$language]))
   #end
   #if ($wiki != '')
     #set ($discard = $filters.put('wiki', [$wiki]))
@@ -1310,7 +1401,6 @@ blockquote.search-result-highlight {
 {{/velocity}}
 
 {{velocity}}
-#set ($discard = $services.localization.use('document', 'Main.SolrTranslations'))
 #set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
 #set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
 ## Disable the document extra data: comments, attachments, history...

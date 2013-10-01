@@ -27,6 +27,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.xpn.xwiki.XWikiException;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
@@ -37,6 +38,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.workspace.Workspace;
 import org.xwiki.workspace.WorkspaceException;
 import org.xwiki.workspace.WorkspaceManager;
@@ -145,8 +147,22 @@ public class DefaultWorkspaceManager implements WorkspaceManager, Initializable
             return false;
         }
 
-        /* Do not allow the guest user. Note: Shouldn't this be decided by the admin trough rights? */
-        if (XWikiRightService.GUEST_USER_FULLNAME.equals(userName)) {
+        /* Check if the user has the CREATE_WIKI right */
+        try {
+            XWikiContext xcontext = getXWikiContext();
+
+            XWikiRightService rightService = xcontext.getWiki().getRightService();
+
+            String mainWikiPreferencesDocumentName =
+                    String.format(WIKI_PREFERENCES_PREFIXED_FORMAT, xcontext.getMainXWiki());
+
+            if (!rightService.hasAccessLevel("createwiki", userName, mainWikiPreferencesDocumentName,
+                    xcontext))
+            {
+                return false;
+            }
+        } catch (XWikiException e) {
+            logger.error("Failed to check if user [{}] can create a workspace. Assuming false.", userName, e);
             return false;
         }
 

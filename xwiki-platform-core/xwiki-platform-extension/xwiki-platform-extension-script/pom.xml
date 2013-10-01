@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-script</artifactId>
   <name>XWiki Platform - Extension - Script</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Script</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>16.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.16</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

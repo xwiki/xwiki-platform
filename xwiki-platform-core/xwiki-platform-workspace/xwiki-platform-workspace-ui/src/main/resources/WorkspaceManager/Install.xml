@@ -31,19 +31,20 @@
 #macro (registerWorkspaceSearchSuggestions $wikiName $skipSuccessMessage $skipNeedsAdminRightsCheck)
   #set ($searchSuggestConfigDocumentReference = $services.model.createDocumentReference($wikiName, 'XWiki', 'SearchSuggestConfig'))
   #set ($searchSuggestConfigDocument = $xwiki.getDocument($searchSuggestConfigDocumentReference))
-  #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestSourceClass', 'name', 'Workspaces'))
+  #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestSourceClass', 'name',
+    'platform.workspace.searchSuggestSourceWorkspaces'))
   #if (!$searchSuggestConfigObject)
     #if ($hasGlobalAdmin)
       #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject('XWiki.SearchSuggestSourceClass'))
-      #set ($discard = $searchSuggestConfigObject.set('name', '$services.localization.render(''platform.workspace.searchSuggestSourceWorkspaces'')'))
-      #set ($discard = $searchSuggestConfigObject.set('query', 'XWiki.XWikiServerClass.wikiprettyname:__INPUT__* AND object:WorkspaceManager.WorkspaceClass'))
+      #set ($discard = $searchSuggestConfigObject.set('name', 'platform.workspace.searchSuggestSourceWorkspaces'))
+      #set ($discard = $searchSuggestConfigObject.set('engine', 'solr'))
+      #set ($discard = $searchSuggestConfigObject.set('query', 'class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:__INPUT__*'))
       #set ($discard = $searchSuggestConfigObject.set('resultsNumber', '3'))
-      #set ($suggestUrl = '$xwiki.getURL(' + $escapetool.quote + '${xcontext.mainWikiName}:WorkspaceManager.WorkspacesSuggestLuceneService' + $escapetool.quote + ', ' + $escapetool.singleQuote + 'get' + $escapetool.singleQuote + ', ' + $escapetool.singleQuote + 'outputSyntax=plain' + $escapetool.singleQuote + ')')
-      #set ($discard = $searchSuggestConfigObject.set('url', $suggestUrl))
+      #set ($searchSuggestServiceReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WorkspacesSuggestSolrService'))
+      #set ($discard = $searchSuggestConfigObject.set('url', "$searchSuggestServiceReference"))
       #set ($discard = $searchSuggestConfigObject.set('activated', 1))
       #set ($discard = $searchSuggestConfigObject.set('highlight', 1))
-      #set ($suggestIcon = '$xwiki.getSkinFile(' + $escapetool.singleQuote + 'icons/silk/chart_organisation.png' + $escapetool.singleQuote + ')')
-      #set ($discard = $searchSuggestConfigObject.set('icon', $suggestIcon))
+      #set ($discard = $searchSuggestConfigObject.set('icon', 'icon:chart_organisation'))
       ##
       #set ($discard = $searchSuggestConfigDocument.save($services.localization.render('platform.workspace.searchSuggestionsInstallSaveComment'), true))
       #if (!$skipSuccessMessage)
@@ -57,7 +58,7 @@
     ##
     ## Don't display this information if the code is included from somewhere else.
     ##
-    #if ($context.doc == $context.tdoc)
+    #if ($xcontext.doc == $xcontext.tdoc)
 
       {{success}}{{translation key="workspacemanager.searchSuggestions.install.success"/}}{{/success}}
     #end
@@ -151,7 +152,7 @@
   ##
   ## Don't display this information if the code is included from somewhere else.
   ##
-  #if ($context.doc == $context.tdoc)
+  #if ($xcontext.doc == $xcontext.tdoc)
 
     {{success}}{{translation key="workspacemanager.template.install.success"/}}{{/success}}
   #end
@@ -163,7 +164,6 @@
 ##
 ## Install template features only if not already done so.
 #set ($template = $WikiManager.getWikiTemplateDocument($TEMPLATE_NAME))
-#set ($manageWorkspaceDocumentReference = $services.model.createDocumentReference("$TEMPLATE_NAME", 'XWiki', 'ManageWorkspace'))
 #if (!$template)
   #if (!$hasGlobalAdmin)
     #set ($needsAdminRights = true)
@@ -171,197 +171,201 @@
 
     {{error}}{{translation key="platform.workspace.templateFeaturesInstallErrorNeedTemplateFirst"/}}{{/error}}
   #end
-#elseif (!$xwiki.exists($manageWorkspaceDocumentReference))
-  #set ($templateFeaturesAttachment = $doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
-  #if (!$hasGlobalAdmin)
-    #set ($needsAdminRights = true)
-  #elseif ($templateFeaturesAttachment)
-    ## Change the database to the target wiki due to the Packager plugin limitation.
-    #set ($currentDatabase = $xcontext.database)
-    #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-    #set ($packager = $xwiki.package)
-    #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.content))
-    #set ($templateFeaturesAttachmentInstallResult = $packager.install())
-    ## Change back to the current wiki.
-    #set ($discard = $xcontext.setDatabase($currentDatabase))
-    #set ($PACKAGE_INSTALL_OK = 2)
-    #if (!$templateFeaturesAttachmentLoadResultOk || $templateFeaturesAttachmentInstallResult != $PACKAGE_INSTALL_OK)
-
-      {{error}}The template features package contains invalid entries. $!xcontext.import_error{{/error}}
-    #else
-      ## The workspace pages are now imported. Making final changes.
-      #set ($xwikiPreferencesDocumentReference = $services.model.createDocumentReference("$TEMPLATE_NAME", 'XWiki', 'XWikiPreferences'))
-      #set ($xwikiPreferencesDocument = $xwiki.getDocument($xwikiPreferencesDocumentReference))
-      #set ($xwikiPreferencesClassName = $services.model.serialize($xwikiPreferencesDocumentReference))
-      #set ($xwikiPreferencesObject = $xwikiPreferencesDocument.getObject($xwikiPreferencesClassName))
-      #set ($xwikiPreferencesNeedsSaving = false)
-      ##
-      ## 2(1). Register the Workspace Information Panel
-      ##
-      #set ($workspaceInformationPanel = 'Panels.WorkspaceInformationPanel')
-      #set ($currentRightPanels = $xwikiPreferencesObject.getProperty('rightPanels').value)
-      #if (!$currentRightPanels.contains($workspaceInformationPanel))
-        #set ($discard = $xwikiPreferencesObject.set('rightPanels', "$workspaceInformationPanel,$!currentRightPanels"))
-        #set ($xwikiPreferencesNeedsSaving = true)
-      #end
-      ##
-      ## Save XWikiPreferences with the new changes.
-      #if ($xwikiPreferencesNeedsSaving)
-        #set ($discard = $xwikiPreferencesDocument.save($services.localization.render('platform.workspace.templateFeaturesInstallTranslationsAndPanelSaveComment'), true))
-      #end
-      ##
-      ## 3. Extend XWiki.SearchSuggestConfig to show Workspaces as search suggestions.
-      ##
-      #registerWorkspaceSearchSuggestions($TEMPLATE_NAME, true, true)
-      ##
-      ## 4. Remove the local admin from XWikiAllGroup and XWikiAdminGroup.
-      ##
-      #set ($templateXwikiAllGroupDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiAllGroup'))
-      #set ($templateXwikiAdminGroupDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiAdminGroup'))
-      #set ($templateGroupClass = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiGroups'))
-      #set ($groupReferencesToClean = [$templateXwikiAllGroupDocumentReference, $templateXwikiAdminGroupDocumentReference])
-      ##
-      #foreach ($groupReferenceToClean in $groupReferencesToClean)
-        #set ($groupDocumentToClean = $xwiki.getDocument($groupReferenceToClean))
-        #set ($serializedTemplateGroupClass = $services.model.serialize($templateGroupClass))
-        #set ($groupAllMembers = $groupDocumentToClean.getObjects($serializedTemplateGroupClass))
-        #set ($templateAdminMember = $groupDocumentToClean.getObject($serializedTemplateGroupClass, 'member', 'XWiki.Admin'))
-        #if ($templateAdminMember)
-          #if ($groupAllMembers.size() == 1)
-            ## Just one member, we must not delete the object or the group will be dissolved.
-            #set ($discard = $templateAdminMember.set('member', ''))
-          #else
-            ## More than 1 member, we can safely delete this object and the group will not be affected.
-            #set ($discard = $groupDocumentToClean.removeObject($templateAdminMember))
-          #end
-          #set ($discard = $groupDocumentToClean.save($services.localization.render('platform.workspace.templateFeaturesInstallRemoveAdminSaveComment'), true))
-        #end
-      #end
-      ##
-      ## Some tools used below, for steps 5, 6, 7 and 8.
-      ##
-      #set ($templateXWikiRightsDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiRights'))
-      #set ($templateXWikiGlobalRightsDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiGlobalRights'))
-      #macro (setRights $documentReference $rightsClassDocumentReference $entity $comment $isGroup)
-        #set ($document = $xwiki.getDocument($documentReference))
-        #set ($serializedRightsClass = $services.model.serialize($rightsClassDocumentReference))
-        #set ($entityType = "#if($isGroup)groups#{else}users#end")
-        #set ($existingRight = $document.getObject($serializedRightsClass, $entityType, $entity))
-        #if (!$existingRight)
-          #set ($newRightsObject = $document.newObject($serializedRightsClass))
-          #set ($discard = $newRightsObject.set($entityType, "$!entity"))
-          #set ($discard = $newRightsObject.set('levels', 'view'))
-          #set ($discard = $newRightsObject.set('allow', 1))
-          ##
-          #set ($discard = $document.save("$!comment", true))
-        #end
-      #end
-      ##
-      #set ($allGlobalUsersGroup = "${xcontext.mainWikiName}:XWiki.XWikiAllGroup")
-      #set ($guestUser = 'XWiki.XWikiGuest')
-      ##
-      ## 5. Set initial rights for the entire workspace to registered users.
-      ##
-      #setRights($xwikiPreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetViewRightsSaveComment'), true)
-      ##
-      ## 6. Set initial rights for displaying panels properly to guests/registered users.
-      ##
-      #set ($panelsSpacePreferencesDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'Panels', 'WebPreferences'))
-      #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, $services.localization.render('platform.workspace.templateFeaturesInstallSetPanelViewRightsGuestsSaveComment'))
-      #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetPanelViewRightsGlobalUsersSaveComment'), true)
-      ##
-      ## 7. Set initial rights for displaying color themes properly to guests/registered users.
-      ##
-      #set ($colorThemesSpacePreferencesDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'ColorThemes', 'WebPreferences'))
-      #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, $services.localization.render('platform.workspace.templateFeaturesInstallSetThemesViewRightsGuestsSaveComment'))
-      #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetThemesViewRightsGlobalUsersSaveComment'), true)
-      ##
-      ## 8. Set initial rights for displaying the skin properly to guests/registered users.
-      ##
-      #set ($skinDocumentName = $xwikiPreferencesObject.getProperty('skin').value)
+#else
+  #set ($manageWorkspaceDocumentReference = $services.model.createDocumentReference("$TEMPLATE_NAME", 'XWiki', 'ManageWorkspace'))
+  #set ($xwikiPreferencesDocumentReference = $services.model.createDocumentReference("$TEMPLATE_NAME", 'XWiki', 'XWikiPreferences'))
+  #set ($xwikiPreferencesDocument = $xwiki.getDocument($xwikiPreferencesDocumentReference))
+  #set ($xwikiPreferencesClassName = $services.model.serialize($xwikiPreferencesDocumentReference))
+  #set ($xwikiPreferencesObject = $xwikiPreferencesDocument.getObject($xwikiPreferencesClassName))
+  #set ($workspaceInformationPanel = 'Panels.WorkspaceInformationPanel')
+  #set ($currentRightPanels = $xwikiPreferencesObject.getProperty('rightPanels').value)  
+  #if (!$xwiki.exists($manageWorkspaceDocumentReference) || !$currentRightPanels.contains($workspaceInformationPanel))
+    #set ($templateFeaturesAttachment = $doc.getAttachment($TEMPLATE_FEATURES_PACKAGE))
+    #if (!$hasGlobalAdmin)
+      #set ($needsAdminRights = true)
+    #elseif ($templateFeaturesAttachment)
+      ## Change the database to the target wiki due to the Packager plugin limitation.
+      #set ($currentDatabase = $xcontext.database)
       #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-      #set ($skinDocumentReference = $services.model.resolveDocument($skinDocumentName))
+      #set ($packager = $xwiki.package)
+      #set ($templateFeaturesAttachmentLoadResultOk = $packager.importPackageFromByteArray($templateFeaturesAttachment.content))
+      #set ($templateFeaturesAttachmentInstallResult = $packager.install())
+      ## Change back to the current wiki.
       #set ($discard = $xcontext.setDatabase($currentDatabase))
-      #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $guestUser, $services.localization.render('platform.workspace.templateFeaturesInstallSetSkinViewRightsGuestsSaveComment'))
-      #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetSkinViewRightsGlobalUsersSaveComment'), true)
-      ##
-      ## 9. Disable local user registration
-      ##
-      #macro (permanentlyDeleteDocument $documentReferenceToRemove)
-        #if ($xwiki.exists($documentReferenceToRemove))
-          #set ($documentToRemove = $xwiki.getDocument($documentReferenceToRemove))
+      #set ($PACKAGE_INSTALL_OK = 2)
+      #if (!$templateFeaturesAttachmentLoadResultOk || $templateFeaturesAttachmentInstallResult != $PACKAGE_INSTALL_OK)
+
+        {{error}}The template features package contains invalid entries. $!xcontext.import_error{{/error}}
+      #else
+        ## The workspace pages are now imported. Making final changes.      
+        #set ($xwikiPreferencesNeedsSaving = false)
+        ##
+        ## 2(1). Register the Workspace Information Panel
+        ##      
+        #if (!$currentRightPanels.contains($workspaceInformationPanel))
+          #set ($discard = $xwikiPreferencesObject.set('rightPanels', "$workspaceInformationPanel,$!currentRightPanels"))
+          #set ($xwikiPreferencesNeedsSaving = true)
+        #end
+        ##
+        ## Save XWikiPreferences with the new changes.
+        #if ($xwikiPreferencesNeedsSaving)
+          #set ($discard = $xwikiPreferencesDocument.save($services.localization.render('platform.workspace.templateFeaturesInstallTranslationsAndPanelSaveComment'), true))
+        #end
+        ##
+        ## 3. Extend XWiki.SearchSuggestConfig to show Workspaces as search suggestions.
+        ##
+        #registerWorkspaceSearchSuggestions($TEMPLATE_NAME, true, true)
+        ##
+        ## 4. Remove the local admin from XWikiAllGroup and XWikiAdminGroup.
+        ##
+        #set ($templateXwikiAllGroupDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiAllGroup'))
+        #set ($templateXwikiAdminGroupDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiAdminGroup'))
+        #set ($templateGroupClass = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiGroups'))
+        #set ($groupReferencesToClean = [$templateXwikiAllGroupDocumentReference, $templateXwikiAdminGroupDocumentReference])
+        ##
+        #foreach ($groupReferenceToClean in $groupReferencesToClean)
+          #set ($groupDocumentToClean = $xwiki.getDocument($groupReferenceToClean))
+          #set ($serializedTemplateGroupClass = $services.model.serialize($templateGroupClass))
+          #set ($groupAllMembers = $groupDocumentToClean.getObjects($serializedTemplateGroupClass))
+          #set ($templateAdminMember = $groupDocumentToClean.getObject($serializedTemplateGroupClass, 'member', 'XWiki.Admin'))
+          #if ($templateAdminMember)
+            #if ($groupAllMembers.size() == 1)
+              ## Just one member, we must not delete the object or the group will be dissolved.
+              #set ($discard = $templateAdminMember.set('member', ''))
+            #else
+              ## More than 1 member, we can safely delete this object and the group will not be affected.
+              #set ($discard = $groupDocumentToClean.removeObject($templateAdminMember))
+            #end
+            #set ($discard = $groupDocumentToClean.save($services.localization.render('platform.workspace.templateFeaturesInstallRemoveAdminSaveComment'), true))
+          #end
+        #end
+        ##
+        ## Some tools used below, for steps 5, 6, 7 and 8.
+        ##
+        #set ($templateXWikiRightsDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiRights'))
+        #set ($templateXWikiGlobalRightsDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'XWikiGlobalRights'))
+        #macro (setRights $documentReference $rightsClassDocumentReference $entity $comment $isGroup)
+          #set ($document = $xwiki.getDocument($documentReference))
+          #set ($discard = $document.setHidden(true))
+          #set ($serializedRightsClass = $services.model.serialize($rightsClassDocumentReference))
+          #set ($entityType = "#if($isGroup)groups#{else}users#end")
+          #set ($existingRight = $document.getObject($serializedRightsClass, $entityType, $entity))
+          #if (!$existingRight)
+            #set ($newRightsObject = $document.newObject($serializedRightsClass))
+            #set ($discard = $newRightsObject.set($entityType, "$!entity"))
+            #set ($discard = $newRightsObject.set('levels', 'view'))
+            #set ($discard = $newRightsObject.set('allow', 1))
+            ##
+            #set ($discard = $document.save("$!comment", true))
+          #end
+        #end
+        ##
+        #set ($allGlobalUsersGroup = "${xcontext.mainWikiName}:XWiki.XWikiAllGroup")
+        #set ($guestUser = 'XWiki.XWikiGuest')
+        ##
+        ## 5. Set initial rights for the entire workspace to registered users.
+        ##
+        #setRights($xwikiPreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetViewRightsSaveComment'), true)
+        ##
+        ## 6. Set initial rights for displaying panels properly to guests/registered users.
+        ##
+        #set ($panelsSpacePreferencesDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'Panels', 'WebPreferences'))
+        #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, $services.localization.render('platform.workspace.templateFeaturesInstallSetPanelViewRightsGuestsSaveComment'))
+        #setRights($panelsSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetPanelViewRightsGlobalUsersSaveComment'), true)
+        ##
+        ## 7. Set initial rights for displaying color themes properly to guests/registered users.
+        ##
+        #set ($colorThemesSpacePreferencesDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'ColorThemes', 'WebPreferences'))
+        #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $guestUser, $services.localization.render('platform.workspace.templateFeaturesInstallSetThemesViewRightsGuestsSaveComment'))
+        #setRights($colorThemesSpacePreferencesDocumentReference, $templateXWikiGlobalRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetThemesViewRightsGlobalUsersSaveComment'), true)
+        ##
+        ## 8. Set initial rights for displaying the skin properly to guests/registered users.
+        ##
+        #set ($skinDocumentName = $xwikiPreferencesObject.getProperty('skin').value)
+        #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
+        #set ($skinDocumentReference = $services.model.resolveDocument($skinDocumentName))
+        #set ($discard = $xcontext.setDatabase($currentDatabase))
+        #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $guestUser, $services.localization.render('platform.workspace.templateFeaturesInstallSetSkinViewRightsGuestsSaveComment'))
+        #setRights($skinDocumentReference, $templateXWikiRightsDocumentReference, $allGlobalUsersGroup, $services.localization.render('platform.workspace.templateFeaturesInstallSetSkinViewRightsGlobalUsersSaveComment'), true)
+        ##
+        ## 9. Disable local user registration
+        ##
+        #macro (permanentlyDeleteDocument $documentReferenceToRemove)
+          #if ($xwiki.exists($documentReferenceToRemove))
+            #set ($documentToRemove = $xwiki.getDocument($documentReferenceToRemove))
+            #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
+            ## Make sure not to leave anything in the recycle bin so don't send to trash.
+            #set ($discard = $xwiki.xWiki.deleteDocument($documentToRemove.document, false, $xcontext.context))
+            #set ($discard = $xcontext.setDatabase($currentDatabase))
+          #end
+        #end
+        ##
+        #set ($templateAdminRegistrationSheetDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'AdminRegistrationSheet'))
+        #set ($templateRegistrationConfigDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'RegistrationConfig'))
+        #set ($templateRegistrationHelpDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'RegistrationHelp'))
+        #permanentlyDeleteDocument($templateAdminRegistrationSheetDocumentReference)
+        #permanentlyDeleteDocument($templateRegistrationConfigDocumentReference)
+        #permanentlyDeleteDocument($templateRegistrationHelpDocumentReference)
+        ##
+        ## 10. Disable local user management
+        ##
+        #set ($templateAdminRegistrationSheetDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'AdminUsersSheet'))
+        #permanentlyDeleteDocument($templateAdminRegistrationSheetDocumentReference)
+        ##
+        ## 11. Disable the local admin.
+        ##
+        #set ($templateLocalAdminDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'Admin'))
+        #permanentlyDeleteDocument($templateLocalAdminDocumentReference)
+        ##
+        ## Macro to be used for setting the document author of documents requiring an existing user as author or a user with admin/programming rights.
+        ##
+        #set ($documentNamesAlreadyFixed = [])
+        #macro(fixDocumentAuthor $className $comment $documentNamesAlreadyFixed)
+          #set ($currentDatabase = $xcontext.database)
           #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-          ## Make sure not to leave anything in the recycle bin so don't send to trash.
-          #set ($discard = $xwiki.xWiki.deleteDocument($documentToRemove.document, false, $xcontext.context))
+          #set ($documentNamesToFix = $services.query.xwql("from doc.object($className) as theObject").execute())
+          #foreach ($documentNameToFix in $documentNamesToFix)
+            #if (!$documentNamesAlreadyFixed.contains($documentNameToFix))
+              #set ($documentReferencetoFix = $services.model.resolveDocument($documentNameToFix))
+              #set ($documentToFix = $xwiki.getDocument($documentReferencetoFix))
+              #set ($discard = $documentToFix.save($comment, true))
+              #set ($discard = $documentNamesAlreadyFixed.add($documentNameToFix))
+            #end
+          #end
           #set ($discard = $xcontext.setDatabase($currentDatabase))
         #end
+        ##
+        ## 12. Fix the author of wiki macro documents (use the current admin user) so that they are correctly registered.
+        ##
+        #fixDocumentAuthor('XWiki.WikiMacroClass', $services.localization.render('platform.workspace.templateFeaturesInstallFixMacrosSaveComment'), $documentNamesAlreadyFixed)
+        ##
+        ## 13. Fix the author of configuration pages for each application (use the current admin user) so that they are correctly registered and accessible in the workspace Administration section.
+        ##
+        #fixDocumentAuthor('XWiki.ConfigurableClass', $services.localization.render('platform.workspace.templateFeaturesInstallFixConfigurableClassSaveComment'), $documentNamesAlreadyFixed)
+        ##
+        ## 14. Fix the author of SSX and JSX extensions.
+        ##
+        #fixDocumentAuthor('XWiki.StyleSheetExtension', $services.localization.render('platform.workspace.templateFeaturesInstallFixSSXSaveComment'), $documentNamesAlreadyFixed)
+        #fixDocumentAuthor('XWiki.JavaScriptExtension', $services.localization.render('platform.workspace.templateFeaturesInstallFixJSXSaveComment'), $documentNamesAlreadyFixed)
+        ##
+        ## 15. Fix the author of documents with RequiredRightClass declarations.
+        ##
+        #fixDocumentAuthor('XWiki.RequiredRightClass', $services.localization.render('platform.workspace.templateFeaturesInstallFixRequiredRightClassSaveComment'), $documentNamesAlreadyFixed)
+
+        {{success}}{{translation key="platform.workspace.templateFeaturesInstallSuccess"/}}{{/success}}
       #end
-      ##
-      #set ($templateAdminRegistrationSheetDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'AdminRegistrationSheet'))
-      #set ($templateRegistrationConfigDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'RegistrationConfig'))
-      #set ($templateRegistrationHelpDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'RegistrationHelp'))
-      #permanentlyDeleteDocument($templateAdminRegistrationSheetDocumentReference)
-      #permanentlyDeleteDocument($templateRegistrationConfigDocumentReference)
-      #permanentlyDeleteDocument($templateRegistrationHelpDocumentReference)
-      ##
-      ## 10. Disable local user management
-      ##
-      #set ($templateAdminRegistrationSheetDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'AdminUsersSheet'))
-      #permanentlyDeleteDocument($templateAdminRegistrationSheetDocumentReference)
-      ##
-      ## 11. Disable the local admin.
-      ##
-      #set ($templateLocalAdminDocumentReference = $services.model.createDocumentReference($TEMPLATE_NAME, 'XWiki', 'Admin'))
-      #permanentlyDeleteDocument($templateLocalAdminDocumentReference)
-      ##
-      ## Macro to be used for setting the document author of documents requiring an existing user as author or a user with admin/programming rights.
-      ##
-      #set ($documentNamesAlreadyFixed = [])
-      #macro(fixDocumentAuthor $className $comment $documentNamesAlreadyFixed)
-        #set ($currentDatabase = $xcontext.database)
-        #set ($discard = $xcontext.setDatabase($TEMPLATE_NAME))
-        #set ($documentNamesToFix = $services.query.xwql("from doc.object($className) as theObject").execute())
-        #foreach ($documentNameToFix in $documentNamesToFix)
-          #if (!$documentNamesAlreadyFixed.contains($documentNameToFix))
-            #set ($documentReferencetoFix = $services.model.resolveDocument($documentNameToFix))
-            #set ($documentToFix = $xwiki.getDocument($documentReferencetoFix))
-            #set ($discard = $documentToFix.save($comment, true))
-            #set ($discard = $documentNamesAlreadyFixed.add($documentNameToFix))
-          #end
-        #end
-        #set ($discard = $xcontext.setDatabase($currentDatabase))
-      #end
-      ##
-      ## 12. Fix the author of wiki macro documents (use the current admin user) so that they are correctly registered.
-      ##
-      #fixDocumentAuthor('XWiki.WikiMacroClass', $services.localization.render('platform.workspace.templateFeaturesInstallFixMacrosSaveComment'), $documentNamesAlreadyFixed)
-      ##
-      ## 13. Fix the author of configuration pages for each application (use the current admin user) so that they are correctly registered and accessible in the workspace Administration section.
-      ##
-      #fixDocumentAuthor('XWiki.ConfigurableClass', $services.localization.render('platform.workspace.templateFeaturesInstallFixConfigurableClassSaveComment'), $documentNamesAlreadyFixed)
-      ##
-      ## 14. Fix the author of SSX and JSX extensions.
-      ##
-      #fixDocumentAuthor('XWiki.StyleSheetExtension', $services.localization.render('platform.workspace.templateFeaturesInstallFixSSXSaveComment'), $documentNamesAlreadyFixed)
-      #fixDocumentAuthor('XWiki.JavaScriptExtension', $services.localization.render('platform.workspace.templateFeaturesInstallFixJSXSaveComment'), $documentNamesAlreadyFixed)
-      ##
-      ## 15. Fix the author of documents with RequiredRightClass declarations.
-      ##
-      #fixDocumentAuthor('XWiki.RequiredRightClass', $services.localization.render('platform.workspace.templateFeaturesInstallFixRequiredRightClassSaveComment'), $documentNamesAlreadyFixed)
+    #else
+
+      {{error}}$services.localization.render('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $doc.fullName]){{/error}}
+    #end
+  #else
+    ##
+    ## Don't display this information if the code is included from somewhere else.
+    ##
+    #if ($xcontext.doc == $xcontext.tdoc)
 
       {{success}}{{translation key="platform.workspace.templateFeaturesInstallSuccess"/}}{{/success}}
     #end
-  #else
-
-    {{error}}$services.localization.render('workspacemanager.template.install.error.missingattachment', [$TEMPLATE_FEATURES_PACKAGE, $doc.fullName]){{/error}}
-  #end
-#else
-  ##
-  ## Don't display this information if the code is included from somewhere else.
-  ##
-  #if ($context.doc == $context.tdoc)
-
-    {{success}}{{translation key="platform.workspace.templateFeaturesInstallSuccess"/}}{{/success}}
   #end
 #end
 ##

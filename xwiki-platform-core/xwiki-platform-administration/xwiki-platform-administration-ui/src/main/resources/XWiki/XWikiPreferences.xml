@@ -31,9 +31,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1364502204000</creationDate>
-  <date>1364566342000</date>
-  <contentUpdateDate>1364566342000</contentUpdateDate>
+  <creationDate>1375383729000</creationDate>
+  <date>1375450864000</date>
+  <contentUpdateDate>1375450864000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki Preferences</title>
   <defaultTemplate/>
@@ -149,7 +149,7 @@
 #end
 &lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
   #if ($editor != 'globaladmin')&lt;option value=""#if ($value == '') selected="selected"#end&gt;---&lt;/option&gt;#end
-#foreach($theme in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title")))
+#foreach($theme in $xwiki.wrapDocs($services.query.hql(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title").execute()))
   &lt;option value="$theme.fullName"#if ($theme.fullName.equals($value)) selected="selected"#end&gt;$theme.plainTitle&lt;/option&gt;
 #end
 &lt;/select&gt;
@@ -742,6 +742,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </multilingual>
+    <obfuscateEmailAddresses>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <name>obfuscateEmailAddresses</name>
+      <number>72</number>
+      <prettyName>Obfuscate Email Addresses</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </obfuscateEmailAddresses>
     <parent>
       <customDisplay/>
       <disabled>0</disabled>
@@ -1278,7 +1292,7 @@
       <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
-      <levels>admin,edit,undelete,delete,programming,view,comment,register</levels>
+      <levels>admin,edit,undelete,delete,programming,view,comment,register,createwiki</levels>
     </property>
     <property>
       <users/>
@@ -1558,7 +1572,7 @@
 #end
 &lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
   #if ($editor != 'globaladmin')&lt;option value=""#if ($value == '') selected="selected"#end&gt;---&lt;/option&gt;#end
-#foreach($theme in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title")))
+#foreach($theme in $xwiki.wrapDocs($services.query.hql(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title").execute()))
   &lt;option value="$theme.fullName"#if ($theme.fullName.equals($value)) selected="selected"#end&gt;$theme.plainTitle&lt;/option&gt;
 #end
 &lt;/select&gt;
@@ -2151,6 +2165,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </multilingual>
+      <obfuscateEmailAddresses>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>obfuscateEmailAddresses</name>
+        <number>72</number>
+        <prettyName>Obfuscate Email Addresses</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </obfuscateEmailAddresses>
       <parent>
         <customDisplay/>
         <disabled>0</disabled>

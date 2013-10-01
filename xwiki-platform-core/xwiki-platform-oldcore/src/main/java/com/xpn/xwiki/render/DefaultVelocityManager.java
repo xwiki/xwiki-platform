@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
@@ -41,6 +42,7 @@ import org.xwiki.velocity.XWikiWebappResourceLoader;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -67,9 +69,18 @@ public class DefaultVelocityManager implements VelocityManager
      */
     private static final String RESOURCE_LOADER_CLASS = "xwiki.resource.loader.class";
 
+    /**
+     * Used to access the current {@link org.xwiki.context.ExecutionContext}.
+     */
     @Inject
     private Execution execution;
 
+    /**
+     * Used to access the current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+    
     /**
      * Used to get the current script context.
      */
@@ -95,13 +106,15 @@ public class DefaultVelocityManager implements VelocityManager
                 vcontext.put(entry.getKey(), entry.getValue());
             }
         }
+        
+        XWikiContext xcontext = xcontextProvider.get();
 
         // Add the "context" binding which is deprecated since 1.9.1.
-        vcontext.put("context", vcontext.get("xcontext"));
+        vcontext.put("context", new DeprecatedContext(xcontext));
 
         // Make sure the execution context and the XWiki context point to the same Velocity context instance. There is
         // old code that accesses the Velocity context from the XWiki context.
-        ((Map<String, Object>) this.execution.getContext().getProperty("xwikicontext")).put("vcontext", vcontext);
+        xcontext.put("vcontext", vcontext);
 
         return vcontext;
     }
@@ -172,7 +185,7 @@ public class DefaultVelocityManager implements VelocityManager
         // macros.vm
 
         // Get the location of the skin's macros.vm file
-        XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        XWikiContext xcontext = this.xcontextProvider.get();
         String skin = xcontext.getWiki().getSkin(xcontext);
         String cacheKey = getVelocityEngineCacheKey(skin, xcontext);
 

@@ -55,7 +55,7 @@
       <number>4</number>
       <prettyName>Content</prettyName>
       <rows>25</rows>
-      <size>60</size>
+      <size>120</size>
       <unmodifiable>0</unmodifiable>
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </content>

@@ -13,6 +13,8 @@
   #if($isAdvancedUser)
     #xwikitopmenuentrystart($doc.getURL($editaction, $!languageparams) $services.localization.render('core.menu.edit') 'tmEdit' 'hasIcon')
     #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '')
+    ## Check if the WYSIWYG supports the current document's syntax and if so add a menu entry to edit the current
+    ## document with the WYSIWYG editor.
     #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) || $tdoc.syntax.toIdString() == 'xwiki/1.0')
       #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '')
     #end
@@ -68,6 +70,15 @@
   #submenuitem($doc.getURL('view', "xpage=print&amp;$!request.getQueryString()") $services.localization.render('core.menu.preview') 'tmPrintPreview', '')
   #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '')
   #xwikitopmenuentryend()
+  #if ($keyboardShortcutsEnabled)
+    <script type="text/javascript">
+    //<![CDATA[
+      shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
+        location.href = $('tmViewSource').href;
+      }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+    //]]>
+    </script>
+  #end
 #end
 </div>
 </div>

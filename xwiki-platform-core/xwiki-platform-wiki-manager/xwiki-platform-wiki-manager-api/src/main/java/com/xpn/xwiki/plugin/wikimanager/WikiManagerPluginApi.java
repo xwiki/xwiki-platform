@@ -655,9 +655,9 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         wikiXObjectDocument.setOwner(this.context.getUser());
 
         try {
-            String[] params = new String[] {templateName, packageName};
             String message =
-                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE, params);
+                this.localizationManager.getTranslationPlain(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE,
+                    templateName, packageName);
             this.wikiManager.createWikiTemplate(wikiXObjectDocument, packageName, message, this.context);
         } catch (WikiManagerException e) {
             error(this.localizationManager.getTranslationPlain(WikiManagerMessageTool.LOG_WIKICREATION,

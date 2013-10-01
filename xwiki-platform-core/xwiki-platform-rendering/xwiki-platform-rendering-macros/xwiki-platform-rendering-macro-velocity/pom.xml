@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
   <name>XWiki Platform - Rendering - Macro - Velocity</name>
   <description>Executes a Velocity script and apply current page parser on the result</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>89.71</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Velocity Macro</xwiki.extension.name>
   </properties>

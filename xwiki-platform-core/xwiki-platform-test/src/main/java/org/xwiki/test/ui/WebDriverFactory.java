@@ -46,6 +46,10 @@ public class WebDriverFactory
             // testing the WYSIWYG editor. See http://code.google.com/p/selenium/issues/detail?id=2331 .
             FirefoxProfile profile = new FirefoxProfile();
             profile.setEnableNativeEvents(true);
+            // Make sure Firefox doesn't upgrade automatically on CI agents.
+            profile.setPreference("app.update.auto", false);
+            profile.setPreference("app.update.enabled", false);
+            profile.setPreference("app.update.silent", false);
             driver = new FirefoxDriver(profile);
 
             // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can

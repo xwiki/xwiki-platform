@@ -23,7 +23,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -120,4 +122,25 @@ public abstract class AbstractPackager
 
         return xcontext;
     }
+
+    /**
+     * Free resources initialized by {@link #createXWikiContext(String, File)}.
+     * 
+     * @param xcontext the XWiki context
+     * @throws ComponentLookupException when failing to dispose component manager
+     */
+    public void disposeXWikiContext(XWikiContext xcontext) throws ComponentLookupException
+    {
+        ComponentManager componentManager = Utils.getComponentManager();
+
+        // Remove ExecutionContext
+        Execution execution = componentManager.getInstance(Execution.class);
+        execution.removeContext();
+
+        // Dispose component manager
+        org.xwiki.environment.System.dispose(componentManager);
+
+        Utils.setComponentManager(null);
+    }
+
 }

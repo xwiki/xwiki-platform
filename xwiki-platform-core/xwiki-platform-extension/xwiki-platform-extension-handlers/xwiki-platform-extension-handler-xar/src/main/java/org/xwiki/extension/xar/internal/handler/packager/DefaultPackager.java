@@ -63,6 +63,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
@@ -98,6 +99,9 @@ public class DefaultPackager implements Packager, Initializable
 
     @Inject
     private DocumentMergeImporter importer;
+
+    @Inject
+    private MandatoryDocumentInitializerManager initializerManager;
 
     private SAXParserFactory parserFactory;
 
@@ -241,25 +245,33 @@ public class DefaultPackager implements Packager, Initializable
                 || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
                 DocumentReference documentReference =
                     this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference);
-                try {
-                    XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
-                    if (!document.isNew()) {
-                        Locale locale = xarEntry.getLocale();
-                        if (locale != null && !Locale.ROOT.equals(locale)) {
-                            document = document.getTranslatedDocument(locale, xcontext);
+                if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
+                    try {
+                        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+                        if (!document.isNew()) {
+                            Locale locale = xarEntry.getLocale();
+                            if (locale != null && !Locale.ROOT.equals(locale)) {
+                                document = document.getTranslatedDocument(locale, xcontext);
+                            }
+
+                            xcontext.getWiki().deleteDocument(document, xcontext);
+
+                            this.logger.info("Successfully deleted document [{}] in language [{}]",
+                                document.getDocumentReference(), document.getRealLocale());
                         }
-
-                        xcontext.getWiki().deleteDocument(document, xcontext);
-
-                        this.logger.info("Successfully deleted document [{}] in language [{}]",
-                            document.getDocumentReference(), document.getRealLocale());
+                    } catch (XWikiException e) {
+                        this.logger.error("Failed to delete document [{}]", documentReference, e);
                     }
-                } catch (XWikiException e) {
-                    this.logger.error("Failed to delete document [{}]", documentReference, e);
                 }
             }
         }
+    }
+
+    private boolean isMandatoryDocument(DocumentReference documentReference)
+    {
+        return this.initializerManager.getMandatoryDocumentInitializer(documentReference) != null;
     }
 
     @Override

@@ -67,6 +67,9 @@
 #end
   </div> ## globallinks
   <div class="clearfloats"></div>
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.header.after'))
+    $services.rendering.render($uix.execute(), 'xhtml/1.0')
+  #end
 </div> ## headerglobal
 #end
 ### TODO: Format the header for pdf output

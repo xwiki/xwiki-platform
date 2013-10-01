@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-uiextension</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-uiextension-api</artifactId>
   <name>XWiki Platform - User Interface Extension - API</name>
   <packaging>jar</packaging>
   <description>Java API for the User Interface extensions</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>68.80</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

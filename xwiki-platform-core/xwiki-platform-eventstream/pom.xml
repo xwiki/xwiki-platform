@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-eventstream</artifactId>
   <name>XWiki Platform - Event Stream</name>
@@ -36,7 +36,7 @@
     However, at this stage it still uses the ActivityStream implementation as its back-end.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>87.96</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

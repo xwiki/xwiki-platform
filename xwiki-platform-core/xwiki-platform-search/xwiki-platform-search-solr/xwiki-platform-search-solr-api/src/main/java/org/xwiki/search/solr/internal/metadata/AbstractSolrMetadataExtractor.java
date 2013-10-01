@@ -61,7 +61,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     /**
      * The format used when indexing the objcontent field: "&lt;propertyName&gt;:&lt;propertyValue&gt;".
      */
-    private static final String OBJCONTENT_FORMAT = "%s:%s";
+    private static final String OBJCONTENT_FORMAT = "%s : %s";
 
     /**
      * Logging framework.
@@ -99,19 +99,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException
     {
-        DocumentReference documentReference =
-            new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT));
-
         try {
             LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
 
-            solrDocument.setField(FieldUtils.ID, getResolver(entityReference).getId(documentReference));
+            solrDocument.setField(FieldUtils.ID, getResolver(entityReference).getId(entityReference));
 
-            if (!setDocumentFields(documentReference, solrDocument)) {
+            if (!setDocumentFields(new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT)),
+                solrDocument)) {
                 return null;
             }
 
-            solrDocument.setField(FieldUtils.TYPE, documentReference.getType().name());
+            solrDocument.setField(FieldUtils.TYPE, entityReference.getType().name());
 
             if (!setFieldsInternal(solrDocument, entityReference)) {
                 return null;
@@ -119,7 +117,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
             return solrDocument;
         } catch (Exception e) {
-            String message = String.format("Failed to get input document for '%s'", documentReference);
+            String message = String.format("Failed to get input Solr document for entity '%s'", entityReference);
             throw new SolrIndexerException(message, e);
         }
     }
@@ -275,9 +273,18 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         }
 
         // 4) Make sure that the original document's locale is there as well.
-        documentLocales.add(getLocale(xdocument.getDocumentReference()));
+        locales.add(getLocale(xdocument.getDocumentReference()));
 
         return locales;
+    }
+
+    protected void addLocales(XWikiDocument xdocument, Locale entityLocale, SolrInputDocument solrDocument)
+        throws SolrIndexerException, XWikiException
+    {
+        Set<Locale> locales = getLocales(xdocument, entityLocale);
+        for (Locale childLocale : locales) {
+            solrDocument.addField(FieldUtils.LOCALES, childLocale.toString());
+        }
     }
 
     /**

@@ -19,6 +19,9 @@
  */
 package org.xwiki.query.internal;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,10 +31,6 @@ import org.junit.Test;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests for {@link org.xwiki.query.internal.UniqueDocumentFilter}
@@ -92,10 +91,8 @@ public class UniqueDocumentFilterTest
         List<Object[]> results = filter.filterResults(
             Arrays.asList(new Object[] {"full1", "name1"}, new Object[] {"full2", "name2"}));
         assertEquals(2, results.size());
-        assertEquals(1, results.get(0).length);
-        assertEquals("full1", results.get(0)[0]);
-        assertEquals(1, results.get(1).length);
-        assertEquals("full2", results.get(1)[0]);
+        assertEquals("full1", results.get(0));
+        assertEquals("full2", results.get(1));
     }
 
     @Test

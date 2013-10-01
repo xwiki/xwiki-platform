@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-crypto</artifactId>
   <name>XWiki Platform - Cryptographic Services</name>
   <description>XWiki Platform - Cryptographic Services</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>75.41</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Used by CryptoScriptService which provides a service to Velocity scripts -->

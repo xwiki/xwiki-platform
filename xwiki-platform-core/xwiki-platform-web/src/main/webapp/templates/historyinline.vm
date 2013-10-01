@@ -51,7 +51,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       <div id="_history">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-      <input type="hidden" name="language" value="$!{context.language}" />
+      <input type="hidden" name="language" value="$!xcontext.language" />
       <div class="centered">
       <table class="xwikidatatable" summary="$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])">
 ## Print the table header

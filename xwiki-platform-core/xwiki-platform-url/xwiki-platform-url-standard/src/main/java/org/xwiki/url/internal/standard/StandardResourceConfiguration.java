@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Configuration options specific to the {@code standard} URL implementation scheme.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Role
 @Unstable
@@ -43,6 +43,13 @@ public interface StandardResourceConfiguration
      *         {@code http://server/xwiki/&lt;prefix&gt;/mywiki/...})
      */
     String getWikiPathPrefix();
+
+    /**
+     * @return the path prefix used for signifiying that a URL is pointing at a Model Entity (Document, Space, Object,
+     *         etc): {@code http://server/xwiki/&lt;prefix&gt;/...}.
+     *         For example: {@code http://server/xwiki/bin/...}.
+     */
+    String getEntityPathPrefix();
 
     WikiNotFoundBehavior getWikiNotFoundBehavior();
 }

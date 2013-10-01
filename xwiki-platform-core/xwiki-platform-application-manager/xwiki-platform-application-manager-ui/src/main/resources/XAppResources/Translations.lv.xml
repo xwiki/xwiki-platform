@@ -24,5 +24,34 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+xapp.action.exportnonrecurse=Eksportēt (nerekursīvi)
+xapp.action.exportrecurse=Eksportēt
+xapp.action.reloadapp=Pārlādēt
+xapp.answer.deleteapp.msg=Vai tiešām vēlaties dzēst lietotni "{0}"?
+xapp.answer.deleteapp.title=Dzēst lietotni "{0}"
+xapp.answer.exportapp.recursive=Rekursīvi
+xapp.answer.exportapp.title=Eksportēt lietotni "{0}"
+xapp.answer.exportapp.withdetails=Ar vēsturi
+xapp.appmanager=Lietotņu pārvaldnieks
+xapp.appname=Lietotnes nosaukums
+xapp.availablefilestoimport=Importēšanai pieejamie faili
+xapp.createapplication=Izveidot jaunu lietotni
+xapp.description=Apraksts
+xapp.docname=Dokumenta nosaukumš
+xapp.errorcreateapp=Veidojot lietotni radās kļūda "{0}" (kods "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Lietotne "{0}" jau pastāv. Izvēlieties citu nosaukumu.
+xapp.errordeleteapp=Dzēšot lietotni radās kļūda "{0}" (kods "{1}").
+xapp.errorexportapp=Eksportējot lietotni radās kļūda "{0}" (kods "{1}").
+xapp.errorimportapp=Importējot lietotnes pakotni radās kļūda "{0}" (kods "{1}").
+xapp.errorreloadapp=Pārlādējot lietotni radās kļūda "{0}" (kods "{1}").
+xapp.legend.application=Lietotne
+xapp.legend.validate=Validēt
+xapp.pluginnotenabled=Nav iespējots lietotņu pārvaldības spraudnis un šī lapa nedarbosies pareizi. Pārliecinieties, ka xwiki.cfg failā ir norādīts "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" spraudnis.
+xapp.successcreateapp=Lietotne "{0}" ir izveidota. Jūs varat atvērt to [{1}]. 
+xapp.successdeleteapp=Lietotne "{0}" izdzēsta veiksmīgi.
+xapp.successexportapp=Lietotne "{0}" eksportēta veiksmīgi.
+xapp.successimportapp=Lietotne "{0}" importēta veiksmīgi.
+xapp.successreloadapp=Lietotne "{0}" pārlādēta veiksmīgi.
+xapp.totalnumberofapp=Kopējais lietotņu skaits
 </content>
 </xwikidoc>

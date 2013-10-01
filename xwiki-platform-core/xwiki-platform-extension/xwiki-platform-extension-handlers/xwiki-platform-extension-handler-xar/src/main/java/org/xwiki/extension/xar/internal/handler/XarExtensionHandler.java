@@ -391,6 +391,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         configuration.setUser(getRequestUserReference(PROPERTY_USERREFERENCE, request));
         configuration.setWiki(wiki);
         configuration.setLogEnabled(true);
+        configuration.setSkipMandatorytDocuments(true);
 
         try {
             Job currentJob = this.componentManager.<JobContext> getInstance(JobContext.class).getCurrentJob();

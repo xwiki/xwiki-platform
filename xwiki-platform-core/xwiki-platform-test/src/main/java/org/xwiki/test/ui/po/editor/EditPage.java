@@ -127,7 +127,7 @@ public class EditPage extends BasePage
     {
         this.saveandcontinue.click();
 
-        // Wait until the page is really saved
+        // Wait until the page is really saved.
         waitForNotificationSuccessMessage("Saved");
     }
 

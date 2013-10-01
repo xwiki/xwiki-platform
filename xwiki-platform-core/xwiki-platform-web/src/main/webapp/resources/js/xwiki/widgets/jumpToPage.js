@@ -56,7 +56,11 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       // Create the Suggest.
       new XWiki.widgets.Suggest(this.input, {
         // This document also provides the suggestions.
-        script: "${request.contextPath}/rest/wikis/${context.database}/search?scope=name&number=10&",
+        // Trick so that Velocity will get executed but Javascript lint will not choke on it... Note that we cannot
+        // use a standard javascript comment ("//") since the minification process removes comments ;)
+        // We use the special construct ("/*!") which tells yuicompressor to not compress this part...
+        /*!#set ($restURL = "${request.contextPath}/rest/wikis/${xcontext.database}/search?scope=name&number=10&")*/
+        script: "$response.encodeURL($restURL)",
         // Prefixed with & since the current (as of 1.7) Suggest code does not automatically append it.
         varname: "q",
         noresults: "$services.localization.render('core.viewers.jump.suggest.noResults')",

@@ -417,9 +417,8 @@ $xwiki.jsx.use($paneldoc.fullName)##
           &lt;option value="$syntax.toIdString()"#if($docSyntax.toIdString().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
         #end
       #end
-      ## If the current document's syntax is not in the list of configured syntax, add it to the Select. Note that if we don't do this it causes a bug
-      ## since when saving the document its syntax will be set to XWiki Syntax 1.0 (which is the first syntax in the Select).
-      #if (!$configuredSyntaxes.contains($docSyntax.toIdString()))
+      ## If the current document's syntax is not in the list of configured syntax, add it to the Select so that the user sees the Document's Syntax.
+      #if (!$configuredSyntaxes.contains($docSyntax.toIdString()) || $docSyntax.toIdString().equalsIgnoreCase('xwiki/1.0'))
         &lt;option value="$docSyntax.toIdString()" selected="selected"&gt;$docSyntax.toString()&lt;/option&gt;
       #end
     &lt;/select&gt;

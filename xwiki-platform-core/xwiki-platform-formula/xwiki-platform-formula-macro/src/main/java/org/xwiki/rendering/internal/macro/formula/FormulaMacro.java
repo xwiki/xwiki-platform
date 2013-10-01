@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro.formula;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.FormulaRenderer.FontSize;
@@ -110,15 +108,14 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         String rendererHint = this.configuration.getRenderer();
         FontSize size = parameters.getFontSize();
         Type type = parameters.getImageType();
-        Block result = null;
+        Block result;
         try {
             result = render(content, context.isInline(), size, type, rendererHint);
-        } catch (ComponentLookupException ex) {
-            this.logger.error("Invalid renderer: [" + rendererHint + "]. Falling back to the safe renderer.", ex);
+        } catch (MacroExecutionException ex) {
+            this.logger.debug("Failed to render content with the [{}] renderer. Falling back to the safe renderer.",
+                rendererHint, ex);
             try {
                 result = render(content, context.isInline(), size, type, this.configuration.getSafeRenderer());
-            } catch (ComponentLookupException ex2) {
-                this.logger.error("Safe renderer not found. No image generated. Returning plain text.", ex);
             } catch (IllegalArgumentException ex2) {
                 throw new MacroExecutionException(WRONG_CONTENT_ERROR);
             }
@@ -146,11 +143,12 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
      * @param imageType the specified resulting image type
      * @param rendererHint the hint for the renderer to use
      * @return the resulting block holding the generated image, or {@code null} in case of an error.
-     * @throws ComponentLookupException if no component with the specified hint can be retrieved
+     * @throws MacroExecutionException if no renderer exists for the passed hint or if that rendered failed to render
+     *         the formula
      * @throws IllegalArgumentException if the formula is not valid, according to the LaTeX syntax
      */
     private Block render(String formula, boolean inline, FontSize fontSize, Type imageType, String rendererHint)
-        throws ComponentLookupException, IllegalArgumentException
+        throws MacroExecutionException, IllegalArgumentException
     {
         try {
             FormulaRenderer renderer = this.manager.getInstance(FormulaRenderer.class, rendererHint);
@@ -161,8 +159,9 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
             // Set the alternative text for the image to be the original formula
             result.setParameter("alt", formula);
             return result;
-        } catch (IOException ex) {
-            throw new ComponentLookupException("Failed to render formula using [" + rendererHint + "] renderer");
+        } catch (Exception e) {
+            throw new MacroExecutionException(
+                String.format("Failed to render formula using the [%s] renderer", rendererHint), e);
         }
     }
 

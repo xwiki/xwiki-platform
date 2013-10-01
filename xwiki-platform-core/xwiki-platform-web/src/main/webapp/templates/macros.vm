@@ -1,5 +1,4 @@
 ##
-##
 ## #template("name.vm")
 ## Searches for the given velocity template and interprets it.
 ## Only the velocity parser is executed on the file.
@@ -224,7 +223,7 @@ $xwiki.getUserName("xwiki:${username}")
   #else
     #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatar.png', true))
   #end
-  #if (!$profileDoc.isNew() && $profileDoc.attachmentList.size() > 0)
+  #if ($profileDoc && !$profileDoc.isNew() && $profileDoc.attachmentList.size() > 0)
     #set ($profileObj = $profileDoc.getObject('XWiki.XWikiUsers', 0))
     #set ($avatarFileName = $profileObj.getProperty('avatar').value)
     #if ("$!avatarFileName" != '')
@@ -1613,13 +1612,10 @@ function (row, i, table) {
       #end
     #end
   #end
-  }
-  else {
-    var page = row["doc_fullName"];
-    var dp = page.indexOf(':');
-    var p = page.indexOf('.');
-    var space = (dp > 0) ? page.substring(dp + 1, p) : page.substring(0, p);
-    var name = page.substring(p + 1);
+  } else {
+    var documentReference = XWiki.Model.resolve(row['doc_fullName'] || '', XWiki.EntityType.DOCUMENT);
+    var pageName = documentReference.name;
+    var spaceName = documentReference.parent ? documentReference.parent.name : '';
     #foreach($colname in $collist)
       // $colname
       #set($colprop = $colprops.get($colname))
@@ -1630,9 +1626,9 @@ function (row, i, table) {
          #set($jscolname = $colname)
         #end
         #if($jscolname == "doc_name")
-          tr.insert(new Element("td").update(name + "*"));
+          tr.insert(new Element("td").update(pageName + "*"));
         #elseif($jscolname == "doc_space")
-          tr.insert(new Element("td").update(space));
+          tr.insert(new Element("td").update(spaceName));
         #else
           tr.insert(new Element("td").update(" "));
         #end
@@ -1929,10 +1925,16 @@ function (row, i, table) {
     loading.style.height = field.offsetHeight + 'px';
     field.parentNode.insertBefore(loading, field);
     var removeLoadingAnimation = function() {
-      // Remove the loading animation after the WYSIWYG module has been loaded.
-      Wysiwyg.onModuleLoad(function() {
+      // Remove the loading animation after the editor code has been loaded or if it can't be loaded.
+      var callback = function() {
         loading.parentNode.removeChild(loading);
-      });
+      };
+      if (typeof Wysiwyg == 'object' && Wysiwyg) {
+        Wysiwyg.onModuleLoad(callback);
+      } else {
+        field.style.visibility = 'visible';
+        callback();
+      }
       return true;
     };
     (XWiki.domIsLoaded && removeLoadingAnimation()) || document.observe('xwiki:dom:loaded', removeLoadingAnimation);
@@ -2100,11 +2102,13 @@ var $jsVarName = {
 //<![CDATA[
 (function() {
   var init = function() {
-    Wysiwyg.onModuleLoad(function() {
+    // Fail safe if the editor can't be loaded.
+    var editorCanBeLoaded = typeof Wysiwyg == 'object' && Wysiwyg;
+    editorCanBeLoaded && Wysiwyg.onModuleLoad(function() {
       new WysiwygEditor($jsVarName);
       $jsVarName = undefined;
     });
-    return true;
+    return editorCanBeLoaded;
   };
   (XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
 })(XWiki || {});
@@ -2247,7 +2251,7 @@ var $jsVarName = {
   #if ($name == '')
     #set ($name = $services.localization.render("$!{options.translationPrefix}${item.id}"))
   #end
-  $level (% class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
+  $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
   #if ($hasChildren)
     #foreach ($child in $item.children)
       #verticalNavigationItem($child $level.concat('*') $options)
@@ -2430,4 +2434,36 @@ $services.display.title($doc, {'displayerHint': 'default'})##
 #else##
 Recursive title display detected!##
 #end##
+#end
+
+#**
+ * Outputs the skin extension hooks, for both Stylesheet and JavaScript extensions. This is useful when the HTML response
+ * of an AJAX request needs to pull some CSS and JavaScript resources. The code that makes the AJAX request should move
+ * the 'includes' (i.e. the link and script tags) to the head of the HTML page after receiving the HTML response.
+ *#
+#macro (skinExtensionHooks)
+  #styleSheetExtensionHooks
+  #javaScriptExtensionHooks
+#end
+
+#**
+ * Hook for inserting CSS skin extensions.
+ *#
+#macro (styleSheetExtensionHooks)
+  ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+  <!-- com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin -->
+  <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
+  <!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin -->
+#end
+
+#**
+ * Hooks for inserting JavaScript skin extensions.
+ *#
+#macro (javaScriptExtensionHooks)
+  ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+  <!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
+  ## - Skin file extension hook.
+  <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
+  ## - Skin extension hook
+  <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
 #end

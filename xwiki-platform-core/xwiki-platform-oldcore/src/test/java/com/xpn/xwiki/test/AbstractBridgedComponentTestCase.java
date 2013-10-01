@@ -20,6 +20,7 @@
 package com.xpn.xwiki.test;
 
 import java.io.File;
+
 import javax.servlet.ServletContext;
 
 import org.jmock.Expectations;
@@ -41,10 +42,12 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Same as {@link com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase} but for JUnit 4.x and JMock 2.x.
- *
+ * 
  * @version $Id$
  * @since 2.2M2
+ * @deprecated sine 5.2M1 use {@link MockitoOldcoreRule} instead
  */
+@Deprecated
 public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 {
     private XWikiContext context;

@@ -217,7 +217,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         builder.append(QUERY_AND);
 
-        builder.append(FieldUtils.NAME);
+        builder.append(FieldUtils.NAME_EXACT);
         builder.append(':');
         builder.append(ClientUtils.escapeQueryChars(reference.getName()));
 

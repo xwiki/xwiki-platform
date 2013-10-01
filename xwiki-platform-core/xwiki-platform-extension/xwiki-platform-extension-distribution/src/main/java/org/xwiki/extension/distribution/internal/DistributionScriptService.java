@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.distribution.internal;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -34,10 +36,14 @@ import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributio
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -64,6 +70,18 @@ public class DistributionScriptService implements ScriptService
     public static final String EXTENSIONERROR_KEY = "scriptservice.distribution.error";
 
     /**
+     * The component used to get information about the current distribution.
+     */
+    @Inject
+    protected DistributionManager distributionManager;
+
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
+
+    /**
      * Provides safe objects for scripts.
      */
     @Inject
@@ -71,23 +89,23 @@ public class DistributionScriptService implements ScriptService
     private ScriptSafeProvider scriptProvider;
 
     /**
-     * The component used to get information about the current distribution.
-     */
-    @Inject
-    private DistributionManager distributionManager;
-
-    /**
-     * Used to access current {@link XWikiContext}.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    /**
      * Used to access HTML renderer.
      */
     @Inject
     @Named("xhtml/1.0")
     private BlockRenderer xhtmlRenderer;
+
+    /**
+     * Used to execute transformations.
+     */
+    @Inject
+    private transient TransformationManager transformationManager;
+
+    /**
+     * The component used to serialize entity references.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     /**
      * @param <T> the type of the object
@@ -122,13 +140,24 @@ public class DistributionScriptService implements ScriptService
     }
 
     /**
-     * @return the recommended user interface for {@link #getDistributionExtension()}
+     * @return the recommended user interface for current wiki
      */
     public ExtensionId getUIExtensionId()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
+        return getUIExtensionId(xcontext.getDatabase());
+    }
+
+    /**
+     * @param wiki the wiki
+     * @return the recommended user interface for passed wiki
+     */
+    public ExtensionId getUIExtensionId(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
             .getWikiUIExtensionId();
     }
 
@@ -166,6 +195,19 @@ public class DistributionScriptService implements ScriptService
      */
     public String renderCurrentStepToXHTML()
     {
+        String transformationId = null;
+
+        XWikiContext xcontext = xcontextProvider.get();
+        if (xcontext != null && xcontext.getDoc() != null) {
+            transformationId =
+                this.defaultEntityReferenceSerializer.serialize(xcontext.getDoc().getDocumentReference());
+        }
+
+        return renderCurrentStepToXHTML(transformationId);
+    }
+
+    public String renderCurrentStepToXHTML(String transformationId)
+    {
         DistributionJob job = this.distributionManager.getCurrentDistributionJob();
 
         if (job != null) {
@@ -177,6 +219,8 @@ public class DistributionScriptService implements ScriptService
                 if (jobState == State.RUNNING || jobState == State.WAITING) {
                     Block block = job.getCurrentStep().render();
 
+                    transform(block, transformationId);
+
                     WikiPrinter printer = new DefaultWikiPrinter();
 
                     this.xhtmlRenderer.render(block, printer);
@@ -187,6 +231,21 @@ public class DistributionScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    private void transform(Block block, String transformationId)
+    {
+        TransformationContext txContext =
+            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
+                false);
+
+        txContext.setId(transformationId);
+
+        try {
+            this.transformationManager.performTransformations(block, txContext);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

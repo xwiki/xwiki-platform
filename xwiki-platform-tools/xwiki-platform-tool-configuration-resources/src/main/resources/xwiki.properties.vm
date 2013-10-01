@@ -285,7 +285,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = resource.manager.logwhenfound = false
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
 #-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.ChainingUberspector
-#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector\,org.xwiki.velocity.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy
@@ -479,30 +479,28 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 4.5M1]
 #-# The location where the embedded Solr instance stores its configuration and the indexed data.
 #-# The default is the subfolder "solr" inside the folder defined by the property "environment.permanentDirectory".
-#if ($xwikiPropertiesEnvironmentPermanentDirectory)
-# solr.embedded.home=$xwikiPropertiesEnvironmentPermanentDirectory/solr
-#else
 # solr.embedded.home=/var/local/xwiki/solr
-#end
 
 #-# [Since 4.5M1]
 #-# The URL to use to connect to the remote solr server.
 #-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
 # solr.remote.url=http://localhost:8983/solr
 
-#-# [Since 4.5M1]
-#-# Each language has its particularities and needs to be handled specially in order to index and retrieve the best results.
-#-# The list of available languages for which optimized indexing is possible. 
-# solr.multilingual.availableLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr 
+#-# [Since 5.1M1]
+#-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
+#-# It's possible to configure this behavior with the following properties:
+#-# 
+#-# The maximum number of elements sent at the same time to the Solr server
+#-# The default is 50.
+# solr.indexer.batch.size=50
+#-# The maximum number of characters in the batch of elements to send to the Solr server.
+#-# The default is 10000.
+# solr.indexer.batch.maxLength=10000
 
-#-# [Since 4.5M1]
-#-# The list of languages for which to use optimized indexing.
-#-# The values used here must be a sublist of solr.multilingual.available. A smaller sublist can offer slightly better query time performance.
-# solr.multilingual.activeLanguages=ar,bg,ca,cz,da,de,en,el,es,eu,fa,fi,fr,ga,gl,hi,hu,hy,id,it,ja,lv,nl,no,pt,ro,ru,sv,th,tr
-
-#-# [Since 4.5M1]
-#-# The list of multilingual fields for which to use optimized indexing.
-# solr.multilingual.fields=title,doccontent,comment,objcontent,propertyvalue,attcontent
+#-# [Since 5.1M1]
+#-# The maximum number of elements in the background queue of elements to index/delete
+#-# The default is 10000.
+# solr.indexer.queue.capacity=100000
 
 #-------------------------------------------------------------------------------------
 # Security
@@ -558,9 +556,42 @@ rendering.transformations = $xwikiRenderingTransformations
 # url.standard.multiwiki.wikiPathPrefix=wiki
 
 #-# [Since 5.2M1]
-#-# What to do when the requested wiki does not exist:
-#-# - 0: (default) serve the main wiki
-#-# - 1: display an error (customizable through wikidoesnotexist.vm or xwiki:XWiki.WikiDoesNotExist)
-# url.standard.multiwiki.notFoundBehavior=0
+#-# Defines the URL path prefix used for Entity URLs, i.e. URLs pointing to a Document, Space, Object, etc.
+#-# For example this is the "bin" part in the following URL:
+#-#   http://server/xwiki/bin/view/space/page
+#-# Note that this replaces the old xwiki.defaultservletpath property in the old xwiki.cfg file.
+#-#
+#-# The default is:
+# url.standard.getEntityPathPrefix=bin
+
+#-------------------------------------------------------------------------------------
+# Attachment
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.2M2]
+#-# Define the kind of attachment that can be displayed inline. You can either choose to do it through a whitelist (only
+#-# the mimetypes defined in this list would be displayed inline) or a blacklist (every mimetype that is not in this list
+#-# would be displayed inline if possible)
+#-#
+#-# By default we use the following whitelist (coma separated list of values).
+# attachment.download.whitelist=audio/basic,audio/L24,audio/mp4,audio/mpeg,audio/ogg,audio/vorbis,audio/vnd.rn-realaudio,audio/vnd.wave,audio/webm,image/gif,image/jpeg,image/pjpeg,image/png,image/svg+xml,image/tiff,text/csv,text/plain,text/xml,text/rtf,video/mpeg,video/ogg,video/quicktime,video/webm,video/x-matroska,video/x-ms-wmv,video/x-flv 
+#-#
+#-# If you prefer to use a blacklist instead, you can define the forbidden types here, as a coma separated list of values.
+#-# We advise you to forbid at least the following mimetypes : text/html, text/javascript
+# attachment.download.blacklist=text/html,text/javascript 
+
+#-------------------------------------------------------------------------------------
+# Active Installs
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.2M2]
+#-# The URL of where the Active Installs module should connect to in order to send a ping of activity. This feature
+#-# regularly sends the following information to xwiki.org about the current instance:
+#-# - its unique id
+#-# - the id and versions of all installed extensions)
+#-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
+#-#
+#-# The default is:
+# activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
 
 $!xwikiPropertiesAdditionalProperties

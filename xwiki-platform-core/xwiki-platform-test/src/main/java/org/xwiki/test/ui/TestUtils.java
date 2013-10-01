@@ -712,7 +712,12 @@ public class TestUtils
 
     public boolean isInViewMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='tmEdit']")).size() > 0;
+        return getDriver().findElements(By.id("tmEdit")).size() > 0;
+    }
+
+    public boolean isInSourceViewMode()
+    {
+        return getDriver().findElements(By.xpath("//textarea[@class = 'wiki-code']")).size() > 0;
     }
 
     public boolean isInInlineEditMode()

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>WorkspaceTranslations</name>
+  <language>pt_BR</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1303158348000</creationDate>
+  <date>1307445978000</date>
+  <contentUpdateDate>1307445978000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Workspace Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
+XWiki.WorkspaceCandidateMemberClass_status_accepted=Aceito
+XWiki.WorkspaceCandidateMemberClass_status_pending=Pendente
+XWiki.WorkspaceCandidateMemberClass_status_rejected=Rejeitado
+XWiki.WorkspaceCandidateMemberClass_type_invitation=Convite
+XWiki.WorkspaceCandidateMemberClass_type_request=Solicitação
+admin.xwiki.manageworkspace.description=Gerenciar configurações tais como nome da divisão, descrição, dono e como entrar.
+admin.xwiki.workspaceusers.description=Gerencia membros da divisão\: adiciona, remove, convida, aceita ou rejeita membros da divisão.
+core.menu.admin.wiki=Administrar Divisão
+core.menu.type.wiki=Divisão
+core.menu.watchlist.add.wiki=Seguir Divisão
+core.menu.watchlist.remove.wiki=Não Seguir Divisão
+platform.workspace.candidateAcceptLabel=Aceitar
+platform.workspace.candidateAcceptedSuccess=Solicitação aceita.
+platform.workspace.candidateHandledComment=Comentário\:
+platform.workspace.candidateHandledSaveComment=Candidato processado {0} ({1})
+platform.workspace.candidateRejectLabel=Rejeitar
+platform.workspace.candidateRejectedSuccess=Solicitação rejeitada.
+platform.workspace.candidateReviewerLabel=Admin\:
+platform.workspace.candidateReviewerMessageLabel=Mensagem do Admin\:
+platform.workspace.candidateReviewerPrivateComment=Comentário Privado\:
+platform.workspace.candidateStatusLabel=Status\:
+platform.workspace.candidateTypeLabel=Tipo\:
+platform.workspace.candidatesHint=Usuários que solicitaram ou que foram convidados a entrar na divisão.
+platform.workspace.candidatesLabel=Candidatos
+platform.workspace.currentUserCanJoin=Se você quiser pode [[entrar nessa divisão&gt;&gt;path\:{0}]].
+platform.workspace.currentUserCanLeave=Se você quiser pode [[sair dessa divisão&gt;&gt;path\:{0}]].
+platform.workspace.currentUserIsAdministrator=Você é um administrador dessa divisão.
+platform.workspace.currentUserIsMember=Você é membro dessa divisão.
+platform.workspace.currentUserIsOwner=Você é o dono dessa divisão.
+platform.workspace.currentUserNotMember=Você não é membro dessa divisão.
+platform.workspace.exceptionWithMessage=Exceção\: {0}
+platform.workspace.gadgetTopActiveUsersAllMembers=Para ver a lista completa de membros da divisão você pode usar o [[Diretório de Usuários&gt;&gt;Main.UserDirectory]].
+platform.workspace.gadgetTopActiveUsersLabel=Membros mais ativos
+platform.workspace.gadgetWelcomeToWorkspace=Bem-vindo à divisão **{0}**.
+platform.workspace.gadgetWorkspaceInformationLabel=Informação da Divisão
+platform.workspace.invitationActionViewLabel=Ver convite
+platform.workspace.invitationCancelLabel=Cancelar Convite
+platform.workspace.invitationCancelNotification=Seu convite foi cancelado e não é mais válido.
+platform.workspace.invitationCancelSaveComment=convite {0} cancelado ({1})
+platform.workspace.invitationCancelSuccess=Convite cancelado.
+platform.workspace.invitationPendingForCurrentWorkspace=Você foi convidado para entrar nessa divisão
+platform.workspace.inviteInviteButtonLabel=Convite
+platform.workspace.inviteMessageHint=A mensagem a ser enviada para o usuário.
+platform.workspace.inviteMessageLabel=Mensagem
+platform.workspace.inviteNotification=Você foi convidado para entrar na divisão ''{0}''.
+platform.workspace.inviteRequestAlreadyExists={0} já tem uma solicitação pendente. Por favor responda.
+platform.workspace.inviteSaveComment=O usuário ''{0}'' foi convidado a entrar na divisão.
+platform.workspace.inviteSuccess={0} convidado com sucesso.
+platform.workspace.inviteUserAlreadyInvited={0} já tem um convite pendente de resposta.
+platform.workspace.inviteUserAlreadyMember={0} já é um membro dessa divisão.
+platform.workspace.inviteUserNameHint=O nome do usuário a ser adicionado na divisão.
+platform.workspace.inviteUserNameLabel=Nome do usuário
+platform.workspace.joinActionJoinLabel=Entrar
+platform.workspace.joinNeedToLogIn=Para entrar nessa divisão você precisa ter iniciado uma sessão.
+platform.workspace.joinRequestAcceptedNotification=Sua solicitação para entrar na divisão ''{0}'' foi aceita.
+platform.workspace.joinRequestActionCancelLabel=Cancelar Solicitação
+platform.workspace.joinRequestActionRequestLabel=Solicitar Entrada
+platform.workspace.joinRequestPendingForCurrentWorkspace=Você fez uma solicitação para entrar nessa divisão
+platform.workspace.joinRequestRejectedNotification=Sua solicitação para entrar na divisão ''{0}'' foi rejeitada.
+platform.workspace.leaveWorkspace=Sair da Divisão
+platform.workspace.manageWorkspaceTitle=Divisão
+platform.workspace.panelInformationDescriptionLabel=Descrição
+platform.workspace.panelInformationMembersLabel=Membros
+platform.workspace.panelInformationNameLabel=Nome
+platform.workspace.wikiNotWorkspace=A wiki atual não é uma divisão.
+platform.workspace.workspaceUsersTitle=Usuários da Divisão
+workspacemanager.error.workspacedoesnotexist=Divisão [{0}] não existe
+workspacemanager.member.add=Adicionar ou convidar usuários para a divisão
+workspacemanager.panel.title=Informação da Divisão
+workspacemanager.prop.description.hint=Uma breve descrição da divisão e seu propósito.
+workspacemanager.prop.description.label=Descrição
+workspacemanager.prop.membershipType.hint=Como os usuários podem entrar na divisão.
+workspacemanager.prop.membershipType.label=Como entrar
+workspacemanager.prop.owner.hint=Um usuário que vai ter todas as permissões na divisão.
+workspacemanager.prop.owner.label=Dono
+workspacemanager.prop.secure.hint=Se habilitado, toas as páginas externas geradas por essa divisão vão ter a URL iniciando com //https\:~/~///.
+workspacemanager.prop.secure.label=Seguro (SSL)
+workspacemanager.prop.wikiprettyname.hint=O nome de exibição da divisão.
+workspacemanager.prop.wikiprettyname.label=Nome de exibição
+</content>
+</xwikidoc>

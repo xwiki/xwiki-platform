@@ -49,9 +49,15 @@ public final class FieldUtils
     public static final String LANGUAGE = "language";
 
     /**
-     * Locale of the document.
+     * The real/calculated locale of the document (the default locale in default document entry case).
      */
     public static final String LOCALE = "locale";
+
+    /**
+     * Technical locale of the document (emty for the default document entry). Not indexed, mostly used to find the
+     * document in database.
+     */
+    public static final String DOCUMENT_LOCALE = "doclocale";
 
     /**
      * The list of Locales covered by this entity. Dynamically determined from the list of enabled Locales and the
@@ -78,6 +84,11 @@ public final class FieldUtils
      * Name of the document.
      */
     public static final String NAME = "name";
+
+    /**
+     * Unanalyzed and not stored version of the document's space.
+     */
+    public static final String NAME_EXACT = "name_exact";
 
     /**
      * FullName of the document (example: {@code Main.WebHome}).
@@ -248,10 +259,12 @@ public final class FieldUtils
 
         builder.append(USCORE);
 
-        if (locale != null && !locale.equals(Locale.ROOT)) {
-            builder.append(locale);
-        } else {
-            builder.append(USCORE);
+        if (locale != null) {
+            if (locale.equals(Locale.ROOT)) {
+                builder.append(USCORE);
+            } else {
+                builder.append(locale);
+            }
         }
 
         return builder.toString();

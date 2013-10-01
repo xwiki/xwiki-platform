@@ -40,7 +40,10 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @version $Id$
  * @since 3.0M2
  */
-@ComponentRole()
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have
+// AbstractXMLSerializer<R, P extends R>. Changing it will thus break all code looking up components implementing this
+// role.
+@ComponentRole
 public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerializer<R, P>
 {
     @Override

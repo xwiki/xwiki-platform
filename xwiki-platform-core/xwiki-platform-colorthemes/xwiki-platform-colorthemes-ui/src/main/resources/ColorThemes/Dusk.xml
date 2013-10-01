@@ -16,7 +16,6 @@
   <contentUpdateDate>1326293092000</contentUpdateDate>
   <version>1.1</version>
   <title>Dusk</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -1401,5 +1400,5 @@ RK5CYII=
       <tags/>
     </property>
   </object>
-  <content>{{include document="ColorThemes.ColorThemeSheet"/}}</content>
+  <content/>
 </xwikidoc>

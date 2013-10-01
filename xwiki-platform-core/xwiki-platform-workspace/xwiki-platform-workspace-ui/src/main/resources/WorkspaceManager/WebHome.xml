@@ -16,13 +16,12 @@
   <contentUpdateDate>1307113397000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('workspacemanager.browse')</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <object>
     <class>
       <name>XWiki.StyleSheetExtension</name>
@@ -134,11 +133,13 @@
     </property>
   </object>
   <content>{{velocity}}
+## Load the User Picker style for the wiki owner column.
+#set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #set($columns = ['wikiprettyname', 'description', 'owner', 'membershipType'])
 #set($columnsProperties = {
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
-    'description' : { 'type' : 'text' , 'size' : 50 },
-    'owner' : { 'type' : 'text', 'link' : 'field' },
+    'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
+    'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
     'membershipType' : { 'type' : 'text', 'class' : 'WorkspaceManager.WorkspaceClass'}
 })
 #set($options = {
@@ -151,7 +152,6 @@
   #set($discard = $columns.add('_actions'))
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'delete'] }))
 #end
-[[{{translation key="platform.workspace.createNewWorkspaceLabel"/}}&gt;&gt;CreateNewWorkspace]]
 #livetable('workspaces', $columns, $columnsProperties, $options)
 {{/velocity}}</content>
 </xwikidoc>

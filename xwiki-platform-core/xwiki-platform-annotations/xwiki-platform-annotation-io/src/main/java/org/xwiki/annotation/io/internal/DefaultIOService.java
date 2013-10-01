@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationConfiguration;
@@ -151,8 +152,10 @@ public class DefaultIOService implements IOService
             }
             // set the author of the document to the current user
             document.setAuthor(deprecatedContext.getUser());
-            deprecatedContext.getWiki().saveDocument(document,
-                "Added annotation on \"" + annotation.getSelection() + "\"", deprecatedContext);
+            // Note: We make sure to only provide a few characters of contextual information in order to control the
+            // size of the comment (we display the first 30 characters).
+            deprecatedContext.getWiki().saveDocument(document, "Added annotation on \""
+                + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", deprecatedContext);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
         }

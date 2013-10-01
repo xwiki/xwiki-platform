@@ -19,19 +19,28 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import java.util.Map;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.category.BarRenderer3D;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link org.xwiki.chart.internal.plot.PlotGenerator} for generating 3D bar charts.
- *
+ * 
  * @version $Id$
  * @since 4.1M1
  */
+@Component
+@Named("bar3D")
+@Singleton
 public class Bar3DPlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override
-    protected CategoryItemRenderer getRenderer()
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
         return new BarRenderer3D();
     }

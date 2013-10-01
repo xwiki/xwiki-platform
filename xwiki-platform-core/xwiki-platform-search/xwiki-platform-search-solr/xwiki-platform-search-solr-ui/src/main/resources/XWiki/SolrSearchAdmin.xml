@@ -15,7 +15,7 @@
   <date>1351958422000</date>
   <contentUpdateDate>1351958422000</contentUpdateDate>
   <version>1.1</version>
-  <title>Solr search administration</title>
+  <title>$services.localization.render("solr.admin.title")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -23,6 +23,261 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.SolrSearchAdmin</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b5c1b9ee-7ea5-4196-af00-80c93bd72387</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jQueryNoConflict'], function($) {
+  var displayTimeDelta = function(millis) {
+    millis = Math.floor(millis);
+    if (millis &lt; 1000) {
+      return Math.floor(millis) + 'ms';
+    } else if (millis &lt; 60000) {
+      return Math.floor(millis / 1000) + 's ' + (millis % 1000) + 'ms';
+    } else if (millis &lt; 3600000) {
+      return Math.floor(millis / 60000) + 'm ' + Math.floor((millis % 60000) / 1000) + 's';
+    } else {
+      return Math.floor(millis / 3600000) + 'h ' + Math.floor((millis % 3600000) / 60000) + 'm';
+    }
+  };
+
+  var estimateRemainingTime = function(data) {
+    if (this._previousData) {
+      var sizeDelta = this._previousData.queueSize - data.queueSize;
+      if (data.queueSize &gt; 0 &amp;&amp; sizeDelta &gt; 0) {
+        var timeDelta = data.timestamp - this._previousData.timestamp;
+        var etr = (timeDelta / sizeDelta) * data.queueSize;
+        $(this).next().text('(Estimated time remaining: ' + displayTimeDelta(etr) + ')');
+      } else {
+        $(this).next().html('');
+      }
+    }
+    this._previousData = data;
+  };
+
+  var updateQueueSize = function(data) {
+    $(this).text(data.queueSize);
+    if (data.queueSize &gt; 0) {
+      $(this).addClass('loading');
+    } else {
+      $(this).removeClass('loading');
+    }
+    estimateRemainingTime.call(this, data);
+    scheduleQueueSizeUpdate.call(this);
+  };
+
+  var requestQueueSizeUpdate = function() {
+    var queueSizeContainer = this;
+    $.ajax({
+      url: "$xwiki.getURL('XWiki.SolrSearchAdmin', 'get', 'outputSyntax=plain')",
+      data: {action: 'getQueueSize'}
+    }).done(function(data) {
+      updateQueueSize.call(queueSizeContainer, data);
+    });
+  };
+
+  var scheduleQueueSizeUpdate = function() {
+    var queueSize = parseInt($(this).text());
+    // Wait more if the queue size is 0 or not a number.
+    var delay = isNaN(queueSize) || queueSize &lt;= 0 ? 60 : 5;
+    var queueSizeContainer = this;
+    setTimeout(function() {
+      requestQueueSizeUpdate.call(queueSizeContainer);
+    }, delay * 1000);
+  };
+
+  $('.solrQueueSize').after('&lt;span class="estimatedTimeRemaining"/&gt;').each(scheduleQueueSizeUpdate);
+})</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.SolrSearchAdmin</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e33ed638-628e-44ec-bb7e-87c9511da6ec</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.solrQueueSize.loading {
+  background-position: right center;
+  padding-right: 18px;
+}
+
+.estimatedTimeRemaining {
+  color: $theme.textSecondaryColor;
+  font-style: italic;
+  margin-left: 1em;
+}</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
   <object>
     <class>
       <name>XWiki.UIExtensionClass</name>
@@ -111,7 +366,7 @@ search=Main.SolrSearch</parameters>
     </property>
   </object>
   <content>{{velocity output='false'}}
-#macro (displayForm)
+#macro (displaySolrIndexForm)
   {{html}}
   &lt;form class="xform half" action="" method="post"&gt;
     &lt;div class="hidden"&gt;
@@ -119,25 +374,25 @@ search=Main.SolrSearch</parameters>
     &lt;/div&gt;
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for="solrAdminAction"&gt;Action&lt;/label&gt;
-        &lt;span class="xHint"&gt;The action to perform on the index.&lt;/span&gt;
+        &lt;label for="solrAdminAction"&gt;$services.localization.render('solr.admin.indexing.action.label')&lt;/label&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('solr.admin.indexing.action.hint')&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         &lt;select id="solrAdminAction" name="action"&gt;
-          &lt;option value="index"&gt;Add to index&lt;/option&gt;
-          &lt;option value="delete"&gt;Delete from index&lt;/option&gt;
-          &lt;option value="reindex"&gt;Reindex&lt;/option&gt;
+          &lt;option value="index"&gt;$services.localization.render('solr.admin.indexing.action.select_index')&lt;/option&gt;
+          &lt;option value="delete"&gt;$services.localization.render('solr.admin.indexing.action.select_delete')&lt;/option&gt;
+          &lt;option value="reindex"&gt;$services.localization.render('solr.admin.indexing.action.select_reindex')&lt;/option&gt;
         &lt;/select&gt;
       &lt;/dd&gt;
       ## Indexing on the entire farm or on various wikis is done only on the main wiki.
       #if ($xcontext.isMainWiki())
         &lt;dt&gt;
-          &lt;label for="solrAdminWiki"&gt;Wiki&lt;/label&gt;
-          &lt;span class="xHint"&gt;The wiki for which all its documents will be affected by the selected action.&lt;/span&gt;
+          &lt;label for="solrAdminWiki"&gt;$services.localization.render('solr.admin.indexing.wiki.label')&lt;/label&gt;
+          &lt;span class="xHint"&gt;$services.localization.render('solr.admin.indexing.wiki.hint')&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
           &lt;select id="solrAdminWiki" name="wiki"&gt;
-            &lt;option value=""&gt;Entire farm&lt;/option&gt;
+            &lt;option value=""&gt;$services.localization.render('solr.admin.indexing.wiki.select_farm')&lt;/option&gt;
             #foreach ($wiki in $allWikis)
               #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wiki).wikiPrettyName)
               #if ("$!wikiPrettyName.trim()" == '')
@@ -148,34 +403,48 @@ search=Main.SolrSearch</parameters>
           &lt;/select&gt;
         &lt;/dd&gt;
       #end
-      &lt;dt&gt;
-        &lt;label for="solrAdminCustomQuery"&gt;Custom query&lt;/label&gt;
-        &lt;span class="xHint"&gt;Optional HQL query to limit the documents that will be affected by the selected action in the index.&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;textarea id="solrAdminCustomQuery" name="customQuery" rows="7" cols="45"&gt;&lt;/textarea&gt;
-      &lt;/dd&gt;
+      ## We allow only users with programming rights to execute custom queries in order to prevent administrators that
+      ## don't have programming rights from executing full statement queries when this page is saved with programming
+      ## rights.
+      #if ($hasProgramming)
+        &lt;dt&gt;
+          &lt;label for="solrAdminCustomQuery"&gt;$services.localization.render('solr.admin.indexing.query.label')&lt;/label&gt;
+          &lt;span class="xHint"&gt;$services.localization.render('solr.admin.indexing.query.hint')&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select name="customQueryLanguage"&gt;
+            &lt;option value="xwql"&gt;XWiki Query Language (XWQL)&lt;/option&gt;
+            &lt;option value="hql"&gt;Hibernate Query Language (HQL)&lt;/option&gt;
+          &lt;/select&gt;
+          &lt;textarea id="solrAdminCustomQuery" name="customQuery" rows="7" cols="45"&gt;&lt;/textarea&gt;
+        &lt;/dd&gt;
+      #end
     &lt;/dl&gt;
     &lt;p class="buttons"&gt;
       &lt;span class="buttonwrapper"&gt;
-        &lt;input type="submit" class="button" value="Apply" /&gt;
+        &lt;input type="submit" class="button" value="$services.localization.render('solr.admin.submit')" /&gt;
       &lt;/span&gt;
     &lt;/p&gt;
   &lt;/form&gt;
   {{/html}}
 #end
 
-#macro (displayAdminSection)
-  == Indexing ==
+#macro (displaySolrAdminSection)
+  #set ($discard = $xwiki.ssx.use('XWiki.SolrSearchAdmin'))
+  #set ($discard = $xwiki.jsx.use('XWiki.SolrSearchAdmin'))
+  == $services.localization.render('solr.admin.status.title') ==
 
-  #if ($hasGlobalAdmin)
-    #displayForm()
-  #else
-    {{error}}Admin rights are required to access this section.{{/error}}
-  #end
+  (% class="xform half" %)
+  ; {{html}}&lt;label&gt;$services.localization.render('solr.admin.status.queueSize.label')&lt;/label&gt;{{/html}}##
+    (% class="xHint" %)$services.localization.render('solr.admin.status.queueSize.hint')
+  : (% class="solrQueueSize" %)$services.solr.queueSize
+
+  == $services.localization.render('solr.admin.indexing.title') ==
+
+  #displaySolrIndexForm()
 #end
 
-#macro (handleAction)
+#macro (handleSolrIndexAction)
   ##
   ## Build the targets.
   ##
@@ -191,24 +460,22 @@ search=Main.SolrSearch</parameters>
     #set ($wikis = [$xcontext.database])
   #end
   ## On each wiki, execute the custom query or add the entire wiki.
-  #set ($currentDatabase = $xcontext.database)
   #foreach ($wiki in $wikis)
-    #if (!$stringtool.isBlank($request.customQuery))
+    #set ($wikiReference = $services.model.createWikiReference($wiki))
+    ## Only administrators with programmings rights are allowed to execute a custom query.
+    #if ($hasProgramming &amp;&amp; !$stringtool.isBlank($request.customQuery))
+      #set ($query = $services.query.createQuery($request.customQuery, $request.customQueryLanguage))
       ## Always use the database specified by the wiki parameter.
-      #set ($discard = $xcontext.setDatabase($wiki))
+      #set ($discard = $query.setWiki($wiki).addFilter('unique'))
       ## Run the custom query and get the document references.
-      #set ($customDocumentNames = $xwiki.searchDocuments($request.customQuery))
-      #foreach ($customDocumentName in $customDocumentNames)
-        #set ($customDocumentReference = $services.model.resolveDocument($customDocumentName))
-        #set ($discard = $targetReferences.add($customDocumentReference))
+      #foreach ($documentName in $query.execute())
+        #set ($documentReference = $services.model.resolveDocument($documentName, $wikiReference))
+        #set ($discard = $targetReferences.add($documentReference))
       #end
     #else
-      ## Get the wiki reference.
-      #set ($discard = $targetReferences.add($services.model.createWikiReference($wiki)))
+      #set ($discard = $targetReferences.add($wikiReference))
     #end
   #end
-  ## Restore the database in case we had to run the custom query.
-  #set ($discard = $xcontext.setDatabase($currentDatabase))
   ##
   ## Perform the action on the computed targets.
   ##
@@ -228,28 +495,64 @@ search=Main.SolrSearch</parameters>
   ##
   #set ($exception = $xcontext.lastexception)
   #if ("$!exception" != '')
-    {{error}}$escapetool.xml($stringtool.capitalize($request.action)) failed: $exception.message ($exception.class){{/error}}
-  #else
-    {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully complete.{{/success}}
-    #if (!$stringtool.isBlank($request.customQuery))
+    #set ($message = "$stringtool.capitalize($request.action) failed: $exception.message ($exception.class)")
+    #if ($isAjaxRequest)
+      $response.sendError(500, $message)
+    #else
+      {{error}}$message{{/error}}
+    #end
+  #elseif (!$isAjaxRequest)
+    {{success}}$escapetool.xml($stringtool.capitalize($request.action)) successfully triggered.{{/success}}
+    ## Only administrators with programmings rights are allowed to execute a custom query.
+    #if ($hasProgramming &amp;&amp; !$stringtool.isBlank($request.customQuery))
 
       {{info}}Affected documents in the index: $targetReferences{{/info}}
     #end
+
+    #displaySolrAdminSection()
+  #end
+#end
+
+#macro(handleSolrAction $withValidToken)
+  #set ($indexActions = ['index', 'reindex', 'delete'])
+  #if ($withValidToken &amp;&amp; $indexActions.contains($request.action))
+    #set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+    #handleSolrIndexAction()
+  #elseif ($request.action == 'getQueueSize')
+    $response.setContentType('application/json')
+    $jsontool.serialize({
+      'queueSize': $services.solr.queueSize,
+      'timestamp': $datetool.date.time
+    })
+  #else
+    #set ($allWikis = $sorttool.sort($xwiki.wikiNames))
+    #displaySolrAdminSection()
+  #end
+#end
+
+#macro (handleSolrRequest)
+  #if (!$hasGlobalAdmin)
+    #if ("$!request.action" != '')
+      {{error}}$services.localization.render('solr.admin.error.notallowed'){{/error}}
+    #else
+      {{error}}$services.localization.render('solr.admin.error.norights'){{/error}}
+    #end
+  #elseif ($request.form_token)
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #handleSolrAction(true)
+    #elseif ($isAjaxRequest)
+      $response.sendError(401, 'CSRF token verification failed!')
+    #else
+      $response.sendRedirect($services.csrf.getResubmissionURL())
+    #end
+  #else
+    #handleSolrAction(false)
   #end
 #end
 {{/velocity}}
 
 {{velocity}}
-#set ($allWikis = $sorttool.sort($xwiki.wikiNames))
-#if ("$!request.action" != '')
-  #if ($services.csrf.isTokenValid($request.form_token))
-    #handleAction()
-
-  #else
-    $response.sendRedirect($services.csrf.getResubmissionURL())
-    #stop
-  #end
-#end
-#displayAdminSection()
+#set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
+#handleSolrRequest()
 {{/velocity}}</content>
 </xwikidoc>

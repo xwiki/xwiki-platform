@@ -109,7 +109,7 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         builder.append(QUERY_AND);
 
-        builder.append(FieldUtils.SPACE);
+        builder.append(FieldUtils.SPACE_EXACT);
         builder.append(':');
         builder.append(ClientUtils.escapeQueryChars(reference.getName()));
 

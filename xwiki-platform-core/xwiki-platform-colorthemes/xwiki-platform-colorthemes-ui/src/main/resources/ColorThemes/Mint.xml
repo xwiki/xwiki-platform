@@ -16,7 +16,6 @@
   <contentUpdateDate>1326293092000</contentUpdateDate>
   <version>1.1</version>
   <title>Mint</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -1295,5 +1294,5 @@ ksT5AbWhTQAAAABAkf8HQ9KhZ4UQB8EAAAAASUVORK5CYII=
       <titleColor>#414141</titleColor>
     </property>
   </object>
-  <content>{{include document="ColorThemes.ColorThemeSheet"/}}</content>
+  <content/>
 </xwikidoc>

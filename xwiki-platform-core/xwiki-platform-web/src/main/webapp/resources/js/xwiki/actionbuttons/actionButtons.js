@@ -66,23 +66,15 @@ actionButtons.EditActions = Class.create({
         return false;
       }
     }
-    if ($xwiki.isEditCommentMandatory()) {
-      var commentField = form.comment
-      while (commentField.value == "") {
-        var response = prompt("${services.localization.render('core.comment.prompt')}", '');
+    var commentField = form.comment;
+    if (commentField && ($xwiki.isEditCommentSuggested() || $xwiki.isEditCommentMandatory())) {
+      while (commentField.value == '') {
+        var response = prompt("$services.localization.render('core.comment.prompt')", '');
         if (response === null) {
           return false;
         }
         commentField.value = response;
-      }
-    } else if ($xwiki.isEditCommentSuggested()) {
-      var commentField = form.comment
-      if (commentField.value == "") {
-        var response = prompt("${services.localization.render('core.comment.prompt')}", '');
-        if (response === null) {
-          return false;
-        }
-        commentField.value = response;
+        if (!$xwiki.isEditCommentMandatory()) break;
       }
     }
     return true;
@@ -151,9 +143,9 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     this.addListeners();
   },
   createMessages : function() {
-    this.savingBox = new XWiki.widgets.Notification("Saving...", "inprogress", {inactive: true});
-    this.savedBox = new XWiki.widgets.Notification("Saved", "done", {inactive: true});
-    this.failedBox = new XWiki.widgets.Notification("Failed to save the document. Reason: <span id=\"ajaxRequestFailureReason\"></span>", "error", {inactive: true});
+    this.savingBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.inprogress'))", "inprogress", {inactive: true});
+    this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
+    this.failedBox = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""/>"]))', "error", {inactive: true});
   },
   addListeners : function() {
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));

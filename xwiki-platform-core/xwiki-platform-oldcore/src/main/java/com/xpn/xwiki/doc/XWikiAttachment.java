@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -741,13 +742,8 @@ public class XWikiAttachment implements Cloneable
 
     public String getMimeType(XWikiContext context)
     {
-        // Choose the right content type
-        String mimetype = context.getEngineContext().getMimeType(getFilename().toLowerCase());
-        if (mimetype != null) {
-            return mimetype;
-        } else {
-            return "application/octet-stream";
-        }
+        // TODO: Try the stream too in case the extension in unknown (might be expensive to load it just for this) ?
+        return new Tika().detect(getFilename());
     }
 
     public boolean isImage(XWikiContext context)

@@ -27,12 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>  
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-python</artifactId>
   <name>XWiki Platform - Rendering - Macro - Python</name>
   <description>Adds ability to write scripts in Python in wiki pages</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Python Macro</xwiki.extension.name>
   </properties>

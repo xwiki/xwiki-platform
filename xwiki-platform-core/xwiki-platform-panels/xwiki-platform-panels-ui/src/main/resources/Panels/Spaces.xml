@@ -107,13 +107,14 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.spaces'))
-#set ($spaces = $xwiki.spaces)
-#foreach ($space in $spaces)
-  #if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$blacklistedSpaces.contains($space)))
-    #if ($foreach.index &gt; 0)
-      (% class="pitemseparator" %) ~| (%%)##
-    #end
-    (% class="panelitem#if ($space == $doc.space) currentspace#end" %)[[$space&gt;&gt;${space}.WebHome]](%%)##
+#set ($defaultDocName = $services.model.getEntityReferenceValue('DOCUMENT', 'default'))
+#foreach ($space in $xwiki.spaces)
+  #set ($spaceHomeReference = $services.model.createDocumentReference($xcontext.database, $space, $defaultDocName))
+  #set ($spaceHomeFullName = $services.model.serialize($spaceHomeReference, 'default'))
+  #if ($hasAdmin || ($xwiki.hasAccessLevel('view', $spaceHomeFullName) &amp;&amp; !$blacklistedSpaces.contains($space)))
+    ## We use HTML here because we don't have a tool to escape wiki syntax in space name.
+    * {{html}}&lt;a href="$xwiki.getURL($spaceHomeReference)"
+        #if ($space == $doc.space)class="currentspace"#end&gt;$escapetool.xml($space)&lt;/a&gt;{{/html}}
   #end
 #end
 #panelfooter()

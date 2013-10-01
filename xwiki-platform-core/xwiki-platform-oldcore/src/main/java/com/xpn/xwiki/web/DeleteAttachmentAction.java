@@ -116,7 +116,7 @@ public class DeleteAttachmentAction extends XWikiAction
             return true;
         }
 
-        newdoc.setAuthor(context.getUser());
+        newdoc.setAuthorReference(context.getUserReference());
 
         // Set "deleted attachment" as the version comment.
         ArrayList<String> params = new ArrayList<String>();
@@ -128,13 +128,8 @@ public class DeleteAttachmentAction extends XWikiAction
         }
 
         try {
-            newdoc.deleteAttachment(attachment, context);
-
-            // Needed to counter a side effect: the attachment is deleted from the newdoc.originalDoc as well
-            newdoc.setOriginalDocument(doc);
-
-            // Also save the document and attachment metadata
-            context.getWiki().saveDocument(newdoc, context);
+            newdoc.removeAttachment(attachment);
+            xwiki.saveDocument(newdoc, "Deleted attachment [" + attachment.getFilename() + "]", context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -146,8 +141,10 @@ public class DeleteAttachmentAction extends XWikiAction
         }
 
         // forward to attach page
-        String redirect = Utils.getRedirect("attach", context);
-        sendRedirect(response, redirect);
+        if (!((Boolean) context.get("ajax")).booleanValue()) {
+            String redirect = Utils.getRedirect("attach", context);
+            sendRedirect(response, redirect);
+        }
 
         return false;
     }

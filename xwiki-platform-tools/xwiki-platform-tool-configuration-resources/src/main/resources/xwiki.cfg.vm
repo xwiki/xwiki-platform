@@ -34,8 +34,12 @@
 
 #-# [Since 1.6RC1] Defines the list of supported syntaxes
 #-# Available syntaxes are: 
-#-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
-#-#    html/4.01, plain/1.0, docbook/4.4, markdown/1.0, apt/1.0
+#-#    xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
+#-#    html/4.01, plain/1.0, docbook/4.4, markdown/1.0, markdown/1.1, apt/1.0
+#-#
+#-# Note that starting with XWiki 5.0 the xwiki/1.0 syntax is not shown in anymore in the Edit Panel since we want to
+#-# prevent users from creating content in that deprecated syntax. Existing documents in that Syntax will be still be
+#-# rendered properly though.
 xwiki.rendering.syntaxes = xwiki/2.0, xwiki/2.1
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
@@ -648,5 +652,11 @@ xwiki.plugin.image.cache.capacity=30
 #-# * major: add to watchlist only document which are not edited as minor edit. That's the default mode.
 #-# * new: add to watchlist only newly created documents
 # xwiki.plugin.watchlist.automaticwatch=major
+
+#-# [Since 5.2RC1]
+#-# Indicate if WikiStream should be used when exporting a XAR in the export action.
+#-# This property will be removed as soon as WikiStream is old/stable enough.
+#-# By default the old system is used, uncomment to use WikiStream (among other things it allows exporting very big wikis).
+# xwiki.action.export.xar.usewikistream=1
 
 $!xwikiCfgAdditionalProperties

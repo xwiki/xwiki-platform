@@ -75,7 +75,7 @@ public class UIExtensionScriptService implements ScriptService
      * @param nameList the list of extension names to split
      * @return a List containing all the names from the given String.
      */
-    private String[] parserFilterParameters(String nameList)
+    private String[] parseFilterParameters(String nameList)
     {
         return nameList.replaceAll(" ", "").split(",");
     }
@@ -133,7 +133,7 @@ public class UIExtensionScriptService implements ScriptService
             try {
                 UIExtensionFilter filter =
                     contextComponentManagerProvider.get().getInstance(UIExtensionFilter.class, filterHint);
-                extensions = filter.filter(extensions, this.parserFilterParameters(entry.getValue()));
+                extensions = filter.filter(extensions, this.parseFilterParameters(entry.getValue()));
             } catch (ComponentLookupException e) {
                 logger.warn("Unable to find a UIExtensionFilter for hint [{}] "
                     + "while getting UIExtensions for extension point [{}]", filterHint, extensionPointId);

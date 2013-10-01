@@ -45,7 +45,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -498,12 +497,14 @@ public class XWiki extends Api
 
     /**
      * Privileged API allowing to run a search on the database returning a list of data This search is send to the store
-     * engine (Hibernate HQL, JCR XPATH or other)
+     * engine (Hibernate HQL, JCR XPATH or other).
      * 
      * @param wheresql Query to be run (HQL, XPath)
      * @return A list of rows (Object[])
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String wheresql) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -525,7 +526,9 @@ public class XWiki extends Api
      * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
      *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -544,7 +547,9 @@ public class XWiki extends Api
      * @param start skip the 'start' first elements
      * @return A list of rows (Object[])
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String wheresql, int nb, int start) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -568,7 +573,9 @@ public class XWiki extends Api
      * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
      *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public <T> List<T> search(String parameterizedWhereClause, int maxResults, int startOffset,
         List< ? > parameterValues) throws XWikiException
     {
@@ -607,7 +614,9 @@ public class XWiki extends Api
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by "where ..."
      * @return List of document names matching (Main.Page1, Main.Page2)
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String wheresql) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(wheresql, getXWikiContext());
@@ -621,7 +630,9 @@ public class XWiki extends Api
      *            not portable.
      * @return The number of documents that matched the query.
      * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
      */
+    @Deprecated
     public int countDocuments(String wheresql) throws XWikiException
     {
         return this.xwiki.getStore().countDocuments(wheresql, getXWikiContext());
@@ -637,7 +648,9 @@ public class XWiki extends Api
      * @return List of document names matching
      * @throws XWikiException
      * @see List searchDocuments(String where sql)
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String wheresql, int nb, int start) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(wheresql, nb, start, getXWikiContext());
@@ -654,7 +667,9 @@ public class XWiki extends Api
      * @param selectColumns List of columns to add to the result
      * @return List of Object[] with the column values of the matching rows
      * @throws XWikiException
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException
     {
         if (hasProgrammingRights()) {
@@ -718,7 +733,9 @@ public class XWiki extends Api
      * @param parameterValues the where clause values that replace the question marks (?)
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String parameterizedWhereClause, int maxResults, int startOffset,
         List< ? > parameterValues) throws XWikiException
     {
@@ -730,7 +747,9 @@ public class XWiki extends Api
      * Same as {@link #searchDocuments(String, int, int, java.util.List)} but returns all rows.
      * 
      * @see #searchDocuments(String, int, int, java.util.List)
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocuments(String parameterizedWhereClause, List< ? > parameterValues)
         throws XWikiException
     {
@@ -746,7 +765,9 @@ public class XWiki extends Api
      * @param parameterValues The parameter values that replace the question marks.
      * @return The number of documents that matched the query.
      * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
      */
+    @Deprecated
     public int countDocuments(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
     {
         return this.xwiki.getStore().countDocuments(parameterizedWhereClause, parameterValues, getXWikiContext());
@@ -765,7 +786,9 @@ public class XWiki extends Api
      * @return a list of document full names (Space.Name).
      * @see #searchDocuments(String, int, int, java.util.List)
      * @throws XWikiException in case of error while performing the query
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> searchDocumentsNames(String wikiName, String parameterizedWhereClause, int maxResults,
         int startOffset, List< ? > parameterValues) throws XWikiException
     {

@@ -35,6 +35,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -82,7 +83,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     private XWikiContext getContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        ExecutionContext econtext = this.execution.getContext();
+
+        return econtext != null ? (XWikiContext) econtext.getProperty("xwikicontext") : null;
     }
 
     @Override
@@ -608,11 +611,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         if (isFullURL) {
             XWikiContext xcontext = getContext();
             url =
-                xcontext.getURLFactory().getURL(
-                    xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
-                        attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
-                        attachmentReference.getDocumentReference().getName(), "download", queryString,
-                        attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext), xcontext);
+                xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
+                    attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
+                    attachmentReference.getDocumentReference().getName(), "download", queryString,
+                    attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext).toString();
         } else {
             XWikiContext xcontext = getContext();
             String documentReference =
@@ -694,7 +696,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public DocumentReference getCurrentUserReference()
     {
-        return getContext().getUserReference();
+        XWikiContext xcontext = getContext();
+        return xcontext != null ? xcontext.getUserReference() : null;
     }
 
     @Override

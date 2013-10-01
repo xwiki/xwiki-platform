@@ -54,7 +54,7 @@
          Thus we need to tell Hibernate to map materialized_clob to String.
     -->
     <typedef name="materialized_clob" class="org.hibernate.type.StringClobType" />
-	
+
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
     <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
         <id name="id" type="long" unsaved-value="undefined">
@@ -97,8 +97,10 @@
             <key-property name="version2" column="XWR_VERSION2" type="integer" />
         </composite-id>
         <property name="date" type="timestamp" column="XWR_DATE" index="REV_DATE" not-null="true" />
-        <property name="comment" type="string" column="XWR_COMMENT" />
-        <property name="author" type="string" column="XWR_AUTHOR" index="REV_AUTHOR" />
+        <!-- Note: Length must be the same one as XWD_COMMENT since it's the same content being put in history -->
+        <property name="comment" type="string" column="XWR_COMMENT" length="1023" />
+        <!-- Note: Length must be the same one as XWD_COMMENT since it's the same content being put in history -->
+        <property name="author" type="string" column="XWR_AUTHOR" length="255" index="REV_AUTHOR" />
         <property name="diff" type="boolean" column="XWR_ISDIFF" index="REV_ISDIFF" not-null="false" update="false" insert="false" />
     </class>
 
@@ -174,7 +176,8 @@
         <property name="date" type="timestamp" column="XWA_DATE" index="ATT_DATE" not-null="true" />
         <property name="author" type="string" column="XWA_AUTHOR" length="255" index="ATT_AUTHOR" />
         <property name="version" type="string" column="XWA_VERSION" length="255" not-null="true" />
-        <property name="comment" type="string" column="XWA_COMMENT" length="255" />
+        <!-- Align the max comment size with the document max comment size (i.e. XWD_COMMENT) -->
+        <property name="comment" type="string" column="XWA_COMMENT" length="1023" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachmentContent" table="xwikiattachment_content">
@@ -382,7 +385,7 @@
         <property name="use_email_verification" type="integer" column="XWP_USE_EMAIL_VERIFICATION" />
         <property name="smtp_server" type="string" column="XWP_SMTP_SERVER" length="255" />
         <property name="admin_email" type="string" column="XWP_ADMIN_EMAIL" length="255" />
-		<property name="validation_email_content" type="materialized_clob" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
+        <property name="validation_email_content" type="materialized_clob" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
         <property name="confirmation_email_content" type="materialized_clob" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
         <property name="invitation_email_content" type="materialized_clob" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
         <property name="leftPanels" type="string" column="XWP_LEFT_PANELS" length="2000" />

@@ -476,7 +476,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
 {{html wiki="true" clean="false"}}
 &lt;noscript&gt;
 
-  #set($deletedAttachments = $xwiki.search('select count(datt.id) from DeletedAttachment as datt').get(0))
+  #set($deletedAttachments = $services.query.hql('select count(datt.id) from DeletedAttachment as datt').execute().get(0))
   #if($deletedAttachments == 0)
 
     {{info}}$services.localization.render('platform.index.trashAttachmentsEmpty'){{/info}}
@@ -505,7 +505,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
     #set($queryParams = "view=$!{escapetool.url($request.view)}")
   #end
   #set($paginationParameters = {
-    'totalItems' : $xwiki.search("select count(datt.id) from DeletedAttachment as datt").get(0),
+    'totalItems' : $services.query.hql('select count(datt.id) from DeletedAttachment as datt').execute().get(0),
     'defaultItemsPerPage' : 15,
     'url' : $doc.getURL('view', $queryParams)
   })
@@ -519,7 +519,8 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
       &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.actions')&lt;/th&gt;
     &lt;/tr&gt;&lt;/thead&gt;
     &lt;tbody class="xwiki-livetable-display-body"&gt;
-    #foreach($item in $xwiki.search('select datt.id from DeletedAttachment as datt order by datt.filename asc', $paginationParameters.itemsPerPage, $paginationParameters.firstItem))
+    #set ($query = $services.query.hql('select datt.id from DeletedAttachment as datt order by datt.filename asc'))
+    #foreach($item in $query.setLimit($paginationParameters.itemsPerPage).setOffset($paginationParameters.firstItem).execute())
       #displayDeletedAttachment($item)
     #end
     &lt;/tbody&gt;
@@ -573,8 +574,8 @@ $response.setContentType('application/json')
 #end
 #set($selectSql = "select datt.id, $order from DeletedAttachment as datt where 1=1 " + $sql + " order by $order $dir")
 #set($countSql = "select count(*) from DeletedAttachment as datt where 1=1 " + $sql)
-#set($items = $xwiki.search($selectSql, $limit, $offset))
-#set($totalItems = $xwiki.search($countSql).get(0))
+#set($items = $services.query.hql($selectSql).setLimit($limit).setOffset($offset).execute())
+#set($totalItems = $services.query.hql($countSql).execute().get(0))
 #set($returnedItems = $items.size())
 ## ==============================================
 ## json starts

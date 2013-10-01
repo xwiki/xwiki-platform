@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-remote</artifactId>
   <name>XWiki Platform - Observation - Remote</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Observation - Remote</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>67.71</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

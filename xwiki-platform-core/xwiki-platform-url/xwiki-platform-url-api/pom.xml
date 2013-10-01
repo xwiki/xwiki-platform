@@ -27,12 +27,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-api</artifactId>
   <name>XWiki Platform - URL - API</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - URL - API</description>
+  <description>Allows configuration of the URL scheme used by XWiki to parse/serialize URLs</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>37</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>URL API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

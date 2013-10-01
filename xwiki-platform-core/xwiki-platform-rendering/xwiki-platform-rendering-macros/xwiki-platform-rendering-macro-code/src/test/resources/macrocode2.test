@@ -13,7 +13,8 @@
 beginDocument
 beginMacroMarkerStandalone [code] [language=java] [<b>bold</b>
 <i>italic</i>]
-beginGroup [[class]=[box code]]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [<]
 endFormat [NONE] [[style]=[color: #666666; ]]
@@ -47,7 +48,8 @@ onWord [i]
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [>]
 endFormat [NONE] [[style]=[color: #666666; ]]
-endGroup [[class]=[box code]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
 endMacroMarkerStandalone [code] [language=java] [<b>bold</b>
 <i>italic</i>]
 endDocument

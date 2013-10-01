@@ -20,11 +20,11 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.resource.EntityResource;
-import org.xwiki.resource.Resource;
-import org.xwiki.resource.ResourceCreationException;
-import org.xwiki.resource.ResourceFactory;
-import org.xwiki.resource.UnsupportedResourceException;
+import org.xwiki.url.URLCreationException;
+import org.xwiki.url.UnsupportedURLException;
+import org.xwiki.url.XWikiEntityURL;
+import org.xwiki.url.XWikiURL;
+import org.xwiki.url.XWikiURLFactory;
 import org.xwiki.url.internal.ExtendedURL;
 
 import java.net.URL;
@@ -91,13 +91,10 @@ public class StandardResourceFactory implements ResourceFactory<URL, Resource>
         String ignorePrefix = (String) parameters.get(IGNORE_PREFIX_KEY);
         ExtendedURL extendedURL = new ExtendedURL(url, ignorePrefix);
 
-        // Step2: Find out what type of URL we have and call the appropriate factories
-        String type = extendedURL.getSegments().get(0);
-        if (type.equals("bin") || type.equals(this.configuration.getWikiPathPrefix())) {
-            resource = this.entityResourceFactory.createResource(extendedURL, parameters);
-        } else {
-            throw new UnsupportedResourceException(String.format("URL type [%s] are not yet supported!", type));
-        }
+        // Step 2: Find out what type of URL we have and call the appropriate factories
+        // At the moment we consider that all URL given to this module are Entity URLs and that the filtering is done
+        // by rules in the web.xml so that for example resources, skins or REST URLs do not reach here.
+        resource = this.entityResourceFactory.createResource(extendedURL, parameters);
 
         return resource;
     }

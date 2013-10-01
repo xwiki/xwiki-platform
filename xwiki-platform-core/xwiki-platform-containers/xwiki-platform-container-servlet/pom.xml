@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-containers</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-container-servlet</artifactId>
   <name>XWiki Platform - Containers - Servlet</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Containers - Servlet</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>15.37</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

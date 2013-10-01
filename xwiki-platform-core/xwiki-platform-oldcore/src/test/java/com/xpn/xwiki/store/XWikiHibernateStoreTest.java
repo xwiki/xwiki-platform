@@ -32,8 +32,8 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.id.SequenceGenerator;
@@ -237,7 +237,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     }
 
     @Test
-    public void addHibernateSequenceIfRequired() throws Exception
+    public void createHibernateSequenceIfRequired() throws Exception
     {
         Session session = mock(Session.class);
         SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
@@ -245,24 +245,13 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         when(session.getSessionFactory()).thenReturn(sessionFactory);
         when(sessionFactory.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
+        SQLQuery sqlQuery = mock(SQLQuery.class);
+        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sqlQuery.executeUpdate()).thenReturn(0);
 
-        String[] result = this.store.addHibernateSequenceIfRequired(new String[0], "schema", session);
-        assertEquals(1, result.length);
-        assertEquals("create sequence schema.hibernate_sequence", result[0]);
-    }
+        this.store.createHibernateSequenceIfRequired("schema", session);
 
-    @Test
-    public void addHibernateSequenceIfRequiredWhenSequenceAlreadyPresent() throws Exception
-    {
-        Session session = mock(Session.class);
-        SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
-        Dialect dialect = mock(Dialect.class);
-        when(session.getSessionFactory()).thenReturn(sessionFactory);
-        when(sessionFactory.getDialect()).thenReturn(dialect);
-        when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
-
-        String[] result = this.store.addHibernateSequenceIfRequired(
-            new String[] {"create sequence schema.hibernate_sequence"}, "schema", session);
-        assertEquals(1, result.length);
+        verify(session).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sqlQuery).executeUpdate();
     }
 }

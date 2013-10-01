@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -88,6 +89,7 @@ import com.xpn.xwiki.api.PropertyClass;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
@@ -622,7 +624,7 @@ public class DomainObjectFactory
 
         String[] propertyNames = xwikiObject.getPropertyNames();
         if (propertyNames.length > 0) {
-            objectSummary.setHeadline(xwikiObject.get(propertyNames[0]).toFormString());
+            objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(propertyNames[0])));
         }
     }
 
@@ -710,11 +712,7 @@ public class DomainObjectFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (xwikiObject.get(propertyClass.getName()) != null) {
-                property.setValue(xwikiObject.get(propertyClass.getName()).toFormString());
-            } else {
-                property.setValue("");
-            }
+            property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
 
             String propertyUri;
 
@@ -836,5 +834,27 @@ public class DomainObjectFactory
     private static String uri(URI baseURI, java.lang.Class< ? > resourceClass, java.lang.Object... pathElements)
     {
         return Utils.createURI(baseURI, resourceClass, pathElements).toString();
+    }
+
+    /**
+     * Serializes the value of the given XObject property.
+     * 
+     * @param property an XObject property
+     * @return the String representation of the property value
+     */
+    private static String serializePropertyValue(PropertyInterface property)
+    {
+        if (property == null) {
+            return "";
+        }
+
+        java.lang.Object value = ((BaseProperty) property).getValue();
+        if (value instanceof List) {
+            return StringUtils.join((List) value, "|");
+        } else if (value != null) {
+            return value.toString();
+        } else {
+            return "";
+        }
     }
 }

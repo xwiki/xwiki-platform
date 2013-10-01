@@ -42,7 +42,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
 {
     @Override
     public Response getAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -61,7 +61,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
 
     @Override
     public Response putAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
-            byte[] content) throws XWikiRestException
+        byte[] content) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
@@ -87,7 +87,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
 
     @Override
     public void deleteAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
@@ -104,13 +104,15 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
             }
 
             XWikiDocument xwikiDocument =
-                    Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                            Utils.getXWikiContext(componentManager));
+                Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                    Utils.getXWikiContext(componentManager));
             XWikiAttachment baseXWikiAttachment = xwikiDocument.getAttachment(attachmentName);
 
-            xwikiDocument.deleteAttachment(baseXWikiAttachment, Utils.getXWikiContext(componentManager));
+            xwikiDocument.removeAttachment(baseXWikiAttachment);
 
-            Utils.getXWiki(componentManager).saveDocument(xwikiDocument, Utils.getXWikiContext(componentManager));
+            Utils.getXWiki(componentManager).saveDocument(xwikiDocument,
+                "Deleted attachment [" + baseXWikiAttachment.getFilename() + "]",
+                Utils.getXWikiContext(componentManager));
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

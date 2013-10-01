@@ -19,7 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.handler.internal.job;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
@@ -42,7 +43,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
         super.setUp();
 
         this.xarExtensionRepository =
-            getComponentManager().getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
+            this.mocker.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
     }
 
     protected Job repair(ExtensionId extensionId, String[] namespaces, LogLevel failFrom) throws Throwable
@@ -59,11 +60,11 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 
-        Assert.assertTrue(installedExtension.isValid(null));
+        assertTrue(installedExtension.isValid(null));
 
         installedExtension = this.xarExtensionRepository.resolve(new ExtensionId("dependency", "1.0"));
 
-        Assert.assertTrue(installedExtension.isValid(null));
+        assertTrue(installedExtension.isValid(null));
     }
 
     @Test
@@ -75,6 +76,6 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 
-        Assert.assertFalse(installedExtension.isValid(null));
+        assertFalse(installedExtension.isValid(null));
     }
 }

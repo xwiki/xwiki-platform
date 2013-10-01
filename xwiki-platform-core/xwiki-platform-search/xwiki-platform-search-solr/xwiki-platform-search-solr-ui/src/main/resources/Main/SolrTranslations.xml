@@ -54,10 +54,31 @@
     <className>XWiki.TranslationDocumentClass</className>
     <guid>54715b8e-2403-4d0f-9b46-26f2b0e9e339</guid>
     <property>
-      <scope>ON_DEMAND</scope>
+      <scope>WIKI</scope>
     </property>
   </object>
-  <content>solr.sortBy=Sort by:
+  <content>solr.admin.title=Solr Search Administration
+solr.admin.submit=Apply
+solr.admin.error.notallowed=You are not allowed to perform this action.
+solr.admin.error.norights=Administration rights are required to access this section.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Queue Size
+solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
+
+solr.admin.indexing.title=Indexing
+solr.admin.indexing.action.label=Action
+solr.admin.indexing.action.hint=The action to perform on the index.
+solr.admin.indexing.action.select_index=Add to index
+solr.admin.indexing.action.select_delete=Delete from index
+solr.admin.indexing.action.select_reindex=Reindex
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affected by the selected action.
+solr.admin.indexing.wiki.select_farm=Entire farm
+solr.admin.indexing.query.label=Custom query
+solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+
+solr.sortBy=Sort by:
 solr.sortBy.score=Relevance
 solr.sortBy.title_sort=Title
 solr.sortBy.date=Date
@@ -65,11 +86,13 @@ solr.sortBy.author_display_sort=Last Author
 solr.sortOrder.asc=Ascending
 solr.sortOrder.desc=Descending
 
+solr.result.language=Language
 solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 solr.result.author=Modified by {0} on {1}
 solr.result.mediaType=File of type {0}
 solr.result.object=Object of type {0}
 solr.result.property=Property {0}#{1}
+solr.result.highlightAll=Highlight all matches
 
 solr.filter.title=Advanced Options
 solr.filter.hint=Select predefined filters that will be applied on your query.
@@ -98,5 +121,26 @@ solr.facets.title=Refine your search
 solr.facets.hint=Select a category and activate filters on the current results
 solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
-solr.facets.collapseAll=Collapse all</content>
+solr.facets.collapseAll=Collapse all
+solr.facets.emptyValue=Empty Value
+
+solr.field.locale=Language
+solr.field.locale.emptyValue=No Language
+solr.field.wiki=Wiki
+solr.field.space=Space
+solr.field.space_exact=Space
+solr.field.name=Page
+solr.field.name_exact=Page
+solr.field.title=Title
+solr.field.author_display=Author
+solr.field.creator_display=Creator
+solr.field.creationdate=Creation Date
+solr.field.doccontent=Rendered Document Content
+solr.field.doccontentraw=Raw Document Content
+solr.field.propertyname=Property Name
+solr.field.propertyvalue=Property Value
+solr.field.filename=Attachment Name
+solr.field.attcontent=Attachment Content
+solr.field.comment=Comments
+solr.field.objcontent=Objects</content>
 </xwikidoc>

@@ -345,6 +345,6 @@ return XWiki;
   &lt;/div&gt;
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   {{/html}}
-#end ## User object exists
+#end## User object exists
 {{/velocity}}</content>
 </xwikidoc>

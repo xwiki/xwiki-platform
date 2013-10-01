@@ -418,7 +418,7 @@ return XWiki;
 
 {{velocity}}
 #if("$!request.appName" != '')
-  #if($context.action == 'get')
+  #if($xcontext.action == 'get')
     #validateAppName($request.appName)
   #else
     ## CSRF protection is not needed because this step only redirects to the next one passing data in the query string.

@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -57,7 +58,7 @@ public class ObjectEditPage extends EditPage
         return new ObjectEditPage();
     }
 
-    public FormElement addObject(String className)
+    public ObjectEditPane addObject(String className)
     {
         getForm().setFieldValue(this.classNameField, className);
 
@@ -75,11 +76,11 @@ public class ObjectEditPage extends EditPage
             }
         });
 
-        List<FormElement> objects = getObjectsOfClass(className);
+        List<ObjectEditPane> objects = getObjectsOfClass(className);
         return objects.get(objects.size() - 1);
     }
 
-    public FormElement addObjectFromInlineLink(String className)
+    public ObjectEditPane addObjectFromInlineLink(String className)
     {
         final By objectsLocator = By.cssSelector("[id='xclass_" + className + "'] .xobject");
         final int initialObjectCount = getDriver().findElements(objectsLocator).size();
@@ -96,7 +97,7 @@ public class ObjectEditPage extends EditPage
             }
         });
 
-        List<FormElement> objects = getObjectsOfClass(className);
+        List<ObjectEditPane> objects = getObjectsOfClass(className);
         return objects.get(objects.size() - 1);
     }
 
@@ -176,21 +177,22 @@ public class ObjectEditPage extends EditPage
     }
 
     /** className will look something like "XWiki.XWikiRights" */
-    public List<FormElement> getObjectsOfClass(String className)
+    public List<ObjectEditPane> getObjectsOfClass(String className)
     {
         List<WebElement> titles =
             getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-title"));
         List<WebElement> elements =
             getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-content"));
-        List<FormElement> forms = new ArrayList<FormElement>(elements.size());
+        List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());
         for (int i = 0; i < elements.size(); i++) {
             WebElement element = elements.get(i);
             // Make sure all forms are displayed otherwise we can't interact with them.
             if (!element.isDisplayed()) {
                 titles.get(i).click();
             }
-            forms.add(new FormElement(element));
+            int objectNumber = Integer.parseInt(element.getAttribute("id").split("_")[2]);
+            objects.add(new ObjectEditPane(element, className, objectNumber));
         }
-        return forms;
+        return objects;
     }
 }

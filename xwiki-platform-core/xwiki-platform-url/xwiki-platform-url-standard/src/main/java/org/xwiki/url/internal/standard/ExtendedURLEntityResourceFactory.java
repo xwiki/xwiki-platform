@@ -50,7 +50,7 @@ import org.xwiki.url.internal.ExtendedURL;
  * </ul>
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 @Component
 @Named("standard")
@@ -73,7 +73,7 @@ public class ExtendedURLEntityResourceFactory implements ResourceFactory<Extende
      * Used to get the configured entity path prefix from the URL to allow for short URLs.
      */
     @Inject
-    private StandardURLConfiguration configuration;
+    private StandardResourceConfiguration configuration;
 
     @Override
     public EntityResource createResource(ExtendedURL url, Map<String, Object> parameters)

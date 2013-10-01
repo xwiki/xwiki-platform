@@ -39,6 +39,7 @@ public interface Resource
     ResourceType getType();
 
     /**
+     * @param name the name of the parameter to add
      * @param value the value of the parameter to add. If null then no value is added.
      */
     void addParameter(String name, String value);

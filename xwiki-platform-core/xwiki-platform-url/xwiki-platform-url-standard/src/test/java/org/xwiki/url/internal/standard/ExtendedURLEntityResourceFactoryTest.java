@@ -63,7 +63,7 @@ public class ExtendedURLEntityResourceFactoryTest
         when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(
             new ImmutablePair<WikiReference, Boolean>(this.wikiReference, false));
 
-        StandardURLConfiguration configuration = this.mocker.getInstance(StandardURLConfiguration.class);
+        StandardResourceConfiguration configuration = this.mocker.getInstance(StandardResourceConfiguration.class);
         when(configuration.getEntityPathPrefix()).thenReturn("entity");
     }
 
@@ -152,22 +152,22 @@ public class ExtendedURLEntityResourceFactoryTest
     }
 
     @Test
-    public void createURLWhenUsingBinEvenThoughPathConfiguredAsEntity() throws Exception
+    public void createResourceWhenUsingBinEvenThoughPathConfiguredAsEntity() throws Exception
     {
         EntityReference fullReference = buildEntityReference("wiki", "space", "page");
-        testCreateURL("http://localhost/bin/space/page", "view", fullReference, fullReference,
+        testCreateResource("http://localhost/bin/space/page", "view", fullReference, fullReference,
             EntityType.DOCUMENT);
     }
 
     @Test
-    public void createURLWhenInPathBasedSubWiki() throws Exception
+    public void createResourceWhenInPathBasedSubWiki() throws Exception
     {
         WikiReferenceExtractor wikiReferenceExtractor = this.mocker.getInstance(WikiReferenceExtractor.class);
         when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(
             new ImmutablePair<WikiReference, Boolean>(new WikiReference("somewiki"), true));
 
         EntityReference reference = buildEntityReference("somewiki", "space", "page");
-        testCreateURL("http://localhost/wiki/somewiki/view/space/page", "view",
+        testCreateResource("http://localhost/wiki/somewiki/view/space/page", "view",
             reference, reference, EntityType.DOCUMENT);
     }
     

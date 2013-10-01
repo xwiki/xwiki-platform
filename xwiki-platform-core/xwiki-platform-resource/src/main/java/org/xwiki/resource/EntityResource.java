@@ -33,6 +33,8 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class EntityResource extends AbstractResource
 {
+    private static final String REVISION_PARAMETER_NAME = "rev";
+
     // Note: We're not using a typed object since the action name can be anything and corresponds to an Action
     // component role hint.
     private String action;
@@ -40,8 +42,6 @@ public class EntityResource extends AbstractResource
     private EntityReference entityReference;
 
     private Locale locale;
-
-    private static final String REVISION_PARAMETER_NAME = "rev";
 
     public EntityResource(EntityReference entityReference)
     {

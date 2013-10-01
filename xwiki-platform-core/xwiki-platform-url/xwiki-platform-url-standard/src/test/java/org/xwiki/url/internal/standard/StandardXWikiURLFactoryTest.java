@@ -63,18 +63,4 @@ public class StandardXWikiURLFactoryTest
             this.mocker.getInstance(TYPE_ENTITY_EXTENDED_URL, "standard");
         verify(factory).createResource(any(ExtendedURL.class), anyMap());
     }
-
-    @Test
-    public void createResourceWhenUnknownPathSegment() throws Exception
-    {
-        URL url = new URL("http://localhost:8080/xwiki/rest/whatever");
-        Map<String, Object> parameters = Collections.singletonMap("ignorePrefix", (Object) "xwiki");
-
-        try {
-            this.mocker.getComponentUnderTest().createResource(url, parameters);
-            fail("Should have thrown an exception here");
-        } catch (UnsupportedResourceException expected) {
-            assertEquals("URL type [rest] are not yet supported!", expected.getMessage());
-        }
-    }
 }

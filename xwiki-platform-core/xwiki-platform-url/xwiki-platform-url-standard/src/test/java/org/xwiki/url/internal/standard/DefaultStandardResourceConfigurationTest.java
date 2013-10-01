@@ -27,16 +27,16 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link DefaultStandardURLConfiguration}.
+ * Unit tests for {@link DefaultStandardResourceConfiguration}.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 public class DefaultStandardResourceConfigurationTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultStandardURLConfiguration> mocker =
-        new MockitoComponentMockingRule(DefaultStandardURLConfiguration.class);
+    public MockitoComponentMockingRule<DefaultStandardResourceConfiguration> mocker =
+        new MockitoComponentMockingRule(DefaultStandardResourceConfiguration.class);
 
     @Test
     public void isPathBasedMultiWiki() throws Exception

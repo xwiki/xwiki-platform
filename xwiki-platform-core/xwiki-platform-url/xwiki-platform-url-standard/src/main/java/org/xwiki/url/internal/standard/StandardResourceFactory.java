@@ -20,11 +20,11 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.url.URLCreationException;
-import org.xwiki.url.UnsupportedURLException;
-import org.xwiki.url.XWikiEntityURL;
-import org.xwiki.url.XWikiURL;
-import org.xwiki.url.XWikiURLFactory;
+import org.xwiki.resource.EntityResource;
+import org.xwiki.resource.Resource;
+import org.xwiki.resource.ResourceCreationException;
+import org.xwiki.resource.ResourceFactory;
+import org.xwiki.resource.UnsupportedResourceException;
 import org.xwiki.url.internal.ExtendedURL;
 
 import java.net.URL;

@@ -15,7 +15,7 @@
   <date>1301497691000</date>
   <contentUpdateDate>1301497691000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render("platform.help.syntaxpage.title")</title>
+  <title>$services.localization.render("help.syntaxpage.title")</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -467,8 +467,8 @@ $syntaxMenu.add($cat)
       #if ($request.language)
         &lt;input type="hidden" name="language" value="$escapetool.xml($request.language)" /&gt;
       #end
-      &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("platform.help.changesyntax"))"&gt;
-        &lt;optgroup label="$services.localization.render('platform.help.choose_syntax')"&gt;
+      &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("help.changesyntax"))"&gt;
+        &lt;optgroup label="$services.localization.render('help.choose_syntax')"&gt;
           #set ($query = "syntax=1.0&amp;amp;${crtSelection}")
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;XWiki Syntax 1.0&lt;/option&gt;
           #set ($query = "syntax=2.0&amp;amp;${crtSelection}")
@@ -496,13 +496,13 @@ $xwiki.get('ssx').use($doc.getFullName())##
 #elseif ($crtCategoryId != '')
   #set ($sectionName = ${crtCategory.name})
 #else
-  #set ($sectionName = $services.localization.render("platform.help.syntaxall"))
+  #set ($sectionName = $services.localization.render("help.syntaxall"))
 #end
-#set ($syntaxTitle = $services.localization.render("platform.help.syntaxtitle", ["${crtSyntaxVer}"]))
+#set ($syntaxTitle = $services.localization.render("help.syntaxtitle", ["${crtSyntaxVer}"]))
 #syntaxSwitch()
 (((
 #set ($query = "syntax=$escapetool.url(${crtSyntaxVer})")
-#if ($crtCategory){{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}}#{else}(% class="current" %)$syntaxTitle(%%)#{end}#if ($crtCategory) (% class="separator" %)»(%%) #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}(%%)#{end}#if ($crtSection) (% class="separator" %)»(%%) (% class="current" %)${crtSection.name}(%%)#end#end
+#if ($crtCategory){{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}}#{else}(% class="current" %)$syntaxTitle#{end}#if ($crtCategory) (% class="separator" %)» #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}#{end}#if ($crtSection) (% class="separator" %)» (% class="current" %)${crtSection.name}#end#end
 )))
 == $syntaxTitle: $sectionName ==
 

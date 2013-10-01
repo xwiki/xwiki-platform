@@ -47,13 +47,16 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     public WikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context)
     {
         // Create a WikiDescriptor object with the first XWikiServerClass object
-        WikiDescriptor descriptor = extractWikiDescriptor(serverClassObjects.get(0), document);
+        WikiDescriptor descriptor = null;
 
-        if (descriptor != null) {
-            // Create WikiDescriptorAlias instances for the other XWikiServerClass objects
-            for (int i = 1; i < serverClassObjects.size(); i++) {
-                WikiDescriptorAlias descriptorAlias = extractWikiDescriptorAlias(serverClassObjects.get(i));
-                descriptor.addDescriptorAlias(descriptorAlias);
+        if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
+            descriptor = extractWikiDescriptor(serverClassObjects.get(0), document);
+            if (descriptor != null) {
+                // Create WikiDescriptorAlias instances for the other XWikiServerClass objects
+                for (int i = 1; i < serverClassObjects.size(); i++) {
+                    WikiDescriptorAlias descriptorAlias = extractWikiDescriptorAlias(serverClassObjects.get(i));
+                    descriptor.addDescriptorAlias(descriptorAlias);
+                }
             }
         }
 

@@ -640,7 +640,7 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.2M1 use
+     * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
      *             {@link ResourceFactory}
      */
     @Deprecated
@@ -651,7 +651,7 @@ public privileged aspect XWikiCompatibilityAspect
 
     /**
      * @since 2.3M1
-     * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.2M1 use
+     * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
      *             {@link ResourceFactory}
      */
     @Deprecated
@@ -691,7 +691,7 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.2M1 use
+     * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
      *             {@link ResourceFactory}
      */
     @Deprecated

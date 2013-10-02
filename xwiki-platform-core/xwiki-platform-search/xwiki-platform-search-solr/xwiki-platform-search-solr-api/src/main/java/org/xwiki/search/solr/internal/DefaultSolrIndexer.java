@@ -289,6 +289,10 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     @Override
     public void initialize() throws InitializationException
     {
+        // Initialize the queues before starting the threads.
+        this.resolveQueue = new LinkedBlockingQueue<ResolveQueueEntry>();
+        this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
+
         // Launch the resolve thread
         this.resolveThread = new Thread(new Resolver());
         this.resolveThread.setName("XWiki Solr resolve thread");
@@ -302,10 +306,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         this.indexThread.setDaemon(true);
         this.indexThread.start();
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
-
-        // Initialize the queue
-        this.resolveQueue = new LinkedBlockingQueue<ResolveQueueEntry>();
-        this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
 
         // Setup indexer job thread
         BasicThreadFactory factory =

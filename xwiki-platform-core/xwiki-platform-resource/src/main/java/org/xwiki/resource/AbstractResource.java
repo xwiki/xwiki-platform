@@ -46,6 +46,9 @@ public abstract class AbstractResource implements Resource
      */
     private Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
 
+    /**
+     * @param type see {@link #getType()}
+     */
     public AbstractResource(ResourceType type)
     {
         setType(type);
@@ -57,6 +60,9 @@ public abstract class AbstractResource implements Resource
         return this.type;
     }
 
+    /**
+     * @param type see {@link #getType()}
+     */
     public void setType(ResourceType type)
     {
         this.type = type;

@@ -21,6 +21,12 @@ package org.xwiki.wiki;
 
 import org.xwiki.stability.Unstable;
 
+/**
+ * Defines an alias to a wiki (ie the name by which a wiki can be called in a URL). A wiki can have 1 or more aliases.
+ *
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Unstable
 public class WikiDescriptorAlias
 {

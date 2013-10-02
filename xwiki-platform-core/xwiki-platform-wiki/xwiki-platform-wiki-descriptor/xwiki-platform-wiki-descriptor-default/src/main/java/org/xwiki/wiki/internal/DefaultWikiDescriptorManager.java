@@ -50,6 +50,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Default implementation of {@link org.xwiki.wiki.WikiDescriptorManager} which uses an internal cache to store wiki
+ * descriptors for improved performances.
+ *
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Component
 @Singleton
 public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Initializable

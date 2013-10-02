@@ -42,7 +42,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Used to refresh the Wiki Descriptor Cache
+ * Used to refresh the Wiki Descriptor Cache.
+ *
+ * @version $Id$
+ * @since 5.3M1
  */
 @Component
 @Named("wikidescriptor")

@@ -33,6 +33,9 @@
   <name>XWiki Platform - Wiki - Wiki Descriptors - Default Implementation</name>
   <description>XWiki Platform - Wiki - Wiki Descriptors - Default Implementation</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.47</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

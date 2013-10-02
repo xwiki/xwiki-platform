@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Encapsulate any exception related to Wiki Descriptors.
  *
  * @version $Id$
- * @since 5.1M1
+ * @since 5.3M1
  */
 @Unstable
 public class WikiDescriptorException extends Exception

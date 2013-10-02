@@ -22,12 +22,19 @@ package org.xwiki.wiki.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.WikiDescriptor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Constructs a {@link org.xwiki.wiki.WikiDescriptor} instance from an XObject.
+ *
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Role
 public interface WikiDescriptorBuilder
 {

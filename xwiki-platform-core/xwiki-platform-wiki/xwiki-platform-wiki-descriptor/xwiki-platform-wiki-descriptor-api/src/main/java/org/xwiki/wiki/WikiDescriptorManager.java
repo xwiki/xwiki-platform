@@ -24,6 +24,12 @@ import java.util.Collection;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
+/**
+ * Entry point to manipulate wiki descriptors (add, remove, get).
+ *
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Role
 @Unstable
 public interface WikiDescriptorManager

@@ -33,57 +33,95 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class EntityResource extends AbstractResource
 {
+    /**
+     * The parameter name that represents a version of the entity.
+     */
     private static final String REVISION_PARAMETER_NAME = "rev";
 
-    // Note: We're not using a typed object since the action name can be anything and corresponds to an Action
-    // component role hint.
+    /**
+     * @see #getAction()
+     */
     private String action;
 
+    /**
+     * @see #getEntityReference()
+     */
     private EntityReference entityReference;
 
+    /**
+     * @see #getLocale()
+     */
     private Locale locale;
 
+    /**
+     * @param entityReference the entity reference being wrapped
+     */
     public EntityResource(EntityReference entityReference)
     {
         super(ResourceType.ENTITY);
         setEntityReference(entityReference);
     }
 
+    /**
+     * @return the action requested on this resource (e.g. "view", "download", etc). Note that We're not using a typed
+     *         object since the action name can be anything and corresponds to an Action Component role hint.
+     */
     public String getAction()
     {
         return this.action;
     }
 
+    /**
+     * @param action see {@link #getAction()}
+     */
     public void setAction(String action)
     {
         this.action = action;
     }
 
+    /**
+     * @return the wrapped entity reference
+     */
     public EntityReference getEntityReference()
     {
         return this.entityReference;
     }
 
+    /**
+     * @param entityReference see {@link #getEntityReference()}
+     */
     public void setEntityReference(EntityReference entityReference)
     {
         this.entityReference = entityReference;
     }
-    
+
+    /**
+     * @param locale see {@link #getLocale()}
+     */
     public void setLocale(Locale locale)
     {
         this.locale = locale;
     }
-    
+
+    /**
+     * @return the locale of the entity
+     */
     public Locale getLocale()
     {
         return this.locale;
     }
-    
+
+    /**
+     * @param revision see {@link #getRevision()}
+     */
     public void setRevision(String revision)
     {
         addParameter(REVISION_PARAMETER_NAME, revision);
     }
-    
+
+    /**
+     * @return the version of the resource (eg "2.1", etc)
+     */
     public String getRevision()
     {
         return getParameterValue(REVISION_PARAMETER_NAME);

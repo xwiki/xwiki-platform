@@ -30,5 +30,23 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public enum ResourceType
 {
-    ENTITY, SKIN, TEMPLATE, RESOURCE
+    /**
+     * Resource to an Entity (Document, Space, Page, Attachment, etc).
+     */
+    ENTITY,
+
+    /**
+     * Resource to a skin item (vm file, image, js, etc).
+     */
+    SKIN,
+
+    /**
+     * Resource to a template item (vm file).
+     */
+    TEMPLATE,
+
+    /**
+     * Resource to some file on the filesystem (js, images, etc).
+     */
+    RESOURCE
 }

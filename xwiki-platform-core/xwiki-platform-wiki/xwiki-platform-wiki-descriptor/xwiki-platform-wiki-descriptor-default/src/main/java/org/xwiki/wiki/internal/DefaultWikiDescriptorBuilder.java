@@ -32,6 +32,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Constructs a {@link org.xwiki.wiki.WikiDescriptor} from an XObject (of type {@code XWiki.XWikiServerClass}
+ * by extracting its XProperties.
+ *
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Component
 @Singleton
 public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder

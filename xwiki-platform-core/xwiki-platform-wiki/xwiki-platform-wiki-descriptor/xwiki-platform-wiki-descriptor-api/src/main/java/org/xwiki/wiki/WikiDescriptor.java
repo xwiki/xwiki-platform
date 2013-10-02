@@ -26,6 +26,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
 
+/**
+ * Contains data associated to a wiki (its id, alias, owner, etc).
+ *
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Unstable
 public class WikiDescriptor
 {

@@ -53,23 +53,22 @@ public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<Insta
     @Named("context")
     private Provider<ComponentManager> componentManager;
 
-    private List<OutputInstanceWikiStreamFactory> factories;
-
     @Override
     public void setProperties(InstanceOutputProperties properties) throws WikiStreamException
     {
         super.setProperties(properties);
 
+        List<OutputInstanceWikiStreamFactory> factories;
         try {
-            this.factories = this.componentManager.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
+            factories = this.componentManager.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
         } catch (ComponentLookupException e) {
             throw new WikiStreamException(
                 "Failed to get regsitered instance of OutputInstanceWikiStreamFactory components", e);
         }
 
-        Object[] filters = new Object[this.factories.size()];
+        Object[] filters = new Object[factories.size()];
         int i = 0;
-        for (OutputInstanceWikiStreamFactory factory : this.factories) {
+        for (OutputInstanceWikiStreamFactory factory : factories) {
             filters[i++] = factory.creaOutputWikiStream(properties).getFilter();
         }
 

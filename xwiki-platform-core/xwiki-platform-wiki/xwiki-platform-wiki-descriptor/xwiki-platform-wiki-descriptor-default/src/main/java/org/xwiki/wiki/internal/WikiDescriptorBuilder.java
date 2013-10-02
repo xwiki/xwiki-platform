@@ -22,10 +22,8 @@ package org.xwiki.wiki.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.WikiDescriptor;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -38,5 +36,14 @@ import com.xpn.xwiki.objects.BaseObject;
 @Role
 public interface WikiDescriptorBuilder
 {
-    WikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context);
+    /**
+     * Extract data from the passed XObjects to construct a wiki descriptor. The first XObject must be the descriptor
+     * itself containing the full data and the other XObjects are descriptors containing just alias information.
+     *
+     * @param serverClassObjects the XObjects from which to extract the descriptor and its aliases
+     * @param document the document containing the XObject, which we use to extract the wiki id (by removing the
+     *        {@code XWikiServer} prefix from the document's page name)
+     * @return the generated wiki descriptor
+     */
+    WikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document);
 }

@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.wiki.WikiDescriptor;
 import org.xwiki.wiki.WikiDescriptorAlias;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -51,7 +50,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     static final String VALID_PAGE_PREFIX = "XWikiServer";
 
     @Override
-    public WikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context)
+    public WikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document)
     {
         // Create a WikiDescriptor object with the first XWikiServerClass object
         WikiDescriptor descriptor = null;
@@ -102,7 +101,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
         String wikiId = null;
         String pageName = document.getDocumentReference().getName();
         if (pageName.startsWith(VALID_PAGE_PREFIX)) {
-            wikiId = StringUtils.removeStart(pageName, "XWikiServer").toLowerCase();
+            wikiId = StringUtils.removeStart(pageName, VALID_PAGE_PREFIX).toLowerCase();
         }
         return wikiId;
     }

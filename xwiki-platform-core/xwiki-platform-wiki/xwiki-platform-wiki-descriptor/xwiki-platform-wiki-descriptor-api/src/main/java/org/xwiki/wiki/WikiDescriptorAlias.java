@@ -30,13 +30,22 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class WikiDescriptorAlias
 {
+    /**
+     * @see #getWikiAlias()
+     */
     private String wikiAlias;
 
+    /**
+     * @param wikiAlias see {@link #getWikiAlias()}
+     */
     public WikiDescriptorAlias(String wikiAlias)
     {
         this.wikiAlias = wikiAlias;
     }
 
+    /**
+     * @return another name under which the wiki is known and can be addressed in URLs
+     */
     public String getWikiAlias()
     {
         return this.wikiAlias;

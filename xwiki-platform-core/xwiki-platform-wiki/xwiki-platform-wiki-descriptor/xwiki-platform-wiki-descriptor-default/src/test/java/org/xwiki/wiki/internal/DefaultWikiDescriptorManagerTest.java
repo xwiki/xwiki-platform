@@ -104,8 +104,7 @@ public class DefaultWikiDescriptorManagerTest
         // Get a WikiDescriptor from the Wiki Descriptor Builder
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
-        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
-            any(XWikiContext.class))).thenReturn(descriptor);
+        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class))).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
 
@@ -188,8 +187,7 @@ public class DefaultWikiDescriptorManagerTest
         // Get a WikiDescriptor from the Wiki Descriptor Builder
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
-        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
-            any(XWikiContext.class))).thenReturn(descriptor);
+        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class))).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
 
@@ -287,8 +285,8 @@ public class DefaultWikiDescriptorManagerTest
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         WikiDescriptor descriptor1 = new WikiDescriptor("wikiid1", "wikialias1");
         WikiDescriptor descriptor2 = new WikiDescriptor("wikiid2", "wikialias2");
-        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
-            any(XWikiContext.class))).thenReturn(descriptor1, descriptor2);
+        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class))).thenReturn(
+            descriptor1, descriptor2);
 
         Collection<WikiDescriptor> descriptors = this.mocker.getComponentUnderTest().getAll();
         assertEquals(2, descriptors.size());

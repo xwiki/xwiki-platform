@@ -37,7 +37,6 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.wiki.WikiDescriptor;
 import org.xwiki.wiki.WikiDescriptorManager;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -83,30 +82,29 @@ public class WikiDescriptorListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
-        XWikiContext context = (XWikiContext) data;
 
         // If the document is deleted then check the original document to see if it had XWiki Server objects and if
         // so then unregister them
         if (event instanceof DocumentDeletedEvent || event instanceof DocumentUpdatedEvent) {
-            removeExistingDescriptor(document.getOriginalDocument(), context);
+            removeExistingDescriptor(document.getOriginalDocument());
         }
 
         // Register the new XWiki Server objects if any
         List<BaseObject> serverClassObjects = document.getXObjects(SERVER_CLASS);
         if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
-            WikiDescriptor descriptor = this.builder.build(serverClassObjects, document, context);
+            WikiDescriptor descriptor = this.builder.build(serverClassObjects, document);
             if (descriptor != null) {
                 this.wikiDescriptorManager.set(descriptor);
             }
         }
     }
 
-    private void removeExistingDescriptor(XWikiDocument document, XWikiContext context)
+    private void removeExistingDescriptor(XWikiDocument document)
     {
         List<BaseObject> existingServerClassObjects = document.getXObjects(SERVER_CLASS);
         if (existingServerClassObjects != null && !existingServerClassObjects.isEmpty()) {
             WikiDescriptor existingDescriptor =
-                this.builder.build(existingServerClassObjects, document, context);
+                this.builder.build(existingServerClassObjects, document);
             if (existingDescriptor != null) {
                 this.wikiDescriptorManager.remove(existingDescriptor);
             }

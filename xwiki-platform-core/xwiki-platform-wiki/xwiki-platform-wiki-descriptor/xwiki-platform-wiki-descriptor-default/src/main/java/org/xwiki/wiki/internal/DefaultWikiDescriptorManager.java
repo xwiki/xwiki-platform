@@ -133,7 +133,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
 
         if (descriptor == null) {
             // Try to load a page named XWiki.XWikiServer<wikiId>
-            XWikiDocument document = getDocument(new DocumentReference(getXWikiContext().getMainXWiki(),"XWiki",
+            XWikiDocument document = getDocument(new DocumentReference(getXWikiContext().getMainXWiki(), "XWiki",
                 String.format("XWikiServer%s", StringUtils.capitalize(wikiId))));
             if (!document.isNew()) {
                 descriptor = set(document);
@@ -146,7 +146,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     private WikiDescriptor set(XWikiDocument document)
     {
         WikiDescriptor descriptor = this.wikiDescriptorBuilder.build(
-            document.getXObjects(WikiDescriptorListener.SERVER_CLASS), document, getXWikiContext());
+            document.getXObjects(WikiDescriptorListener.SERVER_CLASS), document);
         // Add to the cache
         if (descriptor != null) {
             set(descriptor);

@@ -35,33 +35,59 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class WikiDescriptor
 {
+    /**
+     * @see #getWikiId()
+     */
     private String wikiId;
 
+    /**
+     * @see #getWikiAlias()
+     */
     private String wikiAlias;
 
+    /**
+     * @see #getDescriptorAliases()
+     */
     private List<WikiDescriptorAlias> descriptorAliases = new ArrayList<WikiDescriptorAlias>();
 
+    /**
+     * @param wikiId see {@link #getWikiId()}
+     * @param wikiAlias see {@link #getWikiAlias()}
+     */
     public WikiDescriptor(String wikiId, String wikiAlias)
     {
         this.wikiId = wikiId;
         this.wikiAlias = wikiAlias;
     }
 
+    /**
+     * @return the technical identifier of the wiki (eg "xwiki") which internally corresponds to the schema or database
+     *         name where data for this wiki is stored
+     */
     public String getWikiId()
     {
         return this.wikiId;
     }
 
+    /**
+     * @return the name of this wiki used for example in URLs when addressing the wiki
+     */
     public String getWikiAlias()
     {
         return this.wikiAlias;
     }
 
+    /**
+     * @param descriptorAlias see {@link #getDescriptorAliases()}
+     */
     public void addDescriptorAlias(WikiDescriptorAlias descriptorAlias)
     {
         this.descriptorAliases.add(descriptorAlias);
     }
 
+    /**
+     * @return the list of alias names for this wiki
+     */
     public List<WikiDescriptorAlias> getDescriptorAliases()
     {
         return this.descriptorAliases;

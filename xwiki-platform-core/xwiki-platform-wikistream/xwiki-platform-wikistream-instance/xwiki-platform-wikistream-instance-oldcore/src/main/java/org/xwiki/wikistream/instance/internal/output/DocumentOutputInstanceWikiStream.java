@@ -47,7 +47,9 @@ import org.xwiki.wikistream.filter.WikiAttachmentFilter;
 import org.xwiki.wikistream.filter.WikiClassFilter;
 import org.xwiki.wikistream.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.filter.WikiObjectFilter;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
+import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
 import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
@@ -69,10 +71,10 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
  * @since 5.2
  */
 @Component
-@Named("documents")
+@Named(DocumentOutputInstanceWikiStreamFactory.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputInstanceWikiStream<DocumentOutputProperties>
-    implements XWikiDocumentFilter
+public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<DocumentOutputProperties> implements
+    XWikiDocumentFilter
 {
     @Inject
     @Named("current")
@@ -113,6 +115,12 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputInstance
     private BaseObject currentXObject;
 
     private BaseClass currentXObjectClass;
+
+    @Override
+    public void close() throws IOException
+    {
+        // Nothing to close
+    }
 
     private <T> T get(Type type, String key, FilterEventParameters parameters, T def)
     {
@@ -157,6 +165,8 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputInstance
     {
         return get(Syntax.class, key, parameters, def);
     }
+
+    // Events
 
     @Override
     public void beginWiki(String name, FilterEventParameters parameters) throws WikiStreamException

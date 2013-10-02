@@ -396,7 +396,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
             {
                 oneOf(attachmentResolver).resolve("attachmentReference", new Object[] {});
                 will(returnValue(attachmentReference));
-                oneOf(documentAccessBridge).getAttachmentURL(attachmentReference, null, true);
+                oneOf(documentAccessBridge).getAttachmentURL(attachmentReference, null, false);
                 will(returnValue(expectedAttachmentURL));
                 oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(expectedIsImageDimensionsIncludedInImageURL));

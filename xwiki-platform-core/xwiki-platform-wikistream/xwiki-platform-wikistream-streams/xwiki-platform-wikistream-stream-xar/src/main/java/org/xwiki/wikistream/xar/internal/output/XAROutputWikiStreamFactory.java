@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils;
 
 /**
@@ -37,7 +38,7 @@ import org.xwiki.wikistream.xar.internal.XARUtils;
 @Component
 @Named(XARUtils.ROLEHINT)
 @Singleton
-public class XAROutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<XAROutputProperties>
+public class XAROutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<XAROutputProperties, XARFilter>
 {
     public XAROutputWikiStreamFactory()
     {

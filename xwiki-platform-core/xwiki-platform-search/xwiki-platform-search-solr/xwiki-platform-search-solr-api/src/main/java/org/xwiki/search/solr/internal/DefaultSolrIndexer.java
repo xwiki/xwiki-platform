@@ -187,6 +187,12 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                     queueEntry = resolveQueue.take();
                 } catch (InterruptedException e) {
                     logger.warn("The SOLR resolve thread has been interrupted", e);
+                    queueEntry = RESOLVE_QUEUE_ENTRY_STOP;
+                }
+
+                if (queueEntry == RESOLVE_QUEUE_ENTRY_STOP) {
+                    // Send the stop signal to the indexing thread without blocking.
+                    indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
                     break;
                 }
 
@@ -221,9 +227,16 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
-     * Stop index thread.
+     * Stop resolver thread.
      */
-    private static final IndexQueueEntry QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null, IndexOperation.STOP);
+    private static final ResolveQueueEntry RESOLVE_QUEUE_ENTRY_STOP = new ResolveQueueEntry(null, false,
+        IndexOperation.STOP);
+
+    /**
+     * Stop indexer thread.
+     */
+    private static final IndexQueueEntry INDEX_QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null,
+        IndexOperation.STOP);
 
     /**
      * Logging framework.
@@ -323,10 +336,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         // Shutdown indexer jobs queue
         this.indexerJobs.shutdownNow();
 
-        // Empty the queue
-        this.indexQueue.clear();
-
-        this.indexQueue.add(QUEUE_ENTRY_STOP);
+        // Send the stop signal to the resolver thread without blocking.
+        this.resolveQueue.offer(RESOLVE_QUEUE_ENTRY_STOP);
     }
 
     @Override
@@ -342,10 +353,10 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             } catch (InterruptedException e) {
                 this.logger.warn("The SOLR index thread has been interrupted", e);
 
-                queueEntry = QUEUE_ENTRY_STOP;
+                queueEntry = INDEX_QUEUE_ENTRY_STOP;
             }
 
-            if (queueEntry == QUEUE_ENTRY_STOP) {
+            if (queueEntry == INDEX_QUEUE_ENTRY_STOP) {
                 break;
             }
 

@@ -30,12 +30,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -49,17 +47,11 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class WikiDescriptorListener implements EventListener
 {
-    /**
-     * Relative reference to the XWiki.XWikiServerClass containing wiki descriptor metadata.
-     */
-    static final EntityReference SERVER_CLASS = new EntityReference("XWikiServerClass", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
-
     @Inject
     private WikiDescriptorBuilder builder;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private WikiManager wikiManager;
 
     @Override
     public String getName()
@@ -89,23 +81,23 @@ public class WikiDescriptorListener implements EventListener
         }
 
         // Register the new XWiki Server objects if any
-        List<BaseObject> serverClassObjects = document.getXObjects(SERVER_CLASS);
+        List<BaseObject> serverClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
         if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
             WikiDescriptor descriptor = this.builder.build(serverClassObjects, document, context);
             if (descriptor != null) {
-                this.wikiDescriptorManager.set(descriptor);
+                this.wikiManager.setDescriptor(descriptor);
             }
         }
     }
 
     private void removeExistingDescriptor(XWikiDocument document, XWikiContext context)
     {
-        List<BaseObject> existingServerClassObjects = document.getXObjects(SERVER_CLASS);
+        List<BaseObject> existingServerClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
         if (existingServerClassObjects != null && !existingServerClassObjects.isEmpty()) {
             WikiDescriptor existingDescriptor =
                 this.builder.build(existingServerClassObjects, document, context);
             if (existingDescriptor != null) {
-                this.wikiDescriptorManager.remove(existingDescriptor);
+                this.wikiManager.removeDescriptor(existingDescriptor);
             }
         }
     }

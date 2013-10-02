@@ -17,24 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor;
+package org.xwiki.wiki.descriptor.internal;
 
-import java.util.Collection;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import com.xpn.xwiki.doc.XWikiDocument;
 
-@Role
-@Unstable
-public interface WikiDescriptorManager
+public class DefaultWikiDescriptor extends WikiDescriptor
 {
-    WikiDescriptor getByWikiAlias(String wikiAlias) throws WikiDescriptorException;
+    /**
+     * Relative reference to the XWiki.XWikiServerClass containing wiki descriptor metadata.
+     */
+    public static final EntityReference SERVER_CLASS = new EntityReference("XWikiServerClass", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.SPACE));
 
-    WikiDescriptor getByWikiId(String wikiId) throws WikiDescriptorException;
+    private XWikiDocument document;
 
-    void set(WikiDescriptor descriptor);
+    public DefaultWikiDescriptor(String wikiId, String wikiAlias, XWikiDocument document)
+    {
+        super(wikiId, wikiAlias);
+        this.document = document;
+    }
 
-    void remove(WikiDescriptor descriptor);
+    public XWikiDocument getDocument() {
+        return document;
+    }
 
-    Collection<WikiDescriptor> getAll() throws WikiDescriptorException;
 }

@@ -27,7 +27,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
@@ -36,23 +38,28 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorAlias;
-import org.xwiki.wiki.descriptor.WikiDescriptorException;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
 
 @Component
 @Singleton
-public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Initializable
+public class DefaultWikiManager implements WikiManager, Initializable
 {
     @Inject
     private CacheFactory cacheFactory;
@@ -69,6 +76,18 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
 
     @Inject
     private Execution execution;
+
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
+    @Inject
+    private ObservationManager observationManager;
+
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private WikiDescriptorBuilder builder;
 
     private Cache<WikiDescriptor> wikiAliasCache;
 
@@ -97,8 +116,111 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
         return cache;
     }
 
+    private WikiDescriptor createDescriptor(String wikiId, String alias) throws WikiManagerException
+    {
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        WikiDescriptor wikiDescriptor = null;
+
+        try {
+            // Create the descriptor document
+            DocumentReference wikiDescriptorReference =
+                    new DocumentReference(context.getMainXWiki(), XWiki.SYSTEM_SPACE, String.format("XWikiServer%s",
+                            StringUtils.capitalize(wikiId.toLowerCase())));
+            XWikiDocument wikiDescriptorDocument = xwiki.getDocument(wikiDescriptorReference, context);
+            BaseObject obj = wikiDescriptorDocument.newXObject(DefaultWikiDescriptor.SERVER_CLASS, context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE, "Main.WebHome", context);
+
+            // Save the document
+            xwiki.saveDocument(wikiDescriptorDocument, context);
+
+            // Create the descriptor object
+            wikiDescriptor = setDescriptor(wikiDescriptorDocument);
+
+        } catch (XWikiException e) {
+            logger.error(e.getMessage());
+            throw new WikiManagerException("Unable to create the descriptor");
+        }
+
+        // The Wiki Descriptor Listener should have created the new wiki descriptor
+        return wikiDescriptor;
+    }
+
     @Override
-    public WikiDescriptor getByWikiAlias(String wikiAlias) throws WikiDescriptorException
+    public WikiDescriptor createWiki(String wikiId, String wikiAlias) throws WikiManagerException
+    {
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+
+        // Check that the wiki does not already exist
+        if (wikiIdExists(wikiId)) {
+            throw new WikiManagerException("wiki already exists");
+        }
+
+        // Check that the wiki ID is correct
+        String wikiForbiddenList = xwiki.Param("xwiki.virtual.reserved_wikis");
+        if (Util.contains(wikiId, wikiForbiddenList, ", ") || wikiId.equals(context.getMainXWiki())) {
+            throw new WikiManagerException("wikiId reserved");
+        }
+
+        // Create database/schema
+        try {
+            xwiki.getStore().createWiki(wikiId, context);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databasecreation"));
+        }
+
+        // Init database/schema
+        try {
+            xwiki.updateDatabase(wikiId, true, true, context);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databaseupdate"));
+        }
+
+        // Create the descriptor
+        WikiDescriptor descriptor = createDescriptor(wikiId, wikiAlias);
+
+        return descriptor;
+    }
+
+    @Override
+    public void deleteWiki(WikiDescriptor descriptor) throws WikiManagerException
+    {
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        String wikiId = descriptor.getWikiId();
+
+        // Check if we try to delete the main wiki
+        if (wikiId.equals(context.getMainXWiki())) {
+            throw new WikiManagerException("can't delete main wiki");
+        }
+
+        // Delete the database
+        try {
+            xwiki.getStore().deleteWiki(wikiId, context);
+        } catch (XWikiException e) {
+            throw new WikiManagerException("can't delete database");
+        }
+
+        // Delete the descriptor document
+        if (descriptor instanceof DefaultWikiDescriptor) {
+            DefaultWikiDescriptor desc = (DefaultWikiDescriptor) descriptor;
+            try {
+                xwiki.deleteDocument(desc.getDocument(), context);
+            } catch (XWikiException e) {
+                throw new WikiManagerException("can't delete descriptor document");
+            }
+        }
+
+        // Send an event
+        observationManager.notify(new WikiDeletedEvent(wikiId), descriptor);
+    }
+
+    @Override
+    public WikiDescriptor getByWikiAlias(String wikiAlias) throws WikiManagerException
     {
         WikiDescriptor descriptor = this.wikiAliasCache.get(wikiAlias);
 
@@ -112,7 +234,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
         if (descriptor == null) {
             DocumentReference reference = findXWikiServerClassDocumentReference(wikiAlias);
             if (reference != null) {
-                descriptor = set(getDocument(reference));
+                descriptor = setDescriptor(getDocument(reference));
             }
         }
 
@@ -120,7 +242,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     }
 
     @Override
-    public WikiDescriptor getByWikiId(String wikiId) throws WikiDescriptorException
+    public WikiDescriptor getByWikiId(String wikiId) throws WikiManagerException
     {
         WikiDescriptor descriptor = this.wikiIdCache.get(wikiId);
 
@@ -129,26 +251,26 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
             XWikiDocument document = getDocument(new DocumentReference(getXWikiContext().getMainXWiki(),"XWiki",
                 String.format("XWikiServer%s", StringUtils.capitalize(wikiId))));
             if (!document.isNew()) {
-                descriptor = set(document);
+                descriptor = setDescriptor(document);
             }
         }
 
         return descriptor;
     }
 
-    private WikiDescriptor set(XWikiDocument document)
+    private WikiDescriptor setDescriptor(XWikiDocument document)
     {
         WikiDescriptor descriptor = this.wikiDescriptorBuilder.build(
-            document.getXObjects(WikiDescriptorListener.SERVER_CLASS), document, getXWikiContext());
+            document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS), document, getXWikiContext());
         // Add to the cache
         if (descriptor != null) {
-            set(descriptor);
+            setDescriptor(descriptor);
         }
         return descriptor;
     }
 
     private DocumentReference findXWikiServerClassDocumentReference(String wikiAlias)
-        throws WikiDescriptorException
+        throws WikiManagerException
     {
         DocumentReference result = null;
 
@@ -166,7 +288,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
             }
 
         } catch (QueryException e) {
-            throw new WikiDescriptorException(String.format(
+            throw new WikiManagerException(String.format(
                 "Failed to locate XWiki.XWikiServerClass document for wiki alias [%s]", wikiAlias), e);
         }
 
@@ -174,7 +296,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     }
 
     @Override
-    public void set(WikiDescriptor descriptor)
+    public void setDescriptor(WikiDescriptor descriptor)
     {
         // Update the wiki name cache
         this.wikiIdCache.set(descriptor.getWikiId(), descriptor);
@@ -187,7 +309,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     }
 
     @Override
-    public void remove(WikiDescriptor descriptor)
+    public void removeDescriptor(WikiDescriptor descriptor)
     {
         // Remove from the wiki name cache
         this.wikiIdCache.remove(descriptor.getWikiId());
@@ -200,7 +322,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
     }
 
     @Override
-    public Collection<WikiDescriptor> getAll() throws WikiDescriptorException
+    public Collection<WikiDescriptor> getAll() throws WikiManagerException
     {
         // Note: Ideally to improve performance we could imagine loading all XWikiServerClasses at initialization time
         // (in initialize()) and thereafter only use the cache. The problem with this approach is that our Cache will
@@ -211,7 +333,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
 
         try {
             Query query = this.queryManager.createQuery(
-                "from doc.object(XWiki.XWikiServerClass) as descriptor and doc.name like 'XWikiServer%'",
+                "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%'",
                 Query.XWQL);
             query.setWiki(getXWikiContext().getMainXWiki());
             List<String> documentNames = query.execute();
@@ -219,24 +341,34 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
             if (documentNames != null && !documentNames.isEmpty()) {
                 for (String documentName : documentNames) {
                     // Resolve the document names into references and for each one extract the WikiDescriptor
-                    result.add(set(getDocument(this.documentReferenceResolver.resolve(documentName))));
+                    result.add(setDescriptor(getDocument(this.documentReferenceResolver.resolve(documentName))));
                 }
             }
         } catch (Exception e) {
-            throw new WikiDescriptorException("Failed to locate XWiki.XWikiServerClass documents", e);
+            throw new WikiManagerException("Failed to locate XWiki.XWikiServerClass documents", e);
         }
 
         return result;
     }
 
-    private XWikiDocument getDocument(DocumentReference reference) throws WikiDescriptorException
+    @Override
+    public boolean wikiIdExists(String wikiId) throws WikiManagerException {
+        return getByWikiId(wikiId) != null;
+    }
+
+    @Override
+    public boolean isWikiIdAvailable(String wikiId) throws WikiManagerException {
+        return !wikiIdExists(wikiId);
+    }
+
+    private XWikiDocument getDocument(DocumentReference reference) throws WikiManagerException
     {
         XWikiContext context = getXWikiContext();
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         try {
             return xwiki.getDocument(reference, context);
         } catch (XWikiException e) {
-            throw new WikiDescriptorException(String.format(
+            throw new WikiManagerException(String.format(
                 "Failed to get document [%s] containing a XWiki.XWikiServerClass object", reference), e);
         }
     }

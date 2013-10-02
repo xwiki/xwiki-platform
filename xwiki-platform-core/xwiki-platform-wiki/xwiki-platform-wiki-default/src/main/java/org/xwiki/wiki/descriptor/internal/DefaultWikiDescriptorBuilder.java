@@ -36,11 +36,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
 {
-    /**
-     * Name of the <code>server</code> xobject property in the XWiki.XWikiServerClass xclass.
-     */
-    static final String SERVER_PROPERTY_NAME = "server";
-
     static final String VALID_PAGE_PREFIX = "XWikiServer";
 
     @Override
@@ -60,9 +55,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
         return descriptor;
     }
 
-    private WikiDescriptor extractWikiDescriptor(BaseObject serverClassObject, XWikiDocument document)
+    private DefaultWikiDescriptor extractWikiDescriptor(BaseObject serverClassObject, XWikiDocument document)
     {
-        WikiDescriptor descriptor = null;
+        DefaultWikiDescriptor descriptor = null;
 
         // If the server property is empty then consider we have an invalid WikiDescriptor
         String serverProperty = extractWikiAlias(serverClassObject);
@@ -70,7 +65,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             // If the page name doesn't start with "XWikiServer" then consider we have an invalid WikiDescriptor
             String wikiId = extractWikiId(document);
             if (wikiId != null) {
-                descriptor = new WikiDescriptor(wikiId, serverProperty);
+                descriptor = new DefaultWikiDescriptor(wikiId, serverProperty, document);
             }
         }
 
@@ -84,7 +79,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
 
     private String extractWikiAlias(BaseObject serverClassObject)
     {
-        return serverClassObject.getStringValue(SERVER_PROPERTY_NAME);
+        return serverClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER);
     }
 
     private String extractWikiId(XWikiDocument document)

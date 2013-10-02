@@ -50,16 +50,23 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link DefaultWikiDescriptorManager}.
+ * Unit tests for {@link DefaultWikiManager}.
  *
  * @version $Id$
  * @since 5.1M1
  */
-public class DefaultWikiDescriptorManagerTest
+public class DefaultWikiManagerTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultWikiDescriptorManager> mocker =
-        new MockitoComponentMockingRule(DefaultWikiDescriptorManager.class);
+    public MockitoComponentMockingRule<DefaultWikiManager> mocker =
+        new MockitoComponentMockingRule(DefaultWikiManager.class);
+
+    @Test
+    public void createWiki() throws Exception
+    {
+        //this.mocker.getComponentUnderTest().createWiki("wikiid", "wikialias");
+
+    }
 
     @Test
     public void getByWikiAliasWhenNotInCacheButExists() throws Exception
@@ -251,7 +258,7 @@ public class DefaultWikiDescriptorManagerTest
 
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         QueryExecutor queryExecutor = mock(QueryExecutor.class);
-        when(queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor and "
+        when(queryManager.createQuery("from doc.object(XWiki.XWikiServerClass) as descriptor where "
             + "doc.name like 'XWikiServer%'", Query.XWQL)).thenReturn(
             new DefaultQuery("statement", "language", queryExecutor));
         when(queryExecutor.<String>execute(any(Query.class))).thenReturn(Arrays.asList("space1.page1", "space2.page2"));

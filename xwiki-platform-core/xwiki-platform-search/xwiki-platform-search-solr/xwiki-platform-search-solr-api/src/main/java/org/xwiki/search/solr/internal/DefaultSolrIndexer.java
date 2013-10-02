@@ -206,14 +206,14 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                         }
 
                         for (EntityReference reference : references) {
-                            indexQueue.offer(new IndexQueueEntry(reference, queueEntry.operation));
+                            indexQueue.put(new IndexQueueEntry(reference, queueEntry.operation));
                         }
                     } else {
                         if (queueEntry.recurse) {
-                            indexQueue.offer(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
-                                IndexOperation.DELETE));
+                            indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                                queueEntry.operation));
                         } else if (queueEntry.reference != null) {
-                            indexQueue.offer(new IndexQueueEntry(queueEntry.reference, IndexOperation.DELETE));
+                            indexQueue.put(new IndexQueueEntry(queueEntry.reference, queueEntry.operation));
                         }
                     }
                 } catch (Throwable e) {
@@ -517,6 +517,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     private void addToQueue(EntityReference reference, boolean recurse, IndexOperation operation)
     {
         if (!this.disposed) {
+            // Don't block because the capacity of the resolver queue is not limited.
             this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
         }
     }

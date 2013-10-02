@@ -34,7 +34,6 @@ import org.xwiki.wikistream.descriptor.DefaultWikiStreamBeanDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
- * 
  * @param <P>
  * @version $Id$
  * @since 5.2M2
@@ -79,13 +78,19 @@ public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStrea
 
     protected P createPropertiesBean(Map<String, Object> properties) throws WikiStreamException
     {
+        Class<P> beanClass = getPropertiesBeanClass();
+
+        if (beanClass.isInstance(properties)) {
+            return (P) properties;
+        }
+
         P parametersBean;
         try {
-            parametersBean = getPropertiesBeanClass().newInstance();
+            parametersBean = beanClass.newInstance();
 
             this.beanManager.populate(parametersBean, properties);
         } catch (Exception e) {
-            throw new WikiStreamException("Failed to read parameters [" + properties + "]", e);
+            throw new WikiStreamException(String.format("Failed to read parameters [%s]", properties), e);
         }
 
         return parametersBean;

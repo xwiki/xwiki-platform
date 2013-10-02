@@ -19,86 +19,26 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.instance.output.BeanOutputInstanceWikiStreamFactory;
-import org.xwiki.wikistream.instance.output.OutputInstanceWikiStream;
-import org.xwiki.wikistream.internal.AbstractBeanWikiStreamFactory;
-import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
+import org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory;
+import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.type.WikiType;
 
 /**
- * @param <P>
+ * @param <P> the type of the properties bean
+ * @param <F> the type of the filter
  * @version $Id$
  * @since 5.2
  */
-public abstract class AbstractBeanOutputInstanceWikiStreamFactory<P, F> extends AbstractBeanWikiStreamFactory<P>
-    implements BeanOutputInstanceWikiStreamFactory<P>, Initializable
+public abstract class AbstractBeanOutputInstanceWikiStreamFactory<P, F> extends
+    AbstractBeanOutputWikiStreamFactory<P, F> implements OutputInstanceWikiStreamFactory, Initializable
 {
-    @Inject
-    private ComponentManager componentManager;
-
-    private List<Class< ? >> filerInterfaces;
-
+    /**
+     * @param id the id of the {@link OutputInstanceWikiStreamFactory}
+     */
     public AbstractBeanOutputInstanceWikiStreamFactory(String id)
     {
-        super(new WikiStreamType(new WikiType(id), null));
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        super.initialize();
-
-        // Get bean properties type
-        ParameterizedType genericType =
-            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanOutputInstanceWikiStreamFactory.class,
-                getClass());
-        this.filerInterfaces =
-            Arrays.<Class< ? >> asList(ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[1]));
-    }
-
-    @Override
-    public Collection<Class< ? >> getFilterInterfaces()
-    {
-        return this.filerInterfaces;
-    }
-
-    @Override
-    public OutputInstanceWikiStream creaOutputWikiStream(Map<String, Object> properties) throws WikiStreamException
-    {
-        return creaOutputWikiStream(createPropertiesBean(properties));
-    }
-
-    @Override
-    public OutputInstanceWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
-    {
-        BeanOutputInstanceWikiStream<P> inputWikiStream;
-        try {
-            inputWikiStream =
-                this.componentManager.getInstance(new DefaultParameterizedType(null,
-                    BeanOutputInstanceWikiStream.class, properties.getClass()), getType().serialize());
-        } catch (ComponentLookupException e) {
-            throw new WikiStreamException(String.format("Failed to get instance of [%s] for type [%s]",
-                BeanInputWikiStream.class, getType()), e);
-        }
-
-        inputWikiStream.setProperties(properties);
-
-        return inputWikiStream;
+        super(new WikiStreamType(WikiStreamType.XWIKI_INSTANCE.getType(), WikiStreamType.XWIKI_INSTANCE.getDataFormat()
+            + "+" + id));
     }
 }

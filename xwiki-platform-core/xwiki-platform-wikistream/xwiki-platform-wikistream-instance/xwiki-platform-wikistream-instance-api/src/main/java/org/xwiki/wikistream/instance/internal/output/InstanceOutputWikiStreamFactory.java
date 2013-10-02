@@ -19,11 +19,22 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -37,13 +48,37 @@ import org.xwiki.wikistream.type.WikiStreamType;
 @Component
 @Named(InstanceUtils.ROLEHINT)
 @Singleton
-public class InstanceOutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<InstanceOutputProperties>
+public class InstanceOutputWikiStreamFactory extends
+    AbstractBeanOutputWikiStreamFactory<InstanceOutputProperties, Object>
 {
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
     public InstanceOutputWikiStreamFactory()
     {
         super(WikiStreamType.XWIKI_INSTANCE);
 
         setName("XWiki instance input stream");
         setDescription("Setup XWiki instance from wiki events.");
+    }
+
+    @Override
+    public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
+    {
+        List<OutputInstanceWikiStreamFactory> factories;
+        try {
+            factories = this.componentManagerProvider.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
+        } catch (ComponentLookupException e) {
+            throw new WikiStreamException(
+                "Failed to get regsitered instance of OutputInstanceWikiStreamFactory components", e);
+        }
+
+        Set<Class< ? >> filters = new HashSet<Class< ? >>();
+        for (OutputInstanceWikiStreamFactory factory : factories) {
+            filters.addAll(factory.getFilterInterfaces());
+        }
+
+        return filters;
     }
 }

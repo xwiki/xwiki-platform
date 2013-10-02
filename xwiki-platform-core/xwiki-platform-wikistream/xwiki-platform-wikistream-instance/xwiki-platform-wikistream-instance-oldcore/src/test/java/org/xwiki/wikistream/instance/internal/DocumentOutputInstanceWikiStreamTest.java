@@ -44,6 +44,7 @@ import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.instance.internal.output.DocumentOutputInstanceWikiStream;
+import org.xwiki.wikistream.instance.internal.output.DocumentOutputProperties;
 import org.xwiki.wikistream.instance.internal.output.InstanceOutputProperties;
 import org.xwiki.wikistream.internal.input.DefaultURLInputSource;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
@@ -236,8 +237,10 @@ public class DocumentOutputInstanceWikiStreamTest
 
     private void importFromXML(String resource) throws WikiStreamException
     {
-        InstanceOutputProperties outputProperties = new InstanceOutputProperties();
+        DocumentOutputProperties outputProperties = new DocumentOutputProperties();
 
+        outputProperties.setPreserveVersion(true);
+        
         OutputWikiStream outputWikiStream = this.outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
 
         URL url = getClass().getResource("/" + resource + ".xml");

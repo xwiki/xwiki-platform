@@ -33,6 +33,10 @@
   <name>XWiki Platform - Resource API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Resource API</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Resource API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

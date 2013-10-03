@@ -35,7 +35,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Watchlist API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.06</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.11</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

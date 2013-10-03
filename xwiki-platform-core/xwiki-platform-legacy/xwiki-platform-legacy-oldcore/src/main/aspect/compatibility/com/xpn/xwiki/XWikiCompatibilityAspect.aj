@@ -41,7 +41,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
-import org.xwiki.resource.EntityResource;
+import org.xwiki.url.XWikiEntityURL;
 
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
@@ -667,7 +667,7 @@ public privileged aspect XWikiCompatibilityAspect
             segments.remove(0);
         }
 
-        EntityResource entityURL = buildEntityURLFromPathSegments(new WikiReference(context.getDatabase()), segments);
+        XWikiEntityURL entityURL = buildEntityURLFromPathSegments(new WikiReference(context.getDatabase()), segments);
 
         return new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
     }
@@ -695,9 +695,9 @@ public privileged aspect XWikiCompatibilityAspect
      *             {@link ResourceFactory}
      */
     @Deprecated
-    private EntityResource XWiki.buildEntityURLFromPathSegments(WikiReference wikiReference, List<String> pathSegments)
+    private XWikiEntityURL XWiki.buildEntityURLFromPathSegments(WikiReference wikiReference, List<String> pathSegments)
     {
-        EntityResource entityURL;
+        XWikiEntityURL entityURL;
 
         // Rules based on counting the url segments:
         // - 0 segments (e.g. ""): default document reference, "view" action
@@ -745,7 +745,7 @@ public privileged aspect XWikiCompatibilityAspect
         }
         reference = this.defaultReferenceEntityReferenceResolver.resolve(reference, entityType);
 
-        entityURL = new EntityResource(reference);
+        entityURL = new XWikiEntityURL(reference);
         entityURL.setAction(action);
 
         return entityURL;

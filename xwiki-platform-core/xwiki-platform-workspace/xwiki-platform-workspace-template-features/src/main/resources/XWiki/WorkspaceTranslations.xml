@@ -50,7 +50,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>WorkspaceManager.TemplateTranslations</name>
+    <name>XWiki.WorkspaceTranslations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
     <guid>55b808f6-2711-4616-add3-e7343c67c956</guid>
@@ -70,15 +70,15 @@ workspacemanager.panel.title=Wiki information
 
 # MESSAGES
 platform.workspace.wikiNotWorkspace=The current wiki is not a workspace.
-platform.workspace.gadgetWelcomeToWorkspace=Welcome to the **{0}** wiki.
+platform.workspace.gadgetWelcomeToWorkspace=Welcome to the {0}{1}{2} wiki.
 platform.workspace.currentUserIsOwner=You are the owner of this wiki.
 platform.workspace.currentUserIsAdministrator=You are an administrator of this wiki.
 platform.workspace.joinNeedToLogIn=To join this wiki you need to be logged in.
 platform.workspace.currentUserNotMember=You are not a member of this wiki.
-platform.workspace.currentUserCanJoin=If you like, you can [[join this wiki&gt;&gt;path:{0}]].
+platform.workspace.currentUserCanJoin=If you like, you can {0}join this wiki{1}.
 platform.workspace.currentUserIsMember=You are a member of this wiki.
-platform.workspace.currentUserCanLeave=If you like, you can [[leave this wiki&gt;&gt;path:{0}]].
-platform.workspace.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, you can use the [[User Directory&gt;&gt;Main.UserDirectory]] page.
+platform.workspace.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
+platform.workspace.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, you can use the {0}User Directory{1} page.
 platform.workspace.invitationPendingForCurrentWorkspace=You have been invited to join this wiki
 platform.workspace.joinRequestPendingForCurrentWorkspace=You have requested to join this wiki
 platform.workspace.joinRequestAcceptedNotification=Your request to join the wiki ''{0}'' has been accepted.
@@ -144,7 +144,7 @@ workspacemanager.prop.wikiprettyname.hint=The display name of the wiki.
 workspacemanager.prop.description.hint=A brief description of the wiki and its purpose.
 workspacemanager.prop.owner.hint=A user who will have all the rights on the wiki.
 workspacemanager.prop.membershipType.hint=The way users can join this wiki.
-workspacemanager.prop.secure.hint=If enabled, all this wiki's generated externals URLs will starting with //https:~/~///.
+workspacemanager.prop.secure.hint=If enabled, all this wiki's generated externals URLs will starting with {0}https:~/~/{1}.
 platform.workspace.inviteUserNameHint=The name of the user to add to the wiki.
 platform.workspace.inviteMessageHint=The message to send to the user.
 platform.workspace.candidatesHint=Users which have requested or which have been invited to join the wiki.

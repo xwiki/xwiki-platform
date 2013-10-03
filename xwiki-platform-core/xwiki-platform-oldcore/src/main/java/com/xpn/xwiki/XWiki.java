@@ -94,8 +94,11 @@ import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -6388,9 +6391,12 @@ public class XWiki implements EventListener
             // Second step, treat each affected attachment
 
             // Delete new attachments
-            for (XWikiAttachment attachmentToDelete : toTrash) {
-                // XWikiDocument#save() is actually the only way to delete an attachment cleanly
-                rolledbackDoc.getAttachmentsToRemove().add(new XWikiAttachmentToRemove(attachmentToDelete, true));
+            if (context.getWiki().hasAttachmentRecycleBin(context)) {
+                for (XWikiAttachment attachmentToDelete : toTrash) {
+                    // Nothing needed for the reverted document, but let's send the extra attachments to the trash
+                    context.getWiki().getAttachmentRecycleBinStore()
+                        .saveToRecycleBin(attachmentToDelete, context.getUser(), new Date(), context, true);
+                }
             }
 
             // Revert updated attachments to the old version

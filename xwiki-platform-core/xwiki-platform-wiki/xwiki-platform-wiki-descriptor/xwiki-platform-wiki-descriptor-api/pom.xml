@@ -33,6 +33,10 @@
   <name>XWiki Platform - Wiki - Wiki Descriptors - API</name>
   <description>XWiki Platform - Wiki - Wiki Descriptors - API</description>
   <packaging>jar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Descriptor API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

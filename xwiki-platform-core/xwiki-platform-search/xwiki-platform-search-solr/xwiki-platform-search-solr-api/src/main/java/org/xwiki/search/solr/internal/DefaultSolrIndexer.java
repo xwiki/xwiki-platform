@@ -191,7 +191,8 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                 }
 
                 if (queueEntry == RESOLVE_QUEUE_ENTRY_STOP) {
-                    // Send the stop signal to the indexing thread without blocking.
+                    // Stop the index thread: clear the queue and send the stop signal without blocking.
+                    indexQueue.clear();
                     indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
                     break;
                 }
@@ -336,8 +337,17 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         // Shutdown indexer jobs queue
         this.indexerJobs.shutdownNow();
 
-        // Send the stop signal to the resolver thread without blocking.
+        // Stop the resolve thread. Clear the queue and send the stop signal without blocking. We know that the resolve
+        // queue will remain empty after the clear call because we set the disposed flag above.
+        this.resolveQueue.clear();
         this.resolveQueue.offer(RESOLVE_QUEUE_ENTRY_STOP);
+
+        // Stop the index thread. Clear the queue and send the stop signal without blocking. There should be enough
+        // space in the index queue before the special stop entry is added as long the the index queue capacity is
+        // greater than 1. In the worse case, the clear call will unblock the resolve thread (which was waiting because
+        // the index queue was full) and just one entry will be added to the queue before the special stop entry.
+        this.indexQueue.clear();
+        this.indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
     }
 
     @Override

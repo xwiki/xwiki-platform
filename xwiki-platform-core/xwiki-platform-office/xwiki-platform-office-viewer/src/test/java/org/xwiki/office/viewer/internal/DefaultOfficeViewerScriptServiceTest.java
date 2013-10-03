@@ -102,9 +102,7 @@ public class DefaultOfficeViewerScriptServiceTest
         OfficeViewer viewer = mocker.getInstance(OfficeViewer.class);
         when(viewer.createView(attachmentReference, Collections.<String, String> emptyMap())).thenReturn(xdom);
 
-        BlockRenderer xhtmlRenderer = mock(BlockRenderer.class);
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        when(componentManager.getInstance(BlockRenderer.class, "xhtml/1.0")).thenReturn(xhtmlRenderer);
+        BlockRenderer xhtmlRenderer = mocker.registerMockComponent(BlockRenderer.class, "xhtml/1.0");
 
         Assert.assertEquals("", mocker.getComponentUnderTest().view(attachmentReference));
 

@@ -73,9 +73,7 @@ public class DefaultHTMLConverterTest
         HTMLCleaner cleaner = mocker.getInstance(HTMLCleaner.class);
         when(cleaner.clean(html)).thenReturn(html);
 
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        PrintRendererFactory printRendererFactory = mock(PrintRendererFactory.class);
-        when(componentManager.getInstance(PrintRendererFactory.class, syntaxId)).thenReturn(printRendererFactory);
+        PrintRendererFactory printRendererFactory = this.mocker.registerMockComponent(PrintRendererFactory.class, syntaxId);
 
         PrintRenderer printRenderer = mock(PrintRenderer.class);
         when(printRendererFactory.createRenderer(any(WikiPrinter.class))).thenReturn(printRenderer);
@@ -97,9 +95,7 @@ public class DefaultHTMLConverterTest
         String syntaxId = "syntax/x.y";
 
         // The source should be parsed.
-        Parser parser = mock(Parser.class);
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        when(componentManager.getInstance(Parser.class, syntaxId)).thenReturn(parser);
+        Parser parser = this.mocker.registerMockComponent(Parser.class, syntaxId);
 
         XDOM xdom = new XDOM(Collections.<Block> emptyList());
         when(parser.parse(any(StringReader.class))).thenReturn(xdom);

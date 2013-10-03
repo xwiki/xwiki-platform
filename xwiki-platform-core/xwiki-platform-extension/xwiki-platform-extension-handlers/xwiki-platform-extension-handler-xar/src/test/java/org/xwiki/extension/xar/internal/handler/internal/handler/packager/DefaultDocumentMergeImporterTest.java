@@ -71,8 +71,7 @@ public class DefaultDocumentMergeImporterTest
 {
     @Rule
     public MockitoComponentMockingRule<DocumentMergeImporter> importer =
-        new MockitoComponentMockingRule<DocumentMergeImporter>(DefaultDocumentMergeImporter.class,
-            Arrays.asList(Provider.class));
+        new MockitoComponentMockingRule<DocumentMergeImporter>(DefaultDocumentMergeImporter.class);
 
     private DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 

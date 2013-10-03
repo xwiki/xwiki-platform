@@ -423,6 +423,7 @@ public class WatchListStore implements EventListener
     /**
      * @param watchedItems the items to watch as a String with entries separated by the WATCHLIST_ELEMENT_SEP separator
      * @return the items as a List (handles escapes so that items can contain the WATCHLIST_ELEMENT_SEP char)
+     * @todo Move this code to a central location so that other modules can reuse this too
      */
     private List<String> unescapeList(String watchedItems)
     {

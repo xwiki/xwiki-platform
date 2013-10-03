@@ -46,9 +46,16 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
+    /**
+     * A reference to the Execution component to be used in {@link #cleanupExecutionContext()} when this thread is
+     * stopped. Since we're not inside a component we cannot inject this dependency so we initialize it in
+     * {@link #initExecutionContext()}. The reason we keep this reference is because this thread can be stopped after
+     * the Component Manager disposes its components so a lookup in {@link #cleanupExecutionContext()} can fail.
+     */
+    private Execution execution;
+
     protected AbstractXWikiRunnable()
     {
-
     }
 
     /**
@@ -85,6 +92,10 @@ public abstract class AbstractXWikiRunnable implements Runnable
      */
     protected ExecutionContext initExecutionContext() throws ExecutionContextException
     {
+        // Keep a reference to the Execution component to avoid a lookup in #cleanupExecutionContext() in case this
+        // thread is stopped after the Component Manager disposes its components.
+        execution = Utils.getComponent(Execution.class);
+
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         ExecutionContext context = new ExecutionContext();
 
@@ -99,10 +110,9 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void cleanupExecutionContext()
     {
-        Execution ech = Utils.getComponent(Execution.class);
         // We must ensure we clean the ThreadLocal variables located in the Execution
         // component as otherwise we will have a potential memory leak.
-        ech.removeContext();
+        execution.removeContext();
     }
 
     @Override

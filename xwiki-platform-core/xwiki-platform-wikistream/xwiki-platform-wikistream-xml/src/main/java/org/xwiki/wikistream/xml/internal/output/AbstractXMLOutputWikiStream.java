@@ -103,7 +103,8 @@ public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputProperties> 
         return this.filter;
     }
 
-    protected abstract Object createFilter(P parameters) throws XMLStreamException, FactoryConfigurationError;
+    protected abstract Object createFilter(P parameters) throws XMLStreamException, FactoryConfigurationError,
+        WikiStreamException;
 
     @Override
     public void close() throws IOException

@@ -25,8 +25,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
 /**
  * @version $Id$

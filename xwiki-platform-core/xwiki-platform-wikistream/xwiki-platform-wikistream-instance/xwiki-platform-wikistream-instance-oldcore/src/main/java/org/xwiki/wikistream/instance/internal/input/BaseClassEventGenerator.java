@@ -29,9 +29,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiClassFilter;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.BaseClassFilter;
+import org.xwiki.wikistream.model.filter.WikiClassFilter;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;

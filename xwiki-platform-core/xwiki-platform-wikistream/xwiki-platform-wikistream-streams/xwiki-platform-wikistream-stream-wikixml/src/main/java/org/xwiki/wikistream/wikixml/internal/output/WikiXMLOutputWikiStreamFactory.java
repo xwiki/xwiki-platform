@@ -19,16 +19,25 @@
  */
 package org.xwiki.wikistream.wikixml.internal.output;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.xml.serializer.XMLSerializerFactory;
-import org.xwiki.wikistream.internal.utils.AllFilter;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
@@ -48,6 +57,9 @@ public class WikiXMLOutputWikiStreamFactory extends
     @Inject
     private XMLSerializerFactory serializerFactory;
 
+    @Inject
+    private Provider<ComponentManager> contextComponentManager;
+
     public WikiXMLOutputWikiStreamFactory()
     {
         super(WikiStreamType.WIKI_XML);
@@ -58,8 +70,21 @@ public class WikiXMLOutputWikiStreamFactory extends
 
     @Override
     protected Object createListener(Result result, WikiXMLOuputProperties properties) throws XMLStreamException,
-        FactoryConfigurationError
+        FactoryConfigurationError, WikiStreamException
     {
-        return this.serializerFactory.createSerializer(AllFilter.class, result, null);
+        List<OutputWikiStreamFactory> factorys;
+        try {
+            factorys = this.contextComponentManager.get().getInstanceList(OutputWikiStreamFactory.class);
+        } catch (ComponentLookupException e) {
+            throw new WikiStreamException("Failed to lookup OutputWikiStreamFactory components instances", e);
+        }
+
+        Set<Object> filters = new HashSet<Object>();
+
+        for (OutputWikiStreamFactory factory : factorys) {
+            filters.addAll(factory.getFilterInterfaces());
+        }
+
+        return this.serializerFactory.createSerializer(filters.toArray(ArrayUtils.EMPTY_CLASS_ARRAY), result, null);
     }
 }

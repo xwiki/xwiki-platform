@@ -41,26 +41,4 @@
     <module>xwiki-platform-wikistream-stream-xwiki</module>
     <module>xwiki-platform-wikistream-stream-xar</module>
   </modules>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-api</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 </project>

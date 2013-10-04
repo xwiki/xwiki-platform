@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 
 /**
  * @version $Id$

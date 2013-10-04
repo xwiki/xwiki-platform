@@ -38,9 +38,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.filter.WikiObjectFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
+import org.xwiki.wikistream.model.filter.WikiClassFilter;
+import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARClassPropertyModel;
@@ -50,8 +52,6 @@ import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARObjectPropertyModel;
 import org.xwiki.wikistream.xar.internal.XARUtils;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
 /**
  * @version $Id$

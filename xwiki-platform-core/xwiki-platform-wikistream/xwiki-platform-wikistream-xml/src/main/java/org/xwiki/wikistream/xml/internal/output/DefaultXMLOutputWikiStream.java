@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 import org.xwiki.wikistream.WikiStreamException;
 
 /**
- * 
  * @param <P>
  * @version $Id$
  * @since 5.2M2
@@ -45,7 +44,8 @@ public class DefaultXMLOutputWikiStream<P extends XMLOuputProperties, F> extends
     }
 
     @Override
-    protected Object createFilter(P properties) throws XMLStreamException, FactoryConfigurationError
+    protected Object createFilter(P properties) throws XMLStreamException, FactoryConfigurationError,
+        WikiStreamException
     {
         return this.factory.createListener(this.result, properties);
     }

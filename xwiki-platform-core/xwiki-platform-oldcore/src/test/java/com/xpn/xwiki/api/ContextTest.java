@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.api;
 
+import java.util.Locale;
+
 import org.apache.velocity.VelocityContext;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
@@ -99,6 +101,7 @@ public class ContextTest extends AbstractComponentTestCase
     {
         // Setup Context and XWiki objects
         final XWikiContext xcontext = new XWikiContext();
+        xcontext.setMainXWiki("testwiki");
         xcontext.setDatabase("testwiki");
 
         final com.xpn.xwiki.XWiki xwiki = getMockery().mock(com.xpn.xwiki.XWiki.class);
@@ -106,7 +109,6 @@ public class ContextTest extends AbstractComponentTestCase
 
         final CoreConfiguration coreConfiguration = registerMockComponent(CoreConfiguration.class);
         final VelocityManager velocityManager = registerMockComponent(VelocityManager.class);
-        final XWikiStoreInterface store = getMockery().mock(XWikiStoreInterface.class);
 
         final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         final XWikiDocument document = new XWikiDocument(documentReference);
@@ -122,10 +124,8 @@ public class ContextTest extends AbstractComponentTestCase
             will(returnValue(new VelocityContext()));
             allowing(xwiki).getLanguagePreference(xcontext);
             will(returnValue("en"));
-            allowing(xwiki).getStore();
-            will(returnValue(store));
             // Translated document
-            allowing(store).loadXWikiDoc(with(anXWikiDocumentWithReference(documentReference)), with(same(xcontext)));
+            allowing(xwiki).getDocument(with(equal(new DocumentReference(documentReference, Locale.ENGLISH))), with(same(xcontext)));
             will(returnValue(document));
             allowing(xwiki).getXClass(documentReference, xcontext);
             will(returnValue(baseClass));

@@ -5618,25 +5618,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         XWikiDocument tdoc = this;
 
         if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(getDefaultLocale())) {
-            tdoc = new XWikiDocument(getDocumentReference());
-            tdoc.setLocale(locale);
-            String database = context.getDatabase();
             try {
-                // We might need to switch database to
-                // get the translated content
-                if (getDatabase() != null) {
-                    context.setDatabase(getDatabase());
-                }
-
-                tdoc = getStore(context).loadXWikiDoc(tdoc, context);
+                tdoc = context.getWiki().getDocument(new DocumentReference(getDocumentReference(), locale), context);
 
                 if (tdoc.isNew()) {
                     tdoc = this;
                 }
             } catch (Exception e) {
                 tdoc = this;
-            } finally {
-                context.setDatabase(database);
             }
         }
 

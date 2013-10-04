@@ -61,8 +61,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
 {
     private XWiki mockXWiki;
 
-    private XWikiStoreInterface mockStore;
-
     private QueryManager mockQueryManager;
 
     private Query mockQuery;
@@ -85,8 +83,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");
-
-        this.mockStore = getMockery().mock(XWikiStoreInterface.class);
 
         this.mockQuery = getMockery().mock(Query.class);
 
@@ -114,35 +110,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                             document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
                             document.setSyntax(Syntax.PLAIN_1_0);
                             document.setOriginalDocument(document.clone());
-                        }
-
-                        return document;
-                    }
-                });
-
-                allowing(mockStore).loadXWikiDoc(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
-                will(new CustomAction("loadXWikiDoc")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        XWikiDocument providedDocument = (XWikiDocument) invocation.getParameter(0);
-                        Map<Locale, XWikiDocument> documentLanguages =
-                            documents.get(providedDocument.getDocumentReference());
-
-                        if (documentLanguages == null) {
-                            documentLanguages = new HashMap<Locale, XWikiDocument>();
-                            documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
-                        }
-
-                        XWikiDocument document = documentLanguages.get(providedDocument.getLocale());
-
-                        if (document == null) {
-                            document = new XWikiDocument(providedDocument.getDocumentReference());
-                            document.setLocale(providedDocument.getLocale());
-                            document.setDefaultLocale(providedDocument.getDefaultLocale());
-                            document.setTranslation(providedDocument.getTranslation());
-                            document.setStore(mockStore);
                         }
 
                         return document;
@@ -214,9 +181,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                         return null;
                     }
                 });
-
-                allowing(mockXWiki).getStore();
-                will(returnValue(mockStore));
 
                 allowing(mockXWiki).prepareResources(with(any(XWikiContext.class)));
 
@@ -292,7 +256,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                 tdocument = new XWikiDocument(document.getDocumentReference());
                 tdocument.setLocale(locale);
                 tdocument.setTranslation(1);
-                tdocument.setStore(mockStore);
             }
             document = tdocument;
         }

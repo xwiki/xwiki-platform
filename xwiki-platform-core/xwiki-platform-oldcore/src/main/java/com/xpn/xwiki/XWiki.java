@@ -2574,7 +2574,7 @@ public class XWiki implements EventListener
                 try {
                     locales.add(LocaleUtils.toLocale(language));
                 } catch (Exception e) {
-                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences", language, e);
+                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences", language);
                 }
             }
         }

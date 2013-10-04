@@ -56,8 +56,6 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 {
     private XWiki mockXWiki;
 
-    private XWikiStoreInterface mockStore;
-
     private ServletContext mockServletContext;
 
     private Map<DocumentReference, Map<Locale, XWikiDocument>> documents =
@@ -83,8 +81,6 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");
 
-        this.mockStore = getMockery().mock(XWikiStoreInterface.class);
-
         ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
         this.mockServletContext = environment.getServletContext();
 
@@ -99,45 +95,24 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                     @Override
                     public Object invoke(Invocation invocation) throws Throwable
                     {
-                        Map<Locale, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
+                        DocumentReference documentReference = (DocumentReference) invocation.getParameter(0);
+
+                        Locale locale =
+                            documentReference.getLocale() != null ? documentReference.getLocale() : Locale.ROOT;
+                        documentReference = new DocumentReference(documentReference, null);
+
+                        Map<Locale, XWikiDocument> documentLanguages = documents.get(documentReference);
 
                         if (documentLanguages == null) {
                             documentLanguages = new HashMap<Locale, XWikiDocument>();
-                            documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
+                            documents.put(documentReference, documentLanguages);
                         }
 
-                        XWikiDocument document = documentLanguages.get(Locale.ROOT);
+                        XWikiDocument document = documentLanguages.get(locale);
 
                         if (document == null) {
-                            document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
-                        }
-
-                        return document;
-                    }
-                });
-
-                allowing(mockStore).loadXWikiDoc(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
-                will(new CustomAction("loadXWikiDoc")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        XWikiDocument providedDocument = (XWikiDocument) invocation.getParameter(0);
-                        Map<Locale, XWikiDocument> documentLanguages =
-                            documents.get(providedDocument.getDocumentReference());
-
-                        if (documentLanguages == null) {
-                            documentLanguages = new HashMap<Locale, XWikiDocument>();
-                            documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
-                        }
-
-                        XWikiDocument document = documentLanguages.get(providedDocument.getLocale());
-
-                        if (document == null) {
-                            document = new XWikiDocument(providedDocument.getDocumentReference());
-                            document.setLocale(providedDocument.getLocale());
-                            document.setDefaultLocale(providedDocument.getDefaultLocale());
-                            document.setTranslation(providedDocument.getTranslation());
+                            document = new XWikiDocument(documentReference);
+                            document.setLocale(locale);
                         }
 
                         return document;
@@ -200,9 +175,6 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
                         return null;
                     }
                 });
-
-                allowing(mockXWiki).getStore();
-                will(returnValue(mockStore));
 
                 allowing(mockXWiki).prepareResources(with(any(XWikiContext.class)));
 

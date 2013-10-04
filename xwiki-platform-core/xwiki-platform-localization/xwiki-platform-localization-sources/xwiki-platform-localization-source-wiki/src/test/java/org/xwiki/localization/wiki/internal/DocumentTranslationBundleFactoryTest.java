@@ -50,7 +50,6 @@ import org.xwiki.security.authorization.Right;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
@@ -65,8 +64,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
 
     private AuthorizationManager mockAuthorizationManager;
 
-    private Map<DocumentReference, Map<Locale, XWikiDocument>> documents =
-        new HashMap<DocumentReference, Map<Locale, XWikiDocument>>();
+    private Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
 
     private ObservationManager observation;
 
@@ -95,14 +93,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                     @Override
                     public Object invoke(Invocation invocation) throws Throwable
                     {
-                        Map<Locale, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
-
-                        if (documentLanguages == null) {
-                            documentLanguages = new HashMap<Locale, XWikiDocument>();
-                            documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
-                        }
-
-                        XWikiDocument document = documentLanguages.get(Locale.ROOT);
+                        XWikiDocument document = documents.get(invocation.getParameter(0));
 
                         if (document == null) {
                             document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
@@ -128,25 +119,11 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                         document.incrementVersion();
                         document.setNew(false);
 
-                        Map<Locale, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+                        DocumentReference documentReference =
+                            new DocumentReference(document.getDocumentReference(), document.getLocale().equals(
+                                Locale.ROOT) ? null : document.getLocale());
 
-                        XWikiDocument previousDocument;
-                        if (documentLanguages == null) {
-                            documentLanguages = new HashMap<Locale, XWikiDocument>();
-                            documents.put(document.getDocumentReference(), documentLanguages);
-                            previousDocument = null;
-                        } else {
-                            previousDocument = documentLanguages.get(document.getLocale());
-                        }
-
-                        for (XWikiAttachment attachment : document.getAttachmentList()) {
-                            if (!attachment.isContentDirty()) {
-                                attachment.setAttachment_content(previousDocument.getAttachment(
-                                    attachment.getFilename()).getAttachment_content());
-                            }
-                        }
-
-                        documentLanguages.put(document.getLocale(), document);
+                        documents.put(documentReference, document);
 
                         if (isNew) {
                             observation.notify(new DocumentCreatedEvent(document.getDocumentReference()), document,
@@ -170,11 +147,10 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
                     {
                         XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
 
-                        Map<Locale, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+                        DocumentReference documentReference =
+                            new DocumentReference(document.getDocumentReference(), document.getLocale());
 
-                        if (documentLanguages != null) {
-                            documentLanguages.remove(document.getLocale());
-                        }
+                        documents.remove(documentReference);
 
                         return null;
                     }

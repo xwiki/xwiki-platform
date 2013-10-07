@@ -93,16 +93,15 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     @Override
     public void setTemplate(String wikiId, boolean value) throws WikiTemplateManagerException
     {
-        try{
+        try {
             XWikiContext context = xcontextProvider.get();
             DefaultWikiManager defaultWikiManager = (DefaultWikiManager) wikiManager;
             DefaultWikiDescriptor desc = (DefaultWikiDescriptor) defaultWikiManager.getByWikiId(wikiId);
             XWikiDocument wikiDocument = desc.getDocument();
             BaseObject obj = wikiDocument.getXObject(getWikiDescriptorClassReference());
             obj.set(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE, "1", context);
-            context.getWiki().saveDocument(wikiDocument, "Set template: "+value, context);
-
-        } catch(WikiManagerException e) {
+            context.getWiki().saveDocument(wikiDocument, "Set template: " + value, context);
+        } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         } catch (XWikiException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
@@ -113,14 +112,13 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     public boolean isTemplate(String wikiId) throws WikiTemplateManagerException
     {
         boolean isTemplate = false;
-        try{
+        try {
             DefaultWikiManager defaultWikiManager = (DefaultWikiManager) wikiManager;
             DefaultWikiDescriptor desc = (DefaultWikiDescriptor) defaultWikiManager.getByWikiId(wikiId);
             XWikiDocument wikiDocument = desc.getDocument();
             BaseObject obj = wikiDocument.getXObject(getWikiDescriptorClassReference());
             isTemplate = obj.getIntValue(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE, 0) != 0;
-
-        } catch(WikiManagerException e) {
+        } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         }
 
@@ -141,7 +139,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
             // Finally, return the descriptor
             return descriptor;
-        } catch (WikiManagerException e){
+        } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         } catch (XWikiException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);

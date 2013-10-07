@@ -33,4 +33,11 @@
   <name>XWiki Platform - Wiki - Template - API</name>
   <description>XWiki Platform - Wiki - Template - API</description>
   <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -37,8 +37,5 @@
     <module>xwiki-platform-wiki-template-api</module>
     <module>xwiki-platform-wiki-template-default</module>
     <module>xwiki-platform-wiki-template-script</module>
-    <module>xwiki-platform-wiki-template-api</module>
-    <module>xwiki-platform-wiki-template-default</module>
-    <module>xwiki-platform-wiki-template-script</module>
   </modules>
 </project>

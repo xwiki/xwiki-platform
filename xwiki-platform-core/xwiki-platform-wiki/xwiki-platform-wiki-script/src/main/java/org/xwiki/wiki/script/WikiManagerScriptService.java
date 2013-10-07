@@ -24,6 +24,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -53,6 +54,9 @@ public class WikiManagerScriptService implements ScriptService
     @Inject
     private WikiManager wikiManager;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     /**
      * Execution context.
      */
@@ -72,7 +76,7 @@ public class WikiManagerScriptService implements ScriptService
     {
         Wiki descriptor = null;
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = xcontextProvider.get();
 
         try {
             // Check right access
@@ -91,11 +95,10 @@ public class WikiManagerScriptService implements ScriptService
         return descriptor;
     }
 
-    public boolean deleteWiki(Wiki descriptor)
+    public boolean deleteWiki(String wikiId)
     {
-        XWikiContext context = getXWikiContext();
-
-        WikiReference wikiReference = new WikiReference(descriptor.getWikiId());
+        XWikiContext context = xcontextProvider.get();
+        WikiReference wikiReference = new WikiReference(wikiId);
 
         try {
             // Check right access
@@ -103,7 +106,7 @@ public class WikiManagerScriptService implements ScriptService
             authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(), wikiReference);
 
             // Delete the wiki
-            wikiManager.delete(descriptor);
+            wikiManager.delete(wikiId);
 
         } catch (WikiManagerException e) {
             return false;
@@ -114,7 +117,7 @@ public class WikiManagerScriptService implements ScriptService
         return true;
     }
 
-    public Wiki getByWikiAlias(String wikiAlias)
+    public Wiki getByAlias(String wikiAlias)
     {
         Wiki descriptor = null;
 
@@ -126,7 +129,7 @@ public class WikiManagerScriptService implements ScriptService
         return descriptor;
     }
 
-    public Wiki getByWikiId(String wikiId)
+    public Wiki getById(String wikiId)
     {
         Wiki descriptor = null;
 
@@ -140,28 +143,28 @@ public class WikiManagerScriptService implements ScriptService
 
     public Collection<Wiki> getAll()
     {
-        Collection<Wiki> descriptors;
+        Collection<Wiki> wikis;
         try {
-            descriptors = wikiManager.getAll();
+            wikis = wikiManager.getAll();
         } catch (WikiManagerException e) {
-            descriptors = new ArrayList<Wiki>();
+            wikis = new ArrayList<Wiki>();
         }
-        return descriptors;
+        return wikis;
     }
 
-    public boolean wikiIdExists(String wikiId)
+    public boolean exists(String wikiId)
     {
         try {
-            return wikiManager.wikiExists(wikiId);
+            return wikiManager.exists(wikiId);
         } catch (WikiManagerException e) {
             return false;
         }
     }
 
-    public boolean isWikiIdAvailable(String wikiId)
+    public boolean idAvailable(String wikiId)
     {
         try {
-            return wikiManager.wikiAvailable(wikiId);
+            return wikiManager.idAvailable(wikiId);
         } catch (WikiManagerException e) {
             return false;
         }
@@ -186,10 +189,5 @@ public class WikiManagerScriptService implements ScriptService
 
         /* Store exception in context. */
         this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

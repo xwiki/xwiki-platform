@@ -29,7 +29,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Role
-public interface WikiDescriptorBuilder
+public interface WikiBuilder
 {
     Wiki build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context);
+
+
 }

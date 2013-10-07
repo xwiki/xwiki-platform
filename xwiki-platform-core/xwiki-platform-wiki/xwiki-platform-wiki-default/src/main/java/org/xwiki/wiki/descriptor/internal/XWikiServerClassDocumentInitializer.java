@@ -243,7 +243,7 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     public XWikiServerClassDocumentInitializer()
     {
         // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.
-        // getDocumentReference() returns the actual main wiki document reference.
+        // getDescriptorReference() returns the actual main wiki document reference.
         super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
     }
 

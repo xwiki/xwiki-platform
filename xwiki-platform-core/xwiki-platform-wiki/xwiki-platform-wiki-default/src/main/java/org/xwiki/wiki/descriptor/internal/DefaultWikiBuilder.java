@@ -34,7 +34,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 @Component
 @Singleton
-public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
+public class DefaultWikiBuilder implements WikiBuilder
 {
     static final String VALID_PAGE_PREFIX = "XWikiServer";
 
@@ -65,7 +65,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             // If the page name doesn't start with "XWikiServer" then consider we have an invalid Wiki
             String wikiId = extractWikiId(document);
             if (wikiId != null) {
-                descriptor = new DefaultWiki(wikiId, serverProperty, document);
+                descriptor = new DefaultWiki(wikiId, serverProperty, document.getDocumentReference());
             }
         }
 

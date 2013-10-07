@@ -25,6 +25,11 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.Wiki;
 
+/**
+ * Manager the create and manage wikis.
+ *
+ * @since 5.3M1
+ */
 @Role
 @Unstable
 public interface WikiManager

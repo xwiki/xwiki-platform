@@ -39,7 +39,7 @@ import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.Wiki;
+import org.xwiki.wiki.Wiki;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -64,7 +64,7 @@ public class DefaultWikiManagerTest
     @Test
     public void createWiki() throws Exception
     {
-        //this.mocker.getComponentUnderTest().createWiki("wikiid", "wikialias");
+        //this.mocker.getComponentUnderTest().create("wikiid", "wikialias");
 
     }
 
@@ -114,9 +114,9 @@ public class DefaultWikiManagerTest
         when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor);
 
-        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
+        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByAlias("wikialias"));
 
-        // Verify that calling getByWikiAlias() also sets the wiki id in the cache.
+        // Verify that calling getByAlias() also sets the wiki id in the cache.
         verify(wikiIdCache).set("wikiid", descriptor);
     }
 
@@ -132,7 +132,7 @@ public class DefaultWikiManagerTest
         Wiki descriptor = new Wiki("wikiid", "wikialias");
         when(wikiAliasCache.get("wikialias")).thenReturn(descriptor);
 
-        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
+        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByAlias("wikialias"));
     }
 
     @Test
@@ -161,7 +161,7 @@ public class DefaultWikiManagerTest
         ec.setProperty("xwikicontext", xcontext);
         when(execution.getContext()).thenReturn(ec);
 
-        assertNull(this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
+        assertNull(this.mocker.getComponentUnderTest().getByAlias("wikialias"));
     }
 
     @Test
@@ -198,9 +198,9 @@ public class DefaultWikiManagerTest
         when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor);
 
-        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
+        assertEquals(descriptor, this.mocker.getComponentUnderTest().getById("wikiid"));
 
-        // Verify that calling getByWikiId() also sets the wiki alias in the cache.
+        // Verify that calling getById() also sets the wiki alias in the cache.
         verify(wikiAliasCache).set("wikialias", descriptor);
     }
 
@@ -216,7 +216,7 @@ public class DefaultWikiManagerTest
         Wiki descriptor = new Wiki("wikiid", "wikialias");
         when(wikiIdCache.get("wikiid")).thenReturn(descriptor);
 
-        assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
+        assertEquals(descriptor, this.mocker.getComponentUnderTest().getById("wikiid"));
     }
 
     @Test
@@ -243,7 +243,7 @@ public class DefaultWikiManagerTest
         when(xwiki.getDocument(eq(reference), any(XWikiContext.class))).thenReturn(document);
         when(document.isNew()).thenReturn(true);
 
-        assertNull(this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
+        assertNull(this.mocker.getComponentUnderTest().getById("wikiid"));
     }
 
     @Test

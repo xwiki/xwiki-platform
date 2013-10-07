@@ -45,8 +45,8 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.wiki.descriptor.Wiki;
-import org.xwiki.wiki.descriptor.WikiAlias;
+import org.xwiki.wiki.Wiki;
+import org.xwiki.wiki.WikiAlias;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -148,7 +148,7 @@ public class DefaultWikiManager implements WikiManager, Initializable
     }
 
     @Override
-    public Wiki createWiki(String wikiId, String wikiAlias) throws WikiManagerException
+    public Wiki create(String wikiId, String wikiAlias) throws WikiManagerException
     {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
@@ -220,7 +220,7 @@ public class DefaultWikiManager implements WikiManager, Initializable
     }
 
     @Override
-    public Wiki getByWikiAlias(String wikiAlias) throws WikiManagerException
+    public Wiki getByAlias(String wikiAlias) throws WikiManagerException
     {
         Wiki descriptor = this.wikiAliasCache.get(wikiAlias);
 
@@ -242,7 +242,7 @@ public class DefaultWikiManager implements WikiManager, Initializable
     }
 
     @Override
-    public Wiki getByWikiId(String wikiId) throws WikiManagerException
+    public Wiki getById(String wikiId) throws WikiManagerException
     {
         Wiki descriptor = this.wikiIdCache.get(wikiId);
 
@@ -353,7 +353,7 @@ public class DefaultWikiManager implements WikiManager, Initializable
 
     @Override
     public boolean wikiExists(String wikiId) throws WikiManagerException {
-        return getByWikiId(wikiId) != null;
+        return getById(wikiId) != null;
     }
 
     @Override

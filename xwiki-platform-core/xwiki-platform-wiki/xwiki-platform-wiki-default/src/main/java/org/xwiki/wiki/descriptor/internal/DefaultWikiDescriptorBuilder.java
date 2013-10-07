@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.wiki.descriptor.Wiki;
-import org.xwiki.wiki.descriptor.WikiAlias;
+import org.xwiki.wiki.Wiki;
+import org.xwiki.wiki.WikiAlias;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;

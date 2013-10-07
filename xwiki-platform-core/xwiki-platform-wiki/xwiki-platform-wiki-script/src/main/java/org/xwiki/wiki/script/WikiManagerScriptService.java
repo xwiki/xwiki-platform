@@ -34,7 +34,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.descriptor.Wiki;
+import org.xwiki.wiki.Wiki;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -80,7 +80,7 @@ public class WikiManagerScriptService implements ScriptService
                     new WikiReference(context.getMainXWiki()));
 
             // Create the wiki
-            descriptor = wikiManager.createWiki(wikiId, wikiAlias);
+            descriptor = wikiManager.create(wikiId, wikiAlias);
 
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
@@ -103,7 +103,7 @@ public class WikiManagerScriptService implements ScriptService
             authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(), wikiReference);
 
             // Delete the wiki
-            wikiManager.deleteWiki(descriptor);
+            wikiManager.delete(descriptor);
 
         } catch (WikiManagerException e) {
             return false;
@@ -119,7 +119,7 @@ public class WikiManagerScriptService implements ScriptService
         Wiki descriptor = null;
 
         try {
-            descriptor = wikiManager.getByWikiAlias(wikiAlias);
+            descriptor = wikiManager.getByAlias(wikiAlias);
         } catch (WikiManagerException e) {
         }
 
@@ -131,7 +131,7 @@ public class WikiManagerScriptService implements ScriptService
         Wiki descriptor = null;
 
         try {
-            descriptor = wikiManager.getByWikiId(wikiId);
+            descriptor = wikiManager.getById(wikiId);
         } catch (WikiManagerException e) {
         }
 

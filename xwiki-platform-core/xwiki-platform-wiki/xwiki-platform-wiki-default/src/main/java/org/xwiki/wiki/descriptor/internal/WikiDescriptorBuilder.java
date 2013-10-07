@@ -22,7 +22,7 @@ package org.xwiki.wiki.descriptor.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.wiki.descriptor.Wiki;
+import org.xwiki.wiki.Wiki;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;

@@ -32,7 +32,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.wiki.descriptor.Wiki;
+import org.xwiki.wiki.Wiki;
 import org.xwiki.wiki.manager.WikiManager;
 
 import com.xpn.xwiki.XWikiContext;

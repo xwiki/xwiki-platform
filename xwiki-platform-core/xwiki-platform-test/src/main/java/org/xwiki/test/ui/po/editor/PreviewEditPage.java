@@ -35,6 +35,9 @@ public class PreviewEditPage extends EditPage
      */
     private PreviewableEditPage editedPage;
 
+    @FindBy(id = "xwikicontent")
+    private WebElement content;
+
     /**
      * The button used to return to edit.
      */
@@ -60,5 +63,13 @@ public class PreviewEditPage extends EditPage
     {
         backToEdit.click();
         return editedPage;
+    }
+
+    /**
+     * @return the page's main content as text (no HTML)
+     */
+    public String getContent()
+    {
+        return this.content.getText();
     }
 }

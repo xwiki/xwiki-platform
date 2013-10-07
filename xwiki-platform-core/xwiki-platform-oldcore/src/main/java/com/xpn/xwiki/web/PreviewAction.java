@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * <p>
@@ -90,7 +91,19 @@ public class PreviewAction extends EditAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        prepareEditedDocument(context);
+        XWikiDocument editedDocument = prepareEditedDocument(context);
+
+        // The current user editing the document should be displayed as author and creator (if the edited document is
+        // new) when the edited document is previewed.
+        editedDocument.setAuthorReference(context.getUserReference());
+        if (editedDocument.isNew()) {
+            editedDocument.setCreatorReference(context.getUserReference());
+        }
+
+        // Make sure the current user doesn't use the programming rights of the previous content author (by editing a
+        // document saved with programming rights, changing it and then previewing it). Also make sure the code
+        // requiring programming rights is executed in preview mode if the current user has programming rights.
+        editedDocument.setContentAuthorReference(context.getUserReference());
 
         // Reconfirm edit (captcha) when jcaptcha is not correct.
         Boolean reCheckCaptcha = (Boolean) context.get("recheckcaptcha");

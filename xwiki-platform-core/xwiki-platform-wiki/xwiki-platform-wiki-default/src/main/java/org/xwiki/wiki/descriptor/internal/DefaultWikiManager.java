@@ -59,6 +59,7 @@ import com.xpn.xwiki.util.Util;
 
 @Component
 @Singleton
+@Named("default")
 public class DefaultWikiManager implements WikiManager, Initializable
 {
     @Inject

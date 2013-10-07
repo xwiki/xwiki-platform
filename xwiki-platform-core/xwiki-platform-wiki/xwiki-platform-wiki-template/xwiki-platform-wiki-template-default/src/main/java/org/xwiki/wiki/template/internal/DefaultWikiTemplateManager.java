@@ -1,0 +1,156 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.wiki.template.internal;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
+import org.xwiki.wiki.descriptor.internal.DefaultWikiManager;
+import org.xwiki.wiki.manager.WikiManager;
+import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.template.WikiTemplateManager;
+import org.xwiki.wiki.template.WikiTemplateManagerException;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+public class DefaultWikiTemplateManager implements WikiTemplateManager
+{
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    @Named("default")
+    private WikiManager wikiManager;
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Override
+    public Collection<WikiDescriptor> getTemplates() throws WikiTemplateManagerException
+    {
+        List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
+
+        try {
+            Query query = this.queryManager.createQuery(
+                    "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%' and " +
+                            "descriptor.iswikitemplate = 1",
+                    Query.XWQL);
+            query.setWiki(xcontextProvider.get().getMainXWiki());
+            List<String> documentNames = query.execute();
+
+            if (documentNames != null && !documentNames.isEmpty()) {
+                for (String documentName : documentNames) {
+                    String id = documentName.substring("XWiki.XWikiServer".length()).toLowerCase();
+                    result.add(wikiManager.getByWikiId(id));
+                }
+            }
+        } catch (Exception e) {
+            throw new WikiTemplateManagerException("Failed to locate XWiki.XWikiServerClass documents", e);
+        }
+
+        return result;
+    }
+
+    @Override
+    public void setTemplate(String wikiId, boolean value) throws WikiTemplateManagerException
+    {
+        try{
+            XWikiContext context = xcontextProvider.get();
+            DefaultWikiManager defaultWikiManager = (DefaultWikiManager) wikiManager;
+            DefaultWikiDescriptor desc = (DefaultWikiDescriptor) defaultWikiManager.getByWikiId(wikiId);
+            XWikiDocument wikiDocument = desc.getDocument();
+            BaseObject obj = wikiDocument.getXObject(getWikiDescriptorClassReference());
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE, "1", context);
+            context.getWiki().saveDocument(wikiDocument, "Set template: "+value, context);
+
+        } catch(WikiManagerException e) {
+            throw new WikiTemplateManagerException(e.getMessage(), e);
+        } catch (XWikiException e) {
+            throw new WikiTemplateManagerException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean isTemplate(String wikiId) throws WikiTemplateManagerException
+    {
+        boolean isTemplate = false;
+        try{
+            DefaultWikiManager defaultWikiManager = (DefaultWikiManager) wikiManager;
+            DefaultWikiDescriptor desc = (DefaultWikiDescriptor) defaultWikiManager.getByWikiId(wikiId);
+            XWikiDocument wikiDocument = desc.getDocument();
+            BaseObject obj = wikiDocument.getXObject(getWikiDescriptorClassReference());
+            isTemplate = obj.getIntValue(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE, 0) != 0;
+
+        } catch(WikiManagerException e) {
+            throw new WikiTemplateManagerException(e.getMessage(), e);
+        }
+
+        return isTemplate;
+    }
+
+    @Override
+    public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias,
+            WikiDescriptor templateDescriptor) throws WikiTemplateManagerException
+    {
+        try {
+            // First, create the new wiki
+            WikiDescriptor descriptor = wikiManager.createWiki(newWikiId, newWikiAlias);
+
+            // Then copy the wiki
+            WikiCopy wikiCopy = new WikiCopy();
+            wikiCopy.copyWiki(templateDescriptor.getWikiId(), newWikiId, "", xcontextProvider.get());
+
+            // Finally, return the descriptor
+            return descriptor;
+        } catch (WikiManagerException e){
+            throw new WikiTemplateManagerException(e.getMessage(), e);
+        } catch (XWikiException e) {
+            throw new WikiTemplateManagerException(e.getMessage(), e);
+        }
+    }
+
+    private DocumentReference getWikiDescriptorClassReference()
+    {
+        return new DocumentReference(xcontextProvider.get().getMainXWiki(), XWiki.SYSTEM_SPACE,
+                XWikiServerClassDocumentInitializer.DOCUMENT_NAME);
+    }
+}

@@ -43,11 +43,18 @@ public interface WikiTemplateManager
     /**
      * Set if the specified wiki is a template or not.
      *
-     * @param wikiDescriptor the wiki to specify
+     * @param wikiId the ID of the wiki to specify
      * @param value whether or not the wiki is a template
      * @throws WikiTemplateManagerException if problems occur
      */
-    void setTemplate(WikiDescriptor wikiDescriptor, boolean value) throws WikiTemplateManagerException;
+    void setTemplate(String wikiId, boolean value) throws WikiTemplateManagerException;
+
+    /**
+     * @param wikiId The id of the wiki to test
+     * @return if the wiki is a template or not
+     * @throws WikiTemplateManagerException if problems occur
+     */
+    boolean isTemplate(String wikiId) throws WikiTemplateManagerException;
 
     /**
      * Create a new wiki from the specified template.

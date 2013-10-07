@@ -17,22 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor;
+package org.xwiki.wiki.descriptor.internal;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.wiki.descriptor.Wiki;
 
-@Unstable
-public class WikiDescriptorAlias
+import com.xpn.xwiki.doc.XWikiDocument;
+
+public class DefaultWiki extends Wiki
 {
-    private String wikiAlias;
+    /**
+     * Relative reference to the XWiki.XWikiServerClass containing wiki descriptor metadata.
+     */
+    public static final EntityReference SERVER_CLASS = new EntityReference("XWikiServerClass", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.SPACE));
 
-    public WikiDescriptorAlias(String wikiAlias)
+    private XWikiDocument document;
+
+    public DefaultWiki(String wikiId, String wikiAlias, XWikiDocument document)
     {
-        this.wikiAlias = wikiAlias;
+        super(wikiId, wikiAlias);
+        this.document = document;
     }
 
-    public String getWikiAlias()
-    {
-        return this.wikiAlias;
+    public XWikiDocument getDocument() {
+        return document;
     }
+
 }

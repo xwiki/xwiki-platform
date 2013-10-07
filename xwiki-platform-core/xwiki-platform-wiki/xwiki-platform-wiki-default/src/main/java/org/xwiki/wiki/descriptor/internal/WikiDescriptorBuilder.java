@@ -22,7 +22,7 @@ package org.xwiki.wiki.descriptor.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.Wiki;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -31,5 +31,5 @@ import com.xpn.xwiki.objects.BaseObject;
 @Role
 public interface WikiDescriptorBuilder
 {
-    WikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context);
+    Wiki build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context);
 }

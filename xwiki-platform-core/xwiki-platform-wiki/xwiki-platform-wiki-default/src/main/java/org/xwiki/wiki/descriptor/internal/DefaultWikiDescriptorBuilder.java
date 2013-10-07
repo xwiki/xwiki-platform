@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
-import org.xwiki.wiki.descriptor.WikiDescriptorAlias;
+import org.xwiki.wiki.descriptor.Wiki;
+import org.xwiki.wiki.descriptor.WikiAlias;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -39,15 +39,15 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     static final String VALID_PAGE_PREFIX = "XWikiServer";
 
     @Override
-    public WikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context)
+    public Wiki build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context)
     {
-        // Create a WikiDescriptor object with the first XWikiServerClass object
-        WikiDescriptor descriptor = extractWikiDescriptor(serverClassObjects.get(0), document);
+        // Create a Wiki object with the first XWikiServerClass object
+        Wiki descriptor = extractWikiDescriptor(serverClassObjects.get(0), document);
 
         if (descriptor != null) {
-            // Create WikiDescriptorAlias instances for the other XWikiServerClass objects
+            // Create WikiAlias instances for the other XWikiServerClass objects
             for (int i = 1; i < serverClassObjects.size(); i++) {
-                WikiDescriptorAlias descriptorAlias = extractWikiDescriptorAlias(serverClassObjects.get(i));
+                WikiAlias descriptorAlias = extractWikiDescriptorAlias(serverClassObjects.get(i));
                 descriptor.addDescriptorAlias(descriptorAlias);
             }
         }
@@ -55,26 +55,26 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
         return descriptor;
     }
 
-    private DefaultWikiDescriptor extractWikiDescriptor(BaseObject serverClassObject, XWikiDocument document)
+    private DefaultWiki extractWikiDescriptor(BaseObject serverClassObject, XWikiDocument document)
     {
-        DefaultWikiDescriptor descriptor = null;
+        DefaultWiki descriptor = null;
 
-        // If the server property is empty then consider we have an invalid WikiDescriptor
+        // If the server property is empty then consider we have an invalid Wiki
         String serverProperty = extractWikiAlias(serverClassObject);
         if (!StringUtils.isBlank(serverProperty)) {
-            // If the page name doesn't start with "XWikiServer" then consider we have an invalid WikiDescriptor
+            // If the page name doesn't start with "XWikiServer" then consider we have an invalid Wiki
             String wikiId = extractWikiId(document);
             if (wikiId != null) {
-                descriptor = new DefaultWikiDescriptor(wikiId, serverProperty, document);
+                descriptor = new DefaultWiki(wikiId, serverProperty, document);
             }
         }
 
         return descriptor;
     }
 
-    private WikiDescriptorAlias extractWikiDescriptorAlias(BaseObject serverClassObject)
+    private WikiAlias extractWikiDescriptorAlias(BaseObject serverClassObject)
     {
-        return new WikiDescriptorAlias(extractWikiAlias(serverClassObject));
+        return new WikiAlias(extractWikiAlias(serverClassObject));
     }
 
     private String extractWikiAlias(BaseObject serverClassObject)

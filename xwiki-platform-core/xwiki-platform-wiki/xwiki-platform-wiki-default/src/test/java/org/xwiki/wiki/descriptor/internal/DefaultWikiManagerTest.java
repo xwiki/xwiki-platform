@@ -39,7 +39,7 @@ import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.Wiki;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -72,10 +72,10 @@ public class DefaultWikiManagerTest
     public void getByWikiAliasWhenNotInCacheButExists() throws Exception
     {
         // Wiki alias is not in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
+        Cache<Wiki> wikiAliasCache = mock(Cache.class);
+        Cache<Wiki> wikiIdCache = mock(Cache.class);
         CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheFactory.<Wiki>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
 
         // Return "space.page" document name when querying the DB for a XWiki.XWikiServerClass matching the alias
@@ -108,9 +108,9 @@ public class DefaultWikiManagerTest
         List<BaseObject> baseObjects = Arrays.asList(mock(BaseObject.class));
         when(document.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
-        // Get a WikiDescriptor from the Wiki Descriptor Builder
+        // Get a Wiki from the Wiki Descriptor Builder
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
-        WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
+        Wiki descriptor = new Wiki("wikiid", "wikialias");
         when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor);
 
@@ -124,12 +124,12 @@ public class DefaultWikiManagerTest
     public void getByWikiAliasWhenInCache() throws Exception
     {
         // Wiki alias is in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
+        Cache<Wiki> wikiAliasCache = mock(Cache.class);
+        Cache<Wiki> wikiIdCache = mock(Cache.class);
         CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheFactory.<Wiki>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
-        WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
+        Wiki descriptor = new Wiki("wikiid", "wikialias");
         when(wikiAliasCache.get("wikialias")).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiAlias("wikialias"));
@@ -139,10 +139,10 @@ public class DefaultWikiManagerTest
     public void getByWikiAliasWhenNotInCacheAndItDoesntExist() throws Exception
     {
         // Wiki alias is not in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
+        Cache<Wiki> wikiAliasCache = mock(Cache.class);
+        Cache<Wiki> wikiIdCache = mock(Cache.class);
         CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheFactory.<Wiki>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
 
         // No result when querying the DB for a XWiki.XWikiServerClass matching the alias
@@ -168,10 +168,10 @@ public class DefaultWikiManagerTest
     public void getByWikiIdWhenNotInCacheButExists() throws Exception
     {
         // Wiki id is not in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
+        Cache<Wiki> wikiAliasCache = mock(Cache.class);
+        Cache<Wiki> wikiIdCache = mock(Cache.class);
         CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheFactory.<Wiki>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
 
         // Get the XWikiDocument for the Document Reference
@@ -192,9 +192,9 @@ public class DefaultWikiManagerTest
         List<BaseObject> baseObjects = Arrays.asList(mock(BaseObject.class));
         when(document.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
-        // Get a WikiDescriptor from the Wiki Descriptor Builder
+        // Get a Wiki from the Wiki Descriptor Builder
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
-        WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
+        Wiki descriptor = new Wiki("wikiid", "wikialias");
         when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor);
 
@@ -208,12 +208,12 @@ public class DefaultWikiManagerTest
     public void getByWikiIdWhenInCache() throws Exception
     {
         // Wiki id is in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
+        Cache<Wiki> wikiAliasCache = mock(Cache.class);
+        Cache<Wiki> wikiIdCache = mock(Cache.class);
         CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheFactory.<Wiki>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
-        WikiDescriptor descriptor = new WikiDescriptor("wikiid", "wikialias");
+        Wiki descriptor = new Wiki("wikiid", "wikialias");
         when(wikiIdCache.get("wikiid")).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByWikiId("wikiid"));
@@ -223,10 +223,10 @@ public class DefaultWikiManagerTest
     public void getByWikiIdWhenNotInCacheAndItDoesntExist() throws Exception
     {
         // Wiki id is not in cache...
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
+        Cache<Wiki> wikiAliasCache = mock(Cache.class);
+        Cache<Wiki> wikiIdCache = mock(Cache.class);
         CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheFactory.<Wiki>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
 
         // Get the XWikiDocument for the Document Reference but mark it as new (meaning that it doesn't exist)
@@ -250,10 +250,10 @@ public class DefaultWikiManagerTest
     public void getAll() throws Exception
     {
         // Cache setup
-        Cache<WikiDescriptor> wikiAliasCache = mock(Cache.class);
-        Cache<WikiDescriptor> wikiIdCache = mock(Cache.class);
+        Cache<Wiki> wikiAliasCache = mock(Cache.class);
+        Cache<Wiki> wikiIdCache = mock(Cache.class);
         CacheFactory cacheFactory = this.mocker.getInstance(CacheFactory.class);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheFactory.<Wiki>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
 
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
@@ -290,14 +290,14 @@ public class DefaultWikiManagerTest
         when(document1.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
         when(document2.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
-        // Get a WikiDescriptor from the Wiki Descriptor Builder
+        // Get a Wiki from the Wiki Descriptor Builder
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
-        WikiDescriptor descriptor1 = new WikiDescriptor("wikiid1", "wikialias1");
-        WikiDescriptor descriptor2 = new WikiDescriptor("wikiid2", "wikialias2");
+        Wiki descriptor1 = new Wiki("wikiid1", "wikialias1");
+        Wiki descriptor2 = new Wiki("wikiid2", "wikialias2");
         when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor1, descriptor2);
 
-        Collection<WikiDescriptor> descriptors = this.mocker.getComponentUnderTest().getAll();
+        Collection<Wiki> descriptors = this.mocker.getComponentUnderTest().getAll();
         assertEquals(2, descriptors.size());
 
         // Verify all descriptors were put in cache

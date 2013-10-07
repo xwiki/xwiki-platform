@@ -23,28 +23,24 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.Wiki;
 
 @Role
 @Unstable
 public interface WikiManager
 {
-    WikiDescriptor createWiki(String wikiId, String wikiAlias) throws WikiManagerException;
+    Wiki createWiki(String wikiId, String wikiAlias) throws WikiManagerException;
 
-    void deleteWiki(WikiDescriptor descriptor) throws WikiManagerException;
+    void deleteWiki(Wiki descriptor) throws WikiManagerException;
 
-    WikiDescriptor getByWikiAlias(String wikiAlias) throws WikiManagerException;
+    Wiki getByWikiAlias(String wikiAlias) throws WikiManagerException;
 
-    WikiDescriptor getByWikiId(String wikiId) throws WikiManagerException;
+    Wiki getByWikiId(String wikiId) throws WikiManagerException;
 
-    void setDescriptor(WikiDescriptor descriptor);
+    Collection<Wiki> getAll() throws WikiManagerException;
 
-    void removeDescriptor(WikiDescriptor descriptor);
+    boolean wikiExists(String wikiId) throws WikiManagerException;
 
-    Collection<WikiDescriptor> getAll() throws WikiManagerException;
-
-    boolean wikiIdExists(String wikiId) throws WikiManagerException;
-
-    boolean isWikiIdAvailable(String wikiId) throws WikiManagerException;
+    boolean wikiAvailable(String wikiId) throws WikiManagerException;
 
 }

@@ -34,7 +34,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.Wiki;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -68,9 +68,9 @@ public class WikiManagerScriptService implements ScriptService
     @Inject
     private Logger logger;
 
-    public WikiDescriptor createWiki(String wikiId, String wikiAlias)
+    public Wiki createWiki(String wikiId, String wikiAlias)
     {
-        WikiDescriptor descriptor = null;
+        Wiki descriptor = null;
 
         XWikiContext context = getXWikiContext();
 
@@ -91,7 +91,7 @@ public class WikiManagerScriptService implements ScriptService
         return descriptor;
     }
 
-    public boolean deleteWiki(WikiDescriptor descriptor)
+    public boolean deleteWiki(Wiki descriptor)
     {
         XWikiContext context = getXWikiContext();
 
@@ -114,9 +114,9 @@ public class WikiManagerScriptService implements ScriptService
         return true;
     }
 
-    public WikiDescriptor getByWikiAlias(String wikiAlias)
+    public Wiki getByWikiAlias(String wikiAlias)
     {
-        WikiDescriptor descriptor = null;
+        Wiki descriptor = null;
 
         try {
             descriptor = wikiManager.getByWikiAlias(wikiAlias);
@@ -126,9 +126,9 @@ public class WikiManagerScriptService implements ScriptService
         return descriptor;
     }
 
-    public WikiDescriptor getByWikiId(String wikiId)
+    public Wiki getByWikiId(String wikiId)
     {
-        WikiDescriptor descriptor = null;
+        Wiki descriptor = null;
 
         try {
             descriptor = wikiManager.getByWikiId(wikiId);
@@ -138,13 +138,13 @@ public class WikiManagerScriptService implements ScriptService
         return descriptor;
     }
 
-    public Collection<WikiDescriptor> getAll()
+    public Collection<Wiki> getAll()
     {
-        Collection<WikiDescriptor> descriptors;
+        Collection<Wiki> descriptors;
         try {
             descriptors = wikiManager.getAll();
         } catch (WikiManagerException e) {
-            descriptors = new ArrayList<WikiDescriptor>();
+            descriptors = new ArrayList<Wiki>();
         }
         return descriptors;
     }
@@ -152,7 +152,7 @@ public class WikiManagerScriptService implements ScriptService
     public boolean wikiIdExists(String wikiId)
     {
         try {
-            return wikiManager.wikiIdExists(wikiId);
+            return wikiManager.wikiExists(wikiId);
         } catch (WikiManagerException e) {
             return false;
         }
@@ -161,7 +161,7 @@ public class WikiManagerScriptService implements ScriptService
     public boolean isWikiIdAvailable(String wikiId)
     {
         try {
-            return wikiManager.isWikiIdAvailable(wikiId);
+            return wikiManager.wikiAvailable(wikiId);
         } catch (WikiManagerException e) {
             return false;
         }

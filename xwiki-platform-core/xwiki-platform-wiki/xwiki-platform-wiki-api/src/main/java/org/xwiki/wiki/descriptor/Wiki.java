@@ -27,15 +27,15 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
 
 @Unstable
-public class WikiDescriptor
+public class Wiki
 {
     private String wikiId;
 
     private String wikiAlias;
 
-    private List<WikiDescriptorAlias> descriptorAliases = new ArrayList<WikiDescriptorAlias>();
+    private List<WikiAlias> descriptorAliases = new ArrayList<WikiAlias>();
 
-    public WikiDescriptor(String wikiId, String wikiAlias)
+    public Wiki(String wikiId, String wikiAlias)
     {
         this.wikiId = wikiId;
         this.wikiAlias = wikiAlias;
@@ -51,12 +51,12 @@ public class WikiDescriptor
         return this.wikiAlias;
     }
 
-    public void addDescriptorAlias(WikiDescriptorAlias descriptorAlias)
+    public void addDescriptorAlias(WikiAlias descriptorAlias)
     {
         this.descriptorAliases.add(descriptorAlias);
     }
 
-    public List<WikiDescriptorAlias> getDescriptorAliases()
+    public List<WikiAlias> getDescriptorAliases()
     {
         return this.descriptorAliases;
     }
@@ -82,7 +82,7 @@ public class WikiDescriptor
         if (object.getClass() != getClass()) {
             return false;
         }
-        WikiDescriptor rhs = (WikiDescriptor) object;
+        Wiki rhs = (Wiki) object;
         return new EqualsBuilder()
             .append(getWikiAlias(), rhs.getWikiAlias())
             .append(getWikiId(), rhs.getWikiId())

@@ -32,7 +32,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.Wiki;
 import org.xwiki.wiki.manager.WikiManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -81,9 +81,9 @@ public class WikiDescriptorListener implements EventListener
         }
 
         // Register the new XWiki Server objects if any
-        List<BaseObject> serverClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
+        List<BaseObject> serverClassObjects = document.getXObjects(DefaultWiki.SERVER_CLASS);
         if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
-            WikiDescriptor descriptor = this.builder.build(serverClassObjects, document, context);
+            Wiki descriptor = this.builder.build(serverClassObjects, document, context);
             if (descriptor != null) {
                 this.wikiManager.setDescriptor(descriptor);
             }
@@ -92,9 +92,9 @@ public class WikiDescriptorListener implements EventListener
 
     private void removeExistingDescriptor(XWikiDocument document, XWikiContext context)
     {
-        List<BaseObject> existingServerClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
+        List<BaseObject> existingServerClassObjects = document.getXObjects(DefaultWiki.SERVER_CLASS);
         if (existingServerClassObjects != null && !existingServerClassObjects.isEmpty()) {
-            WikiDescriptor existingDescriptor =
+            Wiki existingDescriptor =
                 this.builder.build(existingServerClassObjects, document, context);
             if (existingDescriptor != null) {
                 this.wikiManager.removeDescriptor(existingDescriptor);

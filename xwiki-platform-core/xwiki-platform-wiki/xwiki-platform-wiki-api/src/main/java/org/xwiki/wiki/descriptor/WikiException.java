@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * @since 5.1M1
  */
 @Unstable
-public class WikiDescriptorException extends Exception
+public class WikiException extends Exception
 {
     /**
      * Class ID for serialization.
@@ -40,7 +40,7 @@ public class WikiDescriptorException extends Exception
      *
      * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
      */
-    public WikiDescriptorException(String message)
+    public WikiException(String message)
     {
         super(message);
     }
@@ -52,7 +52,7 @@ public class WikiDescriptorException extends Exception
      * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value
      *        is permitted, and indicates that the cause is nonexistent or unknown)
      */
-    public WikiDescriptorException(String message, Throwable throwable)
+    public WikiException(String message, Throwable throwable)
     {
         super(message, throwable);
     }

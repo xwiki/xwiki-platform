@@ -365,36 +365,11 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <differenceType>6006</differenceType>
-              <className>com/xpn/xwiki/XWikiContext</className>
-              <field>TYPE_PROVIDER</field>
-              <justification>This field is not meant to be be modified, the final was just forgotten.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
-              <method>* addHibernateSequenceIfRequired(*)</method>
-              <justification>Not an API. This should be internal.</justification>
-            </difference>
           </ignored>
           <excludes>
-            <!-- Has been moved to xwiki-platform-feed-api since it was the only module using it. We also
-                 dropped Tidy in favor of HTMLCleaner.
-
-                 Note: We cannot use a <difference> entry since CLIRR would still try to load the class from version
-                       5.1 and will not find org.w3c.tidy.TidyMessageListener since the dependency on JTidy has been
-                       removed. So we need to tell CLIRR to not load this class at all!
-             -->
-            <exclude>com/xpn/xwiki/util/TidyMessageLogger</exclude>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Google API plugin has been retired -->
-            <exclude>com/xpn/xwiki/plugin/google/GooglePlugin*</exclude>
-            <!-- The JPQLParser generates source code (that should be internal but it is not) and the grammar has
-            changed a bit -->
-            <exclude>org/xwiki/query/jpql/**</exclude>
             <!-- Young API that has been refactored to introduce the new Resource module -->
             <exclude>org/xwiki/url/**</exclude>
             <exclude>org/xwiki/container/Request</exclude>

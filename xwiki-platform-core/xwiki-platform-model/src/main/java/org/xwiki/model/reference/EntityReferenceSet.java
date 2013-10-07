@@ -108,13 +108,13 @@ public class EntityReferenceSet
             }
 
             if (currentEntry.childrenType == null || currentEntry.childrenType == element.getType()) {
-                currentEntry.add(reference.getName());
+                currentEntry.childrenType = element.getType();
+                currentEntry = currentEntry.add(element.getName());
             } else {
                 EntityReferenceEntry newEntry = new EntityReferenceEntry(currentEntry);
                 currentEntry.reset();
                 currentEntry.add(newEntry);
             }
-            currentEntry.childrenType = reference.getType();
         }
     }
 

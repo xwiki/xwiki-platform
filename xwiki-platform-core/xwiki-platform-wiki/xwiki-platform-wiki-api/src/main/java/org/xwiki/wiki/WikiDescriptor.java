@@ -71,9 +71,9 @@ public class WikiDescriptor
     private String ownerId;
 
     /**
-     * Hidden
+     * Hidden.
      */
-    private boolean isHidden = false;
+    private boolean isHidden;
 
     /**
      * Properties groups that new modules can use to store their own value in the wiki descriptor.

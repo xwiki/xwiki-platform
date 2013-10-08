@@ -99,6 +99,7 @@ public interface WikiManager
 
     /**
      * @return the descriptor of the main wiki
+     * @throws WikiManagerException if problems occur
      */
     WikiDescriptor getMainWikiDescriptor() throws WikiManagerException;
 

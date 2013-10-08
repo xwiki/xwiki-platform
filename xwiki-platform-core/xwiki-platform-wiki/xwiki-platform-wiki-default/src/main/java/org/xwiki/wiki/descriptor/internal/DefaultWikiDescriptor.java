@@ -36,26 +36,32 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     /**
      * Reference of the document that store the descriptor of the wiki
      */
-    private DocumentReference descriptorReference;
+    private DocumentReference documentReference;
 
     /**
      * Constructor
      * @param wikiId ID of the wiki
      * @param wikiAlias Alias of the wiki
-     * @param documentReference Reference of the document that store the descriptor
      */
-    public DefaultWikiDescriptor(String wikiId, String wikiAlias, DocumentReference documentReference)
+    public DefaultWikiDescriptor(String wikiId, String wikiAlias)
     {
         super(wikiId, wikiAlias);
-        this.descriptorReference = documentReference;
+    }
+
+    /**
+     * @param documentReference the new descriptor reference
+     */
+    public void setDocumentReference(DocumentReference documentReference)
+    {
+        this.documentReference = documentReference;
     }
 
     /**
      * @return the descriptor reference
      */
-    public DocumentReference getDescriptorReference()
+    public DocumentReference getDocumentReference()
     {
-        return descriptorReference;
+        return documentReference;
     }
 
 }

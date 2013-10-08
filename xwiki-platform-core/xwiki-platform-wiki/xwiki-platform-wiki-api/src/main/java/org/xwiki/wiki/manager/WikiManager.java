@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.Wiki;
 
 /**
- * Manager the create and manage wikis.
+ * Component to create and manage wikis.
  *
  * @since 5.3M1
  */

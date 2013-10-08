@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wiki.Wiki;
-import org.xwiki.wiki.WikiAlias;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -48,7 +47,7 @@ public class DefaultWikiBuilder implements WikiBuilder
             // Create WikiAlias instances for the other XWikiServerClass objects
             for (int i = 1; i < serverClassObjects.size(); i++) {
                 WikiAlias descriptorAlias = extractWikiDescriptorAlias(serverClassObjects.get(i));
-                descriptor.addDescriptorAlias(descriptorAlias);
+                descriptor.addAlias(descriptorAlias);
             }
         }
 

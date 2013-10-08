@@ -46,7 +46,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.Wiki;
-import org.xwiki.wiki.WikiAlias;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -296,11 +295,11 @@ public class DefaultWikiManager implements WikiManager, Initializable
     private void setDescriptor(Wiki descriptor)
     {
         // Update the wiki name cache
-        this.wikiIdCache.set(descriptor.getWikiId(), descriptor);
+        this.wikiIdCache.set(descriptor.getId(), descriptor);
 
         // Update the wiki alias cache
-        this.wikiAliasCache.set(descriptor.getWikiAlias(), descriptor);
-        for (WikiAlias alias : descriptor.getDescriptorAliases()) {
+        this.wikiAliasCache.set(descriptor.getDefaultAlias(), descriptor);
+        for (WikiAlias alias : descriptor.getAliases()) {
             this.wikiAliasCache.set(alias.getWikiAlias(), descriptor);
         }
     }
@@ -308,11 +307,11 @@ public class DefaultWikiManager implements WikiManager, Initializable
     private void removeDescriptor(Wiki descriptor)
     {
         // Remove from the wiki name cache
-        this.wikiIdCache.remove(descriptor.getWikiId());
+        this.wikiIdCache.remove(descriptor.getId());
 
         // Remove from the wiki alias cache
-        this.wikiAliasCache.remove(descriptor.getWikiAlias());
-        for (WikiAlias alias : descriptor.getDescriptorAliases()) {
+        this.wikiAliasCache.remove(descriptor.getDefaultAlias());
+        for (WikiAlias alias : descriptor.getAliases()) {
             this.wikiAliasCache.remove(alias.getWikiAlias());
         }
     }

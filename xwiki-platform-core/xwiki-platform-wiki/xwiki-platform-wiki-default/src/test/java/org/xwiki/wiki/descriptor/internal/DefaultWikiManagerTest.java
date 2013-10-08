@@ -64,6 +64,8 @@ public class DefaultWikiManagerTest
     @Test
     public void createWiki() throws Exception
     {
+
+
         //this.mocker.getComponentUnderTest().create("wikiid", "wikialias");
 
     }

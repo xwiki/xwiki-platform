@@ -26,47 +26,85 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
 
+/**
+ * A wiki.
+ *
+ * @since 5.3M1
+ */
 @Unstable
 public class Wiki
 {
-    private String wikiId;
+    /**
+     * The ID is the unique identifier that designate this wiki.
+     */
+    private String id;
 
-    private String wikiAlias;
+    /**
+     * Alias are names that can be used to designate this wiki in several places, like the URL.
+     */
+    private List<String> aliases;;
 
-    private List<WikiAlias> descriptorAliases = new ArrayList<WikiAlias>();
-
-    public Wiki(String wikiId, String wikiAlias)
+    /**
+     * Constructor.
+     * @param id Unique Id of the wiki
+     * @param defaultAlias Default alias of the wiki
+     */
+    public Wiki(String id, String defaultAlias)
     {
-        this.wikiId = wikiId;
-        this.wikiAlias = wikiAlias;
+        this.id = id;
+        this.aliases = new ArrayList<String>();
+        setDefaultAlias(defaultAlias);
     }
 
-    public String getWikiId()
+    /**
+     * @return the unique Id of the wiki.
+     */
+    public String getId()
     {
-        return this.wikiId;
+        return this.id;
     }
 
-    public String getWikiAlias()
+    /**
+     * The default alias is the alias used to generate URL for that wiki.
+     * @return the default alias.
+     */
+    public String getDefaultAlias()
     {
-        return this.wikiAlias;
+        return aliases.get(0);
     }
 
-    public void addDescriptorAlias(WikiAlias descriptorAlias)
-    {
-        this.descriptorAliases.add(descriptorAlias);
+    /**
+     * Set the default alias.
+     * @param alias new alias
+     */
+    public void setDefaultAlias(String alias) {
+        aliases.set(0, alias);
     }
 
-    public List<WikiAlias> getDescriptorAliases()
+    /**
+     * Add an alias.
+     * @param alias alias to add
+     */
+    public void addAlias(String alias)
     {
-        return this.descriptorAliases;
+        aliases.add(alias);
+    }
+
+    /**
+     * Returns all aliases. Aliases are used for the URL decoding.
+     * @return all aliases
+     */
+    public List<String> getAliases()
+    {
+        return aliases;
     }
 
     @Override
     public int hashCode()
     {
         return new HashCodeBuilder(3, 3)
-            .append(getWikiAlias())
-            .append(getWikiId())
+            .append(getDefaultAlias())
+            .append(getId())
             .toHashCode();
     }
 
@@ -84,8 +122,8 @@ public class Wiki
         }
         Wiki rhs = (Wiki) object;
         return new EqualsBuilder()
-            .append(getWikiAlias(), rhs.getWikiAlias())
-            .append(getWikiId(), rhs.getWikiId())
+            .append(getDefaultAlias(), rhs.getDefaultAlias())
+            .append(getId(), rhs.getId())
             .isEquals();
     }
 }

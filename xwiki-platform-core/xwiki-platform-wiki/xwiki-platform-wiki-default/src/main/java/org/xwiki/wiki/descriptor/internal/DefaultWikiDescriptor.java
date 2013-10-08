@@ -34,7 +34,7 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     public static final EntityReference SERVER_CLASS = XWikiServerClassDocumentInitializer.SERVER_CLASS;
 
     /**
-     * Reference of the document that store the descriptor of the wiki
+     * Reference of the document that store the descriptor of the wiki.
      */
     private DocumentReference documentReference;
 
@@ -46,6 +46,18 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     public DefaultWikiDescriptor(String wikiId, String wikiAlias)
     {
         super(wikiId, wikiAlias);
+    }
+
+    /**
+     * Constructor.
+     * @param wikiId ID of the wiki
+     * @param wikiAlias Alias of the wiki
+     * @param documentReference Reference of the document that store the descriptor in the wiki
+     */
+    public DefaultWikiDescriptor(String wikiId, String wikiAlias, DocumentReference documentReference)
+    {
+        super(wikiId, wikiAlias);
+        this.documentReference = documentReference;
     }
 
     /**

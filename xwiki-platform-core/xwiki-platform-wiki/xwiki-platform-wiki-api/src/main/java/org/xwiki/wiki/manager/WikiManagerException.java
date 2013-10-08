@@ -20,7 +20,7 @@
 package org.xwiki.wiki.manager;
 
 /**
- * Encapsulate any exception related to Wiki Manager.
+ * Encapsulate any exception related to WikiDescriptor Manager.
  *
  * @version $Id$
  * @since 5.1M1

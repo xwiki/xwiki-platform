@@ -73,7 +73,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private static final String DOCWIKI = "Wiki";
+    private static final String DOCWIKI = "WikiDescriptor";
 
     private static final String DOCSPACE = "Space";
 

@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * Properties group is a place where modules can store their own properties concerning a wiki. This group is then
- * attached to the Wiki. Each module is responsible for the persistent storage of its properties.
+ * attached to the WikiDescriptor. Each module is responsible for the persistent storage of its properties.
  *
  * @version $Id$
  * @since 5.3M1

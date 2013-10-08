@@ -38,7 +38,7 @@ import org.xwiki.wiki.properties.WikiPropertiesGroup;
  * @since 5.3M1
  */
 @Unstable
-public class Wiki
+public class WikiDescriptor
 {
     /**
      * Default alias index.
@@ -76,7 +76,7 @@ public class Wiki
      * @param id Unique Id of the wiki
      * @param defaultAlias Default alias of the wiki
      */
-    public Wiki(String id, String defaultAlias)
+    public WikiDescriptor(String id, String defaultAlias)
     {
         this.id = id;
         this.aliases = new ArrayList<String>();
@@ -191,7 +191,7 @@ public class Wiki
         if (object.getClass() != getClass()) {
             return false;
         }
-        Wiki rhs = (Wiki) object;
+        WikiDescriptor rhs = (WikiDescriptor) object;
         return new EqualsBuilder()
                 .append(getDefaultAlias(), rhs.getDefaultAlias())
                 .append(getId(), rhs.getId())

@@ -23,7 +23,7 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.Wiki;
+import org.xwiki.wiki.WikiDescriptor;
 
 /**
  * Component to create and manage wikis.
@@ -40,10 +40,10 @@ public interface WikiManager
      *
      * @param wikiId Id of the new wiki
      * @param wikiAlias Default alias of the new wiki
-     * @return the wiki created
+     * @return the descriptor of the created wiki
      * @throws WikiManagerException if problems occur
      */
-    Wiki create(String wikiId, String wikiAlias) throws WikiManagerException;
+    WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException;
 
     /**
      * Delete a wiki.
@@ -57,19 +57,19 @@ public interface WikiManager
      * Get a wiki from one of its alias.
      *
      * @param wikiAlias Alias of the wiki to retrieve
-     * @return The corresponding wiki of that alias.
+     * @return The corresponding wiki descriptor of that alias.
      * @throws WikiManagerException if problems occur
      */
-    Wiki getByAlias(String wikiAlias) throws WikiManagerException;
+    WikiDescriptor getByAlias(String wikiAlias) throws WikiManagerException;
 
     /**
      * Get a wiki from its Id.
      *
      * @param wikiId Id of the wiki to retrieve.
-     * @return The corresponding wiki of that Id
+     * @return The corresponding wiki descriptor of that Id
      * @throws WikiManagerException if problems occur
      */
-    Wiki getById(String wikiId) throws WikiManagerException;
+    WikiDescriptor getById(String wikiId) throws WikiManagerException;
 
     /**
      * Get the list of all wikis (except the main one).
@@ -77,7 +77,7 @@ public interface WikiManager
      * @return the lit of every wiki created on the farm (except the main one).
      * @throws WikiManagerException if problems occur
      */
-    Collection<Wiki> getAll() throws WikiManagerException;
+    Collection<WikiDescriptor> getAll() throws WikiManagerException;
 
     /**
      * Check if a wiki corresponding to an Id exists.

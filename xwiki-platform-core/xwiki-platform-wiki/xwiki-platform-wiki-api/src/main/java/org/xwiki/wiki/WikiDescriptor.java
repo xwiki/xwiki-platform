@@ -177,7 +177,7 @@ public class WikiDescriptor
      * @param propertiesGroupId the id of the properties group to retrieve
      * @return the properties group corresponding to the id, or null if no properties group correspond to that Id.
      */
-    public WikiPropertiesGroup get(String propertiesGroupId)
+    public WikiPropertiesGroup getPropertiesGroup(String propertiesGroupId)
     {
         return propertiesGroups.get(propertiesGroupId);
     }

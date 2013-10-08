@@ -54,7 +54,7 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     public static final String DOCUMENT_NAME = "XWikiServerClass";
 
     /**
-     * Reference to the server class
+     * Reference to the server class.
      */
     public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
             new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));

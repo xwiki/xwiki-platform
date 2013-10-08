@@ -35,11 +35,11 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.Wiki;
-import org.xwiki.wiki.manager.WikiManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.wikimanager.WikiManager;
+import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
+import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 
 @Component
 @Named("wiki")
@@ -49,7 +49,7 @@ public class WikiManagerScriptService implements ScriptService
     /**
      * Field name of the last API exception inserted in context.
      */
-    public static final String CONTEXT_LASTEXCEPTION = "lastexception2";
+    public static final String CONTEXT_LASTEXCEPTION = "lastexception";
 
     @Inject
     private WikiManager wikiManager;

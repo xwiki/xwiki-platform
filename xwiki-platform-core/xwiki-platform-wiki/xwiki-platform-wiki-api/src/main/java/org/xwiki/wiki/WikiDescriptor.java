@@ -118,7 +118,11 @@ public class WikiDescriptor
      */
     public void setDefaultAlias(String alias)
     {
-        aliases.set(DEFAULT_ALIAS_INDEX, alias);
+        if (aliases.isEmpty()) {
+            aliases.add(alias);
+        } else {
+            aliases.set(DEFAULT_ALIAS_INDEX, alias);
+        }
     }
 
     /**
@@ -187,6 +191,7 @@ public class WikiDescriptor
 
     /**
      * Set if the wiki is hidden.
+     *
      * @param hidden if the wiki is hidden or not
      */
     public void setHidden(boolean hidden)

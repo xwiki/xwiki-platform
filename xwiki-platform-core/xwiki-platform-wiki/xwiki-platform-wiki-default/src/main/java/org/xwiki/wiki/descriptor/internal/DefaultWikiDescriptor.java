@@ -39,7 +39,7 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     private DocumentReference documentReference;
 
     /**
-     * Constructor
+     * Constructor.
      * @param wikiId ID of the wiki
      * @param wikiAlias Alias of the wiki
      */

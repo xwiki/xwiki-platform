@@ -96,4 +96,14 @@ public interface WikiManager
      * @throws WikiManagerException if problems occur
      */
     boolean idAvailable(String wikiId) throws WikiManagerException;
+
+    /**
+     * @return the descriptor of the main wiki
+     */
+    WikiDescriptor getMainWikiDescriptor() throws WikiManagerException;
+
+    /**
+     * @return the Id of the main wiki
+     */
+    String getMainWikiId();
 }

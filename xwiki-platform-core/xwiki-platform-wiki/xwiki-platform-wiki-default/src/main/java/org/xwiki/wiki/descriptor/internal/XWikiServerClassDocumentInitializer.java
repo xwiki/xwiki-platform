@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.sheet.SheetBinder;
@@ -51,6 +52,12 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
      * The name of the mandatory document.
      */
     public static final String DOCUMENT_NAME = "XWikiServerClass";
+
+    /**
+     * Reference to the server class
+     */
+    public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
+            new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     /**
      * Default list separators of XWiki.XWikiServerClass fields.

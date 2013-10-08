@@ -56,6 +56,11 @@ public class WikiDescriptor
     private List<String> aliases = new ArrayList<String>();
 
     /**
+     * Pretty name.
+     */
+    private String prettyName;
+
+    /**
      * Default page.
      */
     private LocalDocumentReference mainPageReference;
@@ -130,6 +135,22 @@ public class WikiDescriptor
     public List<String> getAliases()
     {
         return aliases;
+    }
+
+    /**
+     * @return the pretty name of the wiki
+     */
+    public String getPrettyName()
+    {
+        return prettyName;
+    }
+
+    /**
+     * @param prettyName the new pretty name
+     */
+    public void setPrettyName(String prettyName)
+    {
+        this.prettyName = prettyName;
     }
 
     /**

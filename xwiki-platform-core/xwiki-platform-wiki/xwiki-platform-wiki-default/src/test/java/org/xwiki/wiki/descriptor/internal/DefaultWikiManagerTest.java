@@ -40,6 +40,8 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.Wiki;
+import org.xwiki.wiki.descriptor.internal.builder.WikiDescriptorBuilder;
+import org.xwiki.wiki.descriptor.internal.manager.DefaultWikiManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -50,7 +52,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link DefaultWikiManager}.
+ * Unit tests for {@link org.xwiki.wiki.descriptor.internal.manager.DefaultWikiManager}.
  *
  * @version $Id$
  * @since 5.1M1
@@ -111,9 +113,9 @@ public class DefaultWikiManagerTest
         when(document.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
         // Get a Wiki from the Wiki Descriptor Builder
-        WikiBuilder wikiBuilder = this.mocker.getInstance(WikiBuilder.class);
+        WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         Wiki descriptor = new Wiki("wikiid", "wikialias");
-        when(wikiBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
+        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByAlias("wikialias"));
@@ -194,9 +196,9 @@ public class DefaultWikiManagerTest
         when(document.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
         // Get a Wiki from the Wiki Descriptor Builder
-        WikiBuilder wikiBuilder = this.mocker.getInstance(WikiBuilder.class);
+        WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         Wiki descriptor = new Wiki("wikiid", "wikialias");
-        when(wikiBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
+        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getById("wikiid"));
@@ -292,10 +294,10 @@ public class DefaultWikiManagerTest
         when(document2.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
         // Get a Wiki from the Wiki Descriptor Builder
-        WikiBuilder wikiBuilder = this.mocker.getInstance(WikiBuilder.class);
+        WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         Wiki descriptor1 = new Wiki("wikiid1", "wikialias1");
         Wiki descriptor2 = new Wiki("wikiid2", "wikialias2");
-        when(wikiBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
+        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class),
             any(XWikiContext.class))).thenReturn(descriptor1, descriptor2);
 
         Collection<Wiki> descriptors = this.mocker.getComponentUnderTest().getAll();

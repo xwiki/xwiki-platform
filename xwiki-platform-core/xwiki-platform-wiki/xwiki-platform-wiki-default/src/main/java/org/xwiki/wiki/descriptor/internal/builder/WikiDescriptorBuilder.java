@@ -17,21 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal;
+package org.xwiki.wiki.descriptor.internal.builder;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.wiki.Wiki;
+import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Component that create WikiDescriptor object from wiki document and vice versa.
+ * @version $Id $
+ * @since 5.3M1
+ */
 @Role
-public interface WikiBuilder
+public interface WikiDescriptorBuilder
 {
-    Wiki build(List<BaseObject> serverClassObjects, XWikiDocument document, XWikiContext context);
+    /**
+     * Build a wiki descriptor from a document and its objects.
+     * @param serverClassObjects objects of that page to parse
+     * @param document document that hold the wiki descriptor
+     * @return a wiki descriptor
+     */
+    DefaultWikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document);
 
-
+    /**
+     * Save the descriptor into the wiki.
+     * @param descriptor descriptor to build
+     * @return the document that hold the descriptor
+     */
+    XWikiDocument build(DefaultWikiDescriptor descriptor) throws WikiDescriptorBuilderException;
 }

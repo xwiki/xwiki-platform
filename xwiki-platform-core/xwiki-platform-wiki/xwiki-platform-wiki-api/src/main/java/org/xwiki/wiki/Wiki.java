@@ -21,19 +21,30 @@ package org.xwiki.wiki;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wiki.properties.WikiPropertiesGroup;
 
 /**
- * A wiki.
+ * This class is a descriptor for wiki.
  *
+ * @version $Id$
  * @since 5.3M1
  */
 @Unstable
 public class Wiki
 {
+    /**
+     * Default alias index.
+     */
+    private static final int DEFAULT_ALIAS_INDEX = 0;
+
     /**
      * The ID is the unique identifier that designate this wiki.
      */
@@ -42,10 +53,26 @@ public class Wiki
     /**
      * Alias are names that can be used to designate this wiki in several places, like the URL.
      */
-    private List<String> aliases;;
+    private List<String> aliases = new ArrayList<String>();
+
+    /**
+     * Default page.
+     */
+    private LocalDocumentReference mainPageReference;
+
+    /**
+     * The owner of the wiki.
+     */
+    private String ownerId;
+
+    /**
+     * Properties groups that new modules can use to store their own value in the wiki descriptor.
+     */
+    private Map<String, WikiPropertiesGroup> propertiesGroups;
 
     /**
      * Constructor.
+     *
      * @param id Unique Id of the wiki
      * @param defaultAlias Default alias of the wiki
      */
@@ -66,24 +93,26 @@ public class Wiki
 
     /**
      * The default alias is the alias used to generate URL for that wiki.
+     *
      * @return the default alias.
      */
     public String getDefaultAlias()
     {
-        return aliases.get(0);
+        return aliases.get(DEFAULT_ALIAS_INDEX);
     }
 
     /**
      * Set the default alias.
-     * @param alias new alias
+     *
+     * @param alias the new default alias
      */
-    public void setDefaultAlias(String alias) {
-        aliases.set(0, alias);
+    public void setDefaultAlias(String alias)
+    {
+        aliases.set(DEFAULT_ALIAS_INDEX, alias);
     }
 
     /**
-     * Add an alias.
-     * @param alias alias to add
+     * @param alias the new alias to add
      */
     public void addAlias(String alias)
     {
@@ -91,7 +120,6 @@ public class Wiki
     }
 
     /**
-     * Returns all aliases. Aliases are used for the URL decoding.
      * @return all aliases
      */
     public List<String> getAliases()
@@ -99,13 +127,56 @@ public class Wiki
         return aliases;
     }
 
+    /**
+     * @return a reference to that wiki
+     */
+    public WikiReference getReference()
+    {
+        return new WikiReference(getId());
+    }
+
+    /**
+     * @return a reference to the main page of the wiki
+     */
+    public DocumentReference getMainPageReference()
+    {
+        return new DocumentReference(getId(), mainPageReference.getParent().getName(), mainPageReference.getName());
+    }
+
+    /**
+     * @return the Id of the owner of the wiki
+     */
+    public String getOwnerId()
+    {
+        return ownerId;
+    }
+
+    /**
+     * @param propertiesGroupId the id of the properties group to retrieve
+     * @return the properties group corresponding to the id, or null if no properties group correspond to that Id.
+     */
+    public WikiPropertiesGroup get(String propertiesGroupId)
+    {
+        return propertiesGroups.get(propertiesGroupId);
+    }
+
+    /**
+     * Add a properties group to the wiki.
+     *
+     * @param group properties group to add
+     */
+    public void addPropertiesGroup(WikiPropertiesGroup group)
+    {
+        propertiesGroups.put(group.getId(), group);
+    }
+
     @Override
     public int hashCode()
     {
         return new HashCodeBuilder(3, 3)
-            .append(getDefaultAlias())
-            .append(getId())
-            .toHashCode();
+                .append(getDefaultAlias())
+                .append(getId())
+                .toHashCode();
     }
 
     @Override
@@ -122,8 +193,8 @@ public class Wiki
         }
         Wiki rhs = (Wiki) object;
         return new EqualsBuilder()
-            .append(getDefaultAlias(), rhs.getDefaultAlias())
-            .append(getId(), rhs.getId())
-            .isEquals();
+                .append(getDefaultAlias(), rhs.getDefaultAlias())
+                .append(getId(), rhs.getId())
+                .isEquals();
     }
 }

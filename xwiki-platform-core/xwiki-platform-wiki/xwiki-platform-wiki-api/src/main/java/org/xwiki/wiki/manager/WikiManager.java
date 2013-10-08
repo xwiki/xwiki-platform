@@ -28,6 +28,7 @@ import org.xwiki.wiki.Wiki;
 /**
  * Component to create and manage wikis.
  *
+ * @version $Id$
  * @since 5.3M1
  */
 @Role
@@ -63,6 +64,7 @@ public interface WikiManager
 
     /**
      * Get a wiki from its Id.
+     *
      * @param wikiId Id of the wiki to retrieve.
      * @return The corresponding wiki of that Id
      * @throws WikiManagerException if problems occur
@@ -94,5 +96,4 @@ public interface WikiManager
      * @throws WikiManagerException if problems occur
      */
     boolean idAvailable(String wikiId) throws WikiManagerException;
-
 }

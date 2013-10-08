@@ -17,15 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.manager;
+package org.xwiki.wiki.properties;
 
 /**
- * Encapsulate any exception related to Wiki Manager.
+ * Encapsulate any exception related to Wiki Properties Groups.
  *
  * @version $Id$
  * @since 5.1M1
  */
-public class WikiManagerException extends Exception
+public class WikiPropertiesGroupException extends Exception
 {
     /**
      * Class ID for serialization.
@@ -37,7 +37,7 @@ public class WikiManagerException extends Exception
      *
      * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
      */
-    public WikiManagerException(String message)
+    public WikiPropertiesGroupException(String message)
     {
         super(message);
     }
@@ -49,7 +49,7 @@ public class WikiManagerException extends Exception
      * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value is
      * permitted, and indicates that the cause is nonexistent or unknown)
      */
-    public WikiManagerException(String message, Throwable throwable)
+    public WikiPropertiesGroupException(String message, Throwable throwable)
     {
         super(message, throwable);
     }

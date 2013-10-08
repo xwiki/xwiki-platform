@@ -66,6 +66,11 @@ public class WikiDescriptor
     private String ownerId;
 
     /**
+     * Hidden
+     */
+    private boolean isHidden = false;
+
+    /**
      * Properties groups that new modules can use to store their own value in the wiki descriptor.
      */
     private Map<String, WikiPropertiesGroup> propertiesGroups;
@@ -149,6 +154,23 @@ public class WikiDescriptor
     public String getOwnerId()
     {
         return ownerId;
+    }
+
+    /**
+     * @return if the wiki is hidden
+     */
+    public boolean isHidden()
+    {
+        return isHidden;
+    }
+
+    /**
+     * Set if the wiki is hidden.
+     * @param hidden if the wiki is hidden or not
+     */
+    public void setHidden(boolean hidden)
+    {
+        this.isHidden = hidden;
     }
 
     /**

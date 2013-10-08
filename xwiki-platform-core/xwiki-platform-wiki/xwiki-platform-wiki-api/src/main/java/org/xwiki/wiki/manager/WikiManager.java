@@ -69,7 +69,7 @@ public interface WikiManager
      * @return The corresponding wiki descriptor of that Id
      * @throws WikiManagerException if problems occur
      */
-    WikiDescriptor getById(String wikiId) throws WikiManagerException;
+    WikiDescriptor get(String wikiId) throws WikiManagerException;
 
     /**
      * Get the list of all wikis (except the main one).

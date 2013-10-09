@@ -23,16 +23,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Properties group is a place where modules can store their own properties concerning a wiki. This group is then
+ * Property group is a place where modules can store their own properties concerning a wiki. This group is then
  * attached to the WikiDescriptor. Each module is responsible for the persistent storage of its properties.
  *
  * @version $Id$
  * @since 5.3M1
  */
-public class WikiPropertiesGroup
+public class WikiPropertyGroup
 {
     /**
-     * Unique identifier of the properties group.
+     * Unique identifier of the property group.
      */
     private String id;
 
@@ -46,7 +46,7 @@ public class WikiPropertiesGroup
      *
      * @param id Unique identifier of the group
      */
-    public WikiPropertiesGroup(String id)
+    public WikiPropertyGroup(String id)
     {
         this.id = id;
         this.properties = new HashMap<String, Object>();

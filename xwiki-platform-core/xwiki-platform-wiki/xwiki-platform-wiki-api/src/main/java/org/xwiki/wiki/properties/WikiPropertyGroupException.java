@@ -25,7 +25,7 @@ package org.xwiki.wiki.properties;
  * @version $Id$
  * @since 5.1M1
  */
-public class WikiPropertiesGroupException extends Exception
+public class WikiPropertyGroupException extends Exception
 {
     /**
      * Class ID for serialization.
@@ -37,7 +37,7 @@ public class WikiPropertiesGroupException extends Exception
      *
      * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
      */
-    public WikiPropertiesGroupException(String message)
+    public WikiPropertyGroupException(String message)
     {
         super(message);
     }
@@ -49,7 +49,7 @@ public class WikiPropertiesGroupException extends Exception
      * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value is
      * permitted, and indicates that the cause is nonexistent or unknown)
      */
-    public WikiPropertiesGroupException(String message, Throwable throwable)
+    public WikiPropertyGroupException(String message, Throwable throwable)
     {
         super(message, throwable);
     }

@@ -67,7 +67,7 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
     private WikiManager wikiManager;
 
     @Override
-    public DefaultWikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document)
+    public DefaultWikiDescriptor buildDescriptorObject(List<BaseObject> serverClassObjects, XWikiDocument document)
     {
         // Create a Wiki object with the first XWikiServerClass object
         DefaultWikiDescriptor descriptor = extractWikiDescriptor(serverClassObjects.get(0), document);
@@ -116,7 +116,7 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
     }
 
     @Override
-    public XWikiDocument build(DefaultWikiDescriptor descriptor) throws WikiDescriptorBuilderException
+    public XWikiDocument buildDescriptorDocument(DefaultWikiDescriptor descriptor) throws WikiDescriptorBuilderException
     {
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();

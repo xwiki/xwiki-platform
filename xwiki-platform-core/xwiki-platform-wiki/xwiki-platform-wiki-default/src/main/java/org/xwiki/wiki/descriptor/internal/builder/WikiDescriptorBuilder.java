@@ -41,12 +41,12 @@ public interface WikiDescriptorBuilder
      * @param document document that hold the wiki descriptor
      * @return a wiki descriptor
      */
-    DefaultWikiDescriptor build(List<BaseObject> serverClassObjects, XWikiDocument document);
+    DefaultWikiDescriptor buildDescriptorObject(List<BaseObject> serverClassObjects, XWikiDocument document);
 
     /**
      * Save the descriptor into the wiki.
-     * @param descriptor descriptor to build
+     * @param descriptor descriptor to buildDescriptorObject
      * @return the document that hold the descriptor
      */
-    XWikiDocument build(DefaultWikiDescriptor descriptor) throws WikiDescriptorBuilderException;
+    XWikiDocument buildDescriptorDocument(DefaultWikiDescriptor descriptor) throws WikiDescriptorBuilderException;
 }

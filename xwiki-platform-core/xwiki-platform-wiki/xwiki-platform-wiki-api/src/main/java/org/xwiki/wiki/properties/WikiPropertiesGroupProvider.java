@@ -31,20 +31,20 @@ import org.xwiki.component.annotation.Role;
 public interface WikiPropertiesGroupProvider
 {
     /**
-     * Get the WikiDescriptor Properties Group corresponding to a wiki.
+     * Get the WikiDescriptor Property Group corresponding to a wiki.
      *
      * @param wikiId Id of the wiki
      * @return the group corresponding to the wiki
-     * @throws WikiPropertiesGroupException if problem occurs
+     * @throws WikiPropertyGroupException if problem occurs
      */
-    WikiPropertiesGroup getPropertiesGroup(String wikiId) throws WikiPropertiesGroupException;
+    WikiPropertyGroup get(String wikiId) throws WikiPropertyGroupException;
 
     /**
-     * Save the WikiDescriptor Properties Group corresponding to a wiki in the persistent storage.
+     * Save the WikiDescriptor Property Group corresponding to a wiki in the persistent storage.
      *
      * @param group group to save
      * @param wikiId uniquement identifier of the wiki concerned by this group
-     * @throws WikiPropertiesGroupException if problem occurs
+     * @throws WikiPropertyGroupException if problem occurs
      */
-    void savePropertiesGroup(WikiPropertiesGroup group, String wikiId) throws WikiPropertiesGroupException;
+    void save(WikiPropertyGroup group, String wikiId) throws WikiPropertyGroupException;
 }

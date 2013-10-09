@@ -147,7 +147,7 @@ public class DefaultWikiManager implements WikiManager, Initializable
 
         try {
             // Build the document
-            XWikiDocument descriptorDocument = wikiDescriptorBuilder.build(descriptor);
+            XWikiDocument descriptorDocument = wikiDescriptorBuilder.buildDescriptorDocument(descriptor);
             // Save the document
             xwiki.getStore().saveXWikiDoc(descriptorDocument, context);
             // Add the document to the descriptor
@@ -238,7 +238,7 @@ public class DefaultWikiManager implements WikiManager, Initializable
 
     private DefaultWikiDescriptor buildDescriptorFromDocument(XWikiDocument document)
     {
-        DefaultWikiDescriptor descriptor = wikiDescriptorBuilder.build(
+        DefaultWikiDescriptor descriptor = wikiDescriptorBuilder.buildDescriptorObject(
                 document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS), document);
         // Add to the cache
         if (descriptor != null) {

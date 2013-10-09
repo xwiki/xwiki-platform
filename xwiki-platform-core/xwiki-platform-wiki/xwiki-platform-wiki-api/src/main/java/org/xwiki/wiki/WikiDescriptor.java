@@ -29,7 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.properties.WikiPropertiesGroup;
+import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 /**
  * This class is a descriptor for wiki.
@@ -78,7 +78,7 @@ public class WikiDescriptor
     /**
      * Properties groups that new modules can use to store their own value in the wiki descriptor.
      */
-    private Map<String, WikiPropertiesGroup> propertiesGroups;
+    private Map<String, WikiPropertyGroup> propertyGroups;
 
     /**
      * Constructor.
@@ -200,22 +200,22 @@ public class WikiDescriptor
     }
 
     /**
-     * @param propertiesGroupId the id of the properties group to retrieve
-     * @return the properties group corresponding to the id, or null if no properties group correspond to that Id.
+     * @param propertyGroupId the id of the property group to retrieve
+     * @return the property group corresponding to the id, or null if no property group correspond to that Id.
      */
-    public WikiPropertiesGroup getPropertiesGroup(String propertiesGroupId)
+    public WikiPropertyGroup getPropertyGroup(String propertyGroupId)
     {
-        return propertiesGroups.get(propertiesGroupId);
+        return propertyGroups.get(propertyGroupId);
     }
 
     /**
-     * Add a properties group to the wiki.
+     * Add a property group to the wiki.
      *
-     * @param group properties group to add
+     * @param group property group to add
      */
-    public void addPropertiesGroup(WikiPropertiesGroup group)
+    public void addPropertyGroup(WikiPropertyGroup group)
     {
-        propertiesGroups.put(group.getId(), group);
+        propertyGroups.put(group.getId(), group);
     }
 
     @Override

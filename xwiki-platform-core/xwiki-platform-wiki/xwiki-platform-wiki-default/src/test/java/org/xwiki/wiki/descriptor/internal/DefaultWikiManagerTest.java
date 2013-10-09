@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -147,7 +148,7 @@ public class DefaultWikiManagerTest
         // Get a Wiki from the Wiki Descriptor Builder
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
-        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class))).
+        when(wikiDescriptorBuilder.buildDescriptorObject(anyListOf(BaseObject.class), any(XWikiDocument.class))).
                 thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getById("wikiid"));
@@ -208,7 +209,7 @@ public class DefaultWikiManagerTest
         // Get a Wiki from the Wiki Descriptor Builder
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias", reference);
-        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class))).thenReturn(descriptor);
+        when(wikiDescriptorBuilder.buildDescriptorObject(anyListOf(BaseObject.class), any(XWikiDocument.class))).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getByAlias("wikialias"));
 
@@ -272,7 +273,7 @@ public class DefaultWikiManagerTest
         WikiDescriptorBuilder wikiDescriptorBuilder = this.mocker.getInstance(WikiDescriptorBuilder.class);
         DefaultWikiDescriptor descriptor1 = new DefaultWikiDescriptor("wikiid1", "wikialias1", reference1);
         DefaultWikiDescriptor descriptor2 = new DefaultWikiDescriptor("wikiid2", "wikialias2", reference2);
-        when(wikiDescriptorBuilder.build(anyListOf(BaseObject.class), any(XWikiDocument.class))).
+        when(wikiDescriptorBuilder.buildDescriptorObject(anyListOf(BaseObject.class), any(XWikiDocument.class))).
                 thenReturn(descriptor1, descriptor2);
 
         Collection<WikiDescriptor> descriptors = this.mocker.getComponentUnderTest().getAll();
@@ -388,18 +389,21 @@ public class DefaultWikiManagerTest
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
         when(xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(descriptorDocument);
         when(descriptorDocument.isNew()).thenReturn(true);
+
         // The wiki id is valid
         when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
+
         // Other mocks
         XWikiStoreInterface store = mock(XWikiStoreInterface.class);
         when(xwiki.getStore()).thenReturn(store);
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
-        when(wikiDescriptorBuilder.build(eq(descriptor))).thenReturn(descriptorDocument);
+        when(wikiDescriptorBuilder.buildDescriptorDocument(eq(descriptor))).thenReturn(descriptorDocument);
         when(descriptorDocument.getDocumentReference()).thenReturn(documentReference);
 
         // Create
         WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1");
         assertNotNull(newWikiDescriptor);
+
         // Verify that the wiki descriptor is an instance of DefaultWikiDescriptor
         assertTrue(newWikiDescriptor instanceof DefaultWikiDescriptor);
         // Verify that the wiki has been created
@@ -413,6 +417,46 @@ public class DefaultWikiManagerTest
         // Verify that the descriptor has been added to the caches
         verify(wikiIdCache).set("wikiid1", (DefaultWikiDescriptor) newWikiDescriptor);
         verify(wikiAliasCache).set("wikialias1", (DefaultWikiDescriptor) newWikiDescriptor);
+    }
+
+    @Test
+    public void deleteTheMainWiki() throws Exception
+    {
+        boolean exceptionCaught = false;
+        try {
+            this.mocker.getComponentUnderTest().delete("xwiki");
+        } catch (WikiManagerException e) {
+            exceptionCaught = true;
+        }
+        assertTrue(exceptionCaught);
+    }
+
+    @Test
+    public void deleteWiki() throws Exception
+    {
+        // Mock
+        XWikiStoreInterface store = mock(XWikiStoreInterface.class);
+        when(xwiki.getStore()).thenReturn(store);
+        DocumentReference documentReference = new DocumentReference("xwiki", "space", "page");
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias", documentReference);
+        descriptor.addAlias("wikialias2");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(xwiki.getDocument(eq(documentReference), any(XWikiContext.class))).thenReturn(document);
+        when(wikiIdCache.get("wikiid")).thenReturn(descriptor);
+
+        // Delete
+        this.mocker.getComponentUnderTest().delete("wikiid");
+
+        // Verify that the database has been deleted
+        verify(store).deleteWiki(eq("wikiid"), any(XWikiContext.class));
+        // Verify that the descriptor document has been deleted
+        verify(xwiki).deleteDocument(eq(document), any(XWikiContext.class));
+        // Verify that the descriptor has been removed from caches
+        verify(wikiIdCache).remove("wikiid");
+        verify(wikiAliasCache).remove("wikialias");
+        verify(wikiAliasCache).remove("wikialias2");
+        // Verify that an event has been sent
+        verify(observationManager).notify(eq(new WikiDeletedEvent("wikiid")), eq(descriptor));
     }
 }
 

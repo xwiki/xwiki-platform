@@ -24,7 +24,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.wiki.WikiDescriptor;
 
 /**
- * Default implementation of the Wiki notion.
+ * Default implementation of the {@link WikiDescriptor}.
+ * @version $Id$
+ * @since 5.3M1
  */
 public class DefaultWikiDescriptor extends WikiDescriptor
 {

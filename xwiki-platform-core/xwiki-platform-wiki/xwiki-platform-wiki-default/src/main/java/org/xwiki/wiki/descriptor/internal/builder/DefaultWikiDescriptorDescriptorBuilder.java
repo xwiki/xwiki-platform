@@ -39,6 +39,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Default implementation for {@link WikiDescriptorBuilder}.
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Component
 @Singleton
 public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBuilder
@@ -142,13 +147,12 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
             DocumentReference serverClass = new DocumentReference(wikiManager.getMainWikiId(),
                     DefaultWikiDescriptor.SERVER_CLASS.getParent().getName(),
                     DefaultWikiDescriptor.SERVER_CLASS.getName());
-            for(int i = 1; i < aliases.size(); ++i) {
+            for (int i = 1; i < aliases.size(); ++i) {
                 String alias = aliases.get(i);
                 BaseObject objAlias = wikiDescriptorDocument.getXObject(serverClass,
                         XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, true);
                 objAlias.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
             }
-
         } catch (XWikiException e) {
             throw new WikiDescriptorBuilderException("Unable to create the descriptor", e);
         }

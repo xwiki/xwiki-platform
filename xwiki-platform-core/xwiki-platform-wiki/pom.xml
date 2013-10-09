@@ -35,5 +35,7 @@
   <description>XWiki Platform - Wiki - Parent POM</description>
   <modules>
     <module>xwiki-platform-wiki-descriptor</module>
+    <module>xwiki-platform-wiki-api</module>
+    <module>xwiki-platform-wiki-default</module>
   </modules>
 </project>

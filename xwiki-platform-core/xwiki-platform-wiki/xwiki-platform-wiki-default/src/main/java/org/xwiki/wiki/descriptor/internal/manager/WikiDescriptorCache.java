@@ -17,37 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal.builder;
-
-import java.util.List;
+package org.xwiki.wiki.descriptor.internal.manager;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-
 /**
- * Component that create WikiDescriptor object from wiki document and vice versa.
- * @version $Id $
+ * Component that handle caching for wiki descriptors.
+ * @version $Id$
  * @since 5.3M1
  */
 @Role
-public interface WikiDescriptorBuilder
+public interface WikiDescriptorCache
 {
     /**
-     * Build a wiki descriptor from a document and its objects.
-     * @param serverClassObjects objects of that page to parse
-     * @param document document that hold the wiki descriptor
-     * @return a wiki descriptor
+     * Add a descriptor to the cache.
+     *
+     * @param descriptor descriptor to add
      */
-    DefaultWikiDescriptor buildDescriptorObject(List<BaseObject> serverClassObjects, XWikiDocument document);
+    void add(DefaultWikiDescriptor descriptor);
 
     /**
-     * Save the descriptor into the wiki.
-     * @param descriptor descriptor to buildDescriptorObject
-     * @return the document that hold the descriptor
-     * @throws WikiDescriptorBuilderException if problems occur
+     * Remove a descriptor from the cache.
+     * @param descriptor descriptor to remove
      */
-    XWikiDocument buildDescriptorDocument(DefaultWikiDescriptor descriptor) throws WikiDescriptorBuilderException;
+    void remove(DefaultWikiDescriptor descriptor);
+
+    /**
+     * Get a descriptor from the cache.
+     *
+     * @param wikiId Id of the wiki to get
+     * @return the descriptor related to the id or null if there is no corresponding descriptor in the cache
+     */
+    DefaultWikiDescriptor getFromId(String wikiId);
+
+    /**
+     * Get a descriptor from the cache.
+     *
+     * @param wikiAlias Alias of the wiki to get
+     * @return the descriptor related to the alias or null if there is no corresponding descriptor in the cache
+     */
+    DefaultWikiDescriptor getFromAlias(String wikiAlias);
 }

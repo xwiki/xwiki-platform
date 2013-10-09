@@ -36,7 +36,6 @@
   <modules>
     <module>xwiki-platform-url-api</module>
     <module>xwiki-platform-url-standard</module>
-    <module>xwiki-platform-url-container</module>
   </modules>
 </project>
        

@@ -31,11 +31,9 @@
   </parent>
   <artifactId>xwiki-platform-wiki</artifactId>
   <name>XWiki Platform - Wiki - Parent POM</name>
-  <description>XWiki Platform - Wiki - Parent POM</description>
   <packaging>pom</packaging>
+  <description>XWiki Platform - Wiki - Parent POM</description>
   <modules>
-    <module>xwiki-platform-wiki-api</module>
-    <module>xwiki-platform-wiki-default</module>
-    <module>xwiki-platform-wiki-script</module>
+    <module>xwiki-platform-wiki-descriptor</module>
   </modules>
 </project>

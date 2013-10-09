@@ -1,3 +1,2 @@
 org.xwiki.url.internal.DefaultURLConfiguration
-org.xwiki.url.internal.DefaultXWikiURLFactory
-org.xwiki.url.internal.DefaultXWikiURLManager
+org.xwiki.url.internal.DefaultResourceFactory

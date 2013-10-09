@@ -229,7 +229,7 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
             notifyPopLevelProgress();
         }
 
-        this.logger.info("Successfully Repaired extension [{}] on namespace [{}]", localExtension, namespace);
+        this.logger.info("Successfully Repaired extension [{}] on namespace [{}]", localExtension.getId(), namespace);
     }
 
     /**

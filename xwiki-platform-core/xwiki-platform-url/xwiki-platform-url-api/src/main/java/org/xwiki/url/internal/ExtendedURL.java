@@ -30,8 +30,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
-import org.xwiki.url.URLCreationException;
+import org.xwiki.resource.ResourceCreationException;
 
 /**
  * Extend a {@link URL} by providing access to the URL path segments (URL-decoded).
@@ -39,7 +38,6 @@ import org.xwiki.url.URLCreationException;
  * @version $Id$
  * @since 5.1M1
  */
-@Unstable
 public class ExtendedURL implements Cloneable
 {
     /**
@@ -59,9 +57,9 @@ public class ExtendedURL implements Cloneable
 
     /**
      * @param url the URL being wrapped
-     * @throws URLCreationException if the passed URL is invalid which can happen if it has incorrect encoding
+     * @throws ResourceCreationException if the passed URL is invalid which can happen if it has incorrect encoding
      */
-    public ExtendedURL(URL url) throws URLCreationException
+    public ExtendedURL(URL url) throws ResourceCreationException
     {
         this(url, null);
     }
@@ -70,9 +68,9 @@ public class ExtendedURL implements Cloneable
      * @param url the URL being wrapped
      * @param ignorePrefix the ignore prefix must start with "/" (eg "/xwiki"). It can be empty or null too in which
      *        case it's not used
-     * @throws URLCreationException if the passed URL is invalid which can happen if it has incorrect encoding
+     * @throws ResourceCreationException if the passed URL is invalid which can happen if it has incorrect encoding
      */
-    public ExtendedURL(URL url, String ignorePrefix) throws URLCreationException
+    public ExtendedURL(URL url, String ignorePrefix) throws ResourceCreationException
     {
         // Convert the URL to a URI since URI performs correctly decoding.
         // Note that this means that this method only accepts valid URLs (with proper encoding)
@@ -80,7 +78,7 @@ public class ExtendedURL implements Cloneable
         try {
             internalURI = url.toURI();
         } catch (URISyntaxException e) {
-            throw new URLCreationException(String.format("Invalid URL [%s]", url), e);
+            throw new ResourceCreationException(String.format("Invalid URL [%s]", url), e);
         }
         this.uri = internalURI;
 
@@ -94,7 +92,7 @@ public class ExtendedURL implements Cloneable
             }
 
             if (!getURI().getPath().startsWith(normalizedIgnorePrefix)) {
-                throw new URLCreationException(
+                throw new ResourceCreationException(
                     String.format("URL Path [%s] doesn't start with [%s]", getURI().getPath(), ignorePrefix));
             }
             // Note: We also remove the leading "/" after the context path.

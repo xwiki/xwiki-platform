@@ -26,17 +26,17 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 5.2
  */
-public class DocumentOutputProperties
+public class DocumentOutputProperties extends InstanceOutputProperties
 {
-    private EntityReference defaultReference;
+    private EntityReference defaultReference = null;
 
     private String saveComment = "Import";
 
-    private DocumentReference author;
+    private DocumentReference author = null;
 
-    private boolean authorSet;
+    private boolean authorSet = false;
 
-    private boolean preserveVersion;
+    private boolean preserveVersion = false;
 
     public EntityReference getDefaultReference()
     {

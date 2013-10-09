@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link DefaultStandardURLConfiguration}.
  *
  * @version $Id$
- * @since 5.2M1
+ * @since 5.3M1
  */
 public class DefaultStandardURLConfigurationTest
 {

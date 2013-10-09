@@ -42,7 +42,8 @@ import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamF
 @Component
 @Named("wiki+xml")
 @Singleton
-public class WikiXMLOutputWikiStreamFactory extends AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputProperties>
+public class WikiXMLOutputWikiStreamFactory extends
+    AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputProperties, Object>
 {
     @Inject
     private XMLSerializerFactory serializerFactory;

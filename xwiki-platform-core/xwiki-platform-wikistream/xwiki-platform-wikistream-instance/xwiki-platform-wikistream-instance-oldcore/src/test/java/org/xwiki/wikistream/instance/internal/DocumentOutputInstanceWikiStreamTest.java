@@ -20,9 +20,13 @@
 package org.xwiki.wikistream.instance.internal;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +35,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.wikistream.WikiStreamException;
@@ -38,6 +44,7 @@ import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.instance.internal.output.DocumentOutputInstanceWikiStream;
+import org.xwiki.wikistream.instance.internal.output.DocumentOutputProperties;
 import org.xwiki.wikistream.instance.internal.output.InstanceOutputProperties;
 import org.xwiki.wikistream.internal.input.DefaultURLInputSource;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
@@ -50,7 +57,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
@@ -108,35 +117,6 @@ public class DocumentOutputInstanceWikiStreamTest
                 return document;
             }
         });
-        Mockito
-            .when(
-                this.oldcore.getMockStore().loadXWikiDoc(Mockito.any(XWikiDocument.class),
-                    Mockito.any(XWikiContext.class))).then(new Answer<XWikiDocument>()
-            {
-                @Override
-                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument providedDocument = (XWikiDocument) invocation.getArguments()[0];
-                    Map<String, XWikiDocument> documentLanguages =
-                        documents.get(providedDocument.getDocumentReference());
-
-                    if (documentLanguages == null) {
-                        documentLanguages = new HashMap<String, XWikiDocument>();
-                        documents.put(providedDocument.getDocumentReference(), documentLanguages);
-                    }
-
-                    XWikiDocument document = documentLanguages.get(providedDocument.getLanguage());
-
-                    if (document == null) {
-                        document = new XWikiDocument(providedDocument.getDocumentReference());
-                        document.setLanguage(providedDocument.getLanguage());
-                        document.setDefaultLanguage(providedDocument.getDefaultLanguage());
-                        document.setTranslation(providedDocument.getTranslation());
-                    }
-
-                    return document;
-                }
-            });
         Mockito
             .doAnswer(new Answer()
             {
@@ -222,12 +202,16 @@ public class DocumentOutputInstanceWikiStreamTest
 
         Mockito.when(this.oldcore.getMockXWiki().hasAttachmentRecycleBin(Mockito.any(XWikiContext.class))).thenReturn(
             true);
+
+        this.oldcore.getXWikiContext().setDatabase("wiki");
     }
 
     private void importFromXML(String resource) throws WikiStreamException
     {
-        InstanceOutputProperties outputProperties = new InstanceOutputProperties();
+        DocumentOutputProperties outputProperties = new DocumentOutputProperties();
 
+        outputProperties.setPreserveVersion(true);
+        
         OutputWikiStream outputWikiStream = this.outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
 
         URL url = getClass().getResource("/" + resource + ".xml");
@@ -243,8 +227,91 @@ public class DocumentOutputInstanceWikiStreamTest
     // Tests
 
     @Test
-    public void testDocument() throws WikiStreamException
+    public void testDocumentFull() throws WikiStreamException, XWikiException
     {
         importFromXML("document1");
+
+        XWikiDocument document =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(document.isNew());
+
+        Assert.assertEquals(Locale.ENGLISH, document.getDefaultLocale());
+        Assert.assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
+        Assert.assertEquals("customclass", document.getCustomClass());
+        Assert.assertEquals("title", document.getTitle());
+        Assert.assertEquals("defaultTemplate", document.getDefaultTemplate());
+        Assert.assertEquals("validationScript", document.getValidationScript());
+        Assert.assertEquals(new Syntax(new SyntaxType("syntax", "syntax"), "1.0"), document.getSyntax());
+        Assert.assertEquals(true, document.isHidden());
+        Assert.assertEquals("content", document.getContent());
+
+        /*Assert.assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
+        Assert.assertEquals(Locale.ROOT, document.getCreationDate());
+        Assert.assertEquals(Locale.ROOT, document.getAuthorReference());
+        Assert.assertEquals(Locale.ROOT, document.getDate());
+        Assert.assertEquals(Locale.ROOT, document.getContentUpdateDate());
+        Assert.assertEquals(new DocumentReference("wiki", "space", "contentAuthor"), document.getContentAuthorReference());
+        Assert.assertEquals(Locale.ROOT, document.isMinorEdit());
+        Assert.assertEquals(Locale.ROOT, document.getComment());*/
+
+        // Attachment
+
+        Assert.assertEquals(1, document.getAttachmentList().size());
+        XWikiAttachment attachment = document.getAttachment("attachment.txt");
+        Assert.assertEquals("attachment.txt", attachment.getFilename());
+        Assert.assertEquals(10, attachment.getFilesize());
+        Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            attachment.getContent(this.oldcore.getXWikiContext())));
+
+        /*Assert.assertEquals(Locale.ROOT, attachment.getAuthor());
+        Assert.assertEquals(Locale.ROOT, attachment.getDate());
+        Assert.assertEquals(Locale.ROOT, attachment.getVersion());
+        Assert.assertEquals(Locale.ROOT, attachment.getComment());*/
+
+        // XClass
+
+        BaseClass xclass = document.getXClass();
+        Assert.assertEquals(1, xclass.getFieldList().size());
+        Assert.assertEquals("customClass", xclass.getCustomClass());
+        Assert.assertEquals("customMapping", xclass.getCustomMapping());
+        Assert.assertEquals("defaultViewSheet", xclass.getDefaultViewSheet());
+        Assert.assertEquals("defaultEditSheet", xclass.getDefaultEditSheet());
+        Assert.assertEquals("defaultWeb", xclass.getDefaultWeb());
+        Assert.assertEquals("nameField", xclass.getNameField());
+        Assert.assertEquals("validationScript", xclass.getValidationScript());
+
+        NumberClass numberFiled = (NumberClass) xclass.getField("prop1");
+        Assert.assertEquals("prop1", numberFiled.getName());
+        Assert.assertEquals(false, numberFiled.isDisabled());
+        Assert.assertEquals(1, numberFiled.getNumber());
+        Assert.assertEquals("long", numberFiled.getNumberType());
+        Assert.assertEquals("Prop1", numberFiled.getPrettyName());
+        Assert.assertEquals(30, numberFiled.getSize());
+        Assert.assertEquals(false, numberFiled.isUnmodifiable());
+
+        // Objects
+        
+        Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
+        Assert.assertEquals(2, objects.size());
+        
+        // Object 1
+
+        List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "space", "page"));
+        Assert.assertEquals(1, documentObjects.size());
+        BaseObject documentObject = documentObjects.get(0);
+        Assert.assertEquals(0, documentObject.getNumber());
+        Assert.assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
+        Assert.assertEquals("e2167721-2a64-430c-9520-bac1c0ee68cb", documentObject.getGuid());
+
+        // Object 2
+
+        List<BaseObject> otherObjects = objects.get(new DocumentReference("wiki", "space", "otherclass"));
+        Assert.assertEquals(1, otherObjects.size());
+        BaseObject otherObject = otherObjects.get(0);
+        Assert.assertEquals(0, otherObject.getNumber());
+        Assert.assertEquals(new DocumentReference("wiki", "space", "otherclass"), otherObject.getXClassReference());
+        Assert.assertEquals("8eaeac52-e2f2-47b2-87e1-bc6909597b39", otherObject.getGuid());
     }
 }

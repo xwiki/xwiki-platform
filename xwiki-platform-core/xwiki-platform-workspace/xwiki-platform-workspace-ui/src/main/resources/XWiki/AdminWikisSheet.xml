@@ -201,7 +201,7 @@
       &lt;legend&gt;$services.localization.render("admin.wikis.template")&lt;/legend&gt;
       #set ($isInstallComplete = ($services.workspace.getWorkspaceTemplates().size() &gt; 0))
       #if (!$isInstallComplete)
-        &lt;p&gt;$services.localization.render('admin.wikis.templatemissing', [$xwiki.getURL('WorkspaceManager.Install')])&lt;/p&gt;
+        &lt;p&gt;$services.localization.render('admin.wikis.templatemissing', ["&lt;a href='$xwiki.getURL('WorkspaceManager.Install')'&gt;", '&lt;/a&gt;'])&lt;/p&gt;
       #else
         &lt;p&gt;$services.localization.render('workspacemanager.template.install.success')&lt;/p&gt;
       #end

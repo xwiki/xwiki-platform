@@ -16,5 +16,5 @@ org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner
 org.xwiki.officeimporter.internal.server.DefaultOfficeServerConfiguration
 org.xwiki.officeimporter.internal.server.DefaultOfficeServer
 org.xwiki.officeimporter.internal.server.OfficeServerLifecycleListener
-org.xwiki.officeimporter.internal.server.script.OfficeServerScriptService
-org.xwiki.officeimporter.internal.script.OfficeImporterScriptService
+org.xwiki.officeimporter.script.OfficeImporterScriptService
+org.xwiki.officeimporter.server.script.OfficeServerScriptService

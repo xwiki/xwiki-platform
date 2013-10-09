@@ -1,4 +1,4 @@
-org.xwiki.extension.script.internal.ExtensionManagerScriptService
+org.xwiki.extension.script.ExtensionManagerScriptService
 org.xwiki.extension.script.internal.XWikiExtensionValidator
 org.xwiki.extension.script.internal.safe.ExtensionPlanScriptSafeProvider
 org.xwiki.extension.script.internal.safe.ExtensionRepositoryScriptSafeProvider

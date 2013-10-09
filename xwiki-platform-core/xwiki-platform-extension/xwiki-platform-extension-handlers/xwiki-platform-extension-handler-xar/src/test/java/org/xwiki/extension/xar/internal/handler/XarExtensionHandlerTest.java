@@ -150,35 +150,6 @@ public class XarExtensionHandlerTest
             }
         });
         Mockito
-            .when(
-                this.oldcore.getMockStore().loadXWikiDoc(Mockito.any(XWikiDocument.class),
-                    Mockito.any(XWikiContext.class))).then(new Answer<XWikiDocument>()
-            {
-                @Override
-                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument providedDocument = (XWikiDocument) invocation.getArguments()[0];
-                    Map<String, XWikiDocument> documentLanguages =
-                        documents.get(providedDocument.getDocumentReference());
-
-                    if (documentLanguages == null) {
-                        documentLanguages = new HashMap<String, XWikiDocument>();
-                        documents.put(providedDocument.getDocumentReference(), documentLanguages);
-                    }
-
-                    XWikiDocument document = documentLanguages.get(providedDocument.getLanguage());
-
-                    if (document == null) {
-                        document = new XWikiDocument(providedDocument.getDocumentReference());
-                        document.setLanguage(providedDocument.getLanguage());
-                        document.setDefaultLanguage(providedDocument.getDefaultLanguage());
-                        document.setTranslation(providedDocument.getTranslation());
-                    }
-
-                    return document;
-                }
-            });
-        Mockito
             .doAnswer(new Answer()
             {
                 @Override

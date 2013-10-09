@@ -35,8 +35,8 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputProperties> extends
-    AbstractBeanOutputWikiStreamFactory<P>
+public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputProperties, F> extends
+    AbstractBeanOutputWikiStreamFactory<P, F>
 {
     public AbstractXMLBeanOutputWikiStreamFactory(WikiStreamType type)
     {
@@ -47,7 +47,7 @@ public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputP
     public OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
     {
         try {
-            return new DefaultXMLOutputWikiStream<P>(this, properties);
+            return new DefaultXMLOutputWikiStream<P, F>(this, properties);
         } catch (Exception e) {
             throw new WikiStreamException("Failed to create output wiki stream", e);
         }

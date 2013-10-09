@@ -23,11 +23,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.Converter;
 import org.xwiki.properties.internal.converter.ColorConverter;
@@ -48,17 +45,10 @@ public class EntityReferenceConverterTest
 
     private ConverterManager converterManager;
 
-    private EntityReferenceResolver<String> mockStringResolver;
-
-    private EntityReferenceSerializer<String> mockSerialier;
-
     @Before
     public void setUp() throws Exception
     {
         this.converterManager = mocker.getInstance(ConverterManager.class);
-
-        this.mockStringResolver = this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "relative");
-        this.mockSerialier = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
     }
 
     @Test
@@ -69,17 +59,14 @@ public class EntityReferenceConverterTest
         reference =
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)));
-        Mockito.when(this.mockStringResolver.resolve("wiki:space.page", EntityType.DOCUMENT)).thenReturn(reference);
         Assert
             .assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:wiki:space.page"));
 
         reference = new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
-        Mockito.when(this.mockStringResolver.resolve("space.page", EntityType.DOCUMENT)).thenReturn(reference);
         Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:space.page"));
         Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "space.page"));
 
         reference = new EntityReference("page", EntityType.DOCUMENT);
-        Mockito.when(this.mockStringResolver.resolve("page", EntityType.DOCUMENT)).thenReturn(reference);
         Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:page"));
         Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "page"));
     }
@@ -90,11 +77,9 @@ public class EntityReferenceConverterTest
         EntityReference reference;
 
         reference = new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI));
-        Mockito.when(this.mockStringResolver.resolve("wiki:space", EntityType.SPACE)).thenReturn(reference);
         Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:wiki:space"));
 
         reference = new EntityReference("space", EntityType.SPACE);
-        Mockito.when(this.mockStringResolver.resolve("space", EntityType.SPACE)).thenReturn(reference);
         Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:space"));
     }
 
@@ -112,7 +97,6 @@ public class EntityReferenceConverterTest
         reference =
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)));
-        Mockito.when(this.mockSerialier.serialize(reference)).thenReturn("wiki:space.page");
         Assert.assertEquals("document:wiki:space.page", this.converterManager.convert(String.class, reference));
     }
 }

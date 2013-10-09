@@ -37,19 +37,83 @@ public class EntityReferenceSetTest
     {
         EntityReferenceSet set = new EntityReferenceSet();
 
-        set.includes(new EntityReference("name", EntityType.WIKI));
+        set.includes(new EntityReference("wiki", EntityType.WIKI));
 
-        Assert.assertTrue(set.matches(new EntityReference("name", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertFalse(set.matches(new EntityReference("notwiki", EntityType.WIKI)));
 
-        Assert.assertFalse(set.matches(new EntityReference("notname", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+        Assert.assertFalse(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("notwiki",
+            EntityType.WIKI))));
 
-        set.includes(new EntityReference("othername", EntityType.WIKI));
+        set.includes(new EntityReference("otherwiki", EntityType.WIKI));
 
-        Assert.assertTrue(set.matches(new EntityReference("name", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("wiki", EntityType.WIKI)));
 
-        Assert.assertTrue(set.matches(new EntityReference("othername", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("otherwiki", EntityType.WIKI)));
 
-        Assert.assertFalse(set.matches(new EntityReference("notname", EntityType.WIKI)));
+        Assert.assertFalse(set.matches(new EntityReference("notwiki", EntityType.WIKI)));
+    }
+
+    @Test
+    public void testIncludeSpace()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.includes(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)));
+
+        Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+
+        Assert.assertFalse(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("notwiki",
+            EntityType.WIKI))));
+        Assert.assertFalse(set.matches(new EntityReference("notspace", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+
+        set.includes(new EntityReference("otherspace", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)));
+
+        Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+
+        Assert.assertTrue(set.matches(new EntityReference("otherspace", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+
+        Assert.assertFalse(set.matches(new EntityReference("notspace", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+    }
+
+    @Test
+    public void testIncludePartial()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.includes(new EntityReference("space", EntityType.SPACE));
+
+        Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+
+        Assert.assertFalse(set.matches(new EntityReference("notspace", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+    }
+
+    @Test
+    public void testIncludeDocument()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.includes(new EntityReference("document", EntityType.DOCUMENT, new EntityReference("space",
+            EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))));
+
+        Assert.assertTrue(set.matches(new EntityReference("document", EntityType.DOCUMENT, new EntityReference("space",
+            EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
+
+        Assert.assertFalse(set.matches(new EntityReference("document", EntityType.DOCUMENT, new EntityReference(
+            "space", EntityType.SPACE, new EntityReference("notwiki", EntityType.WIKI)))));
+        Assert.assertFalse(set.matches(new EntityReference("document", EntityType.DOCUMENT, new EntityReference(
+            "notspace", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
+        Assert.assertFalse(set.matches(new EntityReference("notdocument", EntityType.DOCUMENT, new EntityReference(
+            "space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
     }
 
     @Test
@@ -57,20 +121,20 @@ public class EntityReferenceSetTest
     {
         EntityReferenceSet set = new EntityReferenceSet();
 
-        set.excludes(new EntityReference("name", EntityType.WIKI));
+        set.excludes(new EntityReference("wiki", EntityType.WIKI));
 
-        Assert.assertFalse(set.matches(new EntityReference("name", EntityType.WIKI)));
+        Assert.assertFalse(set.matches(new EntityReference("wiki", EntityType.WIKI)));
 
-        Assert.assertTrue(set.matches(new EntityReference("othername", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("otherwiki", EntityType.WIKI)));
 
-        Assert.assertTrue(set.matches(new EntityReference("notname", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("notwiki", EntityType.WIKI)));
 
-        set.excludes(new EntityReference("othername", EntityType.WIKI));
+        set.excludes(new EntityReference("otherwiki", EntityType.WIKI));
 
-        Assert.assertFalse(set.matches(new EntityReference("name", EntityType.WIKI)));
+        Assert.assertFalse(set.matches(new EntityReference("wiki", EntityType.WIKI)));
 
-        Assert.assertFalse(set.matches(new EntityReference("othername", EntityType.WIKI)));
+        Assert.assertFalse(set.matches(new EntityReference("otherwiki", EntityType.WIKI)));
 
-        Assert.assertTrue(set.matches(new EntityReference("notname", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("notwiki", EntityType.WIKI)));
     }
 }

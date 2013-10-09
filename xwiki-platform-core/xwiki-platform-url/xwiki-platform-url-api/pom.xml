@@ -34,37 +34,15 @@
   <packaging>jar</packaging>
   <description>Allows configuration of the URL scheme used by XWiki to parse/serialize URLs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.37</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>URL API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-resource</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            org/xwiki/url/AbstractXWikiURL.java,
-            org/xwiki/url/XWikiEntityURL.java,
-            org/xwiki/url/XWikiURL.java,
-            org/xwiki/url/XWikiURLType.java
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

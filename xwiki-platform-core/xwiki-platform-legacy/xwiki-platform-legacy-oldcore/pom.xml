@@ -41,6 +41,12 @@
     </xwiki.extension.features>
   </properties>
   <dependencies>
+    <!-- Legacy oldcore needs some legacy classes from legacy URL -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-url</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- We need this dependency so that the wrapped module is built before this one -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

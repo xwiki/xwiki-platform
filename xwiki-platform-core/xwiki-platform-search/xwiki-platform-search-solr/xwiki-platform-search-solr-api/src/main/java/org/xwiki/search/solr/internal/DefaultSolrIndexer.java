@@ -187,6 +187,13 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                     queueEntry = resolveQueue.take();
                 } catch (InterruptedException e) {
                     logger.warn("The SOLR resolve thread has been interrupted", e);
+                    queueEntry = RESOLVE_QUEUE_ENTRY_STOP;
+                }
+
+                if (queueEntry == RESOLVE_QUEUE_ENTRY_STOP) {
+                    // Stop the index thread: clear the queue and send the stop signal without blocking.
+                    indexQueue.clear();
+                    indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
                     break;
                 }
 
@@ -200,14 +207,14 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
                         }
 
                         for (EntityReference reference : references) {
-                            indexQueue.offer(new IndexQueueEntry(reference, queueEntry.operation));
+                            indexQueue.put(new IndexQueueEntry(reference, queueEntry.operation));
                         }
                     } else {
                         if (queueEntry.recurse) {
-                            indexQueue.offer(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
-                                IndexOperation.DELETE));
+                            indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                                queueEntry.operation));
                         } else if (queueEntry.reference != null) {
-                            indexQueue.offer(new IndexQueueEntry(queueEntry.reference, IndexOperation.DELETE));
+                            indexQueue.put(new IndexQueueEntry(queueEntry.reference, queueEntry.operation));
                         }
                     }
                 } catch (Throwable e) {
@@ -221,9 +228,16 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     /**
-     * Stop index thread.
+     * Stop resolver thread.
      */
-    private static final IndexQueueEntry QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null, IndexOperation.STOP);
+    private static final ResolveQueueEntry RESOLVE_QUEUE_ENTRY_STOP = new ResolveQueueEntry(null, false,
+        IndexOperation.STOP);
+
+    /**
+     * Stop indexer thread.
+     */
+    private static final IndexQueueEntry INDEX_QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null,
+        IndexOperation.STOP);
 
     /**
      * Logging framework.
@@ -289,6 +303,10 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     @Override
     public void initialize() throws InitializationException
     {
+        // Initialize the queues before starting the threads.
+        this.resolveQueue = new LinkedBlockingQueue<ResolveQueueEntry>();
+        this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
+
         // Launch the resolve thread
         this.resolveThread = new Thread(new Resolver());
         this.resolveThread.setName("XWiki Solr resolve thread");
@@ -302,10 +320,6 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         this.indexThread.setDaemon(true);
         this.indexThread.start();
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
-
-        // Initialize the queue
-        this.resolveQueue = new LinkedBlockingQueue<ResolveQueueEntry>();
-        this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
 
         // Setup indexer job thread
         BasicThreadFactory factory =
@@ -323,10 +337,17 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
         // Shutdown indexer jobs queue
         this.indexerJobs.shutdownNow();
 
-        // Empty the queue
-        this.indexQueue.clear();
+        // Stop the resolve thread. Clear the queue and send the stop signal without blocking. We know that the resolve
+        // queue will remain empty after the clear call because we set the disposed flag above.
+        this.resolveQueue.clear();
+        this.resolveQueue.offer(RESOLVE_QUEUE_ENTRY_STOP);
 
-        this.indexQueue.add(QUEUE_ENTRY_STOP);
+        // Stop the index thread. Clear the queue and send the stop signal without blocking. There should be enough
+        // space in the index queue before the special stop entry is added as long the the index queue capacity is
+        // greater than 1. In the worse case, the clear call will unblock the resolve thread (which was waiting because
+        // the index queue was full) and just one entry will be added to the queue before the special stop entry.
+        this.indexQueue.clear();
+        this.indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
     }
 
     @Override
@@ -342,10 +363,10 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
             } catch (InterruptedException e) {
                 this.logger.warn("The SOLR index thread has been interrupted", e);
 
-                queueEntry = QUEUE_ENTRY_STOP;
+                queueEntry = INDEX_QUEUE_ENTRY_STOP;
             }
 
-            if (queueEntry == QUEUE_ENTRY_STOP) {
+            if (queueEntry == INDEX_QUEUE_ENTRY_STOP) {
                 break;
             }
 
@@ -506,6 +527,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     private void addToQueue(EntityReference reference, boolean recurse, IndexOperation operation)
     {
         if (!this.disposed) {
+            // Don't block because the capacity of the resolver queue is not limited.
             this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
         }
     }

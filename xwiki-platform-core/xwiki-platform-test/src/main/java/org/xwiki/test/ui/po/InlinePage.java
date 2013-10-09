@@ -87,7 +87,7 @@ public class InlinePage extends ViewPage
     /**
      * @return the form element
      */
-    protected WebElement getForm()
+    public WebElement getForm()
     {
         return form;
     }

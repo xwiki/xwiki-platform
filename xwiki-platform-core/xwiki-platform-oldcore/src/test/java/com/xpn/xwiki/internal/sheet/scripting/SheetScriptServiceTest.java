@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.internal.sheet.scripting;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
@@ -34,15 +35,18 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.sheet.SheetManager;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.script.sheet.SheetScriptService;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Unit tests for {@link SheetScriptService}.
+ * Unit tests for {@link com.xpn.xwiki.script.sheet.SheetScriptService}.
  * 
  * @version $Id$
  */
@@ -62,6 +66,12 @@ public class SheetScriptServiceTest
      */
     private SheetScriptService sheetScriptService;
 
+    private SheetBinder mockClassSheetBinder;
+
+    private SheetBinder mockDocumentSheetBinder;
+
+    private DocumentAccessBridge mockDocumentAccessBridge;
+
     /**
      * Test setup.
      * 
@@ -72,7 +82,20 @@ public class SheetScriptServiceTest
     {
         // Required in order to create a new instance of XWikiDocument.
         Utils.setComponentManager(mocker);
-        sheetScriptService = (SheetScriptService) mocker.getComponentUnderTest();
+        this.sheetScriptService = (SheetScriptService) mocker.getComponentUnderTest();
+    }
+
+    @AfterComponent
+    public void afterComponent() throws Exception
+    {
+        // Because of @AllComponents all component are injected (for XWikiDocument) while in this case we would like
+        // SheetScriptService to be isolated
+
+        this.mockClassSheetBinder = this.mocker.registerMockComponent(SheetBinder.class, "class");
+        this.mockDocumentSheetBinder = this.mocker.registerMockComponent(SheetBinder.class, "document");
+        this.mockDocumentAccessBridge = this.mocker.registerMockComponent(DocumentAccessBridge.class);
+
+        this.mocker.registerMockComponent(SheetManager.class);
     }
 
     /**
@@ -90,9 +113,8 @@ public class SheetScriptServiceTest
 
         final DocumentReference sheetReference =
             new DocumentReference("MySheet", classReference.getLastSpaceReference());
-        final SheetBinder mockClassSheetBinder = mocker.getInstance(SheetBinder.class, "class");
 
-        when(mockClassSheetBinder.bind(argThat(new ArgumentMatcher<DocumentModelBridge>()
+        when(this.mockClassSheetBinder.bind(argThat(new ArgumentMatcher<DocumentModelBridge>()
         {
             @Override
             public boolean matches(Object argument)
@@ -101,7 +123,7 @@ public class SheetScriptServiceTest
             }
         }), same(sheetReference))).thenReturn(true);
 
-        Assert.assertTrue(sheetScriptService.bindClassSheet(classDocumentApi, sheetReference));
+        Assert.assertTrue(this.sheetScriptService.bindClassSheet(classDocumentApi, sheetReference));
     }
 
     /**
@@ -116,19 +138,16 @@ public class SheetScriptServiceTest
         DocumentReference publicClassReference = new DocumentReference("wiki", "Space", "PublicClass");
         DocumentReference privateClassReference = new DocumentReference("wiki", "Space", "PrivateClass");
 
-        SheetBinder documentSheetBinder = mocker.getInstance(SheetBinder.class, "document");
-        when(documentSheetBinder.getDocuments(sheetReference)).thenReturn(
+        when(this.mockDocumentSheetBinder.getDocuments(sheetReference)).thenReturn(
             Arrays.asList(publicDocumentReference, privateDocumentReference));
 
-        SheetBinder classSheetBinder = mocker.getInstance(SheetBinder.class, "class");
-        when(classSheetBinder.getDocuments(sheetReference)).thenReturn(
+        when(this.mockClassSheetBinder.getDocuments(sheetReference)).thenReturn(
             Arrays.asList(privateClassReference, publicClassReference));
 
-        DocumentAccessBridge documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-        when(documentAccessBridge.isDocumentViewable(publicClassReference)).thenReturn(true);
-        when(documentAccessBridge.isDocumentViewable(publicDocumentReference)).thenReturn(true);
+        when(this.mockDocumentAccessBridge.isDocumentViewable(publicClassReference)).thenReturn(true);
+        when(this.mockDocumentAccessBridge.isDocumentViewable(publicDocumentReference)).thenReturn(true);
 
         Assert.assertEquals(Arrays.asList(publicDocumentReference, publicClassReference),
-            sheetScriptService.getDocuments(sheetReference));
+            this.sheetScriptService.getDocuments(sheetReference));
     }
 }

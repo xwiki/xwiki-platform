@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
 import org.junit.Assert;
-
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
@@ -948,13 +948,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("<b>bold</b>", this.document.getRenderedContent(getContext()));
 
-        this.translatedDocument = new XWikiDocument();
+        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference());
+        this.translatedDocument.setLocale(Locale.FRENCH);
         this.translatedDocument.setContent("~italic~");
         this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
         this.translatedDocument.setNew(false);
 
-        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("fr"));
-        this.mockXWikiStoreInterface.stubs().method("loadXWikiDoc").will(returnValue(this.translatedDocument));
+        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue(Locale.FRENCH.toString()));
+        this.mockXWiki.stubs().method("getDocument").with(eq(new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())), ANYTHING).will(returnValue(this.translatedDocument));
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("~italic~"), ANYTHING, ANYTHING)
             .will(returnValue("<i>italic</i>"));
 
@@ -968,13 +969,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(getContext()));
 
-        this.translatedDocument = new XWikiDocument();
+        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference());
+        this.translatedDocument.setLocale(Locale.FRENCH);
         this.translatedDocument.setContent("//italic//");
         this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
         this.translatedDocument.setNew(false);
 
-        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("fr"));
-        this.mockXWikiStoreInterface.stubs().method("loadXWikiDoc").will(returnValue(this.translatedDocument));
+        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue(Locale.FRENCH.toString()));
+        this.mockXWiki.stubs().method("getDocument").with(eq(new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())), ANYTHING).will(returnValue(this.translatedDocument));
 
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
     }

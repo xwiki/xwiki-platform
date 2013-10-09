@@ -140,8 +140,9 @@ public class XWikiWikiModel implements WikiModel
     @Override
     public String getLinkURL(ResourceReference linkReference)
     {
+        // Note that we don't ask for a full URL because links should be relative as much as possible
         return this.documentAccessBridge.getAttachmentURL(resolveAttachmentReference(linkReference),
-            linkReference.getParameter(AttachmentResourceReference.QUERY_STRING), true);
+            linkReference.getParameter(AttachmentResourceReference.QUERY_STRING), false);
     }
 
     /**

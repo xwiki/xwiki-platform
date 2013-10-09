@@ -34,7 +34,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.script.internal.ExtensionManagerScriptService;
+import org.xwiki.extension.script.ExtensionManagerScriptService;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;

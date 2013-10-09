@@ -270,8 +270,6 @@ public class ExportAction extends XWikiAction
                         entities.includes(resolver.resolve(pageName));
                     }
                 }
-
-                return null;
             }
 
             inputProperties.setEntities(entities);

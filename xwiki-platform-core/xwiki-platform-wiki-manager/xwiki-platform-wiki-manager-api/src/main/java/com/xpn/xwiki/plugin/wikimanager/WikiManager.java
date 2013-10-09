@@ -543,11 +543,6 @@ public final class WikiManager
 
             wikiSuperDocToSave = wikiClass.newXObjectDocument(docToSave, 0, context);
 
-            // clear entry in virtual wiki cache
-            if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {
-                xwiki.getVirtualWikiCache().remove(userWikiSuperDoc.getServer());
-            }
-
             wikiSuperDocToSave.mergeObject(userWikiSuperDoc);
         } else {
             wikiSuperDocToSave = userWikiSuperDoc;

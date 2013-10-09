@@ -46,8 +46,6 @@ public class SolrInstanceProviderTest
     public final MockitoComponentMockingRule<SolrInstanceProvider> mocker =
         new MockitoComponentMockingRule<SolrInstanceProvider>(SolrInstanceProvider.class);
 
-    private ComponentManager mockCM;
-
     private SolrInstance embedded;
 
     private SolrInstance remote;
@@ -60,16 +58,10 @@ public class SolrInstanceProviderTest
         URL url = this.getClass().getClassLoader().getResource("solrhome");
         System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
 
-        this.embedded = mock(SolrInstance.class);
-        this.remote = mock(SolrInstance.class);
+        this.embedded = this.mocker.registerMockComponent(SolrInstance.class, "embedded");
+        this.remote = this.mocker.registerMockComponent(SolrInstance.class, "remote");
 
         this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
-
-        this.mockCM = this.mocker.getInstance(ComponentManager.class);
-        when(this.mockCM.getInstance(SolrInstance.class, "embedded")).thenReturn(this.embedded);
-        when(this.mockCM.getInstance(SolrInstance.class, "remote")).thenReturn(this.remote);
-        when(this.mockCM.getInstance(SolrInstance.class, "none")).thenThrow(
-            new ComponentLookupException("No such component"));
     }
 
     @Test

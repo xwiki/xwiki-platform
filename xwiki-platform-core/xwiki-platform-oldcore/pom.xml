@@ -440,11 +440,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-container</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-display-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -548,7 +543,17 @@
       <artifactId>xwiki-platform-security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-descriptor-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -617,12 +622,6 @@
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
-    <!--dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-default</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency-->
   </dependencies>
   <build>
     <plugins>

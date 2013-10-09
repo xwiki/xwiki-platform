@@ -404,13 +404,16 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The resulting xobject of the blog post.
  *###
-#macro(getEntryObject $entryDoc $entryObj)
+#macro(getEntryObject $entryDoc $__entryObj)
   #set($result = $entryDoc.getObject("${blogPostClassname}"))
   #if(!$result)
     #set($result = $entryDoc.getObject("${oldArticleClassname}"))
   #end
-  #set ($entryObj = $NULL)
-  #setVariable ("$entryObj" $result)
+  ## NOTE: The reason we put an underscore in front of the variable name is to prevent the following line from
+  ## overwriting the $entryObj variable that may be defined before this macro is called. Of course, $__entryObj may be
+  ## overwritten in this case but it's less likely to have such a variable defined before.
+  #set ($__entryObj = $NULL)
+  #setVariable ("$__entryObj" $result)
 #end
 ##
 ##

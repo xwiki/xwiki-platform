@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URL;
 
 import org.junit.Test;
+import org.xwiki.resource.ResourceCreationException;
 import org.xwiki.url.internal.ExtendedURL;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -76,7 +77,7 @@ public class ExtendedURLTest
         try {
             new ExtendedURL(url, "/xwiki");
             fail("Should have thrown an exception here");
-        } catch (URLCreationException e) {
+        } catch (ResourceCreationException e) {
             assertEquals("URL Path [/some/path] doesn't start with [/xwiki]", e.getMessage());
         }
     }
@@ -96,7 +97,7 @@ public class ExtendedURLTest
             // Invalid URL since the space in the page name isn't encoded.
             new ExtendedURL(new URL("http://host/xwiki/bin/view/space/page name"));
             fail("Should have thrown an exception here");
-        } catch (URLCreationException expected) {
+        } catch (ResourceCreationException expected) {
             assertEquals("Invalid URL [http://host/xwiki/bin/view/space/page name]", expected.getMessage());
         }
     }

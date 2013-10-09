@@ -55,16 +55,16 @@
     ##
     #set ($existingMemberObject = $workspaceGroupDocumentRestricted.getXObject($groupsClassReference, 'member', $currentUser))
     #if ("$!existingMemberObject" == '')
-      {{error}}$services.localization.render('platform.workspace.userNotMemberOfWorkspace', [$currentUser, $workspaceName, $workspaceUrl]){{/error}}
+      {{error}}$services.localization.render('platform.workspace.userNotMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/error}}
     #elseif ($workspace.wikiDescriptor.owner == $currentUser)
-      {{error}}$services.localization.render('platform.workspace.leaveErrorUserIsOwner', [$currentUser, $workspaceName, $workspaceUrl]){{/error}}
+      {{error}}$services.localization.render('platform.workspace.leaveErrorUserIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/error}}
     #else
       #if ("$!confirm" != 1)
         #set ($browseDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
         #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}
-          $services.localization.render('platform.workspace.leaveConfirmation', [$workspaceName, $workspaceUrl])
+          $services.localization.render('platform.workspace.leaveConfirmation', ['[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
           ((({{html}}
             &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.leaveYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.leaveNo')&lt;/a&gt;&lt;/span&gt;
           {{/html}})))
@@ -72,7 +72,7 @@
       #else
         #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($existingMemberObject))
         #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $services.localization.render('platform.workspace.leaveSaveComment', [$currentUser]), true, $xcontext.context))
-        {{success}}$services.localization.render('platform.workspace.leaveSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
+        {{success}}$services.localization.render('platform.workspace.leaveSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/success}}
       #end
     #end
   #end

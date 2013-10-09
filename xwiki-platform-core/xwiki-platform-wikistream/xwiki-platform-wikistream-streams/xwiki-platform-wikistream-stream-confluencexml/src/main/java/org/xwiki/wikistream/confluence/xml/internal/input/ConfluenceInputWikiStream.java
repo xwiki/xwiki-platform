@@ -20,7 +20,6 @@
 package org.xwiki.wikistream.confluence.xml.internal.input;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.inject.Named;
 
@@ -29,8 +28,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceFilter;
-import org.xwiki.wikistream.input.InputSource;
-import org.xwiki.wikistream.input.InputStreamInputSource;
+import org.xwiki.wikistream.confluence.xml.internal.ConfluenceXMLPackage;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 
 /**
@@ -42,6 +40,8 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<ConfluenceInputProperties, ConfluenceFilter>
 {
+    private ConfluenceXMLPackage confluencePackage;
+
     @Override
     public void close() throws IOException
     {
@@ -51,20 +51,12 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
     @Override
     protected void read(Object filter, ConfluenceFilter proxyFilter) throws WikiStreamException
     {
-        InputSource inputSource = this.properties.getSource();
-
-        if (inputSource instanceof InputStreamInputSource) {
-            InputStream stream;
-            try {
-                stream = ((InputStreamInputSource) inputSource).getInputStream();
-            } catch (IOException e) {
-                throw new WikiStreamException("Failed to get input stream", e);
-            }
-
-            // TODO: Read
-        } else {
-            throw new WikiStreamException(
-                String.format("Unsupported input source of type [%s]", inputSource.getClass()));
+        try {
+            this.confluencePackage = new ConfluenceXMLPackage(this.properties.getSource());
+        } catch (Exception e) {
+            throw new WikiStreamException("Failed to read package", e);
         }
+
+        
     }
 }

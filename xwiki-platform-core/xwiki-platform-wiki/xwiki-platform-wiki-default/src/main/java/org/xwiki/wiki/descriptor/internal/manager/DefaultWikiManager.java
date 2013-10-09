@@ -37,7 +37,7 @@ import org.xwiki.wiki.WikiDescriptor;
 import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
 import org.xwiki.wiki.descriptor.internal.builder.WikiDescriptorBuilder;
 import org.xwiki.wiki.descriptor.internal.builder.WikiDescriptorBuilderException;
-import org.xwiki.wiki.descriptor.internal.document.WikiDescriptorDocumentHelper;
+import org.xwiki.wiki.descriptor.internal.document.DefaultWikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -63,7 +63,7 @@ public class DefaultWikiManager implements WikiManager
     private WikiDescriptorCache cache;
 
     @Inject
-    private WikiDescriptorDocumentHelper descriptorDocumentHelper;
+    private DefaultWikiDescriptorDocumentHelper descriptorDocumentHelper;
 
     @Inject
     private ContextualLocalizationManager localizationManager;

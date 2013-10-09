@@ -14,7 +14,7 @@ com.xpn.xwiki.internal.event.AttachmentEventGeneratorListener
 com.xpn.xwiki.internal.event.CommentEventGeneratorListener
 com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
-com.xpn.xwiki.internal.display.scripting.DisplayScriptService
+com.xpn.xwiki.script.display.DisplayScriptService
 com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer

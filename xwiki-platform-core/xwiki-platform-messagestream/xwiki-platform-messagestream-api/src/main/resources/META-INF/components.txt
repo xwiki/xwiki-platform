@@ -1,2 +1,2 @@
 org.xwiki.messagestream.internal.DefaultMessageStream
-org.xwiki.messagestream.internal.MessageStreamScriptService
+org.xwiki.messagestream.script.MessageStreamScriptService

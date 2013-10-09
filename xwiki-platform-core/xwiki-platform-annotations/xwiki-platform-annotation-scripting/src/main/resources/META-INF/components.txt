@@ -1,1 +1,1 @@
-org.xwiki.annotation.internal.AnnotationScriptService
+org.xwiki.annotation.script.AnnotationScriptService

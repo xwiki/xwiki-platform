@@ -27,7 +27,7 @@ import java.util.Map;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.internal.script.OfficeImporterScriptService;
+import org.xwiki.officeimporter.script.OfficeImporterScriptService;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.script.service.ScriptService;
 

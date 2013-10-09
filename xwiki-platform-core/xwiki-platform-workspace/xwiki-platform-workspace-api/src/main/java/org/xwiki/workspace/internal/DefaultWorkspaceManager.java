@@ -38,7 +38,6 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.workspace.Workspace;
 import org.xwiki.workspace.WorkspaceException;
 import org.xwiki.workspace.WorkspaceManager;
@@ -54,7 +53,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.wikimanager.WikiManager;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
-import com.xpn.xwiki.plugin.wikimanager.internal.WikiManagerScriptService;
+import com.xpn.xwiki.plugin.wikimanager.script.WikiManagerScriptService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.uiextension;
+package org.xwiki.uiextension.script;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,9 +33,11 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.UIExtensionFilter;
+import org.xwiki.uiextension.UIExtensionManager;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.uiextension.internal.filter.SortByIdFilter;
-import org.xwiki.uiextension.internal.scripting.UIExtensionScriptService;
 import static org.mockito.Mockito.*;
 
 import org.junit.Assert;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.internal;
+package org.xwiki.query.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +28,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -49,7 +50,7 @@ public class QueryManagerScriptService implements ScriptService
     private QueryManager secureQueryManager;
 
     /**
-     * Used to create {@link ScriptQuery}.
+     * Used to create {@link org.xwiki.query.internal.ScriptQuery}.
      */
     @Inject
     private ComponentManager componentManager;

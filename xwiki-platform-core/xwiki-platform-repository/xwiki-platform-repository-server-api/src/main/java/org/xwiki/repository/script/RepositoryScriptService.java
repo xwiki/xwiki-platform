@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.repository.internal;
+package org.xwiki.repository.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +30,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.script.service.ScriptService;
 
 @Component

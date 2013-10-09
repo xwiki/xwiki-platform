@@ -42,10 +42,11 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.script.sheet.SheetScriptService;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Unit tests for {@link SheetScriptService}.
+ * Unit tests for {@link com.xpn.xwiki.script.sheet.SheetScriptService}.
  * 
  * @version $Id$
  */

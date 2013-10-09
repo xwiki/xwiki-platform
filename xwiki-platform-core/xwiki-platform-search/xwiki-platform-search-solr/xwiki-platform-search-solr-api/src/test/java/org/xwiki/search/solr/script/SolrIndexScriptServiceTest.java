@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal.script;
+package org.xwiki.search.solr.script;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -41,6 +41,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.script.SolrIndexScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -50,7 +51,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Tests for the {@link SolrIndexScriptService}.
+ * Tests for the {@link org.xwiki.search.solr.script.SolrIndexScriptService}.
  * 
  * @version $Id$
  */

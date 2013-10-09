@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.scripting;
+package org.xwiki.rendering.script;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,7 +28,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link RenderingScriptService}.
+ * Unit tests for {@link org.xwiki.rendering.script.RenderingScriptService}.
  *
  * @version $Id$
  * @since 3.2M3
@@ -42,7 +42,7 @@ public class RenderingScriptServiceTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.rss = (RenderingScriptService) getComponentManager().getInstance(ScriptService.class, "rendering");
+        this.rss = getComponentManager().getInstance(ScriptService.class, "rendering");
     }
 
     @Test

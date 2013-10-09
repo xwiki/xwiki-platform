@@ -35,12 +35,18 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.manager.WikiManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.wikimanager.WikiManager;
-import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
-import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 
+/**
+ * Script service to manager wikis.
+ *
+ * @version $Id$
+ * @since 5.3M1
+ */
 @Component
 @Named("wiki")
 @Singleton
@@ -72,9 +78,16 @@ public class WikiManagerScriptService implements ScriptService
     @Inject
     private Logger logger;
 
-    public Wiki createWiki(String wikiId, String wikiAlias)
+    /**
+     * Create a new wiki.
+     *
+     * @param wikiId unique identifier of the new wiki
+     * @param wikiAlias default alias of the new wiki
+     * @return the wiki descriptor of the new wiki, or null if problems occur
+     */
+    public WikiDescriptor createWiki(String wikiId, String wikiAlias)
     {
-        Wiki descriptor = null;
+        WikiDescriptor descriptor = null;
 
         XWikiContext context = xcontextProvider.get();
 
@@ -85,7 +98,6 @@ public class WikiManagerScriptService implements ScriptService
 
             // Create the wiki
             descriptor = wikiManager.create(wikiId, wikiAlias);
-
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
         } catch (AccessDeniedException e) {
@@ -95,6 +107,12 @@ public class WikiManagerScriptService implements ScriptService
         return descriptor;
     }
 
+    /**
+     * Delete the specified wiki.
+     *
+     * @param wikiId unique identifier of the wiki to delete
+     * @return true if the wiki has been successfully deleted
+     */
     public boolean deleteWiki(String wikiId)
     {
         XWikiContext context = xcontextProvider.get();
@@ -107,7 +125,6 @@ public class WikiManagerScriptService implements ScriptService
 
             // Delete the wiki
             wikiManager.delete(wikiId);
-
         } catch (WikiManagerException e) {
             return false;
         } catch (AccessDeniedException e) {
@@ -117,57 +134,113 @@ public class WikiManagerScriptService implements ScriptService
         return true;
     }
 
-    public Wiki getByAlias(String wikiAlias)
+    /**
+     * Get a wiki descriptor from one of its alias.
+     *
+     * @param wikiAlias alias to search
+     * @return the wiki descriptor corresponding to the alias, or null if no descriptors match the alias
+     */
+    public WikiDescriptor getByAlias(String wikiAlias)
     {
-        Wiki descriptor = null;
+        WikiDescriptor descriptor = null;
 
         try {
             descriptor = wikiManager.getByAlias(wikiAlias);
         } catch (WikiManagerException e) {
+            error(e.getMessage(), e);
         }
 
         return descriptor;
     }
 
-    public Wiki getById(String wikiId)
+    /**
+     * Get a wiki descriptor from its unique identifier.
+     *
+     * @param wikiId unique identifier of the wiki to search
+     * @return the wiki descriptor corresponding to the Id, or null if no descriptors match the id
+     */
+    public WikiDescriptor getById(String wikiId)
     {
-        Wiki descriptor = null;
+        WikiDescriptor descriptor = null;
 
         try {
             descriptor = wikiManager.getById(wikiId);
         } catch (WikiManagerException e) {
+            error(e.getMessage(), e);
         }
 
         return descriptor;
     }
 
-    public Collection<Wiki> getAll()
+    /**
+     * Get all the wiki descriptors.
+     *
+     * @return the list of all wiki descriptors
+     */
+    public Collection<WikiDescriptor> getAll()
     {
-        Collection<Wiki> wikis;
+        Collection<WikiDescriptor> wikis;
         try {
             wikis = wikiManager.getAll();
         } catch (WikiManagerException e) {
-            wikis = new ArrayList<Wiki>();
+            error(e.getMessage(), e);
+            wikis = new ArrayList<WikiDescriptor>();
         }
         return wikis;
     }
 
+    /**
+     * Test if a wiki exists.
+     *
+     * @param wikiId unique identifier to test
+     * @return true if a wiki with this Id exists on the system.
+     */
     public boolean exists(String wikiId)
     {
         try {
             return wikiManager.exists(wikiId);
         } catch (WikiManagerException e) {
+            error(e.getMessage(), e);
             return false;
         }
     }
 
+    /**
+     * Check if the wikiId is valid and available (the name is not already taken for technical reasons).
+     *
+     * @param wikiId the Id to test
+     * @return true if the Id is valid and available
+     */
     public boolean idAvailable(String wikiId)
     {
         try {
             return wikiManager.idAvailable(wikiId);
         } catch (WikiManagerException e) {
+            error(e.getMessage(), e);
             return false;
         }
+    }
+
+    /**
+     * @return the descriptor of the main wiki or null if problems occur
+     */
+    public WikiDescriptor getMainWikiDescriptor()
+    {
+        WikiDescriptor descriptor = null;
+        try {
+            descriptor = wikiManager.getMainWikiDescriptor();
+        } catch (WikiManagerException e) {
+            error(e.getMessage(), e);
+        }
+        return descriptor;
+    }
+
+    /**
+     * @return the Id of the main wiki
+     */
+    public String getMainWikiId()
+    {
+        return wikiManager.getMainWikiId();
     }
 
     /**

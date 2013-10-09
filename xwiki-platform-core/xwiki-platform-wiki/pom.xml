@@ -37,5 +37,6 @@
     <module>xwiki-platform-wiki-descriptor</module>
     <module>xwiki-platform-wiki-api</module>
     <module>xwiki-platform-wiki-default</module>
+    <module>xwiki-platform-wiki-script</module>
   </modules>
 </project>

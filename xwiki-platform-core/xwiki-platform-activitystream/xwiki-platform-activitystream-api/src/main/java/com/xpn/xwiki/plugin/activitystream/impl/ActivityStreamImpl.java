@@ -39,8 +39,11 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.event.HiddenEvent;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -837,9 +840,24 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         return LISTENER_NAME;
     }
 
+    private static BeginEvent IGNORED_EVENTS = new BeginEvent()
+    {
+        @Override
+        public boolean matches(Object otherEvent)
+        {
+            return otherEvent instanceof HiddenEvent;
+        }
+    };
+
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        // Do not record some ignored events
+        ObservationContext observationContext = Utils.getComponent(ObservationContext.class);
+        if (event instanceof HiddenEvent || observationContext.isIn(IGNORED_EVENTS)) {
+            return;
+        }
+
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;

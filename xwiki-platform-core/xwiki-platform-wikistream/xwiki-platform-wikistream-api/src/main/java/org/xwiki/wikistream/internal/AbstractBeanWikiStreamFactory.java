@@ -28,7 +28,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.BeanManager;
-import org.xwiki.wikistream.WikiStream;
+import org.xwiki.wikistream.WikiStreamFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.descriptor.DefaultWikiStreamBeanDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
@@ -38,7 +38,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStream implements WikiStream, Initializable
+public abstract class AbstractBeanWikiStreamFactory<P> extends AbstractWikiStream implements WikiStreamFactory, Initializable
 {
     /**
      * The {@link BeanManager} component.

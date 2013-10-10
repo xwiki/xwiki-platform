@@ -27,13 +27,12 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
- * 
  * @param <P>
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputProperties> extends
-    AbstractBeanInputWikiStreamFactory<P>
+public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputProperties, F> extends
+    AbstractBeanInputWikiStreamFactory<P, F>
 {
     public AbstractXMLBeanInputWikiStreamFactory(WikiStreamType type)
     {
@@ -43,7 +42,7 @@ public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputPr
     @Override
     public InputWikiStream createInputWikiStream(P properties) throws WikiStreamException
     {
-        return new DefaultXMLInputWikiStream<P>(this, properties);
+        return new DefaultXMLInputWikiStream<P, F>(this, properties);
     }
 
     protected abstract Result createParser(Object filter, P parameters);

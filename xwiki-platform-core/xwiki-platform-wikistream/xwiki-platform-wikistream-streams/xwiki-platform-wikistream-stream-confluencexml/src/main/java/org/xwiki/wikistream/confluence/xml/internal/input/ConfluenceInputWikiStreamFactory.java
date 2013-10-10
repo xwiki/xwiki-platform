@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.confluence.xml.internal.ConfluenceFilter;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -36,7 +37,8 @@ import org.xwiki.wikistream.type.WikiStreamType;
 @Component
 @Named(ConfluenceInputWikiStreamFactory.ROLEHINT)
 @Singleton
-public class ConfluenceInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<ConfluenceInputProperties>
+public class ConfluenceInputWikiStreamFactory extends
+    AbstractBeanInputWikiStreamFactory<ConfluenceInputProperties, ConfluenceFilter>
 {
     public static final String ROLEHINT = "confluence+xml";
 

@@ -57,6 +57,10 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
             throw new WikiStreamException("Failed to read package", e);
         }
 
-        
+        /*try {
+            this.confluencePackage.close();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close package", e);
+        }*/
     }
 }

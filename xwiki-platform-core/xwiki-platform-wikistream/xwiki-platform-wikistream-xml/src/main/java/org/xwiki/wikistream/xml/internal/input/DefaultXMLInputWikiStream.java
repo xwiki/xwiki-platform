@@ -22,16 +22,15 @@ package org.xwiki.wikistream.xml.internal.input;
 import javax.xml.transform.Result;
 
 /**
- * 
  * @param <P>
  * @version $Id$
  * @since 5.2M2
  */
-public class DefaultXMLInputWikiStream<P extends XMLInputProperties> extends AbstractXMLInputWikiStream<P>
+public class DefaultXMLInputWikiStream<P extends XMLInputProperties, F> extends AbstractXMLInputWikiStream<P>
 {
-    private final AbstractXMLBeanInputWikiStreamFactory<P> factory;
+    private final AbstractXMLBeanInputWikiStreamFactory<P, F> factory;
 
-    public DefaultXMLInputWikiStream(AbstractXMLBeanInputWikiStreamFactory<P> factory, P parameters)
+    public DefaultXMLInputWikiStream(AbstractXMLBeanInputWikiStreamFactory<P, F> factory, P parameters)
     {
         super(parameters);
 

@@ -19,21 +19,21 @@
  */
 package org.xwiki.wikistream;
 
+import java.util.Collection;
+
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
 
 /**
- * <p>
  * WikiStream class should be inherited by all the stream based classes to implement the type and descriptor which
  * describes a wiki stream with list of bean class parameters.
- * </p>
  * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3M1
  */
 @Unstable
-public interface WikiStream
+public interface WikiStreamFactory
 {
     /**
      * @return The {@link WikiStreamType}, which identifies a wiki stream input and output components using a role hint.
@@ -44,4 +44,10 @@ public interface WikiStream
      * @return The WikiStreamDescriptor describes a WikiStream and has the list of bean class parameters or properties.
      */
     WikiStreamDescriptor getDescriptor();
+
+    /**
+     * @return the filters supported by this stream factory
+     * @throws WikiStreamException when failing to get filters interfaces
+     */
+    Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException;
 }

@@ -19,13 +19,12 @@
  */
 package org.xwiki.wikistream.output;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.WikiStreamFactory;
 
 /**
  * @version $Id$
@@ -33,14 +32,7 @@ import org.xwiki.wikistream.WikiStreamException;
  */
 @Role
 @Unstable
-public interface OutputWikiStreamFactory extends WikiStream
+public interface OutputWikiStreamFactory extends WikiStreamFactory
 {
     OutputWikiStream creaOutputWikiStream(Map<String, Object> properties) throws WikiStreamException;
-
-    /**
-     * @return the filters supported by this stream factory
-     * @throws WikiStreamException when failing to get filters interfacesO
-     * @since 5.2
-     */
-    Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException;
 }

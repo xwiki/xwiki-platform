@@ -119,7 +119,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## Space filtering
 ## ---------------
 #set($spaces = $xwiki.spaces)
-#set($selectedSpace = "$!request.space")
+#set($selectedSpace = $escapetool.html($!request.space))
 ## ---------------
 ## Space macros
 ## ---------------

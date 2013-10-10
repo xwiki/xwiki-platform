@@ -43,7 +43,7 @@ import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.HiddenEvent;
+import org.xwiki.observation.event.TransientEvent;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -845,7 +845,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         @Override
         public boolean matches(Object otherEvent)
         {
-            return otherEvent instanceof HiddenEvent;
+            return otherEvent instanceof TransientEvent;
         }
     };
 
@@ -854,7 +854,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         // Do not record some ignored events
         ObservationContext observationContext = Utils.getComponent(ObservationContext.class);
-        if (event instanceof HiddenEvent || observationContext.isIn(IGNORED_EVENTS)) {
+        if (event instanceof TransientEvent || observationContext.isIn(IGNORED_EVENTS)) {
             return;
         }
 

@@ -28,6 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -347,6 +348,12 @@ public abstract class XWikiAction extends Action
                     }
                     vcontext.put("exp", e);
                     if (LOGGER.isWarnEnabled()) {
+                        // Don't log "Broken Pipe" exceptions since they're not real errors and we don't want to pollute
+                        // the logs with unnecessary stack traces. It just means the client side has cancelled the
+                        // connection.
+                        if (ExceptionUtils.getRootCauseMessage(e).equals("IOException: Broken pipe")) {
+                            return null;
+                        }
                         LOGGER.warn("Uncaught exception: " + e.getMessage(), e);
                     }
                     // If the request is an AJAX request, we don't return a whole HTML page, but just the exception

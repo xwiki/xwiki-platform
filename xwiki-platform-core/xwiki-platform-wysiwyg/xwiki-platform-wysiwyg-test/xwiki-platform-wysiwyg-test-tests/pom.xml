@@ -152,7 +152,7 @@
               <dependency>
                 <groupId>com.cenqua.clover</groupId>
                 <artifactId>clover</artifactId>
-                <version>3.1.6</version>
+                <version>${clover.version}</version>
               </dependency>
             </dependencies>
           </plugin>

@@ -129,7 +129,9 @@ public class SolrIndexAvailableLocalesListener implements EventListener
         this.localesCache.put(wiki, new HashSet<Locale>(availableLocales));
 
         try {
-            if (event instanceof AbstractDocumentEvent) {
+            // oldLocales may be null in case the XWikiPreferences has been modified as part of a mandatory document
+            // initialization
+            if (oldLocales != null && event instanceof AbstractDocumentEvent) {
                 Collection<Locale> newLocales = CollectionUtils.subtract(availableLocales, oldLocales);
 
                 if (!newLocales.isEmpty()) {

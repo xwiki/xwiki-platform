@@ -73,6 +73,9 @@ public class ObjectAddAction extends XWikiAction
         BaseObject object = doc.newXObject(classReference, context);
 
         BaseClass baseclass = object.getXClass(context);
+        if(!baseclass.canAccess(context)) {
+            return false;
+        }
         // The request parameter names that correspond to object fields must NOT specify the object number because the
         // object number is not known before the object is added. The following is a good parameter name:
         // Space.Class_property. As a consequence we use only the class name to extract the object from the request.

@@ -14,14 +14,18 @@
  * NOTE: the $document.display*(something, ...) methods are very difficult to use correctly, because they sometimes generate (unescaped) HTML
  *#
 #macro(displayObject $obj $class $props $firstField)
+  #set($canAccess = $class.canAccess())
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   #getFieldSummary($obj $firstField $firstFieldSummary)
+  #if(!$canAccess)
+    <em>$services.localization.render('core.editors.object.restrictedAccess')</em>
+  #end
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
     <h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstField): $firstFieldSummary#end
-        <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
-        #if (!$hasCustomObject)
-          <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
-        #end
+      <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete #if(!$canAccess) hidden #end" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
+      #if (!$hasCustomObject)
+        <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit #if(!$canAccess) hidden #end" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
+      #end
     </h3>
   </div>
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
@@ -36,7 +40,7 @@
     #end
     #foreach ($prop in $properties)
       <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}">${escapetool.xml($prop.translatedPrettyName)}</label></dt>
-      <dd#if ($prop.isDisabled()) class="disabled"#end>$doc.display($prop.name, "edit", $obj)</dd>
+      <dd#if ($prop.isDisabled()) class="disabled"#end>#if ($canAccess) $doc.display($prop.name, "edit", $obj)#else $doc.display($prop.name, "view", $obj) #end</dd>
     #end
     </dl>
     #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
@@ -106,6 +110,7 @@
  *#
 #macro(displayClass $class)
   #set ($props = $class.getProperties())
+  #set($canAccess = $class.canAccess())
   #getTitleField($props)
   <div id="xclass_${escapetool.xml($class.name)}" class="xclass">
     #if ($hasCustomObject)
@@ -126,7 +131,9 @@
       #foreach ($object in $objects)
         #displayObject($object $class $props $titleField)
       #end
-      #displayAddObject($class)
+      #if ($canAccess)
+        #displayAddObject($class)
+      #end
       </div></div>
     #end
   </div>
@@ -156,8 +163,9 @@
     ## The list is already sorted alphabetically
 #set($prevSpace = '')
 #foreach ($classname in $xwiki.classList)
-  #if ($!xwiki.hasAccessLevel('view', $classname))
+  #if ($!xwiki.hasAccessLevel('view', $classname) && $!xwiki.getClass($classname).canAccess())
     #set ($classdoc = $xwiki.getDocument($classname))
+    #set ($class = $classdoc.getClass())
     #if ($classdoc.space != $prevSpace)
       #if ($prevSpace != '')
         </optgroup>

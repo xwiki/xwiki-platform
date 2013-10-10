@@ -12,6 +12,8 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   'values' : "(separated by '|'; Example: <tt>value1=Text displayed for value 1|value2=Text displayed for value 2|value3|value4</tt>)",
   'size' : 'of the corresponding form element in edit mode'
 })
+## Different restriction levels possible
+#set($restrictionLevels = ['admin', 'programming'])
 ##
 ##
 ##
@@ -107,6 +109,23 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   </div>
 #end
 ##
+##
+#**
+ * Inline form for setting the class restriction
+ *#
+#macro(displayRestrictionForm)
+  ## Current restriction level on the class
+  #set($restriction = $class.getRestriction())
+  $services.localization.render('core.editors.class.restrictClass.label')
+  <select name="restriction">
+    <option value="" #if(!$restrictionLevels.contains($restriction))selected=selected #end>---</option>
+    #foreach($level in $restrictionLevels)
+      <option value="$level" #if($level==$restriction)selected=selected #end>$level</option>
+    #end
+  </select> <br>
+  <em>$services.localization.render('core.editors.class.restrictClass.explanation')</em>
+#end
+##
 ##---------------------------------
 ## Done with macro definitions, now the actual content
 ##
@@ -151,6 +170,12 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
     </div></div>
   </div>
 </div> ## properties
+## Allow users with PR to restrict the use of this class to users with some specific rights.
+#if($xwiki.getUser().hasProgrammingRights())
+  <div id="xclass_restriction">
+    #displayRestrictionForm()  
+  </div>
+#end
 <div class="bottombuttons">#template("editactions.vm")</div>
 </div> ## xwikieditcontent
 </form>

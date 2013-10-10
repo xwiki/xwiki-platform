@@ -1,1 +1,2 @@
 com.xpn.xwiki.plugin.activitystream.eventstreambridge.BridgeEventStream
+com.xpn.xwiki.plugin.activitystream.impl.DefaultIgnoredEvents

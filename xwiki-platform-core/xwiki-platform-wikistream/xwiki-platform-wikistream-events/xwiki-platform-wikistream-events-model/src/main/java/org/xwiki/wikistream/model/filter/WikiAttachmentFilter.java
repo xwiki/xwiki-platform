@@ -44,17 +44,32 @@ public interface WikiAttachmentFilter
     /**
      * @type String
      */
+    String PARAMETER_CONTENT_TYPE = "content_type";
+
+    /**
+     * @type String
+     */
+    String PARAMETER_CREATION_AUTHOR = "creation_author";
+
+    /**
+     * @type Date
+     */
+    String PARAMETER_CREATION_DATE = "creation_date";
+
+    /**
+     * @type String
+     */
+    String PARAMETER_REVISION = "revision";
+
+    /**
+     * @type String
+     */
     String PARAMETER_REVISION_AUTHOR = "revision_author";
 
     /**
      * @type Date
      */
     String PARAMETER_REVISION_DATE = "revision_date";
-
-    /**
-     * @type String
-     */
-    String PARAMETER_REVISION = "revision_version";
 
     /**
      * @type String

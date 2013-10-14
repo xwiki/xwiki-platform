@@ -40,12 +40,12 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
-import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
@@ -79,6 +79,10 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
     @Inject
     @Named("current")
     private DocumentReferenceResolver<EntityReference> entityResolver;
+
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeResolver;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -166,6 +170,18 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
         return get(Syntax.class, key, parameters, def);
     }
 
+    private EntityReference getEntityReference(String key, FilterEventParameters parameters, EntityReference def)
+    {
+        Object reference = get(Object.class, key, parameters, def);
+
+        if (reference instanceof EntityReference) {
+            return (EntityReference) reference;
+        }
+
+        return reference != null ? this.relativeResolver.resolve(reference.toString(), EntityType.DOCUMENT, parameters)
+            : def;
+    }
+
     // Events
 
     @Override
@@ -236,7 +252,8 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
         this.currentDocument.setLocale(this.currentLocale);
         this.currentDocument.setVersion(version);
 
-        this.currentDocument.setParent(getString(WikiDocumentFilter.PARAMETER_PARENT, parameters, null));
+        this.currentDocument.setParentReference(getEntityReference(WikiDocumentFilter.PARAMETER_PARENT, parameters,
+            null));
         this.currentDocument.setCustomClass(getString(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, parameters, null));
         this.currentDocument.setTitle(getString(WikiDocumentFilter.PARAMETER_TITLE, parameters, null));
         this.currentDocument.setDefaultTemplate(getString(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, parameters,

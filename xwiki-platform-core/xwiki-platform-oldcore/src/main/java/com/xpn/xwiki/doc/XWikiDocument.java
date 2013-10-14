@@ -8207,11 +8207,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @return the relative parent reference, this method should stay private since this the relative saving of the
-     *         parent reference is an implementation detail and from the outside we should only see absolute references
+     * Return the reference of the parent document as it stored and passed to
+     * {@link #setParentReference(EntityReference)}.
+     * <p>
+     * You should use {@link #getParentReference()} reference if you want to complete parent reference.
+     * 
+     * @return the relative parent reference
      * @since 2.2.3
      */
-    protected EntityReference getRelativeParentReference()
+    public EntityReference getRelativeParentReference()
     {
         return this.parentReference;
     }

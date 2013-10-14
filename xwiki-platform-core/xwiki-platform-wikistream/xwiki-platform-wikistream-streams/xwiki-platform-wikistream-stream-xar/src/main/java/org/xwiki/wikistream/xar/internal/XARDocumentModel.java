@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
@@ -120,7 +121,7 @@ public class XARDocumentModel
             put(ELEMENT_CUSTOMCLASS, new Parameter(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS));
             put(ELEMENT_DEFAULTTEMPLATE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
             put(ELEMENT_HIDDEN, new Parameter(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, Boolean.class));
-            put(ELEMENT_PARENT, new Parameter(XWikiWikiDocumentFilter.PARAMETER_PARENT));
+            put(ELEMENT_PARENT, new Parameter(XWikiWikiDocumentFilter.PARAMETER_PARENT, EntityReference.class));
             put(ELEMENT_REVISION_AUTHOR, new Parameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
             put(ELEMENT_REVISION_COMMENT, new Parameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
             put(ELEMENT_REVISION_DATE, new Parameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE, Date.class));

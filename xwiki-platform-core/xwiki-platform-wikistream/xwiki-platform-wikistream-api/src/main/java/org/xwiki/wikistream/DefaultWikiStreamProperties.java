@@ -17,14 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal;
-
-import org.xwiki.wikistream.DefaultWikiStreamProperties;
+package org.xwiki.wikistream;
 
 /**
+ * Properties common to most streams.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3M1
  */
-public class XMLProperties extends DefaultWikiStreamProperties
+public class DefaultWikiStreamProperties implements WikiStreamProperties
 {
+    private boolean verbose;
+
+    @Override
+    public boolean isVerbose()
+    {
+        return this.verbose;
+    }
+
+    @Override
+    public void setVerbose(boolean verbose)
+    {
+        this.verbose = verbose;
+    }
 }

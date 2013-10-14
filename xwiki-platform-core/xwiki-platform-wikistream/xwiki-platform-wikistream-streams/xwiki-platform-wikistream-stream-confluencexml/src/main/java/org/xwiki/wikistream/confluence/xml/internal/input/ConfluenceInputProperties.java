@@ -19,18 +19,23 @@
  */
 package org.xwiki.wikistream.confluence.xml.internal.input;
 
+import java.util.Locale;
+
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.wikistream.DefaultWikiStreamProperties;
 import org.xwiki.wikistream.input.InputSource;
 
 /**
  * @version $Id$
  * @since 5.3M1
  */
-public class ConfluenceInputProperties
+public class ConfluenceInputProperties extends DefaultWikiStreamProperties
 {
     private InputSource source;
+
+    private Locale defaultLocale;
 
     @PropertyName("The source")
     @PropertyDescription("The source to load the wiki from")
@@ -43,5 +48,15 @@ public class ConfluenceInputProperties
     public void setSource(InputSource source)
     {
         this.source = source;
+    }
+
+    public Locale getDefaultLocale()
+    {
+        return defaultLocale;
+    }
+
+    public void setDefaultLocale(Locale defaultLocale)
+    {
+        this.defaultLocale = defaultLocale;
     }
 }

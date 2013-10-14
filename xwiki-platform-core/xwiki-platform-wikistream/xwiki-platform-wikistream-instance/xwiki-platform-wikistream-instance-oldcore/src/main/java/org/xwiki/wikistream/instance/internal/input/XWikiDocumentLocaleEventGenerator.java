@@ -103,7 +103,7 @@ public class XWikiDocumentLocaleEventGenerator extends
         FilterEventParameters revisionParameters = new FilterEventParameters();
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, document.getLocale());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_PARENT, document.getParent());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_PARENT, document.getRelativeParentReference());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE, document.getTitle());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, document.getCustomClass());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, document.getDefaultTemplate());

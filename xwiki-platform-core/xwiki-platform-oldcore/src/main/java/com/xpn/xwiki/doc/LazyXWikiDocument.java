@@ -240,7 +240,7 @@ public class LazyXWikiDocument extends XWikiDocument
     }
 
     @Override
-    protected EntityReference getRelativeParentReference()
+    public EntityReference getRelativeParentReference()
     {
         return getDocument().getRelativeParentReference();
     }

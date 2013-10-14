@@ -49,7 +49,7 @@ public interface WikiDocumentFilter
     String PARAMETER_SYNTAX = "syntax";
 
     /**
-     * @type String
+     * @type EntityReference
      */
     String PARAMETER_PARENT = "parent_reference";
 

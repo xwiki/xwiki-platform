@@ -23,8 +23,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -37,6 +45,9 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
@@ -44,6 +55,65 @@ import org.xwiki.xml.stax.StAXUtils;
 
 public class ConfluenceXMLPackage
 {
+    public static final String KEY_SPACE_NAME = "name";
+
+    public static final String KEY_SPACE_DESCRIPTION = "description";
+
+    public static final String KEY_PAGE_PARENT = "parent";
+
+    public static final String KEY_PAGE_SPACE = "space";
+
+    public static final String KEY_PAGE_TITLE = "title";
+
+    public static final String KEY_PAGE_CONTENTS = "bodyContents";
+
+    public static final String KEY_PAGE_CREATION_AUTHOR = "creatorName";
+
+    public static final String KEY_PAGE_CREATION_DATE = "creationDate";
+
+    public static final String KEY_PAGE_REVISION = "version";
+
+    public static final String KEY_PAGE_REVISION_AUTHOR = "lastModifierName";
+
+    public static final String KEY_PAGE_REVISION_DATE = "lastModificationDate";
+
+    public static final String KEY_PAGE_REVISION_COMMENT = "versionComment";
+
+    public static final String KEY_PAGE_REVISIONS = "historicalVersions";
+
+    public static final String KEY_PAGE_CONTENT_STATUS = "contentStatus";
+
+    public static final String KEY_PAGE_BODY = "body";
+
+    public static final String KEY_PAGE_BODY_TYPE = "bodyType";
+
+    public static final String KEY_ATTACHMENT_NAME = "fileName";
+
+    public static final String KEY_ATTACHMENT_CONTENT_TYPE = "contentType";
+
+    public static final String KEY_ATTACHMENT_CONTENT = "content";
+
+    public static final String KEY_ATTACHMENT_CREATION_AUTHOR = "creatorName";
+
+    public static final String KEY_ATTACHMENT_CREATION_DATE = "creationDate";
+
+    public static final String KEY_ATTACHMENT_REVISION_AUTHOR = "lastModifierName";
+
+    public static final String KEY_ATTACHMENT_REVISION_DATE = "lastModificationDate";
+
+    public static final String KEY_ATTACHMENT_CONTENT_SIZE = "fileSize";
+
+    public static final String KEY_ATTACHMENT_REVISION_COMMENT = "comment";
+
+    public static final String KEY_ATTACHMENT_REVISION = "attachmentVersion";
+
+    public static final String KEY_ATTACHMENT_DTO = "imageDetailsDTO";
+
+    /**
+     * 2012-03-07 17:16:48.158
+     */
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss.SSS");
+
     private File directory;
 
     private File entities;
@@ -51,6 +121,8 @@ public class ConfluenceXMLPackage
     private File descriptor;
 
     private File tree;
+
+    private Map<Integer, Set<Integer>> pages = new HashMap<Integer, Set<Integer>>();
 
     public ConfluenceXMLPackage(InputSource source) throws IOException, WikiStreamException, XMLStreamException,
         FactoryConfigurationError, NumberFormatException, ConfigurationException
@@ -96,6 +168,45 @@ public class ConfluenceXMLPackage
         createTree();
     }
 
+    public Date getDate(PropertiesConfiguration properties, String key) throws ParseException
+    {
+        String str = properties.getString(key);
+
+        return str != null ? DATE_FORMAT.parse(str) : null;
+    }
+
+    public EntityReference getReferenceFromId(PropertiesConfiguration currentProperties, String key)
+        throws ConfigurationException
+    {
+        int pageId = currentProperties.getInt(key);
+
+        PropertiesConfiguration pageProperties = getPageProperties(pageId);
+
+        int spaceId = pageProperties.getInt(KEY_PAGE_SPACE);
+        int currentSpaceId = currentProperties.getInt(KEY_PAGE_SPACE);
+
+        EntityReference spaceReference;
+        if (spaceId != currentSpaceId) {
+            spaceReference = new EntityReference(getSpaceName(currentSpaceId), EntityType.SPACE);
+        } else {
+            spaceReference = null;
+        }
+
+        return new EntityReference(pageProperties.getString(KEY_PAGE_TITLE), EntityType.DOCUMENT, spaceReference);
+    }
+
+    public String getSpaceName(int spaceId) throws ConfigurationException
+    {
+        PropertiesConfiguration spaceProperties = getSpaceProperties(spaceId);
+
+        return spaceProperties.getString(KEY_SPACE_NAME);
+    }
+
+    public Map<Integer, Set<Integer>> getPages()
+    {
+        return this.pages;
+    }
+
     private void createTree() throws XMLStreamException, FactoryConfigurationError, NumberFormatException, IOException,
         ConfigurationException, WikiStreamException
     {
@@ -132,8 +243,7 @@ public class ConfluenceXMLPackage
             } else if (type.equals("BodyContent")) {
                 readBodyContentObject(xmlReader);
             } else if (type.equals("SpaceDescription")) {
-                // TODO: any idea how to convert that ?
-                StAXUtils.skipElement(xmlReader);
+                readSpaceDescriptionObject(xmlReader);
             } else if (type.equals("SpacePermission")) {
                 readSpacePermissionObject(xmlReader);
             } else if (type.equals("Attachment")) {
@@ -150,44 +260,16 @@ public class ConfluenceXMLPackage
         }
     }
 
-    private void readAttachmentObject(XMLStreamReader xmlReader) throws XMLStreamException
+    private int readObjectProperties(XMLStreamReader xmlReader, PropertiesConfiguration properties)
+        throws XMLStreamException, WikiStreamException, ConfigurationException, IOException
     {
-        // TODO
-        StAXUtils.skipElement(xmlReader);
-    }
-
-    private void readSpaceObject(XMLStreamReader xmlReader) throws XMLStreamException
-    {
-        // TODO
-        StAXUtils.skipElement(xmlReader);
-    }
-
-    private void readSpacePermissionObject(XMLStreamReader xmlReader) throws XMLStreamException
-    {
-        // TODO
-        StAXUtils.skipElement(xmlReader);
-    }
-
-    private void readBodyContentObject(XMLStreamReader xmlReader) throws XMLStreamException
-    {
-        // TODO
-        StAXUtils.skipElement(xmlReader);
-    }
-
-    private void readPageObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
-        XMLStreamException, ConfigurationException, WikiStreamException
-    {
-        int spaceId = -1;
-
-        int pageId = -1;
-
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        int id = -1;
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
             if (elementName.equals("id")) {
-                pageId = Integer.valueOf(xmlReader.getElementText());
+                id = Integer.valueOf(xmlReader.getElementText());
             } else if (elementName.equals("property")) {
                 String propertyName = xmlReader.getAttributeValue(null, "name");
 
@@ -201,7 +283,97 @@ public class ConfluenceXMLPackage
             }
         }
 
-        savePageProperties(properties, spaceId, pageId);
+        return id;
+    }
+
+    private void readAttachmentObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
+        ConfigurationException, IOException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        int attachmentId = readObjectProperties(xmlReader, properties);
+
+        int pageId = properties.getInt("content");
+
+        // Save attachment
+        saveAttachmentProperties(properties, pageId, attachmentId);
+    }
+
+    private void readSpaceObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
+        ConfigurationException, IOException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        int spaceId = readObjectProperties(xmlReader, properties);
+
+        // Save page
+        saveSpaceProperties(properties, spaceId);
+
+        // Register space
+        Set<Integer> spacePages = this.pages.get(spaceId);
+        if (spacePages == null) {
+            spacePages = new HashSet<Integer>();
+            this.pages.put(spaceId, spacePages);
+        }
+    }
+
+    private void readSpaceDescriptionObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
+        ConfigurationException, IOException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        int descriptionId = readObjectProperties(xmlReader, properties);
+
+        // Save page
+        savePageProperties(properties, descriptionId);
+    }
+
+    private void readSpacePermissionObject(XMLStreamReader xmlReader) throws XMLStreamException,
+        ConfigurationException, IOException, WikiStreamException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        int permissionId = readObjectProperties(xmlReader, properties);
+
+        int spaceId = properties.getInt("space");
+
+        // Save attachment
+        saveSpacePermissionsProperties(properties, spaceId, permissionId);
+    }
+
+    private void readBodyContentObject(XMLStreamReader xmlReader) throws XMLStreamException, ConfigurationException,
+        WikiStreamException, IOException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        readObjectProperties(xmlReader, properties);
+
+        int pageId = properties.getInt("content");
+
+        savePageProperties(properties, pageId);
+    }
+
+    private void readPageObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
+        XMLStreamException, ConfigurationException, WikiStreamException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        int pageId = readObjectProperties(xmlReader, properties);
+
+        // Save page
+        savePageProperties(properties, pageId);
+
+        // Register only current pages (they will take care of handling there history)
+        Integer originalVersion = (Integer) properties.getProperty("originalVersion");
+        if (originalVersion == null) {
+            Integer spaceId = (Integer) properties.getInteger("space", null);
+            Set<Integer> spacePages = this.pages.get(spaceId);
+            if (spacePages == null) {
+                spacePages = new HashSet<Integer>();
+                this.pages.put(spaceId, spacePages);
+            }
+            spacePages.add(pageId);
+        }
     }
 
     private Object readProperty(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
@@ -250,51 +422,153 @@ public class ConfluenceXMLPackage
         return list;
     }
 
-    private int getPropertyId(XMLStreamReader xmlReader) throws NumberFormatException, XMLStreamException
+    private File getSpacesFolder()
     {
-        for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-            String elementName = xmlReader.getLocalName();
-
-            if (elementName.equals("id")) {
-                return Integer.valueOf(xmlReader.getElementText());
-            } else {
-                StAXUtils.skipElement(xmlReader);
-            }
-        }
-
-        return -1;
+        return new File(this.tree, "spaces");
     }
 
     private File getSpaceFolder(int spaceId)
     {
-        return new File(this.tree, String.valueOf(spaceId));
+        return new File(getSpacesFolder(), String.valueOf(spaceId));
     }
 
-    private File getPageFolder(int spaceId, int pageId)
+    private File getPagesFolder()
     {
-        File spaceFolder = getSpaceFolder(spaceId);
-
-        return new File(spaceFolder, String.valueOf(pageId));
+        return new File(this.tree, "pages");
     }
 
-    private File getPagePropertiesFile(int spaceId, int pageId)
+    private File getPageFolder(int pageId)
     {
-        File folder = getPageFolder(spaceId, pageId);
+        return new File(getPagesFolder(), String.valueOf(pageId));
+    }
+
+    private File getPagePropertiesFile(int pageId)
+    {
+        File folder = getPageFolder(pageId);
 
         return new File(folder, "properties.properties");
     }
 
-    private PropertiesConfiguration getPageProperties(int spaceId, int pageId) throws ConfigurationException
+    public List<Integer> getAttachments(int pageId)
     {
-        File file = getPagePropertiesFile(spaceId, pageId);
+        File folder = getAttachmentsFolder(pageId);
+
+        String[] attachmentFolders = folder.list();
+
+        List<Integer> attachments = new ArrayList<Integer>(attachmentFolders.length);
+        for (String attachmentIdString : attachmentFolders) {
+            if (NumberUtils.isNumber(attachmentIdString)) {
+                attachments.add(Integer.valueOf(attachmentIdString));
+            }
+        }
+
+        return attachments;
+    }
+
+    private File getAttachmentsFolder(int pageId)
+    {
+        return new File(getPageFolder(pageId), "attachments");
+    }
+
+    private File getSpacePermissionsFolder(int spaceId)
+    {
+        return new File(getSpaceFolder(spaceId), "permissions");
+    }
+
+    private File getAttachmentFolder(int pageId, int attachmentId)
+    {
+        return new File(getAttachmentsFolder(pageId), String.valueOf(attachmentId));
+    }
+
+    private File getSpacePermissionFolder(int spaceId, int permissionId)
+    {
+        return new File(getSpacePermissionsFolder(spaceId), String.valueOf(permissionId));
+    }
+
+    private File getAttachmentPropertiesFile(int pageId, int attachmentId)
+    {
+        File folder = getAttachmentFolder(pageId, attachmentId);
+
+        return new File(folder, "properties.properties");
+    }
+
+    private File getSpacePermissionPropertiesFile(int spaceId, int permissionId)
+    {
+        File folder = getSpacePermissionFolder(spaceId, permissionId);
+
+        return new File(folder, "properties.properties");
+    }
+
+    private File getSpacePropertiesFile(int spaceId)
+    {
+        File folder = getSpaceFolder(spaceId);
+
+        return new File(folder, "properties.properties");
+    }
+
+    public PropertiesConfiguration getPageProperties(int pageId) throws ConfigurationException
+    {
+        File file = getPagePropertiesFile(pageId);
 
         return new PropertiesConfiguration(file);
     }
 
-    private void savePageProperties(PropertiesConfiguration properties, int spaceId, int pageId) throws IOException,
+    public PropertiesConfiguration getAttachmentProperties(int pageId, int attachmentId) throws ConfigurationException
+    {
+        File file = getAttachmentPropertiesFile(pageId, attachmentId);
+
+        return new PropertiesConfiguration(file);
+    }
+
+    public PropertiesConfiguration getSpacePermissionProperties(int spaceId, int permissionId)
+        throws ConfigurationException
+    {
+        File file = getSpacePermissionPropertiesFile(spaceId, permissionId);
+
+        return new PropertiesConfiguration(file);
+    }
+
+    public PropertiesConfiguration getSpaceProperties(int spaceId) throws ConfigurationException
+    {
+        File file = getSpacePropertiesFile(spaceId);
+
+        return new PropertiesConfiguration(file);
+    }
+
+    private void savePageProperties(PropertiesConfiguration properties, int pageId) throws IOException,
         ConfigurationException
     {
-        PropertiesConfiguration fileProperties = getPageProperties(spaceId, pageId);
+        PropertiesConfiguration fileProperties = getPageProperties(pageId);
+
+        fileProperties.copy(properties);
+
+        fileProperties.save();
+    }
+
+    private void saveAttachmentProperties(PropertiesConfiguration properties, int pageId, int attachmentId)
+        throws IOException, ConfigurationException
+    {
+        PropertiesConfiguration fileProperties = getAttachmentProperties(pageId, attachmentId);
+
+        fileProperties.copy(properties);
+
+        fileProperties.save();
+    }
+
+    private void saveSpacePermissionsProperties(PropertiesConfiguration properties, int spaceId, int permissionId)
+        throws IOException, ConfigurationException
+    {
+        PropertiesConfiguration fileProperties = getSpacePermissionProperties(spaceId, permissionId);
+
+        fileProperties.copy(properties);
+
+        fileProperties.save();
+    }
+
+    private void saveSpaceProperties(PropertiesConfiguration properties, int spaceId) throws IOException,
+        ConfigurationException
+    {
+        PropertiesConfiguration fileProperties = getSpaceProperties(spaceId);
 
         fileProperties.copy(properties);
 
@@ -311,9 +585,13 @@ public class ConfluenceXMLPackage
         return this.descriptor;
     }
 
-    public File getAttachment(Integer id0, Integer id1)
+    public File getAttachmentFile(int pageId, int attachmentId, int version)
     {
-        return null;
+        File attachmentsFolder = new File(this.directory, "attachments");
+        File attachmentsPageFolder = new File(attachmentsFolder, String.valueOf(pageId));
+        File attachmentFolder = new File(attachmentsPageFolder, String.valueOf(attachmentId));
+
+        return new File(attachmentFolder, String.valueOf(version));
     }
 
     public void close() throws IOException

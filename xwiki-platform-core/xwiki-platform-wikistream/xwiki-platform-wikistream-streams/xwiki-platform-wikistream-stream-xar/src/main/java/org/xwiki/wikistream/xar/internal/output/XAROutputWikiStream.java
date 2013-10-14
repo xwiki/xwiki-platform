@@ -34,6 +34,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -65,6 +66,9 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localSerializer;
+
+    @Inject
+    private EntityReferenceSerializer<String> defaultSerializer;
 
     private XARWikiWriter wikiWriter;
 
@@ -106,6 +110,11 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     public String toString(byte[] bytes)
     {
         return Base64.encodeBase64String(bytes);
+    }
+
+    public String toString(EntityReference reference)
+    {
+        return this.defaultSerializer.serialize(reference);
     }
 
     // events
@@ -220,7 +229,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.currentDocumentVersion = version;
 
         this.writer.writeElement(XARDocumentModel.ELEMENT_PARENT,
-            (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT));
+            toString((EntityReference) parameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT)));
         this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_AUTHOR,
             (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
         this.writer.writeElement(XARDocumentModel.ELEMENT_CUSTOMCLASS,

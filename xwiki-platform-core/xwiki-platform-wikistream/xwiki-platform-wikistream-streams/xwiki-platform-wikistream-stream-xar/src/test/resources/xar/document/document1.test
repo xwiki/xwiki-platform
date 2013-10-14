@@ -33,7 +33,10 @@
           <parameters>
             <entry>
               <string>parent_reference</string>
-              <string>parent</string>
+              <org.xwiki.model.reference.EntityReference>
+                <name>parent</name>
+                <type>DOCUMENT</type>
+              </org.xwiki.model.reference.EntityReference>
             </entry>
             <entry>
               <string>revision_author</string>

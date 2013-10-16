@@ -207,26 +207,6 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     public static final String FIELDPN_HOMEPAGE = "Home page";
 
     /**
-     * Name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
-     */
-    public static final String FIELD_ISWIKITEMPLATE = "iswikitemplate";
-
-    /**
-     * Pretty name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
-     */
-    public static final String FIELDPN_ISWIKITEMPLATE = "Template";
-
-    /**
-     * Display type of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
-     */
-    public static final String FIELDDT_ISWIKITEMPLATE = FIELDDT_SECURE;
-
-    /**
-     * Default value of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
-     */
-    public static final Boolean DEFAULT_ISWIKITEMPLATE = Boolean.FALSE;
-
-    /**
      * Used to bind a class to a document sheet.
      */
     @Inject
@@ -292,8 +272,6 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= baseClass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE);
         needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_SECURE, DEFAULT_SECURE);
         needsUpdate |= baseClass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
-        needsUpdate |= baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE);
-        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
 
         // Add missing document fields
         needsUpdate |= setClassDocumentFields(document, "XWiki Server Class");

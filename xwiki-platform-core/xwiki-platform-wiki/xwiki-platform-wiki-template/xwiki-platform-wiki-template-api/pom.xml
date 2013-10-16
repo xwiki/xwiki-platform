@@ -26,18 +26,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-wiki-template</artifactId>
     <version>5.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki</artifactId>
-  <name>XWiki Platform - Wiki - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Wiki - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-wiki-descriptor</module>
-    <module>xwiki-platform-wiki-api</module>
-    <module>xwiki-platform-wiki-default</module>
-    <module>xwiki-platform-wiki-script</module>
-    <module>xwiki-platform-wiki-template</module>
-  </modules>
+  <artifactId>xwiki-platform-wiki-template-api</artifactId>
+  <name>XWiki Platform - Wiki - Template - API</name>
+  <description>XWiki Platform - Wiki - Template - API</description>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -47,6 +47,7 @@ import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.internal.RepositoryUtils;
 import org.xwiki.extension.repository.internal.local.AbstractCachedExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -250,17 +251,32 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     @Override
     public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
-        Pattern patternMatcher = Pattern.compile(".*" + pattern + ".*");
+        Pattern patternMatcher = createPatternMatcher(pattern);
 
         List<Extension> result = new ArrayList<Extension>();
 
         for (XarInstalledExtension extension : this.extensions.values()) {
-            if (patternMatcher.matcher(extension.getId().getId()).matches()
-                || patternMatcher.matcher(extension.getDescription()).matches()
-                || patternMatcher.matcher(extension.getSummary()).matches()
-                || patternMatcher.matcher(extension.getName()).matches()
-                || patternMatcher.matcher(extension.getFeatures().toString()).matches()) {
+            if (patternMatcher == null || RepositoryUtils.matches(patternMatcher, extension)) {
                 result.add(extension);
+            }
+        }
+
+        return new CollectionIterableResult<Extension>(this.extensions.size(), offset, result);
+    }
+
+    @Override
+    public IterableResult<Extension> searchInstalledExtensions(String pattern, String namespace, int offset, int nb)
+        throws SearchException
+    {
+        Pattern patternMatcher = createPatternMatcher(pattern);
+
+        List<Extension> result = new ArrayList<Extension>();
+
+        for (XarInstalledExtension extension : this.extensions.values()) {
+            if (extension.isInstalled(namespace)) {
+                if (patternMatcher == null || RepositoryUtils.matches(patternMatcher, extension)) {
+                    result.add(extension);
+                }
             }
         }
 

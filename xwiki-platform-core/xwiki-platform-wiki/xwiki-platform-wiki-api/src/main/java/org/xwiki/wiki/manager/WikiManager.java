@@ -54,6 +54,20 @@ public interface WikiManager
     void delete(String wikiId) throws WikiManagerException;
 
     /**
+     * Copy a wiki.
+     *
+     * @param fromWikiId If of the wiki to copy
+     * @param newWikiId Id of the new wiki
+     * @param newWikiAlias Default alias of the new wiki
+     * @param copyHistory decide if you want to copy the pages' history
+     * @param copyRecycleBin decide if you want to copy the recycle bin content
+     * @return the descriptor of the created wiki
+     * @throws WikiManagerException if problems occur
+     */
+    WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
+            boolean copyRecycleBin) throws WikiManagerException;
+
+    /**
      * Get a wiki from one of its alias.
      *
      * @param wikiAlias Alias of the wiki to retrieve

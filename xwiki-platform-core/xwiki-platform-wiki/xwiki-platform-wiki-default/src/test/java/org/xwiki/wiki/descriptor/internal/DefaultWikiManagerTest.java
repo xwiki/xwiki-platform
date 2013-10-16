@@ -393,5 +393,55 @@ public class DefaultWikiManagerTest
         // Verify that an event has been sent
         verify(observationManager).notify(eq(new WikiDeletedEvent("wikiid")), eq(descriptor));
     }
+
+    @Test
+    public void copyWhenWikiAlreadyExists() throws Exception
+    {
+        // The wiki already exist
+        when(cache.getFromId("existingid")).thenReturn(new DefaultWikiDescriptor("exisitingid", "alias"));
+        boolean exceptionCaught = false;
+        try {
+            this.mocker.getComponentUnderTest().copy("wikiid", "existingid", "newwikialias", true, true);
+        } catch (WikiManagerException e) {
+            exceptionCaught = true;
+        }
+        assertTrue(exceptionCaught);
+    }
+
+    @Test
+    public void copyWhenWikiAvailable() throws Exception
+    {
+        // The wiki does not already exist
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "XWikiServerWikiid1");
+        XWikiDocument descriptorDocument = mock(XWikiDocument.class);
+        when(descriptorDocumentHelper.getDocumentFromWikiId("wikiid1")).thenReturn(descriptorDocument);
+        when(descriptorDocument.isNew()).thenReturn(true);
+
+        // The new id is valid
+        when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
+
+        // Other mocks
+        XWikiStoreInterface store = mock(XWikiStoreInterface.class);
+        when(xwiki.getStore()).thenReturn(store);
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
+        when(wikiDescriptorBuilder.buildDescriptorDocument(eq(descriptor))).thenReturn(descriptorDocument);
+        when(descriptorDocument.getDocumentReference()).thenReturn(documentReference);
+
+        // Create
+        WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().copy("wikiid", "wikiid1",
+                "wikialias1", true, true);
+        assertNotNull(newWikiDescriptor);
+
+        // Verify that the wiki descriptor is an instance of DefaultWikiDescriptor
+        assertTrue(newWikiDescriptor instanceof DefaultWikiDescriptor);
+        // Verify that the wiki has been copied
+        verify(xwiki).copyWiki(eq("wikiid"), eq("wikiid1"), any(String.class), any(XWikiContext.class));
+        // Verify that the descriptor document has been saved
+        verify(store).saveXWikiDoc(eq(descriptorDocument), any(XWikiContext.class));
+        // Verify that the descriptor has the good document reference
+        assertEquals(documentReference, ((DefaultWikiDescriptor) newWikiDescriptor).getDocumentReference());
+        // Verify that the descriptor has been added to the caches
+        verify(cache).add(eq((DefaultWikiDescriptor) newWikiDescriptor));
+    }
 }
 

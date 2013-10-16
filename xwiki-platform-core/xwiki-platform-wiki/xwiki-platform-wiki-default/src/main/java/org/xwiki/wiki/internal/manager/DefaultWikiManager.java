@@ -77,6 +77,32 @@ public class DefaultWikiManager implements WikiManager
     @Inject
     private WikiDescriptorBuilder wikiDescriptorBuilder;
 
+    private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
+    {
+        XWikiContext context = xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        // Create the descriptor
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias);
+
+        try {
+            // Build the document
+            XWikiDocument descriptorDocument = wikiDescriptorBuilder.buildDescriptorDocument(descriptor);
+            // Save the document
+            xwiki.getStore().saveXWikiDoc(descriptorDocument, context);
+            // Add the document to the descriptor
+            descriptor.setDocumentReference(descriptorDocument.getDocumentReference());
+            // Add the descriptor to the cache
+            cache.add(descriptor);
+        } catch (WikiDescriptorBuilderException e) {
+            throw new WikiManagerException("Failed to build the descriptor document.", e);
+        } catch (XWikiException e) {
+            throw new WikiManagerException("Failed to save the descriptor document.", e);
+        }
+
+        return descriptor;
+    }
+
     @Override
     public WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException
     {
@@ -104,25 +130,29 @@ public class DefaultWikiManager implements WikiManager
             throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databaseupdate"));
         }
 
-        // Create the descriptor
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias);
+        return createDescriptor(wikiId, wikiAlias);
+    }
 
-        try {
-            // Build the document
-            XWikiDocument descriptorDocument = wikiDescriptorBuilder.buildDescriptorDocument(descriptor);
-            // Save the document
-            xwiki.getStore().saveXWikiDoc(descriptorDocument, context);
-            // Add the document to the descriptor
-            descriptor.setDocumentReference(descriptorDocument.getDocumentReference());
-            // Add the descriptor to the cache
-            cache.add(descriptor);
-        } catch (WikiDescriptorBuilderException e) {
-            throw new WikiManagerException("Failed to build the descriptor document.", e);
-        } catch (XWikiException e) {
-            throw new WikiManagerException("Failed to save the descriptor document.", e);
+    @Override
+    public WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
+            boolean copyRecycleBin) throws WikiManagerException
+    {
+        // Verify that the newId is valid
+        if (!idAvailable(newWikiId)) {
+            throw new WikiManagerException(String.format("Id [%s] is not avalaible.", newWikiId));
         }
 
-        return descriptor;
+        XWikiContext context = xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        // Copy all the wiki
+        try {
+            xwiki.copyWiki(fromWikiId, newWikiId, null, context);
+        } catch (XWikiException e) {
+            throw new WikiManagerException("Failed to copy the wiki.", e);
+        }
+
+        return createDescriptor(newWikiId, newWikiAlias);
     }
 
     @Override
